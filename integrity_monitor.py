@@ -4,7 +4,6 @@ DSTerminal Integrity Monitor Module
 Comprehensive system integrity monitoring with real-time alerts
 All reports saved to DSTerminal workspace
 """
-# At the VERY TOP of integrity_monitor.py, add:
 # CRITICAL FIX: Import colorama FIRST
 from colorama import Fore, Style, init as colorama_init
 colorama_init(autoreset=True)

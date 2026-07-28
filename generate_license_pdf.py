@@ -5,6 +5,7 @@ Clean, professional legal document with no background colors
 """
 
 import os
+import sys
 from datetime import datetime
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
@@ -13,11 +14,16 @@ from reportlab.platypus import (
     PageBreak, Image
 )
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_JUSTIFY
+from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_JUSTIFY, TA_RIGHT
 from reportlab.pdfgen import canvas
 from PIL import Image as PILImage
 
+# Version constant
+VERSION = "3.1.113"
+
 class DSTERMINALEULAGenerator:
+    """Generate professional EULA PDF with clean formatting"""
+    
     def __init__(self):
         self.output_dir = "licenses"
         os.makedirs(self.output_dir, exist_ok=True)
@@ -26,11 +32,7 @@ class DSTERMINALEULAGenerator:
         """Generate the professional EULA PDF with clean formatting"""
         
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-<<<<<<< HEAD
-        pdf_filename = f"DSTERMINAL_EULA_v3.1.113_{timestamp}.pdf"
-=======
-        pdf_filename = f"DSTERMINAL_EULA_v2.1.327_{timestamp}.pdf"
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
+        pdf_filename = f"DSTERMINAL_EULA_v{VERSION}_{timestamp}.pdf"
         pdf_path = os.path.join(self.output_dir, pdf_filename)
         
         doc = SimpleDocTemplate(
@@ -105,7 +107,7 @@ class DSTERMINALEULAGenerator:
             leading=14
         )
         
-        # Important/Warning Text Style (for visibility without background)
+        # Important/Warning Text Style
         warning_style = ParagraphStyle(
             'WarningText',
             parent=styles['Normal'],
@@ -165,7 +167,8 @@ class DSTERMINALEULAGenerator:
                     pil_img.save(temp_logo, "PNG")
                     logo_img = Image(temp_logo, width=60, height=60)
                     break
-                except:
+                except Exception as e:
+                    print(f"⚠️ Logo load warning: {e}")
                     continue
         
         # Build story
@@ -185,11 +188,7 @@ class DSTERMINALEULAGenerator:
         story.append(Paragraph("DSTERMINAL - Defensive Security Terminal", title_style))
         story.append(Paragraph("Cyber-Ops Platform", title_style))
         story.append(Paragraph("End User License Agreement (EULA)", subtitle_style))
-<<<<<<< HEAD
-        story.append(Paragraph(f"Version v3.1.113 | Last Updated: {datetime.now().strftime('%B %d, %Y')}", subtitle_style))
-=======
-        story.append(Paragraph(f"Version v2.1.327 | Last Updated: {datetime.now().strftime('%B %d, %Y')}", subtitle_style))
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
+        story.append(Paragraph(f"Version v{VERSION} | Last Updated: {datetime.now().strftime('%B %d, %Y')}", subtitle_style))
         story.append(Spacer(1, 15))
         
         # Divider
@@ -286,7 +285,7 @@ class DSTERMINALEULAGenerator:
                 "For license inquiries, support, or to report violations of this Agreement:",
                 "",
                 "Stark Expo Tech Exchange",
-                "Contact (s): [+265] 993 076 724 / 886 283 247 "
+                "Contact (s): [+265] 993 076 724 / 886 283 247",
                 "Email: licensing@starkexpotechexchange-mw.com",
                 "Website: https://www.starkexpotechexchange-mw.com"
             ])
@@ -401,11 +400,7 @@ class DSTERMINALEULAGenerator:
         <br/>
         Document ID: DSTERMINAL-EULA-{datetime.now().strftime('%Y%m%d')}-001<br/>
         Printed On: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}<br/>
-<<<<<<< HEAD
-        Version: 3.1.113
-=======
-        Version: 2.1.327
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
+        Version: {VERSION}
         """
         story.append(Paragraph(copyright_text, footer_style))
         
@@ -428,11 +423,7 @@ class DSTERMINALEULAGenerator:
             canvas_obj.setFont('Helvetica', 8)
             canvas_obj.setFillAlpha(0.5)
             canvas_obj.setFillColor(colors.gray)
-<<<<<<< HEAD
-            canvas_obj.drawCentredString(center_x, 20, f"Page {doc.page} | DSTERMINAL EULA v3.1.113")
-=======
-            canvas_obj.drawCentredString(center_x, 20, f"Page {doc.page} | DSTERMINAL EULA v2.1.327")
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
+            canvas_obj.drawCentredString(center_x, 20, f"Page {doc.page} | DSTERMINAL EULA v{VERSION}")
             canvas_obj.restoreState()
         
         # Build PDF
@@ -441,7 +432,10 @@ class DSTERMINALEULAGenerator:
         # Clean up
         temp_logo = os.path.join(self.output_dir, "temp_logo.png")
         if os.path.exists(temp_logo):
-            os.remove(temp_logo)
+            try:
+                os.remove(temp_logo)
+            except:
+                pass
         
         print(f"\n✅ License Agreement Generated Successfully!")
         print(f"📄 File: {pdf_path}")
@@ -449,7 +443,9 @@ class DSTERMINALEULAGenerator:
         
         return pdf_path
 
+
 def main():
+    """Main entry point"""
     print("\n" + "="*60)
     print("   DSTERMINAL License Agreement PDF Generator")
     print("   Clean Professional Legal Document")
@@ -462,11 +458,25 @@ def main():
     print("   Generation Complete!")
     print("="*60)
     
-    import webbrowser
-    open_pdf = input("\n📄 Open PDF file? (y/n): ").strip().lower()
-    if open_pdf == 'y':
-        webbrowser.open(f"file://{pdf_path}")
-        print("✅ PDF opened")
+    try:
+        import webbrowser
+        open_pdf = input("\n📄 Open PDF file? (y/n): ").strip().lower()
+        if open_pdf == 'y':
+            webbrowser.open(f"file://{pdf_path}")
+            print("✅ PDF opened")
+    except KeyboardInterrupt:
+        print("\n\n✅ PDF generated successfully!")
+    except Exception as e:
+        print(f"\n⚠️ Could not open PDF: {e}")
+        print(f"📄 File location: {pdf_path}")
+
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n\n⚠️ Generation cancelled by user")
+        sys.exit(0)
+    except Exception as e:
+        print(f"\n❌ Error: {e}")
+        sys.exit(1)
