@@ -1,0 +1,13 @@
+{
+    "zenMode.fullScreen": false,
+    "zenMode.centerLayout": false,
+    "zenMode.hideActivityBar": false,
+    "zenMode.hideStatusBar": false,
+    "zenMode.restore": true,
+<<<<<<< HEAD
+    "zenMode.hideLineNumbers": false,
+    "python.analysis.typeCheckingMode": "standard"
+=======
+    "zenMode.hideLineNumbers": false
+>>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
+}

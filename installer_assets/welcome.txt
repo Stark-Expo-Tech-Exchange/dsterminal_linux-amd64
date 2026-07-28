@@ -1,0 +1,7 @@
+Welcome to DSTerminal 2.0.59!
+
+Thank you for choosing DSTerminal, the ultimate cinematic cybersecurity terminal.
+
+This installer will guide you through the installation process and set up the workspace automatically.
+
+Click Next to continue and install DSTerminal on your PC.

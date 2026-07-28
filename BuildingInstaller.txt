@@ -1,0 +1,1 @@
+pyinstaller --onefile --collect-all rich --collect-all tqdm --collect-all pygments --icon=installer_assets/icon-removebg-preview.ico --name dsterminal_win-2025_v2.0.113_x64-amd64 dsterminal.py

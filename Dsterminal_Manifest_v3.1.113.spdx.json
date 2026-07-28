@@ -1,0 +1,1800 @@
+{
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "spdxVersion": "SPDX-2.3",
+  "creationInfo": {
+    "created": "2026-07-20T20:32:53Z",
+    "creators": [
+      "Organization: Dsterminal Security Labs",
+      "Tool: Dsterminal-Manifest-Generator-3.1.113"
+    ],
+    "licenseListVersion": "3.22"
+  },
+  "name": "Dsterminal Platform 3.1.113",
+  "dataLicense": "CC0-1.0",
+  "documentNamespace": "https://dsterminal.dev/spdx/Dsterminal-3.1.113",
+  "documentDescribes": [
+    "SPDXRef-Dsterminal-Platform"
+  ],
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-Dsterminal-Platform",
+      "name": "Dsterminal Platform",
+      "versionInfo": "3.1.113",
+      "supplier": "Organization: Dsterminal Security Labs",
+      "downloadLocation": "https://dsterminal.dev/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "LicenseRef-Proprietary-Dsterminal",
+      "licenseDeclared": "LicenseRef-Proprietary-Dsterminal",
+      "copyrightText": "Copyright (c) 2024-2026 Dsterminal Security Labs. All rights reserved.",
+      "description": "Offline-first, AI-assisted cybersecurity platform for defensive operations.",
+      "homepage": "https://dsterminal.dev",
+      "sourceInfo": "Built from source at https://github.com/dsterminal/dsterminal"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-001",
+      "name": "Python",
+      "versionInfo": "3.11.9",
+      "supplier": "Organization: Python Software Foundation",
+      "downloadLocation": "https://www.python.org/downloads/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "PSF-2.0",
+      "licenseDeclared": "PSF-2.0",
+      "copyrightText": "Copyright (c) 2026 Python Software Foundation",
+      "description": "Python dependency package",
+      "homepage": "https://www.python.org/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-002",
+      "name": "reportlab",
+      "versionInfo": "5.0.0",
+      "supplier": "Organization: ReportLab Inc.",
+      "downloadLocation": "https://pypi.org/project/reportlab/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "BSD-3-Clause",
+      "licenseDeclared": "BSD-3-Clause",
+      "copyrightText": "Copyright (c) 2026 ReportLab Inc.",
+      "description": "reportlab dependency package",
+      "homepage": "https://www.reportlab.com/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-003",
+      "name": "Pillow",
+      "versionInfo": "12.3.0",
+      "supplier": "Organization: Pillow Contributors",
+      "downloadLocation": "https://pypi.org/project/Pillow/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "HPND",
+      "licenseDeclared": "HPND",
+      "copyrightText": "Copyright (c) 2026 Pillow Contributors",
+      "description": "Pillow dependency package",
+      "homepage": "https://python-pillow.org/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-004",
+      "name": "qrcode",
+      "versionInfo": "8.0",
+      "supplier": "Organization: Lincoln Loop",
+      "downloadLocation": "https://pypi.org/project/qrcode/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "BSD-3-Clause",
+      "licenseDeclared": "BSD-3-Clause",
+      "copyrightText": "Copyright (c) 2026 Lincoln Loop",
+      "description": "qrcode dependency package",
+      "homepage": "https://github.com/lincolnloop/python-qrcode"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-005",
+      "name": "dsterminal-core",
+      "versionInfo": "3.1.113",
+      "supplier": "Organization: Dsterminal Security Labs",
+      "downloadLocation": "https://dsterminal.dev/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Proprietary - See License Agreement",
+      "licenseDeclared": "Proprietary - See License Agreement",
+      "copyrightText": "Copyright (c) 2026 Dsterminal Security Labs",
+      "description": "dsterminal-core dependency package",
+      "homepage": "https://dsterminal.dev"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-006",
+      "name": "ascii_magic",
+      "versionInfo": "2.7.5",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/ascii_magic/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "ascii_magic dependency package",
+      "homepage": "https://pypi.org/project/ascii_magic/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-007",
+      "name": "asttokens",
+      "versionInfo": "3.0.2",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/asttokens/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "asttokens dependency package",
+      "homepage": "https://pypi.org/project/asttokens/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-008",
+      "name": "attrs",
+      "versionInfo": "26.1.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/attrs/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "attrs dependency package",
+      "homepage": "https://pypi.org/project/attrs/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-009",
+      "name": "backcall",
+      "versionInfo": "0.2.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/backcall/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "backcall dependency package",
+      "homepage": "https://pypi.org/project/backcall/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-010",
+      "name": "beautifulsoup4",
+      "versionInfo": "4.15.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/beautifulsoup4/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "beautifulsoup4 dependency package",
+      "homepage": "https://pypi.org/project/beautifulsoup4/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-011",
+      "name": "bleach",
+      "versionInfo": "6.4.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/bleach/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "bleach dependency package",
+      "homepage": "https://pypi.org/project/bleach/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-012",
+      "name": "branca",
+      "versionInfo": "0.8.2",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/branca/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "branca dependency package",
+      "homepage": "https://pypi.org/project/branca/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-013",
+      "name": "certifi",
+      "versionInfo": "2026.6.17",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/certifi/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "certifi dependency package",
+      "homepage": "https://pypi.org/project/certifi/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-014",
+      "name": "cffi",
+      "versionInfo": "2.1.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/cffi/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "cffi dependency package",
+      "homepage": "https://pypi.org/project/cffi/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-015",
+      "name": "charset-normalizer",
+      "versionInfo": "3.4.9",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/charset-normalizer/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "charset-normalizer dependency package",
+      "homepage": "https://pypi.org/project/charset-normalizer/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-016",
+      "name": "colorama",
+      "versionInfo": "0.4.6",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/colorama/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "colorama dependency package",
+      "homepage": "https://pypi.org/project/colorama/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-017",
+      "name": "comm",
+      "versionInfo": "0.2.3",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/comm/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "comm dependency package",
+      "homepage": "https://pypi.org/project/comm/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-018",
+      "name": "cryptography",
+      "versionInfo": "49.0.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/cryptography/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "cryptography dependency package",
+      "homepage": "https://pypi.org/project/cryptography/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-019",
+      "name": "customtkinter",
+      "versionInfo": "6.0.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/customtkinter/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "customtkinter dependency package",
+      "homepage": "https://pypi.org/project/customtkinter/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-020",
+      "name": "darkdetect",
+      "versionInfo": "0.8.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/darkdetect/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "darkdetect dependency package",
+      "homepage": "https://pypi.org/project/darkdetect/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-021",
+      "name": "decorator",
+      "versionInfo": "5.3.1",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/decorator/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "decorator dependency package",
+      "homepage": "https://pypi.org/project/decorator/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-022",
+      "name": "defusedxml",
+      "versionInfo": "0.7.1",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/defusedxml/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "defusedxml dependency package",
+      "homepage": "https://pypi.org/project/defusedxml/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-023",
+      "name": "docopt",
+      "versionInfo": "0.6.2",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/docopt/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "docopt dependency package",
+      "homepage": "https://pypi.org/project/docopt/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-024",
+      "name": "executing",
+      "versionInfo": "2.2.1",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/executing/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "executing dependency package",
+      "homepage": "https://pypi.org/project/executing/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-025",
+      "name": "fastjsonschema",
+      "versionInfo": "2.21.2",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/fastjsonschema/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "fastjsonschema dependency package",
+      "homepage": "https://pypi.org/project/fastjsonschema/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-026",
+      "name": "flatbuffers",
+      "versionInfo": "25.12.19",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/flatbuffers/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "flatbuffers dependency package",
+      "homepage": "https://pypi.org/project/flatbuffers/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-027",
+      "name": "folium",
+      "versionInfo": "0.20.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/folium/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "folium dependency package",
+      "homepage": "https://pypi.org/project/folium/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-028",
+      "name": "geographiclib",
+      "versionInfo": "2.1",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/geographiclib/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "geographiclib dependency package",
+      "homepage": "https://pypi.org/project/geographiclib/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-029",
+      "name": "geopy",
+      "versionInfo": "2.5.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/geopy/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "geopy dependency package",
+      "homepage": "https://pypi.org/project/geopy/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-030",
+      "name": "h3",
+      "versionInfo": "4.5.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/h3/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "h3 dependency package",
+      "homepage": "https://pypi.org/project/h3/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-031",
+      "name": "html5lib",
+      "versionInfo": "1.1",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/html5lib/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "html5lib dependency package",
+      "homepage": "https://pypi.org/project/html5lib/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-032",
+      "name": "idna",
+      "versionInfo": "3.18",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/idna/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "idna dependency package",
+      "homepage": "https://pypi.org/project/idna/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-033",
+      "name": "ipython",
+      "versionInfo": "8.12.3",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/ipython/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "ipython dependency package",
+      "homepage": "https://pypi.org/project/ipython/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-034",
+      "name": "ipywidgets",
+      "versionInfo": "8.1.8",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/ipywidgets/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "ipywidgets dependency package",
+      "homepage": "https://pypi.org/project/ipywidgets/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-035",
+      "name": "jedi",
+      "versionInfo": "0.20.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/jedi/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "jedi dependency package",
+      "homepage": "https://pypi.org/project/jedi/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-036",
+      "name": "Jinja2",
+      "versionInfo": "3.1.6",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/Jinja2/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "Jinja2 dependency package",
+      "homepage": "https://pypi.org/project/Jinja2/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-037",
+      "name": "jsonschema",
+      "versionInfo": "4.26.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/jsonschema/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "jsonschema dependency package",
+      "homepage": "https://pypi.org/project/jsonschema/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-038",
+      "name": "jsonschema-specifications",
+      "versionInfo": "2025.9.1",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/jsonschema-specifications/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "jsonschema-specifications dependency package",
+      "homepage": "https://pypi.org/project/jsonschema-specifications/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-039",
+      "name": "jupyter_client",
+      "versionInfo": "8.9.1",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/jupyter_client/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "jupyter_client dependency package",
+      "homepage": "https://pypi.org/project/jupyter_client/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-040",
+      "name": "jupyter_core",
+      "versionInfo": "5.9.1",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/jupyter_core/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "jupyter_core dependency package",
+      "homepage": "https://pypi.org/project/jupyter_core/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-041",
+      "name": "jupyterlab_pygments",
+      "versionInfo": "0.3.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/jupyterlab_pygments/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "jupyterlab_pygments dependency package",
+      "homepage": "https://pypi.org/project/jupyterlab_pygments/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-042",
+      "name": "jupyterlab_widgets",
+      "versionInfo": "3.0.16",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/jupyterlab_widgets/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "jupyterlab_widgets dependency package",
+      "homepage": "https://pypi.org/project/jupyterlab_widgets/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-043",
+      "name": "lxml",
+      "versionInfo": "6.1.1",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/lxml/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "lxml dependency package",
+      "homepage": "https://pypi.org/project/lxml/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-044",
+      "name": "markdown-it-py",
+      "versionInfo": "4.2.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/markdown-it-py/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "markdown-it-py dependency package",
+      "homepage": "https://pypi.org/project/markdown-it-py/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-045",
+      "name": "MarkupSafe",
+      "versionInfo": "3.0.3",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/MarkupSafe/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "MarkupSafe dependency package",
+      "homepage": "https://pypi.org/project/MarkupSafe/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-046",
+      "name": "matplotlib-inline",
+      "versionInfo": "0.2.2",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/matplotlib-inline/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "matplotlib-inline dependency package",
+      "homepage": "https://pypi.org/project/matplotlib-inline/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-047",
+      "name": "mdurl",
+      "versionInfo": "0.1.2",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/mdurl/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "mdurl dependency package",
+      "homepage": "https://pypi.org/project/mdurl/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-048",
+      "name": "mistune",
+      "versionInfo": "3.3.3",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/mistune/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "mistune dependency package",
+      "homepage": "https://pypi.org/project/mistune/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-049",
+      "name": "narwhals",
+      "versionInfo": "2.24.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/narwhals/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "narwhals dependency package",
+      "homepage": "https://pypi.org/project/narwhals/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-050",
+      "name": "nbclient",
+      "versionInfo": "0.11.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/nbclient/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "nbclient dependency package",
+      "homepage": "https://pypi.org/project/nbclient/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-051",
+      "name": "nbconvert",
+      "versionInfo": "7.17.1",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/nbconvert/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "nbconvert dependency package",
+      "homepage": "https://pypi.org/project/nbconvert/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-052",
+      "name": "nbformat",
+      "versionInfo": "5.10.4",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/nbformat/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "nbformat dependency package",
+      "homepage": "https://pypi.org/project/nbformat/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-053",
+      "name": "netifaces",
+      "versionInfo": "0.11.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/netifaces/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "netifaces dependency package",
+      "homepage": "https://pypi.org/project/netifaces/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-054",
+      "name": "numpy",
+      "versionInfo": "2.4.6",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/numpy/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "numpy dependency package",
+      "homepage": "https://pypi.org/project/numpy/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-055",
+      "name": "opencv-python-headless",
+      "versionInfo": "5.0.0.93",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/opencv-python-headless/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "opencv-python-headless dependency package",
+      "homepage": "https://pypi.org/project/opencv-python-headless/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-056",
+      "name": "packaging",
+      "versionInfo": "26.2",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/packaging/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "packaging dependency package",
+      "homepage": "https://pypi.org/project/packaging/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-057",
+      "name": "pandocfilters",
+      "versionInfo": "1.5.1",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/pandocfilters/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "pandocfilters dependency package",
+      "homepage": "https://pypi.org/project/pandocfilters/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-058",
+      "name": "parso",
+      "versionInfo": "0.8.7",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/parso/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "parso dependency package",
+      "homepage": "https://pypi.org/project/parso/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-059",
+      "name": "pickleshare",
+      "versionInfo": "0.7.5",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/pickleshare/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "pickleshare dependency package",
+      "homepage": "https://pypi.org/project/pickleshare/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-060",
+      "name": "pipreqs",
+      "versionInfo": "0.5.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/pipreqs/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "pipreqs dependency package",
+      "homepage": "https://pypi.org/project/pipreqs/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-061",
+      "name": "platformdirs",
+      "versionInfo": "4.10.1",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/platformdirs/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "platformdirs dependency package",
+      "homepage": "https://pypi.org/project/platformdirs/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-062",
+      "name": "plotly",
+      "versionInfo": "6.9.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/plotly/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "plotly dependency package",
+      "homepage": "https://pypi.org/project/plotly/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-063",
+      "name": "prompt_toolkit",
+      "versionInfo": "3.0.52",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/prompt_toolkit/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "prompt_toolkit dependency package",
+      "homepage": "https://pypi.org/project/prompt_toolkit/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-064",
+      "name": "psutil",
+      "versionInfo": "7.2.2",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/psutil/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "psutil dependency package",
+      "homepage": "https://pypi.org/project/psutil/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-065",
+      "name": "pure_eval",
+      "versionInfo": "0.2.3",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/pure_eval/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "pure_eval dependency package",
+      "homepage": "https://pypi.org/project/pure_eval/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-066",
+      "name": "pycparser",
+      "versionInfo": "3.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/pycparser/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "pycparser dependency package",
+      "homepage": "https://pypi.org/project/pycparser/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-067",
+      "name": "pycryptodome",
+      "versionInfo": "3.23.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/pycryptodome/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "pycryptodome dependency package",
+      "homepage": "https://pypi.org/project/pycryptodome/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-068",
+      "name": "pyfiglet",
+      "versionInfo": "1.0.4",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/pyfiglet/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "pyfiglet dependency package",
+      "homepage": "https://pypi.org/project/pyfiglet/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-069",
+      "name": "Pygments",
+      "versionInfo": "2.20.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/Pygments/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "Pygments dependency package",
+      "homepage": "https://pypi.org/project/Pygments/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-070",
+      "name": "pyOpenSSL",
+      "versionInfo": "26.3.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/pyOpenSSL/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "pyOpenSSL dependency package",
+      "homepage": "https://pypi.org/project/pyOpenSSL/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-071",
+      "name": "python-dateutil",
+      "versionInfo": "2.9.0.post0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/python-dateutil/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "python-dateutil dependency package",
+      "homepage": "https://pypi.org/project/python-dateutil/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-072",
+      "name": "python-whois",
+      "versionInfo": "0.9.6",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/python-whois/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "python-whois dependency package",
+      "homepage": "https://pypi.org/project/python-whois/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-073",
+      "name": "pytz",
+      "versionInfo": "2026.2",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/pytz/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "pytz dependency package",
+      "homepage": "https://pypi.org/project/pytz/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-074",
+      "name": "pyzbar",
+      "versionInfo": "0.1.9",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/pyzbar/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "pyzbar dependency package",
+      "homepage": "https://pypi.org/project/pyzbar/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-075",
+      "name": "pyzmq",
+      "versionInfo": "27.1.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/pyzmq/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "pyzmq dependency package",
+      "homepage": "https://pypi.org/project/pyzmq/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-076",
+      "name": "referencing",
+      "versionInfo": "0.37.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/referencing/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "referencing dependency package",
+      "homepage": "https://pypi.org/project/referencing/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-077",
+      "name": "requests",
+      "versionInfo": "2.34.2",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/requests/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "requests dependency package",
+      "homepage": "https://pypi.org/project/requests/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-078",
+      "name": "rich",
+      "versionInfo": "15.0.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/rich/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "rich dependency package",
+      "homepage": "https://pypi.org/project/rich/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-079",
+      "name": "rpds-py",
+      "versionInfo": "2026.6.3",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/rpds-py/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "rpds-py dependency package",
+      "homepage": "https://pypi.org/project/rpds-py/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-080",
+      "name": "six",
+      "versionInfo": "1.17.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/six/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "six dependency package",
+      "homepage": "https://pypi.org/project/six/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-081",
+      "name": "soupsieve",
+      "versionInfo": "2.8.4",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/soupsieve/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "soupsieve dependency package",
+      "homepage": "https://pypi.org/project/soupsieve/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-082",
+      "name": "sqlmap",
+      "versionInfo": "1.10.7",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/sqlmap/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "sqlmap dependency package",
+      "homepage": "https://pypi.org/project/sqlmap/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-083",
+      "name": "stack-data",
+      "versionInfo": "0.6.3",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/stack-data/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "stack-data dependency package",
+      "homepage": "https://pypi.org/project/stack-data/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-084",
+      "name": "termcolor",
+      "versionInfo": "3.3.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/termcolor/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "termcolor dependency package",
+      "homepage": "https://pypi.org/project/termcolor/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-085",
+      "name": "timezonefinder",
+      "versionInfo": "8.2.5",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/timezonefinder/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "timezonefinder dependency package",
+      "homepage": "https://pypi.org/project/timezonefinder/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-086",
+      "name": "tinycss2",
+      "versionInfo": "1.5.1",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/tinycss2/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "tinycss2 dependency package",
+      "homepage": "https://pypi.org/project/tinycss2/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-087",
+      "name": "tornado",
+      "versionInfo": "6.5.7",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/tornado/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "tornado dependency package",
+      "homepage": "https://pypi.org/project/tornado/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-088",
+      "name": "tqdm",
+      "versionInfo": "4.69.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/tqdm/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "tqdm dependency package",
+      "homepage": "https://pypi.org/project/tqdm/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-089",
+      "name": "traitlets",
+      "versionInfo": "5.15.1",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/traitlets/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "traitlets dependency package",
+      "homepage": "https://pypi.org/project/traitlets/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-090",
+      "name": "typing_extensions",
+      "versionInfo": "4.16.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/typing_extensions/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "typing_extensions dependency package",
+      "homepage": "https://pypi.org/project/typing_extensions/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-091",
+      "name": "urllib3",
+      "versionInfo": "2.7.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/urllib3/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "urllib3 dependency package",
+      "homepage": "https://pypi.org/project/urllib3/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-092",
+      "name": "watchdog",
+      "versionInfo": "6.0.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/watchdog/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "watchdog dependency package",
+      "homepage": "https://pypi.org/project/watchdog/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-093",
+      "name": "wcwidth",
+      "versionInfo": "0.8.2",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/wcwidth/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "wcwidth dependency package",
+      "homepage": "https://pypi.org/project/wcwidth/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-094",
+      "name": "webencodings",
+      "versionInfo": "0.5.1",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/webencodings/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "webencodings dependency package",
+      "homepage": "https://pypi.org/project/webencodings/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-095",
+      "name": "whois",
+      "versionInfo": "1.20240129.2",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/whois/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "whois dependency package",
+      "homepage": "https://pypi.org/project/whois/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-096",
+      "name": "widgetsnbextension",
+      "versionInfo": "4.0.15",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/widgetsnbextension/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "widgetsnbextension dependency package",
+      "homepage": "https://pypi.org/project/widgetsnbextension/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-097",
+      "name": "xyzservices",
+      "versionInfo": "2026.3.0",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/xyzservices/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "xyzservices dependency package",
+      "homepage": "https://pypi.org/project/xyzservices/"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-098",
+      "name": "yarg",
+      "versionInfo": "0.1.9",
+      "supplier": "Organization: Unknown",
+      "downloadLocation": "https://pypi.org/project/yarg/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unknown - Please verify",
+      "licenseDeclared": "Unknown - Please verify",
+      "copyrightText": "Copyright (c) 2026 Unknown",
+      "description": "yarg dependency package",
+      "homepage": "https://pypi.org/project/yarg/"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-001"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-002"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-003"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-004"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-005"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-006"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-007"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-008"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-009"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-010"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-011"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-012"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-013"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-014"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-015"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-016"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-017"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-018"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-019"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-020"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-021"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-022"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-023"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-024"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-025"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-026"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-027"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-028"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-029"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-030"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-031"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-032"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-033"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-034"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-035"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-036"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-037"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-038"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-039"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-040"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-041"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-042"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-043"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-044"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-045"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-046"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-047"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-048"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-049"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-050"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-051"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-052"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-053"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-054"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-055"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-056"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-057"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-058"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-059"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-060"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-061"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-062"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-063"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-064"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-065"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-066"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-067"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-068"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-069"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-070"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-071"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-072"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-073"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-074"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-075"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-076"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-077"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-078"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-079"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-080"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-081"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-082"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-083"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-084"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-085"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-086"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-087"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-088"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-089"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-090"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-091"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-092"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-093"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-094"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-095"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-096"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-097"
+    },
+    {
+      "spdxElementId": "SPDXRef-Dsterminal-Platform",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-098"
+    }
+  ]
+}

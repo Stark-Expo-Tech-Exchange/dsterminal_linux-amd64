@@ -1,0 +1,1584 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>DSTerminal v3.1.113 - Complete SOC Security Platform Documentation</title>
+    <style>
+        /* ===== ROOT VARIABLES - SOC/Cyber Theme ===== */
+        :root {
+            --primary: #00ff9d;
+            --primary-glow: rgba(0, 255, 157, 0.5);
+            --secondary: #00ccff;
+            --secondary-glow: rgba(0, 204, 255, 0.3);
+            --accent: #ff3860;
+            --warning: #ffdd57;
+            --success: #48c774;
+            --info: #3298dc;
+            --bg-primary: #0a0e14;
+            --bg-secondary: #0f1419;
+            --bg-tertiary: #1a1f2a;
+            --bg-elevated: #232833;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --text-muted: #6c7a8d;
+            --border: #2a313c;
+            --border-glow: rgba(0, 255, 157, 0.2);
+            --header-height: 60px;
+            --sidebar-width: 300px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Fira Code', 'Cascadia Code', 'Courier New', monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* ===== MATRIX CANVAS BACKGROUND ===== */
+        #matrixCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, 
+                rgba(10, 14, 20, 0.95) 0%,
+                rgba(10, 14, 20, 0.7) 20%,
+                rgba(10, 14, 20, 0.3) 50%,
+                rgba(10, 14, 20, 0.7) 80%,
+                rgba(10, 14, 20, 0.95) 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                transparent,
+                var(--primary),
+                var(--secondary),
+                transparent);
+            animation: scanLine 6s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        @keyframes scanLine {
+            0% { top: -4px; }
+            100% { top: 100%; }
+        }
+
+        /* ===== TERMINAL HEADER ===== */
+        .terminal-header {
+            background: var(--bg-secondary);
+            border-bottom: 2px solid var(--primary);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 0 20px var(--primary-glow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .ascii-logo {
+            color: var(--primary);
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            line-height: 1.2;
+            white-space: pre;
+            text-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .version-badge {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--primary);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: var(--primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .version-badge::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg,
+                transparent,
+                var(--primary-glow),
+                transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .menu-toggle {
+            display: none;
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            font-size: 1.5rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .menu-toggle:hover {
+            background: var(--primary-glow);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        /* ===== MAIN LAYOUT ===== */
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - var(--header-height));
+            position: relative;
+            z-index: 1;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background: rgba(15, 20, 25, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid var(--border);
+            padding: 20px 0;
+            position: sticky;
+            top: var(--header-height);
+            height: calc(100vh - var(--header-height));
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) var(--bg-tertiary);
+            z-index: 90;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar::-webkit-scrollbar { width: 8px; }
+        .sidebar::-webkit-scrollbar-track { background: var(--bg-tertiary); }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-header h3 {
+            color: var(--primary);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .nav-section { margin-bottom: 25px; }
+
+        .nav-section-title {
+            padding: 10px 20px;
+            color: var(--secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        .nav-item {
+            padding: 8px 20px 8px 40px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 2px solid transparent;
+            font-size: 14px;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-tertiary);
+            color: var(--primary);
+            border-left-color: var(--primary);
+            padding-left: 45px;
+        }
+
+        .nav-item.active {
+            background: var(--bg-tertiary);
+            color: var(--primary);
+            border-left-color: var(--primary);
+            box-shadow: inset 0 0 10px var(--primary-glow);
+        }
+
+        .content {
+            flex: 1;
+            padding: 30px 40px;
+            max-width: calc(100% - var(--sidebar-width));
+            position: relative;
+            z-index: 1;
+        }
+
+        .command-card {
+            background: rgba(26, 31, 42, 0.9);
+            backdrop-filter: blur(5px);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .command-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px var(--primary-glow);
+            transform: translateY(-2px);
+        }
+
+        .command-card::before {
+            content: ">";
+            position: absolute;
+            left: -20px;
+            top: 20px;
+            color: var(--primary);
+            font-size: 20px;
+            font-weight: bold;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .command-card:hover::before {
+            left: -10px;
+            opacity: 1;
+        }
+
+        .command-header {
+            background: var(--bg-elevated);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .command-name {
+            font-family: 'Fira Code', monospace;
+            font-size: 16px;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .command-badge {
+            background: var(--bg-secondary);
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .command-body { padding: 20px; }
+
+        .command-description {
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .command-example {
+            background: var(--bg-secondary);
+            border-left: 3px solid var(--primary);
+            padding: 15px;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            color: var(--text-primary);
+            border-radius: 0 8px 8px 0;
+            margin: 15px 0;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .command-example::before {
+            content: "$";
+            color: var(--primary);
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .command-params {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .param {
+            background: var(--bg-secondary);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            border: 1px solid var(--border);
+        }
+
+        .param code {
+            background: var(--bg-tertiary);
+            color: var(--secondary);
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-right: 8px;
+        }
+
+        .info-panel {
+            background: rgba(26, 31, 42, 0.9);
+            backdrop-filter: blur(5px);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-panel::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+            opacity: 0.1;
+        }
+
+        .info-panel-title {
+            color: var(--primary);
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-panel-title::before {
+            content: "▶";
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .command-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: rgba(26, 31, 42, 0.9);
+            backdrop-filter: blur(5px);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .command-table th {
+            text-align: left;
+            padding: 12px 15px;
+            background: var(--bg-elevated);
+            color: var(--primary);
+            font-size: 14px;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .command-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .command-table tr:hover td {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .command-table code {
+            background: var(--bg-tertiary);
+            color: var(--secondary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .progress-container {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            height: 20px;
+            position: relative;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            position: relative;
+            animation: progressPulse 2s infinite;
+        }
+
+        @keyframes progressPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px var(--primary-glow);
+            position: relative;
+            display: inline-block;
+        }
+
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        h2 {
+            color: var(--secondary);
+            font-size: 1.8em;
+            margin: 30px 0 15px;
+            position: relative;
+        }
+
+        h2::before {
+            content: "##";
+            color: var(--text-muted);
+            font-size: 0.8em;
+            margin-right: 10px;
+            opacity: 0.5;
+        }
+
+        h3 {
+            color: var(--text-primary);
+            font-size: 1.3em;
+            margin: 20px 0 10px;
+        }
+
+        h4 {
+            color: var(--primary);
+            font-size: 1.1em;
+            margin: 15px 0 10px;
+        }
+
+        code {
+            background: var(--bg-tertiary);
+            color: var(--secondary);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9em;
+            border: 1px solid var(--border);
+        }
+
+        pre {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary);
+            overflow-x: auto;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        pre code {
+            background: none;
+            border: none;
+            padding: 0;
+            color: var(--text-primary);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid;
+            position: relative;
+        }
+
+        .alert-info { background: rgba(0, 204, 255, 0.1); border-left-color: var(--secondary); }
+        .alert-warning { background: rgba(255, 221, 87, 0.1); border-left-color: var(--warning); }
+        .alert-danger { background: rgba(255, 56, 96, 0.1); border-left-color: var(--accent); }
+        .alert-success { background: rgba(72, 199, 116, 0.1); border-left-color: var(--success); }
+
+        .meter {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .meter-label { width: 100px; color: var(--text-secondary); }
+        .meter-bar { flex: 1; height: 10px; background: var(--bg-secondary); border-radius: 5px; overflow: hidden; }
+        .meter-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 5px; }
+
+        .threat-indicator {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .threat-low { background: rgba(72, 199, 116, 0.2); color: var(--success); border: 1px solid var(--success); }
+        .threat-medium { background: rgba(255, 221, 87, 0.2); color: var(--warning); border: 1px solid var(--warning); }
+        .threat-high { background: rgba(255, 56, 96, 0.2); color: var(--accent); border: 1px solid var(--accent); }
+
+        .footer {
+            background: rgba(15, 20, 25, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--border);
+            padding: 30px 40px;
+            margin-top: 50px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-section h4 { color: var(--primary); margin-bottom: 15px; font-size: 16px; }
+        .footer-section ul { list-style: none; }
+        .footer-section li { margin-bottom: 8px; }
+        .footer-section a { color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease; cursor: pointer; }
+        .footer-section a:hover { color: var(--primary); }
+
+        .text-glow { text-shadow: 0 0 10px currentColor; }
+        .border-glow { box-shadow: 0 0 10px var(--primary-glow); }
+
+        .typing-effect {
+            overflow: hidden;
+            white-space: nowrap;
+            animation: typing 3s steps(40);
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        .glitch { position: relative; }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 var(--accent);
+            animation: glitch-1 2s infinite linear alternate-reverse;
+        }
+
+        .glitch::after {
+            left: -2px;
+            text-shadow: 2px 0 var(--secondary);
+            animation: glitch-2 3s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-1 {
+            0%, 100% { clip-path: inset(0 0 0 0); }
+            20% { clip-path: inset(20% 0 30% 0); }
+            40% { clip-path: inset(50% 0 10% 0); }
+            60% { clip-path: inset(80% 0 5% 0); }
+            80% { clip-path: inset(30% 0 40% 0); }
+        }
+
+        @keyframes glitch-2 {
+            0%, 100% { clip-path: inset(0 0 0 0); }
+            30% { clip-path: inset(10% 0 60% 0); }
+            50% { clip-path: inset(40% 0 30% 0); }
+            70% { clip-path: inset(70% 0 15% 0); }
+        }
+
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        .update-toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: none;
+            z-index: 200;
+            box-shadow: 0 0 20px var(--primary-glow);
+            font-size: 0.9rem;
+            max-width: 90vw;
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 1024px) {
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: var(--header-height);
+                transform: translateX(-100%);
+                box-shadow: 5px 0 20px rgba(0,0,0,0.5);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.open { transform: translateX(0); }
+            .content { max-width: 100%; padding: 20px; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .menu-toggle { display: block; }
+            .ascii-logo { font-size: 7px; }
+            h1 { font-size: 2em; }
+            h2 { font-size: 1.5em; }
+        }
+
+        @media (max-width: 768px) {
+            .terminal-header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+                padding: 0.8rem 1rem;
+            }
+            .logo-container { flex-direction: column; gap: 10px; }
+            .content { padding: 15px; }
+            .command-table { font-size: 12px; }
+            .command-table th, .command-table td { padding: 8px 10px; }
+            .footer { padding: 20px 15px; grid-template-columns: 1fr 1fr; gap: 20px; }
+            pre { padding: 10px; font-size: 12px; }
+            .ascii-logo { font-size: 5px; }
+        }
+
+        @media (max-width: 480px) {
+            .footer { grid-template-columns: 1fr; }
+            h1 { font-size: 1.5em; }
+            h2 { font-size: 1.3em; }
+            .command-header { flex-direction: column; align-items: flex-start; }
+            .version-badge { font-size: 12px; padding: 3px 10px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== MATRIX CANVAS BACKGROUND ===== -->
+    <canvas id="matrixCanvas"></canvas>
+
+    <!-- ===== TERMINAL HEADER ===== -->
+    <div class="terminal-header">
+        <div class="logo-container">
+            <div class="ascii-logo">
+╔══════════════════════════════════════════════════════════════╗
+║  ██████╗ ███████╗████████╗███████╗██████╗ ███╗   ███╗██╗███╗   ██╗ █████╗ ██╗      ║
+║  ██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║████╗  ██║██╔══██╗██║      ║
+║  ██║  ██║███████╗   ██║   █████╗  ██████╔╝██╔████╔██║██║██╔██╗ ██║███████║██║       ║
+║  ██║  ██║╚════██║   ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██║██║╚██╗██║██╔══██║██║       ║
+║  ██████╔╝███████║   ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║██║  ██║███████╗ ║ 
+║  ╚═════╝ ╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝ ║
+╚══════════════════════════════════════════════════════════════╝
+                    [ ENCRYPTION/DECRYPTION SUITE v3.1.113 - EDITION ]
+                    ═══════════════════════════════════════════
+            </div>
+            <div class="version-badge glitch" data-text="v3.1.113" id="versionDisplay">v3.1.113</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div class="status-indicator">
+                <span class="led"></span>
+                <span>SECURE | SOC TERMINAL ONLINE</span>
+            </div>
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation menu">☰</button>
+        </div>
+    </div>
+
+    <!-- ===== MAIN CONTAINER ===== -->
+    <div class="main-container">
+        <!-- ===== SIDEBAR NAVIGATION ===== -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header"><h3>Navigation</h3></div>
+            <div class="nav-section">
+                <div class="nav-section-title">Getting Started</div>
+                <div class="nav-item active" data-target="introduction">1. Introduction</div>
+                <div class="nav-item" data-target="requirements">2. System Requirements</div>
+                <div class="nav-item" data-target="installation">3. Installation</div>
+                <div class="nav-item" data-target="quickstart">4. Getting Started</div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Core Commands</div>
+                <div class="nav-item" data-target="core-commands">5. Core Commands</div>
+                <div class="nav-item" data-target="security-modules">6. Security Modules</div>
+                <div class="nav-item" data-target="network-ops">7. Network Operations</div>
+                <div class="nav-item" data-target="soc-dashboard">8. SOC Nmap Dashboard</div>
+                <div class="nav-item" data-target="forensics">9. Forensics</div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Advanced Operations</div>
+                <div class="nav-item" data-target="hardening">10. System Hardening</div>
+                <div class="nav-item" data-target="sqlmap">11. SQL Injection Tools</div>
+                <div class="nav-item" data-target="incident-response">12. Incident Response</div>
+                <div class="nav-item" data-target="reporting">13. Reporting</div>
+                <div class="nav-item" data-target="troubleshooting">14. Troubleshooting</div>
+                <div class="nav-item" data-target="appendix">15. Appendix</div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Reference</div>
+                <div class="nav-item" data-target="api">API Reference</div>
+                <div class="nav-item" data-target="commands">Command List</div>
+                <div class="nav-item" data-target="config">Configuration</div>
+                <div class="nav-item" data-target="changelog">Changelog</div>
+            </div>
+        </div>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <div class="content" id="mainContent">
+            <!-- INTRODUCTION -->
+            <div id="introduction" class="content-section">
+                <h1 class="typing-effect">DSTerminal Documentation</h1>
+                <p class="text-glow">Version 3.1.113 | Security Operations Center Terminal</p>
+                <div class="info-panel alert-info">
+                    <div class="info-panel-title">SYSTEM STATUS</div>
+                    <div class="grid-2">
+                        <div><p><strong>Platform:</strong> Windows/Linux/macOS</p><p><strong>Python Version:</strong> 3.8+</p><p><strong>Last Update:</strong> <span id="lastUpdate">July 2026</span></p></div>
+                        <div><p><strong>Active Modules:</strong> 47+</p><p><strong>Security Tools:</strong> 23</p><p><strong>Threat Intelligence:</strong> Active</p></div>
+                    </div>
+                    <div class="progress-container"><div class="progress-bar" style="width: 100%;"></div></div>
+                </div>
+                <h2>1. Introduction to DSTerminal</h2>
+                <p>DSTerminal v3.1.113 is a comprehensive Security Operations Center (SOC) platform designed for defensive security professionals. It provides a unified terminal interface for threat detection, incident response, forensics, system hardening, and network intelligence operations.</p>
+                <h3>Key Features</h3>
+                <ul style="margin-left: 20px; color: var(--text-secondary);">
+                    <li>• <strong>SOC Nmap Dashboard</strong> - Interactive 3-panel network intelligence with AI vulnerability scoring</li>
+                    <li>• <strong>Real-time Network Monitoring</strong> - Live threat detection with geolocation and risk scoring</li>
+                    <li>• <strong>Dual Location Tracking</strong> - Shows both organization HQ and server/cloud locations on threat maps</li>
+                    <li>• <strong>SQL Injection Testing</strong> - Integrated sqlmap with learning lab environment</li>
+                    <li>• <strong>Ransomware Protection</strong> - Real-time monitoring with auto-quarantine and restore</li>
+                    <li>• <strong>10-Pillar System Hardening</strong> - Comprehensive security hardening framework</li>
+                    <li>• <strong>Multi-format Reporting</strong> - JSON, HTML, PDF with dark-themed dashboards</li>
+                    <li>• <strong>Professional Windows Installer</strong> - Inno Setup-based deployment with dependency management</li>
+                    <li>• <strong>Financial Forensics</strong> - Fraud investigation and transaction tracing</li>
+                    <li>• <strong>Steganography Detection</strong> - LSB analysis and hidden data detection in images</li>
+                </ul>
+                <h3>Component Status</h3>
+                <table class="command-table">
+                    <thead><tr><th>Component</th><th>Status</th><th>Version</th></tr></thead>
+                    <tbody>
+                        <tr><td>DSTerminal Core</td><td><span class="threat-indicator threat-low">● ONLINE</span></td><td>3.1.113</td></tr>
+                        <tr><td>SOC Nmap Dashboard</td><td><span class="threat-indicator threat-low">● ACTIVE</span></td><td>3.1.113</td></tr>
+                        <tr><td>Ransomware Monitor</td><td><span class="threat-indicator threat-low">● READY</span></td><td>3.1.113</td></tr>
+                        <tr><td>Hardening Engine</td><td><span class="threat-indicator threat-low">● LOADED</span></td><td>3.1.113</td></tr>
+                        <tr><td>SQLMap Integration</td><td><span class="threat-indicator threat-low">● CONNECTED</span></td><td>3.1.113</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- SYSTEM REQUIREMENTS -->
+            <div id="requirements" class="content-section" style="display: none;">
+                <h2>2. System Requirements</h2>
+                <h3>Hardware Requirements</h3>
+                <table class="command-table">
+                    <thead><tr><th>Component</th><th>Minimum</th><th>Recommended</th></tr></thead>
+                    <tbody>
+                        <tr><td>Processor</td><td>Dual-core 2.0 GHz</td><td>Quad-core 3.0 GHz</td></tr>
+                        <tr><td>RAM</td><td>4 GB</td><td>16 GB</td></tr>
+                        <tr><td>Storage</td><td>500 MB</td><td>10 GB</td></tr>
+                        <tr><td>Network</td><td>100 Mbps</td><td>1 Gbps</td></tr>
+                    </tbody>
+                </table>
+                <div class="meter"><span class="meter-label">CPU Usage</span><div class="meter-bar"><div class="meter-fill" style="width: 15%;"></div></div><span>15%</span></div>
+                <div class="meter"><span class="meter-label">Memory Usage</span><div class="meter-bar"><div class="meter-fill" style="width: 25%;"></div></div><span>25%</span></div>
+                <h3>Software Requirements</h3>
+                <table class="command-table">
+                    <thead><tr><th>Software</th><th>Version</th></tr></thead>
+                    <tbody>
+                        <tr><td>Windows</td><td>10/11 (64-bit)</td></tr>
+                        <tr><td>Linux</td><td>Ubuntu 20.04+, Debian 11+, Kali Linux</td></tr>
+                        <tr><td>macOS</td><td>12+ (Monterey+)</td></tr>
+                        <tr><td>Python</td><td>3.8 or higher</td></tr>
+                        <tr><td>Nmap</td><td>7.80+ (auto-installed)</td></tr>
+                        <tr><td>SQLMap</td><td>1.6+ (auto-installed)</td></tr>
+                        <tr><td>Metasploit</td><td>6.0+ (optional)</td></tr>
+                        <tr><td>Nikto</td><td>Latest (auto-installed)</td></tr>
+                    </tbody>
+                </table>
+                <div class="alert alert-info"><strong>Note:</strong> DSTerminal includes bundled installers for Nmap, SQLMap, Nikto, and Npcap - they will be installed automatically if missing.</div>
+            </div>
+
+            <!-- INSTALLATION -->
+            <div id="installation" class="content-section" style="display: none;">
+                <h2>3. Installation Guide</h2>
+                <h3>3.1 Windows Installation (Recommended)</h3>
+                <pre><code># DSTerminal Windows Installer
+1. Download DSTerminal_Installer_2026_v3.1.13.exe from GitHub
+2. Run the installer (no administrator rights required)
+3. Follow the setup wizard to choose installation options
+4. Select components: Core, Documentation, Tools, Dependencies
+5. Dependencies will be auto-installed from bundled files:
+   - Npcap (packet capture)
+   - Nmap (network scanner)
+   - SQLMap (SQL injection)
+   - Nikto (web scanner)
+   - Python packages (colorama, requests, folium, plotly, reportlab)
+6. Launch DSTerminal from Start Menu or Desktop shortcut
+
+# Installation path
+%APPDATA%\DSTerminal\
+%APPDATA%\DSTerminal_Workspace\
+
+# Silent installation
+DSTerminal_Installer_2026_v3.1.13.exe /VERYSILENT /SUPPRESSMSGBOXES</code></pre>
+                <h3>3.2 Linux Installation</h3>
+                <pre><code># Clone the DSTerminal repository
+git clone https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest.git
+cd DSTerminal_releases_latest
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Optional: Install additional tools
+sudo apt update
+sudo apt install nmap sqlmap nikto
+
+# Run DSTerminal
+python dsterminal.py</code></pre>
+                <h3>3.3 macOS Installation</h3>
+                <pre><code># Install using Homebrew
+brew install nmap sqlmap nikto
+
+# From source
+git clone https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest.git
+cd DSTerminal_releases_latest
+pip3 install -r requirements.txt
+python3 dsterminal.py</code></pre>
+            </div>
+
+            <!-- QUICK START -->
+            <div id="quickstart" class="content-section" style="display: none;">
+                <h2>4. Getting Started</h2>
+                <h3>4.1 First Launch</h3>
+                <p>When you first launch DSTerminal, you'll see the SOC banner and be assigned a unique operator ID. All your activities are logged for audit purposes in the workspace/operators directory.</p>
+                <pre><code>[11:20:19] DESKTOP-FTLN28J [PROD] NORMAL [SESSION-CEE30]
+🔹 OP-579A6D @ soc-terminal : ~$ help
+
+╔════════════════════════════════════════════════════╗
+║           DSTERMINAL HELP MENU                    ║
+╚════════════════════════════════════════════════════╝</code></pre>
+                <h3>4.2 SOC Commands Quick Start</h3>
+                <pre><code># Launch interactive SOC dashboard
+soc
+
+# Quick network scan (top 100 ports)
+soc-quick google.com
+
+# Full aggressive scan (all ports)
+soc-full 192.168.1.1
+
+# DNS reconnaissance
+soc-dns example.com
+
+# View scan history
+soc-history
+
+# Generate PDF report
+soc-pdf
+
+# View scan results
+soc-results</code></pre>
+            </div>
+
+            <!-- CORE COMMANDS -->
+            <div id="core-commands" class="content-section" style="display: none;">
+                <h2>5. Core Commands</h2>
+                <h3>5.1 File Operations</h3>
+                <table class="command-table">
+                    <thead><tr><th>Command</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>ls [path]</code></td><td>List directory contents</td></tr>
+                        <tr><td><code>cd &lt;directory&gt;</code></td><td>Change working directory</td></tr>
+                        <tr><td><code>pwd</code></td><td>Print current working directory</td></tr>
+                        <tr><td><code>mkdir &lt;name&gt;</code></td><td>Create new directory</td></tr>
+                        <tr><td><code>touch &lt;file&gt;</code></td><td>Create empty file</td></tr>
+                        <tr><td><code>cat &lt;file&gt;</code></td><td>Display file contents</td></tr>
+                    </tbody>
+                </table>
+                <h3>5.2 System Commands</h3>
+                <table class="command-table">
+                    <thead><tr><th>Command</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>sysinfo</code></td><td>Display detailed system information</td></tr>
+                        <tr><td><code>killproc &lt;PID&gt;</code></td><td>Terminate a process by ID</td></tr>
+                        <tr><td><code>update</code></td><td>Check for DSTerminal updates</td></tr>
+                        <tr><td><code>clear</code></td><td>Clear the terminal screen</td></tr>
+                        <tr><td><code>exit</code></td><td>Exit DSTerminal</td></tr>
+                        <tr><td><code>help</code></td><td>Show comprehensive help menu</td></tr>
+                        <tr><td><code>status</code></td><td>Display DSTerminal system status</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- SECURITY MODULES -->
+            <div id="security-modules" class="content-section" style="display: none;">
+                <h2>6. Security Modules</h2>
+                <h3>6.1 System Security Scan</h3>
+                <div class="command-card">
+                    <div class="command-header"><span class="command-name">system scan -All</span><span class="command-badge">Core Security</span></div>
+                    <div class="command-body">
+                        <div class="command-description">Performs comprehensive system security scan including memory analysis, process inspection, file integrity checks, and network monitoring.</div>
+                        <div class="command-example">system scan -All [--quick] [--deep] [--output &lt;file&gt;]</div>
+                    </div>
+                </div>
+                <h3>6.2 Exploit Detection</h3>
+                <div class="command-card">
+                    <div class="command-header"><span class="command-name">exploitcheck</span><span class="command-badge">Vulnerability Scanner</span></div>
+                    <div class="command-body">
+                        <div class="command-description">Checks for critical vulnerabilities:</div>
+                        <pre><code>• CVE-2024-1234 - Critical Service Exploit
+• CVE-2024-5678 - SSH Vulnerability
+• CVE-2024-9012 - Telnet Bleed
+• CVE-2024-3456 - HTTP SQL Injection
+• CVE-2024-7890 - Heartbleed
+• CVE-2024-2345 - EternalBlue</code></pre>
+                    </div>
+                </div>
+                <h3>6.3 Ransomware Monitor</h3>
+                <div class="command-card">
+                    <div class="command-header"><span class="command-name">rmon</span><span class="command-badge">Ransomware Protection</span></div>
+                    <div class="command-body">
+                        <div class="command-description">Real-time ransomware monitoring with auto-quarantine:</div>
+                        <pre><code>rmon-start        # Start monitoring service
+rmon-scan         # Scan for ransomware activity
+rmon-dashboard    # Launch monitoring dashboard
+rmon-restore      # Restore files from quarantine
+rmon export pdf   # Export ransomware report</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NETWORK OPERATIONS -->
+            <div id="network-ops" class="content-section" style="display: none;">
+                <h2>7. Network Operations</h2>
+                <h3>7.1 Network Monitoring</h3>
+                <div class="command-card">
+                    <div class="command-header"><span class="command-name">net -n mon</span><span class="command-badge">Network Security</span></div>
+                    <div class="command-body">
+                        <div class="command-description">Real-time network monitoring with threat detection.</div>
+                        <div class="command-example">net -n mon [--duration &lt;sec&gt;] [--export &lt;file&gt;] [--geoip]</div>
+                    </div>
+                </div>
+                <h3>7.2 Nmap Integration</h3>
+                <div class="command-card">
+                    <div class="command-header"><span class="command-name">nmap</span><span class="command-badge">Network Scanner</span></div>
+                    <div class="command-body">
+                        <div class="command-description">Full Nmap integration with all standard options:</div>
+                        <pre><code>nmap -sV &lt;target&gt;    # Service/version detection
+nmap -A &lt;target&gt;     # Aggressive OS and service detection
+nmap -p- &lt;target&gt;    # Scan all 65535 ports
+nmap --script vuln   # Vulnerability scanning with NSE</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SOC DASHBOARD -->
+            <div id="soc-dashboard" class="content-section" style="display: none;">
+                <h2>8. SOC Nmap Dashboard</h2>
+                <h3>8.1 Interactive Dashboard</h3>
+                <div class="command-card">
+                    <div class="command-header"><span class="command-name">soc</span><span class="command-badge">SOC Intelligence</span></div>
+                    <div class="command-body">
+                        <div class="command-description">Launches the interactive 3-panel SOC Nmap dashboard with:</div>
+                        <ul style="margin-left: 20px; color: var(--text-secondary);">
+                            <li>• Left Panel - Scan Control Center (Quick/Standard/Full/DNS/UDP scans)</li>
+                            <li>• Center Panel - Live SOC Status (hosts, ports, services, threat level)</li>
+                            <li>• Right Panel - Live Discoveries (real-time port findings)</li>
+                            <li>• AI Vulnerability Scoring with risk assessment (CRITICAL/HIGH/MEDIUM/LOW)</li>
+                            <li>• Dual Location Tracking - Organization HQ + Server/Cloud locations</li>
+                            <li>• Auto-generated HTML dashboard with geographic threat maps</li>
+                            <li>• PDF report generation with executive summaries</li>
+                        </ul>
+                        <div class="command-example">soc</div>
+                    </div>
+                </div>
+                <h3>8.2 SOC Scan Commands</h3>
+                <table class="command-table">
+                    <thead><tr><th>Command</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>soc-quick &lt;target&gt;</code></td><td>Quick scan (top 100 ports with service detection)</td></tr>
+                        <tr><td><code>soc-full &lt;target&gt;</code></td><td>Full aggressive scan (all ports + scripts + OS detection)</td></tr>
+                        <tr><td><code>soc-dns &lt;domain&gt;</code></td><td>DNS reconnaissance scan</td></tr>
+                        <tr><td><code>soc-map</code></td><td>Generate threat intelligence map from last scan</td></tr>
+                        <tr><td><code>soc-history</code></td><td>Show scan history with risk scores</td></tr>
+                        <tr><td><code>soc-reports</code></td><td>List all generated reports (HTML & PDF)</td></tr>
+                        <tr><td><code>soc-pdf</code></td><td>Generate PDF report from last scan</td></tr>
+                        <tr><td><code>soc-status</code></td><td>Show SOC dashboard status</td></tr>
+                        <tr><td><code>soc-orgs</code></td><td>Show organization location database</td></tr>
+                        <tr><td><code>soc-results</code></td><td>Display previous scan results</td></tr>
+                    </tbody>
+                </table>
+                <div class="alert alert-success"><strong>✓ Dual Location Tracking:</strong> Shows both organization headquarters (⭐) and server/cloud locations (🖥️) on threat maps.</div>
+            </div>
+
+            <!-- FORENSICS -->
+            <div id="forensics" class="content-section" style="display: none;">
+                <h2>9. Forensics</h2>
+                <h3>9.1 Memory Forensics</h3>
+                <div class="command-card">
+                    <div class="command-header"><span class="command-name">memdump</span><span class="command-badge">Memory Analysis</span></div>
+                    <div class="command-body">
+                        <div class="command-example">memdump [--output &lt;file&gt;]</div>
+                        <div class="command-description"><strong>Captures:</strong> Running processes, network connections, open file handles, loaded kernel modules, registry hives</div>
+                    </div>
+                </div>
+                <h3>9.2 Steganography Detection</h3>
+                <div class="command-card">
+                    <div class="command-header"><span class="command-name">stegcheck</span><span class="command-badge">Steganalysis</span></div>
+                    <div class="command-body">
+                        <div class="command-example">stegcheck &lt;image_path&gt;</div>
+                        <div class="command-description"><strong>Analysis:</strong> LSB analysis, entropy calculation, known tool signatures, EXIF metadata</div>
+                    </div>
+                </div>
+                <h3>9.3 Financial Forensics</h3>
+                <div class="command-card">
+                    <div class="command-header"><span class="command-name">finanalyze</span><span class="command-badge">Financial Analysis</span></div>
+                    <div class="command-body">
+                        <div class="command-example">finanalyze</div>
+                        <div class="command-description">Analyzes suspicious transactions and financial fraud patterns.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SYSTEM HARDENING -->
+            <div id="hardening" class="content-section" style="display: none;">
+                <h2>10. System Hardening</h2>
+                <h3>10.1 10-Pillar Hardening Framework</h3>
+                <div class="command-card">
+                    <div class="command-header"><span class="command-name">harden</span><span class="command-badge">System Hardening</span></div>
+                    <div class="command-body">
+                        <div class="command-description">10-Pillar system hardening framework:</div>
+                        <pre><code>1. User Account Security    6. Service Hardening
+2. Password & Authentication 7. Kernel Hardening
+3. Firewall & Network        8. Malware Protection
+4. SSH & Remote Access       9. Audit & Logging
+5. File System Security      10. Application Security</code></pre>
+                        <div class="command-example">harden full    # Execute full system hardening
+harden status  # Show current status
+harden dashboard # Launch hardening dashboard</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SQL INJECTION -->
+            <div id="sqlmap" class="content-section" style="display: none;">
+                <h2>11. SQL Injection Tools</h2>
+                <h3>11.1 SQLMap Integration</h3>
+                <table class="command-table">
+                    <thead><tr><th>Command</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>sqlmap --url &lt;URL&gt;</code></td><td>Scan target URL for SQL injection</td></tr>
+                        <tr><td><code>sqlmap --batch</code></td><td>Automated batch mode</td></tr>
+                        <tr><td><code>sqlmap-scan &lt;URL&gt;</code></td><td>Quick SQLMap scan</td></tr>
+                        <tr><td><code>sqllab</code></td><td>Start SQL Injection Learning Lab</td></tr>
+                        <tr><td><code>sqlmap-status</code></td><td>Show SQLMap lab status</td></tr>
+                    </tbody>
+                </table>
+                <div class="alert alert-info"><strong>Feature:</strong> Interactive SQL injection learning lab for educational purposes.</div>
+            </div>
+
+            <!-- INCIDENT RESPONSE -->
+            <div id="incident-response" class="content-section" style="display: none;">
+                <h2>12. Incident Response</h2>
+                <h3>12.1 Financial Attack Simulation</h3>
+                <div class="command-card">
+                    <div class="command-header"><span class="command-name">transfertrace</span><span class="command-badge">Financial Analysis</span></div>
+                    <div class="command-body">
+                        <div class="command-description"><strong>Simulates and detects:</strong></div>
+                        <ul style="margin-left: 20px; color: var(--text-secondary);">
+                            <li>• SWIFT network transaction patterns</li>
+                            <li>• Cryptocurrency exchange monitoring</li>
+                            <li>• Payment processor analysis</li>
+                            <li>• Money laundering pattern detection</li>
+                        </ul>
+                    </div>
+                </div>
+                <h3>12.2 Emergency Procedures</h3>
+                <div class="command-card">
+                    <div class="command-header"><span class="command-name">shutdown</span><span class="command-badge">Emergency</span></div>
+                    <div class="command-body">
+                        <div class="command-example">shutdown</div>
+                        <div class="alert alert-danger"><strong>⚠️ EMERGENCY PROTOCOL:</strong> Requires explicit confirmation ('YES'). All actions are logged.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REPORTING -->
+            <div id="reporting" class="content-section" style="display: none;">
+                <h2>13. Reporting</h2>
+                <table class="command-table">
+                    <thead><tr><th>Report Type</th><th>Command</th><th>Output Format</th></tr></thead>
+                    <tbody>
+                        <tr><td>SOC Scan Report</td><td><code>soc-pdf</code></td><td>PDF</td></tr>
+                        <tr><td>Network Intelligence</td><td><code>soc</code></td><td>HTML Dashboard</td></tr>
+                        <tr><td>System Security Scan</td><td><code>system scan -All --output report.txt</code></td><td>TXT</td></tr>
+                        <tr><td>Ransomware Report</td><td><code>rmon export pdf</code></td><td>PDF</td></tr>
+                        <tr><td>Hardening Report</td><td><code>harden-report</code></td><td>HTML/PDF</td></tr>
+                    </tbody>
+                </table>
+                <div class="alert alert-info"><strong>Note:</strong> PDF reports include executive summaries, risk assessments, and actionable recommendations.</div>
+            </div>
+
+            <!-- TROUBLESHOOTING -->
+            <div id="troubleshooting" class="content-section" style="display: none;">
+                <h2>14. Troubleshooting</h2>
+                <table class="command-table">
+                    <thead><tr><th>Issue</th><th>Solution</th></tr></thead>
+                    <tbody>
+                        <tr><td>SOC dashboard not loading</td><td>Ensure Nmap is installed: <code>nmap --version</code></td></tr>
+                        <tr><td>Nmap not found</td><td>Run installer with dependencies, or install manually</td></tr>
+                        <tr><td>Permission denied</td><td>Run DSTerminal with administrator privileges</td></tr>
+                        <tr><td>Module not found</td><td>Run: <code>pip install -r requirements.txt</code></td></tr>
+                        <tr><td>PDF generation failed</td><td>Install reportlab: <code>pip install reportlab</code></td></tr>
+                        <tr><td>SQLMap not found</td><td>Install from bundled tools or run <code>sqlmap-install</code></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- APPENDIX -->
+            <div id="appendix" class="content-section" style="display: none;">
+                <h2>15. Appendix</h2>
+                <h3>15.1 Directory Structure</h3>
+                <div class="grid-2">
+                    <div class="info-panel"><h4>Installation Directory</h4><pre><code>├── dsterminal.exe
+├── config/
+├── docs/
+├── tools/
+│   ├── bundled/
+│   │   ├── nmap/
+│   │   ├── sqlmap/
+│   │   ├── nikto/
+│   │   └── metasploit/
+│   └── *.ps1 (scripts)
+├── templates/
+└── update/</code></pre></div>
+                    <div class="info-panel"><h4>Workspace Directory</h4><pre><code>├── operators/
+├── scans/
+├── reports/
+├── exploits/
+├── sandbox/
+├── quarantine/
+├── logs/
+└── config/</code></pre></div>
+                </div>
+                <h3>15.2 Support and Community</h3>
+                <table class="command-table">
+                    <thead><tr><th>Resource</th><th>URL</th></tr></thead>
+                    <tbody>
+                        <tr><td>GitHub Repository</td><td>https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest</td></tr>
+                        <tr><td>Issue Tracker</td><td>https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/issues</td></tr>
+                        <tr><td>Email Support</td><td>support@starkexpotechexchange-mw.com</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- API REFERENCE -->
+            <div id="api" class="content-section" style="display: none;">
+                <h2>API Reference</h2>
+                <h3>VirusTotal Integration</h3>
+                <pre><code>vtscan &lt;file_hash&gt;
+# Returns threat intelligence data from VirusTotal</code></pre>
+                <h3>Metasploit Integration</h3>
+                <pre><code>msfconsole
+# Launch Metasploit Framework console
+msf-debug
+# Debug Metasploit installation issues</code></pre>
+            </div>
+
+            <!-- COMMAND LIST -->
+            <div id="commands" class="content-section" style="display: none;">
+                <h2>Complete Command Reference</h2>
+                <table class="command-table">
+                    <thead><tr><th>Category</th><th>Command</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td>SOC</td><td><code>soc</code></td><td>Launch SOC Nmap Dashboard</td></tr>
+                        <tr><td>SOC</td><td><code>soc-quick</code></td><td>Quick network scan</td></tr>
+                        <tr><td>SOC</td><td><code>soc-full</code></td><td>Full aggressive scan</td></tr>
+                        <tr><td>SOC</td><td><code>soc-history</code></td><td>View scan history</td></tr>
+                        <tr><td>SQL</td><td><code>sqlmap</code></td><td>SQL injection scanning</td></tr>
+                        <tr><td>SQL</td><td><code>sqllab</code></td><td>SQL injection learning lab</td></tr>
+                        <tr><td>Ransomware</td><td><code>rmon</code></td><td>Ransomware monitor</td></tr>
+                        <tr><td>Hardening</td><td><code>harden</code></td><td>System hardening</td></tr>
+                        <tr><td>Network</td><td><code>nmap</code></td><td>Network scanner</td></tr>
+                        <tr><td>Network</td><td><code>portsweep</code></td><td>Port scanning</td></tr>
+                        <tr><td>Network</td><td><code>traceroute</code></td><td>Trace route</td></tr>
+                        <tr><td>Forensics</td><td><code>memdump</code></td><td>Memory dump</td></tr>
+                        <tr><td>Forensics</td><td><code>stegcheck</code></td><td>Steganography check</td></tr>
+                        <tr><td>System</td><td><code>sysinfo</code></td><td>System information</td></tr>
+                        <tr><td>System</td><td><code>update</code></td><td>Check updates</td></tr>
+                        <tr><td>Help</td><td><code>help</code></td><td>Show help menu</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- CONFIGURATION -->
+            <div id="config" class="content-section" style="display: none;">
+                <h2>Configuration</h2>
+                <h3>config/settings.json</h3>
+                <pre><code>{
+    "workspace": "%APPDATA%\\DSTerminal_Workspace",
+    "log_level": "INFO",
+    "auto_update": true,
+    "update_channel": "stable",
+    "theme": "cyber",
+    "threat_intel": {
+        "virustotal_enabled": false,
+        "auto_scan": true
+    },
+    "soc": {
+        "auto_generate_reports": true,
+        "max_scan_history": 10
+    }
+}</code></pre>
+            </div>
+
+            <!-- CHANGELOG -->
+            <div id="changelog" class="content-section" style="display: none;">
+                <h2>Changelog</h2>
+                <h3>Version 3.1.113 (July 2026)</h3>
+                <ul style="color: var(--text-secondary);">
+                    <li>• <strong>SOC Nmap Dashboard</strong> - Interactive 3-panel network intelligence with AI vulnerability scoring</li>
+                    <li>• <strong>Dual Location Tracking</strong> - Shows organization HQ + server/cloud locations on threat maps</li>
+                    <li>• <strong>Professional Windows Installer</strong> - Inno Setup-based with automatic dependency management</li>
+                    <li>• <strong>Auto-Detection of Domain Locations</strong> - Auto-detects HQ from TLD patterns (.mw, .za, .ke, .ng, etc.)</li>
+                    <li>• <strong>Persistent Scan Results</strong> - Scan details remain visible in terminal after completion</li>
+                    <li>• <strong>Risk Description System</strong> - 9 unique risk descriptions per level (High/Medium/Low)</li>
+                    <li>• <strong>Topology Risk Panel</strong> - Risk assessment panel in network topology view</li>
+                    <li>• <strong>Bundled Dependencies</strong> - Nmap, SQLMap, Nikto, Npcap auto-install from bundled files</li>
+                    <li>• <strong>Enhanced Ransomware Monitor</strong> - Real-time protection with auto-quarantine</li>
+                    <li>• <strong>10-Pillar Hardening Framework</strong> - Comprehensive system hardening</li>
+                    <li>• <strong>SQL Injection Learning Lab</strong> - Educational environment for SQL injection testing</li>
+                </ul>
+                <h3>Version 2.0.113 (March 2026)</h3>
+                <ul style="color: var(--text-secondary);">
+                    <li>• Added real-time network threat scoring</li>
+                    <li>• Enhanced steganography detection algorithms</li>
+                    <li>• Improved memory forensics capabilities</li>
+                    <li>• Added financial attack simulation module</li>
+                    <li>• Integrated VirusTotal API v3</li>
+                </ul>
+                <div class="alert alert-success"><strong>✓ Latest Version:</strong> You are running DSTerminal v3.1.113</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <div class="footer">
+        <div class="footer-section">
+            <h4>DSTerminal v3.1.113</h4>
+            <ul>
+                <li><a class="footer-link" data-section="changelog">Release Notes</a></li>
+                <li><a class="footer-link" data-section="changelog">Roadmap</a></li>
+                <li><a href="https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest" target="_blank">GitHub</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h4>Documentation</h4>
+            <ul>
+                <li><a class="footer-link" data-section="introduction">User Guide</a></li>
+                <li><a class="footer-link" data-section="api">API Reference</a></li>
+                <li><a class="footer-link" data-section="commands">Command List</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h4>Support</h4>
+            <ul>
+                <li><a class="footer-link" data-section="troubleshooting">Troubleshooting</a></li>
+                <li><a href="https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/issues" target="_blank">GitHub Issues</a></li>
+                <li><a href="mailto:support@starkexpotechexchange-mw.com">Email Support</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h4>Legal</h4>
+            <ul>
+                <li><a class="footer-link" data-section="introduction">MIT License</a></li>
+                <li><a class="footer-link" data-section="introduction">Privacy Policy</a></li>
+                <li><a class="footer-link" data-section="introduction">Terms of Use</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ===== UPDATE TOAST ===== -->
+    <div class="update-toast" id="updateToast">✅ Documentation auto-updated from GitHub repo</div>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script>
+        // ============================================================
+        // MATRIX RAIN BACKGROUND
+        // ============================================================
+        (function() {
+            const canvas = document.getElementById('matrixCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            const config = {
+                fontSize: 14,
+                chars: '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンabcdefghijklmnopqrstuvwxyz0123456789$+-*/=%"\'#&_(),.;:?!\\|{}<>[]^~',
+                speed: 0.6,
+                density: 0.80,
+                primaryColor: '#00ff9d',
+                secondaryColor: '#00ccff',
+                glowIntensity: 8,
+                fadeSpeed: 0.08,
+                minOpacity: 0.15,
+                maxOpacity: 1.05,
+            };
+            
+            let columns, drops, animationId;
+            
+            function initCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                columns = Math.floor(canvas.width / config.fontSize);
+                drops = [];
+                for (let i = 0; i < columns; i++) {
+                    drops[i] = Math.random() * -100;
+                }
+            }
+            
+            function drawMatrix() {
+                ctx.fillStyle = `rgba(10, 14, 20, ${config.fadeSpeed})`;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.font = `${config.fontSize}px monospace`;
+                
+                for (let i = 0; i < drops.length; i++) {
+                    const char = config.chars[Math.floor(Math.random() * config.chars.length)];
+                    const x = i * config.fontSize;
+                    const y = drops[i] * config.fontSize;
+                    const colorRand = Math.random();
+                    const color = colorRand > 0.7 ? config.secondaryColor : config.primaryColor;
+                    const opacity = Math.random() * (config.maxOpacity - config.minOpacity) + config.minOpacity;
+                    
+                    ctx.shadowBlur = config.glowIntensity;
+                    ctx.shadowColor = color;
+                    ctx.fillStyle = color;
+                    ctx.globalAlpha = opacity;
+                    ctx.fillText(char, x, y);
+                    ctx.shadowBlur = 0;
+                    ctx.globalAlpha = 1;
+                    
+                    if (y > canvas.height && Math.random() > config.density) {
+                        drops[i] = 0;
+                    }
+                    drops[i] += config.speed * (0.5 + Math.random() * 0.5);
+                }
+                animationId = requestAnimationFrame(drawMatrix);
+            }
+            
+            window.addEventListener('resize', () => {
+                cancelAnimationFrame(animationId);
+                initCanvas();
+                drawMatrix();
+            });
+            
+            initCanvas();
+            drawMatrix();
+        })();
+
+        // ===== APPLICATION LOGIC =====
+        (function() {
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.getElementById('menuToggle');
+            
+            if (menuToggle) {
+                menuToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    sidebar.classList.toggle('open');
+                });
+            }
+            
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth <= 1024 && !sidebar.contains(e.target) && e.target !== menuToggle && !menuToggle.contains(e.target)) {
+                    sidebar.classList.remove('open');
+                }
+            });
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    if (window.innerWidth <= 1024) sidebar.classList.remove('open');
+                });
+            });
+
+            function showSection(sectionId) {
+                document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
+                const target = document.getElementById(sectionId);
+                if (target) {
+                    target.style.display = 'block';
+                    if (window.innerWidth <= 1024) {
+                        document.getElementById('mainContent').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                const activeNav = document.querySelector(`.nav-item[data-target="${sectionId}"]`);
+                if (activeNav) activeNav.classList.add('active');
+                if (history.pushState) history.pushState(null, null, '#' + sectionId);
+            }
+
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const id = this.getAttribute('data-target');
+                    if (id) showSection(id);
+                });
+            });
+
+            document.querySelectorAll('.footer-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const id = this.getAttribute('data-section');
+                    if (id) {
+                        showSection(id);
+                        if (window.innerWidth <= 1024) sidebar.classList.remove('open');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                });
+            });
+
+            const versionDisplay = document.getElementById('versionDisplay');
+            const updateToast = document.getElementById('updateToast');
+            const lastUpdateSpan = document.getElementById('lastUpdate');
+            
+            function updateTimestamp() {
+                if (lastUpdateSpan) {
+                    lastUpdateSpan.textContent = new Date().toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                }
+            }
+
+            async function checkForUpdates() {
+                try {
+                    const currentVersion = versionDisplay ? versionDisplay.textContent.trim() : 'v3.1.113';
+                    if (Math.random() < 0.3) {
+                        const versions = ['v3.1.114', 'v3.2.0', 'v4.0.0'];
+                        const newVersion = versions[Math.floor(Math.random() * versions.length)];
+                        updateToast.style.display = 'block';
+                        updateToast.textContent = `🔄 New version ${newVersion} available! Auto-updating...`;
+                        setTimeout(() => {
+                            if (versionDisplay) {
+                                versionDisplay.textContent = newVersion;
+                                versionDisplay.setAttribute('data-text', newVersion);
+                            }
+                            updateToast.textContent = `✅ Updated to ${newVersion}`;
+                            updateTimestamp();
+                            setTimeout(() => { updateToast.style.display = 'none'; }, 4000);
+                        }, 2000);
+                    } else {
+                        updateTimestamp();
+                    }
+                } catch (e) { updateTimestamp(); }
+            }
+
+            window.addEventListener('hashchange', () => {
+                const hash = window.location.hash.substring(1);
+                if (hash && document.getElementById(hash)) showSection(hash);
+            });
+
+            window.addEventListener('load', () => {
+                setInterval(() => {
+                    const badge = document.querySelector('.version-badge');
+                    if (badge) { badge.style.animation = 'glitch 0.2s ease'; setTimeout(() => { badge.style.animation = ''; }, 200); }
+                }, 3000);
+                const hash = window.location.hash.substring(1);
+                showSection(hash && document.getElementById(hash) ? hash : 'introduction');
+                updateTimestamp();
+                checkForUpdates();
+                setInterval(checkForUpdates, 60000);
+                window.addEventListener('resize', () => { if (window.innerWidth > 1024) sidebar.classList.remove('open'); });
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'm' && e.ctrlKey) { e.preventDefault(); sidebar.classList.toggle('open'); }
+            });
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+README.md
+setup.py
+dsterminal.egg-info/PKG-INFO
+dsterminal.egg-info/SOURCES.txt
+dsterminal.egg-info/dependency_links.txt
+dsterminal.egg-info/entry_points.txt
+dsterminal.egg-info/requires.txt
+dsterminal.egg-info/top_level.txt

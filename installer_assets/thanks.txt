@@ -1,0 +1,10 @@
+DSTerminal has been successfully installed!
+
+You can launch DSTerminal from the Start Menu or your Desktop shortcut.
+
+Your workspace has been created in:
+C:\Users\<YourUserName>\AppData\Roaming\DSTerminal
+
+Stay secure, and enjoy the ultimate cinematic cybersecurity experience!
+
+— Stark Expo Tech Exchange

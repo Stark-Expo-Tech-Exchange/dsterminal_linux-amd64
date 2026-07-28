@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dsterminal Manifest v3.1.113</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; 
+               max-width: 900px; margin: 40px auto; padding: 20px; 
+               line-height: 1.6; color: #1a1a2e; background: #fafafa; }
+        h1 { text-align: center; color: #0a0a1a; border-bottom: 3px solid #00d4ff; padding-bottom: 10px; }
+        h2 { color: #16213e; border-left: 4px solid #00d4ff; padding-left: 15px; margin-top: 30px; }
+        .section { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; color: #777; font-size: 0.9em; }
+        .metadata { background: #f5f5fa; padding: 15px; border-radius: 8px; margin: 15px 0; }
+        .metadata-item { display: flex; padding: 5px 0; }
+        .metadata-label { font-weight: bold; width: 150px; }
+        .table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.9em; }
+        .table th { background: #e8e8f0; padding: 8px; border: 1px solid #ccc; text-align: center; font-weight: bold; }
+        .table td { padding: 8px; border: 1px solid #ccc; text-align: center; }
+        .bullet { margin-left: 20px; padding: 3px 0; }
+        .monospace { font-family: 'Courier New', monospace; background: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto; white-space: pre-wrap; }
+        .badge { display: inline-block; background: #00d4ff; color: white; padding: 2px 10px; border-radius: 12px; font-size: 0.7em; }
+        .spdx-badge { display: inline-block; background: #16213e; color: white; padding: 2px 10px; border-radius: 12px; font-size: 0.7em; }
+        a { color: #00d4ff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        code { background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1>Dsterminal Platform Manifest</h1>
+    <p style="text-align: center; font-size: 1.2em; color: #1a3a5c;">Version 3.1.113 <span class="badge">Latest</span></p>
+    <p style="text-align: center; font-style: italic;">"For Defensive Use Only. Protect. Detect. Respond. Explain."</p>
+    
+    <div class="metadata">
+        <div class="metadata-item"><span class="metadata-label">Issued By:</span> Dsterminal Security Labs</div>
+        <div class="metadata-item"><span class="metadata-label">Date:</span> July 20, 2026</div>
+        <div class="metadata-item"><span class="metadata-label">Contact:</span> <a href="mailto:manifest@dsterminal.dev">manifest@dsterminal.dev</a></div>
+        <div class="metadata-item"><span class="metadata-label">GPG Key:</span> <code>0xA4F5C123D7E8F9AB</code></div>
+        <div class="metadata-item"><span class="metadata-label">Classification:</span> <strong>UNCLASSIFIED / PUBLIC RELEASE</strong></div>
+        <div class="metadata-item"><span class="metadata-label">SPDX SBOM:</span> <code>Dsterminal_SPDX_v3.1.113.json</code> <span class="spdx-badge">SPDX-2.3</span></div>
+        <div class="metadata-item"><span class="metadata-label">QR Code URL:</span> <a href="https://dsterminal.dev/verify/manifest">https://dsterminal.dev/verify/manifest</a></div>
+    </div>
+
+    <div class="section">
+        <h2>1. PURPOSE & ETHICAL FRAMEWORK</h2>
+        <p>Dsterminal is an offline-first, AI-assisted cybersecurity platform designed exclusively</p><p>for defensive operations (Blue Team), security education, and infrastructure hardening.</p><br><p>Core Ethical Commitments:</p><div class="bullet">• Legal Use Only: This platform is strictly prohibited for unauthorized network</div><p>  intrusion, exfiltration, or manipulation of data without explicit ownership or consent.</p><div class="bullet">• Defensive Mandate: Every module exists to identify, report, and remediate</div><p>  vulnerabilities within the user's legally owned or authorized environment.</p><div class="bullet">• Zero Harm: Automated actions require explicit user confirmation unless explicitly</div><p>  overridden for automated enterprise deployments.</p>
+    </div>
+
+    <div class="section">
+        <h2>2. DATA PRIVACY & SOVEREIGNTY (The Zero-Phone-Home Pledge)</h2>
+        <h3>2.1 Absolute Data Locality</h3><p>All data processed by Dsterminal remains on the local machine. No logs, telemetry,</p><p>configuration files, or analysis results are transmitted to external servers, cloud</p><p>platforms, or third-party entities by default.</p><br><h3>2.2 Network Behavior</h3><div class="bullet">• Core functionality operates fully offline (anomaly detection, system hardening,</div><p>  log analysis, SQLmap labs).</p><div class="bullet">• Internet-Required Modules (SSL/TLS validation, VirusTotal scanning, self-updates)</div><p>  require explicit user consent with a warning prompt.</p><br><h3>2.3 No Telemetry or Backdoors</h3><p>Dsterminal does not contain telemetry agents, analytics trackers, call-home</p><p>routines, or backdoor mechanisms.</p><br><h3>2.4 Data Encryption</h3><p>All locally stored data is encrypted at rest using AES-256 with a user-provided</p><p>passphrase. If no passphrase is provided, data uses OS-level file permissions.</p>
+    </div>
+
+    <div class="section">
+        <h2>3. EXPLAINABILITY & AUDITABILITY (The Glass Box Pledge)</h2>
+        <p>Dsterminal's AI and automated decision-making are not black boxes. Every action is</p><p>traceable and defensible in a court of law or military tribunal.</p><br><h3>3.1 Decision Transparency</h3><p>Every alert, recommendation, or action includes:</p><div class="bullet">• Plain-English Rationale: What was detected and why it matters.</div><div class="bullet">• Evidence Footprint: Raw log snippets, file hashes, and network packet summaries.</div><div class="bullet">• Mathematical Trace: The exact decision path (Decision Tree, feature importance,</div><p>  or behavioral rule) that led to the conclusion.</p><div class="bullet">• MITRE ATT&CK Mapping: If applicable, the specific Tactic and Technique.</div><br><h3>3.2 Audit Trail</h3><p>Dsterminal maintains an immutable, append-only audit log recording:</p><div class="bullet">• Timestamp (millisecond precision, timezone-aware)</div><div class="bullet">• Module and sub-command executed</div><div class="bullet">• AI Model version used</div><div class="bullet">• Cryptographic hash (SHA-256) of input data</div><div class="bullet">• Full decision path and confidence score</div><div class="bullet">• Human user who executed the command</div><div class="bullet">• Any human override or manual intervention</div>
+    </div>
+
+    <div class="section">
+        <h2>4. SECURITY & INTEGRITY (Protecting the Protector)</h2>
+        <h3>4.1 Tamper-Proof Installation</h3><p>The official installer includes a SHA-256 checksum manifest. If any checksum fails,</p><p>the installation aborts with a tamper warning.</p><br><h3>4.2 Update Integrity</h3><p>Self-updates are signed with a GPG key controlled by the Dsterminal development team.</p><p>Updates apply only with a valid GPG signature and matching checksum.</p><br><h3>4.3 Privilege Escalation</h3><p>Dsterminal requests the minimum necessary privileges. System hardening and quarantine</p><p>modules require elevated privileges but notify the user and require confirmation.</p><br><h3>4.4 Dependency Vetting</h3><p>All bundled libraries and binaries are verified for known CVEs during the build</p><p>process. A Software Bill of Materials (SBOM) in SPDX format is included.</p>
+    </div>
+
+    <div class="section">
+        <h2>5. MODULARITY & SCOPE (Defined Use Cases)</h2>
+        <p>Dsterminal is a modular platform with the following core modules:</p><br><table class="table"><tr><td>Module</td><td>Internet?</td><td>Offline Capable</td></tr><tr><th>------------------------</th><th>-------------</th><th>-----------------</th></tr><tr><td>Network Recon</td><td>No</td><td>Yes</td></tr><tr><td>Log Forensics</td><td>No</td><td>Yes</td></tr><tr><td>File Quarantine</td><td>Optional VT</td><td>Yes</td></tr><tr><td>SSL/TLS Inspector</td><td>Yes</td><td>Partial</td></tr><tr><td>System Hardening</td><td>No</td><td>Yes</td></tr><tr><td>SQLmap Learning Lab</td><td>No</td><td>Yes</td></tr><tr><td>AI Advisor</td><td>No</td><td>Yes</td></tr><tr><td>Report Engine</td><td>No</td><td>Yes</td></tr><tr><td>Self-Update</td><td>Yes</td><td>File-based</td></tr><tr><td>Compliance Scanner</td><td>No</td><td>Yes</td></tr><tr><td>Threat Intelligence</td><td>Optional</td><td>Yes (bundled)</td></tr><br></table><p>Each module can be independently enabled/disabled via:</p><p>dsterminal module --enable <module> --disable <module></p>
+    </div>
+
+    <div class="section">
+        <h2>6. LIABILITY & DISCLAIMER</h2>
+        <h3>6.1 Defensive Use Only</h3><p>Dsterminal is provided as is for defensive and educational purposes. Users are</p><p>solely responsible for ensuring they have proper authorization to scan, test, or</p><p>harden any system.</p><br><h3>6.2 No Warranty</h3><p>The platform is provided without warranty of any kind. While we strive for accuracy</p><p>and security, no system is infallible.</p><br><h3>6.3 Compliance</h3><p>Users are responsible for ensuring their use of Dsterminal complies with local,</p><p>national, and international laws, including but not limited to:</p><div class="bullet">• Computer Fraud and Abuse Act (CFAA - US)</div><div class="bullet">• General Data Protection Regulation (GDPR - EU)</div><div class="bullet">• Defense Trade Controls (ITAR - US)</div><div class="bullet">• Military and government-specific cybersecurity policies</div>
+    </div>
+
+    <div class="section">
+        <h2>7. TRANSPARENCY & ACCOUNTABILITY</h2>
+        <h3>7.1 Open Communication</h3><p>The Dsterminal development team is committed to transparency. Users may request:</p><div class="bullet">• Source code access (under NDA for proprietary modules)</div><div class="bullet">• Full model training data (sanitized and anonymized)</div><div class="bullet">• Penetration test results from independent third-party audits</div><br><h3>7.2 Reporting Vulnerabilities</h3><p>Report vulnerabilities responsibly to: security@dsterminal.dev</p><p>We guarantee:</p><div class="bullet">• Response within 72 hours</div><div class="bullet">• Acknowledgment within 24 hours</div><div class="bullet">• Fix within 30 days (or waiver accepted)</div><br><h3>7.3 Continuous Improvement</h3><p>Dsterminal evolves with the threat landscape. We will never compromise privacy,</p><p>offline capability, or explainability for convenience.</p>
+    </div>
+
+    <div class="section">
+        <h2>8. USER ACKNOWLEDGMENT</h2>
+        <p>By installing, executing, or updating Dsterminal, the user acknowledges that they have</p><p>read, understood, and agreed to this manifest in its entirety.</p><br><p>The user confirms that:</p><div class="bullet">• They have the legal authority to analyze, scan, and harden the systems on which</div><p>  Dsterminal is used.</p><div class="bullet">• They will use the platform solely for defensive, educational, or authorized</div><p>  operational purposes.</p><div class="bullet">• They accept that Dsterminal provides guidance, not guarantees, and the ultimate</div><p>  responsibility for security decisions rests with the user.</p>
+    </div>
+
+    <div class="section">
+        <h2>9. SIGNATURE & VERIFICATION</h2>
+        <p>This manifest is digitally signed using the Dsterminal GPG Key</p><p>(Key ID: 0xA4F5C123D7E8F9AB) and is valid for version 3.1.113.</p><br><p>Verification Methods:</p><h3>1. GPG Signature Verification:</h3><p>   gpg --verify Dsterminal_Manifest_v3.1.113.pdf.sig Dsterminal_Manifest_v3.1.113.pdf</p><br><h3>2. SHA-256 Checksum:</h3><p>   sha256sum Dsterminal_Manifest_v3.1.113.pdf</p><br><h3>3. QR Code Verification:</h3><p>   Scan the QR code included in this document to verify on our website</p><br><h3>4. SPDX SBOM Verification:</h3><p>   The SPDX bill of materials is included as Dsterminal_SPDX_v3.1.113.json</p><br><div class="bullet">• BEGIN PGP SIGNATURE-----</div><p>Version: GnuPG v2.4</p><br><p>iQIzBAEBCgAdFiEE...</p><p>wE4HfJkLmNpQrStUvWxYz...</p><div class="bullet">• END PGP SIGNATURE-----</div><br><p>Issued By: Dsterminal Security Labs</p><p>Date: July 20, 2026</p><p>Contact: manifest@dsterminal.dev</p><p>Version: 3.1.113</p>
+    </div>
+
+    <div class="section">
+        <h2>10. SOFTWARE BILL OF MATERIALS (SBOM)</h2>
+        <p>Dsterminal provides a comprehensive Software Bill of Materials (SBOM) in SPDX format</p><p>to ensure transparency and compliance with cybersecurity standards including:</p><div class="bullet">• Executive Order 14028 (US)</div><div class="bullet">• NIST SP 800-218 (SSDF)</div><div class="bullet">• CISA requirements for software supply chain security</div><br><p>The SBOM includes:</p><div class="bullet">• All direct and transitive dependencies</div><div class="bullet">• Version information for each component</div><div class="bullet">• License information</div><div class="bullet">• Supplier information</div><div class="bullet">• Known vulnerabilities (when available)</div><br><p>SPDX File: Dsterminal_SPDX_v3.1.113.json</p><p>SPDX Version: SPDX-2.3</p><p>Document Namespace: https://dsterminal.dev/spdx/Dsterminal-3.1.113</p><br><p>The SBOM can be verified using SPDX-compliant tools:</p><div class="bullet">• spdx-sbom-generator --file Dsterminal_SPDX_v3.1.113.json --verify</div><div class="bullet">• spdx-tools --validate Dsterminal_SPDX_v3.1.113.json</div><br><p>Key Dependencies:</p><table class="table"><tr><td>Component</td><td>Version</td><td>License</td></tr><tr><th>---------------------</th><th>-------------</th><th>----------------------</th></tr><tr><td>Python</td><td>3.x</td><td>PSF-2.0</td></tr><tr><td>reportlab</td><td>5.0.0</td><td>BSD-3-Clause</td></tr><tr><td>Pillow</td><td>12.3.0</td><td>HPND</td></tr><tr><td>qrcode</td><td>8.0</td><td>BSD-3-Clause</td></tr><tr><td>Dsterminal Platform</td><td>3.1.113</td><td>Proprietary</td></tr><br></table><p>For a complete list, refer to the SPDX JSON file or run:</p><p>dsterminal sbom --export=spdx</p>
+    </div>
+
+    <div class="footer">
+        <p><strong>Verification Methods:</strong></p>
+        <ul style="list-style: none; padding: 0;">
+            <li>• GPG Signature: <code>gpg --verify Dsterminal_Manifest_v3.1.113.pdf.sig Dsterminal_Manifest_v3.1.113.pdf</code></li>
+            <li>• SHA-256: <code>sha256sum Dsterminal_Manifest_v3.1.113.pdf</code></li>
+            <li>• SPDX SBOM: <code>Dsterminal_SPDX_v3.1.113.json</code></li>
+            <li>• QR Code: Scan the QR code on the cover</li>
+        </ul>
+        <br>
+        <p>© 2024-2026 Dsterminal Security Labs. All rights reserved.</p>
+        <p>Generated: July 20, 2026 at 20:32:49</p>
+        <p>Version 3.1.113 | <a href="https://dsterminal.dev">https://dsterminal.dev</a></p>
+        <p style="font-size: 0.8em; color: #999;">
+            <a href="Dsterminal_SPDX_v3.1.113.json">Download SPDX SBOM</a> | 
+            <a href="https://dsterminal.dev/verify/manifest">Verify Online</a>
+        </p>
+    </div>
+</body>
+</html>

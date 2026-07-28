@@ -1,0 +1,3 @@
+﻿DSTerminal Security Report
+Generated: {DATE}
+Version: 2.1.0

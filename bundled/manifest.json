@@ -1,0 +1,47 @@
+{
+  "created": "2026-06-29 09:24:13",
+  "packages": {
+    "nmap": {
+      "bundled": true,
+      "path": "C:\\Users\\User\\Desktop\\desktop files\\DSTerminal_releases_latest\\bundled\\nmap",
+      "files": [
+        "nmap-7.95-setup.exe"
+      ]
+    },
+    "npcap": {
+      "bundled": true,
+      "path": "C:\\Users\\User\\Desktop\\desktop files\\DSTerminal_releases_latest\\bundled\\npcap",
+      "files": [
+        "npcap-1.79.exe"
+      ]
+    },
+    "metasploit": {
+      "bundled": true,
+      "path": "C:\\Users\\User\\Desktop\\desktop files\\DSTerminal_releases_latest\\bundled\\metasploit",
+      "files": [
+        "metasploit-latest-windows-x64-installer.exe"
+      ]
+    },
+    "sqlmap": {
+      "bundled": true,
+      "path": "C:\\Users\\User\\Desktop\\desktop files\\DSTerminal_releases_latest\\bundled\\sqlmap",
+      "files": [
+        "sqlmap.zip"
+      ]
+    },
+    "nikto": {
+      "bundled": true,
+      "path": "C:\\Users\\User\\Desktop\\desktop files\\DSTerminal_releases_latest\\bundled\\nikto",
+      "files": [
+        "nikto.zip"
+      ]
+    },
+    "whois": {
+      "bundled": true,
+      "path": "C:\\Users\\User\\Desktop\\desktop files\\DSTerminal_releases_latest\\bundled\\whois",
+      "files": [
+        "whois.ps1"
+      ]
+    }
+  }
+}
