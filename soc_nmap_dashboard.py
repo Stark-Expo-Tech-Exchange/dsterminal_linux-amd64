@@ -15,10 +15,6 @@ import threading
 import webbrowser
 import random
 import math
-<<<<<<< HEAD
-import socket
-=======
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass, field
@@ -42,7 +38,6 @@ class Colors:
     PINK = '\033[38;5;205m'
     RESET = '\033[0m'
     BOLD = '\033[1m'
-<<<<<<< HEAD
     try:
         DIM = '\033[2m'
     except:
@@ -54,11 +49,9 @@ class Colors:
     BLACK = '\033[30m'
     DARK_GRAY = '\033[90m'
     LIGHT_GRAY = '\033[37m'
-=======
     # Use this instead of DIM (some terminals don't support DIM)
     DIM = '\033[2m' if hasattr('\033[2m', '__str__') else '\033[90m'  # Fallback to dark gray
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
-
+ 
 
 # ============================================================
 # Required Imports
@@ -85,7 +78,6 @@ except ImportError:
 
 
 # ============================================================
-<<<<<<< HEAD
 # Domain to IP Resolution Helper
 # ============================================================
 
@@ -118,35 +110,30 @@ class OrganizationLocationDB:
     # Cache file for discovered organizations
     CACHE_FILE = os.path.expanduser("~/.dsterminal_org_cache.json")
     
-=======
-# ORGANIZATION LOCATION DATABASE (Universal - Works for ANY Country)
+ # ORGANIZATION LOCATION DATABASE (Universal - Works for ANY Country)
 # ============================================================
 
 class OrganizationLocationDB:
     """Database of organization headquarters locations (not server locations)"""
     
     # Add organizations from ANY country here
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
     ORGANIZATIONS = {
         # ========== MALAWI ==========
         "unima.ac.mw": {"country": "Malawi", "city": "Zomba", "lat": -15.3833, "lon": 35.3167, "flag": "🇲🇼", "region": "East Africa"},
         "must.ac.mw": {"country": "Malawi", "city": "Blantyre", "lat": -15.7833, "lon": 34.9667, "flag": "🇲🇼", "region": "East Africa"},
-<<<<<<< HEAD
-        "sparcsystems.africa": {"country": "Malawi", "city": "Lilongwe", "lat": -15.7833, "lon": 34.9667, "flag": "🇲🇼", "region": "East Africa"},
+        # "sparcsystems.africa": {"country": "Malawi", "city": "Lilongwe", "lat": -15.7833, "lon": 34.9667, "flag": "🇲🇼", "region": "East Africa"},
         "poly.ac.mw": {"country": "Malawi", "city": "Blantyre", "lat": -15.7833, "lon": 34.9667, "flag": "🇲🇼", "region": "East Africa"},
         "kuhes.ac.mw": {"country": "Malawi", "city": "Lilongwe", "lat": -13.9833, "lon": 33.7833, "flag": "🇲🇼", "region": "East Africa"},
         "mzuni.ac.mw": {"country": "Malawi", "city": "Mzuzu", "lat": -11.4667, "lon": 34.0167, "flag": "🇲🇼", "region": "East Africa"},
         "cc.ac.mw": {"country": "Malawi", "city": "Zomba", "lat": -15.7833, "lon": 34.9667, "flag": "🇲🇼", "region": "East Africa"},
         "medcol.ac.mw": {"country": "Malawi", "city": "Blantyre", "lat": -15.7833, "lon": 34.9667, "flag": "🇲🇼", "region": "East Africa"},
         "magu.ac.mw": {"country": "Malawi", "city": "Lilongwe", "lat": -15.3833, "lon": 35.3167, "flag": "🇲🇼", "region": "East Africa"},
-=======
         "sparcsystems.africa": {"country": "Malawi", "city": "Blantyre", "lat": -15.7833, "lon": 34.9667, "flag": "🇲🇼", "region": "East Africa"},
         "poly.ac.mw": {"country": "Malawi", "city": "Blantyre", "lat": -15.7833, "lon": 34.9667, "flag": "🇲🇼", "region": "East Africa"},
         "kuhes.ac.mw": {"country": "Malawi", "city": "Lilongwe", "lat": -13.9833, "lon": 33.7833, "flag": "🇲🇼", "region": "East Africa"},
         "mzuni.ac.mw": {"country": "Malawi", "city": "Mzuzu", "lat": -11.4667, "lon": 34.0167, "flag": "🇲🇼", "region": "East Africa"},
         "cc.ac.mw": {"country": "Malawi", "city": "Blantyre", "lat": -15.7833, "lon": 34.9667, "flag": "🇲🇼", "region": "East Africa"},
         "medcol.ac.mw": {"country": "Malawi", "city": "Blantyre", "lat": -15.7833, "lon": 34.9667, "flag": "🇲🇼", "region": "East Africa"},
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         
         # ========== SOUTH AFRICA ==========
         "uct.ac.za": {"country": "South Africa", "city": "Cape Town", "lat": -33.9249, "lon": 18.4241, "flag": "🇿🇦", "region": "Southern Africa"},
@@ -200,7 +187,6 @@ class OrganizationLocationDB:
     }
     
     @classmethod
-<<<<<<< HEAD
     def _load_cache(cls) -> Dict:
         """Load cached organization locations from file"""
         if os.path.exists(cls.CACHE_FILE):
@@ -279,7 +265,6 @@ class OrganizationLocationDB:
             return cache[domain_lower]
         
         # 3. Check partial match
-=======
     def get_organization_location(cls, domain: str, hostname: str = "") -> Optional[Dict]:
         """Get organization headquarters location for a domain"""
         domain_lower = domain.lower()
@@ -290,12 +275,10 @@ class OrganizationLocationDB:
             return cls.ORGANIZATIONS[domain_lower]
         
         # Check partial match (e.g., .ac.mw domains)
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         for org_domain, location in cls.ORGANIZATIONS.items():
             if org_domain in domain_lower or domain_lower.endswith(org_domain):
                 return location
         
-<<<<<<< HEAD
         # 4. Auto-detect from TLD
         detected = cls._detect_location_from_tld(domain)
         if detected:
@@ -305,9 +288,7 @@ class OrganizationLocationDB:
             return detected
         
         # 5. Check .africa domains
-=======
         # Check if it's an .africa domain (could be any African country)
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         if domain_lower.endswith('.africa') or '.africa' in domain_lower:
             return {
                 "country": "Africa (HQ Unknown)",
@@ -316,25 +297,19 @@ class OrganizationLocationDB:
                 "lon": 0,
                 "flag": "🌍",
                 "region": "Africa",
-<<<<<<< HEAD
                 "note": "Organization headquarters location unknown"
-=======
                 "note": "Organization headquarters location unknown - showing approximate continent"
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             }
         
         return None
     
     @classmethod
     def add_organization(cls, domain: str, country: str, city: str, lat: float, lon: float, flag: str = "🌐", region: str = "Unknown"):
-<<<<<<< HEAD
         """Dynamically add an organization to the database and cache"""
         domain_lower = domain.lower()
         location = {
-=======
         """Dynamically add an organization to the database"""
         cls.ORGANIZATIONS[domain.lower()] = {
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             "country": country,
             "city": city,
             "lat": lat,
@@ -342,7 +317,7 @@ class OrganizationLocationDB:
             "flag": flag,
             "region": region
         }
-<<<<<<< HEAD
+
         # Add to in-memory database
         cls.ORGANIZATIONS[domain_lower] = location
         
@@ -354,13 +329,10 @@ class OrganizationLocationDB:
         print(f"[+] Added {domain} to organization database ({country})")
 
 
-=======
         print(f"[+] Added {domain} to organization database ({country})")
 
 
 # Initialize organization database at startup
-
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
 # ============================================================
 # Data Classes
 # ============================================================
@@ -378,7 +350,7 @@ class NetworkNode:
     risk_score: float = 0.0
     is_organization_location: bool = False
     server_location: str = ""
-<<<<<<< HEAD
+
     server_country: str = ""
     server_city: str = ""
     server_lat: float = 0.0
@@ -386,9 +358,6 @@ class NetworkNode:
     server_isp: str = ""
     org_country: str = ""
     org_city: str = ""
-=======
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
-
 
 @dataclass
 class ScanHistory:
@@ -437,17 +406,16 @@ class AIVulnerabilityScorer:
 
 
 # ============================================================
-<<<<<<< HEAD
+
 # Enhanced GeoIP Lookup with Dual Location
-=======
+ 
 # Enhanced GeoIP Lookup with Organization Location
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
 # ============================================================
 
 def get_server_location(ip: str) -> Dict:
     """Get actual server location (where the website is hosted)"""
     try:
-<<<<<<< HEAD
+
         if ip.startswith(("192.168.", "10.", "172.", "127.", "169.254.", "::1")):
             return {"country": "Private Network", "city": "Local", "lat": 0, "lon": 0, "isp": "Private", "location": "Local Network"}
         
@@ -517,7 +485,7 @@ class EnhancedGeoMapVisualizer:
     def __init__(self):
         self.locations = []
         self.org_locations = []
-=======
+ 
         if ip.startswith(("192.168.", "10.", "172.", "127.", "169.254.")):
             return {"country": "Private Network", "city": "Local", "lat": 0, "lon": 0, "isp": "Private", "location": "Local Network"}
         
@@ -571,25 +539,23 @@ class EnhancedGeoMapVisualizer:
     
     def __init__(self):
         self.locations = []
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         
     def add_location(self, lat: float, lon: float, ip: str, risk_score: float, 
                      ports: List[Dict] = None, country: str = "", 
                      is_org_location: bool = False, server_location: str = "",
-<<<<<<< HEAD
+
                      server_country: str = "", server_city: str = "",
                      server_lat: float = 0.0, server_lon: float = 0.0,
                      server_isp: str = "",
                      org_country: str = "", org_city: str = "",
-=======
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
+ 
                      domain: str = ""):
         self.locations.append({
             "lat": lat, "lon": lon, "ip": ip, "risk_score": risk_score,
             "ports": ports or [], "country": country, "timestamp": datetime.now(),
             "is_organization_location": is_org_location,
             "server_location": server_location,
-<<<<<<< HEAD
+
             "server_country": server_country,
             "server_city": server_city,
             "server_lat": server_lat,
@@ -615,27 +581,25 @@ class EnhancedGeoMapVisualizer:
     
     def generate_threat_map(self) -> str:
         """Generate interactive threat intelligence map with DUAL location display"""
-=======
+
             "domain": domain
-        })
+    
     
     def generate_threat_map(self) -> str:
         """Generate interactive threat intelligence map with BLINKING lines and circles"""
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         if not GEO_AVAILABLE:
             return '<div style="padding:50px;text-align:center;">🌍 GeoIP module not available</div>'
         
         m = folium.Map(location=[20, 0], zoom_start=2, tiles='CartoDB dark_matter', control_scale=True)
         
-<<<<<<< HEAD
+
         blink_css = """
         <style>
-=======
+ 
         # CSS for blinking animations - LINES AND CIRCLES
         blink_css = """
         <style>
             /* Blinking animations for circles */
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             @keyframes blink-red { 
                 0%, 100% { opacity: 1; filter: drop-shadow(0 0 5px #ff0000); transform: scale(1); } 
                 50% { opacity: 0.3; filter: drop-shadow(0 0 20px #ff0000); transform: scale(1.2); } 
@@ -652,11 +616,10 @@ class EnhancedGeoMapVisualizer:
                 0%, 100% { opacity: 1; filter: drop-shadow(0 0 5px #00ff00); transform: scale(1); } 
                 50% { opacity: 0.6; filter: drop-shadow(0 0 8px #00ff00); transform: scale(1.05); } 
             }
-<<<<<<< HEAD
-=======
+
+ 
             
             /* Blinking animations for lines */
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             @keyframes blink-line-red {
                 0%, 100% { stroke: #ff0000; stroke-width: 2; stroke-dasharray: 5, 5; opacity: 1; }
                 50% { stroke: #ff6666; stroke-width: 4; stroke-dasharray: 10, 5; opacity: 0.7; }
@@ -673,48 +636,44 @@ class EnhancedGeoMapVisualizer:
                 0%, 100% { stroke: #00ff00; stroke-width: 1.5; stroke-dasharray: 4, 4; opacity: 1; }
                 50% { stroke: #88ff88; stroke-width: 2.5; stroke-dasharray: 6, 4; opacity: 0.7; }
             }
-<<<<<<< HEAD
-=======
+
+ 
             
             /* Circle blinking classes */
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             .blink-critical { animation: blink-red 0.6s ease-in-out infinite; }
             .blink-high { animation: blink-orange 0.8s ease-in-out infinite; }
             .blink-medium { animation: blink-yellow 1s ease-in-out infinite; }
             .blink-low { animation: blink-green 1.2s ease-in-out infinite; }
-<<<<<<< HEAD
-=======
+
+ 
             
             /* Line blinking classes */
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             .line-critical { animation: blink-line-red 0.6s ease-in-out infinite; }
             .line-high { animation: blink-line-orange 0.8s ease-in-out infinite; }
             .line-medium { animation: blink-line-yellow 1s ease-in-out infinite; }
             .line-low { animation: blink-line-green 1.2s ease-in-out infinite; }
-<<<<<<< HEAD
-=======
+
+ 
             
             /* Pulse ring effect */
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             @keyframes pulse-ring {
                 0% { transform: scale(0.8); opacity: 0.8; }
                 100% { transform: scale(2); opacity: 0; }
             }
-<<<<<<< HEAD
+
             .pulse-ring { animation: pulse-ring 1.5s ease-out infinite; }
-=======
+ 
             .pulse-ring {
                 animation: pulse-ring 1.5s ease-out infinite;
             }
             
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             .live-badge { 
                 position: fixed; top: 10px; right: 10px; background: #00ff00; color: #000; 
                 padding: 5px 10px; border-radius: 5px; font-family: monospace; font-size: 10px; 
                 z-index: 1000; animation: blink-green 1s infinite; font-weight: bold;
             }
-<<<<<<< HEAD
-=======
+
+ 
             
             .org-marker {
                 border: 3px solid #ffaa00;
@@ -722,7 +681,6 @@ class EnhancedGeoMapVisualizer:
             }
             
             /* Animated connection line */
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             .animated-line {
                 stroke-dasharray: 10;
                 animation: dash 1s linear infinite;
@@ -730,7 +688,7 @@ class EnhancedGeoMapVisualizer:
             @keyframes dash {
                 to { stroke-dashoffset: -20; }
             }
-<<<<<<< HEAD
+
             .dual-location-badge {
                 background: rgba(0,0,0,0.8);
                 color: #ffaa00;
@@ -740,8 +698,7 @@ class EnhancedGeoMapVisualizer:
                 margin-left: 5px;
                 border: 1px solid #ffaa00;
             }
-=======
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
+ 
         </style>
         """
         m.get_root().header.add_child(folium.Element(blink_css))
@@ -753,21 +710,20 @@ class EnhancedGeoMapVisualizer:
             HeatMap(heat_data, radius=25, blur=15, max_zoom=6,
                 gradient={0.2: 'blue', 0.5: 'lime', 0.8: 'orange', 1: 'red'}).add_to(m)
         
-<<<<<<< HEAD
+
         valid_locations = [loc for loc in self.locations if loc["lat"] != 0]
         
         # Draw connection lines
-=======
+ 
         # Create list of locations with valid coordinates for connection lines
         valid_locations = [loc for loc in self.locations if loc["lat"] != 0]
         
         # Draw BLINKING connection lines between locations
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         if len(valid_locations) >= 2:
             for i in range(len(valid_locations) - 1):
                 loc1 = valid_locations[i]
                 loc2 = valid_locations[i + 1]
-<<<<<<< HEAD
+
                 avg_risk = (loc1["risk_score"] + loc2["risk_score"]) / 2
                 if avg_risk >= 7:
                     line_class = "line-critical"
@@ -785,7 +741,7 @@ class EnhancedGeoMapVisualizer:
                 folium.PolyLine(
                     locations=[[loc1["lat"], loc1["lon"]], [loc2["lat"], loc2["lon"]]],
                     color=color,
-=======
+ 
                 
                 # Determine line color based on risk
                 avg_risk = (loc1["risk_score"] + loc2["risk_score"]) / 2
@@ -802,17 +758,16 @@ class EnhancedGeoMapVisualizer:
                 folium.PolyLine(
                     locations=[[loc1["lat"], loc1["lon"]], [loc2["lat"], loc2["lon"]]],
                     color="#ff0000" if avg_risk >= 7 else "#ff6600" if avg_risk >= 4 else "#ffcc00" if avg_risk >= 2 else "#00ff00",
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
                     weight=3,
                     opacity=0.8,
                     dash_array='5, 5',
                     className=line_class,
                     popup=f"Connection: {loc1['ip']} → {loc2['ip']}<br>Risk: {avg_risk:.1f}"
                 ).add_to(m)
-<<<<<<< HEAD
+
         
         # Add BLINKING markers for ALL locations
-=======
+ 
                 
                 # Add animated directional arrow (small circle along the line)
                 mid_lat = (loc1["lat"] + loc2["lat"]) / 2
@@ -830,7 +785,6 @@ class EnhancedGeoMapVisualizer:
                 ).add_to(m)
         
         # Add BLINKING markers
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         for loc in self.locations:
             if loc["lat"] == 0:
                 continue
@@ -840,35 +794,32 @@ class EnhancedGeoMapVisualizer:
                 color = "#ff0000"
                 blink_class = "blink-critical"
                 radius = 16
-<<<<<<< HEAD
+
                 pulse_radius = 200000
-=======
+ 
                 icon = "💀"
                 pulse_radius = 200000  # Large pulse for critical
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             elif risk >= 4:
                 color = "#ff6600"
                 blink_class = "blink-high"
                 radius = 13
-<<<<<<< HEAD
-=======
+
+ 
                 icon = "⚠️"
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
                 pulse_radius = 150000
             elif risk >= 2:
                 color = "#ffcc00"
                 blink_class = "blink-medium"
                 radius = 10
-<<<<<<< HEAD
-=======
+
+ 
                 icon = "●"
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
                 pulse_radius = 100000
             else:
                 color = "#00ff00"
                 blink_class = "blink-low"
                 radius = 7
-<<<<<<< HEAD
+
                 pulse_radius = 50000
             
             # Build popup HTML with DUAL location info
@@ -884,7 +835,7 @@ class EnhancedGeoMapVisualizer:
                     <b>🖥️ SERVER/HOSTING LOCATION:</b><br>
                     <span style="color: #ff6600;">  🌍 {loc.get('server_country', 'Unknown')} - {loc.get('server_city', 'Unknown')}</span><br>
                     <span style="color: #888; font-size: 10px;">  Provider: {loc.get('server_isp', 'Unknown')}</span><br>
-=======
+ 
                 icon = "✓"
                 pulse_radius = 50000
             
@@ -900,32 +851,30 @@ class EnhancedGeoMapVisualizer:
                     
                     <b>🖥️ SERVER/CLOUD LOCATION:</b><br>
                     <span style="color: #ff6600;">  🌍 {loc.get('server_location', 'Unknown')}</span><br>
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
                     
                     <b>⚠️ Risk Score:</b> <span style="color: {color}; font-weight: bold;">{risk}/10</span><br>
                     <b>🔓 Open Ports:</b> {len(loc.get('ports', []))}<br>
                     <b>🔧 Services:</b> {', '.join([p.get('service', 'unknown') for p in loc.get('ports', [])[:3]])}<br>
                     
-<<<<<<< HEAD
+
                     <span style="color: #888; font-size: 10px;">📌 Showing HQ location with server location overlay</span>
                     <br><span style="color: #ff6600; font-size: 10px;">🔘 Blinking circle indicates live monitoring</span>
                 </div>
                 """
                 # Star for organization headquarters
-=======
+ 
                     <hr style="border-color: #333; margin: 5px 0;">
                     <span style="color: #888; font-size: 10px;">ℹ️ Organization uses CDN/Cloud hosting - showing HQ location</span>
                     <br><span style="color: #ff6600; font-size: 10px;">🔘 Blinking circle indicates live monitoring</span>
                 </div>
                 """
                 # Add star marker for organization headquarters
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
                 folium.Marker(
                     location=[loc["lat"], loc["lon"]],
                     icon=folium.Icon(color="orange", icon="star", prefix="fa"),
                     popup=folium.Popup(popup_html, max_width=400)
                 ).add_to(m)
-<<<<<<< HEAD
+
                 
                 # Also add a small circle marker at the HQ location
                 folium.CircleMarker(
@@ -973,8 +922,7 @@ class EnhancedGeoMapVisualizer:
                         dash_array='5, 10',
                         popup=f"🏢 HQ → 🖥️ Server: {loc.get('domain', '')}"
                     ).add_to(m)
-=======
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
+ 
             else:
                 popup_html = f"""
                 <div style="font-family: monospace; background: #0a0a0a; color: #00ff00; padding: 12px; border-radius: 8px; min-width: 280px;">
@@ -982,12 +930,11 @@ class EnhancedGeoMapVisualizer:
                     <hr style="border-color: #333; margin: 5px 0;">
                     
                     <b>🖥️ SERVER LOCATION:</b><br>
-<<<<<<< HEAD
+
                     <span style="color: #ffcc00;">  🌍 {loc.get('country', 'Unknown')} - {loc.get('city', 'Unknown')}</span><br>
                     <span style="color: #888; font-size: 10px;">  Provider: {loc.get('server_isp', 'Unknown')}</span><br>
-=======
+ 
                     <span style="color: #ffcc00;">  {loc.get('flag', '🌐')} {loc['country']} - {loc.get('city', 'Unknown')}</span><br>
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
                     
                     <b>⚠️ Risk Score:</b> <span style="color: {color}; font-weight: bold;">{risk}/10</span><br>
                     <b>🔓 Open Ports:</b> {len(loc.get('ports', []))}<br>
@@ -999,10 +946,9 @@ class EnhancedGeoMapVisualizer:
                 </div>
                 """
                 
-<<<<<<< HEAD
-=======
+
+ 
                 # Add BLINKING circle marker
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
                 folium.CircleMarker(
                     location=[loc["lat"], loc["lon"]],
                     radius=radius,
@@ -1015,10 +961,9 @@ class EnhancedGeoMapVisualizer:
                     className=blink_class
                 ).add_to(m)
             
-<<<<<<< HEAD
-=======
+
+ 
             # Add PULSE RING effect for critical/high risk
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             if risk >= 4:
                 folium.Circle(
                     location=[loc["lat"], loc["lon"]],
@@ -1031,21 +976,19 @@ class EnhancedGeoMapVisualizer:
                     popup=f"⚠️ Active Threat Zone - Risk Level: {risk}/10"
                 ).add_to(m)
         
-<<<<<<< HEAD
+
         # Network mesh lines
-=======
+ 
         # Add BLINKING connection lines between all location pairs (network mesh)
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         if len(valid_locations) >= 2:
             for i in range(len(valid_locations)):
                 for j in range(i + 1, len(valid_locations)):
                     loc1 = valid_locations[i]
                     loc2 = valid_locations[j]
-<<<<<<< HEAD
-=======
+
+ 
                     
                     # Calculate distance-based risk
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
                     dist_risk = (loc1["risk_score"] + loc2["risk_score"]) / 2
                     
                     if dist_risk >= 7:
@@ -1075,11 +1018,10 @@ class EnhancedGeoMapVisualizer:
                         popup=f"Network Link<br>{loc1['ip']} ↔ {loc2['ip']}<br>Risk: {dist_risk:.1f}"
                     ).add_to(m)
         
-<<<<<<< HEAD
+
         # Legend with dual location indicator
-=======
+ 
         # Legend with blinking indicators
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         legend_html = '''
         <div style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; background: rgba(0,0,0,0.85); padding: 12px; border-radius: 8px; border: 1px solid #00ff00; font-family: monospace; font-size: 10px;">
             <b style="color: #00ff00;">🗺️ THREAT LEGEND</b><br>
@@ -1088,30 +1030,29 @@ class EnhancedGeoMapVisualizer:
             <span style="color:#ffcc00; animation: blink-yellow 1s infinite;">🟡</span> Medium (Risk 3-4)<br>
             <span style="color:#00ff00; animation: blink-green 1.2s infinite;">🟢</span> Low (Risk 0-2)<br>
             <span style="color:#ffaa00;">⭐</span> Organization Headquarters<br>
-<<<<<<< HEAD
+
             <span style="color:#ff6600;">●</span> Server/Cloud Location<br>
             <span style="color:#ffaa00;">━━━</span> <span style="animation: blink-green 1s infinite;">HQ → Server Connection</span><br>
             <span style="color:#00ffff;">━━━</span> <span style="animation: blink-green 1s infinite;">Network Link</span><br>
             <span style="color:#ff00ff;">◉</span> <span style="animation: blink-red 1s infinite;">Pulse Ring = Active Threat Zone</span>
             <br><span style="color:#ffaa00; font-size:9px;">🏢 Dual Location: HQ + Server</span>
-=======
+ 
             <span style="color:#00ffff;">━━━</span> <span style="animation: blink-green 1s infinite;">Blinking Connection</span><br>
             <span style="color:#ff00ff;">◉</span> <span style="animation: blink-red 1s infinite;">Pulse Ring = Active Threat Zone</span>
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         </div>
         '''
         m.get_root().html.add_child(folium.Element(legend_html))
         
         return m._repr_html_()
-<<<<<<< HEAD
+
 
 
 # ============================================================
 # Interactive SOC Dashboard
 # ============================================================
 
-=======
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
+ 
+
 class InteractiveSOCDashboard:
     def __init__(self):
         self.workspace = os.path.expanduser("~/dsterminal_workspace")
@@ -1127,14 +1068,14 @@ class InteractiveSOCDashboard:
         self.ai_scorer = AIVulnerabilityScorer()
         self.geo_map = EnhancedGeoMapVisualizer()
         self.scan_history: List[ScanHistory] = []
-<<<<<<< HEAD
+
         self.scan_output = []  # Store scan output lines for persistence
         self.host_details = {}  # Store host details
 
         self.history_file = os.path.join(self.scans_dir, "scan_history.json")
         self._load_history()
         
-=======
+ 
         
 
         # Load history from file
@@ -1142,26 +1083,23 @@ class InteractiveSOCDashboard:
         self._load_history()
         
         # Terminal display settings
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         self.spinner_frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
         self.terminal_width = self._get_terminal_width()
 
     def _get_terminal_width(self):
-<<<<<<< HEAD
-=======
+
+ 
         """Get terminal width safely"""
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         try:
             return shutil.get_terminal_size((100, 24)).columns
         except:
             return 100
-<<<<<<< HEAD
+
             
     def _load_history(self):
-=======
+ 
     def _load_history(self):
         """Load scan history from file"""
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         if os.path.exists(self.history_file):
             try:
                 with open(self.history_file, 'r') as f:
@@ -1180,10 +1118,9 @@ class InteractiveSOCDashboard:
                 pass
     
     def _save_history(self):
-<<<<<<< HEAD
-=======
+
+ 
         """Save scan history to file"""
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         try:
             data = []
             for hist in self.scan_history:
@@ -1201,10 +1138,9 @@ class InteractiveSOCDashboard:
             pass
         
     def generate_pdf_report(self, target: str = None) -> str:
-<<<<<<< HEAD
-=======
+
+ 
         """Generate professional PDF report of scan results"""
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         try:
             from reportlab.lib import colors
             from reportlab.lib.pagesizes import letter, A4
@@ -1215,10 +1151,9 @@ class InteractiveSOCDashboard:
             from reportlab.pdfgen import canvas
             import datetime
             
-<<<<<<< HEAD
-=======
+
+ 
             # Create PDF filename
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             if not target:
                 target = self.current_target if self.current_target else "scan"
             
@@ -1226,18 +1161,16 @@ class InteractiveSOCDashboard:
             pdf_filename = f"soc_report_{target.replace('.', '_')}_{timestamp}.pdf"
             pdf_path = os.path.join(self.scans_dir, pdf_filename)
             
-<<<<<<< HEAD
-=======
+
+ 
             # Create the PDF document
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             doc = SimpleDocTemplate(pdf_path, pagesize=A4,
                                     rightMargin=72, leftMargin=72,
                                     topMargin=72, bottomMargin=72)
             
-<<<<<<< HEAD
-=======
+
+ 
             # Styles
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             styles = getSampleStyleSheet()
             title_style = ParagraphStyle(
                 'CustomTitle',
@@ -1278,13 +1211,13 @@ class InteractiveSOCDashboard:
                 fontSize=10
             )
             
-<<<<<<< HEAD
+
             story = []
             
             story.append(Paragraph("DSTERMINAL SOC Security Assessment Report", title_style))
             story.append(Spacer(1, 12))
             
-=======
+ 
             # Build story (content)
             story = []
             
@@ -1293,16 +1226,14 @@ class InteractiveSOCDashboard:
             story.append(Spacer(1, 12))
             
             # Report metadata
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             story.append(Paragraph(f"Generated: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", styles['Normal']))
             story.append(Paragraph(f"Target: {target}", styles['Normal']))
             story.append(Paragraph(f"Scan Duration: {self.scan_duration} seconds", styles['Normal']))
             story.append(Spacer(1, 20))
             
-<<<<<<< HEAD
-=======
+
+ 
             # Executive Summary
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             story.append(Paragraph("Executive Summary", heading_style))
             
             total_risk = sum(p.get("risk_score", 0) for p in self.discovered_ports)
@@ -1334,14 +1265,14 @@ class InteractiveSOCDashboard:
             story.append(Paragraph(summary_text, styles['Normal']))
             story.append(Spacer(1, 20))
             
-<<<<<<< HEAD
+
             story.append(Paragraph("Discovered Services & Vulnerabilities", heading_style))
             
             if self.services_found:
                 table_data = [['Port', 'Service', 'Version', 'Risk Score', 'Exploit', 'CVE ID']]
                 
                 for service in self.services_found[:20]:
-=======
+ 
             # Discovered Services Table
             story.append(Paragraph("Discovered Services & Vulnerabilities", heading_style))
             
@@ -1350,7 +1281,6 @@ class InteractiveSOCDashboard:
                 table_data = [['Port', 'Service', 'Version', 'Risk Score', 'Exploit', 'CVE ID']]
                 
                 for service in self.services_found[:20]:  # Limit to 20 for PDF
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
                     risk_score = service.get("risk_score", 0)
                     risk_str = f"{risk_score:.1f}"
                     
@@ -1363,10 +1293,9 @@ class InteractiveSOCDashboard:
                         service.get('cvss_id', 'N/A')
                     ])
                 
-<<<<<<< HEAD
-=======
+
+ 
                 # Create table
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
                 table = Table(table_data, colWidths=[60, 80, 70, 50, 80, 70])
                 table.setStyle(TableStyle([
                     ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#00ffff')),
@@ -1385,10 +1314,9 @@ class InteractiveSOCDashboard:
             
             story.append(Spacer(1, 20))
             
-<<<<<<< HEAD
-=======
+
+ 
             # Critical Findings (High Risk)
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             high_risk = [s for s in self.services_found if s.get("risk_score", 0) >= 7]
             if high_risk:
                 story.append(Paragraph("Critical Findings (High Risk)", heading_style))
@@ -1402,10 +1330,9 @@ class InteractiveSOCDashboard:
                     story.append(Paragraph(finding_text, risk_high_style))
                     story.append(Spacer(1, 10))
             
-<<<<<<< HEAD
-=======
+
+ 
             # Medium Risk Findings
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             medium_risk = [s for s in self.services_found if 4 <= s.get("risk_score", 0) < 7]
             if medium_risk:
                 story.append(Paragraph("Medium Risk Findings", heading_style))
@@ -1419,20 +1346,18 @@ class InteractiveSOCDashboard:
             
             story.append(PageBreak())
             
-<<<<<<< HEAD
-=======
+
+ 
             # Network Topology
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             story.append(Paragraph("Network Topology Analysis", heading_style))
             
             if self.network_nodes:
                 topo_data = [['Host', 'Open Ports', 'Risk Score', 'Location Type']]
                 for ip, node in self.network_nodes.items():
-<<<<<<< HEAD
+
                     location_type = "🏢 HQ + Server" if node.is_organization_location else "🖥️ Server"
-=======
+ 
                     location_type = "🏢 HQ" if node.is_organization_location else "🖥️ Server"
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
                     topo_data.append([
                         ip[:15],
                         str(len(node.ports)),
@@ -1440,11 +1365,10 @@ class InteractiveSOCDashboard:
                         location_type
                     ])
                 
-<<<<<<< HEAD
+
                 topo_table = Table(topo_data, colWidths=[100, 70, 70, 100])
-=======
+ 
                 topo_table = Table(topo_data, colWidths=[100, 70, 70, 80])
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
                 topo_table.setStyle(TableStyle([
                     ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#00ffff')),
                     ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
@@ -1458,10 +1382,9 @@ class InteractiveSOCDashboard:
             
             story.append(Spacer(1, 20))
             
-<<<<<<< HEAD
-=======
+
+ 
             # Recommendations
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             story.append(Paragraph("Security Recommendations", heading_style))
             
             recommendations = []
@@ -1480,17 +1403,16 @@ class InteractiveSOCDashboard:
             
             story.append(Spacer(1, 20))
             
-<<<<<<< HEAD
+
             story.append(Paragraph("This report was automatically generated by DSTERMINAL Cyber-Ops Platform", styles['Normal']))
             story.append(Paragraph("For questions or support, contact your security team.", styles['Normal']))
             
-=======
+ 
             # Footer note
             story.append(Paragraph("This report was automatically generated by DSTERMINAL Cyber-Ops Platform", styles['Normal']))
             story.append(Paragraph("For questions or support, contact your security team.", styles['Normal']))
             
             # Build PDF
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             doc.build(story)
             
             print(f"{Colors.GREEN}[+] PDF Report generated: {pdf_path}{Colors.RESET}")
@@ -1523,10 +1445,9 @@ class InteractiveSOCDashboard:
 {self.center("║" + " " * 76 + "║")}
 {self.center("║" + " " * 20 + Colors.YELLOW + "⚡ SOC-GRADE NETWORK INTELLIGENCE ⚡" + Colors.RED + " " * 20 + "║")}
 {self.center("║" + " " * 25 + Colors.DIM + "Real-time Scanning | AI Scoring | Threat Intelligence | DNS Reconnaissance" + Colors.RED + " " * 25 + "║")}
-<<<<<<< HEAD
+
 {self.center("║" + " " * 25 + Colors.CYAN + "🏢 HQ + Server Dual Location Tracking" + Colors.RED + " " * 25 + "║")}
-=======
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
+ 
 {self.center("║" + " " * 76 + "║")}
 {self.center("╚" + "═" * 76 + "╝")}
 {Colors.RESET}
@@ -1534,74 +1455,69 @@ class InteractiveSOCDashboard:
         print(header)
     
     def draw_centered_dashboard(self):
-<<<<<<< HEAD
-=======
+
+ 
         """
         Ultra-centered SOC dashboard with:
         LEFT PANEL  | CENTER PANEL | RIGHT PANEL
         """
         # Get actual terminal width safely
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         try:
             terminal_width = shutil.get_terminal_size((80, 24)).columns
         except:
             terminal_width = 80
         
-<<<<<<< HEAD
+
         if terminal_width < 120:
             panel_width = 38
             spacing = 5
-=======
+ 
         # Adjust panel widths based on terminal size
         if terminal_width < 120:
             panel_width = 38
             spacing = 5
 
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         elif terminal_width < 150:
             panel_width = 38
             spacing = 5
         else:
-<<<<<<< HEAD
+
             panel_width = 38
             spacing = 18
-=======
+ 
             panel_width = 35
             spacing = 45
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         
         total_width = (panel_width * 3) + (spacing * 2)
         left_padding = max(0, (terminal_width - total_width) // 2)
         pad = " " * left_padding
 
-<<<<<<< HEAD
-=======
+
+ 
         # =========================================================
         # LEFT PANEL
         # =========================================================
 
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         left_panel = [
             f"{Colors.CYAN}┌{'─' * panel_width}┐{Colors.RESET}",
             f"{Colors.CYAN}│{Colors.RESET} {Colors.BOLD}{Colors.GREEN}🎯 SCAN CONTROL CENTER{Colors.RESET}{' ' * 8}{Colors.CYAN}│{Colors.RESET}",
             f"{Colors.CYAN}├{'─' * panel_width}┤{Colors.RESET}",
-<<<<<<< HEAD
-=======
 
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
+ 
+
             f"{Colors.CYAN}│{Colors.RESET} {Colors.YELLOW}[1]{Colors.RESET} Quick Scan{' ' * 18}{Colors.CYAN}│{Colors.RESET}",
             f"{Colors.CYAN}│{Colors.RESET} {Colors.YELLOW}[2]{Colors.RESET} Standard Scan{' ' * 15}{Colors.CYAN}│{Colors.RESET}",
             f"{Colors.CYAN}│{Colors.RESET} {Colors.YELLOW}[3]{Colors.RESET} Full Aggressive{' ' * 13}{Colors.CYAN}│{Colors.RESET}",
             f"{Colors.CYAN}│{Colors.RESET} {Colors.YELLOW}[4]{Colors.RESET} DNS Recon{' ' * 20}{Colors.CYAN}│{Colors.RESET}",
             f"{Colors.CYAN}│{Colors.RESET} {Colors.YELLOW}[5]{Colors.RESET} UDP Scan{' ' * 20}{Colors.CYAN}│{Colors.RESET}",
-<<<<<<< HEAD
+
             f"{Colors.CYAN}├{'─' * panel_width}┤{Colors.RESET}",
             f"{Colors.CYAN}│{Colors.RESET} Target : {Colors.GREEN}{self.current_target[:18]:<18}{Colors.RESET} {Colors.CYAN}│{Colors.RESET}",
             f"{Colors.CYAN}│{Colors.RESET} Status : {Colors.RED if self.scan_active else Colors.YELLOW}{'● ACTIVE' if self.scan_active else '○ IDLE'}{Colors.RESET}{' ' * 17}{Colors.CYAN}│{Colors.RESET}",
             f"{Colors.CYAN}└{'─' * panel_width}┘{Colors.RESET}",
         ]
 
-=======
+ 
 
             f"{Colors.CYAN}├{'─' * panel_width}┤{Colors.RESET}",
 
@@ -1615,7 +1531,6 @@ class InteractiveSOCDashboard:
         # CENTER PANEL
         # =========================================================
 
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         total_risk = sum(p.get("risk_score", 0) for p in self.discovered_ports)
         avg_risk = total_risk / max(1, len(self.discovered_ports))
 
@@ -1637,15 +1552,14 @@ class InteractiveSOCDashboard:
             f"{Colors.MAGENTA}┌{'─' * panel_width}┐{Colors.RESET}",
             f"{Colors.MAGENTA}│{Colors.RESET} {Colors.BOLD}{Colors.CYAN}🛡 SOC LIVE STATUS{Colors.RESET}{' ' * 13}{Colors.MAGENTA}│{Colors.RESET}",
             f"{Colors.MAGENTA}├{'─' * panel_width}┤{Colors.RESET}",
-<<<<<<< HEAD
-=======
 
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
+ 
+
             f"{Colors.MAGENTA}│{Colors.RESET} Hosts Found : {Colors.GREEN}{len(self.network_nodes):<10}{Colors.RESET}{' ' * 9}{Colors.MAGENTA}│{Colors.RESET}",
             f"{Colors.MAGENTA}│{Colors.RESET} Open Ports : {Colors.GREEN}{len(self.discovered_ports):<10}{Colors.RESET}{' ' * 9}{Colors.MAGENTA}│{Colors.RESET}",
             f"{Colors.MAGENTA}│{Colors.RESET} Services    : {Colors.GREEN}{len(self.services_found):<10}{Colors.RESET}{' ' * 9}{Colors.MAGENTA}│{Colors.RESET}",
             f"{Colors.MAGENTA}│{Colors.RESET} Duration    : {Colors.GREEN}{self.scan_duration}s{' ' * 16}{Colors.RESET}{Colors.MAGENTA}│{Colors.RESET}",
-<<<<<<< HEAD
+
             f"{Colors.MAGENTA}├{'─' * panel_width}┤{Colors.RESET}",
             f"{Colors.MAGENTA}│{Colors.RESET} Threat Level:{' ' * 18}{Colors.MAGENTA}│{Colors.RESET}",
             f"{Colors.MAGENTA}│{Colors.RESET} {risk_color}{risk_bar}{Colors.RESET} {avg_risk:.1f}/10 {Colors.MAGENTA}│{Colors.RESET}",
@@ -1653,7 +1567,7 @@ class InteractiveSOCDashboard:
             f"{Colors.MAGENTA}└{'─' * panel_width}┘{Colors.RESET}",
         ]
 
-=======
+ 
 
             f"{Colors.MAGENTA}├{'─' * panel_width}┤{Colors.RESET}",
 
@@ -1668,7 +1582,6 @@ class InteractiveSOCDashboard:
         # RIGHT PANEL
         # =========================================================
 
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         right_panel = [
             f"{Colors.BLUE}┌{'─' * panel_width}┐{Colors.RESET}",
             f"{Colors.BLUE}│{Colors.RESET} {Colors.BOLD}{Colors.YELLOW}🔍 LIVE DISCOVERIES{Colors.RESET}{' ' * 11}{Colors.BLUE}│{Colors.RESET}",
@@ -1681,13 +1594,12 @@ class InteractiveSOCDashboard:
             for p in recent:
                 port = f"{p['port']}/{p['protocol']}"
                 service = p["service"][:14]
-<<<<<<< HEAD
+
                 score = p.get("risk_score", 0)
-=======
+ 
 
                 score = p.get("risk_score", 0)
 
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
                 if score >= 7:
                     color = Colors.RED
                     icon = "⚠"
@@ -1697,13 +1609,12 @@ class InteractiveSOCDashboard:
                 else:
                     color = Colors.GREEN
                     icon = "✓"
-<<<<<<< HEAD
+
                 line = f"{icon} {port:<10} {service:<14}"
-=======
+ 
 
                 line = f"{icon} {port:<10} {service:<14}"
 
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
                 right_panel.append(
                     f"{Colors.BLUE}│{Colors.RESET} {color}{line:<32}{Colors.RESET}{Colors.BLUE}│{Colors.RESET}"
                 )
@@ -1719,7 +1630,7 @@ class InteractiveSOCDashboard:
             f"{Colors.BLUE}└{'─' * panel_width}┘{Colors.RESET}",
         ])
 
-<<<<<<< HEAD
+
         max_lines = max(len(left_panel), len(center_panel), len(right_panel))
 
         for i in range(max_lines):
@@ -1727,7 +1638,7 @@ class InteractiveSOCDashboard:
             center = center_panel[i] if i < len(center_panel) else " " * (panel_width + 2)
             right = right_panel[i] if i < len(right_panel) else " " * (panel_width + 2)
             print(pad + left + (" " * spacing) + center + (" " * spacing) + right)
-=======
+ 
         # =========================================================
         # RENDER DASHBOARD
         # =========================================================
@@ -1752,7 +1663,6 @@ class InteractiveSOCDashboard:
                 (" " * spacing) +
                 right
             )
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
     
     def draw_results_table(self):
         if not self.services_found:
@@ -1792,7 +1702,7 @@ class InteractiveSOCDashboard:
 """
         print(footer)
     
-<<<<<<< HEAD
+
     def enhanced_geoip_lookup(self, hostname: str, ip: str = None) -> Tuple[Dict, Dict, bool]:
         """Enhanced GeoIP lookup with organization location override and dual location support"""
         if not ip or ip == hostname:
@@ -2195,7 +2105,7 @@ class InteractiveSOCDashboard:
     #         self.scan_active = False
     #         # Display summary of findings
     #         self._display_scan_summary()
-=======
+ 
     def enhanced_geoip_lookup(self, hostname: str, ip: str) -> Tuple[Dict, bool]:
         """Enhanced GeoIP lookup with organization location override"""
         # First, check if we have the organization's headquarters location
@@ -2236,7 +2146,6 @@ class InteractiveSOCDashboard:
         except:
             return {"country": "Unknown", "city": "Unknown", "lat": 0, "lon": 0, "flag": "🌐", "is_organization_location": False}, False
     
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
     def parse_nmap_output(self, line: str):
         line = line.strip()
         if not line:
@@ -2246,7 +2155,7 @@ class InteractiveSOCDashboard:
         if host_match:
             host = host_match.group(1).strip()
             host = re.sub(r'\([^)]*\)', '', host).strip()
-<<<<<<< HEAD
+
             
             if host not in self.network_nodes:
                 resolved_ip = resolve_domain_to_ip(host)
@@ -2362,7 +2271,7 @@ class InteractiveSOCDashboard:
                                 org_city=org_location.get("city", "Unknown"),
                                 domain=f"{host} 🌐 Server"
                             )
-=======
+ 
             if host not in self.network_nodes:
                 # Use enhanced GeoIP lookup
                 geo, is_org_location = self.enhanced_geoip_lookup(host, host)
@@ -2383,7 +2292,6 @@ class InteractiveSOCDashboard:
                         geo.get("server_location", ""),
                         host
                     )
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             return
         
         port_match = re.search(r'(\d+)/(tcp|udp)\s+open\s+(\S+)', line)
@@ -2407,7 +2315,7 @@ class InteractiveSOCDashboard:
                 "cvss_id": vuln.get("cvss_id", "N/A")
             })
             
-<<<<<<< HEAD
+
             # Build port output
             risk_icon = "🔴" if risk_score >= 7 else "🟡" if risk_score >= 4 else "🟢"
             risk_text = "CRITICAL" if risk_score >= 7 else "HIGH" if risk_score >= 5 else "MEDIUM" if risk_score >= 3 else "LOW"
@@ -2428,14 +2336,13 @@ class InteractiveSOCDashboard:
                 self.scan_output.append(line)
                 print(line)
             
-=======
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
+ 
             for node in self.network_nodes.values():
                 if node.lat != 0:
                     node.ports.append({"port": port, "service": service, "risk_score": risk_score})
                     node.risk_score = max(node.risk_score, risk_score)
-<<<<<<< HEAD
-=======
+
+ 
                     self.geo_map.add_location(
                         node.lat, node.lon, node.ip, node.risk_score, node.ports, 
                         node.country, node.is_organization_location, node.server_location, node.ip
@@ -2445,12 +2352,11 @@ class InteractiveSOCDashboard:
             spinner = random.choice(self.spinner_frames)
             print(f"\r{self.center(f'{Colors.CYAN}[{spinner}]{Colors.RESET} {color}[!] NEW: {port} - {service} (Risk: {risk_score}){Colors.RESET}')}")
             time.sleep(0.05)
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             return
         
         if "Nmap done" in line:
             self.scan_active = False
-<<<<<<< HEAD
+
             # Display summary (but keep all previous output)
             self._display_scan_summary()
         # ========================================
@@ -2589,10 +2495,9 @@ class InteractiveSOCDashboard:
     #         self.scan_active = False
 
     def run_nmap_scan(self, target: str, flags: List[str], auto_open: bool = False):
-=======
+ 
     
     def run_nmap_scan(self, target: str, flags: List[str]):
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         if not shutil.which("nmap"):
             print(self.center(f"{Colors.RED}[!] Nmap not installed{Colors.RESET}"))
             return
@@ -2607,7 +2512,7 @@ class InteractiveSOCDashboard:
         start_time = datetime.now()
         cmd = ["nmap"] + flags + [target]
         
-<<<<<<< HEAD
+
         self.clear_screen()
         self.draw_header()
         print(f"\n{self.center(Colors.GREEN + '[+] Running: ' + ' '.join(cmd) + Colors.RESET)}\n")
@@ -2643,16 +2548,15 @@ class InteractiveSOCDashboard:
         timer_thread.start()
         
         print(f"{Colors.CYAN}{'─' * 70}{Colors.RESET}\n")
-=======
+ 
         print(f"\n{self.center(Colors.GREEN + '[+] Running: ' + ' '.join(cmd) + Colors.RESET)}\n")
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         
         try:
             process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
             for line in process.stdout:
                 self.parse_nmap_output(line)
             process.wait()
-<<<<<<< HEAD
+
             
             # Stop the timer
             timer_running = False
@@ -2664,12 +2568,11 @@ class InteractiveSOCDashboard:
             self.scan_duration = (datetime.now() - start_time).seconds
             self.scan_active = False
             
-=======
+ 
             self.scan_duration = (datetime.now() - start_time).seconds
             self.scan_active = False
             
             # Save to history
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             services_list = [s['service'] for s in self.services_found]
             history = ScanHistory(
                 timestamp=datetime.now(),
@@ -2680,7 +2583,7 @@ class InteractiveSOCDashboard:
                 services=services_list[:5]
             )
             self.scan_history.append(history)
-<<<<<<< HEAD
+
             self._save_history()
             if len(self.scan_history) > 10:
                 self.scan_history.pop(0)
@@ -2697,7 +2600,7 @@ class InteractiveSOCDashboard:
             print(self.center(Colors.YELLOW + '[+] Generating dashboard...' + Colors.RESET))
             self.generate_full_dashboard(auto_open=auto_open)
 
-=======
+ 
             self._save_history()  # Save to file
             if len(self.scan_history) > 10:
                 self.scan_history.pop(0)
@@ -2709,12 +2612,11 @@ class InteractiveSOCDashboard:
             self.generate_full_dashboard()
 
             # Generate PDF report as well
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             print(self.center(Colors.CYAN + '[+] Generating PDF report...' + Colors.RESET))
             pdf_path = self.generate_pdf_report(target)
             if pdf_path:
                 print(self.center(Colors.GREEN + f'[+] PDF saved: {pdf_path}' + Colors.RESET))
-<<<<<<< HEAD
+
                 
         except Exception as e:
             # Stop the timer on error
@@ -2749,7 +2651,7 @@ class InteractiveSOCDashboard:
     def generate_network_topology(self) -> str:
         if not PLOTLY_AVAILABLE or not self.network_nodes:
             return '<div style="padding:50px;text-align:center;color:#888;">No topology data available</div>'
-=======
+
         except Exception as e:
             print(self.center(f"{Colors.RED}[!] Scan failed: {e}{Colors.RESET}"))
             self.scan_active = False
@@ -2758,14 +2660,13 @@ class InteractiveSOCDashboard:
         """Generate network topology visualization using Plotly"""
         if not PLOTLY_AVAILABLE or not self.network_nodes:
             return '<div style="padding:50px;text-align:center;">No topology data available</div>'
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         
         node_list = list(self.network_nodes.keys())
         num_nodes = len(node_list)
         
         node_x = []
         node_y = []
-<<<<<<< HEAD
+
         node_colors = []
         node_sizes = []
         node_hover_texts = []
@@ -2816,11 +2717,10 @@ class InteractiveSOCDashboard:
         
         # Store descriptions for each node
         self.node_descriptions = {}
-=======
+
         node_text = []
         node_colors = []
         node_sizes = []
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         
         for i, ip in enumerate(node_list):
             angle = 2 * math.pi * i / max(1, num_nodes)
@@ -2829,7 +2729,7 @@ class InteractiveSOCDashboard:
             node_y.append(radius * math.sin(angle))
             risk = self.network_nodes[ip].risk_score
             is_org = self.network_nodes[ip].is_organization_location
-<<<<<<< HEAD
+
             location_note = "🏢 HQ+Server" if is_org else "🖥️ Server"
             
             # Select random description based on risk level
@@ -2907,7 +2807,6 @@ class InteractiveSOCDashboard:
             node_sizes.append(node_size)
         
         # Create edges
-=======
             location_note = "🏢 HQ" if is_org else "🖥️ Server"
             node_text.append(f"{ip}<br>{location_note}<br>Risk: {risk:.1f}<br>Ports: {len(self.network_nodes[ip].ports)}")
             
@@ -2921,7 +2820,6 @@ class InteractiveSOCDashboard:
                 node_colors.append("#00ff00")
                 node_sizes.append(15)
         
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         edge_x = []
         edge_y = []
         for i in range(len(node_x) - 1):
@@ -2930,10 +2828,8 @@ class InteractiveSOCDashboard:
         
         fig = go.Figure()
         
-<<<<<<< HEAD
+
         # Add edges
-=======
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         if edge_x:
             fig.add_trace(go.Scatter(
                 x=edge_x, y=edge_y,
@@ -2943,7 +2839,7 @@ class InteractiveSOCDashboard:
                 showlegend=False
             ))
         
-<<<<<<< HEAD
+
         # Add nodes with proper hover template - INCREASE hover label length
         fig.add_trace(go.Scatter(
             x=node_x, y=node_y,
@@ -2999,7 +2895,6 @@ class InteractiveSOCDashboard:
                 font=dict(color='#00ffff', size=14),
                 x=0.5
             ),
-=======
         fig.add_trace(go.Scatter(
             x=node_x, y=node_y,
             mode='markers+text',
@@ -3014,7 +2909,6 @@ class InteractiveSOCDashboard:
         
         fig.update_layout(
             title=dict(text="🌐 NETWORK TOPOLOGY", font=dict(color='#00ffff', size=14), x=0.5),
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
             showlegend=False,
             hovermode='closest',
             xaxis=dict(showgrid=False, zeroline=False, showticklabels=False, range=[-6, 6]),
@@ -3022,7 +2916,7 @@ class InteractiveSOCDashboard:
             plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
             font=dict(color='white'),
-<<<<<<< HEAD
+
             height=450,
             margin=dict(l=20, r=20, t=60, b=20),
             annotations=[
@@ -3139,7 +3033,6 @@ class InteractiveSOCDashboard:
 # ================================================================
 # ================================================================
     def generate_historical_timeline(self) -> str:
-=======
             height=400,
             margin=dict(l=20, r=20, t=50, b=20)
         )
@@ -3148,7 +3041,6 @@ class InteractiveSOCDashboard:
     
     def generate_historical_timeline(self) -> str:
         """Generate historical scan timeline using Plotly"""
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         if not PLOTLY_AVAILABLE or not self.scan_history:
             return '<div style="padding:50px;text-align:center;">No historical data available. Run scans to see timeline.</div>'
         
@@ -3189,11 +3081,9 @@ class InteractiveSOCDashboard:
         
         return fig.to_html(include_plotlyjs='cdn', full_html=False)
     
-<<<<<<< HEAD
+
     def generate_full_dashboard(self, auto_open: bool = False):
-=======
     def generate_full_dashboard(self):
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         """Generate complete dashboard with GeoMap, Topology, Timeline, and Services"""
         
         total_risk = sum(p.get('risk_score', 0) for p in self.discovered_ports)
@@ -3214,7 +3104,7 @@ class InteractiveSOCDashboard:
             """
         
         geo_html = self.geo_map.generate_threat_map()
-<<<<<<< HEAD
+
         topology_graph = self.generate_network_topology()
         timeline_html = self.generate_historical_timeline()
         risk_panel = self.get_risk_assessment_panel()
@@ -3319,7 +3209,6 @@ class InteractiveSOCDashboard:
         </div>
     </body>
     </html>
-=======
         topology_html = self.generate_network_topology()
         timeline_html = self.generate_historical_timeline()
         
@@ -3407,14 +3296,13 @@ class InteractiveSOCDashboard:
     </div>
 </body>
 </html>
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         """
         
         html_path = os.path.join(self.scans_dir, f"soc_full_dashboard_{self.current_target.replace('.', '_')}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html")
         with open(html_path, 'w', encoding='utf-8') as f:
             f.write(html)
         
-<<<<<<< HEAD
+
         # Ask user if they want to open the dashboard
         if not auto_open:
             print(f"\n{Colors.CYAN}╔{'═' * 60}╗{Colors.RESET}")
@@ -3441,12 +3329,10 @@ class InteractiveSOCDashboard:
 
     # ==============================================
     # ==============================================
-=======
         webbrowser.open(f"file://{html_path}")
         # print(self.center(f"{Colors.GREEN}[+] Full dashboard opened: {html_path}{Colors.RESET}"))
         return html_path
     
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
     def interactive_loop(self):
         self.clear_screen()
         
@@ -3504,23 +3390,20 @@ class InteractiveSOCDashboard:
 """
         print(help_text)
 
-<<<<<<< HEAD
 
-=======
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
-# ============================================================
+
+ # ============================================================
 # EXPORTED CLASSES FOR MAIN DSTERMINAL
 # ============================================================
 
-<<<<<<< HEAD
+
 __all__ = ['InteractiveSOCDashboard', 'SOCNmapDashboard', 'SOCNmapIntegration']
 
-=======
-# These are the classes that will be imported by dsterminal.py
+ # These are the classes that will be imported by dsterminal.py
 __all__ = ['InteractiveSOCDashboard', 'SOCNmapDashboard', 'SOCNmapIntegration']
 
 # Alias for backward compatibility - THIS IS CRITICAL
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
+
 SOCNmapDashboard = InteractiveSOCDashboard
 
 class SOCNmapIntegration:
@@ -3532,7 +3415,7 @@ class SOCNmapIntegration:
             self.dashboard = InteractiveSOCDashboard()
         self.dashboard.interactive_loop()
     
-<<<<<<< HEAD
+
     def quick_scan(self, target: str, auto_open: bool = False):
         if not self.dashboard:
             self.dashboard = InteractiveSOCDashboard()
@@ -3560,7 +3443,6 @@ class SOCNmapIntegration:
 
 # ============================================================
 # MAIN ENTRY POINT
-=======
     def quick_scan(self, target: str):
         if not self.dashboard:
             self.dashboard = InteractiveSOCDashboard()
@@ -3592,7 +3474,6 @@ class SOCNmapIntegration:
 
 # ============================================================
 # MAIN ENTRY POINT (for standalone execution)
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
 # ============================================================
 
 if __name__ == "__main__":

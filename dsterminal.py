@@ -497,7 +497,36 @@ try:
 except:
     CryptoEngine = None
     pass
+# ===================================
 
+# IOC Education Module
+try:
+    from ioc_edu import IOCEducation
+    IOC_EDUCATION_AVAILABLE = True
+except ImportError as e:
+    IOC_EDUCATION_AVAILABLE = False
+    print(f"{Fore.YELLOW}⚠️ IOC Education module not found: {e}{Style.RESET_ALL}")
+    print(f"{Fore.YELLOW}   Download ioc_education from the repository{Style.RESET_ALL}")
+
+# ==========================import wifi_audit module=================
+
+# Exploit Scanner Module
+try:
+    from exploit_scanner import ExploitScanner
+    EXPLOIT_SCANNER_AVAILABLE = True
+except ImportError as e:
+    EXPLOIT_SCANNER_AVAILABLE = False
+    print(f"{Fore.YELLOW}⚠️ Exploit Scanner module not found: {e}{Style.RESET_ALL}")
+    print(f"{Fore.YELLOW}   Download exploit_scanner from the repository{Style.RESET_ALL}")
+    
+# WiFi Audit Module
+try:
+    from wifi_audit import WiFiAudit
+    WIFI_AUDIT_AVAILABLE = True
+except ImportError as e:
+    WIFI_AUDIT_AVAILABLE = False
+    print(f"{Fore.YELLOW}⚠️ WiFi Audit module not found: {e}{Style.RESET_ALL}")
+    print(f"{Fore.YELLOW}   Download wifi_audit from the repository{Style.RESET_ALL}")
 # 2. Integrity Monitor - Silent
 try:
     from integrity_monitor import (
@@ -2113,364 +2142,7 @@ class SecurityTerminal:
             return 80
     
     # =====================================================================================================
-    # =====================================================================================================
-    # ========================================================================
-# ULTRA-FAST TYPEWRITER ENGINE - REUSABLE ACROSS ALL MODULES
-# ========================================================================
-
-    def _ultra_type(self, text, color=None, speed='ultra', centered=False):
-        """
-        ULTRA-FAST typewriter effect - 2000+ characters per second.
-        
-        Args:
-            text (str): Text to display
-            color: Colorama color (default: Fore.GREEN)
-            speed (str): 'ultra', 'fast', 'medium', 'slow', 'instant'
-            centered (bool): Center text in terminal
-        """
-        import sys
-        import time
-        import re
-        import random
-        from colorama import Fore, Style
-        
-        # Speed presets - ULTRA FAST (0.0003 = 0.3ms per char = 3333 chars/sec)
-        speed_map = {
-            'instant': 0,           # 0ms - INSTANT
-            'ultra': 0.0005,        # 0.3ms - ULTRA FAST (3333 chars/sec)
-            'fast': 0.001,         # 1.5ms - FAST (667 chars/sec)
-            'medium': 0.003,        # 4ms - MEDIUM (250 chars/sec)
-            'slow': 0.005,          # 12ms - SLOW (83 chars/sec)
-        }
-        
-        base_delay = speed_map.get(speed, 0.0015)
-        color = color or Fore.GREEN
-        
-        # Remove any markup
-        text = re.sub(r'\[.*?\]', '', text)
-        
-        # Center text if requested
-        if centered:
-            import shutil
-            term_width = shutil.get_terminal_size((80, 25)).columns
-            text = text.center(term_width)
-        
-        # Apply color
-        sys.stdout.write(color)
-        
-        # ================================================================
-        # ULTRA FAST MODE - Minimal delays, burst writing
-        # ================================================================
-        if speed == 'ultra':
-            # Write in chunks for maximum speed
-            chunk_size = 20
-            for i in range(0, len(text), chunk_size):
-                chunk = text[i:i+chunk_size]
-                sys.stdout.write(chunk)
-                sys.stdout.flush()
-                # Tiny pause between chunks
-                if i + chunk_size < len(text):
-                    time.sleep(0.0005)
-            
-            # Small pause at punctuation
-            if text and text[-1] in ".!?,":
-                time.sleep(0.003)
-        
-        # ================================================================
-        # FAST MODE - Character by character with small delays
-        # ================================================================
-        elif speed == 'fast':
-            for char in text:
-                sys.stdout.write(char)
-                sys.stdout.flush()
-                if char in ".!?,":
-                    time.sleep(0.002)
-                elif char == " ":
-                    time.sleep(0.0005)
-                else:
-                    time.sleep(0.001)
-        
-        # ================================================================
-        # MEDIUM/SLOW MODE - Human-like typing with variance
-        # ================================================================
-        else:
-            # Human-like variance
-            burst = random.randint(5, 15)
-            for char in text:
-                sys.stdout.write(char)
-                sys.stdout.flush()
-                
-                # Burst mode - occasional pauses
-                if burst <= 0:
-                    time.sleep(random.uniform(base_delay * 2, base_delay * 5))
-                    burst = random.randint(5, 15)
-                burst -= 1
-                
-                # Punctuation pauses
-                if char in ".!?,":
-                    time.sleep(base_delay * 2)
-                elif char == " ":
-                    time.sleep(base_delay * 0.3)
-                elif char in "═╔╗║╠╣╚╝":
-                    time.sleep(base_delay * 0.1)
-                else:
-                    time.sleep(base_delay * 0.7)
-        
-        # Reset color and add newline
-        sys.stdout.write(Style.RESET_ALL)
-        sys.stdout.write('\n')
-        sys.stdout.flush()
-
-    # ========================================================================
-    # WRAPPER FUNCTIONS FOR DIFFERENT USE CASES
-    # ========================================================================
-
-    def _ultra_type_header(self, text, color=None):
-        """Print a header with ultra-fast typewriter"""
-        from colorama import Fore
-        color = color or Fore.CYAN
-        self._ultra_type(f"\n{text}", color=color, speed='fast')
-        self._ultra_type("━" * min(len(text), 70), color=Fore.CYAN, speed='ultra')
-
-    def _ultra_type_status(self, text, color=None):
-        """Print a status message with ultra-fast typewriter"""
-        from colorama import Fore
-        color = color or Fore.CYAN
-        self._ultra_type(f"[*] {text}", color=color, speed='ultra')
-
-    def _ultra_type_success(self, text, color=None):
-        """Print a success message with ultra-fast typewriter"""
-        from colorama import Fore
-        color = color or Fore.GREEN
-        self._ultra_type(f"[+] {text}", color=color, speed='ultra')
-
-    def _ultra_type_error(self, text, color=None):
-        """Print an error message with ultra-fast typewriter"""
-        from colorama import Fore
-        color = color or Fore.RED
-        self._ultra_type(f"[!] {text}", color=color, speed='ultra')
-
-    def _ultra_type_warning(self, text, color=None):
-        """Print a warning message with ultra-fast typewriter"""
-        from colorama import Fore
-        color = color or Fore.YELLOW
-        self._ultra_type(f"[?] {text}", color=color, speed='ultra')
-
-    def _ultra_type_finding(self, text, severity="INFO", color=None):
-        """Print a finding with severity-based coloring"""
-        from colorama import Fore
-        
-        severity_colors = {
-            "CRITICAL": Fore.RED,
-            "HIGH": Fore.YELLOW,
-            "MEDIUM": Fore.CYAN,
-            "LOW": Fore.GREEN,
-            "INFO": Fore.WHITE
-        }
-        severity_prefix = {
-            "CRITICAL": "🚨",
-            "HIGH": "⚠️",
-            "MEDIUM": "🔍",
-            "LOW": "ℹ️",
-            "INFO": "📌"
-        }
-        
-        color = color or severity_colors.get(severity, Fore.WHITE)
-        self._ultra_type(f"{severity_prefix.get(severity, '')} {text}", color=color, speed='ultra')
-
-    def _ultra_type_box(self, title, content_lines, title_color, border_color, content_color=None, width=None):
-        """
-        Draw a centered box with ultra-fast typewriter effect.
-        Replaces _draw_centered_box for maximum speed.
-        """
-        import textwrap
-        import shutil
-        import sys
-        from colorama import Fore, Style
-        
-        content_color = content_color or Fore.GREEN
-        
-        term = shutil.get_terminal_size((100, 30))
-        if width is None:
-            width = min(term.columns - 6, 110)
-        width = max(width, 60)
-        left_margin = max(0, (term.columns - width) // 2)
-        inner = width - 4
-        
-        wrapped = []
-        for line in content_lines:
-            if not line.strip():
-                wrapped.append("")
-                continue
-            wrapped.extend(textwrap.wrap(line, inner, break_long_words=False, replace_whitespace=False))
-        
-        top = "╔" + "═" * (width - 2) + "╗"
-        mid = "╠" + "═" * (width - 2) + "╣"
-        bot = "╚" + "═" * (width - 2) + "╝"
-        title_text = f" {title} ".center(width - 2)
-        
-        print()
-        
-        # Top border - instant
-        sys.stdout.write(" " * left_margin + border_color + top + Style.RESET_ALL + "\n")
-        
-        # Title - ultra fast
-        sys.stdout.write(" " * left_margin + title_color + "║" + title_text + "║" + Style.RESET_ALL + "\n")
-        
-        # Separator - instant
-        sys.stdout.write(" " * left_margin + border_color + mid + Style.RESET_ALL + "\n")
-        
-        # Content - ultra fast typewriter
-        for line in wrapped:
-            sys.stdout.write(" " * left_margin + border_color + "║ " + Style.RESET_ALL)
-            self._ultra_type(line.ljust(inner), color=content_color, speed='ultra')
-            sys.stdout.write(" " * left_margin + border_color + "║" + Style.RESET_ALL + "\n")
-        
-        # Bottom border - instant
-        sys.stdout.write(" " * left_margin + border_color + bot + Style.RESET_ALL + "\n")
-        sys.stdout.flush()
-        print()
-
-    # ========================================================================
-    # HOW TO USE IN EACH MODULE
-    # ========================================================================
-
-    """
-    EXAMPLE 1: IOC Education Module
-    --------------------------------
-    def _show_ioc_education(self):
-        from colorama import Fore
-        
-        # Use ultra-fast header
-        self._ultra_type_header("🛡️ INDICATORS OF COMPROMISE", Fore.CYAN)
-        
-        # Use ultra-fast box
-        self._ultra_type_box(
-            "📌 WHAT ARE IOCS?",
-            [
-                "Indicators of Compromise are forensic artifacts that provide evidence",
-                "of a potential security breach. They are the digital breadcrumbs"
-            ],
-            title_color=Fore.YELLOW,
-            border_color=Fore.CYAN,
-            content_color=Fore.GREEN
-        )
-        
-        # Use ultra-fast status messages
-        self._ultra_type_status("Scanning for threats...")
-        self._ultra_type_success("Scan complete!")
-        self._ultra_type_finding("Found 5 indicators", "HIGH")
-
-
-    EXAMPLE 2: Exploit Scanner Module
-    ----------------------------------
-    def check_exploits(self):
-        from colorama import Fore
-        
-        # Ultra-fast header
-        self._ultra_type_header("🔍 EXPLOIT VULNERABILITY SCANNER", Fore.MAGENTA)
-        
-        # Ultra-fast status updates
-        self._ultra_type_status("Initializing scan...")
-        time.sleep(0.1)
-        self._ultra_type_status("Checking CVE-2024-6387...")
-        time.sleep(0.1)
-        self._ultra_type_success("No vulnerabilities found")
-        
-        # Ultra-fast findings
-        self._ultra_type_finding("System appears secure", "LOW")
-
-
-    EXAMPLE 3: Ransomware Monitor Module
-    ------------------------------------
-    def _ransomware_status(self):
-        from colorama import Fore
-        
-        # Ultra-fast box
-        self._ultra_type_box(
-            "🛡️ RANSOMWARE MONITOR STATUS",
-            [
-                f"Status: {'🚨 ACTIVE' if detected else '✅ CLEAN'}",
-                f"Threat Level: {threat_level}",
-                f"Uptime: {uptime}"
-            ],
-            title_color=Fore.CYAN,
-            border_color=Fore.CYAN,
-            content_color=Fore.WHITE
-        )
-
-
-    EXAMPLE 4: WiFi Audit Module
-    ----------------------------
-    def wifi_audit(self):
-        from colorama import Fore
-        
-        # Ultra-fast header with ASCII art
-        self._ultra_type_header("🔐 WIFI SECURITY AUDIT", Fore.LIGHTCYAN_EX)
-        
-        # Ultra-fast scanning status
-        self._ultra_type_status("Scanning for networks...")
-        time.sleep(0.05)
-        self._ultra_type_success("Found 12 access points")
-        
-        # Ultra-fast findings
-        for ap in access_points[:5]:
-            self._ultra_type_finding(f"{ap['ssid']} - {ap['security']}", 
-                                    "CRITICAL" if ap['security'] == 'Open' else "INFO")
-    """
-
-    # ========================================================================
-    # SPEED COMPARISON TABLE
-    # ========================================================================
-
-    """
-    SPEED COMPARISON:
-
-    | Mode      | Delay/char | Chars/sec | Use Case                    |
-    |-----------|------------|-----------|-----------------------------|
-    | instant   | 0ms        | Infinite  | Box borders, headers        |
-    | ultra     | 0.3ms      | 3,333     | Main content, status msgs   |
-    | fast      | 1.5ms      | 667       | Important findings          |
-    | medium    | 4ms        | 250       | User-readable content       |
-    | slow      | 12ms       | 83        | Educational/demonstration   |
-
-    RECOMMENDED USAGE:
-    - Box borders/headers: speed='instant' or 'ultra'
-    - Main content: speed='ultra'
-    - Status messages: speed='ultra'
-    - Findings: speed='ultra' or 'fast'
-    - Educational text: speed='fast' or 'medium'
-    """
-
-    # ========================================================================
-    # QUICK REFERENCE - ADD THIS TO ANY MODULE
-    # ========================================================================
-
-    """
-    To add ultra-fast typing to any module:
-
-    1. Add this at the top of the module:
-    from colorama import Fore, Style
-
-    2. Use these methods anywhere:
-    self._ultra_type(text, color=Fore.GREEN)           # Ultra fast
-    self._ultra_type_header(text, Fore.CYAN)           # Header
-    self._ultra_type_status(text)                      # Status
-    self._ultra_type_success(text)                     # Success
-    self._ultra_type_error(text)                       # Error
-    self._ultra_type_warning(text)                     # Warning
-    self._ultra_type_finding(text, severity)           # Finding
-    self._ultra_type_box(title, lines, ...)            # Box
-
-    3. For maximum speed, use speed='instant' for static elements:
-    self._ultra_type("Border text", speed='instant')
-
-    4. For educational content, use speed='medium' or 'slow':
-    self._ultra_type("Educational text", speed='medium')
-    """
-
-    # ===========================================================================================
-    # Add this at the top of dsterminal.py (after other imports)
+ # Add this at the top of dsterminal.py (after other imports)
     from deletion_protection import DSTerminalMonitor, BackupDatabase, RestoreManager, ServiceManager
 
 # Then in your SecurityTerminal class, you can use:
@@ -2510,645 +2182,7 @@ class SecurityTerminal:
             self.soc_dashboard = SOCNmapIntegration()
         except:
             pass
-    
-    # ============================================================
-    # TYPEWRITER EFFECT METHODS - FAST SPEED
-    # ============================================================
 
-    def _draw_hacker_box(
-            self,
-            title,
-            content_lines,
-            title_color,
-            border_color,
-            content_color=None,
-            width=None,
-            speed="ultra"):
-
-        import textwrap
-
-        content_color = content_color or Fore.GREEN
-
-        term = shutil.get_terminal_size((100, 30))
-
-        if width is None:
-            width = min(term.columns - 6, 110)
-
-        width = max(width, 60)
-
-        left_margin = max(0, (term.columns - width) // 2)
-
-        inner = width - 4
-
-        wrapped = []
-
-        for line in content_lines:
-
-            if not line.strip():
-                wrapped.append("")
-                continue
-
-            wrapped.extend(
-                textwrap.wrap(
-                    line,
-                    inner,
-                    break_long_words=False,
-                    replace_whitespace=False
-                )
-            )
-
-        top = "╔" + "═" * (width - 2) + "╗"
-        mid = "╠" + "═" * (width - 2) + "╣"
-        bot = "╚" + "═" * (width - 2) + "╝"
-
-        print()
-
-        print(" " * left_margin + border_color + top)
-
-        title_text = f" {title} "
-
-        print(
-            " " * left_margin +
-            title_color +
-            "║" +
-            title_text.center(width - 2) +
-            "║"
-        )
-
-        print(" " * left_margin + border_color + mid)
-
-        for line in wrapped:
-
-            print(
-                " " * left_margin +
-                border_color +
-                "║ " +
-                Style.RESET_ALL,
-                end=""
-            )
-
-            self._ultra_type(
-                line.ljust(inner),
-                color=content_color,
-                speed=speed
-            )
-
-            print(
-                " " * left_margin +
-                border_color +
-                "║"
-            )
-
-        print(" " * left_margin + border_color + bot)
-        print()
-        
-    def _ultra_type(
-            self,
-            text,
-            color=None,
-            centered=False,
-            box_width=None, speed='ultra'):
-
-        import os
-        import sys
-        import time
-        import random
-        import shutil
-        import textwrap
-
-        from colorama import Fore, Back, Style, init
-        init(autoreset=True)
-        import re
-
-        speed_map = {
-            "slow": 0.018,
-            "medium": 0.010,
-            "fast": 0.0045,
-            "ultra": 0.0025,
-            "instant": 0
-        }
-
-        base = speed_map.get(speed, 0.004)
-
-        color = color or Fore.GREEN
-
-        text = re.sub(r"\[.*?\]", "", text)
-
-        if centered:
-            width = shutil.get_terminal_size((80, 25)).columns
-            text = text.center(width)
-
-        sys.stdout.write(color)
-
-        burst = random.randint(8, 18)
-
-        for i, ch in enumerate(text):
-
-            sys.stdout.write(ch)
-            sys.stdout.flush()
-
-            if base == 0:
-                continue
-
-            if burst <= 0:
-                time.sleep(random.uniform(base * 2, base * 6))
-                burst = random.randint(8, 18)
-
-            burst -= 1
-
-            if ch in ".!?":
-                time.sleep(random.uniform(base * 18, base * 35))
-
-            elif ch in ",;:":
-                time.sleep(random.uniform(base * 8, base * 16))
-
-            elif ch == " ":
-                time.sleep(random.uniform(base * .15, base * .4))
-
-            elif ch == "\n":
-                time.sleep(random.uniform(base * 6, base * 12))
-
-            else:
-                time.sleep(random.uniform(base * .45, base * 1.4))
-
-        sys.stdout.write(Style.RESET_ALL + "\n")
-        sys.stdout.flush()
-        
-    def _show_ioc_education(self, speed='ultra'):
-        """Show IOC education with hacker-style centered boxed windows - FIXED"""
-        import time
-        import os
-        from colorama import Fore, Style, init
-        init(autoreset=True)
-        
-        speed_map = {
-            "slow": 0.018,
-            "medium": 0.010,
-            "fast": 0.0045,
-            "ultra": 0.025,
-            "instant": 0
-        }
-
-        base = speed_map.get(speed, 0.004)
-        # Hacker color scheme
-        GREEN = Fore.GREEN
-        CYAN = Fore.CYAN
-        YELLOW = Fore.YELLOW
-        RED = Fore.RED
-        MAGENTA = Fore.MAGENTA
-        WHITE = Fore.WHITE
-        BRIGHT_GREEN = Fore.LIGHTGREEN_EX
-        BRIGHT_CYAN = Fore.LIGHTCYAN_EX
-        BRIGHT_YELLOW = Fore.LIGHTYELLOW_EX
-        
-        # Clear screen
-        os.system('cls' if os.name == 'nt' else 'clear')
-        
-        # Get terminal width for centering
-        try:
-            term_width = os.get_terminal_size().columns
-            box_width = min(term_width - 4, 100)
-            box_width = max(box_width, 60)
-        except:
-            box_width = 80
-        
-        # Header
-        header_art = [
-            "  ██╗  ██╗ ██████╗  ██████╗██╗  ██╗",
-            "  ██║  ██║██╔═══██╗██╔════╝██║ ██╔╝",
-            "  ███████║██║   ██║██║     █████╔╝ ",
-            "  ██╔══██║██║   ██║██║     ██╔═██╗ ",
-            "  ██║  ██║╚██████╔╝╚██████╗██║  ██╗",
-            "  ╚═╝  ╚═╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝"
-        ]
-        
-        self._draw_hacker_box(
-            "🛡️ INDICATORS OF COMPROMISE - MASTER CLASS",
-            header_art + ["", "💻 Cybersecurity Education Series"],
-            title_color=BRIGHT_GREEN,
-            border_color=BRIGHT_CYAN,
-            content_color=GREEN,
-            width=box_width,
-            speed='instant'
-        )
-        time.sleep(0.003)
-        
-        # Section 1: What are IOCs
-        self._draw_hacker_box(
-            "📌 WHAT ARE IOCS?",
-            [
-                "Indicators of Compromise are forensic artifacts that provide evidence",
-                "of a potential security breach. They are the digital breadcrumbs",
-                "left behind by attackers that security teams use to detect,",
-                "investigate, and respond to cyber threats.",
-                "",
-                "💡 Think of IOCs like fingerprints at a crime scene - they don't",
-                "tell you who committed the crime, but they prove that someone was",
-                "there and help you track them down."
-            ],
-            title_color=YELLOW,
-            border_color=CYAN,
-            content_color=GREEN,
-            width=box_width,
-            speed='instant'
-        )
-        time.sleep(0.3)
-        
-        # Section 2: IOC vs IOA
-        self._draw_hacker_box(
-            "📊 IOC VS IOA - WHAT'S THE DIFFERENCE?",
-            [
-                "",
-                "🔍 IOC (Indicator of Compromise) - PAST/FORENSIC",
-                "   • Evidence that an attack has ALREADY happened",
-                "   • Things you look for AFTER a breach",
-                "   • Example: Malware hash, malicious domain",
-                "   • Question: 'What did the attacker leave behind?'",
-                "",
-                "⚡ IOA (Indicator of Attack) - PRESENT/ACTIVE",
-                "   • Evidence that an attack is HAPPENING RIGHT NOW",
-                "   • Things you look for DURING an active attack",
-                "   • Example: Unusual login attempts, data exfiltration",
-                "   • Question: 'What is the attacker doing right now?'",
-                "",
-                "🎯 BOTH are essential for a complete security strategy!"
-            ],
-            title_color=MAGENTA,
-            border_color=CYAN,
-            content_color=BRIGHT_YELLOW,
-            width=box_width,
-            speed='instant'
-        )
-        time.sleep(0.02)
-        
-        # Section 3: Types of IOCs - Two column
-        ioc_types_left = [
-            "🔑 1. FILE HASHES",
-            "   • Unique file fingerprint",
-            "   • Example: 5d41402abc4...",
-            "",
-            "🌐 2. DOMAINS",
-            "   • Malicious websites",
-            "   • Example: bad-site.com",
-            "",
-            "📍 3. IP ADDRESSES",
-            "   • C2 servers",
-            "   • Example: 185.130.5.253",
-            "",
-            "🔗 4. URLS",
-            "   • Malicious web addresses",
-            "   • Example: /payload.exe"
-        ]
-        
-        ioc_types_right = [
-            "📁 5. FILE PATHS",
-            "   • Malware installation",
-            "   • Example: C:\\Temp\\evil.exe",
-            "",
-            "🔧 6. REGISTRY KEYS",
-            "   • Persistence mechanisms",
-            "   • Example: HKLM\\Run\\Evil",
-            "",
-            "🧠 7. PROCESS NAMES",
-            "   • Malicious processes",
-            "   • Example: cryptolocker.exe",
-            "",
-            "📧 8. EMAIL ADDRESSES",
-            "   • Phishing senders",
-            "   • Example: fake@update.com"
-        ]
-        
-        combined_types = []
-        max_lines = max(len(ioc_types_left), len(ioc_types_right))
-        col_width = (box_width - 10) // 2
-        for i in range(max_lines):
-            left = ioc_types_left[i] if i < len(ioc_types_left) else ""
-            right = ioc_types_right[i] if i < len(ioc_types_right) else ""
-            combined_types.append(f"{left:<{col_width}}  {right}")
-        
-        self._draw_hacker_box(
-            "📋 TYPES OF IOCS",
-            combined_types,
-            title_color=CYAN,
-            border_color=CYAN,
-            content_color=GREEN,
-            width=box_width,
-            speed='instant'
-        )
-        time.sleep(0.2)
-        
-        # Section 4: MITRE ATT&CK
-        mitre_content = [
-            "🔴 Initial Access (TA0001) → Phishing → Email, domain, URL",
-            "🟡 Execution (TA0002) → Command Interpreter → Process, file path",
-            "🔵 Persistence (TA0003) → Registry Run Keys → Registry, task",
-            "🟣 Privilege Escalation → Valid Accounts → Account changes",
-            "🟢 Defense Evasion (TA0005) → File Deletion → Missing logs",
-            "🔴 Credential Access (TA0006) → Dumping → LSASS access",
-            "🟡 Discovery (TA0007) → Network Scanning → Scanning activity",
-            "🔵 Lateral Movement (TA0008) → Remote Services → Connections",
-            "🟣 Collection (TA0009) → Data Staged → Large file copies",
-            "🟢 Exfiltration (TA0010) → Over C2 → Outbound data",
-            "🔴 Command and Control → Application Protocol → C2 traffic",
-            "🟡 Impact (TA0040) → Data Encrypted → Changed extensions"
-        ]
-        
-        self._draw_hacker_box(
-            "🎯 MITRE ATT&CK & IOC MAPPING",
-            mitre_content,
-            title_color=YELLOW,
-            border_color=CYAN,
-            content_color=GREEN,
-            width=box_width,
-            speed='instant'
-        )
-        time.sleep(0.2)
-        
-        # Section 5: Categories
-        self._draw_hacker_box(
-            "🛡️ IOC CATEGORIES & CONFIDENCE LEVELS",
-            [
-                "",
-                "🟢 CATEGORY: CLEAN",
-                "   → Confidence: 100%  |  Action: Do not block",
-                "   → Confirmed safe, false positive",
-                "",
-                "🟡 CATEGORY: SUSPICIOUS",
-                "   → Confidence: 50-70%  |  Action: Investigate",
-                "   → Potentially malicious, needs investigation",
-                "",
-                "🔴 CATEGORY: MALICIOUS",
-                "   → Confidence: 80-100%  |  Action: Block immediately",
-                "   → Confirmed malicious, quarantine and alert",
-                "",
-                "📊 CONFIDENCE SCORING:",
-                "   • Multiple sources = Higher confidence",
-                "   • Freshness = More recent = Higher confidence",
-                "   • Source reliability = Trusted source = Higher confidence",
-            ],
-            title_color=MAGENTA,
-            border_color=CYAN,
-            content_color=GREEN,
-            width=box_width,
-            speed='instant'
-        )
-        time.sleep(0.2)
-        
-        # Section 6: Best Practices
-        best_practices = [
-            "1. ALWAYS VALIDATE",
-            "   → Cross-reference multiple sources",
-            "   → Verify before blocking",
-            "   → Consider false positives",
-            "",
-            "2. CONTEXT IS KEY",
-            "   → Understand the attack scenario",
-            "   → Know your environment",
-            "   → Relevance matters",
-            "",
-            "3. TIMELINESS MATTERS",
-            "   → Use fresh IOCs",
-            "   → Remove outdated IOCs",
-            "   → Regular updates",
-            "",
-            "4. SHARE RESPONSIBLY",
-            "   → Protect sensitive information",
-            "   → Use standard formats (STIX)",
-            "   → Follow sharing protocols",
-            "",
-            "5. AUTOMATE WHERE POSSIBLE",
-            "   → Auto-block known threats",
-            "   → Auto-update IOC feeds",
-            "   → Auto-generate alerts",
-            "",
-            "6. DOCUMENT EVERYTHING",
-            "   → Source of IOC",
-            "   → Discovery date",
-            "   → Confidence level",
-            "   → Related incidents"
-        ]
-        
-        self._draw_hacker_box(
-            "🎓 IOC BEST PRACTICES",
-            best_practices,
-            title_color=CYAN,
-            border_color=CYAN,
-            content_color=YELLOW,
-            width=box_width,
-            speed='instant'
-        )
-        time.sleep(0.2)
-        
-        # Section 7: Why Critical
-        self._draw_hacker_box(
-            "💡 WHY IOCS ARE CRITICAL",
-            [
-                "1. EARLY DETECTION - Identify threats before they cause damage",
-                "2. FAST RESPONSE - Automated blocking of known threats",
-                "3. THREAT INTELLIGENCE - Understand attacker TTPs",
-                "4. COMPLIANCE REQUIREMENTS - GDPR, HIPAA, PCI-DSS, NIST CSF",
-                "5. PROACTIVE HUNTING - Search for threats proactively",
-                "6. ATTRIBUTION - Identify threat actors and link to known groups",
-                "7. SHARING & COLLABORATION - Share intelligence with others"
-            ],
-            title_color=BRIGHT_GREEN,
-            border_color=CYAN,
-            content_color=BRIGHT_YELLOW,
-            width=box_width,
-            speed='instant'
-        )
-        time.sleep(0.2)
-        
-        # Section 8: SOC Lab Usage
-        self._draw_hacker_box(
-            "🔧 USING IOCS IN SOC LAB",
-            [
-                "STEP 1: Add an IOC",
-                "   → Type: soc ioc",
-                "   → Select type: hash, domain, ip, url, file, registry",
-                "   → Enter value and categorize",
-                "",
-                "STEP 2: Test the IOC",
-                "   → The lab will scan your system",
-                "   → Find matching files, processes, or configurations",
-                "",
-                "STEP 3: View All IOCs",
-                "   → See all loaded IOCs with categories and sources",
-                "",
-                "STEP 4: Monitor for IOC Matches",
-                "   → Real-time file system monitoring",
-                "   → Process behavior analysis",
-                "",
-                "STEP 5: Respond to IOC Matches",
-                "   → Quarantine malicious files",
-                "   → Block malicious domains and IPs",
-                "   → Terminate malicious processes"
-            ],
-            title_color=YELLOW,
-            border_color=CYAN,
-            content_color=GREEN,
-            width=box_width,
-            speed='instant'
-        )
-        time.sleep(0.2)
-        
-        # Section 9: Quick Reference
-        self._draw_hacker_box(
-            "🎓 QUICK REFERENCE",
-            [
-                "IOC TYPES:     hash, domain, ip, url, file, registry",
-                "CATEGORIES:    malicious, suspicious, clean",
-                "CONFIDENCE:    0-100% (higher = more reliable)",
-                "SOURCES:       Internal, External, Vendor, Open Source",
-                "ACTIONS:       Block, Quarantine, Alert, Monitor, Investigate"
-            ],
-            title_color=CYAN,
-            border_color=CYAN,
-            content_color=BRIGHT_CYAN,
-            width=box_width,
-            speed='instant'
-        )
-        time.sleep(0.2)
-        
-        # Section 10: Resources
-        resources = [
-            "Online Platforms:",
-            "   • VirusTotal: https://www.virustotal.com",
-            "   • MISP: https://www.misp-project.org",
-            "   • AlienVault OTX: https://otx.alienvault.com",
-            "   • AbuseIPDB: https://www.abuseipdb.com",
-            "",
-            "Threat Intelligence Feeds:",
-            "   • CISA Alerts: https://www.cisa.gov",
-            "   • Talos Intelligence: https://talosintelligence.com",
-            "   • SANS ISC: https://isc.sans.edu",
-            "",
-            "Certifications:",
-            "   • CISSP - Certified Information Systems Security Professional",
-            "   • CISA - Certified Information Systems Auditor",
-            "   • CEH - Certified Ethical Hacker",
-            "   • GIAC - Global Information Assurance Certification"
-        ]
-        
-        self._draw_hacker_box(
-            "📚 LEARNING RESOURCES",
-            resources,
-            title_color=MAGENTA,
-            border_color=CYAN,
-            content_color=BRIGHT_CYAN,
-            width=box_width,
-            speed='instant'
-        )
-        time.sleep(0.2)
-        
-        # Footer
-        footer_content = [
-            "🛡️ STAY VIGILANT | STAY SECURE | STAY INFORMED",
-            "",
-            "💡 Press Enter to continue..."
-        ]
-        
-        self._draw_hacker_box(
-            "⚡ SOC LAB SECURITY EDUCATION",
-            footer_content,
-            title_color=RED,
-            border_color=CYAN,
-            content_color=YELLOW,
-            width=box_width,
-            speed='instant'
-        )
-        input()
-    
-    def _show_ioc_quick(self):
-        """Quick IOC overview with hacker-style centered boxed windows"""
-        import time
-        from colorama import Fore, Style, init
-        init(autoreset=True)
-        
-        # Hacker color scheme
-        GREEN, CYAN, YELLOW, RED, MAGENTA, WHITE = Fore.GREEN, Fore.CYAN, Fore.YELLOW, Fore.RED, Fore.MAGENTA, Fore.WHITE
-        BRIGHT_GREEN, BRIGHT_CYAN = Fore.LIGHTGREEN_EX, Fore.LIGHTCYAN_EX
-        
-        # Clear screen
-        os.system('cls' if os.name == 'nt' else 'clear')
-        
-        # Quick overview boxes
-        self._draw_hacker_box(
-            "📌 WHAT ARE IOCS?",
-            [
-                "Indicators of Compromise are forensic artifacts that provide",
-                "evidence of a potential security breach. They are the digital",
-                "breadcrumbs left behind by attackers."
-            ],
-            title_color=YELLOW,
-            border_color=CYAN,
-            content_color=GREEN,
-            width=78
-        )
-        time.sleep(0.2)
-        
-        self._draw_hacker_box(
-            "📋 TYPES OF IOCS",
-            [
-                "1. File Hashes - Unique file fingerprints",
-                "2. Domains - Malicious websites for C2, phishing",
-                "3. IP Addresses - Command & Control servers",
-                "4. URLs - Specific malicious web addresses",
-                "5. File Paths - Malware installation locations",
-                "6. Registry Keys - Persistence mechanisms",
-                "7. Process Names - Known malicious processes",
-                "8. Email Addresses - Phishing sender addresses"
-            ],
-            title_color=CYAN,
-            border_color=CYAN,
-            content_color=GREEN,
-            width=78
-        )
-        time.sleep(0.2)
-        
-        self._draw_hacker_box(
-            "🎯 IOC CATEGORIES",
-            [
-                "🔴 MALICIOUS - Confirmed malicious (80-100% confidence)",
-                "🟡 SUSPICIOUS - Potentially malicious (50-70% confidence)",
-                "🟢 CLEAN - Confirmed safe (100% confidence)"
-            ],
-            title_color=MAGENTA,
-            border_color=CYAN,
-            content_color=GREEN,
-            width=78
-        )
-        time.sleep(0.2)
-        
-        self._draw_hacker_box(
-            "📊 WHY IOCS ARE CRITICAL",
-            [
-                "✅ Early Detection - Identify threats before damage",
-                "✅ Fast Response - Automated blocking of known threats",
-                "✅ Threat Intelligence - Understand attacker TTPs",
-                "✅ Proactive Hunting - Search for threats proactively"
-            ],
-            title_color=BRIGHT_GREEN,
-            border_color=CYAN,
-            content_color=GREEN,
-            width=78
-        )
-        time.sleep(0.2)
-        
-        # Quick reference footer
-        self._draw_hacker_box(
-            "💡 TIP",
-            [
-                "For the complete education guide, type: ioc-education",
-                "Press Enter to continue..."
-            ],
-            title_color=YELLOW,
-            border_color=CYAN,
-            content_color=BRIGHT_CYAN,
-            width=78
-        )
-        input()
-     
     #  ============================================= 
     def _init_commands(self):
         """Initialize commands dictionary - Fast"""
@@ -3277,34 +2311,79 @@ class SecurityTerminal:
                 'help': 'Complete IOC education guide',
                 'category': 'Education'
             },
-                    # IOC EDUCATION COMMANDS
             # ============================================================
+            # IOC EDUCATION COMMANDS
+            # ============================================================
+            'ioc': {
+                'func': self.cmd_ioc,
+                'help': 'Interactive IOC Education - Learn about Indicators of Compromise',
+                'category': 'Education'
+            },
             'ioc-education': {
-                'func': lambda args: self.process_command('ioc-education'),
-                'help': 'Complete IOC education guide',
+                'func': self.cmd_ioc_education,
+                'help': 'Complete IOC education guide (interactive)',
                 'category': 'Education'
             },
-            'ioc-guide': {
-                'func': lambda args: self.process_command('ioc-guide'),
-                'help': 'IOC education guide',
+            'ioc-random': {
+                'func': self.cmd_ioc_random,
+                'help': 'Show a random IOC lesson',
                 'category': 'Education'
             },
-            'ioc-info': {
-                'func': lambda args: self.process_command('ioc-info'),
-                'help': 'IOC information and best practices',
+            'ioc-all': {
+                'func': self.cmd_ioc_all,
+                'help': 'Show all IOC lessons sequentially',
                 'category': 'Education'
             },
-            'learn-iocs': {
-                'func': lambda args: self.process_command('learn-iocs'),
-                'help': 'Learn about Indicators of Compromise',
+            'ioc-list': {
+                'func': self.cmd_ioc_list,
+                'help': 'List all available IOC lessons',
                 'category': 'Education'
             },
-            'iocs': {
-                'func': lambda args: self.process_command('iocs'),
-                'help': 'Quick IOC overview',
+            'ioc-quick': {
+                'func': self.cmd_ioc_quick,
+                'help': 'Quick IOC overview (single lesson)',
                 'category': 'Education'
             },
-
+            'ioc-help': {
+                'func': self.cmd_ioc_help,
+                'help': 'Show IOC education help',
+                'category': 'Education'
+            },
+            # ============================================================
+            # WIFI AUDIT COMMANDS
+            # ============================================================
+            'wifi': {
+                'func': self.cmd_wifi,
+                'help': 'WiFi Security Audit - Scan and analyze WiFi networks',
+                'category': 'Security'
+            },
+            'wifi-scan': {
+                'func': self.cmd_wifi_scan,
+                'help': 'Scan for WiFi networks and analyze security',
+                'category': 'Security'
+            },
+            'wifi-live': {
+                'func': self.cmd_wifi_live,
+                'help': 'Live WiFi monitoring mode (refreshes every 2 seconds)',
+                'category': 'Security'
+            },
+            'wifi-interface': {
+                'func': self.cmd_wifi_interface,
+                'help': 'Scan using a specific WiFi interface',
+                'category': 'Security'
+            },
+            'wifi-help': {
+                'func': self.cmd_wifi_help,
+                'help': 'Show WiFi audit help',
+                'category': 'Security'
+            },
+            'wifi-status': {
+                'func': self.cmd_wifi_status,
+                'help': 'Show WiFi module status',
+                'category': 'Security'
+            },
+ 
+    
         }
     
     def _setup_logging(self):
@@ -3440,6 +2519,7 @@ class SecurityTerminal:
         """
         # Print the banner instantly without any delays
         print(banner)
+        time.sleep(0.5)
     
     # ========== COMMAND METHODS (Placeholders) ==========
     #   =====================soc_automated section+++++++++++++++++++++++===
@@ -3932,6 +3012,668 @@ class SecurityTerminal:
         
 # ========================================end of the soc_animate=================
 
+    # ==========================for ioc integrals==============================
+    # ========================================================================
+    # IOC EDUCATION COMMAND HANDLERS
+    # ========================================================================
+    
+    def cmd_ioc(self, args=None):
+        """Interactive IOC Education - Main command"""
+        if not IOC_EDUCATION_AVAILABLE:
+            self._print_error("IOC Education module not available.")
+            self._print_info("Make sure ioc_education.py is in the same directory.")
+            return
+        
+        try:
+            # Parse arguments
+            show_all = False
+            non_interactive = False
+            speed = None
+            
+            if args:
+                for arg in args:
+                    if arg == '--all' or arg == '-a':
+                        show_all = True
+                    elif arg == '--non-interactive' or arg == '-n':
+                        non_interactive = True
+                    elif arg.startswith('--speed='):
+                        try:
+                            speed = float(arg.split('=')[1])
+                        except:
+                            pass
+            
+            # Create IOC Education instance with parent reference
+            ioc = IOCEducation(parent_terminal=self)
+            
+            if show_all:
+                ioc.show_all_lessons(speed=speed)
+            elif non_interactive:
+                ioc.show_random_lesson(speed=speed)
+            else:
+                # Interactive mode with continue prompts
+                ioc.run_interactive(speed=speed)
+                
+        except KeyboardInterrupt:
+            print(f"\n{Fore.YELLOW}[!] IOC education interrupted by user{Style.RESET_ALL}")
+        except Exception as e:
+            self._print_error(f"IOC education failed: {str(e)}")
+            import traceback
+            traceback.print_exc()
+    
+    def cmd_ioc_education(self, args=None):
+        """Complete IOC education guide (interactive)"""
+        if not IOC_EDUCATION_AVAILABLE:
+            self._print_error("IOC Education module not available.")
+            return
+        
+        try:
+            ioc = IOCEducation(parent_terminal=self)
+            ioc.run_interactive(speed=None)
+        except KeyboardInterrupt:
+            print(f"\n{Fore.YELLOW}[!] IOC education interrupted{Style.RESET_ALL}")
+        except Exception as e:
+            self._print_error(f"IOC education failed: {str(e)}")
+    
+    def cmd_ioc_random(self, args=None):
+        """Show a random IOC lesson"""
+        if not IOC_EDUCATION_AVAILABLE:
+            self._print_error("IOC Education module not available.")
+            return
+        
+        try:
+            ioc = IOCEducation(parent_terminal=self)
+            ioc.show_random_lesson(speed=None)
+        except KeyboardInterrupt:
+            print(f"\n{Fore.YELLOW}[!] IOC lesson interrupted{Style.RESET_ALL}")
+        except Exception as e:
+            self._print_error(f"Failed to show lesson: {str(e)}")
+    
+    def cmd_ioc_all(self, args=None):
+        """Show all IOC lessons sequentially"""
+        if not IOC_EDUCATION_AVAILABLE:
+            self._print_error("IOC Education module not available.")
+            return
+        
+        try:
+            ioc = IOCEducation(parent_terminal=self)
+            ioc.show_all_lessons(speed=None)
+        except KeyboardInterrupt:
+            print(f"\n{Fore.YELLOW}[!] IOC lessons interrupted{Style.RESET_ALL}")
+        except Exception as e:
+            self._print_error(f"Failed to show lessons: {str(e)}")
+    
+    def cmd_ioc_list(self, args=None):
+        """List all available IOC lessons"""
+        if not IOC_EDUCATION_AVAILABLE:
+            self._print_error("IOC Education module not available.")
+            return
+        
+        try:
+            lessons = IOCEducation.IOC_LESSONS
+            print(f"\n{Fore.CYAN}╔══════════════════════════════════════════════════════════════╗{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.WHITE}📚 AVAILABLE IOC LESSONS{Fore.CYAN}                                    ║{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}╠════════════════════════════════════════════════════════════════╣{Style.RESET_ALL}")
+            for i, lesson in enumerate(lessons, 1):
+                print(f"{Fore.CYAN}║{Style.RESET_ALL}  {i:2}. {lesson['icon']} {lesson['title'][:50]}{Fore.CYAN} ║{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}╠════════════════════════════════════════════════════════════════╣{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.YELLOW}Total: {len(lessons)} lessons{Fore.CYAN}                                          ║{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}╚════════════════════════════════════════════════════════════════╝{Style.RESET_ALL}")
+            print()
+        except Exception as e:
+            self._print_error(f"Failed to list lessons: {str(e)}")
+    
+    def cmd_ioc_quick(self, args=None):
+        """Quick IOC overview (single random lesson)"""
+        if not IOC_EDUCATION_AVAILABLE:
+            self._print_error("IOC Education module not available.")
+            return
+        
+        try:
+            ioc = IOCEducation(parent_terminal=self)
+            ioc.show_random_lesson(speed=None)
+        except KeyboardInterrupt:
+            print(f"\n{Fore.YELLOW}[!] IOC quick view interrupted{Style.RESET_ALL}")
+        except Exception as e:
+            self._print_error(f"Failed to show quick view: {str(e)}")
+    
+    def cmd_ioc_help(self, args=None):
+        """Show IOC education help"""
+        help_text = f"""
+{Fore.CYAN}╔═══════════════════════════════════════════════════════════════════════════╗
+║                     🛡️ IOC EDUCATION COMMANDS                                    ║
+╠═══════════════════════════════════════════════════════════════════════════╣
+║  {Fore.YELLOW}ioc{Fore.CYAN}                    - Interactive learning (default)
+║  {Fore.YELLOW}ioc-education{Fore.CYAN}          - Complete interactive guide
+║  {Fore.YELLOW}ioc-random{Fore.CYAN}             - Show a random lesson
+║  {Fore.YELLOW}ioc-all{Fore.CYAN}                - Show all lessons sequentially
+║  {Fore.YELLOW}ioc-list{Fore.CYAN}               - List all available lessons
+║  {Fore.YELLOW}ioc-quick{Fore.CYAN}              - Quick lesson (single)
+║  {Fore.YELLOW}ioc-help{Fore.CYAN}               - Show this help
+║                                                               ║
+║  {Fore.YELLOW}Options:{Fore.CYAN}                                                 ║
+║  {Fore.GREEN}ioc --all{Fore.CYAN}             - Show all lessons
+║  {Fore.GREEN}ioc --non-interactive{Fore.CYAN}  - Single lesson (non-interactive)
+║  {Fore.GREEN}ioc --speed=0.02{Fore.CYAN}      - Set typing speed
+║                                                               ║
+║  {Fore.YELLOW}What you'll learn:{Fore.CYAN}                                         ║
+║  • What are Indicators of Compromise                         ║
+║  • IOC vs IOA (Indicators of Attack)                         ║
+║  • Types of IOCs (hashes, domains, IPs, URLs, etc.)         ║
+║  • MITRE ATT&CK Mapping                                      ║
+║  • IOC Categories & Confidence Levels                        ║
+║  • Best Practices & SOC Lab Usage                           ║
+║                                                               ║
+║  {Fore.YELLOW}Examples:{Fore.CYAN}                                                 ║
+║  {Fore.GREEN}ioc{Fore.CYAN}                  - Start interactive learning
+║  {Fore.GREEN}ioc-random{Fore.CYAN}           - Jump to a random lesson
+║  {Fore.GREEN}ioc-list{Fore.CYAN}             - See all available lessons
+╚═══════════════════════════════════════════════════════════════════════════╝{Style.RESET_ALL}
+"""
+        print(help_text)
+    
+    def _print_error(self, message):
+        """Print error message with consistent formatting"""
+        print(f"{Fore.RED}[!] {message}{Style.RESET_ALL}")
+    
+    def _print_info(self, message):
+        """Print info message with consistent formatting"""
+        print(f"{Fore.CYAN}[*] {message}{Style.RESET_ALL}")
+    
+    def _print_success(self, message):
+        """Print success message with consistent formatting"""
+        print(f"{Fore.GREEN}[+] {message}{Style.RESET_ALL}")
+    
+    # ==========================end of ioc integral
+       # ========================================================================
+    # WIFI AUDIT COMMAND HANDLERS
+    # ========================================================================
+    
+    def cmd_wifi(self, args=None):
+        """Run WiFi security audit with auto-detection"""
+        if not WIFI_AUDIT_AVAILABLE:
+            self._print_error("WiFi Audit module not available.")
+            self._print_info("Make sure wifi_audit.py is in the same directory.")
+            return
+        
+        try:
+            # Parse arguments for interface
+            interface = None
+            speed = 0.035
+            
+            if args:
+                for arg in args:
+                    if not arg.startswith('--'):
+                        interface = arg
+                    elif arg.startswith('--speed='):
+                        try:
+                            speed = float(arg.split('=')[1])
+                        except:
+                            pass
+            
+            # Create WiFi audit instance
+            wifi = WiFiAudit(interface=interface)
+            wifi.pen_speed = speed
+            wifi.run()
+            
+        except KeyboardInterrupt:
+            print(f"\n{Fore.YELLOW}[!] WiFi audit interrupted by user{Style.RESET_ALL}")
+        except Exception as e:
+            self._print_error(f"WiFi audit failed: {str(e)}")
+            import traceback
+            traceback.print_exc()
+    
+    def cmd_wifi_scan(self, args=None):
+        """Quick WiFi scan"""
+        if not WIFI_AUDIT_AVAILABLE:
+            self._print_error("WiFi Audit module not available.")
+            return
+        
+        try:
+            interface = args[0] if args else None
+            wifi = WiFiAudit(interface=interface)
+            
+            # Override the run method to skip some steps for quick scan
+            # Or just run the full scan
+            wifi.run()
+            
+        except KeyboardInterrupt:
+            print(f"\n{Fore.YELLOW}[!] WiFi scan interrupted{Style.RESET_ALL}")
+        except Exception as e:
+            self._print_error(f"WiFi scan failed: {str(e)}")
+    
+    def cmd_wifi_live(self, args=None):
+        """Live WiFi monitoring mode"""
+        if not WIFI_AUDIT_AVAILABLE:
+            self._print_error("WiFi Audit module not available.")
+            return
+        
+        try:
+            interface = args[0] if args else None
+            speed = 0.035
+            
+            # Check for speed parameter
+            if args:
+                for arg in args:
+                    if arg.startswith('--speed='):
+                        try:
+                            speed = float(arg.split('=')[1])
+                        except:
+                            pass
+            
+            print(f"{Fore.LIGHTCYAN_EX}Live monitoring mode - Press Ctrl+C to stop{Style.RESET_ALL}")
+            
+            wifi = WiFiAudit(interface=interface)
+            wifi.pen_speed = speed
+            
+            # Live monitoring loop
+            while True:
+                wifi.results['access_points'] = []
+                wifi.run()
+                time.sleep(2)
+                os.system('cls' if platform.system() == 'Windows' else 'clear')
+                
+        except KeyboardInterrupt:
+            print(f"\n{Fore.LIGHTYELLOW_EX}Live monitoring stopped{Style.RESET_ALL}")
+        except Exception as e:
+            self._print_error(f"Live monitoring failed: {str(e)}")
+    
+    def cmd_wifi_interface(self, args=None):
+        """Scan using a specific WiFi interface"""
+        if not WIFI_AUDIT_AVAILABLE:
+            self._print_error("WiFi Audit module not available.")
+            return
+        
+        if not args:
+            self._print_error("Please specify an interface.")
+            self._print_info("Usage: wifi-interface <interface_name> [--speed=0.035]")
+            self._print_info("Example: wifi-interface wlan0")
+            return
+        
+        try:
+            interface = args[0]
+            speed = 0.035
+            
+            # Check for speed parameter
+            for arg in args[1:]:
+                if arg.startswith('--speed='):
+                    try:
+                        speed = float(arg.split('=')[1])
+                    except:
+                        pass
+            
+            wifi = WiFiAudit(interface=interface)
+            wifi.pen_speed = speed
+            wifi.run()
+            
+        except KeyboardInterrupt:
+            print(f"\n{Fore.YELLOW}[!] WiFi scan interrupted{Style.RESET_ALL}")
+        except Exception as e:
+            self._print_error(f"WiFi scan failed: {str(e)}")
+    
+    def cmd_wifi_help(self, args=None):
+        """Show WiFi audit help"""
+        if not WIFI_AUDIT_AVAILABLE:
+            self._print_error("WiFi Audit module not available.")
+            return
+        
+        help_text = f"""
+{Fore.CYAN}╔═══════════════════════════════════════════════════════════════════════════╗
+║                     📡 WIFI SECURITY AUDIT COMMANDS  v{WiFiAudit.VERSION}           ║
+╠═══════════════════════════════════════════════════════════════════════════╣
+║  {Fore.YELLOW}wifi{Fore.CYAN}                    - Run WiFi security audit (auto-detect)
+║  {Fore.YELLOW}wifi-scan{Fore.CYAN}              - Quick WiFi scan
+║  {Fore.YELLOW}wifi-live{Fore.CYAN}              - Live monitoring mode (refreshes)
+║  {Fore.YELLOW}wifi-interface{Fore.CYAN} <iface> - Scan using specific interface
+║  {Fore.YELLOW}wifi-help{Fore.CYAN}              - Show this help
+║  {Fore.YELLOW}wifi-status{Fore.CYAN}            - Show WiFi module status
+║                                                               ║
+║  {Fore.YELLOW}Options:{Fore.CYAN}                                                 ║
+║  {Fore.GREEN}wifi --speed=0.02{Fore.CYAN}      - Set typing speed
+║  {Fore.GREEN}wifi-interface wlan0{Fore.CYAN}   - Scan using wlan0
+║                                                               ║
+║  {Fore.YELLOW}Features:{Fore.CYAN}                                                 ║
+║  • Detect and analyze nearby WiFi networks                   ║
+║  • Identify security protocols (WEP, WPA, WPA2, WPA3)       ║
+║  • Detect rogue access points                                ║
+║  • Signal strength analysis and mapping                      ║
+║  • Generate detailed reports (JSON, PDF, HTML)              ║
+║  • Cross-platform support (Windows, Linux, macOS)           ║
+║                                                               ║
+║  {Fore.YELLOW}Examples:{Fore.CYAN}                                                 ║
+║  {Fore.GREEN}wifi{Fore.CYAN}                  - Auto-detect and scan
+║  {Fore.GREEN}wifi wlan0{Fore.CYAN}           - Scan using wlan0 interface
+║  {Fore.GREEN}wifi-live{Fore.CYAN}            - Start live monitoring
+║  {Fore.GREEN}wifi-interface eth1{Fore.CYAN}  - Scan using eth1
+╚═══════════════════════════════════════════════════════════════════════════╝{Style.RESET_ALL}
+"""
+        print(help_text)
+    
+    def cmd_wifi_status(self, args=None):
+        """Show WiFi module status"""
+        print(f"\n{Fore.CYAN}╔══════════════════════════════════════════════════════════════╗{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.WHITE}📡 WIFI AUDIT MODULE STATUS{Fore.CYAN}                                  ║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}╠════════════════════════════════════════════════════════════════╣{Style.RESET_ALL}")
+        
+        if WIFI_AUDIT_AVAILABLE:
+            print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.GREEN}✅{Style.RESET_ALL} Module Status:  Loaded Successfully           {Fore.CYAN}║{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.CYAN}📌{Style.RESET_ALL} Version:        {WiFiAudit.VERSION}                    {Fore.CYAN}║{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.CYAN}📌{Style.RESET_ALL} Platform:       {platform.system()}                      {Fore.CYAN}║{Style.RESET_ALL}")
+            
+            # Check PDF availability
+            try:
+                import reportlab
+                print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.GREEN}✅{Style.RESET_ALL} PDF Support:     Available (reportlab)            {Fore.CYAN}║{Style.RESET_ALL}")
+            except:
+                print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.RED}❌{Style.RESET_ALL} PDF Support:     Not installed (pip install reportlab){Fore.CYAN}║{Style.RESET_ALL}")
+            
+            # Check for wireless interface
+            try:
+                if platform.system() == "Windows":
+                    result = subprocess.run(['netsh', 'wlan', 'show', 'interfaces'], 
+                                          capture_output=True, text=True, timeout=5)
+                    if 'SSID' in result.stdout:
+                        print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.GREEN}✅{Style.RESET_ALL} WiFi Hardware:   Detected                      {Fore.CYAN}║{Style.RESET_ALL}")
+                    else:
+                        print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.YELLOW}⚠️{Style.RESET_ALL} WiFi Hardware:   Not detected/No adapter       {Fore.CYAN}║{Style.RESET_ALL}")
+                else:
+                    result = subprocess.run(['iwconfig'], capture_output=True, text=True, timeout=5)
+                    if 'IEEE 802.11' in result.stdout:
+                        print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.GREEN}✅{Style.RESET_ALL} WiFi Hardware:   Detected                      {Fore.CYAN}║{Style.RESET_ALL}")
+                    else:
+                        print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.YELLOW}⚠️{Style.RESET_ALL} WiFi Hardware:   Not detected                  {Fore.CYAN}║{Style.RESET_ALL}")
+            except:
+                print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.YELLOW}⚠️{Style.RESET_ALL} WiFi Hardware:   Unable to check                {Fore.CYAN}║{Style.RESET_ALL}")
+            
+        else:
+            print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.RED}❌{Style.RESET_ALL} Module Status:  NOT Loaded                    {Fore.CYAN}║{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.YELLOW}⚠️{Style.RESET_ALL} Action:         Download wifi_audit.py        {Fore.CYAN}║{Style.RESET_ALL}")
+        
+        print(f"{Fore.CYAN}╠════════════════════════════════════════════════════════════════╣{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.YELLOW}Type 'wifi' to start scanning{Fore.CYAN}                              ║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}╚════════════════════════════════════════════════════════════════╝{Style.RESET_ALL}")
+        print()
+    
+    def cmd_modules_status(self, args=None):
+        """Show status of all loaded modules"""
+        self.console.print(f"\n[cyan]╔══════════════════════════════════════════════════════════════╗[/]")
+        self.console.print(f"[cyan]║[/]  [white]📊 MODULE STATUS[/white]                                             [cyan]║[/]")
+        self.console.print(f"[cyan]╠════════════════════════════════════════════════════════════════╣[/]")
+        
+        # IOC Education Module
+        if IOC_EDUCATION_AVAILABLE:
+            self.console.print(f"[cyan]║[/]  [green]✅[/green] IOC Education Module  v{IOCEducation.VERSION}        [cyan]║[/]")
+        else:
+            self.console.print(f"[cyan]║[/]  [red]❌[/red] IOC Education Module  Not Available           [cyan]║[/]")
+        
+        # WiFi Audit Module
+        if WIFI_AUDIT_AVAILABLE:
+            self.console.print(f"[cyan]║[/]  [green]✅[/green] WiFi Audit Module     v{WiFiAudit.VERSION}        [cyan]║[/]")
+        else:
+            self.console.print(f"[cyan]║[/]  [red]❌[/red] WiFi Audit Module     Not Available           [cyan]║[/]")
+        
+        self.console.print(f"[cyan]╠════════════════════════════════════════════════════════════════╣[/]")
+        self.console.print(f"[cyan]║[/]  [yellow]Type 'help' for available commands[/yellow]                              [cyan]║[/]")
+        self.console.print(f"[cyan]╚════════════════════════════════════════════════════════════════╝[/]")
+        self.console.print()
+        
+    def _print_error(self, message):
+        """Print error message with consistent formatting"""
+        print(f"{Fore.RED}[!] {message}{Style.RESET_ALL}")
+    
+    def _print_info(self, message):
+        """Print info message with consistent formatting"""
+        print(f"{Fore.CYAN}[*] {message}{Style.RESET_ALL}")
+    
+    def _print_success(self, message):
+        """Print success message with consistent formatting"""
+        print(f"{Fore.GREEN}[+] {message}{Style.RESET_ALL}")
+       
+    
+#   ===========================end of wifi_audit module functions # 
+    
+    # EXPLOIT SCANNER COMMAND HANDLERS
+    # ========================================================================
+    
+    def cmd_exploit(self, args=None):
+        """Run exploit vulnerability scan"""
+        if not EXPLOIT_SCANNER_AVAILABLE:
+            self.console.print("[red]❌ Exploit Scanner module not available.[/red]")
+            self.console.print("[yellow]Make sure exploit_scanner.py is in the same directory.[/yellow]")
+            return
+        
+        try:
+            target = None
+            port = None
+            speed = 0.035
+            
+            if args:
+                for i, arg in enumerate(args):
+                    if arg == '-t' or arg == '--target':
+                        if i + 1 < len(args):
+                            target = args[i + 1]
+                    elif arg == '-p' or arg == '--port':
+                        if i + 1 < len(args):
+                            try:
+                                port = int(args[i + 1])
+                            except:
+                                pass
+                    elif arg.startswith('--speed='):
+                        try:
+                            speed = float(arg.split('=')[1])
+                        except:
+                            pass
+            
+            scanner = ExploitScanner(target=target, port=port)
+            scanner.pen_speed = speed
+            scanner.scan()
+            
+        except KeyboardInterrupt:
+            self.console.print("\n[yellow]⚠️ Exploit scan interrupted by user[/yellow]")
+        except Exception as e:
+            self.console.print(f"[red]❌ Error: {e}[/red]")
+            import traceback
+            traceback.print_exc()
+    
+    def cmd_exploit_local(self, args=None):
+        """Scan local machine for vulnerabilities"""
+        if not EXPLOIT_SCANNER_AVAILABLE:
+            self.console.print("[red]❌ Exploit Scanner module not available.[/red]")
+            return
+        
+        try:
+            speed = 0.035
+            if args:
+                for arg in args:
+                    if arg.startswith('--speed='):
+                        try:
+                            speed = float(arg.split('=')[1])
+                        except:
+                            pass
+            
+            scanner = ExploitScanner(target="localhost")
+            scanner.pen_speed = speed
+            scanner.scan()
+            
+        except KeyboardInterrupt:
+            self.console.print("\n[yellow]⚠️ Local exploit scan interrupted[/yellow]")
+        except Exception as e:
+            self.console.print(f"[red]❌ Error: {e}[/red]")
+    
+    def cmd_exploit_remote(self, args=None):
+        """Scan remote target for vulnerabilities"""
+        if not EXPLOIT_SCANNER_AVAILABLE:
+            self.console.print("[red]❌ Exploit Scanner module not available.[/red]")
+            return
+        
+        if not args:
+            self.console.print("[red]❌ Please specify a target.[/red]")
+            self.console.print("[yellow]Usage: exploit-remote <target> [--speed=0.035][/yellow]")
+            self.console.print("[yellow]Example: exploit-remote example.com[/yellow]")
+            return
+        
+        try:
+            target = args[0]
+            port = None
+            speed = 0.035
+            
+            for i, arg in enumerate(args[1:]):
+                if arg == '-p' or arg == '--port':
+                    if i + 1 < len(args[1:]):
+                        try:
+                            port = int(args[1:][i + 1])
+                        except:
+                            pass
+                elif arg.startswith('--speed='):
+                    try:
+                        speed = float(arg.split('=')[1])
+                    except:
+                        pass
+            
+            scanner = ExploitScanner(target=target, port=port)
+            scanner.pen_speed = speed
+            scanner.scan()
+            
+        except KeyboardInterrupt:
+            self.console.print("\n[yellow]⚠️ Remote exploit scan interrupted[/yellow]")
+        except Exception as e:
+            self.console.print(f"[red]❌ Error: {e}[/red]")
+    
+    def cmd_exploit_port(self, args=None):
+        """Scan specific port on target"""
+        if not EXPLOIT_SCANNER_AVAILABLE:
+            self.console.print("[red]❌ Exploit Scanner module not available.[/red]")
+            return
+        
+        if not args or len(args) < 2:
+            self.console.print("[red]❌ Please specify target and port.[/red]")
+            self.console.print("[yellow]Usage: exploit-port <target> <port> [--speed=0.035][/yellow]")
+            self.console.print("[yellow]Example: exploit-port example.com 443[/yellow]")
+            return
+        
+        try:
+            target = args[0]
+            port = int(args[1])
+            speed = 0.035
+            
+            for arg in args[2:]:
+                if arg.startswith('--speed='):
+                    try:
+                        speed = float(arg.split('=')[1])
+                    except:
+                        pass
+            
+            scanner = ExploitScanner(target=target, port=port)
+            scanner.pen_speed = speed
+            scanner.scan()
+            
+        except ValueError:
+            self.console.print("[red]❌ Invalid port number.[/red]")
+        except KeyboardInterrupt:
+            self.console.print("\n[yellow]⚠️ Port scan interrupted[/yellow]")
+        except Exception as e:
+            self.console.print(f"[red]❌ Error: {e}[/red]")
+    
+    def cmd_exploit_list(self, args=None):
+        """List all available exploits/CVEs"""
+        if not EXPLOIT_SCANNER_AVAILABLE:
+            self.console.print("[red]❌ Exploit Scanner module not available.[/red]")
+            return
+        
+        try:
+            scanner = ExploitScanner()
+            exploit_db = scanner.get_exploit_db()
+            
+            self.console.print(f"\n[cyan]📋 Available Exploits/CVEs ({len(exploit_db)}):[/cyan]")
+            
+            # Group by severity
+            severity_groups = {'CRITICAL': [], 'HIGH': [], 'MEDIUM': [], 'LOW': []}
+            for cve_id, info in exploit_db.items():
+                severity = info.get('severity', 'UNKNOWN')
+                if severity in severity_groups:
+                    severity_groups[severity].append((cve_id, info))
+                else:
+                    severity_groups.setdefault('OTHER', []).append((cve_id, info))
+            
+            # Display by severity
+            for severity, items in severity_groups.items():
+                if items:
+                    color = Fore.RED if severity == 'CRITICAL' else Fore.YELLOW if severity == 'HIGH' else Fore.CYAN if severity == 'MEDIUM' else Fore.GREEN
+                    self.console.print(f"\n  {color}[{severity}]{Style.RESET_ALL}")
+                    for cve_id, info in items[:10]:
+                        self.console.print(f"    {cve_id}: {info['name']}")
+                    if len(items) > 10:
+                        self.console.print(f"    ... and {len(items) - 10} more")
+            
+            self.console.print()
+            
+        except Exception as e:
+            self.console.print(f"[red]❌ Error: {e}[/red]")
+    
+    def cmd_exploit_help(self, args=None):
+        """Show exploit scanner help"""
+        help_text = f"""
+{Fore.CYAN}╔═══════════════════════════════════════════════════════════════════════════╗
+║                     🔍 EXPLOIT SCANNER COMMANDS                                   ║
+╠═══════════════════════════════════════════════════════════════════════════╣
+║  {Fore.YELLOW}exploit{Fore.CYAN}                 - Run exploit vulnerability scan
+║  {Fore.YELLOW}exploit-local{Fore.CYAN}           - Scan local machine
+║  {Fore.YELLOW}exploit-remote{Fore.CYAN} <target> - Scan remote target
+║  {Fore.YELLOW}exploit-port{Fore.CYAN} <target> <port> - Scan specific port
+║  {Fore.YELLOW}exploit-list{Fore.CYAN}            - List all available exploits
+║  {Fore.YELLOW}exploit-help{Fore.CYAN}            - Show this help
+║  {Fore.YELLOW}exploit-status{Fore.CYAN}          - Show module status
+║                                                               ║
+║  {Fore.YELLOW}Options:{Fore.CYAN}                                                 ║
+║  {Fore.GREEN}-t, --target{Fore.CYAN} <target>  - Target IP or domain
+║  {Fore.GREEN}-p, --port{Fore.CYAN} <port>      - Port to scan
+║  {Fore.GREEN}--speed={Fore.CYAN}0.02           - Set typing speed
+║                                                               ║
+║  {Fore.YELLOW}Features:{Fore.CYAN}                                                 ║
+║  • Real-time vulnerability detection                        ║
+║  • 100+ CVE checks with detailed remediation steps          ║
+║  • Cross-platform support (Windows, Linux, macOS)           ║
+║  • PDF/HTML/JSON report generation                          ║
+║  • OS fingerprinting and service detection                 ║
+║                                                               ║
+║  {Fore.YELLOW}Examples:{Fore.CYAN}                                                 ║
+║  {Fore.GREEN}exploit{Fore.CYAN}                           - Scan local machine
+║  {Fore.GREEN}exploit-remote example.com{Fore.CYAN}       - Scan remote target
+║  {Fore.GREEN}exploit-port example.com 443{Fore.CYAN}    - Scan port 443
+║  {Fore.GREEN}exploit -t example.com -p 443{Fore.CYAN}   - With options
+╚═══════════════════════════════════════════════════════════════════════════╝{Style.RESET_ALL}
+"""
+        self.console.print(help_text)
+    
+    def cmd_modules_status(self, args=None):
+        """Show status of all loaded modules"""
+        self.console.print(f"\n[cyan]╔══════════════════════════════════════════════════════════════╗[/]")
+        self.console.print(f"[cyan]║[/]  [white]📊 MODULE STATUS[/white]                                             [cyan]║[/]")
+        self.console.print(f"[cyan]╠════════════════════════════════════════════════════════════════╣[/]")
+        
+        # IOC Education Module
+        if IOC_EDUCATION_AVAILABLE:
+            self.console.print(f"[cyan]║[/]  [green]✅[/green] IOC Education Module  v{IOCEducation.VERSION}        [cyan]║[/]")
+        else:
+            self.console.print(f"[cyan]║[/]  [red]❌[/red] IOC Education Module  Not Available           [cyan]║[/]")
+        
+        # WiFi Audit Module
+        if WIFI_AUDIT_AVAILABLE:
+            self.console.print(f"[cyan]║[/]  [green]✅[/green] WiFi Audit Module     v{WiFiAudit.VERSION}        [cyan]║[/]")
+        else:
+            self.console.print(f"[cyan]║[/]  [red]❌[/red] WiFi Audit Module     Not Available           [cyan]║[/]")
+        
+        # Exploit Scanner Module
+        if EXPLOIT_SCANNER_AVAILABLE:
+            self.console.print(f"[cyan]║[/]  [green]✅[/green] Exploit Scanner       v{ExploitScanner.VERSION}        [cyan]║[/]")
+        else:
+            self.console.print(f"[cyan]║[/]  [red]❌[/red] Exploit Scanner       Not Available           [cyan]║[/]")
+        
+        self.console.print(f"[cyan]╠════════════════════════════════════════════════════════════════╣[/]")
+        self.console.print(f"[cyan]║[/]  [yellow]Type 'help' for available commands[/yellow]                              [cyan]║[/]")
+        self.console.print(f"[cyan]╚════════════════════════════════════════════════════════════════╝[/]")
+        self.console.print()
+        
+    # ===================================end of expkoit import===============
     # ====================== COMMAND LOGGER ======================
     def log_command(self, command):
         """Record every command executed in the session"""
@@ -4357,7 +4099,7 @@ class SecurityTerminal:
         console.print("\n[cyan]📘 Loading Training Module...[/cyan]\n")
         time.sleep(1)
 
-        engine._ultra_type(tip)
+        engine.text_type(tip)
 
         # =================
 
@@ -5210,6 +4952,15 @@ class SecurityTerminal:
             self.soc_help()
             return True
         
+        # ============iocs=========================================
+        if cmd in self.commands:
+            cmd_info = self.commands.get(cmd)
+            if cmd_info and 'func' in cmd_info:
+                try:
+                    cmd_info['func'](args)
+                except Exception as e:
+                    self._print_error(f"Error executing {cmd}: {str(e)}")
+                return True
         # ============================================================
         # HARDENING COMMANDS
         # ============================================================
@@ -5809,7 +5560,7 @@ class SecurityTerminal:
         
         # Check if file exists
         if os.path.exists("soc_nmap_dashboard.py"):
-            print(f"{Fore.GREEN}[✓] soc_nmap_dashboard.py found{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}[✓] soc_nmap found{Style.RESET_ALL}")
             
             # Try to read the file
             try:
@@ -5821,13 +5572,12 @@ class SecurityTerminal:
             except Exception as e:
                 print(f"{Fore.RED}[!] Cannot read file: {e}{Style.RESET_ALL}")
         else:
-            print(f"{Fore.RED}[✗] soc_nmap_dashboard.py NOT found!{Style.RESET_ALL}")
+            print(f"{Fore.RED}[✗] soc_nmap NOT found!{Style.RESET_ALL}")
             return
         
         # Try to import
         try:
             import soc_nmap_dashboard
-            print(f"{Fore.GREEN}[✓] Module imported successfully{Style.RESET_ALL}")
             print(f"{Fore.CYAN}[*] Module location: {soc_nmap_dashboard.__file__}{Style.RESET_ALL}")
             
             # Check if class exists
@@ -11610,7 +11360,6 @@ class SecurityTerminal:
         """Check if integrity monitor is available"""
         if not INTEGRITY_AVAILABLE:
             print(f"{Fore.RED}Integrity monitor not available.{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW}Make sure integrity_monitor.py is in the same directory{Style.RESET_ALL}")
             return False
         if self.integrity is None:
             print(f"{Fore.RED}Integrity monitor not initialized.{Style.RESET_ALL}")
@@ -13957,7 +13706,7 @@ class SecurityTerminal:
         # ========================================================================
         # Generative Text Writer Function
         # ========================================================================
-        def _ultra_type(text, delay=0.025, variance=0.025, color=None):
+        def text_type(text, delay=0.025, variance=0.025, color=None):
             """Print text with a human-like typing effect."""
             if color:
                 print(color, end='', flush=True)
@@ -13972,8 +13721,8 @@ class SecurityTerminal:
         
         def _ultra_type_header(text, color=Fore.CYAN):
             """Print a header with typing effect."""
-            _ultra_type(f"\n{text}", 0.04, 0.02, color)
-            _ultra_type("━" * min(len(text), 70), 0.01, 0.005, Fore.CYAN)
+            text_type(f"\n{text}", 0.04, 0.02, color)
+            text_type("━" * min(len(text), 70), 0.01, 0.005, Fore.CYAN)
         
         # Get terminal width for centering
         try:
@@ -13988,7 +13737,7 @@ class SecurityTerminal:
         # ========================================================================
         # ASCII Art Banner - System Info
         # ========================================================================
-        _ultra_type("""
+        text_type("""
         ╔══════════════════════════════════════════════════════════════════════╗
         ║                                                                      ║
         ║    ███████╗██╗   ██╗███████╗████████╗███████╗███╗   ███╗            ║
@@ -14129,9 +13878,9 @@ class SecurityTerminal:
         # ========================================================================
         
         # Box 1: System Overview
-        _ultra_type("\n" + " " * ((term_width - 45) // 2) + "╔═════════════════════════════════════════════════════╗", delay=0.01, color=Fore.LIGHTCYAN_EX)
-        _ultra_type(" " * ((term_width - 45) // 2) + "║  ⚡ SYSTEM OVERVIEW  ║", delay=0.02, color=Fore.LIGHTCYAN_EX)
-        _ultra_type(" " * ((term_width - 45) // 2) + "╚═════════════════════════════════════════════════════╝", delay=0.01, color=Fore.LIGHTCYAN_EX)
+        text_type("\n" + " " * ((term_width - 45) // 2) + "╔═════════════════════════════════════════════════════╗", delay=0.01, color=Fore.LIGHTCYAN_EX)
+        text_type(" " * ((term_width - 45) // 2) + "║  ⚡ SYSTEM OVERVIEW  ║", delay=0.02, color=Fore.LIGHTCYAN_EX)
+        text_type(" " * ((term_width - 45) // 2) + "╚═════════════════════════════════════════════════════╝", delay=0.01, color=Fore.LIGHTCYAN_EX)
         time.sleep(0.02)
         
         sys_info = [
@@ -14143,15 +13892,15 @@ class SecurityTerminal:
         ]
         
         for info, color in sys_info:
-            _ultra_type(" " * ((term_width - len(info)) // 2) + info, delay=0.02, color=color)
+            text_type(" " * ((term_width - len(info)) // 2) + info, delay=0.02, color=color)
             time.sleep(0.05)
         
         time.sleep(0.03)
         
         # Box 2: Boot & Uptime
-        _ultra_type("\n" + " " * ((term_width - 45) // 2) + "┌─────────────────────────────────────────────────────┐", delay=0.01, color=Fore.LIGHTYELLOW_EX)
-        _ultra_type(" " * ((term_width - 45) // 2) + "│  ⏰ BOOT & UPTIME  │", delay=0.02, color=Fore.LIGHTYELLOW_EX)
-        _ultra_type(" " * ((term_width - 45) // 2) + "├─────────────────────────────────────────────────────┤", delay=0.01, color=Fore.LIGHTYELLOW_EX)
+        text_type("\n" + " " * ((term_width - 45) // 2) + "┌─────────────────────────────────────────────────────┐", delay=0.01, color=Fore.LIGHTYELLOW_EX)
+        text_type(" " * ((term_width - 45) // 2) + "│  ⏰ BOOT & UPTIME  │", delay=0.02, color=Fore.LIGHTYELLOW_EX)
+        text_type(" " * ((term_width - 45) // 2) + "├─────────────────────────────────────────────────────┤", delay=0.01, color=Fore.LIGHTYELLOW_EX)
         
         boot_info = [
             (f"  Boot Time: {boot_time_str}", Fore.LIGHTYELLOW_EX),
@@ -14160,16 +13909,16 @@ class SecurityTerminal:
         
         for info, color in boot_info:
             line = info
-            _ultra_type(" " * ((term_width - 45) // 2) + "│" + line + " " * (45 - len(line) - 2) + "│", delay=0.02, color=color)
+            text_type(" " * ((term_width - 45) // 2) + "│" + line + " " * (45 - len(line) - 2) + "│", delay=0.02, color=color)
             time.sleep(0.05)
         
-        _ultra_type(" " * ((term_width - 45) // 2) + "└─────────────────────────────────────────────────────┘", delay=0.01, color=Fore.LIGHTYELLOW_EX)
+        text_type(" " * ((term_width - 45) // 2) + "└─────────────────────────────────────────────────────┘", delay=0.01, color=Fore.LIGHTYELLOW_EX)
         time.sleep(0.03)
         
         # Box 3: CPU Information
-        _ultra_type("\n" + " " * ((term_width - 45) // 2) + "╔═════════════════════════════════════════════════════╗", delay=0.01, color=Fore.LIGHTMAGENTA_EX)
-        _ultra_type(" " * ((term_width - 45) // 2) + "║  🔥 CPU INFORMATION  ║", delay=0.02, color=Fore.LIGHTMAGENTA_EX)
-        _ultra_type(" " * ((term_width - 45) // 2) + "╚═════════════════════════════════════════════════════╝", delay=0.01, color=Fore.LIGHTMAGENTA_EX)
+        text_type("\n" + " " * ((term_width - 45) // 2) + "╔═════════════════════════════════════════════════════╗", delay=0.01, color=Fore.LIGHTMAGENTA_EX)
+        text_type(" " * ((term_width - 45) // 2) + "║  🔥 CPU INFORMATION  ║", delay=0.02, color=Fore.LIGHTMAGENTA_EX)
+        text_type(" " * ((term_width - 45) // 2) + "╚═════════════════════════════════════════════════════╝", delay=0.01, color=Fore.LIGHTMAGENTA_EX)
         time.sleep(0.02)
         
         cpu_info = [
@@ -14180,7 +13929,7 @@ class SecurityTerminal:
         ]
         
         for info, color in cpu_info:
-            _ultra_type(" " * ((term_width - len(info)) // 2) + info, delay=0.02, color=color)
+            text_type(" " * ((term_width - len(info)) // 2) + info, delay=0.02, color=color)
             time.sleep(0.05)
         
         # CPU Usage Bar
@@ -14195,13 +13944,13 @@ class SecurityTerminal:
             bar_color = Fore.LIGHTRED_EX
         
         bar_line = f"  [{bar}]"
-        _ultra_type(" " * ((term_width - len(bar_line)) // 2) + bar_line, delay=0.01, color=bar_color)
+        text_type(" " * ((term_width - len(bar_line)) // 2) + bar_line, delay=0.01, color=bar_color)
         time.sleep(0.03)
         
         # Box 4: Memory Information
-        _ultra_type("\n" + " " * ((term_width - 45) // 2) + "┌─────────────────────────────────────────────────────┐", delay=0.01, color=Fore.LIGHTCYAN_EX)
-        _ultra_type(" " * ((term_width - 45) // 2) + "│  💾 MEMORY INFORMATION  │", delay=0.02, color=Fore.LIGHTCYAN_EX)
-        _ultra_type(" " * ((term_width - 45) // 2) + "├─────────────────────────────────────────────────────┤", delay=0.01, color=Fore.LIGHTCYAN_EX)
+        text_type("\n" + " " * ((term_width - 45) // 2) + "┌─────────────────────────────────────────────────────┐", delay=0.01, color=Fore.LIGHTCYAN_EX)
+        text_type(" " * ((term_width - 45) // 2) + "│  💾 MEMORY INFORMATION  │", delay=0.02, color=Fore.LIGHTCYAN_EX)
+        text_type(" " * ((term_width - 45) // 2) + "├─────────────────────────────────────────────────────┤", delay=0.01, color=Fore.LIGHTCYAN_EX)
         
         mem_info = [
             (f"  Total RAM: {mem_total:.1f} GB", Fore.LIGHTCYAN_EX),
@@ -14212,7 +13961,7 @@ class SecurityTerminal:
         
         for info, color in mem_info:
             line = info
-            _ultra_type(" " * ((term_width - 45) // 2) + "│" + line + " " * (45 - len(line) - 2) + "│", delay=0.02, color=color)
+            text_type(" " * ((term_width - 45) // 2) + "│" + line + " " * (45 - len(line) - 2) + "│", delay=0.02, color=color)
             time.sleep(0.05)
         
         # Memory Usage Bar
@@ -14227,15 +13976,15 @@ class SecurityTerminal:
             bar_color = Fore.LIGHTRED_EX
         
         line = f"  [{bar}]"
-        _ultra_type(" " * ((term_width - 45) // 2) + "│" + line + " " * (45 - len(line) - 2) + "│", delay=0.01, color=bar_color)
-        _ultra_type(" " * ((term_width - 45) // 2) + "└─────────────────────────────────────────────────────┘", delay=0.01, color=Fore.LIGHTCYAN_EX)
+        text_type(" " * ((term_width - 45) // 2) + "│" + line + " " * (45 - len(line) - 2) + "│", delay=0.01, color=bar_color)
+        text_type(" " * ((term_width - 45) // 2) + "└─────────────────────────────────────────────────────┘", delay=0.01, color=Fore.LIGHTCYAN_EX)
         time.sleep(0.03)
         
         # Box 5: Disk Information
         if disk_info:
-            _ultra_type("\n" + " " * ((term_width - 45) // 2) + "╔═════════════════════════════════════════════════════╗", delay=0.01, color=Fore.LIGHTGREEN_EX)
-            _ultra_type(" " * ((term_width - 45) // 2) + "║  💿 DISK INFORMATION  ║", delay=0.02, color=Fore.LIGHTGREEN_EX)
-            _ultra_type(" " * ((term_width - 45) // 2) + "╚═════════════════════════════════════════════════════╝", delay=0.01, color=Fore.LIGHTGREEN_EX)
+            text_type("\n" + " " * ((term_width - 45) // 2) + "╔═════════════════════════════════════════════════════╗", delay=0.01, color=Fore.LIGHTGREEN_EX)
+            text_type(" " * ((term_width - 45) // 2) + "║  💿 DISK INFORMATION  ║", delay=0.02, color=Fore.LIGHTGREEN_EX)
+            text_type(" " * ((term_width - 45) // 2) + "╚═════════════════════════════════════════════════════╝", delay=0.01, color=Fore.LIGHTGREEN_EX)
             time.sleep(0.2)
             
             for disk in disk_info[:3]:  # Show first 3 disks
@@ -14253,15 +14002,15 @@ class SecurityTerminal:
                 else:
                     color = Fore.LIGHTRED_EX
                 
-                _ultra_type(" " * ((term_width - len(disk_line)) // 2) + disk_line, delay=0.02, color=color)
+                text_type(" " * ((term_width - len(disk_line)) // 2) + disk_line, delay=0.02, color=color)
                 time.sleep(0.05)
         
         time.sleep(0.03)
         
         # Box 6: Network & Process Information
-        _ultra_type("\n" + " " * ((term_width - 45) // 2) + "┌─────────────────────────────────────────────────────┐", delay=0.01, color=Fore.LIGHTBLUE_EX)
-        _ultra_type(" " * ((term_width - 45) // 2) + "│  🌐 NETWORK & PROCESSES  │", delay=0.02, color=Fore.LIGHTBLUE_EX)
-        _ultra_type(" " * ((term_width - 45) // 2) + "├─────────────────────────────────────────────────────┤", delay=0.01, color=Fore.LIGHTBLUE_EX)
+        text_type("\n" + " " * ((term_width - 45) // 2) + "┌─────────────────────────────────────────────────────┐", delay=0.01, color=Fore.LIGHTBLUE_EX)
+        text_type(" " * ((term_width - 45) // 2) + "│  🌐 NETWORK & PROCESSES  │", delay=0.02, color=Fore.LIGHTBLUE_EX)
+        text_type(" " * ((term_width - 45) // 2) + "├─────────────────────────────────────────────────────┤", delay=0.01, color=Fore.LIGHTBLUE_EX)
         
         net_info = [
             (f"  IP Addresses: {', '.join(ip_addresses[:3])}", Fore.LIGHTBLUE_EX),
@@ -14271,35 +14020,35 @@ class SecurityTerminal:
         
         for info, color in net_info:
             line = info
-            _ultra_type(" " * ((term_width - 45) // 2) + "│" + line + " " * (45 - len(line) - 2) + "│", delay=0.02, color=color)
+            text_type(" " * ((term_width - 45) // 2) + "│" + line + " " * (45 - len(line) - 2) + "│", delay=0.02, color=color)
             time.sleep(0.05)
         
-        _ultra_type(" " * ((term_width - 45) // 2) + "└─────────────────────────────────────────────────────┘", delay=0.01, color=Fore.LIGHTBLUE_EX)
+        text_type(" " * ((term_width - 45) // 2) + "└─────────────────────────────────────────────────────┘", delay=0.01, color=Fore.LIGHTBLUE_EX)
         time.sleep(0.03)
         
         # ========================================================================
         # Hacking Matrix Footer
         # ========================================================================
-        _ultra_type("\n", delay=0.01)
+        text_type("\n", delay=0.01)
         
         matrix_chars = ['0', '1', ' ', '░', '▒', '▓']
         
         footer = "▸ " + Fore.LIGHTGREEN_EX + "⚡ System Analysis Complete" + Fore.RESET + " ◂"
-        _ultra_type(" " * ((term_width - len(footer)) // 2) + footer, delay=0.02)
+        text_type(" " * ((term_width - len(footer)) // 2) + footer, delay=0.02)
         
         # Random matrix rain effect
         for _ in range(3):
             matrix_rain = ''.join(random.choice(matrix_chars) for _ in range(random.randint(20, 40)))
-            _ultra_type(" " * ((term_width - len(matrix_rain)) // 2) + matrix_rain, delay=0.005, color=Fore.GREEN)
+            text_type(" " * ((term_width - len(matrix_rain)) // 2) + matrix_rain, delay=0.005, color=Fore.GREEN)
             time.sleep(0.02)
         
-        _ultra_type(" " * ((term_width - 50) // 2) + "=" * 50, delay=0.01, color=Fore.LIGHTBLACK_EX)
-        _ultra_type("\n", delay=0.01)
+        text_type(" " * ((term_width - 50) // 2) + "=" * 50, delay=0.01, color=Fore.LIGHTBLACK_EX)
+        text_type("\n", delay=0.01)
         
         # ========================================================================
         # Export System Info
         # ========================================================================
-        _ultra_type("\n💾 Exporting System Information...", delay=0.02, color=Fore.LIGHTCYAN_EX)
+        text_type("\n💾 Exporting System Information...", delay=0.02, color=Fore.LIGHTCYAN_EX)
         time.sleep(0.3)
         
         export_path = self._export_system_info({
@@ -14329,9 +14078,9 @@ class SecurityTerminal:
         })
         
         if export_path:
-            _ultra_type(f"✅ Results exported to: {export_path}", delay=0.02, color=Fore.LIGHTGREEN_EX)
+            text_type(f"✅ Results exported to: {export_path}", delay=0.02, color=Fore.LIGHTGREEN_EX)
         else:
-            _ultra_type("⚠️ Failed to export results", delay=0.02, color=Fore.LIGHTYELLOW_EX)
+            text_type("⚠️ Failed to export results", delay=0.02, color=Fore.LIGHTYELLOW_EX)
 
     def _export_system_info(self, data):
         """Export system information to JSON file"""
@@ -14362,214 +14111,209 @@ class SecurityTerminal:
         try:
             import requests
             from rich.console import Console
+            from datetime import datetime
             console = Console()
             
+            # Get current version from config
+            current_version = self.config.get("CURRENT_VERSION", "3.1.113")
+            
             # ============================================================
-            # METHOD 1: Try the releases endpoint
+            # METHOD 1: Try the releases endpoint with correct repo
             # ============================================================
-            api_url = "https://api.github.com/repos/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/releases"
+            # NOTE: Update this to your actual source code repo
+            # If the source is in a different repo than the releases,
+            # use the source repo here
+            api_url = "https://api.github.com/repos/Stark-Expo-Tech-Exchange/DSTerminal/releases"
             
             headers = {
                 'Accept': 'application/vnd.github.v3+json',
                 'User-Agent': 'DSTerminal-Update-Checker/4.0'
             }
             
-            console.print(f"[dim]Connecting to Update Module...[/dim]")
+            console.print(f"[dim]Connecting to GitHub API...[/dim]")
             response = requests.get(api_url, timeout=15, headers=headers)
             
-            # Handle different status codes
             if response.status_code == 200:
                 data = response.json()
                 if data:
-                    # Check if the release matches our version
-                    for release in data:
-                        tag = release.get("tag_name", "")
-                        if tag == "v3.1.113" or tag == "3.1.113":
-                            return self._process_release_data(release)
-                    # If no match, use the first release
-                    return self._process_release_data(data[0])
+                    # Find the latest release (first one is usually the newest)
+                    latest_release = data[0]
+                    
+                    # Process the release data
+                    release_info = self._process_release_data(latest_release)
+                    if release_info:
+                        return release_info
                 else:
-                    console.print("[yellow]⚠️ No releases found via API.[/yellow]")
+                    console.print("[red]❌ No releases found via API.[/red]")
+                    raise Exception("No releases found in GitHub repository")
             else:
-                console.print(f"[dim]API returned {response.status_code}, trying alternative...[/dim]")
+                console.print(f"[yellow]API returned {response.status_code}, trying alternative...[/yellow]")
             
             # ============================================================
             # METHOD 2: Try using the GitHub API to get the latest release by tag
             # ============================================================
-            console.print("[dim]Trying to get release by tag...[/dim]")
-            tag_url = "https://api.github.com/repos/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/git/refs/tags/v3.1.113"
-            tag_response = requests.get(tag_url, timeout=10, headers=headers)
+            console.print("[dim]Trying to get latest release by tag...[/dim]")
             
-            if tag_response.status_code == 200:
-                console.print("[green]✓ Found tag v3.1.113[/green]")
-                return {
-                    "version": "3.1.113",
-                    "url": "https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/releases/tag/v3.1.113",
-                    "download_url": None,
-                    "notes": "DSTerminal v3.1.113 - Enterprise Security Platform",
-                    "prerelease": False,
-                    "published_at": datetime.now().strftime('%Y-%m-%d'),
-                    "asset_name": None,
-                    "from_fallback": True
-                }
+            # Get all tags
+            tags_url = "https://api.github.com/repos/Stark-Expo-Tech-Exchange/DSTerminal/tags"
+            tags_response = requests.get(tags_url, timeout=10, headers=headers)
             
-            # ============================================================
-            # METHOD 3: Get version from README
-            # ============================================================
-            console.print("[dim]Trying to get version from README...[/dim]")
-            version = self._get_version_from_readme()
-            if version:
-                console.print(f"[green]✓ Found version from README: v{version}[/green]")
-                return {
-                    "version": version,
-                    "url": "https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest",
-                    "download_url": None,
-                    "notes": f"Current version: v{version}",
-                    "prerelease": False,
-                    "published_at": datetime.now().strftime('%Y-%m-%d'),
-                    "asset_name": None,
-                    "from_fallback": True
-                }
+            if tags_response.status_code == 200:
+                tags_data = tags_response.json()
+                if tags_data:
+                    # Get the latest tag (first one is usually the newest)
+                    latest_tag = tags_data[0].get("name", "")
+                    if latest_tag:
+                        console.print(f"[green]✓ Found latest tag: {latest_tag}[/green]")
+                        # Try to get release info for this tag
+                        release_url = f"https://api.github.com/repos/Stark-Expo-Tech-Exchange/DSTerminal/releases/tags/{latest_tag}"
+                        release_response = requests.get(release_url, timeout=10, headers=headers)
+                        
+                        if release_response.status_code == 200:
+                            return self._process_release_data(release_response.json())
+                        else:
+                            # If no release, still return the tag info
+                            return {
+                                "version": latest_tag.lstrip("v"),
+                                "url": f"https://github.com/Stark-Expo-Tech-Exchange/DSTerminal/tree/{latest_tag}",
+                                "download_url": f"https://github.com/Stark-Expo-Tech-Exchange/DSTerminal/archive/refs/tags/{latest_tag}.zip",
+                                "notes": f"DSTerminal {latest_tag}",
+                                "prerelease": False,
+                                "published_at": datetime.now().strftime('%Y-%m-%d'),
+                                "asset_name": f"DSTerminal-{latest_tag}.zip",
+                                "asset_size": 0,
+                                "from_fallback": True
+                            }
+                else:
+                    console.print("[red]❌ No tags found in repository[/red]")
+                    raise Exception("No tags found in GitHub repository")
+            else:
+                console.print(f"[red]❌ Failed to get tags: {tags_response.status_code}[/red]")
+                raise Exception(f"GitHub API returned {tags_response.status_code} for tags endpoint")
             
-            # ============================================================
-            # METHOD 4: Fallback to local version file
-            # ============================================================
-            return self._get_fallback_update_info()
+            # If we get here, nothing worked
+            console.print("[red]❌ All GitHub API methods failed[/red]")
+            raise Exception("Unable to fetch release information from GitHub")
 
         except requests.RequestException as e:
             console.print(f"[red]⚠️ Connection error: {e}[/red]")
-            return self._get_fallback_update_info()
+            raise Exception(f"Network error while checking for updates: {e}")
         except Exception as e:
             console.print(f"[red]⚠️ Error: {e}[/red]")
-            return self._get_fallback_update_info()
-    
-    def _process_release_data(self, latest):
-        """Process release data from GitHub API"""
-        from rich.console import Console
-        console = Console()
-        
-        if 'tag_name' not in latest:
-            console.print("[red]⚠️ Invalid response from GitHub[/red]")
-            return self._get_fallback_update_info()
-        
-        # Get the version (remove 'v' prefix)
-        version = latest.get("tag_name", "").lstrip("v")
-        
-        # Find Windows installer asset
-        download_url = None
-        asset_name = None
-        asset_size = None
-        
-        console.print("[dim]Scanning release assets...[/dim]")
-        
-        assets_found = False
-        for asset in latest.get("assets", []):
-            name = asset["name"]
-            console.print(f"[dim]  Found: {name}[/dim]")
-            assets_found = True
-            
-            # Look for Windows installer
-            if "DSTerminal_Installer" in name and name.endswith(".exe"):
-                download_url = asset["browser_download_url"]
-                asset_name = name
-                asset_size = asset.get("size", 0)
-                console.print(f"[green]✓ Selected: {name}[/green]")
-                break
-            elif "dsterminal_win" in name and name.endswith(".exe"):
-                download_url = asset["browser_download_url"]
-                asset_name = name
-                asset_size = asset.get("size", 0)
-                console.print(f"[green]✓ Selected: {name}[/green]")
-                break
-        
-        if not assets_found:
-            console.print("[yellow]No assets found in the release[/yellow]")
-        
-        return {
-            "version": version,
-            "url": latest.get("html_url", ""),
-            "download_url": download_url,
-            "assets": {a["name"]: a["browser_download_url"] for a in latest.get("assets", [])},
-            "notes": latest.get("body", "No release notes provided.")[:500],
-            "prerelease": latest.get("prerelease", False),
-            "published_at": latest.get("published_at", ""),
-            "asset_name": asset_name,
-            "asset_size": asset_size,
-            "from_fallback": False
-        }
-    
-    def _get_version_from_readme(self):
-        """Try to get version from README"""
+            raise
+
+    def _process_release_data(self, release):
+        """Process GitHub release data into a standardized format"""
         try:
-            import requests
-            from rich.console import Console
-            console = Console()
+            from datetime import datetime
             
-            # Try to get the README
-            readme_url = "https://raw.githubusercontent.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/main/README.md"
-            response = requests.get(readme_url, timeout=10)
+            # Extract release information
+            tag_name = release.get("tag_name", "").lstrip("v")
+            version = tag_name if tag_name else "0.0.0"
             
-            if response.status_code == 200:
-                content = response.text
-                # Look for version pattern in README
-                import re
-                version_match = re.search(r'v?(\d+\.\d+\.\d+)', content)
-                if version_match:
-                    return version_match.group(1)
+            # Find the first asset (usually the installer)
+            assets = release.get("assets", [])
+            asset = assets[0] if assets else None
             
-            return None
-        except:
-            return None
-    
-    def _get_fallback_update_info(self):
-        """Get update info from local version file as fallback"""
-        try:
-            from rich.console import Console
-            console = Console()
+            download_url = None
+            asset_name = None
+            asset_size = 0
             
-            # Check local VERSION file
-            version_file = os.path.join(os.path.dirname(__file__), "VERSION")
-            if os.path.exists(version_file):
-                with open(version_file, 'r') as f:
-                    local_version = f.read().strip()
-                console.print(f"[dim]Using local version file: v{local_version}[/dim]")
-                return {
-                    "version": local_version,
-                    "url": "https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest",
-                    "download_url": None,
-                    "notes": f"Current local version: v{local_version}",
-                    "prerelease": False,
-                    "published_at": datetime.now().strftime('%Y-%m-%d'),
-                    "asset_name": None,
-                    "from_fallback": True
-                }
+            if asset:
+                download_url = asset.get("browser_download_url")
+                asset_name = asset.get("name")
+                asset_size = asset.get("size", 0)
             
-            # Fallback to config version
-            current_version = self.config.get("CURRENT_VERSION", "3.1.113")
-            console.print(f"[dim]Using config version: v{current_version}[/dim]")
+            # If no assets, use the zipball URL
+            if not download_url:
+                download_url = release.get("zipball_url")
+                asset_name = f"DSTerminal-{version}.zip"
+            
             return {
-                "version": current_version,
-                "url": "https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest",
-                "download_url": None,
-                "notes": f"Current version: v{current_version}",
-                "prerelease": False,
-                "published_at": datetime.now().strftime('%Y-%m-%d'),
-                "asset_name": None,
-                "from_fallback": True
+                "version": version,
+                "url": release.get("html_url", ""),
+                "download_url": download_url,
+                "notes": release.get("body", f"DSTerminal v{version}"),
+                "prerelease": release.get("prerelease", False),
+                "published_at": release.get("published_at", datetime.now().strftime('%Y-%m-%d'))[:10],
+                "asset_name": asset_name,
+                "asset_size": asset_size,
+                "from_fallback": False
             }
         except Exception as e:
-            console.print(f"[red]⚠️ Fallback error: {e}[/red]")
-            return {
-                "version": "3.1.113",
-                "url": "https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest",
-                "download_url": None,
-                "notes": "Version information unavailable",
-                "prerelease": False,
-                "published_at": datetime.now().strftime('%Y-%m-%d'),
-                "asset_name": None,
-                "from_fallback": True
-            }
-    
+            # If processing fails, raise the exception
+            raise Exception(f"Failed to process release data: {e}")
+
+    # Remove the _get_fallback_update_info method entirely - it's no longer needed
+
+    def download_update(self, url, filename):
+        """Download update with progress bar - FIXED"""
+        try:
+            import requests
+            import os
+            from rich.console import Console
+            from rich.progress import (
+                Progress, DownloadColumn, BarColumn, 
+                TextColumn, TransferSpeedColumn
+            )
+            console = Console()
+            
+            console.print(f"\n[cyan]📥 Downloading update from GitHub...[/cyan]")
+            console.print(f"[dim]File: {filename}[/dim]")
+            
+            # Check if URL is valid
+            if not url:
+                console.print("[red]No download URL available[/red]")
+                return False
+            
+            # Stream the download
+            response = requests.get(url, stream=True, timeout=30, 
+                                allow_redirects=True)
+            response.raise_for_status()
+            
+            total_size = int(response.headers.get('content-length', 0))
+            
+            # Ensure the directory exists
+            os.makedirs(os.path.dirname(filename) if os.path.dirname(filename) else '.', exist_ok=True)
+            
+            # Download with progress bar
+            with open(filename, 'wb') as f:
+                with Progress(
+                    DownloadColumn(),
+                    BarColumn(),
+                    TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+                    TransferSpeedColumn(),
+                    console=console,
+                    transient=False
+                ) as progress:
+                    task = progress.add_task("[green]Downloading...[/green]", total=total_size if total_size > 0 else None)
+                    
+                    downloaded = 0
+                    for chunk in response.iter_content(chunk_size=8192):
+                        if chunk:
+                            f.write(chunk)
+                            downloaded += len(chunk)
+                            if total_size > 0:
+                                progress.update(task, advance=len(chunk))
+                            else:
+                                # Update progress with indeterminate bar
+                                progress.update(task, description=f"[green]Downloading... {downloaded//1024}KB[/green]")
+            
+            # Verify file was created
+            if os.path.exists(filename):
+                actual_size = os.path.getsize(filename)
+                console.print(f"[green]✓ Download complete: {filename}[/green]")
+                if total_size > 0:
+                    console.print(f"[dim]Size: {actual_size} bytes[/dim]")
+                return True
+            else:
+                console.print("[red]Download failed - file not created[/red]")
+                return False
+                
+        except Exception as e:
+            console.print(f"[red]✗ Download failed: {e}[/red]")
+            return False
+
     def check_updates(self):
         """Cinematic update check with real GitHub API integration - FIXED"""
         
@@ -14621,7 +14365,7 @@ class SecurityTerminal:
                 for i in range(100):
                     progress.update(task, advance=1,
                                     description=f"{frames[i % len(frames)]} Scanning {i}%")
-                    time.sleep(1.5)
+                    time.sleep(0.15)
 
         def version_comparison_animation(current_ver, latest_ver):
             with Live(refresh_per_second=10, console=console, transient=True) as live:
@@ -14647,44 +14391,6 @@ class SecurityTerminal:
                 parts.append(0)
             return tuple(parts)
 
-        def download_update(url, filename):
-            """Download update with progress bar"""
-            try:
-                console.print(f"\n[cyan]📥 Downloading update from Update Modules...[/cyan]")
-                console.print(f"[dim]File: {filename}[/dim]")
-                
-                response = requests.get(url, stream=True, timeout=30)
-                response.raise_for_status()
-                
-                total_size = int(response.headers.get('content-length', 0))
-                
-                with open(filename, 'wb') as f:
-                    with Progress(
-                        DownloadColumn(),
-                        BarColumn(),
-                        TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-                        TransferSpeedColumn(),
-                        console=console,
-                        transient=False
-                    ) as progress:
-                        task = progress.add_task("[green]Downloading...[/green]", total=total_size)
-                        for chunk in response.iter_content(chunk_size=8192):
-                            f.write(chunk)
-                            progress.update(task, advance=len(chunk))
-                
-                # Verify file size
-                actual_size = os.path.getsize(filename)
-                if total_size > 0 and actual_size != total_size:
-                    console.print(f"[red]Size mismatch! Expected {total_size}, got {actual_size}[/red]")
-                    return False
-                
-                console.print(f"[green]✓ Download complete: {filename}[/green]")
-                return
-                
-            except Exception as e:
-                console.print(f"[red]✗ Download failed: {e}[/red]")
-                return False
-
         def perform_update(latest):
             """Execute the actual update process"""
             
@@ -14697,7 +14403,7 @@ class SecurityTerminal:
             if latest.get('asset_size'):
                 size_mb = latest['asset_size'] / (1024 * 1024)
                 details_table.add_row("Size", f"{size_mb:.1f} MB")
-            details_table.add_row("Release", latest.get('published_at', 'Unknown')[:10])
+            details_table.add_row("Release", latest.get('published_at', 'Unknown'))
             
             console.print(Panel(details_table, title="[bold yellow]📦 UPDATE DETAILS[/bold yellow]", border_style="yellow"))
             
@@ -14721,19 +14427,24 @@ class SecurityTerminal:
                 ))
                 return False
             
-            # Download update to temp directory
+            # Create temp directory for download
             temp_dir = tempfile.gettempdir()
-            installer_path = os.path.join(temp_dir, latest['asset_name'])
+            installer_name = latest['asset_name'] or f"DSTerminal-v{latest['version']}.zip"
+            installer_path = os.path.join(temp_dir, installer_name)
             
             # Remove old installer if exists
             if os.path.exists(installer_path):
-                os.remove(installer_path)
+                try:
+                    os.remove(installer_path)
+                except:
+                    pass
             
-            if not download_update(latest['download_url'], installer_path):
+            # Download the update
+            if not self.download_update(latest['download_url'], installer_path):
                 return False
             
             # Verify download exists
-            if not os.path.exists(installer_path):
+            if not os.path.exists(installer_path) or os.path.getsize(installer_path) == 0:
                 console.print("[red]Download verification failed[/red]")
                 return False
             
@@ -14752,6 +14463,9 @@ class SecurityTerminal:
                     if platform.system().lower() == "windows":
                         os.startfile(installer_path)
                     else:
+                        # Make executable on Unix-like systems
+                        if platform.system().lower() != "windows":
+                            os.chmod(installer_path, 0o755)
                         subprocess.Popen([installer_path], shell=True)
                     
                     console.print(Panel(
@@ -14761,7 +14475,7 @@ class SecurityTerminal:
                         f"[cyan]After installation, restart DSTerminal[/cyan]",
                         border_style="green"
                     ))
-                    return
+                    return True
                     
                 except Exception as e:
                     console.print(f"[red]Failed to launch installer: {e}[/red]")
@@ -14769,7 +14483,7 @@ class SecurityTerminal:
                     return False
             else:
                 console.print(f"[yellow]Installer saved to: {installer_path}[/yellow]")
-                return
+                return True
 
         # ===================== MAIN FLOW =====================
         try:
@@ -14800,18 +14514,27 @@ class SecurityTerminal:
             # CHECK FOR UPDATES - Using the class method
             # ============================================================
             console.print("\n[cyan]🔍 Checking Modules for updates...[/cyan]")
-            latest = self._check_github_release()
+            
+            try:
+                latest = self._check_github_release()
+            except Exception as e:
+                console.print(Panel(
+                    f"[bold red]UPDATE CHECK FAILED[/]\n\n"
+                    f"[yellow]{str(e)}[/yellow]\n\n"
+                    f"[dim]• Please check your internet connection\n"
+                    f"• Verify the GitHub repository exists\n"
+                    f"• Visit: https://github.com/Stark-Expo-Tech-Exchange/DSTerminal[/dim]",
+                    border_style="red"
+                ))
+                return False
             
             if not latest:
                 console.print(Panel(
-                    "[yellow]⚠️ UPDATE SERVER UNREACHABLE - [/yellow]\n\n"
-                    "[dim]• Check your internet connection & make sure you're connected.\n"
-                    "• The update module may be locked or highly secured\n"
-                    "• Visit: https://www.starkexpotechexchange.mw/community[/dim]\n\n"
-                    "[cyan]You can manually download updates from the official site.[/cyan]",
+                    "[yellow]⚠️ No update information available[/yellow]\n\n"
+                    "[dim]Please visit the GitHub repository to check for updates manually.[/dim]",
                     border_style="yellow"
                 ))
-                return
+                return False
             
             # Version comparison animation
             version_comparison_animation(current_version, latest['version'])
@@ -14826,7 +14549,7 @@ class SecurityTerminal:
                     f"[bold red]🚨 UPDATE AVAILABLE! 🚨[/bold red]\n\n"
                     f"[yellow]Current:[/yellow] v{current_version}\n"
                     f"[green]Latest:[/green] v{latest['version']}\n"
-                    f"[cyan]Released:[/cyan] {latest.get('published_at', 'Unknown')[:10]}\n\n"
+                    f"[cyan]Released:[/cyan] {latest.get('published_at', 'Unknown')}\n\n"
                     f"[cyan]Release Notes:[/cyan]\n"
                     f"[dim]{latest['notes'][:400]}[/dim]\n"
                 )
@@ -14848,6 +14571,7 @@ class SecurityTerminal:
                     return perform_update(latest)
                 else:
                     console.print("[yellow]Update postponed[/yellow]")
+                    return False
             
             else:
                 console.print(Panel(
@@ -14859,8 +14583,7 @@ class SecurityTerminal:
                     border_style="green",
                     width=60
                 ))
-            
-            return
+                return True
             
         except KeyboardInterrupt:
             console.print("\n[yellow]Update cancelled by user[/yellow]")
@@ -14872,10 +14595,7 @@ class SecurityTerminal:
             ))
             import traceback
             traceback.print_exc()
-            return
-
-# --------------------------for updates above code--------------------
-
+            return False
     def clear_terminal(self):
         """Advanced terminal clearing with three-column centered layout and spinning animations"""
         
@@ -15845,7 +15565,78 @@ class SecurityTerminal:
                 print(f"❌ Unknown SOC command: {args[0]}")
                 print("   Available: start, stop, status, dashboard, enhanced, ioc, scan, report, help")
                 return
-        
+        # =============================================
+          # WIFI AUDIT COMMANDS
+        # ============================================================
+        elif cmd in ["wifi", "wifi-scan", "wifi-audit", "wifi-info", "wifiinfo"]:
+            # Run WiFi security audit
+            self.cmd_wifi(args)
+            return
+
+        elif cmd in ["wifi-live"]:
+            # Live WiFi monitoring mode
+            self.cmd_wifi_live(args)
+            return
+
+        elif cmd in ["wifi-interface"]:
+            # Scan using specific WiFi interface
+            self.cmd_wifi_interface(args)
+            return
+
+        elif cmd in ["wifi-help"]:
+            # Show WiFi audit help
+            self.cmd_wifi_help()
+            return
+
+        elif cmd in ["wifi-status"]:
+            # Show WiFi module status
+            self.cmd_wifi_status()
+            return
+
+        # ============================================================
+        # MODULE STATUS COMMAND
+        # ============================================================
+        elif cmd in ["modules", "module-status"]:
+            # Show all loaded modules status
+            self.cmd_modules_status()
+            return
+        # ============================================================
+        # EXPLOIT SCANNER COMMANDS
+        # ============================================================
+        elif cmd in ["exploit", "exploit-scan", "vuln", "vuln-scan"]:
+            # Run exploit vulnerability scan
+            self.cmd_exploit(args)
+            return
+
+        elif cmd in ["exploit-local"]:
+            # Scan local machine for vulnerabilities
+            self.cmd_exploit_local(args)
+            return
+
+        elif cmd in ["exploit-remote"]:
+            # Scan remote target for vulnerabilities
+            self.cmd_exploit_remote(args)
+            return
+
+        elif cmd in ["exploit-port"]:
+            # Scan specific port on target
+            self.cmd_exploit_port(args)
+            return
+
+        elif cmd in ["exploit-list"]:
+            # List all available exploits/CVEs
+            self.cmd_exploit_list()
+            return
+
+        elif cmd in ["exploit-help"]:
+            # Show exploit scanner help
+            self.cmd_exploit_help()
+            return
+
+        elif cmd in ["exploit-status"]:
+            # Show exploit scanner module status
+            self.cmd_exploit_status()
+            return
 # ============================================================
 # SQLMAP COMMANDS
 # ============================================================
@@ -16005,14 +15796,16 @@ class SecurityTerminal:
         # ============================================================
         elif cmd in ["ioc-education", "ioc-guide", "ioc-info", "learn-iocs"]:
             # Show IOC education guide with typewriter effect
-            self._show_ioc_education()
+            self.cmd_ioc_education()
             return
 
         elif cmd in ["iocs"]:
             # Quick IOC overview with typewriter effect
-            self._show_ioc_quick()
+            self.cmd_ioc_quick()
             return
 
+
+        # =========================================
         elif cmd in ["sqlmap-scan-file", "sqlmap-file"]:
             # Scan URLs from a file
             if not args:
@@ -16289,11 +16082,11 @@ class SecurityTerminal:
                                     count += 1
                                 except:
                                     pass
-                        self.crypto.typer._ultra_type(f"✅ Deleted {count} QR codes", color=Colors.GREEN)
+                        self.crypto.typer.text_type(f"✅ Deleted {count} QR codes", color=Colors.GREEN)
                         self.crypto.add_activity(f"Cleaned {count} QR codes")
                         input(f"\n{Fore.YELLOW}Press ENTER to continue...{Style.RESET_ALL}")
                 else:
-                    self.crypto.typer._ultra_type("❌ QR directory not found", color=Colors.RED)
+                    self.crypto.typer.text_type("❌ QR directory not found", color=Colors.RED)
                     input(f"\n{Fore.YELLOW}Press ENTER to continue...{Style.RESET_ALL}")
             else:
                 print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
@@ -16317,21 +16110,21 @@ class SecurityTerminal:
         # Debug
         elif cmd == "crypto-debug":
             if self.crypto:
-                self.crypto.typer._ultra_type("DEBUG INFO", color=Colors.RED)
+                self.crypto.typer.text_type("DEBUG INFO", color=Colors.RED)
                 info = PlatformUtils.get_platform_info()
                 for key, value in info.items():
-                    self.crypto.typer._ultra_type(f"{key}: {value}", color=Colors.CYAN)
-                self.crypto.typer._ultra_type(f"KEY_FILE: {KEY_FILE}", color=Colors.CYAN)
-                self.crypto.typer._ultra_type(f"QR_CODE_DIR: {QR_CODE_DIR}", color=Colors.CYAN)
-                self.crypto.typer._ultra_type(f"BACKUP_DIR: {BACKUP_DIR}", color=Colors.CYAN)
-                self.crypto.typer._ultra_type(f"ENCRYPTED_DIR: {ENCRYPTED_DIR}", color=Colors.CYAN)
-                self.crypto.typer._ultra_type(f"REPORTS_DIR: {REPORTS_DIR}", color=Colors.CYAN)
-                self.crypto.typer._ultra_type(f"Key exists: {os.path.exists(KEY_FILE)}", color=Colors.CYAN)
-                self.crypto.typer._ultra_type(f"QR dir exists: {os.path.exists(QR_CODE_DIR)}", color=Colors.CYAN)
-                self.crypto.typer._ultra_type(f"Encrypted dir exists: {os.path.exists(ENCRYPTED_DIR)}", color=Colors.CYAN)
-                self.crypto.typer._ultra_type(f"Reports dir exists: {os.path.exists(REPORTS_DIR)}", color=Colors.CYAN)
-                self.crypto.typer._ultra_type(f"QR Method: {QR_METHOD}", color=Colors.CYAN)
-                self.crypto.typer._ultra_type(f"Report Available: {REPORT_AVAILABLE}", color=Colors.CYAN)
+                    self.crypto.typer.text_type(f"{key}: {value}", color=Colors.CYAN)
+                self.crypto.typer.text_type(f"KEY_FILE: {KEY_FILE}", color=Colors.CYAN)
+                self.crypto.typer.text_type(f"QR_CODE_DIR: {QR_CODE_DIR}", color=Colors.CYAN)
+                self.crypto.typer.text_type(f"BACKUP_DIR: {BACKUP_DIR}", color=Colors.CYAN)
+                self.crypto.typer.text_type(f"ENCRYPTED_DIR: {ENCRYPTED_DIR}", color=Colors.CYAN)
+                self.crypto.typer.text_type(f"REPORTS_DIR: {REPORTS_DIR}", color=Colors.CYAN)
+                self.crypto.typer.text_type(f"Key exists: {os.path.exists(KEY_FILE)}", color=Colors.CYAN)
+                self.crypto.typer.text_type(f"QR dir exists: {os.path.exists(QR_CODE_DIR)}", color=Colors.CYAN)
+                self.crypto.typer.text_type(f"Encrypted dir exists: {os.path.exists(ENCRYPTED_DIR)}", color=Colors.CYAN)
+                self.crypto.typer.text_type(f"Reports dir exists: {os.path.exists(REPORTS_DIR)}", color=Colors.CYAN)
+                self.crypto.typer.text_type(f"QR Method: {QR_METHOD}", color=Colors.CYAN)
+                self.crypto.typer.text_type(f"Report Available: {REPORT_AVAILABLE}", color=Colors.CYAN)
                 input(f"\n{Fore.YELLOW}Press ENTER to continue...{Style.RESET_ALL}")
             else:
                 print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
@@ -16652,8 +16445,7 @@ class SecurityTerminal:
 # =========================================wifi audit=====================
         # In your command handler section
         elif command in ['wifi', 'wifi-audit', 'wlan', 'wlan-audit', 'wifi-info']:
-            interface = args[0] if args else None
-            self.wifi_audit(interface)
+            self.cmd_wifi(args)
             self.show_tip(cmd)
             return
 
@@ -17070,7 +16862,7 @@ class SecurityTerminal:
 # ================================================
     # exploit check and mac address change
         elif cmd == "exploitcheck": 
-            self.check_exploits()
+            self.cmd_exploit(args)
             self.show_tip(cmd)
 # ========== MAC SPOOFING COMMAND ==========
         elif cmd.startswith("macspoof"):
@@ -17892,6 +17684,15 @@ class SecurityTerminal:
             "portsweep": None,
             "hashfile": None,
             "sysinfo": None,
+            "exploit": None,
+            "exploit-scan": None,
+            "vuln": None,
+            "vuln-scan": None,
+            # "module-status": None,
+            "net -n mon": None,
+            "exploit-list": None,
+            "exploit-help": None,
+            "dst-modules": None,
             "killproc": None,
             "watchfolder": None,
             "traceroute": None,
@@ -17902,7 +17703,7 @@ class SecurityTerminal:
             "update": None,
             "vt-scan": None,
             "check-malware": None,
-            "soc-debug": None,
+            "harden-cinematic": None,
             "crypto-list": None,
             "crypto-info": None,
             "crypto-verify": None,
