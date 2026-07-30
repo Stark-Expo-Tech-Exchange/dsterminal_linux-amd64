@@ -10,3 +10,9 @@ venv/
 DSTerminal_Portable_*.zip
 *.exe
 *.dll
+
+# Environment variables
+.env
+*.env
+*.key
+*.secret

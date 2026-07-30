@@ -9,6 +9,13 @@ import subprocess
 from datetime import datetime
 from pathlib import Path
 import requests
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 from rich.console import Console
 from rich.panel import Panel
 from rich.progress import (
@@ -233,6 +240,13 @@ class UpdateManager:
         """Check GitHub for latest release"""
         try:
             import requests
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
             from datetime import datetime
             
             # Get current version from config
@@ -351,6 +365,13 @@ class UpdateManager:
         """Download update with progress bar - Supports both public and private repos"""
         try:
             import requests
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
             import os
             
             self.console.print(f"\n[cyan]📥 Downloading update from DSTerminal Update Module...[/cyan]")
@@ -928,7 +949,7 @@ if __name__ == "__main__":
         def __init__(self):
             self.config = {
                 "CURRENT_VERSION": "3.1.113",
-                "GITHUB_TOKEN": os.environ.get("GITHUB_TOKEN", "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")
+                "GITHUB_TOKEN": os.environ.get("GITHUB_TOKEN", "os.environ.get("GITHUB_TOKEN", "")")
             }
         
         def get(self, key, default=None):
