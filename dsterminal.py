@@ -508,8 +508,7 @@ except ImportError as e:
     print(f"{Fore.YELLOW}⚠️ IOC Education module not found: {e}{Style.RESET_ALL}")
     print(f"{Fore.YELLOW}   Download ioc_education from the repository{Style.RESET_ALL}")
 
-# ==========================import wifi_audit module=================
-
+# =========import update module
 # Exploit Scanner Module
 try:
     from exploit_scanner import ExploitScanner
@@ -532,7 +531,6 @@ try:
     from integrity_monitor import (
         SystemIntegrityMonitor,
         AlertManager,
-        ForensicAnalyzer,
         AutoRemediation,
         RealTimeHandler
     )
@@ -540,7 +538,6 @@ try:
 except:
     SystemIntegrityMonitor = None
     AlertManager = None
-    ForensicAnalyzer = None
     AutoRemediation = None
     RealTimeHandler = None
     pass
@@ -682,7 +679,6 @@ except ImportError:
 # ============================================
 from sqlmap_scanner import SQLMapScanner, SQLInjectionLab
 from dst_footer import DSTerminalFooter, FooterBootAnimation, FooterColors
-
 # ============================================
 # CONSOLE - Fast init
 # ============================================
@@ -1869,7 +1865,7 @@ class SecurityTerminal:
         from datetime import datetime
         import uuid
         
-        # ========== FAST ATTRIBUTE INIT ==========
+            # ========== FAST ATTRIBUTE INIT ==========
         self.scan_results = {}
         self.log_callback = log_callback
         self.log_queue = queue.Queue()
@@ -1879,6 +1875,7 @@ class SecurityTerminal:
         self.threat_level = "LOW"
         self._banner_shown = False
         self.session_manager_initialized = False
+        self.version = "3.1.113"
         
         """Initialize SOC Lab - Called from __init__"""
         self.soc_lab = None
@@ -1917,6 +1914,7 @@ class SecurityTerminal:
         self.operator_dir = None
         self.log_file = None
         
+
         # ========== MODULES - Lazy init ==========
         self.crypto = None
         self.scanner = None
@@ -2140,7 +2138,8 @@ class SecurityTerminal:
             return shutil.get_terminal_size().columns
         except:
             return 80
-    
+    # =========================
+
     # =====================================================================================================
  # Add this at the top of dsterminal.py (after other imports)
     from deletion_protection import DSTerminalMonitor, BackupDatabase, RestoreManager, ServiceManager
@@ -2406,7 +2405,80 @@ class SecurityTerminal:
     def log_message(self, message, level="INFO"):
         """Log message - Fast"""
         print(f"[{level}] {message}")
-    
+
+    # ===============================================================
+    def check_for_updates(self, force=False):
+        """Check for and install updates"""
+        try:
+            # Initialize update manager if not already done
+            if not hasattr(self, 'update') or self.update is None:
+                try:
+                    # Import from update.py (not update_manager.py)
+                    from update import UpdateManager
+                    
+                    # Get token from environment
+                    github_token = os.environ.get("GITHUB_TOKEN", "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")
+                    
+                    self.update_config = {
+                        "CURRENT_VERSION": self.version,
+                        "GITHUB_TOKEN": github_token
+                    }
+                    
+                    self.update = UpdateManager(self.update_config)
+                    print(f"{Fore.CYAN}[✓] Update system initialized{Style.RESET_ALL}")
+                except ImportError as e:
+                    print(f"{Fore.RED}[!] Update module not found: {e}{Style.RESET_ALL}")
+                    self.update = None
+                    return False
+                except Exception as e:
+                    print(f"{Fore.RED}[!] Failed to initialize update system: {e}{Style.RESET_ALL}")
+                    self.update = None
+                    return False
+            
+            if self.update is None:
+                print(f"{Fore.YELLOW}[!] Update system not available{Style.RESET_ALL}")
+                return False
+            
+            # Check for updates
+            result = self.update.check_updates()
+            return result
+                
+        except Exception as e:
+            print(f"{Fore.RED}[!] Error checking for updates: {e}{Style.RESET_ALL}")
+            import traceback
+            traceback.print_exc()
+            return False
+        
+    def show_version(self):
+        """Show current version information"""
+        version = getattr(self, 'version', 'Unknown')
+        author = getattr(self, 'AUTHOR', 'Stark-Expo-Tech-Exchange')
+        
+        print(f"""
+    {Fore.CYAN}╔══════════════════════════════════════════════════════════════╗
+    ║                    DSTERMINAL VERSION INFORMATION                    ║
+    ╠══════════════════════════════════════════════════════════════════════╣
+    ║  Current Version:  v{version}                                        ║
+    ║  System:           {platform.system()} {platform.release()}          ║
+    ║  Architecture:     {platform.machine()}                              ║
+    ║  Build Date:       {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}    ║
+    ║  Author:           {author}                                      ║
+    ╚══════════════════════════════════════════════════════════════════════╝
+    {Style.RESET_ALL}""")
+        
+        # Check if update manager exists and check for latest version
+        if hasattr(self, 'update') and self.update:
+            try:
+                print(f"{Fore.CYAN}[i] Checking for latest version...{Style.RESET_ALL}")
+                latest = self.update._check_github_release()
+                if latest:
+                    print(f"{Fore.GREEN}[✓] Latest version: v{latest['version']}{Style.RESET_ALL}")
+                    if latest['version'] != version:
+                        print(f"{Fore.YELLOW}[!] A newer version is available! Type 'dst-update' to update.{Style.RESET_ALL}")
+            except Exception as e:
+                print(f"{Fore.YELLOW}[!] Could not check for latest version: {e}{Style.RESET_ALL}")
+
+    # =====================================
     def launch_web_security_analyzer(self):
         """Launch web security analyzer - Fast"""
         if self.web_security_available and self.web_security_module:
@@ -2414,7 +2486,7 @@ class SecurityTerminal:
                 self.web_security_module.run()
             except:
                 pass
-    
+            
     # ========== BANNER METHODS ==========
     
     def show_banner(self):
@@ -2442,6 +2514,7 @@ class SecurityTerminal:
                        ══════════════════════════════════════════
 {RESET}"""
         print(banner)
+        time.sleep(1.05)
     
     def initialize_operator_session(self):
         """Initialize operator session - Fast"""
@@ -2499,32 +2572,327 @@ class SecurityTerminal:
         except:
             pass
         print()
+        time.sleep(1.05)
     
     def _display_initialization_banner(self):
-        """Display initialization banner - Fast"""
+        """Display initialization banner with 20-second hacker-style countdown and ultra-fast auto-typing effects"""
         import platform
-        width = self._get_terminal_width()
+        import time
+        import random
+        import sys
         
-        banner = f"""
-╔══════════════════════════════════════════════════════════════╗
-║                    DSTERMINAL Cyber-Ops                      ║
-╠══════════════════════════════════════════════════════════════╣
-║ Version    : {self.config.get('version', '3.1.113')}
-║ Operator   : {self.operator_username}
-║ ID         : {self.session_id}
-║ Started    : {self.session_start.strftime('%Y-%m-%d %H:%M:%S') if self.session_start else 'N/A'}
-║ Host       : {platform.node()}
-║ Workspace  : {self.workspace_root}
-╚══════════════════════════════════════════════════════════════╝
-        """
-        # Print the banner instantly without any delays
-        print(banner)
-        time.sleep(0.5)
-    
+        # Try to import colorama for better colors
+        try:
+            from colorama import Fore, Style, init
+            init(autoreset=True)
+            COLORAMA_AVAILABLE = True
+        except ImportError:
+            COLORAMA_AVAILABLE = False
+        
+        # Clear screen for dramatic effect
+        if platform.system().lower() == "windows":
+            os.system('cls')
+        else:
+            os.system('clear')
+        
+        # ============================================================
+        # ULTRA-FAST AUTO-TYPING FUNCTION - GREEN
+        # ============================================================
+        def type_text_green(text, delay=0.005, end="\n"):
+            """Simulate ultra-fast auto-typing effect in GREEN color"""
+            if COLORAMA_AVAILABLE:
+                sys.stdout.write(Fore.GREEN)
+            else:
+                sys.stdout.write('\x1b[32m')  # Fallback ANSI
+            
+            for char in text:
+                sys.stdout.write(char)
+                sys.stdout.flush()
+                # Ultra-fast typing with minimal delay
+                time.sleep(delay + random.uniform(-0.002, 0.005))
+            
+            if COLORAMA_AVAILABLE:
+                sys.stdout.write(Style.RESET_ALL)
+            else:
+                sys.stdout.write('\x1b[0m')
+            
+            if end:
+                sys.stdout.write(end)
+            sys.stdout.flush()
+        
+        # ============================================================
+        # DSTERMINAL STARTUP SEQUENCE WITH ULTRA-FAST GREEN TYPING
+        # ============================================================
+        
+        # Display ASCII art banner with green typing effect
+        banner_lines = [
+            "╔══════════════════════════════════════════════════════════════╗",
+            "║                    DSTERMINAL Cyber-Ops                      ║",
+            "╠══════════════════════════════════════════════════════════════╣",
+            f"║ Version    : {self.config.get('version', '3.1.113')}",
+            f"║ Operator   : {self.operator_username}",
+            f"║ ID         : {self.session_id}",
+            f"║ Started    : {self.session_start.strftime('%Y-%m-%d %H:%M:%S') if self.session_start else 'N/A'}",
+            f"║ Host       : {platform.node()}",
+            f"║ Workspace  : {self.workspace_root}",
+            "╚══════════════════════════════════════════════════════════════╝"
+        ]
+        
+        # Type each line in GREEN (ultra-fast)
+        for line in banner_lines:
+            type_text_green(line, delay=0.003)  # Ultra-fast
+            time.sleep(0.03)  # Minimal pause between lines
+        
+        print()  # Add extra line after banner
+        
+        # ============================================================
+        # INITIALIZATION SEQUENCE WITH ULTRA-FAST GREEN TYPING
+        # ============================================================
+        
+        startup_messages = [
+            "⚡ INITIALIZING DSTERMINAL ENGINE...",
+            "🔐 Loading security modules...",
+            "📡 Establishing secure uplink...",
+            "🛰️ Connecting to update servers...",
+            "🛰️ Connected...",
+            "🔍 Scanning system architecture...",
+            "🛡️ Activating firewall protocols...",
+            "🌐 Routing through secure nodes...",
+            "📊 Analyzing system integrity...",
+            "🔑 Generating session encryption keys...",
+            "📦 Preparing update infrastructure...",
+            "✅ Verification protocols engaged...",
+            "🚀 Launching DSTERMINAL Core..."
+        ]
+        
+        for msg in startup_messages:
+            type_text_green(msg, delay=0.005)  # Ultra-fast
+            time.sleep(0.08)  # Minimal pause
+        
+        print("\n")
+        
+        # ============================================================
+        # PROGRESS BAR WITH GREEN
+        # ============================================================
+        
+        total_seconds = 20
+        bar_length = 50
+        
+        # Green hacker messages
+        hacker_messages = [
+            "🔐 Decrypting secure channel...",
+            "📡 Establishing satellite uplink...",
+            "🔍 Scanning for vulnerabilities...",
+            "🛡️ Activating firewall protocols...",
+            "🌐 Routing through secure nodes...",
+            "📊 Analyzing system integrity...",
+            "🔑 Generating session keys...",
+            "📦 Preparing update payload...",
+            "✅ Verification in progress...",
+            "⚡ Optimizing connection speed...",
+            "🔒 Encrypting data stream...",
+            "📶 Synchronizing with network...",
+            "💾 Caching update data...",
+            "🔄 Establishing redundant link..."
+        ]
+        
+        # Display initial progress bar
+        if COLORAMA_AVAILABLE:
+            sys.stdout.write(Fore.GREEN)
+        else:
+            sys.stdout.write('\x1b[32m')
+        sys.stdout.write("░" * bar_length + " [0/20s] 0.0%")
+        if COLORAMA_AVAILABLE:
+            sys.stdout.write(Style.RESET_ALL)
+        else:
+            sys.stdout.write('\x1b[0m')
+        sys.stdout.flush()
+        
+        last_msg = ""
+        
+        for i in range(total_seconds + 1):
+            progress = (i / total_seconds) * 100
+            filled_length = int(bar_length * i // total_seconds)
+            bar = '█' * filled_length + '░' * (bar_length - filled_length)
+            
+            msg_index = min(i * 2 // 3, len(hacker_messages) - 1)
+            hacker_msg = hacker_messages[msg_index]
+            
+            sys.stdout.write('\r')
+            
+            # Progress bar - Green
+            if COLORAMA_AVAILABLE:
+                sys.stdout.write(Fore.GREEN)
+            else:
+                sys.stdout.write('\x1b[32m')
+            sys.stdout.write(bar)
+            if COLORAMA_AVAILABLE:
+                sys.stdout.write(Style.RESET_ALL)
+            else:
+                sys.stdout.write('\x1b[0m')
+            
+            sys.stdout.write(' ')
+            
+            # Time - Green
+            if COLORAMA_AVAILABLE:
+                sys.stdout.write(Fore.GREEN)
+            else:
+                sys.stdout.write('\x1b[32m')
+            sys.stdout.write(f"{i:2d}/{total_seconds}s")
+            if COLORAMA_AVAILABLE:
+                sys.stdout.write(Style.RESET_ALL)
+            else:
+                sys.stdout.write('\x1b[0m')
+            
+            sys.stdout.write(' ')
+            
+            # Percentage - Green
+            if COLORAMA_AVAILABLE:
+                sys.stdout.write(Fore.GREEN)
+            else:
+                sys.stdout.write('\x1b[32m')
+            sys.stdout.write(f"{progress:.1f}%")
+            if COLORAMA_AVAILABLE:
+                sys.stdout.write(Style.RESET_ALL)
+            else:
+                sys.stdout.write('\x1b[0m')
+            
+            sys.stdout.write(' ')
+            
+            # Message - Green
+            if COLORAMA_AVAILABLE:
+                sys.stdout.write(Fore.GREEN)
+            else:
+                sys.stdout.write('\x1b[32m')
+            sys.stdout.write(hacker_msg)
+            if COLORAMA_AVAILABLE:
+                sys.stdout.write(Style.RESET_ALL)
+            else:
+                sys.stdout.write('\x1b[0m')
+            
+            if len(hacker_msg) < len(last_msg):
+                sys.stdout.write(" " * (len(last_msg) - len(hacker_msg)))
+            
+            sys.stdout.flush()
+            last_msg = hacker_msg
+            
+            # Random glitch effects (still fast)
+            if random.random() < 0.05 and i > 0 and i < total_seconds:
+                time.sleep(0.05)
+                glitch_msg = random.choice([
+                    "⚠️  Packet loss detected... retransmitting",
+                    "⚠️  Firewall anomaly detected... rerouting",
+                    "⚠️  Handshake timeout... reconnecting",
+                    "⚠️  DNS resolution failed... using backup"
+                ])
+                sys.stdout.write('\r')
+                if COLORAMA_AVAILABLE:
+                    sys.stdout.write(Fore.GREEN)
+                else:
+                    sys.stdout.write('\x1b[32m')
+                sys.stdout.write(glitch_msg)
+                if COLORAMA_AVAILABLE:
+                    sys.stdout.write(Style.RESET_ALL)
+                else:
+                    sys.stdout.write('\x1b[0m')
+                sys.stdout.write(" " * 20)
+                sys.stdout.flush()
+                time.sleep(0.15)
+                
+                # Restore the progress bar
+                sys.stdout.write('\r')
+                if COLORAMA_AVAILABLE:
+                    sys.stdout.write(Fore.GREEN)
+                else:
+                    sys.stdout.write('\x1b[32m')
+                sys.stdout.write(bar)
+                if COLORAMA_AVAILABLE:
+                    sys.stdout.write(Style.RESET_ALL)
+                else:
+                    sys.stdout.write('\x1b[0m')
+                sys.stdout.write(' ')
+                if COLORAMA_AVAILABLE:
+                    sys.stdout.write(Fore.GREEN)
+                else:
+                    sys.stdout.write('\x1b[32m')
+                sys.stdout.write(f"{i:2d}/{total_seconds}s")
+                if COLORAMA_AVAILABLE:
+                    sys.stdout.write(Style.RESET_ALL)
+                else:
+                    sys.stdout.write('\x1b[0m')
+                sys.stdout.write(' ')
+                if COLORAMA_AVAILABLE:
+                    sys.stdout.write(Fore.GREEN)
+                else:
+                    sys.stdout.write('\x1b[32m')
+                sys.stdout.write(f"{progress:.1f}%")
+                if COLORAMA_AVAILABLE:
+                    sys.stdout.write(Style.RESET_ALL)
+                else:
+                    sys.stdout.write('\x1b[0m')
+                sys.stdout.write(' ')
+                if COLORAMA_AVAILABLE:
+                    sys.stdout.write(Fore.GREEN)
+                else:
+                    sys.stdout.write('\x1b[32m')
+                sys.stdout.write(hacker_msg)
+                if COLORAMA_AVAILABLE:
+                    sys.stdout.write(Style.RESET_ALL)
+                else:
+                    sys.stdout.write('\x1b[0m')
+                
+                if len(hacker_msg) < len(last_msg):
+                    sys.stdout.write(" " * (len(last_msg) - len(hacker_msg)))
+                sys.stdout.flush()
+            
+            time.sleep(1)  # Keep this at 1 second for the countdown
+        
+        # Clear the line
+        sys.stdout.write('\r')
+        sys.stdout.write(' ' * 80)
+        sys.stdout.write('\r')
+        sys.stdout.flush()
+        
+        # ============================================================
+        # COMPLETION SEQUENCE WITH ULTRA-FAST GREEN TYPING
+        # ============================================================
+        
+        completion_messages = [
+            "✅ SECURE CONNECTION ESTABLISHED!",
+            "🛡️  All security protocols active",
+            "📡 Update servers synchronized",
+            "🔑 Session keys generated successfully",
+            "🚀 DSTERMINAL Core initialized"
+        ]
+        
+        for msg in completion_messages:
+            type_text_green(msg, delay=0.003)  # Ultra-fast
+            time.sleep(0.1)  # Minimal pause
+        
+        print("\n")
+        
+        # Final system status with ultra-fast typing
+        status_messages = [
+            "\nSYSTEM STATUS:",
+            f"  ✅ DSTERMINAL v{self.config.get('version', '3.1.113')} loaded",
+            f"  ✅ User authenticated: {self.operator_username}",
+            f"  ✅ Session ID: {self.session_id}",
+            f"  ✅ Workspace: {self.workspace_root}",
+            "  ✅ System ready for update operations",
+            f"\n⏱️  Initialization time: {total_seconds} seconds"
+        ]
+        
+        for msg in status_messages:
+            type_text_green(msg, delay=0.003)  # Ultra-fast
+            time.sleep(0.05)  # Minimal pause
+        
+        print("\n")
+        time.sleep(0.3)  # Reduced final pause
+        
     # ========== COMMAND METHODS (Placeholders) ==========
     #   =====================soc_automated section+++++++++++++++++++++++===
     def cmd_soc(self, args):
-        """SOC Automated Lab - GLOWING HACKER STYLE - CENTERED"""
+        """SOC Automated Lab  - CENTERED"""
         import random
         from colorama import Fore, Back, Style, init
         init(autoreset=True)
@@ -5545,9 +5913,22 @@ class SecurityTerminal:
 # ---------========-----------------metasplo ends here from above-----------------------------
 
 # ============================================================
-# SOC-GRADE NMAP SCAN DASHBOARD METHODS
+# DSTERMINAL CLASS WITH SOC METHODS
 # ============================================================
-# ==================== SOC Nmap Dashboard Integration ====================
+    def _get_soc_dashboard(self):
+        """Get or create SOC dashboard instance"""
+        if not self.soc_dashboard:
+            try:
+                from soc_nmap_dashboard import SOCNmapIntegration
+                self.soc_dashboard = SOCNmapIntegration()
+            except ImportError as e:
+                print(f"{Fore.RED}[!] Failed to import SOC module: {e}{Style.RESET_ALL}")
+                return None
+            except Exception as e:
+                print(f"{Fore.RED}[!] SOC dashboard error: {e}{Style.RESET_ALL}")
+                return None
+        return self.soc_dashboard
+
     def soc_debug(self):
         """Debug SOC module import"""
         print(f"{Fore.CYAN}[DEBUG] Checking SOC module...{Style.RESET_ALL}")
@@ -5695,10 +6076,7 @@ class SecurityTerminal:
             print(f"{Fore.RED}[!] Failed to import SOC module: {e}{Style.RESET_ALL}")
         except Exception as e:
             print(f"{Fore.RED}[!] Scan failed: {e}{Style.RESET_ALL}")
-        
-        # ===============================================================
-    
-    
+
     def cmd_soc_dns(self, target=None):
         """DNS reconnaissance using SOC dashboard"""
         # Check if nmap is installed
@@ -5746,8 +6124,6 @@ class SecurityTerminal:
         except Exception as e:
             print(f"{Fore.RED}[!] Failed to generate map: {e}{Style.RESET_ALL}")
 
-    def cmd_soc_reports(self):
-        """List all generated SOC reports (HTML and PDF)"""
         workspace = os.path.expanduser("~/dsterminal_workspace/scans")
         if os.path.exists(workspace):
             all_files = os.listdir(workspace)
@@ -5785,8 +6161,6 @@ class SecurityTerminal:
             print(f"{Fore.YELLOW}[!] No reports directory found{Style.RESET_ALL}")
             print(f"{Fore.YELLOW}[*] Run a scan first to create the directory{Style.RESET_ALL}")
 
-    def cmd_soc_pdf(self):
-        """Generate PDF report from last scan"""
         import glob
         
         workspace = os.path.expanduser("~/dsterminal_workspace/scans")
@@ -5809,8 +6183,6 @@ class SecurityTerminal:
         else:
             print(f"{Fore.YELLOW}[!] No reports directory found.{Style.RESET_ALL}")
     
-    def cmd_soc_report(self):
-        """Open the latest generated report (HTML or PDF)"""
         import glob
         
         workspace = os.path.expanduser("~/dsterminal_workspace/scans")
@@ -5872,10 +6244,52 @@ class SecurityTerminal:
         """Show scan history"""
         try:
             from soc_nmap_dashboard import SOCNmapIntegration
+            import os
+            import json
             
-            soc = SOCNmapIntegration()
+            # Try to load history from file directly
+            history_file = os.path.expanduser("~/dsterminal_workspace/scans/scan_history.json")
             
-            if soc.dashboard and soc.dashboard.scan_history and len(soc.dashboard.scan_history) > 0:
+            if os.path.exists(history_file):
+                try:
+                    with open(history_file, 'r') as f:
+                        history_data = json.load(f)
+                    
+                    if history_data:
+                        print(f"\n{Fore.CYAN}{'='*70}{Style.RESET_ALL}")
+                        print(f"{Fore.GREEN}[+] Recent SOC Scan History:{Style.RESET_ALL}")
+                        print(f"{Fore.CYAN}{'='*70}{Style.RESET_ALL}\n")
+                        
+                        for i, item in enumerate(history_data[-10:], 1):
+                            risk_score = item.get('risk_score', 0)
+                            # Determine risk indicator
+                            if risk_score >= 7:
+                                risk_color = Fore.RED
+                                risk_icon = "🔴"
+                            elif risk_score >= 4:
+                                risk_color = Fore.YELLOW
+                                risk_icon = "🟡"
+                            else:
+                                risk_color = Fore.GREEN
+                                risk_icon = "🟢"
+                            
+                            print(f"{risk_color}{risk_icon} Scan #{i}{Style.RESET_ALL}")
+                            print(f"   {Fore.CYAN}Target:{Style.RESET_ALL} {item.get('target', 'Unknown')}")
+                            print(f"   {Fore.CYAN}Time:{Style.RESET_ALL} {item.get('timestamp', 'Unknown')}")
+                            print(f"   {Fore.CYAN}Duration:{Style.RESET_ALL} {item.get('duration', 0)}s")
+                            print(f"   {Fore.CYAN}Open Ports:{Style.RESET_ALL} {item.get('open_ports', 0)}")
+                            print(f"   {Fore.CYAN}Risk Score:{Style.RESET_ALL} {risk_color}{risk_score:.1f}/10{Style.RESET_ALL}")
+                            print(f"   {Fore.CYAN}Services:{Style.RESET_ALL} {', '.join(item.get('services', [])[:5])}")
+                            print()
+                        
+                        print(f"{Fore.CYAN}{'='*70}{Style.RESET_ALL}")
+                        return
+                except Exception as e:
+                    print(f"{Fore.YELLOW}[!] Could not parse history file: {e}{Style.RESET_ALL}")
+            
+            # Try via dashboard instance
+            soc = self._get_soc_dashboard()
+            if soc and soc.dashboard and soc.dashboard.scan_history and len(soc.dashboard.scan_history) > 0:
                 print(f"\n{Fore.CYAN}{'='*70}{Style.RESET_ALL}")
                 print(f"{Fore.GREEN}[+] Recent SOC Scan History:{Style.RESET_ALL}")
                 print(f"{Fore.CYAN}{'='*70}{Style.RESET_ALL}\n")
@@ -5900,14 +6314,215 @@ class SecurityTerminal:
                     print(f"   {Fore.CYAN}Risk Score:{Style.RESET_ALL} {risk_color}{hist.risk_score:.1f}/10{Style.RESET_ALL}")
                     print(f"   {Fore.CYAN}Services:{Style.RESET_ALL} {', '.join(hist.services[:5])}")
                     print()
+                
+                print(f"{Fore.CYAN}{'='*70}{Style.RESET_ALL}")
             else:
                 print(f"{Fore.YELLOW}[!] No scan history available{Style.RESET_ALL}")
                 print(f"{Fore.YELLOW}[*] Run a scan first: soc-quick <target>{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}[*] Check: ~/dsterminal_workspace/scans/scan_history.json{Style.RESET_ALL}")
         except ImportError as e:
             print(f"{Fore.RED}[!] Failed to import SOC module: {e}{Style.RESET_ALL}")
         except Exception as e:
             print(f"{Fore.RED}[!] Failed to show history: {e}{Style.RESET_ALL}")
 
+    def cmd_soc_reports(self):
+        """List all generated SOC reports (HTML and PDF)"""
+        workspace = os.path.expanduser("~/dsterminal_workspace/scans")
+        if os.path.exists(workspace):
+            all_files = os.listdir(workspace)
+            # Look for all HTML and PDF files (not just soc_report_*)
+            html_reports = [f for f in all_files if f.endswith('.html')]
+            pdf_reports = [f for f in all_files if f.endswith('.pdf')]
+            
+            print(f"\n{Fore.CYAN}{'='*70}{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}[+] Generated SOC Reports{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}{'='*70}{Style.RESET_ALL}\n")
+            
+            if html_reports:
+                print(f"{Fore.YELLOW}📄 HTML Reports:{Style.RESET_ALL}")
+                for report in sorted(html_reports, reverse=True)[:10]:
+                    report_path = os.path.join(workspace, report)
+                    mod_time = datetime.fromtimestamp(os.path.getmtime(report_path))
+                    size_kb = os.path.getsize(report_path) / 1024
+                    print(f"   {Fore.GREEN}→{Style.RESET_ALL} {report}")
+                    print(f"     {Fore.WHITE}Size: {size_kb:.1f} KB | Modified: {mod_time.strftime('%Y-%m-%d %H:%M:%S')}{Style.RESET_ALL}")
+
+            if pdf_reports:
+                print(f"\n{Fore.YELLOW}📑 PDF Reports:{Style.RESET_ALL}")
+                for report in sorted(pdf_reports, reverse=True)[:10]:
+                    report_path = os.path.join(workspace, report)
+                    mod_time = datetime.fromtimestamp(os.path.getmtime(report_path))
+                    size_kb = os.path.getsize(report_path) / 1024
+                    print(f"   {Fore.GREEN}→{Style.RESET_ALL} {report}")
+                    print(f"     {Fore.DIM}Size: {size_kb:.1f} KB | Modified: {mod_time.strftime('%Y-%m-%d %H:%M:%S')}{Style.RESET_ALL}")
+            
+            if not html_reports and not pdf_reports:
+                print(f"{Fore.YELLOW}[!] No reports found in: {workspace}{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}[*] Run a scan first: soc-quick <target>{Style.RESET_ALL}")
+            else:
+                print(f"\n{Fore.CYAN}📁 Location: {workspace}{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}📊 Total: {len(html_reports)} HTML, {len(pdf_reports)} PDF reports{Style.RESET_ALL}")
+        else:
+            print(f"{Fore.YELLOW}[!] No reports directory found: {workspace}{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}[*] Run a scan first to create the directory{Style.RESET_ALL}")
+
+    def cmd_soc_report(self):
+        """Open the latest generated report (HTML or PDF)"""
+        import glob
+        import webbrowser
+        
+        workspace = os.path.expanduser("~/dsterminal_workspace/scans")
+        
+        if not os.path.exists(workspace):
+            print(f"{Fore.YELLOW}[!] No reports found. Run a scan first.{Style.RESET_ALL}")
+            return
+        
+        # Get all reports (including any HTML or PDF)
+        html_reports = glob.glob(os.path.join(workspace, "*.html"))
+        pdf_reports = glob.glob(os.path.join(workspace, "*.pdf"))
+        
+        if not html_reports and not pdf_reports:
+            print(f"{Fore.YELLOW}[!] No reports found. Run a scan first.{Style.RESET_ALL}")
+            return
+        
+        print(f"\n{Fore.CYAN}{'='*70}{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}[+] Latest Reports{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}{'='*70}{Style.RESET_ALL}\n")
+        
+        # Show HTML reports
+        latest_html = None
+        if html_reports:
+            latest_html = max(html_reports, key=os.path.getctime)
+            html_time = datetime.fromtimestamp(os.path.getmtime(latest_html))
+            html_name = os.path.basename(latest_html)
+            print(f"{Fore.YELLOW}📄 HTML Report:{Style.RESET_ALL}")
+            print(f"   {html_name}")
+            print(f"   {Fore.DIM}Modified: {html_time.strftime('%Y-%m-%d %H:%M:%S')}{Style.RESET_ALL}")
+        
+        # Show PDF reports
+        latest_pdf = None
+        if pdf_reports:
+            latest_pdf = max(pdf_reports, key=os.path.getctime)
+            pdf_time = datetime.fromtimestamp(os.path.getmtime(latest_pdf))
+            pdf_name = os.path.basename(latest_pdf)
+            print(f"\n{Fore.YELLOW}📑 PDF Report:{Style.RESET_ALL}")
+            print(f"   {pdf_name}")
+            print(f"   {Fore.DIM}Modified: {pdf_time.strftime('%Y-%m-%d %H:%M:%S')}{Style.RESET_ALL}")
+        
+        print(f"\n{Fore.CYAN}📁 Location: {workspace}{Style.RESET_ALL}")
+        
+        # Ask which to open
+        options = []
+        if latest_html:
+            options.append("1=HTML")
+        if latest_pdf:
+            options.append("2=PDF")
+        if latest_html and latest_pdf:
+            options.append("3=Both")
+        options.append("n=None")
+        
+        choice = input(f"\n{Fore.YELLOW}[?] Open ({', '.join(options)}): {Style.RESET_ALL}").strip()
+        
+        if choice == '1' and latest_html:
+            webbrowser.open(f"file://{latest_html}")
+            print(f"{Fore.GREEN}[+] Opening HTML report...{Style.RESET_ALL}")
+        elif choice == '2' and latest_pdf:
+            webbrowser.open(f"file://{latest_pdf}")
+            print(f"{Fore.GREEN}[+] Opening PDF report...{Style.RESET_ALL}")
+        elif choice == '3':
+            if latest_html:
+                webbrowser.open(f"file://{latest_html}")
+                print(f"{Fore.GREEN}[+] Opening HTML report...{Style.RESET_ALL}")
+            if latest_pdf:
+                webbrowser.open(f"file://{latest_pdf}")
+                print(f"{Fore.GREEN}[+] Opening PDF report...{Style.RESET_ALL}")
+        elif choice.lower() != 'n':
+            print(f"{Fore.YELLOW}[!] Invalid choice{Style.RESET_ALL}")
+
+    def cmd_soc_pdf(self):
+        """Generate PDF report from last scan or find existing PDF"""
+        import glob
+        import webbrowser
+        import os
+        
+        workspace = os.path.expanduser("~/dsterminal_workspace/scans")
+        
+        # First check if we have a PDF already
+        if os.path.exists(workspace):
+            pdf_files = glob.glob(os.path.join(workspace, "*.pdf"))
+            if pdf_files:
+                latest_pdf = max(pdf_files, key=os.path.getctime)
+                print(f"{Fore.GREEN}[+] Found PDF report: {os.path.basename(latest_pdf)}{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}   Location: {latest_pdf}{Style.RESET_ALL}")
+                
+                open_file = input(f"{Fore.YELLOW}[?] Open PDF? (y/n): {Style.RESET_ALL}").strip().lower()
+                if open_file == 'y':
+                    webbrowser.open(f"file://{latest_pdf}")
+                return
+        
+        # If no PDF, try to generate one from the dashboard
+        try:
+            from soc_nmap_dashboard import SOCNmapIntegration
+            
+            # Create a new instance or get existing
+            soc = SOCNmapIntegration()
+            
+            # If dashboard doesn't have data, try to load from history
+            if not soc.dashboard or not soc.dashboard.services_found:
+                print(f"{Fore.YELLOW}[!] No scan data in memory. Trying to load from history...{Style.RESET_ALL}")
+                
+                # Try to load the last scan data
+                if os.path.exists(workspace):
+                    # Find the most recent HTML report and extract data
+                    html_files = glob.glob(os.path.join(workspace, "*.html"))
+                    if html_files:
+                        latest_html = max(html_files, key=os.path.getctime)
+                        print(f"{Fore.GREEN}[+] Found recent scan: {os.path.basename(latest_html)}{Style.RESET_ALL}")
+                        
+                        # Try to extract target from filename
+                        import re
+                        target_match = re.search(r'soc_full_dashboard_(.+?)_\d{8}_\d{6}', os.path.basename(latest_html))
+                        if target_match:
+                            target = target_match.group(1).replace('_', '.')
+                            print(f"{Fore.CYAN}[+] Target: {target}{Style.RESET_ALL}")
+                            
+                            # Run a quick scan to regenerate data
+                            print(f"{Fore.YELLOW}[!] Regenerating scan data for PDF generation...{Style.RESET_ALL}")
+                            soc.quick_scan(target, auto_open=False)
+                            
+                            # Now generate PDF
+                            if soc.dashboard and soc.dashboard.services_found:
+                                pdf_path = soc.dashboard.generate_pdf_report(target)
+                                if pdf_path:
+                                    print(f"{Fore.GREEN}[+] PDF report generated: {pdf_path}{Style.RESET_ALL}")
+                                    open_file = input(f"{Fore.YELLOW}[?] Open PDF? (y/n): {Style.RESET_ALL}").strip().lower()
+                                    if open_file == 'y':
+                                        webbrowser.open(f"file://{pdf_path}")
+                                    return
+                        else:
+                            print(f"{Fore.YELLOW}[!] Could not extract target from filename{Style.RESET_ALL}")
+            
+            # If dashboard has data, generate PDF directly
+            if soc.dashboard and soc.dashboard.services_found:
+                print(f"{Fore.GREEN}[+] Generating PDF report from last scan...{Style.RESET_ALL}")
+                target = soc.dashboard.current_target if soc.dashboard.current_target else "scan"
+                pdf_path = soc.dashboard.generate_pdf_report(target)
+                if pdf_path:
+                    print(f"{Fore.GREEN}[+] PDF report generated: {pdf_path}{Style.RESET_ALL}")
+                    open_file = input(f"{Fore.YELLOW}[?] Open PDF? (y/n): {Style.RESET_ALL}").strip().lower()
+                    if open_file == 'y':
+                        webbrowser.open(f"file://{pdf_path}")
+                    return
+            
+            print(f"{Fore.YELLOW}[!] No scan data available. Run a scan first: soc-quick <target>{Style.RESET_ALL}")
+            
+        except ImportError as e:
+            print(f"{Fore.RED}[!] Failed to import SOC module: {e}{Style.RESET_ALL}")
+        except Exception as e:
+            print(f"{Fore.RED}[!] PDF generation failed: {e}{Style.RESET_ALL}")
+            import traceback
+            traceback.print_exc()
+            
     def cmd_soc_organizations(self):
         """Show organization location database"""
         try:
@@ -5948,20 +6563,6 @@ class SecurityTerminal:
         except Exception as e:
             print(f"{Fore.RED}[!] Failed to show organizations: {e}{Style.RESET_ALL}")
 
-    def _get_soc_dashboard(self):
-        """Get or create SOC dashboard instance"""
-        if not self.soc_dashboard:
-            try:
-                from soc_nmap_dashboard import SOCNmapIntegration
-                self.soc_dashboard = SOCNmapIntegration()
-            except ImportError as e:
-                print(f"{Fore.RED}[!] Failed to import SOC module: {e}{Style.RESET_ALL}")
-                return None
-            except Exception as e:
-                print(f"{Fore.RED}[!] SOC dashboard error: {e}{Style.RESET_ALL}")
-                return None
-        return self.soc_dashboard
-
     def cmd_soc_results(self):
         """Display previous scan results"""
         soc = self._get_soc_dashboard()
@@ -5989,25 +6590,43 @@ class SecurityTerminal:
     def cmd_soc_status(self):
         """Show SOC dashboard status"""
         print(f"\n{Fore.CYAN}{'='*70}{Style.RESET_ALL}")
-        print(f"{Fore.GREEN}[+] SOC Nmap Dashboard Status{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}[+] SOC RECON_NG STATUS{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'='*70}{Style.RESET_ALL}\n")
         
         # Check if file exists
         import os
         if os.path.exists("soc_nmap_dashboard.py"):
-            print(f"{Fore.GREEN}✅ {Style.RESET_ALL}")
+            print(f"{Fore.GREEN}✅ soc_nmap_dashboard.py found{Style.RESET_ALL}")
             
             # Check file size
             size = os.path.getsize("soc_nmap_dashboard.py")
             print(f"   {Fore.CYAN}Size: {size} bytes{Style.RESET_ALL}")
         else:
-            print(f"{Fore.RED}❌ {Style.RESET_ALL}")
+            print(f"{Fore.RED}❌ soc_nmap_dashboard.py NOT found{Style.RESET_ALL}")
             print(f"   {Fore.YELLOW}Current directory: {os.getcwd()}{Style.RESET_ALL}")
         
         # Check nmap
         nmap_installed = shutil.which("nmap") is not None
-        print(f"\n{'✅' if nmap_installed else '❌'} Network Mapper: {'✅' if nmap_installed else '❌'}")
+        nmap_path = shutil.which("nmap") if nmap_installed else None
+        print(f"{'✅' if nmap_installed else '❌'} Network Mapper: {'✅' if nmap_installed else '❌'}")
+        if nmap_path:
+            print(f"   {Fore.CYAN}Path: {nmap_path}{Style.RESET_ALL}")
         
+        # Check Python packages
+        print(f"\n{Fore.YELLOW}📦 Required Python Packages:{Style.RESET_ALL}")
+        packages = {
+            'folium': 'GeoIP mapping',
+            'plotly': 'Network topology',
+            'requests': 'GeoIP API',
+            'reportlab': 'PDF reports'
+        }
+        
+        for package, desc in packages.items():
+            try:
+                __import__(package)
+                print(f"   {Fore.GREEN}✅ {package} - {desc}{Style.RESET_ALL}")
+            except ImportError:
+                print(f"   {Fore.RED}❌ {package} - {desc} (not installed){Style.RESET_ALL}")
         
         # Check workspace
         workspace = os.path.expanduser("~/dsterminal_workspace/scans")
@@ -6015,14 +6634,22 @@ class SecurityTerminal:
             report_count = len([f for f in os.listdir(workspace) if f.endswith(('.html', '.pdf'))])
             print(f"\n{Fore.GREEN}📁 Workspace: {workspace}{Style.RESET_ALL}")
             print(f"   {Fore.CYAN}Reports generated: {report_count}{Style.RESET_ALL}")
+        else:
+            print(f"\n{Fore.YELLOW}📁 Workspace not created yet. Run a scan to create it.{Style.RESET_ALL}")
+        
+        # Check if SOC dashboard instance exists
+        if self.soc_dashboard:
+            print(f"\n{Fore.GREEN}✅ SOC dashboard instance active{Style.RESET_ALL}")
+        else:
+            print(f"\n{Fore.YELLOW}⚠️ SOC dashboard not initialized{Style.RESET_ALL}")
         
         print()
-    
+
     def soc_help(self):
         """Display SOC Nmap Dashboard help"""
         help_text = f"""
     {Fore.CYAN}{'='*70}{Style.RESET_ALL}
-    {Fore.GREEN}🛡️ SOC Nmap Dashboard Commands{Style.RESET_ALL}
+    {Fore.GREEN}🛡️ SOC RECON_NG Commands{Style.RESET_ALL}
     {Fore.CYAN}{'='*70}{Style.RESET_ALL}
 
     {Fore.YELLOW}Interactive Mode:{Style.RESET_ALL}
@@ -6036,21 +6663,26 @@ class SecurityTerminal:
     {Fore.YELLOW}Reporting:{Style.RESET_ALL}
     {Fore.GREEN}soc-pdf{Style.RESET_ALL}                 - Generate PDF report from last scan
     {Fore.GREEN}soc-reports{Style.RESET_ALL}            - List all generated reports (HTML & PDF)
+    {Fore.GREEN}soc-report{Style.RESET_ALL}             - Open the latest generated report
 
     {Fore.YELLOW}Analysis & Reporting:{Style.RESET_ALL}
-    {Fore.GREEN}soc{Style.RESET_ALL}               - Generate threat intelligence map from last scan
+    {Fore.GREEN}soc-map{Style.RESET_ALL}                - Generate threat intelligence map from last scan
     {Fore.GREEN}soc-history{Style.RESET_ALL}           - Show scan history with risk scores
     {Fore.GREEN}soc-orgs{Style.RESET_ALL}              - Show organization location database
+    {Fore.GREEN}soc-results{Style.RESET_ALL}           - Display previous scan results
 
     {Fore.YELLOW}Status & Help:{Style.RESET_ALL}
     {Fore.GREEN}soc-status{Style.RESET_ALL}            - Show SOC dashboard status and installed packages
+    {Fore.GREEN}soc-debug{Style.RESET_ALL}             - Debug SOC module import
     {Fore.GREEN}soc-help{Style.RESET_ALL}              - Show this help message
+    {Fore.GREEN}soc-test{Style.RESET_ALL}              - Test SOC functionality
 
     {Fore.YELLOW}Examples:{Style.RESET_ALL}
     {Fore.GREEN}soc-quick google.com{Style.RESET_ALL}
     {Fore.GREEN}soc-full 192.168.1.1{Style.RESET_ALL}
     {Fore.GREEN}soc-dns example.com{Style.RESET_ALL}
-    {Fore.GREEN}soc{Style.RESET_ALL}
+    {Fore.GREEN}soc-map{Style.RESET_ALL}
+    {Fore.GREEN}soc-report{Style.RESET_ALL}
 
     {Fore.CYAN}{'='*70}{Style.RESET_ALL}
 
@@ -6075,11 +6707,25 @@ class SecurityTerminal:
             print(f"{Fore.RED}[✗] soc_nmap_dashboard.py not found{Style.RESET_ALL}")
         
         try:
-            from soc_nmap_dashboard import SOCNmapDashboard
-            print(f"{Fore.GREEN}[✓] SOCNmapDashboard imported successfully{Style.RESET_ALL}")
+            from soc_nmap_dashboard import SOCNmapDashboard, SOCNmapIntegration
+            print(f"{Fore.GREEN}[✓] SOCNmapDashboard and SOCNmapIntegration imported successfully{Style.RESET_ALL}")
+            
+            # Test creating instance
+            soc = SOCNmapIntegration()
+            print(f"{Fore.GREEN}[✓] SOCNmapIntegration instance created{Style.RESET_ALL}")
+            
+            if soc.dashboard:
+                print(f"{Fore.GREEN}[✓] Dashboard instance available{Style.RESET_ALL}")
+            else:
+                print(f"{Fore.YELLOW}[!] Dashboard not initialized (will be created when needed){Style.RESET_ALL}")
+                
         except ImportError as e:
             print(f"{Fore.RED}[✗] Import failed: {e}{Style.RESET_ALL}")
-
+        except Exception as e:
+            print(f"{Fore.RED}[✗] Test failed: {e}{Style.RESET_ALL}")
+        
+        print(f"\n{Fore.CYAN}[✓] SOC test complete{Style.RESET_ALL}")
+        
 # ==========================================websec=====================
     def launch_web_security_analyzer(self, args=None):
         """Launch the web security analyzer dashboard"""
@@ -14105,509 +14751,7 @@ class SecurityTerminal:
         except Exception as e:
             return None
 #  =================================dsterminal self update module checking==================
-    
-    def _check_github_release(self):
-        """Check GitHub for latest release - Complete working version"""
-        try:
-            import requests
-            from rich.console import Console
-            from datetime import datetime
-            console = Console()
-            
-            # Get current version from config
-            current_version = self.config.get("CURRENT_VERSION", "3.1.113")
-            
-            # ============================================================
-            # REPOSITORY CONFIGURATION - Using your actual repo with releases
-            # ============================================================
-            GITHUB_REPO = "Stark-Expo-Tech-Exchange/DSTerminal_releases_latest"
-            
-            # ============================================================
-            # METHOD 1: Try the releases endpoint with correct repo
-            # ============================================================
-            api_url = f"https://api.github.com/repos/{GITHUB_REPO}/releases"
-            
-            headers = {
-                'Accept': 'application/vnd.github.v3+json',
-                'User-Agent': 'DSTerminal-Update-Checker/4.0'
-            }
-            
-            console.print(f"[dim]Connecting to GitHub API for {GITHUB_REPO}...[/dim]")
-            response = requests.get(api_url, timeout=15, headers=headers)
-            
-            if response.status_code == 200:
-                data = response.json()
-                if data:
-                    # Find the latest release (first one is usually the newest)
-                    latest_release = data[0]
-                    tag_name = latest_release.get("tag_name", "")
-                    console.print(f"[green]✓ Found release: {tag_name}[/green]")
-                    
-                    # Process the release data
-                    release_info = self._process_release_data(latest_release)
-                    if release_info:
-                        return release_info
-                else:
-                    console.print("[red]❌ No releases found via API.[/red]")
-                    raise Exception("No releases found in GitHub repository")
-            elif response.status_code == 404:
-                console.print(f"[yellow]⚠️ Repository not found: {GITHUB_REPO}[/yellow]")
-                console.print("[yellow]Please check the repository name and your internet connection[/yellow]")
-                raise Exception(f"Repository {GITHUB_REPO} not found")
-            else:
-                console.print(f"[yellow]API returned {response.status_code}, trying alternative...[/yellow]")
-            
-            # ============================================================
-            # METHOD 2: Try using the GitHub API to get the latest release by tag
-            # ============================================================
-            console.print("[dim]Trying to get latest release by tag...[/dim]")
-            
-            # Get all tags
-            tags_url = f"https://api.github.com/repos/{GITHUB_REPO}/tags"
-            tags_response = requests.get(tags_url, timeout=10, headers=headers)
-            
-            if tags_response.status_code == 200:
-                tags_data = tags_response.json()
-                if tags_data:
-                    # Get the latest tag (first one is usually the newest)
-                    latest_tag = tags_data[0].get("name", "")
-                    if latest_tag:
-                        console.print(f"[green]✓ Found latest tag: {latest_tag}[/green]")
-                        # Try to get release info for this tag
-                        release_url = f"https://api.github.com/repos/{GITHUB_REPO}/releases/tags/{latest_tag}"
-                        release_response = requests.get(release_url, timeout=10, headers=headers)
-                        
-                        if release_response.status_code == 200:
-                            return self._process_release_data(release_response.json())
-                        else:
-                            # If no release, still return the tag info with download URL
-                            return {
-                                "version": latest_tag.lstrip("v"),
-                                "url": f"https://github.com/{GITHUB_REPO}/tree/{latest_tag}",
-                                "download_url": f"https://github.com/{GITHUB_REPO}/archive/refs/tags/{latest_tag}.zip",
-                                "notes": f"DSTerminal {latest_tag}",
-                                "prerelease": False,
-                                "published_at": datetime.now().strftime('%Y-%m-%d'),
-                                "asset_name": f"DSTerminal-{latest_tag}.zip",
-                                "asset_size": 0,
-                                "from_fallback": True
-                            }
-                    else:
-                        console.print("[red]❌ No tags found in repository[/red]")
-                        raise Exception("No tags found in GitHub repository")
-                else:
-                    console.print("[red]❌ No tags found in repository[/red]")
-                    raise Exception("No tags found in GitHub repository")
-            else:
-                console.print(f"[red]❌ Failed to get tags: {tags_response.status_code}[/red]")
-                raise Exception(f"GitHub API returned {tags_response.status_code} for tags endpoint")
-            
-            # If we get here, nothing worked
-            console.print("[red]❌ All GitHub API methods failed[/red]")
-            raise Exception("Unable to fetch release information from GitHub")
 
-        except requests.RequestException as e:
-            console.print(f"[red]⚠️ Connection error: {e}[/red]")
-            raise Exception(f"Network error while checking for updates: {e}")
-        except Exception as e:
-            console.print(f"[red]⚠️ Error: {e}[/red]")
-            raise
-
-    def _process_release_data(self, release):
-        """Process GitHub release data into a standardized format"""
-        try:
-            from datetime import datetime
-            
-            # Extract release information
-            tag_name = release.get("tag_name", "").lstrip("v")
-            version = tag_name if tag_name else "0.0.0"
-            
-            # Find the first asset (usually the installer)
-            assets = release.get("assets", [])
-            asset = assets[0] if assets else None
-            
-            download_url = None
-            asset_name = None
-            asset_size = 0
-            
-            if asset:
-                download_url = asset.get("browser_download_url")
-                asset_name = asset.get("name")
-                asset_size = asset.get("size", 0)
-                console.print(f"[dim]Found asset: {asset_name} ({asset_size} bytes)[/dim]")
-            
-            # If no assets, use the zipball URL
-            if not download_url:
-                download_url = release.get("zipball_url")
-                asset_name = f"DSTerminal-{version}.zip"
-                console.print(f"[dim]No assets found, using zipball: {download_url}[/dim]")
-            
-            return {
-                "version": version,
-                "url": release.get("html_url", ""),
-                "download_url": download_url,
-                "notes": release.get("body", f"DSTerminal v{version}"),
-                "prerelease": release.get("prerelease", False),
-                "published_at": release.get("published_at", datetime.now().strftime('%Y-%m-%d'))[:10],
-                "asset_name": asset_name,
-                "asset_size": asset_size,
-                "from_fallback": False
-            }
-        except Exception as e:
-            # If processing fails, raise the exception
-            raise Exception(f"Failed to process release data: {e}")
-
-    def download_update(self, url, filename):
-        """Download update with progress bar - FIXED"""
-        try:
-            import requests
-            import os
-            from rich.console import Console
-            from rich.progress import (
-                Progress, DownloadColumn, BarColumn, 
-                TextColumn, TransferSpeedColumn
-            )
-            console = Console()
-            
-            console.print(f"\n[cyan]📥 Downloading update from GitHub...[/cyan]")
-            console.print(f"[dim]File: {filename}[/dim]")
-            
-            # Check if URL is valid
-            if not url:
-                console.print("[red]No download URL available[/red]")
-                return False
-            
-            # Stream the download
-            response = requests.get(url, stream=True, timeout=30, 
-                                allow_redirects=True)
-            response.raise_for_status()
-            
-            total_size = int(response.headers.get('content-length', 0))
-            
-            # Ensure the directory exists
-            os.makedirs(os.path.dirname(filename) if os.path.dirname(filename) else '.', exist_ok=True)
-            
-            # Download with progress bar
-            with open(filename, 'wb') as f:
-                with Progress(
-                    DownloadColumn(),
-                    BarColumn(),
-                    TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-                    TransferSpeedColumn(),
-                    console=console,
-                    transient=False
-                ) as progress:
-                    task = progress.add_task("[green]Downloading...[/green]", total=total_size if total_size > 0 else None)
-                    
-                    downloaded = 0
-                    for chunk in response.iter_content(chunk_size=8192):
-                        if chunk:
-                            f.write(chunk)
-                            downloaded += len(chunk)
-                            if total_size > 0:
-                                progress.update(task, advance=len(chunk))
-                            else:
-                                # Update progress with indeterminate bar
-                                progress.update(task, description=f"[green]Downloading... {downloaded//1024}KB[/green]")
-            
-            # Verify file was created
-            if os.path.exists(filename):
-                actual_size = os.path.getsize(filename)
-                console.print(f"[green]✓ Download complete: {filename}[/green]")
-                if total_size > 0:
-                    console.print(f"[dim]Size: {actual_size} bytes[/dim]")
-                return True
-            else:
-                console.print("[red]Download failed - file not created[/red]")
-                return False
-                
-        except Exception as e:
-            console.print(f"[red]✗ Download failed: {e}[/red]")
-            return False
-
-    def check_updates(self):
-        """Cinematic update check with real GitHub API integration - FIXED"""
-        
-        # ===================== IMPORTS =====================
-        import time
-        import random
-        import requests
-        import subprocess
-        import sys
-        import os
-        import platform
-        import tempfile
-        from datetime import datetime
-        from pathlib import Path
-        from rich.console import Console
-        from rich.panel import Panel
-        from rich.progress import (
-            Progress, SpinnerColumn, TextColumn, BarColumn, 
-            DownloadColumn, TransferSpeedColumn
-        )
-        from rich.live import Live
-        from rich.align import Align
-        from rich.table import Table
-        from rich import box
-
-        console = Console()
-
-        # ===================== ANIMATIONS =====================
-        def hacker_animation():
-            symbols = "█▓▒░▄▀■►▼▲◄▶◀◢◣◥◤▬▭▮▯┌┐└┘├┤┬┴┼╔╗╚╝╠╣╦╩╬═║"
-            width = min(console.size.width, 100)
-            with console.status("[bold red]🔐 ACCESSING UPDATE SERVERS...[/]", spinner="dots"):
-                for _ in range(3):
-                    console.print(
-                        "".join(random.choice(symbols) for _ in range(width)),
-                        style="bold green"
-                    )
-                    time.sleep(1.5)
-
-        def satellite_scan():
-            frames = ["🛰", "📡", "📶", "🔍", "🎯", "⚡"]
-            with Progress(
-                SpinnerColumn(style="cyan"),
-                TextColumn("[bold blue]{task.description}"),
-                transient=True,
-                console=console
-            ) as progress:
-                task = progress.add_task("Establishing secure connection...", total=100)
-                for i in range(100):
-                    progress.update(task, advance=1,
-                                    description=f"{frames[i % len(frames)]} Scanning {i}%")
-                    time.sleep(0.15)
-
-        def version_comparison_animation(current_ver, latest_ver):
-            with Live(refresh_per_second=10, console=console, transient=True) as live:
-                for i in range(1, 4):
-                    bar = "█" * (i * 8)
-                    live.update(
-                        Panel(
-                            f"[bold cyan]Comparing Versions[/]\n\n"
-                            f"[yellow]Current:[/] v{current_ver}\n"
-                            f"[white]{bar:30}[/]\n\n"
-                            f"[green]Latest:[/] v{latest_ver}\n"
-                            f"[white]{bar:30}[/]",
-                            border_style="cyan",
-                            width=50
-                        )
-                    )
-                    time.sleep(1.5)
-
-        # ===================== UPDATE LOGIC =====================
-        def parse_version(v):
-            parts = [int(p) if p.isdigit() else 0 for p in str(v).lstrip("vV").split(".")]
-            while len(parts) < 3:
-                parts.append(0)
-            return tuple(parts)
-
-        def perform_update(latest):
-            """Execute the actual update process"""
-            
-            # Show update details
-            details_table = Table(box=box.HEAVY_EDGE, border_style="cyan")
-            details_table.add_column("Item", style="cyan")
-            details_table.add_column("Details", style="white")
-            details_table.add_row("New Version", f"[green]v{latest['version']}[/green]")
-            details_table.add_row("Installer", latest.get('asset_name', 'Unknown'))
-            if latest.get('asset_size'):
-                size_mb = latest['asset_size'] / (1024 * 1024)
-                details_table.add_row("Size", f"{size_mb:.1f} MB")
-            details_table.add_row("Release", latest.get('published_at', 'Unknown'))
-            
-            console.print(Panel(details_table, title="[bold yellow]📦 UPDATE DETAILS[/bold yellow]", border_style="yellow"))
-            
-            # Security confirmation
-            console.print("\n[bold red]⚠️ SECURITY NOTICE[/bold red]")
-            console.print("[dim]• The installer will be downloaded from GitHub\n"
-                        "• Verify the digital signature before running\n"
-                        "• Administrator privileges may be required[/dim]\n")
-            
-            confirm = console.input("[bold red]Type 'INSTALL' to download and run the installer: [/]").strip()
-            
-            if confirm != "INSTALL":
-                console.print("[yellow]Update cancelled[/yellow]")
-                return False
-            
-            if not latest.get('download_url'):
-                console.print(Panel(
-                    "[yellow]No automatic download available[/]\n\n"
-                    f"Please download manually from:\n{latest['url']}",
-                    border_style="yellow"
-                ))
-                return False
-            
-            # Create temp directory for download
-            temp_dir = tempfile.gettempdir()
-            installer_name = latest['asset_name'] or f"DSTerminal-v{latest['version']}.zip"
-            installer_path = os.path.join(temp_dir, installer_name)
-            
-            # Remove old installer if exists
-            if os.path.exists(installer_path):
-                try:
-                    os.remove(installer_path)
-                except:
-                    pass
-            
-            # Download the update
-            if not self.download_update(latest['download_url'], installer_path):
-                return False
-            
-            # Verify download exists
-            if not os.path.exists(installer_path) or os.path.getsize(installer_path) == 0:
-                console.print("[red]Download verification failed[/red]")
-                return False
-            
-            console.print("\n[green]✓ Download verified successfully[/green]")
-            
-            # Ask to run installer
-            console.print("\n[cyan]🔧 Ready to install update...[/cyan]")
-            run_installer = console.input("[bold yellow]Run the installer now? (Y/n): [/]").strip().lower()
-            
-            if run_installer != 'n':
-                console.print("[cyan]Launching installer...[/cyan]")
-                time.sleep(1)
-                
-                try:
-                    # Launch the installer
-                    if platform.system().lower() == "windows":
-                        os.startfile(installer_path)
-                    else:
-                        # Make executable on Unix-like systems
-                        if platform.system().lower() != "windows":
-                            os.chmod(installer_path, 0o755)
-                        subprocess.Popen([installer_path], shell=True)
-                    
-                    console.print(Panel(
-                        f"[bold green]✅ INSTALLER LAUNCHED![/bold green]\n\n"
-                        f"[yellow]Please complete the installation wizard[/yellow]\n"
-                        f"[dim]Installer location: {installer_path}[/dim]\n\n"
-                        f"[cyan]After installation, restart DSTerminal[/cyan]",
-                        border_style="green"
-                    ))
-                    return True
-                    
-                except Exception as e:
-                    console.print(f"[red]Failed to launch installer: {e}[/red]")
-                    console.print(f"[yellow]Please run manually: {installer_path}[/yellow]")
-                    return False
-            else:
-                console.print(f"[yellow]Installer saved to: {installer_path}[/yellow]")
-                return True
-
-        # ===================== MAIN FLOW =====================
-        try:
-            # Display header
-            console.print(Panel(
-                Align.center("[bold cyan]🔄 DSTERMINAL UPDATE PROTOCOL 🔄[/bold cyan]"),
-                border_style="cyan"
-            ))
-            
-            # Animated sequence
-            hacker_animation()
-            satellite_scan()
-            
-            # Get current version
-            current_version = self.config.get("CURRENT_VERSION", "3.1.113").lstrip("v")
-            
-            # Display version info
-            version_table = Table(box=box.SIMPLE, border_style="blue")
-            version_table.add_column("Component", style="cyan")
-            version_table.add_column("Version", style="green")
-            version_table.add_row("Current Installation", f"v{current_version}")
-            version_table.add_row("System", platform.system())
-            version_table.add_row("Architecture", platform.machine())
-            
-            console.print(Panel(version_table, title="[bold]📊 SYSTEM STATUS[/bold]", border_style="blue"))
-            
-            # ============================================================
-            # CHECK FOR UPDATES - Using the class method
-            # ============================================================
-            console.print("\n[cyan]🔍 Checking Modules for updates...[/cyan]")
-            
-            try:
-                latest = self._check_github_release()
-            except Exception as e:
-                console.print(Panel(
-                    f"[bold red]UPDATE CHECK FAILED[/]\n\n"
-                    f"[yellow]{str(e)}[/yellow]\n\n"
-                    f"[dim]• Please check your internet connection\n"
-                    f"• Verify the GitHub repository exists\n"
-                    f"• Visit: https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest[/dim]",
-                    border_style="red"
-                ))
-                return False
-            
-            if not latest:
-                console.print(Panel(
-                    "[yellow]⚠️ No update information available[/yellow]\n\n"
-                    "[dim]Please visit the GitHub repository to check for updates manually.[/dim]",
-                    border_style="yellow"
-                ))
-                return False
-            
-            # Version comparison animation
-            version_comparison_animation(current_version, latest['version'])
-            
-            # Compare versions
-            current_tuple = parse_version(current_version)
-            latest_tuple = parse_version(latest['version'])
-            
-            if latest_tuple > current_tuple:
-                # Show update available
-                update_info = (
-                    f"[bold red]🚨 UPDATE AVAILABLE! 🚨[/bold red]\n\n"
-                    f"[yellow]Current:[/yellow] v{current_version}\n"
-                    f"[green]Latest:[/green] v{latest['version']}\n"
-                    f"[cyan]Released:[/cyan] {latest.get('published_at', 'Unknown')}\n\n"
-                    f"[cyan]Release Notes:[/cyan]\n"
-                    f"[dim]{latest['notes'][:400]}[/dim]\n"
-                )
-                
-                if latest.get('prerelease'):
-                    update_info += f"\n[red]⚠️ PRE-RELEASE VERSION - Use with caution[/red]\n"
-                
-                console.print(Panel(
-                    update_info,
-                    border_style="red",
-                    width=90,
-                    padding=(1, 2)
-                ))
-                
-                # Ask for update
-                choice = console.input("\n[bold cyan]Download and install update now? (y/N): [/]").lower()
-                
-                if choice == 'y':
-                    return perform_update(latest)
-                else:
-                    console.print("[yellow]Update postponed[/yellow]")
-                    return False
-            
-            else:
-                console.print(Panel(
-                    Align.center(
-                        f"[bold green]✅ DSTERMINAL IS UP TO DATE![/bold green]\n\n"
-                        f"[dim]Version: v{current_version}\n"
-                        f"Checked: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}[/dim]"
-                    ),
-                    border_style="green",
-                    width=60
-                ))
-                return True
-            
-        except KeyboardInterrupt:
-            console.print("\n[yellow]Update cancelled by user[/yellow]")
-            return True
-        except Exception as e:
-            console.print(Panel(
-                f"[bold red]UPDATE ERROR[/]\n\n{str(e)}",
-                border_style="red"
-            ))
-            import traceback
-            traceback.print_exc()
-            return False
-        
     
     def clear_terminal(self):
         """Advanced terminal clearing with three-column centered layout and spinning animations"""
@@ -16196,6 +16340,19 @@ class SecurityTerminal:
                 print(f"{Fore.RED}[!] Web Security Analyzer not available{Style.RESET_ALL}")
             return
 
+            # ===================================================update
+            # Update Commands
+        elif command in ['dst-update', 'update', 'check-update']:
+            self.check_for_updates()
+            return
+
+        elif command in ['dst-version', 'version', 'ver']:
+            self.show_version()
+            return
+
+        elif command == 'dst-upgrade':
+            self.check_for_updates(force=True)
+            return
  
         # =====================for recon & recon_full command parser=============================
         elif command == 'dst-recon' or command == 'recon.py':
@@ -17028,13 +17185,13 @@ class SecurityTerminal:
             self.enable_tor_routing()
             self.show_tip(cmd)
         elif cmd == "dst-update": 
-            print(f"\n[+] {self.check_updates()}")
+            print(f"\n[+] {self.check_for_updates()}")
             self.show_tip(cmd)
         elif cmd == "system-update": 
-            print(f"\n[+] {self.check_updates()}")
+            print(f"\n[+] {self.check_for_updates()}")
             self.show_tip(cmd)
         elif cmd == "system update": 
-            print(f"\n[+] {self.check_updates()}")
+            print(f"\n[+] {self.check_for_updates()}")
             self.show_tip(cmd)
         elif cmd == "vt-scan": 
             self.run_vt_module()
