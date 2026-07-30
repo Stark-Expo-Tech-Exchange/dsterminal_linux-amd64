@@ -14118,19 +14118,21 @@ class SecurityTerminal:
             current_version = self.config.get("CURRENT_VERSION", "3.1.113")
             
             # ============================================================
+            # REPOSITORY CONFIGURATION - Using your actual repo with releases
+            # ============================================================
+            GITHUB_REPO = "Stark-Expo-Tech-Exchange/DSTerminal_releases_latest"
+            
+            # ============================================================
             # METHOD 1: Try the releases endpoint with correct repo
             # ============================================================
-            # NOTE: Update this to your actual source code repo
-            # If the source is in a different repo than the releases,
-            # use the source repo here
-            api_url = "https://api.github.com/repos/Stark-Expo-Tech-Exchange/DSTerminal/releases"
+            api_url = f"https://api.github.com/repos/{GITHUB_REPO}/releases"
             
             headers = {
                 'Accept': 'application/vnd.github.v3+json',
                 'User-Agent': 'DSTerminal-Update-Checker/4.0'
             }
             
-            console.print(f"[dim]Connecting to GitHub API...[/dim]")
+            console.print(f"[dim]Connecting to GitHub API for {GITHUB_REPO}...[/dim]")
             response = requests.get(api_url, timeout=15, headers=headers)
             
             if response.status_code == 200:
@@ -14138,6 +14140,8 @@ class SecurityTerminal:
                 if data:
                     # Find the latest release (first one is usually the newest)
                     latest_release = data[0]
+                    tag_name = latest_release.get("tag_name", "")
+                    console.print(f"[green]✓ Found release: {tag_name}[/green]")
                     
                     # Process the release data
                     release_info = self._process_release_data(latest_release)
@@ -14146,6 +14150,10 @@ class SecurityTerminal:
                 else:
                     console.print("[red]❌ No releases found via API.[/red]")
                     raise Exception("No releases found in GitHub repository")
+            elif response.status_code == 404:
+                console.print(f"[yellow]⚠️ Repository not found: {GITHUB_REPO}[/yellow]")
+                console.print("[yellow]Please check the repository name and your internet connection[/yellow]")
+                raise Exception(f"Repository {GITHUB_REPO} not found")
             else:
                 console.print(f"[yellow]API returned {response.status_code}, trying alternative...[/yellow]")
             
@@ -14155,7 +14163,7 @@ class SecurityTerminal:
             console.print("[dim]Trying to get latest release by tag...[/dim]")
             
             # Get all tags
-            tags_url = "https://api.github.com/repos/Stark-Expo-Tech-Exchange/DSTerminal/tags"
+            tags_url = f"https://api.github.com/repos/{GITHUB_REPO}/tags"
             tags_response = requests.get(tags_url, timeout=10, headers=headers)
             
             if tags_response.status_code == 200:
@@ -14166,17 +14174,17 @@ class SecurityTerminal:
                     if latest_tag:
                         console.print(f"[green]✓ Found latest tag: {latest_tag}[/green]")
                         # Try to get release info for this tag
-                        release_url = f"https://api.github.com/repos/Stark-Expo-Tech-Exchange/DSTerminal/releases/tags/{latest_tag}"
+                        release_url = f"https://api.github.com/repos/{GITHUB_REPO}/releases/tags/{latest_tag}"
                         release_response = requests.get(release_url, timeout=10, headers=headers)
                         
                         if release_response.status_code == 200:
                             return self._process_release_data(release_response.json())
                         else:
-                            # If no release, still return the tag info
+                            # If no release, still return the tag info with download URL
                             return {
                                 "version": latest_tag.lstrip("v"),
-                                "url": f"https://github.com/Stark-Expo-Tech-Exchange/DSTerminal/tree/{latest_tag}",
-                                "download_url": f"https://github.com/Stark-Expo-Tech-Exchange/DSTerminal/archive/refs/tags/{latest_tag}.zip",
+                                "url": f"https://github.com/{GITHUB_REPO}/tree/{latest_tag}",
+                                "download_url": f"https://github.com/{GITHUB_REPO}/archive/refs/tags/{latest_tag}.zip",
                                 "notes": f"DSTerminal {latest_tag}",
                                 "prerelease": False,
                                 "published_at": datetime.now().strftime('%Y-%m-%d'),
@@ -14184,6 +14192,9 @@ class SecurityTerminal:
                                 "asset_size": 0,
                                 "from_fallback": True
                             }
+                    else:
+                        console.print("[red]❌ No tags found in repository[/red]")
+                        raise Exception("No tags found in GitHub repository")
                 else:
                     console.print("[red]❌ No tags found in repository[/red]")
                     raise Exception("No tags found in GitHub repository")
@@ -14223,11 +14234,13 @@ class SecurityTerminal:
                 download_url = asset.get("browser_download_url")
                 asset_name = asset.get("name")
                 asset_size = asset.get("size", 0)
+                console.print(f"[dim]Found asset: {asset_name} ({asset_size} bytes)[/dim]")
             
             # If no assets, use the zipball URL
             if not download_url:
                 download_url = release.get("zipball_url")
                 asset_name = f"DSTerminal-{version}.zip"
+                console.print(f"[dim]No assets found, using zipball: {download_url}[/dim]")
             
             return {
                 "version": version,
@@ -14243,8 +14256,6 @@ class SecurityTerminal:
         except Exception as e:
             # If processing fails, raise the exception
             raise Exception(f"Failed to process release data: {e}")
-
-    # Remove the _get_fallback_update_info method entirely - it's no longer needed
 
     def download_update(self, url, filename):
         """Download update with progress bar - FIXED"""
@@ -14344,7 +14355,7 @@ class SecurityTerminal:
         # ===================== ANIMATIONS =====================
         def hacker_animation():
             symbols = "█▓▒░▄▀■►▼▲◄▶◀◢◣◥◤▬▭▮▯┌┐└┘├┤┬┴┼╔╗╚╝╠╣╦╩╬═║"
-            width = console.size.width
+            width = min(console.size.width, 100)
             with console.status("[bold red]🔐 ACCESSING UPDATE SERVERS...[/]", spinner="dots"):
                 for _ in range(3):
                     console.print(
@@ -14523,7 +14534,7 @@ class SecurityTerminal:
                     f"[yellow]{str(e)}[/yellow]\n\n"
                     f"[dim]• Please check your internet connection\n"
                     f"• Verify the GitHub repository exists\n"
-                    f"• Visit: https://github.com/Stark-Expo-Tech-Exchange/DSTerminal[/dim]",
+                    f"• Visit: https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest[/dim]",
                     border_style="red"
                 ))
                 return False
@@ -14596,6 +14607,8 @@ class SecurityTerminal:
             import traceback
             traceback.print_exc()
             return False
+        
+    
     def clear_terminal(self):
         """Advanced terminal clearing with three-column centered layout and spinning animations"""
         
