@@ -1,11 +1,10 @@
-﻿# -*- mode: python ; coding: utf-8 -*-
+# -*- mode: python ; coding: utf-8 -*-
 import os
 import sys
 import site
 
-# Fix the path - update to your actual path
-BASE_PATH = 'C:\\Users\\DSTERMINAL-V4.0.0.113\\Documents\\DSTerminal_releases_latest'
-
+# Auto-detect the base path using sys.argv[0] (the path to this .spec file)
+BASE_PATH = os.path.dirname(os.path.abspath(sys.argv[0]))
 # ====================================================================
 # DATA FILES - Define FIRST
 # ====================================================================
@@ -855,15 +854,6 @@ def get_installed_packages():
             pass
     return packages
 
-# Add all installed packages to hidden imports
-installed_packages = get_installed_packages()
-if installed_packages:
-    print(f"âœ… Adding {len(installed_packages)} installed packages to hidden imports")
-    hiddenimports.extend(installed_packages)
-    # Remove duplicates
-    hiddenimports = list(dict.fromkeys(hiddenimports))
-
-print(f"Total hidden imports: {len(hiddenimports)}")
 
 # ====================================================================
 # Create the PyInstaller Analysis

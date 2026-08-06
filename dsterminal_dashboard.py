@@ -10,6 +10,29 @@ import webbrowser
 import time
 from datetime import datetime
 
+# ============================================================
+# SILENCE FLASK, SOCKETIO, AND WERKZEUG LOGS COMPLETELY
+# ============================================================
+import logging
+import contextlib
+import io
+
+# Silence standard logs
+logging.getLogger('werkzeug').setLevel(logging.ERROR)
+logging.getLogger('socketio').setLevel(logging.ERROR)
+logging.getLogger('engineio').setLevel(logging.ERROR)
+
+# Custom context manager to block the "Serving Flask app" and "Debug mode" prints
+class SilenceFlaskStartup:
+    def __enter__(self):
+        self._original_stdout = sys.stdout
+        sys.stdout = io.StringIO()
+        return self
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        sys.stdout = self._original_stdout
+
+# ============================================================
+
 # Try to import the dashboard
 DASHBOARD_AVAILABLE = False
 dashboard_app = None
@@ -18,7 +41,6 @@ dashboard_socketio = None
 try:
     from dsterminal_complete import app as dashboard_app, socketio as dashboard_socketio
     DASHBOARD_AVAILABLE = True
-    print("[+] Dashboard module loaded successfully")
 except ImportError as e:
     print(f"[!] Dashboard import error: {e}")
 
@@ -46,13 +68,17 @@ class DashboardIntegration:
         def run_dashboard():
             try:
                 print("\n" + "=" * 60)
-                print("ðŸ”® DSTERMINAL SECURITY DASHBOARD")
+                print("🔮 DSTERMINAL SECURITY DASHBOARD")
                 print("=" * 60)
-                print(f"ðŸ“ Dashboard URL: {self.dashboard_url}")
-                print(f"ðŸ“Š Real-time monitoring active")
-                print(f"ðŸ”„ Press Ctrl+C in this window to stop")
+                print(f"📍 Dashboard URL: {self.dashboard_url}")
+                print(f"📊 Real-time monitoring active")
+                print(f"🔄 Press Ctrl+C in this window to stop")
                 print("=" * 60 + "\n")
-                dashboard_socketio.run(dashboard_app, debug=False, host='0.0.0.0', port=self.port, allow_unsafe_werkzeug=True)
+                
+                # SILENTLY START DASHBOARD (No logs printed to terminal)
+                with SilenceFlaskStartup():
+                    dashboard_socketio.run(dashboard_app, debug=False, host='0.0.0.0', port=self.port, allow_unsafe_werkzeug=True)
+                    
             except Exception as e:
                 print(f"[!] Dashboard error: {e}")
                 
@@ -97,15 +123,15 @@ class DashboardIntegration:
     def help(self):
         """Show dashboard commands help"""
         return """
-â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
-â•‘              DSTERMINAL DASHBOARD COMMANDS                   â•‘
-â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£
-â•‘  dashboard           - Start the security dashboard          â•‘
-â•‘  dashboard stop      - Stop the dashboard                    â•‘
-â•‘  dashboard status    - Check dashboard status                â•‘
-â•‘  dashboard browser   - Open dashboard in browser             â•‘
-â•‘  dashboard help      - Show this help                       â•‘
-â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+╔═══════════════════════════════════════════════════════════════════╗
+║              DSTERMINAL DASHBOARD COMMANDS                   ║
+╠═══════════════════════════════════════════════════════════════════╣
+║  dashboard           - Start the security dashboard          ║
+║  dashboard stop      - Stop the dashboard                    ║
+║  dashboard status    - Check dashboard status                ║
+║  dashboard browser   - Open dashboard in browser             ║
+║  dashboard help      - Show this help                       ║
+╚═══════════════════════════════════════════════════════════════════╝
 """
 
 # Create singleton instance
@@ -172,7 +198,7 @@ def register_dashboard_commands(terminal_instance):
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("ðŸ§ª DSTERMINAL DASHBOARD INTEGRATION TEST")
+    print("🧪 DSTERMINAL DASHBOARD INTEGRATION TEST")
     print("=" * 60)
     print("Available commands:")
     print("  dashboard        - Start the dashboard")

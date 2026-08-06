@@ -2,7 +2,6 @@
 DSTerminal Complete Security Suite v4.0.0.113
 Integrated with Enhanced Dashboard (Reports, Quarantine, Ransomware Detection)
 """
-
 import os
 import sys
 import time
@@ -16,6 +15,36 @@ from flask import Flask, render_template_string, jsonify, request, send_file
 from flask_socketio import SocketIO, emit
 import psutil
 import platform
+
+# ============================================================
+# SURGICAL REMOVAL OF FLASK STARTUP PRINTS (Serving Flask app...)
+# ============================================================
+import contextlib
+import io
+
+# Define a custom context manager to block specific prints
+class SilenceFlaskStartup:
+    def __enter__(self):
+        # Redirect stdout to a dummy buffer
+        self._original_stdout = sys.stdout
+        sys.stdout = io.StringIO()
+        return self
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        # Restore stdout immediately after the startup messages are printed
+        sys.stdout = self._original_stdout
+
+# ============================================================
+# (Optional) Silence logging warnings too
+# ============================================================
+import logging
+logging.getLogger('werkzeug').setLevel(logging.ERROR)
+logging.getLogger('socketio').setLevel(logging.ERROR)
+logging.getLogger('engineio').setLevel(logging.ERROR)
+# ============================================================
+# If you also want to silence the "Press CTRL+C to quit" message, redirect the log stream:
+import sys
+sys.stderr = open(os.devnull, 'w') 
+# ============================================================
 
 # Try to import shield_core
 try:
@@ -51,7 +80,6 @@ try:
     from flask_socketio import SocketIO, emit
     import psutil
     FLASK_AVAILABLE = True
-    print("[+] Flask loaded successfully")
 except ImportError as e:
     print(f"[!] Flask import error: {e}")
     print("[!] Install with: pip install flask flask-socketio psutil")
@@ -1767,4 +1795,6 @@ if __name__ == "__main__":
     print("\nPress Ctrl+C to stop\n")
 
     threading.Thread(target=open_browser, daemon=True).start()
-    socketio.run(app, debug=False, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
+# Silence the specific startup prints
+    with SilenceFlaskStartup():
+        socketio.run(app, debug=False, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)

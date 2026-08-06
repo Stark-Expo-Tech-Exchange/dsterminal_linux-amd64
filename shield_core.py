@@ -68,7 +68,6 @@ class ShieldCore:
             self.workspace_dir = os.path.expanduser("~/dsterminal_workspace")
         
         self._init_workspace()
-        print(f"[SHIELD] Initialized at {self.workspace_dir}")
     
     def _init_workspace(self):
         """Initialize workspace directories"""
@@ -109,15 +108,12 @@ class ShieldCore:
                 with open(path, 'w') as f:
                     f.write(f"{content}\nCreated: {datetime.now()}\n")
                 self.honeypot_paths.append(path)
-                print(f"[SHIELD] Honeypot deployed (workspace): {path}")
-            except Exception as e:
-                print(f"[SHIELD] Could not deploy workspace honeypot: {e}")
+            except Exception:
+                pass
         
         # ============================================================
         # 2. USER PROFILE HONEYPOTS (All users on the system)
-        # ============================================================
-        print("[SHIELD] Deploying honeypots to user profiles...")
-        
+        # ============================================================        
         # Get all user profiles
         user_profiles = self._get_all_user_profiles()
         
@@ -166,27 +162,25 @@ class ShieldCore:
                             f.write(f"Deployed: {datetime.now()}\n")
                             f.write("DO NOT DELETE - Security Monitoring\n")
                         self.honeypot_paths.append(path)
-                        print(f"[SHIELD] Honeypot deployed: {path}")
                     else:
                         # File exists - check if it's our honeypot
                         try:
                             with open(path, 'r') as f:
                                 content = f.read()
                                 if "HONEYPOT" in content:
-                                    print(f"[SHIELD] Honeypot already exists: {path}")
+                                    pass
                                 else:
                                     # Not our honeypot - skip to avoid overwriting user files
-                                    print(f"[SHIELD] Skipping existing user file: {path}")
+                                    pass
                         except:
                             pass
-                except Exception as e:
-                    print(f"[SHIELD] Could not deploy honeypot for user {user_profile}: {e}")
+                except Exception:
+                    pass
         
         # ============================================================
         # 3. SYSTEM-WIDE HONEYPOTS (If admin privileges)
         # ============================================================
         if self._is_admin():
-            print("[SHIELD] Deploying honeypots to system directories...")
             
             system_honeypots = [
                 {
@@ -214,14 +208,11 @@ class ShieldCore:
                             f.write(f"{config['content']}\n")
                             f.write(f"Deployed: {datetime.now()}\n")
                         self.honeypot_paths.append(path)
-                        print(f"[SHIELD] Honeypot deployed (system): {path}")
-                except Exception as e:
-                    print(f"[SHIELD] Could not deploy system honeypot: {e}")
-        else:
-            print("[SHIELD] Not running as admin - skipping system honeypots")
+                except Exception:
+                    pass
         
-        print(f"[SHIELD] Total honeypots deployed: {len(self.honeypot_paths)}")
-    
+        return
+
     def _get_all_user_profiles(self):
         """Get all user profile directories on the system"""
         user_profiles = []
@@ -250,15 +241,14 @@ class ShieldCore:
                 # Add root if exists
                 if os.path.exists('/root'):
                     user_profiles.append('/root')
-        except Exception as e:
-            print(f"[SHIELD] Error getting user profiles: {e}")
+        except Exception:
+            pass
         
         # Always include the current user
         current_user = os.path.expanduser("~")
         if current_user not in user_profiles:
             user_profiles.append(current_user)
         
-        print(f"[SHIELD] Found {len(user_profiles)} user profiles")
         return user_profiles
     
     def _is_admin(self):
@@ -289,16 +279,13 @@ class ShieldCore:
             # Check against known ransomware hashes
             blacklisted = self._get_blacklist()
             if file_hash in blacklisted:
-                print(f"[PREVENTION] BLOCKED: Known ransomware signature in {file_path}")
                 return False
                 
             # Check file size anomalies
             if len(content) > 100 * 1024 * 1024:  # > 100MB
-                print(f"[PREVENTION] BLOCKED: Unusually large file: {file_path}")
                 return False
                 
-        except Exception as e:
-            print(f"[PREVENTION] Scan error: {e}")
+        except Exception:
             return False
             
         return True
@@ -313,7 +300,6 @@ class ShieldCore:
     def enforce_mfa(self, user_token: str, action: str) -> bool:
         """Enforce MFA for critical actions"""
         if action in ["install_system_package", "modify_boot_record", "delete_backup"]:
-            print(f"[PREVENTION] MFA Required for '{action}'")
             return self.policies.allow_mfa_override
         return True
     
@@ -333,14 +319,12 @@ class ShieldCore:
         
         # Check honeypot trigger
         if file_path in self.honeypot_paths:
-            print(f"[DETECTION] CRITICAL: Ransomware touched honeypot! ({process_name})")
             self.threat_level = ThreatLevel.RANSOMWARE_DETECTED
             return ThreatLevel.RANSOMWARE_DETECTED
         
         # Behavioral analysis - rapid file operations
         recent_ops = self._count_recent_operations(process_name, 5)
         if recent_ops > self.policies.max_file_ops_per_second:
-            print(f"[DETECTION] ALERT: {process_name} is encrypting files rapidly!")
             self.threat_level = ThreatLevel.HIGH_RISK
             return ThreatLevel.HIGH_RISK
         
@@ -360,7 +344,6 @@ class ShieldCore:
         if remote_ip.startswith("192.168.") or remote_ip == "127.0.0.1":
             return True
         
-        print(f"[DETECTION] Network connection without auth for {process_name}")
         return False
     
     # ============================================================
@@ -369,11 +352,16 @@ class ShieldCore:
     
     def contain_threat(self, process_name: str, pid: int) -> bool:
         """Contain and isolate the threat"""
-        print(f"[RESPONSE] >>> CONTAINING: {process_name} (PID: {pid}) <<<")
-        print(f"[RESPONSE] - Killed process tree for PID {pid}")
-        print(f"[RESPONSE] - Blocked outbound traffic from PID {pid}")
-        print(f"[RESPONSE] - Isolated {process_name} in sandbox.")
-        return True
+        try:
+            # Terminate the process if possible
+            if psutil.pid_exists(pid):
+                proc = psutil.Process(pid)
+                proc.terminate()
+                proc.wait(timeout=5)
+                return True
+        except Exception:
+            pass
+        return False
     
     def quarantine_file(self, file_path: str) -> bool:
         """Move infected file to quarantine"""
@@ -386,10 +374,8 @@ class ShieldCore:
         
         try:
             shutil.move(file_path, dest_path)
-            print(f"[RESPONSE] Quarantined: {file_path} -> {dest_path}")
             return True
-        except Exception as e:
-            print(f"[RESPONSE] Quarantine error: {e}")
+        except Exception:
             return False
     
     # ============================================================
@@ -410,10 +396,8 @@ class ShieldCore:
         
         try:
             shutil.copy2(file_path, backup_path)
-            print(f"[RECOVERY] Snapshot created: {backup_path}")
             return True
-        except Exception as e:
-            print(f"[RECOVERY] Backup failed: {e}")
+        except Exception:
             return False
     
     def rollback_file(self, file_path: str) -> bool:
@@ -425,17 +409,14 @@ class ShieldCore:
         backups = glob.glob(os.path.join(self.backup_dir, pattern))
         
         if not backups:
-            print(f"[RECOVERY] No backup found for {file_path}")
             return False
             
         latest_backup = max(backups, key=os.path.getctime)
         
         try:
             shutil.copy2(latest_backup, file_path)
-            print(f"[RECOVERY] Restored {file_path} from {latest_backup}")
             return True
-        except Exception as e:
-            print(f"[RECOVERY] Rollback failed: {e}")
+        except Exception:
             return False
     
     # ============================================================
@@ -474,7 +455,6 @@ class ShieldCore:
         with open(report_path, 'w') as f:
             json.dump(report, f, indent=2)
         
-        print(f"[FORENSICS] Report generated: {report_path}")
         return report
     
     # ============================================================
@@ -490,8 +470,6 @@ class ShieldCore:
         self._stop_monitoring = False
         
         def monitor_loop():
-            print("[SHIELD] Real-time monitoring ACTIVE")
-            print(f"[SHIELD] Monitoring {len(self.honeypot_paths)} honeypot files")
             while not self._stop_monitoring:
                 try:
                     # Monitor processes
@@ -506,24 +484,20 @@ class ShieldCore:
                     self._check_honeypots()
                     
                     time.sleep(5)
-                except Exception as e:
-                    print(f"[SHIELD] Monitor error: {e}")
+                except Exception:
                     time.sleep(10)
         
         self._monitor_thread = threading.Thread(target=monitor_loop, daemon=True)
         self._monitor_thread.start()
-        print("[SHIELD] Monitoring started")
     
     def _check_honeypots(self):
         """Check if honeypots still exist and are intact"""
         for path in self.honeypot_paths:
             if not os.path.exists(path):
-                print(f"[SHIELD] ALERT: Honeypot missing! {path}")
                 # Attempt to recreate
                 try:
                     with open(path, 'w') as f:
                         f.write(f"HONEYPOT - Security Monitor Active\nRecreated: {datetime.now()}\n")
-                    print(f"[SHIELD] Honeypot recreated: {path}")
                 except:
                     pass
     
@@ -536,8 +510,7 @@ class ShieldCore:
         """Stop real-time monitoring"""
         self._stop_monitoring = True
         self.is_active = False
-        print("[SHIELD] Monitoring stopped")
-    
+     
     # ============================================================
     # STATUS
     # ============================================================
@@ -561,19 +534,9 @@ class ShieldCore:
 # TEST / STANDALONE
 # ============================================================
 
-if __name__ == "__main__":
-    print("=" * 60)
-    print("ðŸ›¡ï¸ DSTERMINAL SHIELD CORE - MODEL ")
-    print("=" * 60)
-    
+if __name__ == "__main__":    
     # Initialize shield
     shield = ShieldCore()
-    
-    # Show deployment summary
-    print("\n[SUMMARY] Honeypot Deployment:")
-    for i, path in enumerate(shield.honeypot_paths, 1):
-        print(f"  {i}. {path}")
-    print(f"\nTotal honeypots deployed: {len(shield.honeypot_paths)}")
     
     # Test detection
     if shield.honeypot_paths:
@@ -582,15 +545,11 @@ if __name__ == "__main__":
             "malware.exe",
             1234
         )
-        print(f"[TEST] Detection result: {result.name}")
     
     # Test quarantine
     if shield.honeypot_paths and os.path.exists(shield.honeypot_paths[0]):
         shield.quarantine_file(shield.honeypot_paths[0])
     
     # Generate report
-    print("\n[TEST] Generating forensic report...")
     report = shield.generate_forensic_report()
-    print(f"[TEST] Report ID: {report.get('timestamp', 'unknown')}")
-    
-    print("\n[TEST] Shield Core is ready!")
+    print("[TEST] Shield Core is ready!")
