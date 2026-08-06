@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 DSTERMINAL SOC-GRADE NMAP SCAN DASHBOARD - COMPLETE EDITION
 Hacker-style 3-Panel Layout | Real-time Scan Monitoring | AI Vulnerability Scoring
@@ -204,7 +204,7 @@ def enhanced_geoip_lookup(domain: str, ip: Optional[str] = None) -> Tuple[Dict, 
     if org_location and org_location.get("lat", 0) != 0:
         is_org_location = True
     else:
-        org_location = {"country": "Unknown", "city": "Unknown", "lat": 0, "lon": 0, "flag": "🌐"}
+        org_location = {"country": "Unknown", "city": "Unknown", "lat": 0, "lon": 0, "flag": "ðŸŒ"}
     
     # Get server location using the resolved IP
     server_location = get_server_location(ip)
@@ -226,7 +226,7 @@ def enhanced_geoip_lookup(domain: str, ip: Optional[str] = None) -> Tuple[Dict, 
                     "isp": data.get("isp", "Unknown"),
                     "org": data.get("org", "Unknown"),
                     "as": data.get("as", "Unknown"),
-                    "flag": "🌐",
+                    "flag": "ðŸŒ",
                     "location": f"{data.get('city', 'Unknown')}, {data.get('country', 'Unknown')}"
                 }
         except:
@@ -246,7 +246,7 @@ def enhanced_geoip_lookup(domain: str, ip: Optional[str] = None) -> Tuple[Dict, 
                         "isp": data.get("org", "Unknown"),
                         "org": data.get("org", "Unknown"),
                         "as": data.get("asn", "Unknown"),
-                        "flag": "🌐",
+                        "flag": "ðŸŒ",
                         "location": f"{data.get('city', 'Unknown')}, {data.get('country_name', 'Unknown')}"
                     }
             except:
@@ -269,222 +269,222 @@ class OrganizationLocationDB:
     
     ORGANIZATIONS = {
         # ========== MALAWI ==========
-        "unima.ac.mw": {"country": "Malawi", "city": "Zomba", "lat": -15.3833, "lon": 35.3167, "flag": "🇲🇼", "region": "East Africa"},
-        "must.ac.mw": {"country": "Malawi", "city": "Blantyre", "lat": -15.7833, "lon": 34.9667, "flag": "🇲🇼", "region": "East Africa"},
-        "poly.ac.mw": {"country": "Malawi", "city": "Blantyre", "lat": -15.7833, "lon": 34.9667, "flag": "🇲🇼", "region": "East Africa"},
-        "kuhes.ac.mw": {"country": "Malawi", "city": "Lilongwe", "lat": -13.9833, "lon": 33.7833, "flag": "🇲🇼", "region": "East Africa"},
-        "mzuni.ac.mw": {"country": "Malawi", "city": "Mzuzu", "lat": -11.4667, "lon": 34.0167, "flag": "🇲🇼", "region": "East Africa"},
-        "cc.ac.mw": {"country": "Malawi", "city": "Zomba", "lat": -15.7833, "lon": 34.9667, "flag": "🇲🇼", "region": "East Africa"},
-        "medcol.ac.mw": {"country": "Malawi", "city": "Blantyre", "lat": -15.7833, "lon": 34.9667, "flag": "🇲🇼", "region": "East Africa"},
-        "magu.ac.mw": {"country": "Malawi", "city": "Lilongwe", "lat": -15.3833, "lon": 35.3167, "flag": "🇲🇼", "region": "East Africa"},
-        "sparcsystems.africa": {"country": "Malawi", "city": "Blantyre", "lat": -15.7833, "lon": 34.9667, "flag": "🇲🇼", "region": "East Africa"},
+        "unima.ac.mw": {"country": "Malawi", "city": "Zomba", "lat": -15.3833, "lon": 35.3167, "flag": "ðŸ‡²ðŸ‡¼", "region": "East Africa"},
+        "must.ac.mw": {"country": "Malawi", "city": "Blantyre", "lat": -15.7833, "lon": 34.9667, "flag": "ðŸ‡²ðŸ‡¼", "region": "East Africa"},
+        "poly.ac.mw": {"country": "Malawi", "city": "Blantyre", "lat": -15.7833, "lon": 34.9667, "flag": "ðŸ‡²ðŸ‡¼", "region": "East Africa"},
+        "kuhes.ac.mw": {"country": "Malawi", "city": "Lilongwe", "lat": -13.9833, "lon": 33.7833, "flag": "ðŸ‡²ðŸ‡¼", "region": "East Africa"},
+        "mzuni.ac.mw": {"country": "Malawi", "city": "Mzuzu", "lat": -11.4667, "lon": 34.0167, "flag": "ðŸ‡²ðŸ‡¼", "region": "East Africa"},
+        "cc.ac.mw": {"country": "Malawi", "city": "Zomba", "lat": -15.7833, "lon": 34.9667, "flag": "ðŸ‡²ðŸ‡¼", "region": "East Africa"},
+        "medcol.ac.mw": {"country": "Malawi", "city": "Blantyre", "lat": -15.7833, "lon": 34.9667, "flag": "ðŸ‡²ðŸ‡¼", "region": "East Africa"},
+        "magu.ac.mw": {"country": "Malawi", "city": "Lilongwe", "lat": -15.3833, "lon": 35.3167, "flag": "ðŸ‡²ðŸ‡¼", "region": "East Africa"},
+        "sparcsystems.africa": {"country": "Malawi", "city": "Blantyre", "lat": -15.7833, "lon": 34.9667, "flag": "ðŸ‡²ðŸ‡¼", "region": "East Africa"},
         
         # ========== SOUTH AFRICA ==========
-        "uct.ac.za": {"country": "South Africa", "city": "Cape Town", "lat": -33.9249, "lon": 18.4241, "flag": "🇿🇦", "region": "Southern Africa"},
-        "up.ac.za": {"country": "South Africa", "city": "Pretoria", "lat": -25.7548, "lon": 28.2315, "flag": "🇿🇦", "region": "Southern Africa"},
-        "uj.ac.za": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "🇿🇦", "region": "Southern Africa"},
-        "wits.ac.za": {"country": "South Africa", "city": "Johannesburg", "lat": -26.1929, "lon": 28.0305, "flag": "🇿🇦", "region": "Southern Africa"},
-        "stel.ac.za": {"country": "South Africa", "city": "Stellenbosch", "lat": -33.9328, "lon": 18.8644, "flag": "🇿🇦", "region": "Southern Africa"},
-        "nmmu.ac.za": {"country": "South Africa", "city": "Gqeberha", "lat": -33.9618, "lon": 25.6099, "flag": "🇿🇦", "region": "Southern Africa"},
-        "dut.ac.za": {"country": "South Africa", "city": "Durban", "lat": -29.8587, "lon": 31.0218, "flag": "🇿🇦", "region": "Southern Africa"},
-        "tut.ac.za": {"country": "South Africa", "city": "Pretoria", "lat": -25.7548, "lon": 28.2315, "flag": "🇿🇦", "region": "Southern Africa"},
+        "uct.ac.za": {"country": "South Africa", "city": "Cape Town", "lat": -33.9249, "lon": 18.4241, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "up.ac.za": {"country": "South Africa", "city": "Pretoria", "lat": -25.7548, "lon": 28.2315, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "uj.ac.za": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "wits.ac.za": {"country": "South Africa", "city": "Johannesburg", "lat": -26.1929, "lon": 28.0305, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "stel.ac.za": {"country": "South Africa", "city": "Stellenbosch", "lat": -33.9328, "lon": 18.8644, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "nmmu.ac.za": {"country": "South Africa", "city": "Gqeberha", "lat": -33.9618, "lon": 25.6099, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "dut.ac.za": {"country": "South Africa", "city": "Durban", "lat": -29.8587, "lon": 31.0218, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "tut.ac.za": {"country": "South Africa", "city": "Pretoria", "lat": -25.7548, "lon": 28.2315, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
         
         # ========== KENYA ==========
-        "uonbi.ac.ke": {"country": "Kenya", "city": "Nairobi", "lat": -1.2921, "lon": 36.8219, "flag": "🇰🇪", "region": "East Africa"},
-        "ku.ac.ke": {"country": "Kenya", "city": "Nairobi", "lat": -1.2225, "lon": 36.8966, "flag": "🇰🇪", "region": "East Africa"},
-        "tukenya.ac.ke": {"country": "Kenya", "city": "Nairobi", "lat": -1.3204, "lon": 36.8157, "flag": "🇰🇪", "region": "East Africa"},
-        "mku.ac.ke": {"country": "Kenya", "city": "Thika", "lat": -1.0386, "lon": 37.0908, "flag": "🇰🇪", "region": "East Africa"},
-        "daystar.ac.ke": {"country": "Kenya", "city": "Nairobi", "lat": -1.2921, "lon": 36.8219, "flag": "🇰🇪", "region": "East Africa"},
+        "uonbi.ac.ke": {"country": "Kenya", "city": "Nairobi", "lat": -1.2921, "lon": 36.8219, "flag": "ðŸ‡°ðŸ‡ª", "region": "East Africa"},
+        "ku.ac.ke": {"country": "Kenya", "city": "Nairobi", "lat": -1.2225, "lon": 36.8966, "flag": "ðŸ‡°ðŸ‡ª", "region": "East Africa"},
+        "tukenya.ac.ke": {"country": "Kenya", "city": "Nairobi", "lat": -1.3204, "lon": 36.8157, "flag": "ðŸ‡°ðŸ‡ª", "region": "East Africa"},
+        "mku.ac.ke": {"country": "Kenya", "city": "Thika", "lat": -1.0386, "lon": 37.0908, "flag": "ðŸ‡°ðŸ‡ª", "region": "East Africa"},
+        "daystar.ac.ke": {"country": "Kenya", "city": "Nairobi", "lat": -1.2921, "lon": 36.8219, "flag": "ðŸ‡°ðŸ‡ª", "region": "East Africa"},
         
         # ========== NIGERIA ==========
-        "unilag.edu.ng": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "🇳🇬", "region": "West Africa"},
-        "unn.edu.ng": {"country": "Nigeria", "city": "Nsukka", "lat": 6.8575, "lon": 7.3981, "flag": "🇳🇬", "region": "West Africa"},
-        "oauife.edu.ng": {"country": "Nigeria", "city": "Ile-Ife", "lat": 7.5000, "lon": 4.5000, "flag": "🇳🇬", "region": "West Africa"},
-        "abu.edu.ng": {"country": "Nigeria", "city": "Zaria", "lat": 11.1667, "lon": 7.6167, "flag": "🇳🇬", "region": "West Africa"},
-        "uniben.edu": {"country": "Nigeria", "city": "Benin City", "lat": 6.3176, "lon": 5.6145, "flag": "🇳🇬", "region": "West Africa"},
+        "unilag.edu.ng": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "ðŸ‡³ðŸ‡¬", "region": "West Africa"},
+        "unn.edu.ng": {"country": "Nigeria", "city": "Nsukka", "lat": 6.8575, "lon": 7.3981, "flag": "ðŸ‡³ðŸ‡¬", "region": "West Africa"},
+        "oauife.edu.ng": {"country": "Nigeria", "city": "Ile-Ife", "lat": 7.5000, "lon": 4.5000, "flag": "ðŸ‡³ðŸ‡¬", "region": "West Africa"},
+        "abu.edu.ng": {"country": "Nigeria", "city": "Zaria", "lat": 11.1667, "lon": 7.6167, "flag": "ðŸ‡³ðŸ‡¬", "region": "West Africa"},
+        "uniben.edu": {"country": "Nigeria", "city": "Benin City", "lat": 6.3176, "lon": 5.6145, "flag": "ðŸ‡³ðŸ‡¬", "region": "West Africa"},
         
         # ========== GHANA ==========
-        "ug.edu.gh": {"country": "Ghana", "city": "Accra", "lat": 5.6500, "lon": -0.1868, "flag": "🇬🇭", "region": "West Africa"},
-        "knust.edu.gh": {"country": "Ghana", "city": "Kumasi", "lat": 6.6750, "lon": -1.5714, "flag": "🇬🇭", "region": "West Africa"},
-        "central.edu.gh": {"country": "Ghana", "city": "Accra", "lat": 5.6500, "lon": -0.1868, "flag": "🇬🇭", "region": "West Africa"},
+        "ug.edu.gh": {"country": "Ghana", "city": "Accra", "lat": 5.6500, "lon": -0.1868, "flag": "ðŸ‡¬ðŸ‡­", "region": "West Africa"},
+        "knust.edu.gh": {"country": "Ghana", "city": "Kumasi", "lat": 6.6750, "lon": -1.5714, "flag": "ðŸ‡¬ðŸ‡­", "region": "West Africa"},
+        "central.edu.gh": {"country": "Ghana", "city": "Accra", "lat": 5.6500, "lon": -0.1868, "flag": "ðŸ‡¬ðŸ‡­", "region": "West Africa"},
         
         # ========== EGYPT ==========
-        "cu.edu.eg": {"country": "Egypt", "city": "Cairo", "lat": 30.0333, "lon": 31.2333, "flag": "🇪🇬", "region": "North Africa"},
-        "alexu.edu.eg": {"country": "Egypt", "city": "Alexandria", "lat": 31.2001, "lon": 29.9187, "flag": "🇪🇬", "region": "North Africa"},
+        "cu.edu.eg": {"country": "Egypt", "city": "Cairo", "lat": 30.0333, "lon": 31.2333, "flag": "ðŸ‡ªðŸ‡¬", "region": "North Africa"},
+        "alexu.edu.eg": {"country": "Egypt", "city": "Alexandria", "lat": 31.2001, "lon": 29.9187, "flag": "ðŸ‡ªðŸ‡¬", "region": "North Africa"},
         
         # ========== USA ==========
-        "harvard.edu": {"country": "USA", "city": "Cambridge", "lat": 42.3744, "lon": -71.1169, "flag": "🇺🇸", "region": "North America"},
-        "stanford.edu": {"country": "USA", "city": "Stanford", "lat": 37.4275, "lon": -122.1697, "flag": "🇺🇸", "region": "North America"},
-        "mit.edu": {"country": "USA", "city": "Cambridge", "lat": 42.3601, "lon": -71.0942, "flag": "🇺🇸", "region": "North America"},
+        "harvard.edu": {"country": "USA", "city": "Cambridge", "lat": 42.3744, "lon": -71.1169, "flag": "ðŸ‡ºðŸ‡¸", "region": "North America"},
+        "stanford.edu": {"country": "USA", "city": "Stanford", "lat": 37.4275, "lon": -122.1697, "flag": "ðŸ‡ºðŸ‡¸", "region": "North America"},
+        "mit.edu": {"country": "USA", "city": "Cambridge", "lat": 42.3601, "lon": -71.0942, "flag": "ðŸ‡ºðŸ‡¸", "region": "North America"},
         
         # ========== UK ==========
-        "ox.ac.uk": {"country": "United Kingdom", "city": "Oxford", "lat": 51.7520, "lon": -1.2577, "flag": "🇬🇧", "region": "Europe"},
-        "cam.ac.uk": {"country": "United Kingdom", "city": "Cambridge", "lat": 52.2053, "lon": 0.1218, "flag": "🇬🇧", "region": "Europe"},
+        "ox.ac.uk": {"country": "United Kingdom", "city": "Oxford", "lat": 51.7520, "lon": -1.2577, "flag": "ðŸ‡¬ðŸ‡§", "region": "Europe"},
+        "cam.ac.uk": {"country": "United Kingdom", "city": "Cambridge", "lat": 52.2053, "lon": 0.1218, "flag": "ðŸ‡¬ðŸ‡§", "region": "Europe"},
         
         # ========== GERMANY ==========
-        "tu-berlin.de": {"country": "Germany", "city": "Berlin", "lat": 52.5200, "lon": 13.4050, "flag": "🇩🇪", "region": "Europe"},
-        "lmu.de": {"country": "Germany", "city": "Munich", "lat": 48.1351, "lon": 11.5820, "flag": "🇩🇪", "region": "Europe"},
+        "tu-berlin.de": {"country": "Germany", "city": "Berlin", "lat": 52.5200, "lon": 13.4050, "flag": "ðŸ‡©ðŸ‡ª", "region": "Europe"},
+        "lmu.de": {"country": "Germany", "city": "Munich", "lat": 48.1351, "lon": 11.5820, "flag": "ðŸ‡©ðŸ‡ª", "region": "Europe"},
         
         # ========== INDIA ==========
-        "iitb.ac.in": {"country": "India", "city": "Mumbai", "lat": 19.0760, "lon": 72.8777, "flag": "🇮🇳", "region": "South Asia"},
-        "iisc.ac.in": {"country": "India", "city": "Bengaluru", "lat": 12.9716, "lon": 77.5946, "flag": "🇮🇳", "region": "South Asia"},
+        "iitb.ac.in": {"country": "India", "city": "Mumbai", "lat": 19.0760, "lon": 72.8777, "flag": "ðŸ‡®ðŸ‡³", "region": "South Asia"},
+        "iisc.ac.in": {"country": "India", "city": "Bengaluru", "lat": 12.9716, "lon": 77.5946, "flag": "ðŸ‡®ðŸ‡³", "region": "South Asia"},
         
         # ========== ADD UNICAF (MALAWI) ==========
-        "unicaf.org": {"country": "Malawi", "city": "Lilongwe", "lat": -13.9833, "lon": 33.7833, "flag": "🇲🇼", "region": "East Africa"},
-        "unicaf.net": {"country": "Malawi", "city": "Lilongwe", "lat": -13.9833, "lon": 33.7833, "flag": "🇲🇼", "region": "East Africa"},
-        "unicaf.com": {"country": "Malawi", "city": "Lilongwe", "lat": -13.9833, "lon": 33.7833, "flag": "🇲🇼", "region": "East Africa"},
-        "unicaf.mw": {"country": "Malawi", "city": "Lilongwe", "lat": -13.9833, "lon": 33.7833, "flag": "🇲🇼", "region": "East Africa"},
+        "unicaf.org": {"country": "Malawi", "city": "Lilongwe", "lat": -13.9833, "lon": 33.7833, "flag": "ðŸ‡²ðŸ‡¼", "region": "East Africa"},
+        "unicaf.net": {"country": "Malawi", "city": "Lilongwe", "lat": -13.9833, "lon": 33.7833, "flag": "ðŸ‡²ðŸ‡¼", "region": "East Africa"},
+        "unicaf.com": {"country": "Malawi", "city": "Lilongwe", "lat": -13.9833, "lon": 33.7833, "flag": "ðŸ‡²ðŸ‡¼", "region": "East Africa"},
+        "unicaf.mw": {"country": "Malawi", "city": "Lilongwe", "lat": -13.9833, "lon": 33.7833, "flag": "ðŸ‡²ðŸ‡¼", "region": "East Africa"},
         
         # ========== ADD OLD MUTUAL (SOUTH AFRICA) ==========
-        "oldmutual.com": {"country": "South Africa", "city": "Cape Town", "lat": -33.9249, "lon": 18.4241, "flag": "🇿🇦", "region": "Southern Africa"},
-        "oldmutual.co.za": {"country": "South Africa", "city": "Cape Town", "lat": -33.9249, "lon": 18.4241, "flag": "🇿🇦", "region": "Southern Africa"},
-        "oldmutual.co.uk": {"country": "United Kingdom", "city": "London", "lat": 51.5074, "lon": -0.1278, "flag": "🇬🇧", "region": "Europe"},
+        "oldmutual.com": {"country": "South Africa", "city": "Cape Town", "lat": -33.9249, "lon": 18.4241, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "oldmutual.co.za": {"country": "South Africa", "city": "Cape Town", "lat": -33.9249, "lon": 18.4241, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "oldmutual.co.uk": {"country": "United Kingdom", "city": "London", "lat": 51.5074, "lon": -0.1278, "flag": "ðŸ‡¬ðŸ‡§", "region": "Europe"},
         
         # ========== ADD MORE AFRICAN ORGANIZATIONS ==========
         # South Africa
-        "mtn.com": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "🇿🇦", "region": "Southern Africa"},
-        "mtn.co.za": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "🇿🇦", "region": "Southern Africa"},
-        "vodacom.co.za": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "🇿🇦", "region": "Southern Africa"},
-        "standardbank.co.za": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "🇿🇦", "region": "Southern Africa"},
-        "standardbank.com": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "🇿🇦", "region": "Southern Africa"},
-        "absa.co.za": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "🇿🇦", "region": "Southern Africa"},
-        "absa.africa": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "🇿🇦", "region": "Southern Africa"},
-        "naspers.com": {"country": "South Africa", "city": "Cape Town", "lat": -33.9249, "lon": 18.4241, "flag": "🇿🇦", "region": "Southern Africa"},
-        "naspers.co.za": {"country": "South Africa", "city": "Cape Town", "lat": -33.9249, "lon": 18.4241, "flag": "🇿🇦", "region": "Southern Africa"},
-        "multichoice.co.za": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "🇿🇦", "region": "Southern Africa"},
-        "multichoice.com": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "🇿🇦", "region": "Southern Africa"},
-        "dstv.com": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "🇿🇦", "region": "Southern Africa"},
-        "dstv.co.za": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "🇿🇦", "region": "Southern Africa"},
-        "discovery.co.za": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "🇿🇦", "region": "Southern Africa"},
-        "discovery.com": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "🇿🇦", "region": "Southern Africa"},
-        "sasol.com": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "🇿🇦", "region": "Southern Africa"},
-        "sasol.co.za": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "🇿🇦", "region": "Southern Africa"},
-        "angloamerican.com": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "🇿🇦", "region": "Southern Africa"},
-        "angloamerican.co.za": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "🇿🇦", "region": "Southern Africa"},
-        "debeers.com": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "🇿🇦", "region": "Southern Africa"},
-        "debeers.co.za": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "🇿🇦", "region": "Southern Africa"},
+        "mtn.com": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "mtn.co.za": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "vodacom.co.za": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "standardbank.co.za": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "standardbank.com": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "absa.co.za": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "absa.africa": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "naspers.com": {"country": "South Africa", "city": "Cape Town", "lat": -33.9249, "lon": 18.4241, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "naspers.co.za": {"country": "South Africa", "city": "Cape Town", "lat": -33.9249, "lon": 18.4241, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "multichoice.co.za": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "multichoice.com": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "dstv.com": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "dstv.co.za": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "discovery.co.za": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "discovery.com": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "sasol.com": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "sasol.co.za": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "angloamerican.com": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "angloamerican.co.za": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "debeers.com": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
+        "debeers.co.za": {"country": "South Africa", "city": "Johannesburg", "lat": -26.2041, "lon": 28.0473, "flag": "ðŸ‡¿ðŸ‡¦", "region": "Southern Africa"},
         
         # Kenya
-        "safaricom.co.ke": {"country": "Kenya", "city": "Nairobi", "lat": -1.2921, "lon": 36.8219, "flag": "🇰🇪", "region": "East Africa"},
-        "safaricom.com": {"country": "Kenya", "city": "Nairobi", "lat": -1.2921, "lon": 36.8219, "flag": "🇰🇪", "region": "East Africa"},
-        "equitybank.co.ke": {"country": "Kenya", "city": "Nairobi", "lat": -1.2921, "lon": 36.8219, "flag": "🇰🇪", "region": "East Africa"},
-        "equitybank.com": {"country": "Kenya", "city": "Nairobi", "lat": -1.2921, "lon": 36.8219, "flag": "🇰🇪", "region": "East Africa"},
-        "kcb.co.ke": {"country": "Kenya", "city": "Nairobi", "lat": -1.2921, "lon": 36.8219, "flag": "🇰🇪", "region": "East Africa"},
-        "kcb.com": {"country": "Kenya", "city": "Nairobi", "lat": -1.2921, "lon": 36.8219, "flag": "🇰🇪", "region": "East Africa"},
-        "kenyaairways.com": {"country": "Kenya", "city": "Nairobi", "lat": -1.2921, "lon": 36.8219, "flag": "🇰🇪", "region": "East Africa"},
-        "kenyaairways.co.ke": {"country": "Kenya", "city": "Nairobi", "lat": -1.2921, "lon": 36.8219, "flag": "🇰🇪", "region": "East Africa"},
-        "eastafrican.com": {"country": "Kenya", "city": "Nairobi", "lat": -1.2921, "lon": 36.8219, "flag": "🇰🇪", "region": "East Africa"},
+        "safaricom.co.ke": {"country": "Kenya", "city": "Nairobi", "lat": -1.2921, "lon": 36.8219, "flag": "ðŸ‡°ðŸ‡ª", "region": "East Africa"},
+        "safaricom.com": {"country": "Kenya", "city": "Nairobi", "lat": -1.2921, "lon": 36.8219, "flag": "ðŸ‡°ðŸ‡ª", "region": "East Africa"},
+        "equitybank.co.ke": {"country": "Kenya", "city": "Nairobi", "lat": -1.2921, "lon": 36.8219, "flag": "ðŸ‡°ðŸ‡ª", "region": "East Africa"},
+        "equitybank.com": {"country": "Kenya", "city": "Nairobi", "lat": -1.2921, "lon": 36.8219, "flag": "ðŸ‡°ðŸ‡ª", "region": "East Africa"},
+        "kcb.co.ke": {"country": "Kenya", "city": "Nairobi", "lat": -1.2921, "lon": 36.8219, "flag": "ðŸ‡°ðŸ‡ª", "region": "East Africa"},
+        "kcb.com": {"country": "Kenya", "city": "Nairobi", "lat": -1.2921, "lon": 36.8219, "flag": "ðŸ‡°ðŸ‡ª", "region": "East Africa"},
+        "kenyaairways.com": {"country": "Kenya", "city": "Nairobi", "lat": -1.2921, "lon": 36.8219, "flag": "ðŸ‡°ðŸ‡ª", "region": "East Africa"},
+        "kenyaairways.co.ke": {"country": "Kenya", "city": "Nairobi", "lat": -1.2921, "lon": 36.8219, "flag": "ðŸ‡°ðŸ‡ª", "region": "East Africa"},
+        "eastafrican.com": {"country": "Kenya", "city": "Nairobi", "lat": -1.2921, "lon": 36.8219, "flag": "ðŸ‡°ðŸ‡ª", "region": "East Africa"},
         
         # Nigeria
-        "gtbank.com": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "🇳🇬", "region": "West Africa"},
-        "gtco.com": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "🇳🇬", "region": "West Africa"},
-        "zenithbank.com": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "🇳🇬", "region": "West Africa"},
-        "firstbanknigeria.com": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "🇳🇬", "region": "West Africa"},
-        "firstbank.com.ng": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "🇳🇬", "region": "West Africa"},
-        "accessbankplc.com": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "🇳🇬", "region": "West Africa"},
-        "accessbank.com": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "🇳🇬", "region": "West Africa"},
-        "ecobank.com": {"country": "Togo", "city": "Lome", "lat": 6.1319, "lon": 1.2228, "flag": "🇹🇬", "region": "West Africa"},
-        "ecobank.net": {"country": "Togo", "city": "Lome", "lat": 6.1319, "lon": 1.2228, "flag": "🇹🇬", "region": "West Africa"},
-        "ecobank.org": {"country": "Togo", "city": "Lome", "lat": 6.1319, "lon": 1.2228, "flag": "🇹🇬", "region": "West Africa"},
-        "dangote.com": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "🇳🇬", "region": "West Africa"},
-        "dangote.org": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "🇳🇬", "region": "West Africa"},
-        "mtn.ng": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "🇳🇬", "region": "West Africa"},
-        "mtn.com.ng": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "🇳🇬", "region": "West Africa"},
-        "glo.com": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "🇳🇬", "region": "West Africa"},
-        "glo.ng": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "🇳🇬", "region": "West Africa"},
-        "airtel.com.ng": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "🇳🇬", "region": "West Africa"},
-        "airtel.ng": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "🇳🇬", "region": "West Africa"},
+        "gtbank.com": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "ðŸ‡³ðŸ‡¬", "region": "West Africa"},
+        "gtco.com": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "ðŸ‡³ðŸ‡¬", "region": "West Africa"},
+        "zenithbank.com": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "ðŸ‡³ðŸ‡¬", "region": "West Africa"},
+        "firstbanknigeria.com": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "ðŸ‡³ðŸ‡¬", "region": "West Africa"},
+        "firstbank.com.ng": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "ðŸ‡³ðŸ‡¬", "region": "West Africa"},
+        "accessbankplc.com": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "ðŸ‡³ðŸ‡¬", "region": "West Africa"},
+        "accessbank.com": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "ðŸ‡³ðŸ‡¬", "region": "West Africa"},
+        "ecobank.com": {"country": "Togo", "city": "Lome", "lat": 6.1319, "lon": 1.2228, "flag": "ðŸ‡¹ðŸ‡¬", "region": "West Africa"},
+        "ecobank.net": {"country": "Togo", "city": "Lome", "lat": 6.1319, "lon": 1.2228, "flag": "ðŸ‡¹ðŸ‡¬", "region": "West Africa"},
+        "ecobank.org": {"country": "Togo", "city": "Lome", "lat": 6.1319, "lon": 1.2228, "flag": "ðŸ‡¹ðŸ‡¬", "region": "West Africa"},
+        "dangote.com": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "ðŸ‡³ðŸ‡¬", "region": "West Africa"},
+        "dangote.org": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "ðŸ‡³ðŸ‡¬", "region": "West Africa"},
+        "mtn.ng": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "ðŸ‡³ðŸ‡¬", "region": "West Africa"},
+        "mtn.com.ng": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "ðŸ‡³ðŸ‡¬", "region": "West Africa"},
+        "glo.com": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "ðŸ‡³ðŸ‡¬", "region": "West Africa"},
+        "glo.ng": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "ðŸ‡³ðŸ‡¬", "region": "West Africa"},
+        "airtel.com.ng": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "ðŸ‡³ðŸ‡¬", "region": "West Africa"},
+        "airtel.ng": {"country": "Nigeria", "city": "Lagos", "lat": 6.5170, "lon": 3.3968, "flag": "ðŸ‡³ðŸ‡¬", "region": "West Africa"},
         
         # Ghana
-        "mtn.com.gh": {"country": "Ghana", "city": "Accra", "lat": 5.6500, "lon": -0.1868, "flag": "🇬🇭", "region": "West Africa"},
-        "mtn.gh": {"country": "Ghana", "city": "Accra", "lat": 5.6500, "lon": -0.1868, "flag": "🇬🇭", "region": "West Africa"},
-        "vodafone.com.gh": {"country": "Ghana", "city": "Accra", "lat": 5.6500, "lon": -0.1868, "flag": "🇬🇭", "region": "West Africa"},
-        "vodafone.gh": {"country": "Ghana", "city": "Accra", "lat": 5.6500, "lon": -0.1868, "flag": "🇬🇭", "region": "West Africa"},
-        "tigo.com.gh": {"country": "Ghana", "city": "Accra", "lat": 5.6500, "lon": -0.1868, "flag": "🇬🇭", "region": "West Africa"},
+        "mtn.com.gh": {"country": "Ghana", "city": "Accra", "lat": 5.6500, "lon": -0.1868, "flag": "ðŸ‡¬ðŸ‡­", "region": "West Africa"},
+        "mtn.gh": {"country": "Ghana", "city": "Accra", "lat": 5.6500, "lon": -0.1868, "flag": "ðŸ‡¬ðŸ‡­", "region": "West Africa"},
+        "vodafone.com.gh": {"country": "Ghana", "city": "Accra", "lat": 5.6500, "lon": -0.1868, "flag": "ðŸ‡¬ðŸ‡­", "region": "West Africa"},
+        "vodafone.gh": {"country": "Ghana", "city": "Accra", "lat": 5.6500, "lon": -0.1868, "flag": "ðŸ‡¬ðŸ‡­", "region": "West Africa"},
+        "tigo.com.gh": {"country": "Ghana", "city": "Accra", "lat": 5.6500, "lon": -0.1868, "flag": "ðŸ‡¬ðŸ‡­", "region": "West Africa"},
         
         # Egypt
-        "orange.eg": {"country": "Egypt", "city": "Cairo", "lat": 30.0333, "lon": 31.2333, "flag": "🇪🇬", "region": "North Africa"},
-        "orange.com.eg": {"country": "Egypt", "city": "Cairo", "lat": 30.0333, "lon": 31.2333, "flag": "🇪🇬", "region": "North Africa"},
-        "vodafone.eg": {"country": "Egypt", "city": "Cairo", "lat": 30.0333, "lon": 31.2333, "flag": "🇪🇬", "region": "North Africa"},
-        "vodafone.com.eg": {"country": "Egypt", "city": "Cairo", "lat": 30.0333, "lon": 31.2333, "flag": "🇪🇬", "region": "North Africa"},
-        "etisalat.eg": {"country": "Egypt", "city": "Cairo", "lat": 30.0333, "lon": 31.2333, "flag": "🇪🇬", "region": "North Africa"},
-        "etisalat.com.eg": {"country": "Egypt", "city": "Cairo", "lat": 30.0333, "lon": 31.2333, "flag": "🇪🇬", "region": "North Africa"},
+        "orange.eg": {"country": "Egypt", "city": "Cairo", "lat": 30.0333, "lon": 31.2333, "flag": "ðŸ‡ªðŸ‡¬", "region": "North Africa"},
+        "orange.com.eg": {"country": "Egypt", "city": "Cairo", "lat": 30.0333, "lon": 31.2333, "flag": "ðŸ‡ªðŸ‡¬", "region": "North Africa"},
+        "vodafone.eg": {"country": "Egypt", "city": "Cairo", "lat": 30.0333, "lon": 31.2333, "flag": "ðŸ‡ªðŸ‡¬", "region": "North Africa"},
+        "vodafone.com.eg": {"country": "Egypt", "city": "Cairo", "lat": 30.0333, "lon": 31.2333, "flag": "ðŸ‡ªðŸ‡¬", "region": "North Africa"},
+        "etisalat.eg": {"country": "Egypt", "city": "Cairo", "lat": 30.0333, "lon": 31.2333, "flag": "ðŸ‡ªðŸ‡¬", "region": "North Africa"},
+        "etisalat.com.eg": {"country": "Egypt", "city": "Cairo", "lat": 30.0333, "lon": 31.2333, "flag": "ðŸ‡ªðŸ‡¬", "region": "North Africa"},
         
         # ========== ADD MAJOR GLOBAL ORGANIZATIONS ==========
         # Tech Giants
-        "google.com": {"country": "USA", "city": "Mountain View", "lat": 37.4220, "lon": -122.0841, "flag": "🇺🇸", "region": "North America"},
-        "google.co.uk": {"country": "United Kingdom", "city": "London", "lat": 51.5074, "lon": -0.1278, "flag": "🇬🇧", "region": "Europe"},
-        "google.de": {"country": "Germany", "city": "Berlin", "lat": 52.5200, "lon": 13.4050, "flag": "🇩🇪", "region": "Europe"},
-        "google.fr": {"country": "France", "city": "Paris", "lat": 48.8566, "lon": 2.3522, "flag": "🇫🇷", "region": "Europe"},
-        "microsoft.com": {"country": "USA", "city": "Redmond", "lat": 47.6740, "lon": -122.1215, "flag": "🇺🇸", "region": "North America"},
-        "apple.com": {"country": "USA", "city": "Cupertino", "lat": 37.3349, "lon": -122.0090, "flag": "🇺🇸", "region": "North America"},
-        "amazon.com": {"country": "USA", "city": "Seattle", "lat": 47.6062, "lon": -122.3321, "flag": "🇺🇸", "region": "North America"},
-        "facebook.com": {"country": "USA", "city": "Menlo Park", "lat": 37.4530, "lon": -122.1810, "flag": "🇺🇸", "region": "North America"},
-        "twitter.com": {"country": "USA", "city": "San Francisco", "lat": 37.7749, "lon": -122.4194, "flag": "🇺🇸", "region": "North America"},
-        "linkedin.com": {"country": "USA", "city": "Sunnyvale", "lat": 37.3688, "lon": -122.0363, "flag": "🇺🇸", "region": "North America"},
-        "netflix.com": {"country": "USA", "city": "Los Gatos", "lat": 37.2308, "lon": -121.9740, "flag": "🇺🇸", "region": "North America"},
-        "uber.com": {"country": "USA", "city": "San Francisco", "lat": 37.7749, "lon": -122.4194, "flag": "🇺🇸", "region": "North America"},
+        "google.com": {"country": "USA", "city": "Mountain View", "lat": 37.4220, "lon": -122.0841, "flag": "ðŸ‡ºðŸ‡¸", "region": "North America"},
+        "google.co.uk": {"country": "United Kingdom", "city": "London", "lat": 51.5074, "lon": -0.1278, "flag": "ðŸ‡¬ðŸ‡§", "region": "Europe"},
+        "google.de": {"country": "Germany", "city": "Berlin", "lat": 52.5200, "lon": 13.4050, "flag": "ðŸ‡©ðŸ‡ª", "region": "Europe"},
+        "google.fr": {"country": "France", "city": "Paris", "lat": 48.8566, "lon": 2.3522, "flag": "ðŸ‡«ðŸ‡·", "region": "Europe"},
+        "microsoft.com": {"country": "USA", "city": "Redmond", "lat": 47.6740, "lon": -122.1215, "flag": "ðŸ‡ºðŸ‡¸", "region": "North America"},
+        "apple.com": {"country": "USA", "city": "Cupertino", "lat": 37.3349, "lon": -122.0090, "flag": "ðŸ‡ºðŸ‡¸", "region": "North America"},
+        "amazon.com": {"country": "USA", "city": "Seattle", "lat": 47.6062, "lon": -122.3321, "flag": "ðŸ‡ºðŸ‡¸", "region": "North America"},
+        "facebook.com": {"country": "USA", "city": "Menlo Park", "lat": 37.4530, "lon": -122.1810, "flag": "ðŸ‡ºðŸ‡¸", "region": "North America"},
+        "twitter.com": {"country": "USA", "city": "San Francisco", "lat": 37.7749, "lon": -122.4194, "flag": "ðŸ‡ºðŸ‡¸", "region": "North America"},
+        "linkedin.com": {"country": "USA", "city": "Sunnyvale", "lat": 37.3688, "lon": -122.0363, "flag": "ðŸ‡ºðŸ‡¸", "region": "North America"},
+        "netflix.com": {"country": "USA", "city": "Los Gatos", "lat": 37.2308, "lon": -121.9740, "flag": "ðŸ‡ºðŸ‡¸", "region": "North America"},
+        "uber.com": {"country": "USA", "city": "San Francisco", "lat": 37.7749, "lon": -122.4194, "flag": "ðŸ‡ºðŸ‡¸", "region": "North America"},
         
         # Banking & Finance
-        "goldmansachs.com": {"country": "USA", "city": "New York", "lat": 40.7128, "lon": -74.0060, "flag": "🇺🇸", "region": "North America"},
-        "jpmorgan.com": {"country": "USA", "city": "New York", "lat": 40.7128, "lon": -74.0060, "flag": "🇺🇸", "region": "North America"},
-        "bankofamerica.com": {"country": "USA", "city": "Charlotte", "lat": 35.2271, "lon": -80.8431, "flag": "🇺🇸", "region": "North America"},
-        "wellsfargo.com": {"country": "USA", "city": "San Francisco", "lat": 37.7749, "lon": -122.4194, "flag": "🇺🇸", "region": "North America"},
-        "hsbc.com": {"country": "United Kingdom", "city": "London", "lat": 51.5074, "lon": -0.1278, "flag": "🇬🇧", "region": "Europe"},
-        "barclays.com": {"country": "United Kingdom", "city": "London", "lat": 51.5074, "lon": -0.1278, "flag": "🇬🇧", "region": "Europe"},
-        "deutsche-bank.com": {"country": "Germany", "city": "Frankfurt", "lat": 50.1109, "lon": 8.6821, "flag": "🇩🇪", "region": "Europe"},
-        "ubs.com": {"country": "Switzerland", "city": "Zurich", "lat": 47.3769, "lon": 8.5417, "flag": "🇨🇭", "region": "Europe"},
-        "credit-suisse.com": {"country": "Switzerland", "city": "Zurich", "lat": 47.3769, "lon": 8.5417, "flag": "🇨🇭", "region": "Europe"},
+        "goldmansachs.com": {"country": "USA", "city": "New York", "lat": 40.7128, "lon": -74.0060, "flag": "ðŸ‡ºðŸ‡¸", "region": "North America"},
+        "jpmorgan.com": {"country": "USA", "city": "New York", "lat": 40.7128, "lon": -74.0060, "flag": "ðŸ‡ºðŸ‡¸", "region": "North America"},
+        "bankofamerica.com": {"country": "USA", "city": "Charlotte", "lat": 35.2271, "lon": -80.8431, "flag": "ðŸ‡ºðŸ‡¸", "region": "North America"},
+        "wellsfargo.com": {"country": "USA", "city": "San Francisco", "lat": 37.7749, "lon": -122.4194, "flag": "ðŸ‡ºðŸ‡¸", "region": "North America"},
+        "hsbc.com": {"country": "United Kingdom", "city": "London", "lat": 51.5074, "lon": -0.1278, "flag": "ðŸ‡¬ðŸ‡§", "region": "Europe"},
+        "barclays.com": {"country": "United Kingdom", "city": "London", "lat": 51.5074, "lon": -0.1278, "flag": "ðŸ‡¬ðŸ‡§", "region": "Europe"},
+        "deutsche-bank.com": {"country": "Germany", "city": "Frankfurt", "lat": 50.1109, "lon": 8.6821, "flag": "ðŸ‡©ðŸ‡ª", "region": "Europe"},
+        "ubs.com": {"country": "Switzerland", "city": "Zurich", "lat": 47.3769, "lon": 8.5417, "flag": "ðŸ‡¨ðŸ‡­", "region": "Europe"},
+        "credit-suisse.com": {"country": "Switzerland", "city": "Zurich", "lat": 47.3769, "lon": 8.5417, "flag": "ðŸ‡¨ðŸ‡­", "region": "Europe"},
     }
     
     # Known organization name patterns for detection
     KNOWN_ORGANIZATION_PATTERNS = {
-        'unicaf': {'country': 'Malawi', 'city': 'Lilongwe', 'lat': -13.9833, 'lon': 33.7833, 'flag': '🇲🇼', 'region': 'East Africa'},
-        'oldmutual': {'country': 'South Africa', 'city': 'Cape Town', 'lat': -33.9249, 'lon': 18.4241, 'flag': '🇿🇦', 'region': 'Southern Africa'},
-        'mtn': {'country': 'South Africa', 'city': 'Johannesburg', 'lat': -26.2041, 'lon': 28.0473, 'flag': '🇿🇦', 'region': 'Southern Africa'},
-        'vodacom': {'country': 'South Africa', 'city': 'Johannesburg', 'lat': -26.2041, 'lon': 28.0473, 'flag': '🇿🇦', 'region': 'Southern Africa'},
-        'safaricom': {'country': 'Kenya', 'city': 'Nairobi', 'lat': -1.2921, 'lon': 36.8219, 'flag': '🇰🇪', 'region': 'East Africa'},
-        'equitybank': {'country': 'Kenya', 'city': 'Nairobi', 'lat': -1.2921, 'lon': 36.8219, 'flag': '🇰🇪', 'region': 'East Africa'},
-        'kcb': {'country': 'Kenya', 'city': 'Nairobi', 'lat': -1.2921, 'lon': 36.8219, 'flag': '🇰🇪', 'region': 'East Africa'},
-        'gtbank': {'country': 'Nigeria', 'city': 'Lagos', 'lat': 6.5170, 'lon': 3.3968, 'flag': '🇳🇬', 'region': 'West Africa'},
-        'zenithbank': {'country': 'Nigeria', 'city': 'Lagos', 'lat': 6.5170, 'lon': 3.3968, 'flag': '🇳🇬', 'region': 'West Africa'},
-        'firstbank': {'country': 'Nigeria', 'city': 'Lagos', 'lat': 6.5170, 'lon': 3.3968, 'flag': '🇳🇬', 'region': 'West Africa'},
-        'accessbank': {'country': 'Nigeria', 'city': 'Lagos', 'lat': 6.5170, 'lon': 3.3968, 'flag': '🇳🇬', 'region': 'West Africa'},
-        'ecobank': {'country': 'Togo', 'city': 'Lome', 'lat': 6.1319, 'lon': 1.2228, 'flag': '🇹🇬', 'region': 'West Africa'},
-        'standardbank': {'country': 'South Africa', 'city': 'Johannesburg', 'lat': -26.2041, 'lon': 28.0473, 'flag': '🇿🇦', 'region': 'Southern Africa'},
-        'absa': {'country': 'South Africa', 'city': 'Johannesburg', 'lat': -26.2041, 'lon': 28.0473, 'flag': '🇿🇦', 'region': 'Southern Africa'},
-        'naspers': {'country': 'South Africa', 'city': 'Cape Town', 'lat': -33.9249, 'lon': 18.4241, 'flag': '🇿🇦', 'region': 'Southern Africa'},
-        'multichoice': {'country': 'South Africa', 'city': 'Johannesburg', 'lat': -26.2041, 'lon': 28.0473, 'flag': '🇿🇦', 'region': 'Southern Africa'},
-        'dstv': {'country': 'South Africa', 'city': 'Johannesburg', 'lat': -26.2041, 'lon': 28.0473, 'flag': '🇿🇦', 'region': 'Southern Africa'},
-        'discovery': {'country': 'South Africa', 'city': 'Johannesburg', 'lat': -26.2041, 'lon': 28.0473, 'flag': '🇿🇦', 'region': 'Southern Africa'},
-        'sasol': {'country': 'South Africa', 'city': 'Johannesburg', 'lat': -26.2041, 'lon': 28.0473, 'flag': '🇿🇦', 'region': 'Southern Africa'},
-        'angloamerican': {'country': 'South Africa', 'city': 'Johannesburg', 'lat': -26.2041, 'lon': 28.0473, 'flag': '🇿🇦', 'region': 'Southern Africa'},
-        'debeers': {'country': 'South Africa', 'city': 'Johannesburg', 'lat': -26.2041, 'lon': 28.0473, 'flag': '🇿🇦', 'region': 'Southern Africa'},
-        'kenyaairways': {'country': 'Kenya', 'city': 'Nairobi', 'lat': -1.2921, 'lon': 36.8219, 'flag': '🇰🇪', 'region': 'East Africa'},
-        'dangote': {'country': 'Nigeria', 'city': 'Lagos', 'lat': 6.5170, 'lon': 3.3968, 'flag': '🇳🇬', 'region': 'West Africa'},
-        'glo': {'country': 'Nigeria', 'city': 'Lagos', 'lat': 6.5170, 'lon': 3.3968, 'flag': '🇳🇬', 'region': 'West Africa'},
-        'airtel': {'country': 'Nigeria', 'city': 'Lagos', 'lat': 6.5170, 'lon': 3.3968, 'flag': '🇳🇬', 'region': 'West Africa'},
-        'vodafone': {'country': 'United Kingdom', 'city': 'London', 'lat': 51.5074, 'lon': -0.1278, 'flag': '🇬🇧', 'region': 'Europe'},
-        'orange': {'country': 'France', 'city': 'Paris', 'lat': 48.8566, 'lon': 2.3522, 'flag': '🇫🇷', 'region': 'Europe'},
-        'etisalat': {'country': 'UAE', 'city': 'Abu Dhabi', 'lat': 24.4539, 'lon': 54.3773, 'flag': '🇦🇪', 'region': 'Middle East'},
-        'google': {'country': 'USA', 'city': 'Mountain View', 'lat': 37.4220, 'lon': -122.0841, 'flag': '🇺🇸', 'region': 'North America'},
-        'microsoft': {'country': 'USA', 'city': 'Redmond', 'lat': 47.6740, 'lon': -122.1215, 'flag': '🇺🇸', 'region': 'North America'},
-        'apple': {'country': 'USA', 'city': 'Cupertino', 'lat': 37.3349, 'lon': -122.0090, 'flag': '🇺🇸', 'region': 'North America'},
-        'amazon': {'country': 'USA', 'city': 'Seattle', 'lat': 47.6062, 'lon': -122.3321, 'flag': '🇺🇸', 'region': 'North America'},
-        'facebook': {'country': 'USA', 'city': 'Menlo Park', 'lat': 37.4530, 'lon': -122.1810, 'flag': '🇺🇸', 'region': 'North America'},
-        'twitter': {'country': 'USA', 'city': 'San Francisco', 'lat': 37.7749, 'lon': -122.4194, 'flag': '🇺🇸', 'region': 'North America'},
-        'linkedin': {'country': 'USA', 'city': 'Sunnyvale', 'lat': 37.3688, 'lon': -122.0363, 'flag': '🇺🇸', 'region': 'North America'},
-        'netflix': {'country': 'USA', 'city': 'Los Gatos', 'lat': 37.2308, 'lon': -121.9740, 'flag': '🇺🇸', 'region': 'North America'},
-        'uber': {'country': 'USA', 'city': 'San Francisco', 'lat': 37.7749, 'lon': -122.4194, 'flag': '🇺🇸', 'region': 'North America'},
-        'goldmansachs': {'country': 'USA', 'city': 'New York', 'lat': 40.7128, 'lon': -74.0060, 'flag': '🇺🇸', 'region': 'North America'},
-        'jpmorgan': {'country': 'USA', 'city': 'New York', 'lat': 40.7128, 'lon': -74.0060, 'flag': '🇺🇸', 'region': 'North America'},
-        'bankofamerica': {'country': 'USA', 'city': 'Charlotte', 'lat': 35.2271, 'lon': -80.8431, 'flag': '🇺🇸', 'region': 'North America'},
-        'wellsfargo': {'country': 'USA', 'city': 'San Francisco', 'lat': 37.7749, 'lon': -122.4194, 'flag': '🇺🇸', 'region': 'North America'},
-        'hsbc': {'country': 'United Kingdom', 'city': 'London', 'lat': 51.5074, 'lon': -0.1278, 'flag': '🇬🇧', 'region': 'Europe'},
-        'barclays': {'country': 'United Kingdom', 'city': 'London', 'lat': 51.5074, 'lon': -0.1278, 'flag': '🇬🇧', 'region': 'Europe'},
-        'deutschebank': {'country': 'Germany', 'city': 'Frankfurt', 'lat': 50.1109, 'lon': 8.6821, 'flag': '🇩🇪', 'region': 'Europe'},
-        'ubs': {'country': 'Switzerland', 'city': 'Zurich', 'lat': 47.3769, 'lon': 8.5417, 'flag': '🇨🇭', 'region': 'Europe'},
-        'creditsuisse': {'country': 'Switzerland', 'city': 'Zurich', 'lat': 47.3769, 'lon': 8.5417, 'flag': '🇨🇭', 'region': 'Europe'},
+        'unicaf': {'country': 'Malawi', 'city': 'Lilongwe', 'lat': -13.9833, 'lon': 33.7833, 'flag': 'ðŸ‡²ðŸ‡¼', 'region': 'East Africa'},
+        'oldmutual': {'country': 'South Africa', 'city': 'Cape Town', 'lat': -33.9249, 'lon': 18.4241, 'flag': 'ðŸ‡¿ðŸ‡¦', 'region': 'Southern Africa'},
+        'mtn': {'country': 'South Africa', 'city': 'Johannesburg', 'lat': -26.2041, 'lon': 28.0473, 'flag': 'ðŸ‡¿ðŸ‡¦', 'region': 'Southern Africa'},
+        'vodacom': {'country': 'South Africa', 'city': 'Johannesburg', 'lat': -26.2041, 'lon': 28.0473, 'flag': 'ðŸ‡¿ðŸ‡¦', 'region': 'Southern Africa'},
+        'safaricom': {'country': 'Kenya', 'city': 'Nairobi', 'lat': -1.2921, 'lon': 36.8219, 'flag': 'ðŸ‡°ðŸ‡ª', 'region': 'East Africa'},
+        'equitybank': {'country': 'Kenya', 'city': 'Nairobi', 'lat': -1.2921, 'lon': 36.8219, 'flag': 'ðŸ‡°ðŸ‡ª', 'region': 'East Africa'},
+        'kcb': {'country': 'Kenya', 'city': 'Nairobi', 'lat': -1.2921, 'lon': 36.8219, 'flag': 'ðŸ‡°ðŸ‡ª', 'region': 'East Africa'},
+        'gtbank': {'country': 'Nigeria', 'city': 'Lagos', 'lat': 6.5170, 'lon': 3.3968, 'flag': 'ðŸ‡³ðŸ‡¬', 'region': 'West Africa'},
+        'zenithbank': {'country': 'Nigeria', 'city': 'Lagos', 'lat': 6.5170, 'lon': 3.3968, 'flag': 'ðŸ‡³ðŸ‡¬', 'region': 'West Africa'},
+        'firstbank': {'country': 'Nigeria', 'city': 'Lagos', 'lat': 6.5170, 'lon': 3.3968, 'flag': 'ðŸ‡³ðŸ‡¬', 'region': 'West Africa'},
+        'accessbank': {'country': 'Nigeria', 'city': 'Lagos', 'lat': 6.5170, 'lon': 3.3968, 'flag': 'ðŸ‡³ðŸ‡¬', 'region': 'West Africa'},
+        'ecobank': {'country': 'Togo', 'city': 'Lome', 'lat': 6.1319, 'lon': 1.2228, 'flag': 'ðŸ‡¹ðŸ‡¬', 'region': 'West Africa'},
+        'standardbank': {'country': 'South Africa', 'city': 'Johannesburg', 'lat': -26.2041, 'lon': 28.0473, 'flag': 'ðŸ‡¿ðŸ‡¦', 'region': 'Southern Africa'},
+        'absa': {'country': 'South Africa', 'city': 'Johannesburg', 'lat': -26.2041, 'lon': 28.0473, 'flag': 'ðŸ‡¿ðŸ‡¦', 'region': 'Southern Africa'},
+        'naspers': {'country': 'South Africa', 'city': 'Cape Town', 'lat': -33.9249, 'lon': 18.4241, 'flag': 'ðŸ‡¿ðŸ‡¦', 'region': 'Southern Africa'},
+        'multichoice': {'country': 'South Africa', 'city': 'Johannesburg', 'lat': -26.2041, 'lon': 28.0473, 'flag': 'ðŸ‡¿ðŸ‡¦', 'region': 'Southern Africa'},
+        'dstv': {'country': 'South Africa', 'city': 'Johannesburg', 'lat': -26.2041, 'lon': 28.0473, 'flag': 'ðŸ‡¿ðŸ‡¦', 'region': 'Southern Africa'},
+        'discovery': {'country': 'South Africa', 'city': 'Johannesburg', 'lat': -26.2041, 'lon': 28.0473, 'flag': 'ðŸ‡¿ðŸ‡¦', 'region': 'Southern Africa'},
+        'sasol': {'country': 'South Africa', 'city': 'Johannesburg', 'lat': -26.2041, 'lon': 28.0473, 'flag': 'ðŸ‡¿ðŸ‡¦', 'region': 'Southern Africa'},
+        'angloamerican': {'country': 'South Africa', 'city': 'Johannesburg', 'lat': -26.2041, 'lon': 28.0473, 'flag': 'ðŸ‡¿ðŸ‡¦', 'region': 'Southern Africa'},
+        'debeers': {'country': 'South Africa', 'city': 'Johannesburg', 'lat': -26.2041, 'lon': 28.0473, 'flag': 'ðŸ‡¿ðŸ‡¦', 'region': 'Southern Africa'},
+        'kenyaairways': {'country': 'Kenya', 'city': 'Nairobi', 'lat': -1.2921, 'lon': 36.8219, 'flag': 'ðŸ‡°ðŸ‡ª', 'region': 'East Africa'},
+        'dangote': {'country': 'Nigeria', 'city': 'Lagos', 'lat': 6.5170, 'lon': 3.3968, 'flag': 'ðŸ‡³ðŸ‡¬', 'region': 'West Africa'},
+        'glo': {'country': 'Nigeria', 'city': 'Lagos', 'lat': 6.5170, 'lon': 3.3968, 'flag': 'ðŸ‡³ðŸ‡¬', 'region': 'West Africa'},
+        'airtel': {'country': 'Nigeria', 'city': 'Lagos', 'lat': 6.5170, 'lon': 3.3968, 'flag': 'ðŸ‡³ðŸ‡¬', 'region': 'West Africa'},
+        'vodafone': {'country': 'United Kingdom', 'city': 'London', 'lat': 51.5074, 'lon': -0.1278, 'flag': 'ðŸ‡¬ðŸ‡§', 'region': 'Europe'},
+        'orange': {'country': 'France', 'city': 'Paris', 'lat': 48.8566, 'lon': 2.3522, 'flag': 'ðŸ‡«ðŸ‡·', 'region': 'Europe'},
+        'etisalat': {'country': 'UAE', 'city': 'Abu Dhabi', 'lat': 24.4539, 'lon': 54.3773, 'flag': 'ðŸ‡¦ðŸ‡ª', 'region': 'Middle East'},
+        'google': {'country': 'USA', 'city': 'Mountain View', 'lat': 37.4220, 'lon': -122.0841, 'flag': 'ðŸ‡ºðŸ‡¸', 'region': 'North America'},
+        'microsoft': {'country': 'USA', 'city': 'Redmond', 'lat': 47.6740, 'lon': -122.1215, 'flag': 'ðŸ‡ºðŸ‡¸', 'region': 'North America'},
+        'apple': {'country': 'USA', 'city': 'Cupertino', 'lat': 37.3349, 'lon': -122.0090, 'flag': 'ðŸ‡ºðŸ‡¸', 'region': 'North America'},
+        'amazon': {'country': 'USA', 'city': 'Seattle', 'lat': 47.6062, 'lon': -122.3321, 'flag': 'ðŸ‡ºðŸ‡¸', 'region': 'North America'},
+        'facebook': {'country': 'USA', 'city': 'Menlo Park', 'lat': 37.4530, 'lon': -122.1810, 'flag': 'ðŸ‡ºðŸ‡¸', 'region': 'North America'},
+        'twitter': {'country': 'USA', 'city': 'San Francisco', 'lat': 37.7749, 'lon': -122.4194, 'flag': 'ðŸ‡ºðŸ‡¸', 'region': 'North America'},
+        'linkedin': {'country': 'USA', 'city': 'Sunnyvale', 'lat': 37.3688, 'lon': -122.0363, 'flag': 'ðŸ‡ºðŸ‡¸', 'region': 'North America'},
+        'netflix': {'country': 'USA', 'city': 'Los Gatos', 'lat': 37.2308, 'lon': -121.9740, 'flag': 'ðŸ‡ºðŸ‡¸', 'region': 'North America'},
+        'uber': {'country': 'USA', 'city': 'San Francisco', 'lat': 37.7749, 'lon': -122.4194, 'flag': 'ðŸ‡ºðŸ‡¸', 'region': 'North America'},
+        'goldmansachs': {'country': 'USA', 'city': 'New York', 'lat': 40.7128, 'lon': -74.0060, 'flag': 'ðŸ‡ºðŸ‡¸', 'region': 'North America'},
+        'jpmorgan': {'country': 'USA', 'city': 'New York', 'lat': 40.7128, 'lon': -74.0060, 'flag': 'ðŸ‡ºðŸ‡¸', 'region': 'North America'},
+        'bankofamerica': {'country': 'USA', 'city': 'Charlotte', 'lat': 35.2271, 'lon': -80.8431, 'flag': 'ðŸ‡ºðŸ‡¸', 'region': 'North America'},
+        'wellsfargo': {'country': 'USA', 'city': 'San Francisco', 'lat': 37.7749, 'lon': -122.4194, 'flag': 'ðŸ‡ºðŸ‡¸', 'region': 'North America'},
+        'hsbc': {'country': 'United Kingdom', 'city': 'London', 'lat': 51.5074, 'lon': -0.1278, 'flag': 'ðŸ‡¬ðŸ‡§', 'region': 'Europe'},
+        'barclays': {'country': 'United Kingdom', 'city': 'London', 'lat': 51.5074, 'lon': -0.1278, 'flag': 'ðŸ‡¬ðŸ‡§', 'region': 'Europe'},
+        'deutschebank': {'country': 'Germany', 'city': 'Frankfurt', 'lat': 50.1109, 'lon': 8.6821, 'flag': 'ðŸ‡©ðŸ‡ª', 'region': 'Europe'},
+        'ubs': {'country': 'Switzerland', 'city': 'Zurich', 'lat': 47.3769, 'lon': 8.5417, 'flag': 'ðŸ‡¨ðŸ‡­', 'region': 'Europe'},
+        'creditsuisse': {'country': 'Switzerland', 'city': 'Zurich', 'lat': 47.3769, 'lon': 8.5417, 'flag': 'ðŸ‡¨ðŸ‡­', 'region': 'Europe'},
     }
     
     @classmethod
@@ -525,63 +525,63 @@ class OrganizationLocationDB:
         
         # Then check TLD
         tld_map = {
-            '.mw': {'country': 'Malawi', 'city': 'Auto-detected', 'lat': -13.9833, 'lon': 33.7833, 'flag': '🇲🇼', 'region': 'East Africa'},
-            '.za': {'country': 'South Africa', 'city': 'Auto-detected', 'lat': -30.5595, 'lon': 22.9375, 'flag': '🇿🇦', 'region': 'Southern Africa'},
-            '.ke': {'country': 'Kenya', 'city': 'Auto-detected', 'lat': -1.2921, 'lon': 36.8219, 'flag': '🇰🇪', 'region': 'East Africa'},
-            '.ng': {'country': 'Nigeria', 'city': 'Auto-detected', 'lat': 9.0820, 'lon': 8.6753, 'flag': '🇳🇬', 'region': 'West Africa'},
-            '.gh': {'country': 'Ghana', 'city': 'Auto-detected', 'lat': 7.9465, 'lon': -1.0232, 'flag': '🇬🇭', 'region': 'West Africa'},
-            '.eg': {'country': 'Egypt', 'city': 'Auto-detected', 'lat': 26.8206, 'lon': 30.8025, 'flag': '🇪🇬', 'region': 'North Africa'},
-            '.uk': {'country': 'United Kingdom', 'city': 'Auto-detected', 'lat': 55.3781, 'lon': -3.4360, 'flag': '🇬🇧', 'region': 'Europe'},
-            '.de': {'country': 'Germany', 'city': 'Auto-detected', 'lat': 51.1657, 'lon': 10.4515, 'flag': '🇩🇪', 'region': 'Europe'},
-            '.in': {'country': 'India', 'city': 'Auto-detected', 'lat': 20.5937, 'lon': 78.9629, 'flag': '🇮🇳', 'region': 'South Asia'},
-            '.edu': {'country': 'USA', 'city': 'Auto-detected', 'lat': 37.0902, 'lon': -95.7129, 'flag': '🇺🇸', 'region': 'North America'},
-            '.africa': {'country': 'Africa (HQ Unknown)', 'city': 'Auto-detected', 'lat': 0, 'lon': 0, 'flag': '🌍', 'region': 'Africa'},
-            '.fr': {'country': 'France', 'city': 'Auto-detected', 'lat': 46.6034, 'lon': 1.8883, 'flag': '🇫🇷', 'region': 'Europe'},
-            '.it': {'country': 'Italy', 'city': 'Auto-detected', 'lat': 41.8719, 'lon': 12.5674, 'flag': '🇮🇹', 'region': 'Europe'},
-            '.es': {'country': 'Spain', 'city': 'Auto-detected', 'lat': 40.4637, 'lon': -3.7492, 'flag': '🇪🇸', 'region': 'Europe'},
-            '.nl': {'country': 'Netherlands', 'city': 'Auto-detected', 'lat': 52.1326, 'lon': 5.2913, 'flag': '🇳🇱', 'region': 'Europe'},
-            '.se': {'country': 'Sweden', 'city': 'Auto-detected', 'lat': 60.1282, 'lon': 18.6435, 'flag': '🇸🇪', 'region': 'Europe'},
-            '.no': {'country': 'Norway', 'city': 'Auto-detected', 'lat': 60.4720, 'lon': 8.4689, 'flag': '🇳🇴', 'region': 'Europe'},
-            '.dk': {'country': 'Denmark', 'city': 'Auto-detected', 'lat': 56.2639, 'lon': 9.5018, 'flag': '🇩🇰', 'region': 'Europe'},
-            '.fi': {'country': 'Finland', 'city': 'Auto-detected', 'lat': 61.9241, 'lon': 25.7482, 'flag': '🇫🇮', 'region': 'Europe'},
-            '.ch': {'country': 'Switzerland', 'city': 'Auto-detected', 'lat': 46.8182, 'lon': 8.2275, 'flag': '🇨🇭', 'region': 'Europe'},
-            '.at': {'country': 'Austria', 'city': 'Auto-detected', 'lat': 47.5162, 'lon': 14.5501, 'flag': '🇦🇹', 'region': 'Europe'},
-            '.be': {'country': 'Belgium', 'city': 'Auto-detected', 'lat': 50.5039, 'lon': 4.4699, 'flag': '🇧🇪', 'region': 'Europe'},
-            '.pt': {'country': 'Portugal', 'city': 'Auto-detected', 'lat': 39.3999, 'lon': -8.2245, 'flag': '🇵🇹', 'region': 'Europe'},
-            '.gr': {'country': 'Greece', 'city': 'Auto-detected', 'lat': 39.0742, 'lon': 21.8243, 'flag': '🇬🇷', 'region': 'Europe'},
-            '.pl': {'country': 'Poland', 'city': 'Auto-detected', 'lat': 51.9194, 'lon': 19.1451, 'flag': '🇵🇱', 'region': 'Europe'},
-            '.cz': {'country': 'Czech Republic', 'city': 'Auto-detected', 'lat': 49.8175, 'lon': 15.4730, 'flag': '🇨🇿', 'region': 'Europe'},
-            '.hu': {'country': 'Hungary', 'city': 'Auto-detected', 'lat': 47.1625, 'lon': 19.5033, 'flag': '🇭🇺', 'region': 'Europe'},
-            '.ro': {'country': 'Romania', 'city': 'Auto-detected', 'lat': 45.9432, 'lon': 24.9668, 'flag': '🇷🇴', 'region': 'Europe'},
-            '.bg': {'country': 'Bulgaria', 'city': 'Auto-detected', 'lat': 42.7339, 'lon': 25.4858, 'flag': '🇧🇬', 'region': 'Europe'},
-            '.hr': {'country': 'Croatia', 'city': 'Auto-detected', 'lat': 45.1000, 'lon': 15.2000, 'flag': '🇭🇷', 'region': 'Europe'},
-            '.si': {'country': 'Slovenia', 'city': 'Auto-detected', 'lat': 46.1512, 'lon': 14.9955, 'flag': '🇸🇮', 'region': 'Europe'},
-            '.sk': {'country': 'Slovakia', 'city': 'Auto-detected', 'lat': 48.6690, 'lon': 19.6990, 'flag': '🇸🇰', 'region': 'Europe'},
-            '.lt': {'country': 'Lithuania', 'city': 'Auto-detected', 'lat': 55.1694, 'lon': 23.8813, 'flag': '🇱🇹', 'region': 'Europe'},
-            '.lv': {'country': 'Latvia', 'city': 'Auto-detected', 'lat': 56.8796, 'lon': 24.6032, 'flag': '🇱🇻', 'region': 'Europe'},
-            '.ee': {'country': 'Estonia', 'city': 'Auto-detected', 'lat': 58.5953, 'lon': 25.0136, 'flag': '🇪🇪', 'region': 'Europe'},
-            '.is': {'country': 'Iceland', 'city': 'Auto-detected', 'lat': 64.9631, 'lon': -19.0208, 'flag': '🇮🇸', 'region': 'Europe'},
-            '.ie': {'country': 'Ireland', 'city': 'Auto-detected', 'lat': 53.4129, 'lon': -8.2439, 'flag': '🇮🇪', 'region': 'Europe'},
-            '.lu': {'country': 'Luxembourg', 'city': 'Auto-detected', 'lat': 49.8153, 'lon': 6.1296, 'flag': '🇱🇺', 'region': 'Europe'},
-            '.mt': {'country': 'Malta', 'city': 'Auto-detected', 'lat': 35.9375, 'lon': 14.3754, 'flag': '🇲🇹', 'region': 'Europe'},
-            '.cy': {'country': 'Cyprus', 'city': 'Auto-detected', 'lat': 35.1264, 'lon': 33.4299, 'flag': '🇨🇾', 'region': 'Europe'},
-            '.ae': {'country': 'UAE', 'city': 'Auto-detected', 'lat': 23.4241, 'lon': 53.8478, 'flag': '🇦🇪', 'region': 'Middle East'},
-            '.sa': {'country': 'Saudi Arabia', 'city': 'Auto-detected', 'lat': 23.8859, 'lon': 45.0792, 'flag': '🇸🇦', 'region': 'Middle East'},
-            '.il': {'country': 'Israel', 'city': 'Auto-detected', 'lat': 31.0461, 'lon': 34.8516, 'flag': '🇮🇱', 'region': 'Middle East'},
-            '.tr': {'country': 'Turkey', 'city': 'Auto-detected', 'lat': 38.9637, 'lon': 35.2433, 'flag': '🇹🇷', 'region': 'Middle East'},
-            '.pk': {'country': 'Pakistan', 'city': 'Auto-detected', 'lat': 30.3753, 'lon': 69.3451, 'flag': '🇵🇰', 'region': 'South Asia'},
-            '.bd': {'country': 'Bangladesh', 'city': 'Auto-detected', 'lat': 23.6850, 'lon': 90.3563, 'flag': '🇧🇩', 'region': 'South Asia'},
-            '.lk': {'country': 'Sri Lanka', 'city': 'Auto-detected', 'lat': 7.8731, 'lon': 80.7718, 'flag': '🇱🇰', 'region': 'South Asia'},
-            '.np': {'country': 'Nepal', 'city': 'Auto-detected', 'lat': 28.3949, 'lon': 84.1240, 'flag': '🇳🇵', 'region': 'South Asia'},
-            '.cn': {'country': 'China', 'city': 'Auto-detected', 'lat': 35.8617, 'lon': 104.1954, 'flag': '🇨🇳', 'region': 'Asia'},
-            '.jp': {'country': 'Japan', 'city': 'Auto-detected', 'lat': 36.2048, 'lon': 138.2529, 'flag': '🇯🇵', 'region': 'Asia'},
-            '.kr': {'country': 'South Korea', 'city': 'Auto-detected', 'lat': 35.9078, 'lon': 127.7669, 'flag': '🇰🇷', 'region': 'Asia'},
-            '.sg': {'country': 'Singapore', 'city': 'Auto-detected', 'lat': 1.3521, 'lon': 103.8198, 'flag': '🇸🇬', 'region': 'Asia'},
-            '.my': {'country': 'Malaysia', 'city': 'Auto-detected', 'lat': 4.2105, 'lon': 101.9758, 'flag': '🇲🇾', 'region': 'Asia'},
-            '.id': {'country': 'Indonesia', 'city': 'Auto-detected', 'lat': -0.7893, 'lon': 113.9213, 'flag': '🇮🇩', 'region': 'Asia'},
-            '.ph': {'country': 'Philippines', 'city': 'Auto-detected', 'lat': 12.8797, 'lon': 121.7740, 'flag': '🇵🇭', 'region': 'Asia'},
-            '.vn': {'country': 'Vietnam', 'city': 'Auto-detected', 'lat': 14.0583, 'lon': 108.2772, 'flag': '🇻🇳', 'region': 'Asia'},
-            '.th': {'country': 'Thailand', 'city': 'Auto-detected', 'lat': 15.8700, 'lon': 100.9925, 'flag': '🇹🇭', 'region': 'Asia'},
+            '.mw': {'country': 'Malawi', 'city': 'Auto-detected', 'lat': -13.9833, 'lon': 33.7833, 'flag': 'ðŸ‡²ðŸ‡¼', 'region': 'East Africa'},
+            '.za': {'country': 'South Africa', 'city': 'Auto-detected', 'lat': -30.5595, 'lon': 22.9375, 'flag': 'ðŸ‡¿ðŸ‡¦', 'region': 'Southern Africa'},
+            '.ke': {'country': 'Kenya', 'city': 'Auto-detected', 'lat': -1.2921, 'lon': 36.8219, 'flag': 'ðŸ‡°ðŸ‡ª', 'region': 'East Africa'},
+            '.ng': {'country': 'Nigeria', 'city': 'Auto-detected', 'lat': 9.0820, 'lon': 8.6753, 'flag': 'ðŸ‡³ðŸ‡¬', 'region': 'West Africa'},
+            '.gh': {'country': 'Ghana', 'city': 'Auto-detected', 'lat': 7.9465, 'lon': -1.0232, 'flag': 'ðŸ‡¬ðŸ‡­', 'region': 'West Africa'},
+            '.eg': {'country': 'Egypt', 'city': 'Auto-detected', 'lat': 26.8206, 'lon': 30.8025, 'flag': 'ðŸ‡ªðŸ‡¬', 'region': 'North Africa'},
+            '.uk': {'country': 'United Kingdom', 'city': 'Auto-detected', 'lat': 55.3781, 'lon': -3.4360, 'flag': 'ðŸ‡¬ðŸ‡§', 'region': 'Europe'},
+            '.de': {'country': 'Germany', 'city': 'Auto-detected', 'lat': 51.1657, 'lon': 10.4515, 'flag': 'ðŸ‡©ðŸ‡ª', 'region': 'Europe'},
+            '.in': {'country': 'India', 'city': 'Auto-detected', 'lat': 20.5937, 'lon': 78.9629, 'flag': 'ðŸ‡®ðŸ‡³', 'region': 'South Asia'},
+            '.edu': {'country': 'USA', 'city': 'Auto-detected', 'lat': 37.0902, 'lon': -95.7129, 'flag': 'ðŸ‡ºðŸ‡¸', 'region': 'North America'},
+            '.africa': {'country': 'Africa (HQ Unknown)', 'city': 'Auto-detected', 'lat': 0, 'lon': 0, 'flag': 'ðŸŒ', 'region': 'Africa'},
+            '.fr': {'country': 'France', 'city': 'Auto-detected', 'lat': 46.6034, 'lon': 1.8883, 'flag': 'ðŸ‡«ðŸ‡·', 'region': 'Europe'},
+            '.it': {'country': 'Italy', 'city': 'Auto-detected', 'lat': 41.8719, 'lon': 12.5674, 'flag': 'ðŸ‡®ðŸ‡¹', 'region': 'Europe'},
+            '.es': {'country': 'Spain', 'city': 'Auto-detected', 'lat': 40.4637, 'lon': -3.7492, 'flag': 'ðŸ‡ªðŸ‡¸', 'region': 'Europe'},
+            '.nl': {'country': 'Netherlands', 'city': 'Auto-detected', 'lat': 52.1326, 'lon': 5.2913, 'flag': 'ðŸ‡³ðŸ‡±', 'region': 'Europe'},
+            '.se': {'country': 'Sweden', 'city': 'Auto-detected', 'lat': 60.1282, 'lon': 18.6435, 'flag': 'ðŸ‡¸ðŸ‡ª', 'region': 'Europe'},
+            '.no': {'country': 'Norway', 'city': 'Auto-detected', 'lat': 60.4720, 'lon': 8.4689, 'flag': 'ðŸ‡³ðŸ‡´', 'region': 'Europe'},
+            '.dk': {'country': 'Denmark', 'city': 'Auto-detected', 'lat': 56.2639, 'lon': 9.5018, 'flag': 'ðŸ‡©ðŸ‡°', 'region': 'Europe'},
+            '.fi': {'country': 'Finland', 'city': 'Auto-detected', 'lat': 61.9241, 'lon': 25.7482, 'flag': 'ðŸ‡«ðŸ‡®', 'region': 'Europe'},
+            '.ch': {'country': 'Switzerland', 'city': 'Auto-detected', 'lat': 46.8182, 'lon': 8.2275, 'flag': 'ðŸ‡¨ðŸ‡­', 'region': 'Europe'},
+            '.at': {'country': 'Austria', 'city': 'Auto-detected', 'lat': 47.5162, 'lon': 14.5501, 'flag': 'ðŸ‡¦ðŸ‡¹', 'region': 'Europe'},
+            '.be': {'country': 'Belgium', 'city': 'Auto-detected', 'lat': 50.5039, 'lon': 4.4699, 'flag': 'ðŸ‡§ðŸ‡ª', 'region': 'Europe'},
+            '.pt': {'country': 'Portugal', 'city': 'Auto-detected', 'lat': 39.3999, 'lon': -8.2245, 'flag': 'ðŸ‡µðŸ‡¹', 'region': 'Europe'},
+            '.gr': {'country': 'Greece', 'city': 'Auto-detected', 'lat': 39.0742, 'lon': 21.8243, 'flag': 'ðŸ‡¬ðŸ‡·', 'region': 'Europe'},
+            '.pl': {'country': 'Poland', 'city': 'Auto-detected', 'lat': 51.9194, 'lon': 19.1451, 'flag': 'ðŸ‡µðŸ‡±', 'region': 'Europe'},
+            '.cz': {'country': 'Czech Republic', 'city': 'Auto-detected', 'lat': 49.8175, 'lon': 15.4730, 'flag': 'ðŸ‡¨ðŸ‡¿', 'region': 'Europe'},
+            '.hu': {'country': 'Hungary', 'city': 'Auto-detected', 'lat': 47.1625, 'lon': 19.5033, 'flag': 'ðŸ‡­ðŸ‡º', 'region': 'Europe'},
+            '.ro': {'country': 'Romania', 'city': 'Auto-detected', 'lat': 45.9432, 'lon': 24.9668, 'flag': 'ðŸ‡·ðŸ‡´', 'region': 'Europe'},
+            '.bg': {'country': 'Bulgaria', 'city': 'Auto-detected', 'lat': 42.7339, 'lon': 25.4858, 'flag': 'ðŸ‡§ðŸ‡¬', 'region': 'Europe'},
+            '.hr': {'country': 'Croatia', 'city': 'Auto-detected', 'lat': 45.1000, 'lon': 15.2000, 'flag': 'ðŸ‡­ðŸ‡·', 'region': 'Europe'},
+            '.si': {'country': 'Slovenia', 'city': 'Auto-detected', 'lat': 46.1512, 'lon': 14.9955, 'flag': 'ðŸ‡¸ðŸ‡®', 'region': 'Europe'},
+            '.sk': {'country': 'Slovakia', 'city': 'Auto-detected', 'lat': 48.6690, 'lon': 19.6990, 'flag': 'ðŸ‡¸ðŸ‡°', 'region': 'Europe'},
+            '.lt': {'country': 'Lithuania', 'city': 'Auto-detected', 'lat': 55.1694, 'lon': 23.8813, 'flag': 'ðŸ‡±ðŸ‡¹', 'region': 'Europe'},
+            '.lv': {'country': 'Latvia', 'city': 'Auto-detected', 'lat': 56.8796, 'lon': 24.6032, 'flag': 'ðŸ‡±ðŸ‡»', 'region': 'Europe'},
+            '.ee': {'country': 'Estonia', 'city': 'Auto-detected', 'lat': 58.5953, 'lon': 25.0136, 'flag': 'ðŸ‡ªðŸ‡ª', 'region': 'Europe'},
+            '.is': {'country': 'Iceland', 'city': 'Auto-detected', 'lat': 64.9631, 'lon': -19.0208, 'flag': 'ðŸ‡®ðŸ‡¸', 'region': 'Europe'},
+            '.ie': {'country': 'Ireland', 'city': 'Auto-detected', 'lat': 53.4129, 'lon': -8.2439, 'flag': 'ðŸ‡®ðŸ‡ª', 'region': 'Europe'},
+            '.lu': {'country': 'Luxembourg', 'city': 'Auto-detected', 'lat': 49.8153, 'lon': 6.1296, 'flag': 'ðŸ‡±ðŸ‡º', 'region': 'Europe'},
+            '.mt': {'country': 'Malta', 'city': 'Auto-detected', 'lat': 35.9375, 'lon': 14.3754, 'flag': 'ðŸ‡²ðŸ‡¹', 'region': 'Europe'},
+            '.cy': {'country': 'Cyprus', 'city': 'Auto-detected', 'lat': 35.1264, 'lon': 33.4299, 'flag': 'ðŸ‡¨ðŸ‡¾', 'region': 'Europe'},
+            '.ae': {'country': 'UAE', 'city': 'Auto-detected', 'lat': 23.4241, 'lon': 53.8478, 'flag': 'ðŸ‡¦ðŸ‡ª', 'region': 'Middle East'},
+            '.sa': {'country': 'Saudi Arabia', 'city': 'Auto-detected', 'lat': 23.8859, 'lon': 45.0792, 'flag': 'ðŸ‡¸ðŸ‡¦', 'region': 'Middle East'},
+            '.il': {'country': 'Israel', 'city': 'Auto-detected', 'lat': 31.0461, 'lon': 34.8516, 'flag': 'ðŸ‡®ðŸ‡±', 'region': 'Middle East'},
+            '.tr': {'country': 'Turkey', 'city': 'Auto-detected', 'lat': 38.9637, 'lon': 35.2433, 'flag': 'ðŸ‡¹ðŸ‡·', 'region': 'Middle East'},
+            '.pk': {'country': 'Pakistan', 'city': 'Auto-detected', 'lat': 30.3753, 'lon': 69.3451, 'flag': 'ðŸ‡µðŸ‡°', 'region': 'South Asia'},
+            '.bd': {'country': 'Bangladesh', 'city': 'Auto-detected', 'lat': 23.6850, 'lon': 90.3563, 'flag': 'ðŸ‡§ðŸ‡©', 'region': 'South Asia'},
+            '.lk': {'country': 'Sri Lanka', 'city': 'Auto-detected', 'lat': 7.8731, 'lon': 80.7718, 'flag': 'ðŸ‡±ðŸ‡°', 'region': 'South Asia'},
+            '.np': {'country': 'Nepal', 'city': 'Auto-detected', 'lat': 28.3949, 'lon': 84.1240, 'flag': 'ðŸ‡³ðŸ‡µ', 'region': 'South Asia'},
+            '.cn': {'country': 'China', 'city': 'Auto-detected', 'lat': 35.8617, 'lon': 104.1954, 'flag': 'ðŸ‡¨ðŸ‡³', 'region': 'Asia'},
+            '.jp': {'country': 'Japan', 'city': 'Auto-detected', 'lat': 36.2048, 'lon': 138.2529, 'flag': 'ðŸ‡¯ðŸ‡µ', 'region': 'Asia'},
+            '.kr': {'country': 'South Korea', 'city': 'Auto-detected', 'lat': 35.9078, 'lon': 127.7669, 'flag': 'ðŸ‡°ðŸ‡·', 'region': 'Asia'},
+            '.sg': {'country': 'Singapore', 'city': 'Auto-detected', 'lat': 1.3521, 'lon': 103.8198, 'flag': 'ðŸ‡¸ðŸ‡¬', 'region': 'Asia'},
+            '.my': {'country': 'Malaysia', 'city': 'Auto-detected', 'lat': 4.2105, 'lon': 101.9758, 'flag': 'ðŸ‡²ðŸ‡¾', 'region': 'Asia'},
+            '.id': {'country': 'Indonesia', 'city': 'Auto-detected', 'lat': -0.7893, 'lon': 113.9213, 'flag': 'ðŸ‡®ðŸ‡©', 'region': 'Asia'},
+            '.ph': {'country': 'Philippines', 'city': 'Auto-detected', 'lat': 12.8797, 'lon': 121.7740, 'flag': 'ðŸ‡µðŸ‡­', 'region': 'Asia'},
+            '.vn': {'country': 'Vietnam', 'city': 'Auto-detected', 'lat': 14.0583, 'lon': 108.2772, 'flag': 'ðŸ‡»ðŸ‡³', 'region': 'Asia'},
+            '.th': {'country': 'Thailand', 'city': 'Auto-detected', 'lat': 15.8700, 'lon': 100.9925, 'flag': 'ðŸ‡¹ðŸ‡­', 'region': 'Asia'},
         }
         
         for tld, info in tld_map.items():
@@ -629,7 +629,7 @@ class OrganizationLocationDB:
         return None
     
     @classmethod
-    def add_organization(cls, domain: str, country: str, city: str, lat: float, lon: float, flag: str = "🌐", region: str = "Unknown"):
+    def add_organization(cls, domain: str, country: str, city: str, lat: float, lon: float, flag: str = "ðŸŒ", region: str = "Unknown"):
         domain_lower = domain.lower()
         location = {"country": country, "city": city, "lat": lat, "lon": lon, "flag": flag, "region": region}
         cls.ORGANIZATIONS[domain_lower] = location
@@ -882,7 +882,7 @@ class EnhancedGeoMapVisualizer:
     def generate_threat_map(self) -> str:
         """Generate interactive threat intelligence map with BLINKING lines and circles"""
         if not GEO_AVAILABLE:
-            return '<div style="padding:50px;text-align:center;color:#888;">🌍 GeoIP module not available</div>'
+            return '<div style="padding:50px;text-align:center;color:#888;">ðŸŒ GeoIP module not available</div>'
         
         # Create map with dark background
         m = folium.Map(location=[20, 0], zoom_start=2, tiles='CartoDB dark_matter', control_scale=True)
@@ -996,7 +996,7 @@ class EnhancedGeoMapVisualizer:
         """
         
         m.get_root().header.add_child(folium.Element(blink_css))
-        m.get_root().html.add_child(folium.Element('<div class="live-badge">🔴 LIVE MONITORING ACTIVE 🔴</div>'))
+        m.get_root().html.add_child(folium.Element('<div class="live-badge">ðŸ”´ LIVE MONITORING ACTIVE ðŸ”´</div>'))
         
         # Heatmap
         heat_data = [[loc["lat"], loc["lon"], loc["risk_score"] / 10] for loc in self.locations if loc["lat"] != 0]
@@ -1028,7 +1028,7 @@ class EnhancedGeoMapVisualizer:
                     weight=2,
                     opacity=0.6,
                     dash_array='5, 5',
-                    popup=f"Connection: {loc1['ip']} → {loc2['ip']}<br>Risk: {avg_risk:.1f}"
+                    popup=f"Connection: {loc1['ip']} â†’ {loc2['ip']}<br>Risk: {avg_risk:.1f}"
                 ).add_to(m)
         
         # Add markers with detailed popup
@@ -1042,28 +1042,28 @@ class EnhancedGeoMapVisualizer:
                 blink_class = "blink-critical"
                 radius = 16
                 pulse_radius = 200000
-                risk_emoji = "🔴"
+                risk_emoji = "ðŸ”´"
                 risk_label = "CRITICAL"
             elif risk >= 4:
                 color = "#ff6600"
                 blink_class = "blink-high"
                 radius = 13
                 pulse_radius = 150000
-                risk_emoji = "🟠"
+                risk_emoji = "ðŸŸ "
                 risk_label = "HIGH"
             elif risk >= 2:
                 color = "#ffcc00"
                 blink_class = "blink-medium"
                 radius = 10
                 pulse_radius = 100000
-                risk_emoji = "🟡"
+                risk_emoji = "ðŸŸ¡"
                 risk_label = "MEDIUM"
             else:
                 color = "#00ff00"
                 blink_class = "blink-low"
                 radius = 7
                 pulse_radius = 50000
-                risk_emoji = "🟢"
+                risk_emoji = "ðŸŸ¢"
                 risk_label = "LOW"
             
             # Build detailed popup
@@ -1085,16 +1085,16 @@ class EnhancedGeoMapVisualizer:
             popup_html = f"""
             <div style="font-family: monospace; color: #00ff00; padding: 8px;">
                 <div style="border-bottom: 1px solid rgba(0,255,255,0.2); padding-bottom: 6px; margin-bottom: 6px;">
-                    <b style="color: #00ffff; font-size: 13px;">🎯 {domain}</b>
+                    <b style="color: #00ffff; font-size: 13px;">ðŸŽ¯ {domain}</b>
                     <span style="float: right; font-size: 11px; color: {color}; font-weight: bold;">{risk_emoji} {risk_label}</span>
                 </div>
                 
                 <table style="width: 100%%; border-collapse: collapse; font-size: 11px;">
-                    <tr><td style="color: #888; padding: 2px 4px;">📍 Location:</td><td style="color: #ffcc00; padding: 2px 4px;">{city}, {country}</td></tr>
-                    <tr><td style="color: #888; padding: 2px 4px;">🌐 IP:</td><td style="color: #00ff88; padding: 2px 4px;">{loc['ip']}</td></tr>
-                    <tr><td style="color: #888; padding: 2px 4px;">🏢 ISP:</td><td style="color: #88ccff; padding: 2px 4px;">{server_isp}</td></tr>
-                    <tr><td style="color: #888; padding: 2px 4px;">⚠️ Risk:</td><td style="color: {color}; font-weight: bold; padding: 2px 4px;">{risk:.1f}/10</td></tr>
-                    <tr><td style="color: #888; padding: 2px 4px;">🔓 Ports:</td><td style="color: #ff66ff; padding: 2px 4px;">{port_count}</td></tr>
+                    <tr><td style="color: #888; padding: 2px 4px;">ðŸ“ Location:</td><td style="color: #ffcc00; padding: 2px 4px;">{city}, {country}</td></tr>
+                    <tr><td style="color: #888; padding: 2px 4px;">ðŸŒ IP:</td><td style="color: #00ff88; padding: 2px 4px;">{loc['ip']}</td></tr>
+                    <tr><td style="color: #888; padding: 2px 4px;">ðŸ¢ ISP:</td><td style="color: #88ccff; padding: 2px 4px;">{server_isp}</td></tr>
+                    <tr><td style="color: #888; padding: 2px 4px;">âš ï¸ Risk:</td><td style="color: {color}; font-weight: bold; padding: 2px 4px;">{risk:.1f}/10</td></tr>
+                    <tr><td style="color: #888; padding: 2px 4px;">ðŸ”“ Ports:</td><td style="color: #ff66ff; padding: 2px 4px;">{port_count}</td></tr>
                 </table>
             """
             
@@ -1102,7 +1102,7 @@ class EnhancedGeoMapVisualizer:
             if org_country:
                 popup_html += f"""
                 <div style="border-top: 1px solid rgba(255,170,0,0.2); margin-top: 4px; padding-top: 4px;">
-                    <span style="color: #ffaa00;">🏢 HQ:</span> <span style="color: #ffcc44;">{org_country} - {org_city}</span>
+                    <span style="color: #ffaa00;">ðŸ¢ HQ:</span> <span style="color: #ffcc44;">{org_country} - {org_city}</span>
                 </div>
                 """
             
@@ -1113,7 +1113,7 @@ class EnhancedGeoMapVisualizer:
                     services_str += f' +{len(services)-3} more'
                 popup_html += f"""
                 <div style="border-top: 1px solid rgba(0,255,0,0.1); margin-top: 4px; padding-top: 4px;">
-                    <span style="color: #00ff88;">🔧 Services:</span> <span style="color: #88ddff; font-size: 10px;">{services_str}</span>
+                    <span style="color: #00ff88;">ðŸ”§ Services:</span> <span style="color: #88ddff; font-size: 10px;">{services_str}</span>
                 </div>
                 """
             
@@ -1121,14 +1121,14 @@ class EnhancedGeoMapVisualizer:
             if loc.get('server_country') and loc.get('server_country') != org_country:
                 popup_html += f"""
                 <div style="border-top: 1px solid rgba(255,102,0,0.2); margin-top: 4px; padding-top: 4px;">
-                    <span style="color: #ff6600;">🖥️ Server:</span> <span style="color: #ff9966;">{loc.get('server_city', 'Unknown')}, {loc.get('server_country', 'Unknown')}</span>
+                    <span style="color: #ff6600;">ðŸ–¥ï¸ Server:</span> <span style="color: #ff9966;">{loc.get('server_city', 'Unknown')}, {loc.get('server_country', 'Unknown')}</span>
                 </div>
                 """
             
             # Add timestamp
             popup_html += f"""
                 <div style="border-top: 1px solid rgba(255,255,255,0.05); margin-top: 4px; padding-top: 4px; font-size: 9px; color: #666;">
-                    📌 {timestamp_str}
+                    ðŸ“Œ {timestamp_str}
                 </div>
             </div>
             """
@@ -1201,7 +1201,7 @@ class EnhancedGeoMapVisualizer:
                     fill_opacity=0.04,
                     weight=1,
                     className="pulse-ring",
-                    popup=f"⚠️ Active Threat Zone - Risk: {risk}/10"
+                    popup=f"âš ï¸ Active Threat Zone - Risk: {risk}/10"
                 ).add_to(m)
         
         # Network mesh lines
@@ -1231,20 +1231,20 @@ class EnhancedGeoMapVisualizer:
                         weight=weight,
                         opacity=0.4,
                         dash_array='8, 6',
-                        popup=f"Network Link<br>{loc1['ip']} ↔ {loc2['ip']}<br>Risk: {dist_risk:.1f}"
+                        popup=f"Network Link<br>{loc1['ip']} â†” {loc2['ip']}<br>Risk: {dist_risk:.1f}"
                     ).add_to(m)
         
         # Legend
         legend_html = '''
         <div style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; background: rgba(0,0,0,0.85); padding: 10px; border-radius: 8px; border: 1px solid #00ff00; font-family: monospace; font-size: 9px; min-width: 140px;">
-            <b style="color: #00ff00;">🗺️ THREAT LEGEND</b><br>
-            <span style="color:#ff0000;">🔴</span> Critical (7-10)<br>
-            <span style="color:#ff6600;">🟠</span> High (5-6)<br>
-            <span style="color:#ffcc00;">🟡</span> Medium (3-4)<br>
-            <span style="color:#00ff00;">🟢</span> Low (0-2)<br>
-            <span style="color:#ffaa00;">⭐</span> Organization HQ<br>
-            <span style="color:#ff00ff;">◉</span> Active Threat Zone<br>
-            <span style="color:#ff6600; animation: blink-yellow 1s infinite;">● BLINKING = LIVE MONITORING</span>
+            <b style="color: #00ff00;">ðŸ—ºï¸ THREAT LEGEND</b><br>
+            <span style="color:#ff0000;">ðŸ”´</span> Critical (7-10)<br>
+            <span style="color:#ff6600;">ðŸŸ </span> High (5-6)<br>
+            <span style="color:#ffcc00;">ðŸŸ¡</span> Medium (3-4)<br>
+            <span style="color:#00ff00;">ðŸŸ¢</span> Low (0-2)<br>
+            <span style="color:#ffaa00;">â­</span> Organization HQ<br>
+            <span style="color:#ff00ff;">â—‰</span> Active Threat Zone<br>
+            <span style="color:#ff6600; animation: blink-yellow 1s infinite;">â— BLINKING = LIVE MONITORING</span>
             <br><span style="color:#888; font-size:8px;">Click marker for details</span>
         </div>
         '''
@@ -1277,7 +1277,7 @@ class InteractiveSOCDashboard:
         self.node_descriptions = {}
         self.history_file = os.path.join(self.scans_dir, "scan_history.json")
         self._load_history()
-        self.spinner_frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+        self.spinner_frames = ["â ‹", "â ™", "â ¹", "â ¸", "â ¼", "â ´", "â ¦", "â §", "â ‡", "â "]
         self.terminal_width = self._get_terminal_width()
     
     def _get_terminal_width(self):
@@ -1330,20 +1330,20 @@ class InteractiveSOCDashboard:
     def draw_header(self):
         header = f"""
 {Colors.RED}{Colors.BOLD}
-{self.center("╔" + "═" * 76 + "╗")}
-{self.center("║" + " " * 76 + "║")}
-{self.center("║" + " " * 10 + "██████╗ ███████╗████████╗███████╗██████╗ ███╗   ███╗██╗███╗   ██╗ █████╗ ██╗" + " " * 10 + "║")}
-{self.center("║" + " " * 10 + "██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║████╗  ██║██╔══██╗██║" + " " * 10 + "║")}
-{self.center("║" + " " * 10 + "██║  ██║███████╗   ██║   █████╗  ██████╔╝██╔████╔██║██║██╔██╗ ██║███████║██║" + " " * 10 + "║")}
-{self.center("║" + " " * 10 + "██║  ██║╚════██║   ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██║██║╚██╗██║██╔══██║██║" + " " * 10 + "║")}
-{self.center("║" + " " * 10 + "██████╔╝███████╗   ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║██║  ██║███████╗" + " " * 10 + "║")}
-{self.center("║" + " " * 10 + "╚═════╝ ╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝" + " " * 10 + "║")}
-{self.center("║" + " " * 76 + "║")}
-{self.center("║" + " " * 20 + Colors.YELLOW + "⚡ SOC-GRADE NETWORK INTELLIGENCE ⚡" + Colors.RED + " " * 20 + "║")}
-{self.center("║" + " " * 25 + Colors.DIM + "Real-time Scanning | AI Scoring | Threat Intelligence | DNS Reconnaissance" + Colors.RED + " " * 25 + "║")}
-{self.center("║" + " " * 25 + Colors.CYAN + "🏢 HQ + Server Dual Location Tracking" + Colors.RED + " " * 25 + "║")}
-{self.center("║" + " " * 76 + "║")}
-{self.center("╚" + "═" * 76 + "╝")}
+{self.center("â•”" + "â•" * 76 + "â•—")}
+{self.center("â•‘" + " " * 76 + "â•‘")}
+{self.center("â•‘" + " " * 10 + "â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ•—" + " " * 10 + "â•‘")}
+{self.center("â•‘" + " " * 10 + "â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•â•šâ•â•â–ˆâ–ˆâ•”â•â•â•â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘" + " " * 10 + "â•‘")}
+{self.center("â•‘" + " " * 10 + "â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•”â–ˆâ–ˆâ–ˆâ–ˆâ•”â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â–ˆâ–ˆâ•— â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘" + " " * 10 + "â•‘")}
+{self.center("â•‘" + " " * 10 + "â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â•šâ•â•â•â•â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘" + " " * 10 + "â•‘")}
+{self.center("â•‘" + " " * 10 + "â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘ â•šâ•â• â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘ â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—" + " " * 10 + "â•‘")}
+{self.center("â•‘" + " " * 10 + "â•šâ•â•â•â•â•â• â•šâ•â•â•â•â•â•â•   â•šâ•â•   â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•â•šâ•â•     â•šâ•â•â•šâ•â•â•šâ•â•  â•šâ•â•â•â•â•šâ•â•  â•šâ•â•â•šâ•â•â•â•â•â•â•" + " " * 10 + "â•‘")}
+{self.center("â•‘" + " " * 76 + "â•‘")}
+{self.center("â•‘" + " " * 20 + Colors.YELLOW + "âš¡ SOC-GRADE NETWORK INTELLIGENCE âš¡" + Colors.RED + " " * 20 + "â•‘")}
+{self.center("â•‘" + " " * 25 + Colors.DIM + "Real-time Scanning | AI Scoring | Threat Intelligence | DNS Reconnaissance" + Colors.RED + " " * 25 + "â•‘")}
+{self.center("â•‘" + " " * 25 + Colors.CYAN + "ðŸ¢ HQ + Server Dual Location Tracking" + Colors.RED + " " * 25 + "â•‘")}
+{self.center("â•‘" + " " * 76 + "â•‘")}
+{self.center("â•š" + "â•" * 76 + "â•")}
 {Colors.RESET}
 """
         print(header)
@@ -1370,18 +1370,18 @@ class InteractiveSOCDashboard:
         
         # LEFT PANEL
         left_panel = [
-            f"{Colors.CYAN}┌{'─' * panel_width}┐{Colors.RESET}",
-            f"{Colors.CYAN}│{Colors.RESET} {Colors.BOLD}{Colors.GREEN}🎯 SCAN CONTROL CENTER{Colors.RESET}{' ' * 8}{Colors.CYAN}│{Colors.RESET}",
-            f"{Colors.CYAN}├{'─' * panel_width}┤{Colors.RESET}",
-            f"{Colors.CYAN}│{Colors.RESET} {Colors.YELLOW}[1]{Colors.RESET} Quick Scan{' ' * 18}{Colors.CYAN}│{Colors.RESET}",
-            f"{Colors.CYAN}│{Colors.RESET} {Colors.YELLOW}[2]{Colors.RESET} Standard Scan{' ' * 15}{Colors.CYAN}│{Colors.RESET}",
-            f"{Colors.CYAN}│{Colors.RESET} {Colors.YELLOW}[3]{Colors.RESET} Full Aggressive{' ' * 13}{Colors.CYAN}│{Colors.RESET}",
-            f"{Colors.CYAN}│{Colors.RESET} {Colors.YELLOW}[4]{Colors.RESET} DNS Recon{' ' * 20}{Colors.CYAN}│{Colors.RESET}",
-            f"{Colors.CYAN}│{Colors.RESET} {Colors.YELLOW}[5]{Colors.RESET} UDP Scan{' ' * 20}{Colors.CYAN}│{Colors.RESET}",
-            f"{Colors.CYAN}├{'─' * panel_width}┤{Colors.RESET}",
-            f"{Colors.CYAN}│{Colors.RESET} Target : {Colors.GREEN}{self.current_target[:18]:<18}{Colors.RESET} {Colors.CYAN}│{Colors.RESET}",
-            f"{Colors.CYAN}│{Colors.RESET} Status : {Colors.RED if self.scan_active else Colors.YELLOW}{'● ACTIVE' if self.scan_active else '○ IDLE'}{Colors.RESET}{' ' * 17}{Colors.CYAN}│{Colors.RESET}",
-            f"{Colors.CYAN}└{'─' * panel_width}┘{Colors.RESET}",
+            f"{Colors.CYAN}â”Œ{'â”€' * panel_width}â”{Colors.RESET}",
+            f"{Colors.CYAN}â”‚{Colors.RESET} {Colors.BOLD}{Colors.GREEN}ðŸŽ¯ SCAN CONTROL CENTER{Colors.RESET}{' ' * 8}{Colors.CYAN}â”‚{Colors.RESET}",
+            f"{Colors.CYAN}â”œ{'â”€' * panel_width}â”¤{Colors.RESET}",
+            f"{Colors.CYAN}â”‚{Colors.RESET} {Colors.YELLOW}[1]{Colors.RESET} Quick Scan{' ' * 18}{Colors.CYAN}â”‚{Colors.RESET}",
+            f"{Colors.CYAN}â”‚{Colors.RESET} {Colors.YELLOW}[2]{Colors.RESET} Standard Scan{' ' * 15}{Colors.CYAN}â”‚{Colors.RESET}",
+            f"{Colors.CYAN}â”‚{Colors.RESET} {Colors.YELLOW}[3]{Colors.RESET} Full Aggressive{' ' * 13}{Colors.CYAN}â”‚{Colors.RESET}",
+            f"{Colors.CYAN}â”‚{Colors.RESET} {Colors.YELLOW}[4]{Colors.RESET} DNS Recon{' ' * 20}{Colors.CYAN}â”‚{Colors.RESET}",
+            f"{Colors.CYAN}â”‚{Colors.RESET} {Colors.YELLOW}[5]{Colors.RESET} UDP Scan{' ' * 20}{Colors.CYAN}â”‚{Colors.RESET}",
+            f"{Colors.CYAN}â”œ{'â”€' * panel_width}â”¤{Colors.RESET}",
+            f"{Colors.CYAN}â”‚{Colors.RESET} Target : {Colors.GREEN}{self.current_target[:18]:<18}{Colors.RESET} {Colors.CYAN}â”‚{Colors.RESET}",
+            f"{Colors.CYAN}â”‚{Colors.RESET} Status : {Colors.RED if self.scan_active else Colors.YELLOW}{'â— ACTIVE' if self.scan_active else 'â—‹ IDLE'}{Colors.RESET}{' ' * 17}{Colors.CYAN}â”‚{Colors.RESET}",
+            f"{Colors.CYAN}â””{'â”€' * panel_width}â”˜{Colors.RESET}",
         ]
         
         # CENTER PANEL
@@ -1389,7 +1389,7 @@ class InteractiveSOCDashboard:
         avg_risk = total_risk / max(1, len(self.discovered_ports))
         risk_bar_size = 22
         filled = int((avg_risk / 10) * risk_bar_size)
-        risk_bar = "█" * filled + "░" * (risk_bar_size - filled)
+        risk_bar = "â–ˆ" * filled + "â–‘" * (risk_bar_size - filled)
         
         if avg_risk >= 7:
             risk_color = Colors.RED
@@ -1402,25 +1402,25 @@ class InteractiveSOCDashboard:
             threat = "LOW"
         
         center_panel = [
-            f"{Colors.MAGENTA}┌{'─' * panel_width}┐{Colors.RESET}",
-            f"{Colors.MAGENTA}│{Colors.RESET} {Colors.BOLD}{Colors.CYAN}🛡 SOC LIVE STATUS{Colors.RESET}{' ' * 13}{Colors.MAGENTA}│{Colors.RESET}",
-            f"{Colors.MAGENTA}├{'─' * panel_width}┤{Colors.RESET}",
-            f"{Colors.MAGENTA}│{Colors.RESET} Hosts Found : {Colors.GREEN}{len(self.network_nodes):<10}{Colors.RESET}{' ' * 9}{Colors.MAGENTA}│{Colors.RESET}",
-            f"{Colors.MAGENTA}│{Colors.RESET} Open Ports : {Colors.GREEN}{len(self.discovered_ports):<10}{Colors.RESET}{' ' * 9}{Colors.MAGENTA}│{Colors.RESET}",
-            f"{Colors.MAGENTA}│{Colors.RESET} Services    : {Colors.GREEN}{len(self.services_found):<10}{Colors.RESET}{' ' * 9}{Colors.MAGENTA}│{Colors.RESET}",
-            f"{Colors.MAGENTA}│{Colors.RESET} Duration    : {Colors.GREEN}{self.scan_duration}s{' ' * 16}{Colors.RESET}{Colors.MAGENTA}│{Colors.RESET}",
-            f"{Colors.MAGENTA}├{'─' * panel_width}┤{Colors.RESET}",
-            f"{Colors.MAGENTA}│{Colors.RESET} Threat Level:{' ' * 18}{Colors.MAGENTA}│{Colors.RESET}",
-            f"{Colors.MAGENTA}│{Colors.RESET} {risk_color}{risk_bar}{Colors.RESET} {avg_risk:.1f}/10 {Colors.MAGENTA}│{Colors.RESET}",
-            f"{Colors.MAGENTA}│{Colors.RESET} Status : {risk_color}{threat}{Colors.RESET}{' ' * (21 - len(threat))}{Colors.MAGENTA}│{Colors.RESET}",
-            f"{Colors.MAGENTA}└{'─' * panel_width}┘{Colors.RESET}",
+            f"{Colors.MAGENTA}â”Œ{'â”€' * panel_width}â”{Colors.RESET}",
+            f"{Colors.MAGENTA}â”‚{Colors.RESET} {Colors.BOLD}{Colors.CYAN}ðŸ›¡ SOC LIVE STATUS{Colors.RESET}{' ' * 13}{Colors.MAGENTA}â”‚{Colors.RESET}",
+            f"{Colors.MAGENTA}â”œ{'â”€' * panel_width}â”¤{Colors.RESET}",
+            f"{Colors.MAGENTA}â”‚{Colors.RESET} Hosts Found : {Colors.GREEN}{len(self.network_nodes):<10}{Colors.RESET}{' ' * 9}{Colors.MAGENTA}â”‚{Colors.RESET}",
+            f"{Colors.MAGENTA}â”‚{Colors.RESET} Open Ports : {Colors.GREEN}{len(self.discovered_ports):<10}{Colors.RESET}{' ' * 9}{Colors.MAGENTA}â”‚{Colors.RESET}",
+            f"{Colors.MAGENTA}â”‚{Colors.RESET} Services    : {Colors.GREEN}{len(self.services_found):<10}{Colors.RESET}{' ' * 9}{Colors.MAGENTA}â”‚{Colors.RESET}",
+            f"{Colors.MAGENTA}â”‚{Colors.RESET} Duration    : {Colors.GREEN}{self.scan_duration}s{' ' * 16}{Colors.RESET}{Colors.MAGENTA}â”‚{Colors.RESET}",
+            f"{Colors.MAGENTA}â”œ{'â”€' * panel_width}â”¤{Colors.RESET}",
+            f"{Colors.MAGENTA}â”‚{Colors.RESET} Threat Level:{' ' * 18}{Colors.MAGENTA}â”‚{Colors.RESET}",
+            f"{Colors.MAGENTA}â”‚{Colors.RESET} {risk_color}{risk_bar}{Colors.RESET} {avg_risk:.1f}/10 {Colors.MAGENTA}â”‚{Colors.RESET}",
+            f"{Colors.MAGENTA}â”‚{Colors.RESET} Status : {risk_color}{threat}{Colors.RESET}{' ' * (21 - len(threat))}{Colors.MAGENTA}â”‚{Colors.RESET}",
+            f"{Colors.MAGENTA}â””{'â”€' * panel_width}â”˜{Colors.RESET}",
         ]
         
         # RIGHT PANEL
         right_panel = [
-            f"{Colors.BLUE}┌{'─' * panel_width}┐{Colors.RESET}",
-            f"{Colors.BLUE}│{Colors.RESET} {Colors.BOLD}{Colors.YELLOW}🔍 LIVE DISCOVERIES{Colors.RESET}{' ' * 11}{Colors.BLUE}│{Colors.RESET}",
-            f"{Colors.BLUE}├{'─' * panel_width}┤{Colors.RESET}",
+            f"{Colors.BLUE}â”Œ{'â”€' * panel_width}â”{Colors.RESET}",
+            f"{Colors.BLUE}â”‚{Colors.RESET} {Colors.BOLD}{Colors.YELLOW}ðŸ” LIVE DISCOVERIES{Colors.RESET}{' ' * 11}{Colors.BLUE}â”‚{Colors.RESET}",
+            f"{Colors.BLUE}â”œ{'â”€' * panel_width}â”¤{Colors.RESET}",
         ]
         
         recent = self.discovered_ports[-6:]
@@ -1432,28 +1432,28 @@ class InteractiveSOCDashboard:
                 
                 if score >= 7:
                     color = Colors.RED
-                    icon = "⚠"
+                    icon = "âš "
                 elif score >= 4:
                     color = Colors.YELLOW
-                    icon = "●"
+                    icon = "â—"
                 else:
                     color = Colors.GREEN
-                    icon = "✓"
+                    icon = "âœ“"
                 
                 line = f"{icon} {port:<10} {service:<14}"
                 right_panel.append(
-                    f"{Colors.BLUE}│{Colors.RESET} {color}{line:<32}{Colors.RESET}{Colors.BLUE}│{Colors.RESET}"
+                    f"{Colors.BLUE}â”‚{Colors.RESET} {color}{line:<32}{Colors.RESET}{Colors.BLUE}â”‚{Colors.RESET}"
                 )
         else:
             for _ in range(6):
                 right_panel.append(
-                    f"{Colors.BLUE}│{Colors.RESET} {Colors.DIM}Waiting for scan results...{Colors.RESET}{' ' * 4}{Colors.BLUE}│{Colors.RESET}"
+                    f"{Colors.BLUE}â”‚{Colors.RESET} {Colors.DIM}Waiting for scan results...{Colors.RESET}{' ' * 4}{Colors.BLUE}â”‚{Colors.RESET}"
                 )
         
         right_panel.extend([
-            f"{Colors.BLUE}├{'─' * panel_width}┤{Colors.RESET}",
-            f"{Colors.BLUE}│{Colors.RESET} Updated : {Colors.GREEN}{datetime.now().strftime('%H:%M:%S')}{Colors.RESET}{' ' * 12}{Colors.BLUE}│{Colors.RESET}",
-            f"{Colors.BLUE}└{'─' * panel_width}┘{Colors.RESET}",
+            f"{Colors.BLUE}â”œ{'â”€' * panel_width}â”¤{Colors.RESET}",
+            f"{Colors.BLUE}â”‚{Colors.RESET} Updated : {Colors.GREEN}{datetime.now().strftime('%H:%M:%S')}{Colors.RESET}{' ' * 12}{Colors.BLUE}â”‚{Colors.RESET}",
+            f"{Colors.BLUE}â””{'â”€' * panel_width}â”˜{Colors.RESET}",
         ])
         
         max_lines = max(len(left_panel), len(center_panel), len(right_panel))
@@ -1465,47 +1465,47 @@ class InteractiveSOCDashboard:
     
     def draw_results_table(self):
         if not self.services_found:
-            print(f"\n{self.center(Colors.YELLOW + '─' * 70 + Colors.RESET)}")
-            print(self.center(Colors.YELLOW + ' ' * 28 + '⚠ NO RESULTS YET ⚠' + Colors.RESET))
-            print(self.center(Colors.YELLOW + '─' * 70 + Colors.RESET))
+            print(f"\n{self.center(Colors.YELLOW + 'â”€' * 70 + Colors.RESET)}")
+            print(self.center(Colors.YELLOW + ' ' * 28 + 'âš  NO RESULTS YET âš ' + Colors.RESET))
+            print(self.center(Colors.YELLOW + 'â”€' * 70 + Colors.RESET))
             return
         
-        print(f"\n{self.center(Colors.CYAN + Colors.BOLD + '─' * 90 + Colors.RESET)}")
-        print(self.center(Colors.CYAN + Colors.BOLD + '│' + ' ' * 38 + '🔓 DISCOVERED SERVICES 🔓' + ' ' * 38 + '│' + Colors.RESET))
-        print(self.center(Colors.CYAN + Colors.BOLD + '─' * 90 + Colors.RESET))
+        print(f"\n{self.center(Colors.CYAN + Colors.BOLD + 'â”€' * 90 + Colors.RESET)}")
+        print(self.center(Colors.CYAN + Colors.BOLD + 'â”‚' + ' ' * 38 + 'ðŸ”“ DISCOVERED SERVICES ðŸ”“' + ' ' * 38 + 'â”‚' + Colors.RESET))
+        print(self.center(Colors.CYAN + Colors.BOLD + 'â”€' * 90 + Colors.RESET))
         
-        header = f"{Colors.CYAN}│ {Colors.GREEN}PORT{Colors.RESET} │ {Colors.GREEN}SERVICE{Colors.RESET} │ {Colors.GREEN}VERSION{Colors.RESET} │ {Colors.GREEN}RISK{Colors.RESET} │ {Colors.GREEN}EXPLOIT{Colors.RESET} │{Colors.CYAN}"
+        header = f"{Colors.CYAN}â”‚ {Colors.GREEN}PORT{Colors.RESET} â”‚ {Colors.GREEN}SERVICE{Colors.RESET} â”‚ {Colors.GREEN}VERSION{Colors.RESET} â”‚ {Colors.GREEN}RISK{Colors.RESET} â”‚ {Colors.GREEN}EXPLOIT{Colors.RESET} â”‚{Colors.CYAN}"
         print(self.center(header))
-        print(self.center(Colors.CYAN + '─' * 90 + Colors.RESET))
+        print(self.center(Colors.CYAN + 'â”€' * 90 + Colors.RESET))
         
         for service in self.services_found[:8]:
             risk_score = service.get("risk_score", 0)
             if risk_score >= 7:
-                risk_text = f"{Colors.RED}⚠ HIGH ⚠{Colors.RESET}"
+                risk_text = f"{Colors.RED}âš  HIGH âš {Colors.RESET}"
             elif risk_score >= 4:
-                risk_text = f"{Colors.YELLOW}● MED ●{Colors.RESET}"
+                risk_text = f"{Colors.YELLOW}â— MED â—{Colors.RESET}"
             else:
-                risk_text = f"{Colors.GREEN}○ LOW ○{Colors.RESET}"
+                risk_text = f"{Colors.GREEN}â—‹ LOW â—‹{Colors.RESET}"
             
             exploit_info = service.get("exploit", "N/A")[:10]
-            line = f"{Colors.CYAN}│{Colors.RESET} {Colors.GREEN}{service['port']}/{service['protocol']:<4}{Colors.RESET} │ {Colors.CYAN}{service['service'][:10]:<10}{Colors.RESET} │ {Colors.DIM}{service.get('version', 'N/A')[:8]:<8}{Colors.RESET} │ {risk_text:<10} │ {Colors.PURPLE}{exploit_info:<10}{Colors.RESET} │{Colors.CYAN}"
+            line = f"{Colors.CYAN}â”‚{Colors.RESET} {Colors.GREEN}{service['port']}/{service['protocol']:<4}{Colors.RESET} â”‚ {Colors.CYAN}{service['service'][:10]:<10}{Colors.RESET} â”‚ {Colors.DIM}{service.get('version', 'N/A')[:8]:<8}{Colors.RESET} â”‚ {risk_text:<10} â”‚ {Colors.PURPLE}{exploit_info:<10}{Colors.RESET} â”‚{Colors.CYAN}"
             print(self.center(line))
         
-        print(self.center(Colors.CYAN + '─' * 90 + Colors.RESET))
+        print(self.center(Colors.CYAN + 'â”€' * 90 + Colors.RESET))
     
     def draw_footer(self):
         footer = f"""
-{Colors.DIM}{self.center('═' * 90)}{Colors.RESET}
+{Colors.DIM}{self.center('â•' * 90)}{Colors.RESET}
 {self.center(Colors.DIM + ' Commands: ' + Colors.GREEN + '[S]' + Colors.DIM + ' Scan  ' + Colors.YELLOW + '[Q]' + Colors.DIM + ' Quick  ' + Colors.RED + '[F]' + Colors.DIM + ' Full  ' + Colors.CYAN + '[D]' + Colors.DIM + ' DNS Recon  ' + Colors.MAGENTA + '[H]' + Colors.DIM + ' Help  ' + Colors.WHITE + '[X]' + Colors.DIM + ' Exit')}{Colors.RESET}
-{Colors.DIM}{self.center('═' * 90)}{Colors.RESET}
+{Colors.DIM}{self.center('â•' * 90)}{Colors.RESET}
 """
         print(footer)
     
     def show_help(self):
         help_text = f"""
-{self.center(Colors.CYAN + '═' * 60 + Colors.RESET)}
-{self.center(Colors.GREEN + '🛡️ DSTERMINAL SOC DASHBOARD HELP' + Colors.RESET)}
-{self.center(Colors.CYAN + '═' * 60 + Colors.RESET)}
+{self.center(Colors.CYAN + 'â•' * 60 + Colors.RESET)}
+{self.center(Colors.GREEN + 'ðŸ›¡ï¸ DSTERMINAL SOC DASHBOARD HELP' + Colors.RESET)}
+{self.center(Colors.CYAN + 'â•' * 60 + Colors.RESET)}
 {self.center(Colors.YELLOW + 'Commands:' + Colors.RESET)}
 {self.center(Colors.GREEN + '  [S] - Standard Scan' + Colors.RESET)}
 {self.center(Colors.GREEN + '  [Q] - Quick Scan' + Colors.RESET)}
@@ -1513,7 +1513,7 @@ class InteractiveSOCDashboard:
 {self.center(Colors.GREEN + '  [D] - DNS Reconnaissance' + Colors.RESET)}
 {self.center(Colors.GREEN + '  [H] - Help' + Colors.RESET)}
 {self.center(Colors.GREEN + '  [X] - Exit' + Colors.RESET)}
-{self.center(Colors.CYAN + '═' * 60 + Colors.RESET)}
+{self.center(Colors.CYAN + 'â•' * 60 + Colors.RESET)}
 """
         print(help_text)
     
@@ -1526,16 +1526,16 @@ class InteractiveSOCDashboard:
             self.draw_results_table()
             
             # Custom left-aligned footer with glowing input
-            print(f"\n{Colors.DIM}{'─' * 90}{Colors.RESET}")
+            print(f"\n{Colors.DIM}{'â”€' * 90}{Colors.RESET}")
             print(f"{Colors.DIM} Commands: {Colors.GREEN}[S]{Colors.DIM} Scan  {Colors.YELLOW}[Q]{Colors.DIM} Quick  {Colors.RED}[F]{Colors.DIM} Full  {Colors.CYAN}[D]{Colors.DIM} DNS Recon  {Colors.MAGENTA}[H]{Colors.DIM} Help  {Colors.WHITE}[X]{Colors.DIM} Exit{Colors.RESET}")
-            print(f"{Colors.DIM}{'─' * 90}{Colors.RESET}")
+            print(f"{Colors.DIM}{'â”€' * 90}{Colors.RESET}")
             
             # Glowing input prompt with glow effect
-            print(f"\n{Colors.CYAN}{Colors.BOLD}╭─{Colors.RESET} {Colors.GREEN}▶{Colors.RESET} {Colors.BOLD}{Colors.CYAN}SOC COMMAND{Colors.RESET} {Colors.CYAN}{Colors.BOLD}─{Colors.RESET}{Colors.CYAN}{Colors.BOLD}─────────────────────────────────────────────────{Colors.RESET}")
+            print(f"\n{Colors.CYAN}{Colors.BOLD}â•­â”€{Colors.RESET} {Colors.GREEN}â–¶{Colors.RESET} {Colors.BOLD}{Colors.CYAN}SOC COMMAND{Colors.RESET} {Colors.CYAN}{Colors.BOLD}â”€{Colors.RESET}{Colors.CYAN}{Colors.BOLD}â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€{Colors.RESET}")
             
             # Custom input with glow effect using ANSI
             # The glow effect is achieved with bright colors and bold text
-            glow_prompt = f"{Colors.CYAN}╰─{Colors.RESET} {Colors.GREEN}{Colors.BOLD}❯{Colors.RESET} {Colors.CYAN}{Colors.BOLD}${Colors.RESET} "
+            glow_prompt = f"{Colors.CYAN}â•°â”€{Colors.RESET} {Colors.GREEN}{Colors.BOLD}â¯{Colors.RESET} {Colors.CYAN}{Colors.BOLD}${Colors.RESET} "
             
             # Add a subtle glow effect with background color and bold
             print(f"{Colors.CYAN}{Colors.BOLD}\033[5m{glow_prompt}{Colors.RESET}\033[0m", end="")
@@ -1631,27 +1631,27 @@ class InteractiveSOCDashboard:
             node_y.append(radius * math.sin(angle))
             risk = self.network_nodes[ip].risk_score
             is_org = self.network_nodes[ip].is_organization_location
-            location_note = "🏢 HQ+Server" if is_org else "🖥️ Server"
+            location_note = "ðŸ¢ HQ+Server" if is_org else "ðŸ–¥ï¸ Server"
             
             if risk >= 7:
                 desc = random.choice(high_risk_descriptions)
                 risk_color = "#ff4444"
                 risk_text = "CRITICAL"
-                risk_icon = "🔴"
+                risk_icon = "ðŸ”´"
                 node_color = "#ff0000"
                 node_size = 25
             elif risk >= 4:
                 desc = random.choice(medium_risk_descriptions)
                 risk_color = "#ffcc00"
                 risk_text = "MEDIUM"
-                risk_icon = "🟡"
+                risk_icon = "ðŸŸ¡"
                 node_color = "#ffcc00"
                 node_size = 20
             else:
                 desc = random.choice(low_risk_descriptions)
                 risk_color = "#44ff44"
                 risk_text = "LOW"
-                risk_icon = "🟢"
+                risk_icon = "ðŸŸ¢"
                 node_color = "#00ff00"
                 node_size = 15
             
@@ -1668,16 +1668,16 @@ class InteractiveSOCDashboard:
             
             server_loc = ""
             if hasattr(self.network_nodes[ip], 'server_country') and self.network_nodes[ip].server_country:
-                server_loc = f"🖥️ Server: {self.network_nodes[ip].server_country} - {self.network_nodes[ip].server_city}"
+                server_loc = f"ðŸ–¥ï¸ Server: {self.network_nodes[ip].server_country} - {self.network_nodes[ip].server_city}"
             
             org_loc = ""
             if is_org and hasattr(self.network_nodes[ip], 'org_country') and self.network_nodes[ip].org_country:
-                org_loc = f"🏢 HQ: {self.network_nodes[ip].org_country} - {self.network_nodes[ip].org_city}"
+                org_loc = f"ðŸ¢ HQ: {self.network_nodes[ip].org_country} - {self.network_nodes[ip].org_city}"
             
             hover_parts = [
                 f"<b style='color:#00ffff;font-size:14px;'>{ip}</b>",
                 f"{location_note}",
-                "─────────────────",
+                "â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
             ]
             if org_loc:
                 hover_parts.append(org_loc)
@@ -1685,10 +1685,10 @@ class InteractiveSOCDashboard:
                 hover_parts.append(server_loc)
             
             hover_parts.extend([
-                f"<b>⚠️ Risk:</b> <span style='color:{risk_color};font-weight:bold;'>{risk:.1f}/10 [{risk_text}]</span>",
-                f"<b>🔓 Ports:</b> {port_count}",
-                f"<b>🔧 Services:</b> {', '.join(top_services) if top_services else 'None'}",
-                "─────────────────",
+                f"<b>âš ï¸ Risk:</b> <span style='color:{risk_color};font-weight:bold;'>{risk:.1f}/10 [{risk_text}]</span>",
+                f"<b>ðŸ”“ Ports:</b> {port_count}",
+                f"<b>ðŸ”§ Services:</b> {', '.join(top_services) if top_services else 'None'}",
+                "â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
                 f"<span style='color:{risk_color};font-weight:bold;font-size:12px;'>{risk_icon} {desc}</span>"
             ])
             
@@ -1745,26 +1745,26 @@ class InteractiveSOCDashboard:
         
         summary_parts = []
         if high_risk_nodes:
-            summary_parts.append(f"🔴 {len(high_risk_nodes)} Critical")
+            summary_parts.append(f"ðŸ”´ {len(high_risk_nodes)} Critical")
         if medium_risk_nodes:
-            summary_parts.append(f"🟡 {len(medium_risk_nodes)} Medium")
+            summary_parts.append(f"ðŸŸ¡ {len(medium_risk_nodes)} Medium")
         if low_risk_nodes:
-            summary_parts.append(f"🟢 {len(low_risk_nodes)} Low")
+            summary_parts.append(f"ðŸŸ¢ {len(low_risk_nodes)} Low")
         risk_summary = " | ".join(summary_parts) if summary_parts else "No risk data"
         
         if high_risk_nodes:
-            risk_footer = "⚠️ CRITICAL NODES DETECTED - Immediate action required!"
+            risk_footer = "âš ï¸ CRITICAL NODES DETECTED - Immediate action required!"
             footer_color = "#ff4444"
         elif medium_risk_nodes:
-            risk_footer = "📊 Medium risk nodes found - Schedule remediation"
+            risk_footer = "ðŸ“Š Medium risk nodes found - Schedule remediation"
             footer_color = "#ffcc00"
         else:
-            risk_footer = "✅ All nodes have LOW risk - Continue monitoring"
+            risk_footer = "âœ… All nodes have LOW risk - Continue monitoring"
             footer_color = "#44ff44"
         
         fig.update_layout(
             title=dict(
-                text=f"🌐 NETWORK TOPOLOGY<br><span style='font-size:11px;color:#888;'>Risk Summary: {risk_summary}</span>",
+                text=f"ðŸŒ NETWORK TOPOLOGY<br><span style='font-size:11px;color:#888;'>Risk Summary: {risk_summary}</span>",
                 font=dict(color='#00ffff', size=14),
                 x=0.5
             ),
@@ -1779,7 +1779,7 @@ class InteractiveSOCDashboard:
             margin=dict(l=20, r=20, t=60, b=20),
             annotations=[
                 dict(
-                    text=f"📊 {risk_footer}",
+                    text=f"ðŸ“Š {risk_footer}",
                     x=0.5,
                     y=-0.08,
                     xref='paper',
@@ -1788,7 +1788,7 @@ class InteractiveSOCDashboard:
                     font=dict(color=footer_color, size=10)
                 ),
                 dict(
-                    text="💡 Hover over nodes for detailed risk assessment",
+                    text="ðŸ’¡ Hover over nodes for detailed risk assessment",
                     x=0.5,
                     y=-0.15,
                     xref='paper',
@@ -1828,9 +1828,9 @@ class InteractiveSOCDashboard:
         if high_count > 0:
             alert_html = f"""
             <div style="background: rgba(255, 0, 0, 0.15); border: 1px solid #ff0000; border-radius: 6px; padding: 10px 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 20px;">🚨</span>
+                <span style="font-size: 20px;">ðŸš¨</span>
                 <div>
-                    <span style="color: #ff0000; font-weight: bold; font-size: 13px;">⚠️ CRITICAL NODE DETECTED!</span>
+                    <span style="color: #ff0000; font-weight: bold; font-size: 13px;">âš ï¸ CRITICAL NODE DETECTED!</span>
                     <span style="color: #ff6666; font-size: 11px; display: block; margin-top: 2px;">
                         {high_count} node{'s' if high_count > 1 else ''} with CRITICAL risk level - Immediate action required!
                     </span>
@@ -1840,9 +1840,9 @@ class InteractiveSOCDashboard:
         elif medium_count > 0:
             alert_html = f"""
             <div style="background: rgba(255, 204, 0, 0.12); border: 1px solid #ffcc00; border-radius: 6px; padding: 10px 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 20px;">📊</span>
+                <span style="font-size: 20px;">ðŸ“Š</span>
                 <div>
-                    <span style="color: #ffcc00; font-weight: bold; font-size: 13px;">⚠️ MEDIUM RISK NODES</span>
+                    <span style="color: #ffcc00; font-weight: bold; font-size: 13px;">âš ï¸ MEDIUM RISK NODES</span>
                     <span style="color: #ffdd77; font-size: 11px; display: block; margin-top: 2px;">
                         {medium_count} node{'s' if medium_count > 1 else ''} with MEDIUM risk level - Schedule remediation
                     </span>
@@ -1852,9 +1852,9 @@ class InteractiveSOCDashboard:
         else:
             alert_html = f"""
             <div style="background: rgba(0, 255, 0, 0.08); border: 1px solid #44ff44; border-radius: 6px; padding: 10px 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 20px;">✅</span>
+                <span style="font-size: 20px;">âœ…</span>
                 <div>
-                    <span style="color: #44ff44; font-weight: bold; font-size: 13px;">🟢 LOW RISK</span>
+                    <span style="color: #44ff44; font-weight: bold; font-size: 13px;">ðŸŸ¢ LOW RISK</span>
                     <span style="color: #88ff88; font-size: 11px; display: block; margin-top: 2px;">
                         All nodes have LOW risk - Continue monitoring
                     </span>
@@ -1865,7 +1865,7 @@ class InteractiveSOCDashboard:
         risk_panel_html = f"""
         <div style="margin-top: 15px; padding: 12px; background: rgba(10, 15, 30, 0.9); border-radius: 10px; border: 1px solid rgba(0, 255, 255, 0.2);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <span style="color: #00ffff; font-size: 13px; font-weight: bold;">📋 RISK ASSESSMENT PER NODE</span>
+                <span style="color: #00ffff; font-size: 13px; font-weight: bold;">ðŸ“‹ RISK ASSESSMENT PER NODE</span>
                 <span style="color: #666; font-size: 10px;">Hover nodes for details</span>
             </div>
             {alert_html}
@@ -1873,9 +1873,9 @@ class InteractiveSOCDashboard:
                 {risk_descriptions_html}
             </div>
             <div style="margin-top: 10px; display: flex; gap: 15px; justify-content: center; font-size: 10px; color: #888; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px; flex-wrap: wrap;">
-                <span><span style="color:#ff4444;">●</span> Critical ({high_count})</span>
-                <span><span style="color:#ffcc00;">●</span> Medium ({medium_count})</span>
-                <span><span style="color:#44ff44;">●</span> Low ({low_count})</span>
+                <span><span style="color:#ff4444;">â—</span> Critical ({high_count})</span>
+                <span><span style="color:#ffcc00;">â—</span> Medium ({medium_count})</span>
+                <span><span style="color:#44ff44;">â—</span> Low ({low_count})</span>
                 <span style="color:#666;">|</span>
                 <span style="color:#666;">Total Nodes: {total_nodes}</span>
             </div>
@@ -1911,7 +1911,7 @@ class InteractiveSOCDashboard:
         ))
         
         fig.update_layout(
-            title=dict(text="📊 HISTORICAL SCAN TIMELINE", font=dict(color='#00ffff', size=14), x=0.5),
+            title=dict(text="ðŸ“Š HISTORICAL SCAN TIMELINE", font=dict(color='#00ffff', size=14), x=0.5),
             xaxis_title="Scan Time",
             yaxis_title="Value",
             template="plotly_dark",
@@ -1986,10 +1986,10 @@ class InteractiveSOCDashboard:
 </head>
 <body>
     <div class="header">
-        <h1>🛡️ DSTERMINAL CYBER-OPS NETWORK TOPOLOGY MAPPING 🛡️</h1>
+        <h1>ðŸ›¡ï¸ DSTERMINAL CYBER-OPS NETWORK TOPOLOGY MAPPING ðŸ›¡ï¸</h1>
         <div>Network Intelligence | AI Vulnerability Scoring | Real-time Threat Detection</div>
-        <div class="blink" style="color: #00ff00; font-size: 11px; margin-top: 5px;">● FULL INTELLIGENCE DASHBOARD - DUAL LOCATION TRACKING ●</div>
-        <div style="font-size: 10px; color: #ffaa00; margin-top: 3px;">🏢 Organization Headquarters + 🖥️ Server/Cloud Locations</div>
+        <div class="blink" style="color: #00ff00; font-size: 11px; margin-top: 5px;">â— FULL INTELLIGENCE DASHBOARD - DUAL LOCATION TRACKING â—</div>
+        <div style="font-size: 10px; color: #ffaa00; margin-top: 3px;">ðŸ¢ Organization Headquarters + ðŸ–¥ï¸ Server/Cloud Locations</div>
     </div>
     
     <div class="stats-grid">
@@ -2003,20 +2003,20 @@ class InteractiveSOCDashboard:
     
     <div class="dashboard-container">
         <div class="card">
-            <div class="card-header">🌍 GEOGRAPHIC THREAT MAP <span class="org-badge">🏢 HQ</span> <span class="dual-badge">🖥️ Server</span></div>
+            <div class="card-header">ðŸŒ GEOGRAPHIC THREAT MAP <span class="org-badge">ðŸ¢ HQ</span> <span class="dual-badge">ðŸ–¥ï¸ Server</span></div>
             <div id="geomap" style="height: 450px;">{geo_html}</div>
         </div>
         <div class="card">
-            <div class="card-header">🌐 NETWORK TOPOLOGY</div>
+            <div class="card-header">ðŸŒ NETWORK TOPOLOGY</div>
             <div id="topology" style="min-height: 400px;">{topology_graph}</div>
             <div class="risk-panel-container">{risk_panel}</div>
         </div>
         <div class="card full-width">
-            <div class="card-header">📊 HISTORICAL SCAN TIMELINE</div>
+            <div class="card-header">ðŸ“Š HISTORICAL SCAN TIMELINE</div>
             <div id="timeline">{timeline_html}</div>
         </div>
         <div class="card full-width">
-            <div class="card-header">🎯 DISCOVERED SERVICES & VULNERABILITIES</div>
+            <div class="card-header">ðŸŽ¯ DISCOVERED SERVICES & VULNERABILITIES</div>
             <div style="max-height: 300px; overflow: auto;">
                 <table>
                     <thead>
@@ -2032,8 +2032,8 @@ class InteractiveSOCDashboard:
     
     <div class="footer">
         DSTerminal Enterprise SOC Platform | Powered by AI Vulnerability Scoring | Threat Intelligence Active
-        <br>📄 DSTerminal autogenerated report | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-        <br><span style="color: #00ff00;">● GEOLOCATION: IP-API.COM</span> | <span style="color: #ffaa00;">🏢 ORGANIZATION HEADQUARTERS</span> | <span style="color: #ff6600;">🖥️ SERVER LOCATIONS</span> | ● REAL-TIME MONITORING ACTIVE ●
+        <br>ðŸ“„ DSTerminal autogenerated report | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+        <br><span style="color: #00ff00;">â— GEOLOCATION: IP-API.COM</span> | <span style="color: #ffaa00;">ðŸ¢ ORGANIZATION HEADQUARTERS</span> | <span style="color: #ff6600;">ðŸ–¥ï¸ SERVER LOCATIONS</span> | â— REAL-TIME MONITORING ACTIVE â—
     </div>
 </body>
 </html>
@@ -2044,13 +2044,13 @@ class InteractiveSOCDashboard:
             f.write(html)
         
         if not auto_open:
-            print(f"\n{Colors.CYAN}╔{'═' * 60}╗{Colors.RESET}")
-            print(f"{Colors.CYAN}║{Colors.RESET} {Colors.GREEN}📄 Dashboard Generated Successfully!{Colors.RESET} {Colors.CYAN}║{Colors.RESET}")
-            print(f"{Colors.CYAN}║{Colors.RESET} {Colors.DIM}Location: {html_path}{Colors.RESET} {Colors.CYAN}║{Colors.RESET}")
-            print(f"{Colors.CYAN}╠{'═' * 60}╣{Colors.RESET}")
-            print(f"{Colors.CYAN}║{Colors.RESET} {Colors.YELLOW}[?] Open dashboard in browser?{Colors.RESET} {Colors.CYAN}║{Colors.RESET}")
-            print(f"{Colors.CYAN}║{Colors.RESET} {Colors.GREEN}[Y] Yes{Colors.RESET}  {Colors.RED}[N] No{Colors.RESET}  {Colors.CYAN}║{Colors.RESET}")
-            print(f"{Colors.CYAN}╚{'═' * 60}╝{Colors.RESET}")
+            print(f"\n{Colors.CYAN}â•”{'â•' * 60}â•—{Colors.RESET}")
+            print(f"{Colors.CYAN}â•‘{Colors.RESET} {Colors.GREEN}ðŸ“„ Dashboard Generated Successfully!{Colors.RESET} {Colors.CYAN}â•‘{Colors.RESET}")
+            print(f"{Colors.CYAN}â•‘{Colors.RESET} {Colors.DIM}Location: {html_path}{Colors.RESET} {Colors.CYAN}â•‘{Colors.RESET}")
+            print(f"{Colors.CYAN}â• {'â•' * 60}â•£{Colors.RESET}")
+            print(f"{Colors.CYAN}â•‘{Colors.RESET} {Colors.YELLOW}[?] Open dashboard in browser?{Colors.RESET} {Colors.CYAN}â•‘{Colors.RESET}")
+            print(f"{Colors.CYAN}â•‘{Colors.RESET} {Colors.GREEN}[Y] Yes{Colors.RESET}  {Colors.RED}[N] No{Colors.RESET}  {Colors.CYAN}â•‘{Colors.RESET}")
+            print(f"{Colors.CYAN}â•š{'â•' * 60}â•{Colors.RESET}")
             
             choice = input(f"{Colors.GREEN}[SOC] > {Colors.RESET}").strip().lower()
             if choice == 'y' or choice == 'yes':
@@ -2089,7 +2089,7 @@ class InteractiveSOCDashboard:
         
         self.clear_screen()
         self.draw_header()
-        print(f"{Colors.CYAN}{'─' * 70}{Colors.RESET}")
+        print(f"{Colors.CYAN}{'â”€' * 70}{Colors.RESET}")
         
         # Timer thread control
         timer_running = True
@@ -2103,7 +2103,7 @@ class InteractiveSOCDashboard:
                 time_str = f"{minutes:02d}:{seconds:02d}"
                 # Move cursor up one line, clear it, and print the timer
                 sys.stdout.write(f"\033[1A\033[K")
-                # print(f"{Colors.YELLOW}⏳ SCANNING IN PROGRESS... (Elapsed: {Colors.GREEN}{time_str}{Colors.YELLOW}){Colors.RESET}")
+                # print(f"{Colors.YELLOW}â³ SCANNING IN PROGRESS... (Elapsed: {Colors.GREEN}{time_str}{Colors.YELLOW}){Colors.RESET}")
                 sys.stdout.flush()
                 time.sleep(1)  # Update every second
         
@@ -2112,7 +2112,7 @@ class InteractiveSOCDashboard:
         timer_thread.start()
         
         # Initial timer display
-        print(f"{Colors.CYAN}{'─' * 70}{Colors.RESET}\n")
+        print(f"{Colors.CYAN}{'â”€' * 70}{Colors.RESET}\n")
         
         try:
             # Run nmap with real-time output
@@ -2143,7 +2143,7 @@ class InteractiveSOCDashboard:
                         minutes = elapsed // 60
                         seconds = elapsed % 60
                         time_str = f"{minutes:02d}:{seconds:02d}"
-                        print(f"\n{Colors.YELLOW}⏳ SCANNING IN PROGRESS... (Elapsed: {Colors.GREEN}{time_str}{Colors.YELLOW}){Colors.RESET}")
+                        print(f"\n{Colors.YELLOW}â³ SCANNING IN PROGRESS... (Elapsed: {Colors.GREEN}{time_str}{Colors.YELLOW}){Colors.RESET}")
                         sys.stdout.flush()
             
             process.wait()
@@ -2185,7 +2185,7 @@ class InteractiveSOCDashboard:
             self.draw_results_table()
             self.draw_footer()
             
-            print(f"\n{Colors.GREEN}✅ Scan completed in {duration_str}{Colors.RESET}")
+            print(f"\n{Colors.GREEN}âœ… Scan completed in {duration_str}{Colors.RESET}")
             print(self.center(Colors.CYAN + '[+] Found ' + str(len(self.discovered_ports)) + ' open ports' + Colors.RESET))
             
             if self.services_found:
@@ -2262,7 +2262,7 @@ class InteractiveSOCDashboard:
             print(f"   {Fore.CYAN}{i}.{Style.RESET_ALL} {os.path.basename(html_file)}")
             print(f"      {Fore.DIM}Target: {target} | Size: {size_kb:.1f} KB | Modified: {mod_time.strftime('%Y-%m-%d %H:%M:%S')}{Style.RESET_ALL}")
         
-        print(f"\n{Fore.CYAN}📁 Location: {workspace}{Style.RESET_ALL}")
+        print(f"\n{Fore.CYAN}ðŸ“ Location: {workspace}{Style.RESET_ALL}")
         
         choice = input(f"\n{Fore.YELLOW}[?] Enter number to generate PDF (or 'n' to cancel): {Style.RESET_ALL}").strip()
         
@@ -2343,7 +2343,7 @@ class InteractiveSOCDashboard:
                     lon = org_location.get("lon", 0)
                     country = org_location.get("country", "Unknown")
                     city = org_location.get("city", "Unknown")
-                    print(f"{Colors.YELLOW}  ℹ️ Using organization HQ location (server location unknown){Colors.RESET}")
+                    print(f"{Colors.YELLOW}  â„¹ï¸ Using organization HQ location (server location unknown){Colors.RESET}")
                 
                 # Store host details with resolved IP
                 self.host_details[host] = {
@@ -2402,8 +2402,8 @@ class InteractiveSOCDashboard:
                     )
                     
                     # Display location information
-                    print(f"{Colors.GREEN}  📍 Server Location: {city}, {country} ({lat:.4f}, {lon:.4f}){Colors.RESET}")
-                    print(f"{Colors.CYAN}  🖥️ ISP: {isp}{Colors.RESET}")
+                    print(f"{Colors.GREEN}  ðŸ“ Server Location: {city}, {country} ({lat:.4f}, {lon:.4f}){Colors.RESET}")
+                    print(f"{Colors.CYAN}  ðŸ–¥ï¸ ISP: {isp}{Colors.RESET}")
                     
                     # Show organization HQ if available and different from server location
                     org_country = org_location.get('country', 'Unknown')
@@ -2412,13 +2412,13 @@ class InteractiveSOCDashboard:
                     if org_country != 'Unknown' and org_city != 'Unknown':
                         # Check if HQ is different from server location
                         if org_country != country or org_city != city:
-                            print(f"{Colors.YELLOW}  🏢 Organization HQ: {org_country} - {org_city}{Colors.RESET}")
+                            print(f"{Colors.YELLOW}  ðŸ¢ Organization HQ: {org_country} - {org_city}{Colors.RESET}")
                         else:
-                            print(f"{Colors.GREEN}  🏢 Same as server location (HQ: {org_country} - {org_city}){Colors.RESET}")
+                            print(f"{Colors.GREEN}  ðŸ¢ Same as server location (HQ: {org_country} - {org_city}){Colors.RESET}")
                     elif org_country != 'Unknown':
-                        print(f"{Colors.YELLOW}  🏢 Organization Country: {org_country}{Colors.RESET}")
+                        print(f"{Colors.YELLOW}  ðŸ¢ Organization Country: {org_country}{Colors.RESET}")
                 else:
-                    print(f"{Colors.YELLOW}  ⚠️ Location not available for {host}{Colors.RESET}")
+                    print(f"{Colors.YELLOW}  âš ï¸ Location not available for {host}{Colors.RESET}")
                     # Try a fallback using IP-API directly with resolved IP
                     if resolved_ip and resolved_ip != host:
                         try:
@@ -2452,7 +2452,7 @@ class InteractiveSOCDashboard:
                                         org_city=org_location.get("city", "Unknown"),
                                         domain=host
                                     )
-                                    print(f"{Colors.GREEN}  📍 Server Location (fallback): {data.get('city', 'Unknown')}, {data.get('country', 'Unknown')} ({lat:.4f}, {lon:.4f}){Colors.RESET}")
+                                    print(f"{Colors.GREEN}  ðŸ“ Server Location (fallback): {data.get('city', 'Unknown')}, {data.get('country', 'Unknown')} ({lat:.4f}, {lon:.4f}){Colors.RESET}")
                         except:
                             pass
             return
@@ -2510,17 +2510,17 @@ class InteractiveSOCDashboard:
                             break
             
             # Print immediately for real-time feedback
-            risk_icon = "🔴" if risk_score >= 7 else "🟡" if risk_score >= 4 else "🟢"
+            risk_icon = "ðŸ”´" if risk_score >= 7 else "ðŸŸ¡" if risk_score >= 4 else "ðŸŸ¢"
             color = Colors.RED if risk_score >= 7 else Colors.YELLOW if risk_score >= 4 else Colors.GREEN
             risk_text = "CRITICAL" if risk_score >= 7 else "HIGH" if risk_score >= 5 else "MEDIUM" if risk_score >= 3 else "LOW"
             
-            print(f"{color}  ├─ {risk_icon} PORT {port}/{proto} → {service}{Colors.RESET}")
+            print(f"{color}  â”œâ”€ {risk_icon} PORT {port}/{proto} â†’ {service}{Colors.RESET}")
             if version:
-                print(f"{color}  │  └─ Version: {version}{Colors.RESET}")
-            print(f"{color}  │     Risk: {risk_score:.1f}/10 [{risk_text}]{Colors.RESET}")
+                print(f"{color}  â”‚  â””â”€ Version: {version}{Colors.RESET}")
+            print(f"{color}  â”‚     Risk: {risk_score:.1f}/10 [{risk_text}]{Colors.RESET}")
             if vuln.get("exploit"):
-                print(f"{color}  │     Exploit: {vuln.get('exploit')}{Colors.RESET}")
-            print(f"{color}  │     CVE: {vuln.get('cvss_id', 'N/A')}{Colors.RESET}")
+                print(f"{color}  â”‚     Exploit: {vuln.get('exploit')}{Colors.RESET}")
+            print(f"{color}  â”‚     CVE: {vuln.get('cvss_id', 'N/A')}{Colors.RESET}")
             print()
             return
         
@@ -2533,49 +2533,49 @@ class InteractiveSOCDashboard:
         target = self.current_target if self.current_target else "Unknown"
         
         summary_lines = []
-        summary_lines.append(f"\n{Colors.CYAN}{'═' * 70}{Colors.RESET}")
-        summary_lines.append(f"{Colors.GREEN}✅ SCAN COMPLETED - {target}{Colors.RESET}")
-        summary_lines.append(f"{Colors.CYAN}{'═' * 70}{Colors.RESET}")
+        summary_lines.append(f"\n{Colors.CYAN}{'â•' * 70}{Colors.RESET}")
+        summary_lines.append(f"{Colors.GREEN}âœ… SCAN COMPLETED - {target}{Colors.RESET}")
+        summary_lines.append(f"{Colors.CYAN}{'â•' * 70}{Colors.RESET}")
         
-        summary_lines.append(f"\n{Colors.YELLOW}🖥️ HOST DETAILS:{Colors.RESET}")
+        summary_lines.append(f"\n{Colors.YELLOW}ðŸ–¥ï¸ HOST DETAILS:{Colors.RESET}")
         for host, details in self.host_details.items():
-            summary_lines.append(f"  {Colors.GREEN}→{Colors.RESET} {host}")
+            summary_lines.append(f"  {Colors.GREEN}â†’{Colors.RESET} {host}")
             if details.get("is_org", False):
-                summary_lines.append(f"    🏢 HQ: {details.get('org_country', 'Unknown')} - {details.get('org_city', 'Unknown')}")
-            summary_lines.append(f"    🖥️ Server: {details.get('server_country', 'Unknown')} - {details.get('server_city', 'Unknown')}")
+                summary_lines.append(f"    ðŸ¢ HQ: {details.get('org_country', 'Unknown')} - {details.get('org_city', 'Unknown')}")
+            summary_lines.append(f"    ðŸ–¥ï¸ Server: {details.get('server_country', 'Unknown')} - {details.get('server_city', 'Unknown')}")
         
-        summary_lines.append(f"\n{Colors.YELLOW}📊 SUMMARY STATS:{Colors.RESET}")
-        summary_lines.append(f"  • Hosts Found: {len(self.network_nodes)}")
-        summary_lines.append(f"  • Open Ports: {len(self.discovered_ports)}")
-        summary_lines.append(f"  • Services: {len(self.services_found)}")
-        summary_lines.append(f"  • Duration: {self.scan_duration}s")
+        summary_lines.append(f"\n{Colors.YELLOW}ðŸ“Š SUMMARY STATS:{Colors.RESET}")
+        summary_lines.append(f"  â€¢ Hosts Found: {len(self.network_nodes)}")
+        summary_lines.append(f"  â€¢ Open Ports: {len(self.discovered_ports)}")
+        summary_lines.append(f"  â€¢ Services: {len(self.services_found)}")
+        summary_lines.append(f"  â€¢ Duration: {self.scan_duration}s")
         
         if self.discovered_ports:
             high_risk = [p for p in self.discovered_ports if p.get("risk_score", 0) >= 7]
             med_risk = [p for p in self.discovered_ports if 4 <= p.get("risk_score", 0) < 7]
             low_risk = [p for p in self.discovered_ports if p.get("risk_score", 0) < 4]
             
-            summary_lines.append(f"\n{Colors.YELLOW}⚠️ RISK BREAKDOWN:{Colors.RESET}")
+            summary_lines.append(f"\n{Colors.YELLOW}âš ï¸ RISK BREAKDOWN:{Colors.RESET}")
             if high_risk:
-                summary_lines.append(f"  {Colors.RED}🔴 CRITICAL: {len(high_risk)}{Colors.RESET}")
+                summary_lines.append(f"  {Colors.RED}ðŸ”´ CRITICAL: {len(high_risk)}{Colors.RESET}")
             if med_risk:
-                summary_lines.append(f"  {Colors.YELLOW}🟡 MEDIUM: {len(med_risk)}{Colors.RESET}")
+                summary_lines.append(f"  {Colors.YELLOW}ðŸŸ¡ MEDIUM: {len(med_risk)}{Colors.RESET}")
             if low_risk:
-                summary_lines.append(f"  {Colors.GREEN}🟢 LOW: {len(low_risk)}{Colors.RESET}")
+                summary_lines.append(f"  {Colors.GREEN}ðŸŸ¢ LOW: {len(low_risk)}{Colors.RESET}")
         
         if self.services_found:
-            summary_lines.append(f"\n{Colors.YELLOW}🔧 TOP SERVICES:{Colors.RESET}")
+            summary_lines.append(f"\n{Colors.YELLOW}ðŸ”§ TOP SERVICES:{Colors.RESET}")
             for i, s in enumerate(self.services_found[:5], 1):
                 risk_score = s.get("risk_score", 0)
                 color = Colors.RED if risk_score >= 7 else Colors.YELLOW if risk_score >= 4 else Colors.GREEN
-                summary_lines.append(f"  {i}. {s['port']}/{s['protocol']} → {s['service']} {color}({risk_score:.1f}){Colors.RESET}")
+                summary_lines.append(f"  {i}. {s['port']}/{s['protocol']} â†’ {s['service']} {color}({risk_score:.1f}){Colors.RESET}")
         
-        summary_lines.append(f"\n{Colors.CYAN}{'═' * 70}{Colors.RESET}")
-        summary_lines.append(f"{Colors.GREEN}📄 Reports generated:{Colors.RESET}")
-        summary_lines.append(f"  • HTML Dashboard: soc_full_dashboard_*.html")
-        summary_lines.append(f"  • PDF Report: soc_report_*.pdf")
-        summary_lines.append(f"  • Location: ~/dsterminal_workspace/scans/")
-        summary_lines.append(f"{Colors.CYAN}{'═' * 70}{Colors.RESET}\n")
+        summary_lines.append(f"\n{Colors.CYAN}{'â•' * 70}{Colors.RESET}")
+        summary_lines.append(f"{Colors.GREEN}ðŸ“„ Reports generated:{Colors.RESET}")
+        summary_lines.append(f"  â€¢ HTML Dashboard: soc_full_dashboard_*.html")
+        summary_lines.append(f"  â€¢ PDF Report: soc_report_*.pdf")
+        summary_lines.append(f"  â€¢ Location: ~/dsterminal_workspace/scans/")
+        summary_lines.append(f"{Colors.CYAN}{'â•' * 70}{Colors.RESET}\n")
         
         for line in summary_lines:
             self.scan_output.append(line)
@@ -2664,10 +2664,10 @@ class InteractiveSOCDashboard:
             and {len(self.services_found)} active services.<br/>
             <br/>
             <b>Key Findings:</b><br/>
-            • Total Open Ports: {len(self.discovered_ports)}<br/>
-            • Total Services: {len(self.services_found)}<br/>
-            • Average Risk Score: {avg_risk:.1f}/10<br/>
-            • Scan Duration: {self.scan_duration} seconds
+            â€¢ Total Open Ports: {len(self.discovered_ports)}<br/>
+            â€¢ Total Services: {len(self.services_found)}<br/>
+            â€¢ Average Risk Score: {avg_risk:.1f}/10<br/>
+            â€¢ Scan Duration: {self.scan_duration} seconds
             """
             story.append(Paragraph(summary_text, styles['Normal']))
             story.append(Spacer(1, 20))
@@ -2711,7 +2711,7 @@ class InteractiveSOCDashboard:
                 story.append(Paragraph("Critical Findings (High Risk)", heading_style))
                 for service in high_risk[:10]:
                     finding_text = f"""
-                    <b>• {service['port']}/{service['protocol']} - {service['service']}</b><br/>
+                    <b>â€¢ {service['port']}/{service['protocol']} - {service['service']}</b><br/>
                     Risk Score: {service['risk_score']}/10 | CVE: {service.get('cvss_id', 'N/A')}<br/>
                     Exploit: {service.get('exploit', 'N/A')}<br/>
                     Recommendation: {service.get('recommendation', 'Patch immediately')}
@@ -2724,7 +2724,7 @@ class InteractiveSOCDashboard:
                 story.append(Paragraph("Medium Risk Findings", heading_style))
                 for service in medium_risk[:10]:
                     finding_text = f"""
-                    <b>• {service['port']}/{service['protocol']} - {service['service']}</b><br/>
+                    <b>â€¢ {service['port']}/{service['protocol']} - {service['service']}</b><br/>
                     Risk Score: {service['risk_score']}/10 | CVE: {service.get('cvss_id', 'N/A')}
                     """
                     story.append(Paragraph(finding_text, risk_medium_style))
@@ -2737,7 +2737,7 @@ class InteractiveSOCDashboard:
             if self.network_nodes:
                 topo_data = [['Host', 'Open Ports', 'Risk Score', 'Location Type']]
                 for ip, node in self.network_nodes.items():
-                    location_type = "🏢 HQ + Server" if node.is_organization_location else "🖥️ Server"
+                    location_type = "ðŸ¢ HQ + Server" if node.is_organization_location else "ðŸ–¥ï¸ Server"
                     topo_data.append([
                         ip[:15],
                         str(len(node.ports)),
@@ -2764,9 +2764,9 @@ class InteractiveSOCDashboard:
             recommendations = []
             for service in self.services_found:
                 if service.get("risk_score", 0) >= 7:
-                    recommendations.append(f"• CRITICAL: Patch {service['service']} on port {service['port']} immediately")
+                    recommendations.append(f"â€¢ CRITICAL: Patch {service['service']} on port {service['port']} immediately")
                 elif service.get("risk_score", 0) >= 4:
-                    recommendations.append(f"• MEDIUM: Update {service['service']} on port {service['port']}")
+                    recommendations.append(f"â€¢ MEDIUM: Update {service['service']} on port {service['port']}")
             
             if recommendations:
                 for rec in recommendations[:10]:

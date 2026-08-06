@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+﻿<<<<<<< HEAD
 # install_sqlmap.ps1 - Extract bundled SQLMap (No Python required)
 # SQLMap Installation Script for DSTerminal
 
@@ -23,7 +23,7 @@ if ((Test-Path $sqlmapDir) -and (-not $Force)) {
     
     # Check if sqlmap.py exists
     if (Test-Path "$sqlmapDir\sqlmap.py") {
-        Write-Host "✅ sqlmap.py found" -ForegroundColor Green
+        Write-Host "âœ… sqlmap.py found" -ForegroundColor Green
     }
     
     Write-Host ""
@@ -193,11 +193,11 @@ $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";"
 # Test SQLMap
 if (Get-Command sqlmap -ErrorAction SilentlyContinue) {
     $version = & sqlmap --version 2>&1 | Select-Object -First 1
-    Write-Host "✅ SQLMap installed successfully!" -ForegroundColor Green
+    Write-Host "âœ… SQLMap installed successfully!" -ForegroundColor Green
     Write-Host "   Version: $version" -ForegroundColor Gray
     Write-Host "   Location: $wrapperPath" -ForegroundColor Gray
 } else {
-    Write-Host "⚠️ SQLMap installed but not in PATH" -ForegroundColor Yellow
+    Write-Host "âš ï¸ SQLMap installed but not in PATH" -ForegroundColor Yellow
     Write-Host "   You can run it manually from: $sqlmapDir" -ForegroundColor Yellow
     Write-Host "   Or restart your terminal and try again." -ForegroundColor Yellow
 }

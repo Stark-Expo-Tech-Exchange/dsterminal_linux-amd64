@@ -1,7 +1,7 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Dsterminal Manifest PDF Generator
-Version: 3.1.113
+Version: 4.0.0.113
 """
 
 import os
@@ -88,7 +88,7 @@ except ImportError:
 # CONFIGURATION
 # ============================================================================
 
-VERSION = "3.1.113"
+VERSION = "4.0.0.113"
 MANIFEST_TITLE = "DSTERMINAL PLATFORM MANIFEST"
 COPYRIGHT_YEAR = "2026"
 COMPANY_NAME = "Dsterminal Security Labs"
@@ -467,7 +467,7 @@ class LogoImage(Flowable):
         self.canv.circle(self.width/2, self.height/2, min(self.width, self.height)/2, fill=True)
         self.canv.setFillColorRGB(0.2, 0.2, 0.4)
         self.canv.setFont('Helvetica-Bold', 32)
-        self.canv.drawCentredString(self.width/2, self.height/2 + 10, "🛡️")
+        self.canv.drawCentredString(self.width/2, self.height/2 + 10, "ðŸ›¡ï¸")
         self.canv.setFont('Helvetica', 8)
         self.canv.drawCentredString(self.width/2, self.height/2 - 15, "DSTERMINAL")
 
@@ -553,7 +553,7 @@ class ManifestPDFGenerator:
             except Exception as e:
                 print(f"[WARNING] Could not load logo: {e}")
         
-        self.story.append(Paragraph("🛡️", self.styles['ManifestMainTitle']))
+        self.story.append(Paragraph("ðŸ›¡ï¸", self.styles['ManifestMainTitle']))
         self.story.append(Paragraph(MANIFEST_TITLE, self.styles['ManifestMainTitle']))
         self.story.append(Paragraph(f"Version {VERSION}", self.styles['ManifestSubTitle']))
         self.story.append(Spacer(1, 0.1*inch))
@@ -634,8 +634,8 @@ class ManifestPDFGenerator:
             if not line:
                 continue
             
-            if line.startswith('-') or line.startswith('*') or line.startswith('•'):
-                clean = line.lstrip('-*• ').strip()
+            if line.startswith('-') or line.startswith('*') or line.startswith('â€¢'):
+                clean = line.lstrip('-*â€¢ ').strip()
                 if clean:
                     paragraphs.append(Paragraph(f'- {clean}', self.styles['ManifestBullet']))
             elif line[0].isdigit() and '.' in line[:3]:
@@ -680,7 +680,7 @@ class ManifestPDFGenerator:
         
         For the latest version, visit: {WEBSITE_URL}/manifest
         
-        © 2024-{COPYRIGHT_YEAR} {COMPANY_NAME}. All rights reserved.
+        Â© 2024-{COPYRIGHT_YEAR} {COMPANY_NAME}. All rights reserved.
         """
         
         for p in self.parse_content(back_text):
@@ -803,7 +803,7 @@ class HTMLExporter:
     </style>
 </head>
 <body>
-    <h1>🛡️ {MANIFEST_TITLE}</h1>
+    <h1>ðŸ›¡ï¸ {MANIFEST_TITLE}</h1>
     <p style="text-align: center; font-size: 1.2em; color: #1a3a5c;">Version {VERSION}</p>
     <p style="text-align: center; font-style: italic;">"For Defensive Use Only. Protect. Detect. Respond. Explain."</p>
     
@@ -826,7 +826,7 @@ class HTMLExporter:
         
         html += f"""
     <div class="footer">
-        <p>© 2024-{COPYRIGHT_YEAR} {COMPANY_NAME}. All rights reserved.</p>
+        <p>Â© 2024-{COPYRIGHT_YEAR} {COMPANY_NAME}. All rights reserved.</p>
         <p>Generated: {datetime.datetime.now().strftime('%B %d, %Y at %H:%M:%S')}</p>
         <p>Version {VERSION} | <a href="{WEBSITE_URL}">{WEBSITE_URL}</a></p>
     </div>

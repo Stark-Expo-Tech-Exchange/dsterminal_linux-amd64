@@ -1,4 +1,4 @@
-def __init__(self, workspace_root=None, interactive: bool = True):
+﻿def __init__(self, workspace_root=None, interactive: bool = True):
     """Initialize DSTerminal with integrated operator session management"""
     import platform
     import queue
@@ -51,7 +51,7 @@ def __init__(self, workspace_root=None, interactive: bool = True):
         self.initialize_operator_session()
         self.session_manager_initialized = True
     except Exception as e:
-        print(f"⚠ Failed to initialize operator session: {e}")
+        print(f"âš  Failed to initialize operator session: {e}")
         # Fallback session
         import uuid
         self.operator_username = f"OP-{uuid.uuid4().hex[:6].upper()}"
@@ -74,7 +74,7 @@ def __init__(self, workspace_root=None, interactive: bool = True):
     try:
         self.crypto = CryptoEngine(os.getcwd())
     except Exception as e:
-        print(f"⚠ CryptoEngine initialization failed: {e}")
+        print(f"âš  CryptoEngine initialization failed: {e}")
         self.crypto = None
     
     # ============================================================
@@ -83,7 +83,7 @@ def __init__(self, workspace_root=None, interactive: bool = True):
     try:
         self.scanner = SQLMapScanner(verbose=True)
     except Exception as e:
-        print(f"⚠ SQLMapScanner initialization failed: {e}")
+        print(f"âš  SQLMapScanner initialization failed: {e}")
         self.scanner = None
     
     # ============================================================
@@ -109,7 +109,7 @@ def __init__(self, workspace_root=None, interactive: bool = True):
         self.hardening_dashboard = HardeningDashboard(terminal_width=self.terminal_width)
         self.hardening_enabled = True
     except Exception as e:
-        print(f"⚠ Hardening Dashboard initialization failed: {e}")
+        print(f"âš  Hardening Dashboard initialization failed: {e}")
         self.hardening_dashboard = None
         self.hardening_enabled = False
     
@@ -250,7 +250,7 @@ def __init__(self, workspace_root=None, interactive: bool = True):
     pd = PlatformDetector()
     
     self.config = {
-        'version': '3.1.113',
+        'version': '4.0.0.113',
         'monitor_paths': pd.get_trash_paths(),
         'exclude_patterns': ['*.tmp', '*.temp', '*~', '.DS_Store', 'Thumbs.db'],
         'max_file_size': 100 * 1024 * 1024,
@@ -271,7 +271,7 @@ def __init__(self, workspace_root=None, interactive: bool = True):
             pid_file=os.path.join(self.workspace_root, 'dsterminal.pid')
         )
     except Exception as e:
-        print(f"⚠ ServiceManager initialization failed: {e}")
+        print(f"âš  ServiceManager initialization failed: {e}")
         self.service_manager = None
     
     # ============================================================
@@ -291,24 +291,24 @@ def __init__(self, workspace_root=None, interactive: bool = True):
             self.autoremediation = AutoRemediation(self.integrity)
             
             if COLORS_AVAILABLE:
-                print(f"{Fore.GREEN}✓ Integrity Monitor initialized{Style.RESET_ALL}")
+                print(f"{Fore.GREEN}âœ“ Integrity Monitor initialized{Style.RESET_ALL}")
             else:
-                print("✓ Integrity Monitor initialized")
+                print("âœ“ Integrity Monitor initialized")
                 
         except Exception as e:
             if COLORS_AVAILABLE:
-                print(f"{Fore.RED}✗ Failed to initialize Integrity Monitor: {e}{Style.RESET_ALL}")
+                print(f"{Fore.RED}âœ— Failed to initialize Integrity Monitor: {e}{Style.RESET_ALL}")
             else:
-                print(f"✗ Failed to initialize Integrity Monitor: {e}")
+                print(f"âœ— Failed to initialize Integrity Monitor: {e}")
             self.integrity = None
             self.alert_manager = None
             self.forensic = None
             self.autoremediation = None
     else:
         if COLORS_AVAILABLE:
-            print(f"{Fore.YELLOW}⚠ Integrity Monitor disabled{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}âš  Integrity Monitor disabled{Style.RESET_ALL}")
         else:
-            print("⚠ Integrity Monitor disabled")
+            print("âš  Integrity Monitor disabled")
     
     # ============================================================
     # STEP 12: Initialize VirusTotal scanner
@@ -378,16 +378,16 @@ def _display_initialization_banner(self):
     width = shutil.get_terminal_size().columns
     
     banner = f"""
-╔══════════════════════════════════════════════════════════════╗
-║                    DSTerminal Security Tool                   ║
-╠══════════════════════════════════════════════════════════════╣
-║ Version    : {self.config['version']}
-║ Operator   : {self.operator_username}
-║ Session ID : {self.session_id}
-║ Started    : {self.session_start.strftime('%Y-%m-%d %H:%M:%S')}
-║ Host       : {platform.node()}
-║ Workspace  : {self.workspace_root}
-╚══════════════════════════════════════════════════════════════╝
+â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+â•‘                    DSTerminal Security Tool                   â•‘
+â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£
+â•‘ Version    : {self.config['version']}
+â•‘ Operator   : {self.operator_username}
+â•‘ Session ID : {self.session_id}
+â•‘ Started    : {self.session_start.strftime('%Y-%m-%d %H:%M:%S')}
+â•‘ Host       : {platform.node()}
+â•‘ Workspace  : {self.workspace_root}
+â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     """
     
     for line in banner.splitlines():

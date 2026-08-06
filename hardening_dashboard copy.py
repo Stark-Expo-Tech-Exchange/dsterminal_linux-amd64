@@ -1,4 +1,4 @@
-"""
+﻿"""
 DSTerminal Interactive Hardening Dashboard - ENTERPRISE CINEMATIC EDITION
 Real-time telemetry, live command execution, 4-panel tactical layout
 """
@@ -435,16 +435,16 @@ class HardeningDashboard:
         ram_bar = self._create_bar(metrics["ram"], 40)
         
         content = f"""
-[bold cyan]█ SYSTEM TELEMETRY[/bold cyan]
-─────────────────────────────
+[bold cyan]â–ˆ SYSTEM TELEMETRY[/bold cyan]
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 [bright_white]CPU:[/] {metrics['cpu']:5.1f}% {cpu_bar}
 [bright_white]RAM:[/] {metrics['ram']:5.1f}% {ram_bar}
 [bright_white]Processes:[/] {metrics['processes']}
 [bright_white]Uptime:[/] {self._get_uptime()}
 [bright_white]Platform:[/] {self.system}
-[bright_white]Admin:[/] {'✓' if self.is_admin_user else '✗'}
+[bright_white]Admin:[/] {'âœ“' if self.is_admin_user else 'âœ—'}
         """
-        return Panel(content, title="[bold green]🖥️ SYSTEM STATUS[/bold green]", border_style="green")
+        return Panel(content, title="[bold green]ðŸ–¥ï¸ SYSTEM STATUS[/bold green]", border_style="green")
     
     def _get_hardening_ops_panel(self) -> Panel:
         """Panel 2: Hardening Operations"""
@@ -452,37 +452,37 @@ class HardeningDashboard:
         successful = sum(1 for r in self.results if r.success)
         
         content = f"""
-[bold yellow]█ HARDENING OPS[/bold yellow]
-─────────────────────────────
+[bold yellow]â–ˆ HARDENING OPS[/bold yellow]
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 [bright_white]Modules Selected:[/] {len(self.selected_modules)}
 [bright_white]Executed:[/] {executed}
 [bright_white]Successful:[/] [green]{successful}[/green]
 [bright_white]Failed:[/] [red]{executed - successful}[/red]
 [bright_white]Success Rate:[/] {successful/max(1,executed)*100:.0f}%
 
-[bold yellow]▶ Current Module:[/]
+[bold yellow]â–¶ Current Module:[/]
 {self._get_current_module_display()}
         """
-        return Panel(content, title="[bold blue]⚙️ HARDENING ENGINE[/bold blue]", border_style="blue")
+        return Panel(content, title="[bold blue]âš™ï¸ HARDENING ENGINE[/bold blue]", border_style="blue")
     
     def _get_network_defense_panel(self) -> Panel:
         """Panel 3: Network Defense Status"""
         firewall_status = self._check_firewall_status()
         
         content = f"""
-[bold magenta]█ NETWORK DEFENSE[/bold magenta]
-─────────────────────────────
+[bold magenta]â–ˆ NETWORK DEFENSE[/bold magenta]
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 [bright_white]Firewall:[/] {firewall_status}
 [bright_white]Port Blocking:[/] {'ACTIVE' if self._check_ports_blocked() else 'PENDING'}
 [bright_white]IDS/IPS:[/] MONITORING
 [bright_white]Packet Filter:[/] ENABLED
 
-[bold magenta]▶ Protected Ports:[/]
-  • SMB (445) - BLOCKED
-  • RDP (3389) - BLOCKED
-  • NetBIOS (135-139) - BLOCKED
+[bold magenta]â–¶ Protected Ports:[/]
+  â€¢ SMB (445) - BLOCKED
+  â€¢ RDP (3389) - BLOCKED
+  â€¢ NetBIOS (135-139) - BLOCKED
         """
-        return Panel(content, title="[bold red]🛡️ DEFENSE GRID[/bold red]", border_style="red")
+        return Panel(content, title="[bold red]ðŸ›¡ï¸ DEFENSE GRID[/bold red]", border_style="red")
     
     def _get_threat_feed_panel(self) -> Panel:
         """Panel 4: Live Threat Intelligence Feed"""
@@ -491,29 +491,29 @@ class HardeningDashboard:
             feed_lines.append(event)
         
         if not feed_lines:
-            feed_lines = ["[dim]● Waiting for security events...[/dim]"]
+            feed_lines = ["[dim]â— Waiting for security events...[/dim]"]
         
         content = "\n".join(feed_lines)
-        return Panel(content, title="[bold yellow]⚠️ THREAT INTELLIGENCE[/bold yellow]", border_style="yellow")
+        return Panel(content, title="[bold yellow]âš ï¸ THREAT INTELLIGENCE[/bold yellow]", border_style="yellow")
     
     def _get_execution_center_panel(self, module_name: str = None, output_lines: List[str] = None) -> Panel:
         """Center execution panel with animated progress"""
         if module_name:
-            title = f"[bold cyan]▶ EXECUTING: {module_name.upper()}[/bold cyan]"
+            title = f"[bold cyan]â–¶ EXECUTING: {module_name.upper()}[/bold cyan]"
             if output_lines:
-                output_text = "\n".join([f"[dim]► {line[:80]}[/dim]" for line in output_lines[-8:]])
+                output_text = "\n".join([f"[dim]â–º {line[:80]}[/dim]" for line in output_lines[-8:]])
             else:
-                output_text = "[dim]► Waiting for command output...[/dim]"
+                output_text = "[dim]â–º Waiting for command output...[/dim]"
         else:
-            title = "[bold cyan]▶ READY FOR EXECUTION[/bold cyan]"
-            output_text = "[dim]► Select modules and start hardening[/dim]"
+            title = "[bold cyan]â–¶ READY FOR EXECUTION[/bold cyan]"
+            output_text = "[dim]â–º Select modules and start hardening[/dim]"
         
         return Panel(output_text, title=title, border_style="cyan", height=12)
     
     def _create_bar(self, percent: float, width: int) -> str:
         """Create ASCII progress bar"""
         filled = int(width * percent / 100)
-        return f"[green]{'█' * filled}[/green][dim]{'░' * (width - filled)}[/dim]"
+        return f"[green]{'â–ˆ' * filled}[/green][dim]{'â–‘' * (width - filled)}[/dim]"
     
     def _get_uptime(self) -> str:
         try:
@@ -554,8 +554,8 @@ class HardeningDashboard:
     def _get_current_module_display(self) -> str:
         """Get current executing module display"""
         if self.live_capture.current_module:
-            return f"[yellow]► {self.live_capture.current_module}[/yellow]"
-        return "[dim]● Idle[/dim]"
+            return f"[yellow]â–º {self.live_capture.current_module}[/yellow]"
+        return "[dim]â— Idle[/dim]"
     
     def _add_threat_event(self, event: str, event_type: str = "info"):
         """Add event to threat feed"""
@@ -592,16 +592,16 @@ class HardeningDashboard:
                 success, output, live_lines = self.live_capture.execute_command(module, on_output)
                 
                 if success:
-                    self._add_threat_event(f"✓ {module.name} applied successfully", "success")
+                    self._add_threat_event(f"âœ“ {module.name} applied successfully", "success")
                     
                     # Verify if verify command exists
                     if module.verify_command:
                         verify_result = subprocess.run(module.verify_command, shell=True, capture_output=True, text=True)
                         module.verified = verify_result.returncode == 0
                         if module.verified:
-                            self._add_threat_event(f"✓ {module.name} verified", "success")
+                            self._add_threat_event(f"âœ“ {module.name} verified", "success")
                 else:
-                    self._add_threat_event(f"✗ {module.name} failed: {output[:100]}", "critical")
+                    self._add_threat_event(f"âœ— {module.name} failed: {output[:100]}", "critical")
                 
                 module.output = output
                 
@@ -618,7 +618,7 @@ class HardeningDashboard:
                 return HardeningResult(module, True, start_time, datetime.now(), "No command", None)
                 
         except Exception as e:
-            self._add_threat_event(f"⚠ Error in {module.name}: {str(e)}", "critical")
+            self._add_threat_event(f"âš  Error in {module.name}: {str(e)}", "critical")
             return HardeningResult(module, False, start_time, datetime.now(), "", str(e))
     
     def _create_execution_display(self, module: HardeningModule, index: int, total: int, output_lines: List[str]) -> Layout:
@@ -639,13 +639,13 @@ class HardeningDashboard:
         
         # Center panel with live output
         center_content = f"""
-[bold cyan]█ CURRENT OPERATION: {module.name.upper()}[/bold cyan]
+[bold cyan]â–ˆ CURRENT OPERATION: {module.name.upper()}[/bold cyan]
 [bold yellow]Category:[/] {module.category.value}
 [bold yellow]Severity:[/] {module.severity.value}
 [bold yellow]Description:[/] {module.description}
 
-[bold cyan]█ LIVE COMMAND OUTPUT:[/bold cyan]
-{chr(10).join([f"[dim]► {line[:70]}[/dim]" for line in output_lines[-10:]]) if output_lines else "[dim]► Waiting for output...[/dim]"}
+[bold cyan]â–ˆ LIVE COMMAND OUTPUT:[/bold cyan]
+{chr(10).join([f"[dim]â–º {line[:70]}[/dim]" for line in output_lines[-10:]]) if output_lines else "[dim]â–º Waiting for output...[/dim]"}
         """
         layout["footer"].update(Panel(center_content, border_style="cyan", height=12))
         
@@ -695,9 +695,9 @@ class HardeningDashboard:
                 
                 if success:
                     module.applied = True
-                    print(f"  ✓ SUCCESS")
+                    print(f"  âœ“ SUCCESS")
                 else:
-                    print(f"  ✗ FAILED")
+                    print(f"  âœ— FAILED")
             
             self._display_completion_summary()
     
@@ -714,25 +714,25 @@ class HardeningDashboard:
         )
         
         summary_layout["title"].update(Panel(
-            "[bold green]▄︻デ══━ SYSTEM FORTIFICATION COMPLETE ══━︻▄[/bold green]",
+            "[bold green]â–„ï¸»ãƒ‡â•â•â” SYSTEM FORTIFICATION COMPLETE â•â•â”ï¸»â–„[/bold green]",
             border_style="green"
         ))
         
         stats_content = f"""
 [bold cyan]EXECUTION SUMMARY[/bold cyan]
-─────────────────────────────
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 Total Modules: {len(self.results)}
 [green]Successful: {successful}[/green]
 [red]Failed: {failed}[/red]
 Success Rate: {successful/max(1,len(self.results))*100:.0f}%
 
 [bold yellow]THREAT LEVEL: {failed}/10[/bold yellow]
-[red]{'█' * failed}[/red][dim]{'░' * (10 - failed)}[/dim]
+[red]{'â–ˆ' * failed}[/red][dim]{'â–‘' * (10 - failed)}[/dim]
         """
         summary_layout["stats"].update(Panel(stats_content, border_style="cyan"))
         
         if failed > 0:
-            failed_list = "\n".join([f"  ✗ {r.module.name}" for r in self.results if not r.success][:5])
+            failed_list = "\n".join([f"  âœ— {r.module.name}" for r in self.results if not r.success][:5])
             summary_layout["threat"].update(Panel(f"[red]FAILED MODULES:\n{failed_list}[/red]", border_style="red"))
         
         console.print(summary_layout)
@@ -752,7 +752,7 @@ Success Rate: {successful/max(1,len(self.results))*100:.0f}%
             print("\nFailed Modules:")
             for r in self.results:
                 if not r.success:
-                    print(f"  ✗ {r.module.name}")
+                    print(f"  âœ— {r.module.name}")
     
     # ============================================================
     # PUBLIC METHODS
@@ -770,7 +770,7 @@ Success Rate: {successful/max(1,len(self.results))*100:.0f}%
             table.add_column("Compat", justify="center", width=6)
             
             for i, m in enumerate(self.modules, 1):
-                compat = "✓" if not m.platforms or self.system in m.platforms else "✗"
+                compat = "âœ“" if not m.platforms or self.system in m.platforms else "âœ—"
                 severity_color = "red" if m.severity == HardeningSeverity.CRITICAL else "yellow"
                 table.add_row(str(i), m.name[:32], m.category.value[:18], f"[{severity_color}]{m.severity.value[0]}[/{severity_color}]", compat)
             
@@ -894,10 +894,10 @@ Success Rate: {successful/max(1,len(self.results))*100:.0f}%
         
         idx = 1
         for category, mods in categories.items():
-            print(f"\n{Fore.YELLOW}▸ {category}{Fore.RESET}")
-            print(f"{Fore.WHITE}{'─'*50}{Fore.RESET}")
+            print(f"\n{Fore.YELLOW}â–¸ {category}{Fore.RESET}")
+            print(f"{Fore.WHITE}{'â”€'*50}{Fore.RESET}")
             for m in mods:
-                selected = "✓" if m.id in self.selected_modules else "○"
+                selected = "âœ“" if m.id in self.selected_modules else "â—‹"
                 severity_color = Fore.RED if m.severity == HardeningSeverity.CRITICAL else Fore.YELLOW
                 print(f"  [{selected}] {Fore.GREEN}{idx:2d}{Fore.RESET}. {m.name:40s} [{severity_color}{m.severity.value}{Fore.RESET}]")
                 idx += 1
@@ -936,7 +936,7 @@ Success Rate: {successful/max(1,len(self.results))*100:.0f}%
         else:
             selected = [m for m in self.modules if m.id in self.selected_modules]
             for i, m in enumerate(selected, 1):
-                status = f"{Fore.GREEN}✓{Fore.RESET}" if m.applied else f"{Fore.YELLOW}○{Fore.RESET}"
+                status = f"{Fore.GREEN}âœ“{Fore.RESET}" if m.applied else f"{Fore.YELLOW}â—‹{Fore.RESET}"
                 print(f"  {status} {i:2d}. {m.name}")
     
     def _view_results(self):
@@ -947,7 +947,7 @@ Success Rate: {successful/max(1,len(self.results))*100:.0f}%
             print(f"{Fore.YELLOW}No results{Fore.RESET}")
         else:
             for i, r in enumerate(self.results, 1):
-                status = f"{Fore.GREEN}✓{Fore.RESET}" if r.success else f"{Fore.RED}✗{Fore.RESET}"
+                status = f"{Fore.GREEN}âœ“{Fore.RESET}" if r.success else f"{Fore.RED}âœ—{Fore.RESET}"
                 duration = (r.end_time - r.start_time).total_seconds() if r.end_time else 0
                 print(f"  {status} {i:2d}. {r.module.name} [{duration:.1f}s]")
                 if r.error:
@@ -980,7 +980,7 @@ Success Rate: {successful/max(1,len(self.results))*100:.0f}%
         with open(report_path, 'w') as f:
             json.dump(report, f, indent=2)
         
-        print(f"{Fore.GREEN}✓ Report saved: {report_path}{Fore.RESET}")
+        print(f"{Fore.GREEN}âœ“ Report saved: {report_path}{Fore.RESET}")
     
     def _rollback_hardening(self):
         applied = [r for r in self.results if r.success and r.module.rollback_command]
@@ -994,10 +994,10 @@ Success Rate: {successful/max(1,len(self.results))*100:.0f}%
                 print(f"{Fore.CYAN}Rolling back {r.module.name}...{Fore.RESET}")
                 try:
                     subprocess.run(r.module.rollback_command, shell=True, check=True, timeout=15)
-                    print(f"{Fore.GREEN}✓ Rolled back{Fore.RESET}")
+                    print(f"{Fore.GREEN}âœ“ Rolled back{Fore.RESET}")
                     self._add_threat_event(f"Rolled back {r.module.name}", "warning")
                 except Exception as e:
-                    print(f"{Fore.RED}✗ Failed: {e}{Fore.RESET}")
+                    print(f"{Fore.RED}âœ— Failed: {e}{Fore.RESET}")
     
     def _display_header(self):
         header = f"""

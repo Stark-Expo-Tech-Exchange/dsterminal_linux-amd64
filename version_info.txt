@@ -1,4 +1,4 @@
-# UTF-8
+﻿# UTF-8
 #
 # For more details about fixed file info 'ffi' see:
 # http://msdn.microsoft.com/en-us/library/ms646997.aspx
@@ -33,13 +33,13 @@ VSVersionInfo(
         u'040904B0',
         [StringStruct(u'CompanyName', u'Stark Expo Tech Exchange'),
         StringStruct(u'FileDescription', u'Defensive Security Terminal'),
-        StringStruct(u'FileVersion', u'3.1.113.0'),
+        StringStruct(u'FileVersion', u'4.0.0.113.0'),
         StringStruct(u'FileVersion', u'2.0.59.0'),
         StringStruct(u'InternalName', u'dsterminal'),
-        StringStruct(u'LegalCopyright', u'© 2024 Stark Expo Tech Exchange'),
+        StringStruct(u'LegalCopyright', u'Â© 2024 Stark Expo Tech Exchange'),
         StringStruct(u'OriginalFilename', u'dsterminal.exe'),
         StringStruct(u'ProductName', u'DSTerminal'),
-        StringStruct(u'ProductVersion', u'3.1.113.0')])
+        StringStruct(u'ProductVersion', u'4.0.0.113.0')])
         StringStruct(u'ProductVersion', u'2.0.59.0')])
       ]),
     VarFileInfo([VarStruct(u'Translation', [0x0409, 0x04B0])])

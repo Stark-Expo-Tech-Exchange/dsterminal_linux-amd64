@@ -1,6 +1,6 @@
-"""
+﻿"""
 DSTerminal Shield Core - Ransomware Defense Engine
-Version: 3.1.113
+Version: 4.0.0.113
 """
 
 import os
@@ -563,7 +563,7 @@ class ShieldCore:
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("🛡️ DSTERMINAL SHIELD CORE - MODEL ")
+    print("ðŸ›¡ï¸ DSTERMINAL SHIELD CORE - MODEL ")
     print("=" * 60)
     
     # Initialize shield

@@ -1,4 +1,4 @@
-Package: dsterminal
+﻿Package: dsterminal
 Version: 2.1.0
 Section: security
 Priority: optional

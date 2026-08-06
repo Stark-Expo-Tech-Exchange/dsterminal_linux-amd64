@@ -413,7 +413,7 @@ console = Console()
 # ============================================
 # VERSION INFO - FAST
 # ============================================
-VERSION = "3.1.113"
+VERSION = "4.0.0.113"
 APP_NAME = "DSTerminal"
 DESCRIPTION = "Defensive Security Terminal"
 AUTHOR = "Spark Wilson Spink | Powered By Stark Expo Tech Exchange"
@@ -704,7 +704,7 @@ CONFIG = {
     'UPDATE_URL': 'https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest.git',
     'LOG_FILE': 'secure_audit.log',
     'ENCRYPT_KEY': 'generated_on_init',
-    'CURRENT_VERSION': '3.1.113'
+    'CURRENT_VERSION': '4.0.0.113'
 }
 EDUCATION_TIPS = {
     "system scan -all": """
@@ -1895,7 +1895,7 @@ class SecurityTerminal:
         self.threat_level = "LOW"
         self._banner_shown = False
         self.session_manager_initialized = False
-        self.version = "3.1.113"
+        self.version = "4.0.0.113"
                 # ========== BLINKING CURSOR SETUP ==========
         # ============================================================
         # SIEM DASHBOARD PROMPT - LIVE STATS
@@ -2153,7 +2153,7 @@ class SecurityTerminal:
             from deletion_protection import PlatformDetector
             pd = PlatformDetector()
             self.config = {
-                'version': '3.1.113',
+                'version': '4.0.0.113',
                 'monitor_paths': pd.get_trash_paths(),
                 'exclude_patterns': ['*.tmp', '*.temp', '*~', '.DS_Store', 'Thumbs.db'],
                 'max_file_size': 100 * 1024 * 1024,
@@ -2161,7 +2161,7 @@ class SecurityTerminal:
             }
         except:
             self.config = {
-                'version': '3.1.113',
+                'version': '4.0.0.113',
                 'monitor_paths': [],
                 'exclude_patterns': ['*.tmp', '*.temp', '*~', '.DS_Store', 'Thumbs.db'],
                 'max_file_size': 100 * 1024 * 1024,
@@ -2911,7 +2911,7 @@ class SecurityTerminal:
                     from update import UpdateManager
                     
                     # Get token from environment
-                    github_token = os.environ.get("GITHUB_TOKEN", "")
+                    github_token = os.environ.get("GITHUB_TOKEN", "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")
                     
                     self.update_config = {
                         "CURRENT_VERSION": self.version,
@@ -3004,7 +3004,7 @@ class SecurityTerminal:
 ║  ██████╔╝███████║   ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║██║  ██║███████╗    ║
 ║  ╚═════╝ ╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝    ║
 ╚══════════════════════════════════════════════════════════════╝
-                        [ ENCRYPTION SUITE v3.1.113 - EDITION ]
+                        [ ENCRYPTION SUITE v4.0.0.113 - EDITION ]
                        ══════════════════════════════════════════
 {RESET}"""
         print(banner)
@@ -3146,10 +3146,10 @@ class SecurityTerminal:
             "║  ██████╔╝███████║   ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║██║  ██║║",
             "║  ╚═════╝ ╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝║",
             "║                                                                            ║",
-            "║               [ ENCRYPTION SUITE v3.1.113 - EDITION ]                     ║",
+            "║               [ ENCRYPTION SUITE v4.0.0.113 - EDITION ]                     ║",
             "║              ══════════════════════════════════════════                    ║",
             "╠════════════════════════════════════════════════════════════════════════════╣",
-            f"║  Version       : {self.config.get('version', '3.1.113'):<46}║",
+            f"║  Version       : {self.config.get('version', '4.0.0.113'):<46}║",
             f"║  Operator ID   : {self.operator_username:<46}║",
             f"║  Session ID    : {self.session_id:<46}║",
             f"║  Started       : {self.session_start.strftime('%Y-%m-%d %H:%M:%S') if self.session_start else 'N/A':<46}║",
@@ -3300,7 +3300,7 @@ class SecurityTerminal:
 
         status_messages = [
             ("SYSTEM STATUS:", Fore.CYAN if COLORAMA_AVAILABLE else '\x1b[36m'),
-            (f"  ✅ DSTERMINAL v{self.config.get('version', '3.1.113')} loaded", Fore.GREEN if COLORAMA_AVAILABLE else '\x1b[32m'),
+            (f"  ✅ DSTERMINAL v{self.config.get('version', '4.0.0.113')} loaded", Fore.GREEN if COLORAMA_AVAILABLE else '\x1b[32m'),
             (f"  ✅ User authenticated: {self.operator_username}", Fore.GREEN if COLORAMA_AVAILABLE else '\x1b[32m'),
             (f"  ✅ Session ID: {self.session_id}", Fore.GREEN if COLORAMA_AVAILABLE else '\x1b[32m'),
             (f"  ✅ Workspace: {os.path.basename(self.workspace_root) if self.workspace_root else 'N/A'}", Fore.GREEN if COLORAMA_AVAILABLE else '\x1b[32m'),
@@ -5079,7 +5079,7 @@ class SecurityTerminal:
             "║     ╚═════╝ ╚═╝     ╚═╝     ╚══════╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝            ║",
             "║                                                                            ║",
             "╠════════════════════════════════════════════════════════════════════════════╣",
-            f"║     Defensive Security Terminal v3.1.113 | {platform.system()} {platform.release():<20}║",
+            f"║     Defensive Security Terminal v4.0.0.113 | {platform.system()} {platform.release():<20}║",
             "║     Developer: Spark Wilson Spink | © 2024 | Powered by Stark Expo Tech Exchange     ║",
             "║     Type 'help' for available commands:                                                 ║",
             f"║     CLI Mode: {'ADMIN' if self.is_admin() else 'USER'} 🔒                             ║",
@@ -7171,7 +7171,7 @@ class SecurityTerminal:
         
         print(f"\n{Fore.CYAN}{'='*60}{Style.RESET_ALL}")
         print(f"{Fore.GREEN}  LAUNCHING WEB SECURITY ANALYZER DASHBOARD{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}  DSTERMINAL Enterprise Edition v3.1.113{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}  DSTERMINAL Enterprise Edition v4.0.0.113{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'='*60}{Style.RESET_ALL}")
         print(f"\n{Fore.GREEN}[+] Initializing Web Security Analyzer...{Style.RESET_ALL}")
         print(f"{Fore.GREEN}[+] Platform-Specific Remediation Engine Active{Style.RESET_ALL}")
@@ -7906,7 +7906,7 @@ class SecurityTerminal:
             )
             
             story.append(Spacer(1, 20))
-            story.append(Paragraph(f"Generated by DSTerminal v3.1.113 | Report ID: {self.report_id}", footer_style))
+            story.append(Paragraph(f"Generated by DSTerminal v4.0.0.113 | Report ID: {self.report_id}", footer_style))
             story.append(Paragraph("This report is confidential and intended for authorized personnel only.", footer_style))
             
             # Build PDF
@@ -8044,7 +8044,7 @@ class SecurityTerminal:
                 
                 html_content += f"""
             <div class="footer">
-                <p>Generated by DSTerminal v3.1.113 | Report ID: {self.report_id}</p>
+                <p>Generated by DSTerminal v4.0.0.113 | Report ID: {self.report_id}</p>
                 <p style="font-size: 0.8em; color: #999;">This report is confidential and intended for authorized personnel only.</p>
             </div>
         </div>
@@ -9349,7 +9349,7 @@ class SecurityTerminal:
                     canvas_obj.setFont('Helvetica', 8)
                     canvas_obj.setFillAlpha(0.5)
                     canvas_obj.setFillColor(colors.HexColor('#666666'))
-                    canvas_obj.drawCentredString(center_x, 20, f"Page {doc.page} | DSTERMINAL CyberOps v3.1.113")
+                    canvas_obj.drawCentredString(center_x, 20, f"Page {doc.page} | DSTERMINAL CyberOps v4.0.0.113")
                     canvas_obj.restoreState()
                 
                 # Styles
@@ -9421,7 +9421,7 @@ class SecurityTerminal:
                 
                 metadata_data = [
                     ["Report ID:", report_id],
-                    ["Generated By:", "DSTERMINAL Cyber-Ops Platform v3.1.113"],
+                    ["Generated By:", "DSTERMINAL Cyber-Ops Platform v4.0.0.113"],
                     ["Classification:", "CONFIDENTIAL - Security Team Only"],
                     ["Target URL:", url[:80]],
                     ["Scan Date:", datetime.now().strftime('%Y-%m-%d %H:%M:%S')],
@@ -9580,7 +9580,7 @@ class SecurityTerminal:
                 # Footer Information
                 story.append(Paragraph("Report Information", heading_style))
                 footer_text = f"""
-                <font color="#33ff33"><b>Generated by:</b> DSTERMINAL Cyber-Ops Platform v3.1.113</font><br/>
+                <font color="#33ff33"><b>Generated by:</b> DSTERMINAL Cyber-Ops Platform v4.0.0.113</font><br/>
                 <font color="#33ff33"><b>Report Type:</b> SQL Injection Security Assessment</font><br/>
                 <font color="#33ff33"><b>Classification:</b> CONFIDENTIAL - Security Team Only</font><br/>
                 <font color="#33ff33"><b>Retention Policy:</b> 90 days</font><br/>
@@ -11575,7 +11575,7 @@ class SecurityTerminal:
             # Footer
             elements.append(Spacer(1, 0.5 * inch))
             elements.append(Paragraph(
-                f"Report autogenerated by DSTerminal v3.1.113 | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | Audit Trail Verified",
+                f"Report autogenerated by DSTerminal v4.0.0.113 | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | Audit Trail Verified",
                 ParagraphStyle('Footer', parent=styles['Normal'], fontSize=8, textColor=colors.grey, alignment=1)
             ))
             
@@ -12117,7 +12117,7 @@ class SecurityTerminal:
     [bold cyan]██║╚██╔╝██║██╔══██║██║   ██║    ██╔══╝  ██╔══██╗██║   ██║╚════██║
     [bold cyan]██║ ╚═╝ ██║██║  ██║╚██████╔╝    ███████╗██║  ██║╚██████╔╝███████║
     [bold cyan]╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝     ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
-    [bold yellow]            🔐 MAC ADDRESS SPOOFER ENGINE v3.1.113[/bold yellow]
+    [bold yellow]            🔐 MAC ADDRESS SPOOFER ENGINE v4.0.0.113[/bold yellow]
     """)),
             border_style="bright_blue",
             box=box.DOUBLE,
@@ -12895,7 +12895,7 @@ class SecurityTerminal:
         # =============================================================
         print()
         print(f"{Fore.CYAN}╔{'═' * (term_width - 2)}╗{Style.RESET_ALL}")
-        header_text = "🛡️  RANSOMWARE MONITOR  v3.1.113"
+        header_text = "🛡️  RANSOMWARE MONITOR  v4.0.0.113"
         print(f"{Fore.CYAN}║{Style.RESET_ALL}{' ' * ((term_width - 2 - len(header_text)) // 2)}{Fore.WHITE}{header_text}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(header_text)) // 2)}{Fore.CYAN}║{Style.RESET_ALL}")
         sub_header = "DSTerminal CyberOps Platform"
         print(f"{Fore.CYAN}║{Style.RESET_ALL}{' ' * ((term_width - 2 - len(sub_header)) // 2)}{Fore.CYAN}{sub_header}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(sub_header)) // 2)}{Fore.CYAN}║{Style.RESET_ALL}")
@@ -13064,7 +13064,7 @@ class SecurityTerminal:
         # =============================================================
         print()
         print(f"{Fore.CYAN}╔{'═' * (term_width - 2)}╗{Style.RESET_ALL}")
-        header_text = "🛡️  RANSOMWARE MONITOR  v3.1.113"
+        header_text = "🛡️  RANSOMWARE MONITOR  v4.0.0.113"
         print(f"{Fore.CYAN}║{Style.RESET_ALL}{' ' * ((term_width - 2 - len(header_text)) // 2)}{Fore.WHITE}{header_text}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(header_text)) // 2)}{Fore.CYAN}║{Style.RESET_ALL}")
         sub_header = "DSTerminal CyberOps Platform"
         print(f"{Fore.CYAN}║{Style.RESET_ALL}{' ' * ((term_width - 2 - len(sub_header)) // 2)}{Fore.CYAN}{sub_header}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(sub_header)) // 2)}{Fore.CYAN}║{Style.RESET_ALL}")
@@ -14478,7 +14478,7 @@ class SecurityTerminal:
                     self.canv.rotate(45)
                     
                     # Draw watermark text
-                    text = "DSTerminal v3.1.113"
+                    text = "DSTerminal v4.0.0.113"
                     text_width = self.canv.stringWidth(text, 'Helvetica-Bold', 55)
                     self.canv.drawString(-text_width/2, 0, text)
                     
@@ -15678,7 +15678,7 @@ class SecurityTerminal:
                 os.system('cls' if os.name == 'nt' else 'clear')
                 print(f"\n{color}{centered_banner}{Style.RESET_ALL}")
                 print(f"\n{Fore.CYAN}{self._center_text('═' * 60)}{Style.RESET_ALL}")
-                print(f"{Fore.YELLOW}{self._center_text('DEFENSIVE SECURITY TERMINAL v3.1.113')}{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}{self._center_text('DEFENSIVE SECURITY TERMINAL v4.0.0.113')}{Style.RESET_ALL}")
                 print(f"{Fore.CYAN}{self._center_text('═' * 60)}{Style.RESET_ALL}")
                 print(f"{Fore.GREEN}{self._center_text('⚡ System Ready | Mode: HARDENING MODE ⚡')}{Style.RESET_ALL}")
                 time.sleep(0.2)
@@ -18157,7 +18157,7 @@ class SecurityTerminal:
         # Now categories is defined, proceed with display
         # Create header
         print(f"\n{Fore.RED}╔{'═' * (terminal_width-2)}╗{Style.RESET_ALL}")
-        print(f"{Fore.RED}║{Fore.CYAN}{'DSTerminal v3.1.113 - Command Reference Manual'.center(terminal_width-2)}{Fore.RED}║{Style.RESET_ALL}")
+        print(f"{Fore.RED}║{Fore.CYAN}{'DSTerminal v4.0.0.113 - Command Reference Manual'.center(terminal_width-2)}{Fore.RED}║{Style.RESET_ALL}")
         print(f"{Fore.RED}║{Fore.YELLOW}{'INTERACTIVE COMMAND MENU'.center(terminal_width-2)}{Fore.RED}║{Style.RESET_ALL}")
         print(f"{Fore.RED}╠{'═' * (terminal_width-2)}╣{Style.RESET_ALL}")
         
@@ -18366,7 +18366,7 @@ class SecurityTerminal:
         
         timestamp = datetime.now().strftime("%H:%M:%S")
         hostname = socket.gethostname()
-        version = "3.1.113"
+        version = "4.0.0.113"
         
         # Get cursor
         cursor_char = self._get_cursor_char()
@@ -18750,7 +18750,7 @@ class SecurityTerminal:
             bottom_toolbar=HTML(
                 "<b>DSTerminal</b> v{} | Mode: <style bg='{}'>{}</style>"
             ).format(
-                "3.1.113",
+                "4.0.0.113",
                 "ansired" if self.is_admin() else "ansigreen",
                 "ADMIN" if self.is_admin() else "USER",
             ),
@@ -18837,7 +18837,7 @@ if __name__ == "__main__":
                 monitor_paths = pd.get_trash_paths()
         
         config = {
-            'version': '3.1.113',
+            'version': '4.0.0.113',
             'monitor_paths': monitor_paths,
             'exclude_patterns': ['*.tmp', '*.temp', '*~', '.DS_Store', 'Thumbs.db'],
             'max_file_size': 100 * 1024 * 1024,

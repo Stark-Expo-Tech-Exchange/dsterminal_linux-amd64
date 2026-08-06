@@ -1,4 +1,4 @@
-# create_pitch_deck.py
+﻿# create_pitch_deck.py
 """
 DSTERMINAL INVESTOR PITCH DECK GENERATOR
 Creates a professional PowerPoint presentation
@@ -60,7 +60,7 @@ def create_dsterminal_pitch_deck():
     # Title
     title_box = slide.shapes.add_textbox(Inches(1), Inches(1.5), Inches(11), Inches(2))
     tf = title_box.text_frame
-    tf.text = "D S T E R M I N A L ®"
+    tf.text = "D S T E R M I N A L Â®"
     tf.paragraphs[0].font.size = Pt(72)
     tf.paragraphs[0].font.bold = True
     tf.paragraphs[0].font.color.rgb = CYAN
@@ -93,7 +93,7 @@ def create_dsterminal_pitch_deck():
     # ============================================================
     # SLIDE 2: VISION & MISSION
     # ============================================================
-    add_slide("🎯 Vision & Mission", [
+    add_slide("ðŸŽ¯ Vision & Mission", [
         "VISION:",
         "To become Africa's leading cybersecurity operations platform,",
         "protecting critical digital infrastructure across the continent.",
@@ -107,217 +107,217 @@ def create_dsterminal_pitch_deck():
     # ============================================================
     # SLIDE 3: THE PROBLEM
     # ============================================================
-    add_slide("⚠️ The Problem", [
-        "• African organizations face increasing cyber threats",
-        "• Limited access to enterprise-grade security tools",
-        "• High cost of commercial security solutions ($50K-$500K/year)",
-        "• Shortage of skilled cybersecurity professionals",
-        "• Slow incident response and threat detection",
-        "• Growing ransomware attacks targeting African businesses",
-        "• Compliance gaps in data protection regulations"
+    add_slide("âš ï¸ The Problem", [
+        "â€¢ African organizations face increasing cyber threats",
+        "â€¢ Limited access to enterprise-grade security tools",
+        "â€¢ High cost of commercial security solutions ($50K-$500K/year)",
+        "â€¢ Shortage of skilled cybersecurity professionals",
+        "â€¢ Slow incident response and threat detection",
+        "â€¢ Growing ransomware attacks targeting African businesses",
+        "â€¢ Compliance gaps in data protection regulations"
     ])
     
     # ============================================================
     # SLIDE 4: THE OPPORTUNITY
     # ============================================================
-    add_slide("📈 The Opportunity", [
-        "• Africa's cybersecurity market: $3.5B by 2026 (35% CAGR)",
-        "• Malawi's digital economy rapidly expanding",
-        "• 600+ financial institutions need protection",
-        "• 200+ government agencies require security",
-        "• 1,500+ businesses vulnerable to cyber attacks",
-        "• 500,000+ individuals need security awareness",
-        "• $2.5M available in grants and innovation funding"
+    add_slide("ðŸ“ˆ The Opportunity", [
+        "â€¢ Africa's cybersecurity market: $3.5B by 2026 (35% CAGR)",
+        "â€¢ Malawi's digital economy rapidly expanding",
+        "â€¢ 600+ financial institutions need protection",
+        "â€¢ 200+ government agencies require security",
+        "â€¢ 1,500+ businesses vulnerable to cyber attacks",
+        "â€¢ 500,000+ individuals need security awareness",
+        "â€¢ $2.5M available in grants and innovation funding"
     ])
     
     # ============================================================
     # SLIDE 5: THE SOLUTION
     # ============================================================
-    add_slide("🚀 The Solution: DSTERMINAL®", [
+    add_slide("ðŸš€ The Solution: DSTERMINALÂ®", [
         "ALL-IN-ONE CYBERSECURITY PLATFORM",
         "",
-        "• Threat Intelligence",
-        "• Vulnerability Assessment",
-        "• Incident Response",
-        "• Security Hardening",
-        "• Compliance Management",
-        "• Real-time Monitoring",
+        "â€¢ Threat Intelligence",
+        "â€¢ Vulnerability Assessment",
+        "â€¢ Incident Response",
+        "â€¢ Security Hardening",
+        "â€¢ Compliance Management",
+        "â€¢ Real-time Monitoring",
         "",
-        "✅ Enterprise-grade • ✅ Open-source • ✅ Affordable"
+        "âœ… Enterprise-grade â€¢ âœ… Open-source â€¢ âœ… Affordable"
     ])
     
     # ============================================================
     # SLIDE 6: PRODUCT MODULES
     # ============================================================
-    add_slide("🔧 Product Modules", [
-        "1️⃣ Threat Intelligence",
-        "   • SQL Injection Detection & Prevention",
-        "   • Real-time threat feeds",
-        "   • Automated vulnerability scanning",
+    add_slide("ðŸ”§ Product Modules", [
+        "1ï¸âƒ£ Threat Intelligence",
+        "   â€¢ SQL Injection Detection & Prevention",
+        "   â€¢ Real-time threat feeds",
+        "   â€¢ Automated vulnerability scanning",
         "",
-        "2️⃣ Security Hardening",
-        "   • System hardening automation",
-        "   • Compliance checking (CIS, NIST, ISO)",
-        "   • Configuration management",
+        "2ï¸âƒ£ Security Hardening",
+        "   â€¢ System hardening automation",
+        "   â€¢ Compliance checking (CIS, NIST, ISO)",
+        "   â€¢ Configuration management",
         "",
-        "3️⃣ Incident Response",
-        "   • Automated response playbooks",
-        "   • Forensic analysis tools",
-        "   • Real-time alerting"
+        "3ï¸âƒ£ Incident Response",
+        "   â€¢ Automated response playbooks",
+        "   â€¢ Forensic analysis tools",
+        "   â€¢ Real-time alerting"
     ])
     
     # ============================================================
     # SLIDE 7: TECHNOLOGY
     # ============================================================
-    add_slide("⚡ Technology & Innovation", [
-        "• Modular microservices architecture",
-        "• AI-powered threat detection",
-        "• Real-time telemetry collection",
-        "• Cross-platform compatibility",
+    add_slide("âš¡ Technology & Innovation", [
+        "â€¢ Modular microservices architecture",
+        "â€¢ AI-powered threat detection",
+        "â€¢ Real-time telemetry collection",
+        "â€¢ Cross-platform compatibility",
         "  (Windows, Linux, macOS)",
         "",
         "TECH STACK:",
-        "• Python • Rust • Docker",
-        "• ElasticSearch • Kafka • Redis",
-        "• React • Node.js • PostgreSQL"
+        "â€¢ Python â€¢ Rust â€¢ Docker",
+        "â€¢ ElasticSearch â€¢ Kafka â€¢ Redis",
+        "â€¢ React â€¢ Node.js â€¢ PostgreSQL"
     ])
     
     # ============================================================
     # SLIDE 8: MARKET OPPORTUNITY
     # ============================================================
-    add_slide("🌍 Market Opportunity (Malawi & Africa)", [
+    add_slide("ðŸŒ Market Opportunity (Malawi & Africa)", [
         "MALAWI MARKET:",
-        "• 40+ banks and financial institutions",
-        "• 200+ government agencies",
-        "• 500+ SMEs with digital presence",
-        "• 100+ educational institutions",
+        "â€¢ 40+ banks and financial institutions",
+        "â€¢ 200+ government agencies",
+        "â€¢ 500+ SMEs with digital presence",
+        "â€¢ 100+ educational institutions",
         "",
         "AFRICAN MARKET:",
-        "• 54 countries",
-        "• 1.4B population",
-        "• $3.5B cybersecurity market by 2026",
-        "• 35% annual growth rate"
+        "â€¢ 54 countries",
+        "â€¢ 1.4B population",
+        "â€¢ $3.5B cybersecurity market by 2026",
+        "â€¢ 35% annual growth rate"
     ])
     
     # ============================================================
     # SLIDE 9: BUSINESS MODEL
     # ============================================================
-    add_slide("💰 Business Model", [
+    add_slide("ðŸ’° Business Model", [
         "1. SUBSCRIPTION TIERS:",
-        "   • Free Tier: Basic security (5 users)",
-        "   • Pro Tier: $99/month (50 users)",
-        "   • Enterprise Tier: $499/month (Unlimited)",
+        "   â€¢ Free Tier: Basic security (5 users)",
+        "   â€¢ Pro Tier: $99/month (50 users)",
+        "   â€¢ Enterprise Tier: $499/month (Unlimited)",
         "",
         "2. ONE-TIME SERVICES:",
-        "   • Implementation & Training: $5,000",
-        "   • Custom Development: $15,000+",
-        "   • Security Audit: $2,500",
+        "   â€¢ Implementation & Training: $5,000",
+        "   â€¢ Custom Development: $15,000+",
+        "   â€¢ Security Audit: $2,500",
         "",
         "3. PARTNERSHIPS:",
-        "   • Reseller Program (30% commission)",
-        "   • Strategic Alliances"
+        "   â€¢ Reseller Program (30% commission)",
+        "   â€¢ Strategic Alliances"
     ])
     
     # ============================================================
     # SLIDE 10: COMPETITIVE ADVANTAGE
     # ============================================================
-    add_slide("🏆 Competitive Advantage", [
+    add_slide("ðŸ† Competitive Advantage", [
         "VS TRADITIONAL SOLUTIONS:",
         "",
         "DSTERMINAL vs Competitors:",
-        "✅ 90% lower cost than commercial solutions",
-        "✅ Open-source transparency",
-        "✅ Local support and customization",
-        "✅ African-focused threat intelligence",
-        "✅ Multi-platform compatibility",
-        "✅ Zero vendor lock-in",
+        "âœ… 90% lower cost than commercial solutions",
+        "âœ… Open-source transparency",
+        "âœ… Local support and customization",
+        "âœ… African-focused threat intelligence",
+        "âœ… Multi-platform compatibility",
+        "âœ… Zero vendor lock-in",
         "",
         "DIFFERENTIATORS:",
-        "• African cybersecurity expertise",
-        "• Community-driven development"
+        "â€¢ African cybersecurity expertise",
+        "â€¢ Community-driven development"
     ])
     
     # ============================================================
     # SLIDE 11: GO-TO-MARKET STRATEGY
     # ============================================================
-    add_slide("🚀 Go-to-Market Strategy", [
+    add_slide("ðŸš€ Go-to-Market Strategy", [
         "PHASE 1: Malawi Launch (Q1 2025)",
-        "• Beta testing with 20 enterprises",
-        "• Strategic partnerships with ISPs",
-        "• Government cybersecurity program",
+        "â€¢ Beta testing with 20 enterprises",
+        "â€¢ Strategic partnerships with ISPs",
+        "â€¢ Government cybersecurity program",
         "",
         "PHASE 2: Regional Expansion (Q3 2025)",
-        "• Zambia, Zimbabwe, Tanzania",
-        "• Regional reseller network",
+        "â€¢ Zambia, Zimbabwe, Tanzania",
+        "â€¢ Regional reseller network",
         "",
         "PHASE 3: Continental Scale (2026)",
-        "• East and West Africa",
-        "• Pan-African partnerships",
+        "â€¢ East and West Africa",
+        "â€¢ Pan-African partnerships",
         "",
         "CHANNELS:",
-        "Direct Sales • Resellers • Online • Government"
+        "Direct Sales â€¢ Resellers â€¢ Online â€¢ Government"
     ])
     
     # ============================================================
     # SLIDE 12: TRACTION
     # ============================================================
-    add_slide("📊 Traction & Current Stage", [
+    add_slide("ðŸ“Š Traction & Current Stage", [
         "CURRENT STATUS:",
-        "• MVP launched and validated",
-        "• 25 enterprise beta users",
-        "• 300+ individual users",
-        "• 95% user satisfaction rate",
+        "â€¢ MVP launched and validated",
+        "â€¢ 25 enterprise beta users",
+        "â€¢ 300+ individual users",
+        "â€¢ 95% user satisfaction rate",
         "",
         "MILESTONES ACHIEVED:",
-        "• Product architecture design",
-        "• Core security modules built",
-        "• SQL injection detection (98% accuracy)",
-        "• Automated hardening (CIS compliance)",
+        "â€¢ Product architecture design",
+        "â€¢ Core security modules built",
+        "â€¢ SQL injection detection (98% accuracy)",
+        "â€¢ Automated hardening (CIS compliance)",
         "",
         "NEXT MILESTONES:",
-        "• Enterprise scalability testing",
-        "• SOC integration"
+        "â€¢ Enterprise scalability testing",
+        "â€¢ SOC integration"
     ])
     
     # ============================================================
     # SLIDE 13: ROADMAP
     # ============================================================
-    add_slide("🗺️ Product Roadmap", [
+    add_slide("ðŸ—ºï¸ Product Roadmap", [
         "Q1 2025: Malawi Launch",
-        "• Finalize MVP",
-        "• Onboard 20 enterprise clients",
-        "• Establish local support",
+        "â€¢ Finalize MVP",
+        "â€¢ Onboard 20 enterprise clients",
+        "â€¢ Establish local support",
         "",
         "Q2 2025: Feature Expansion",
-        "• AI-powered threat detection",
-        "• Compliance automation",
-        "• Mobile app release",
+        "â€¢ AI-powered threat detection",
+        "â€¢ Compliance automation",
+        "â€¢ Mobile app release",
         "",
         "Q3 2025: Regional Expansion",
-        "• Zambia & Zimbabwe launch",
-        "• Regional partnerships",
+        "â€¢ Zambia & Zimbabwe launch",
+        "â€¢ Regional partnerships",
         "",
         "Q4 2025: Enterprise Scale",
-        "• Full SOC integration",
-        "• Advanced analytics"
+        "â€¢ Full SOC integration",
+        "â€¢ Advanced analytics"
     ])
     
     # ============================================================
     # SLIDE 14: FUNDING REQUEST
     # ============================================================
-    add_slide("💎 Funding Request", [
+    add_slide("ðŸ’Ž Funding Request", [
         "RAISING: $1.5M",
         "",
         "USE OF FUNDS:",
-        "• Product Development: 40%",
-        "• Sales & Marketing: 25%",
-        "• Team Expansion: 20%",
-        "• Operations: 10%",
-        "• Contingency: 5%",
+        "â€¢ Product Development: 40%",
+        "â€¢ Sales & Marketing: 25%",
+        "â€¢ Team Expansion: 20%",
+        "â€¢ Operations: 10%",
+        "â€¢ Contingency: 5%",
         "",
         "INVESTMENT STRUCTURE:",
-        "• Seed Round: $500K",
-        "• Series A: $1M",
+        "â€¢ Seed Round: $500K",
+        "â€¢ Series A: $1M",
         "",
         "VALUATION: $5M Pre-money"
     ])
@@ -325,112 +325,112 @@ def create_dsterminal_pitch_deck():
     # ============================================================
     # SLIDE 15: USE OF FUNDS
     # ============================================================
-    add_slide("📋 Use of Funds", [
+    add_slide("ðŸ“‹ Use of Funds", [
         "PRODUCT DEVELOPMENT ($600K):",
-        "• Core platform enhancements",
-        "• AI/ML integration",
-        "• Mobile app development",
-        "• Security hardening tools",
+        "â€¢ Core platform enhancements",
+        "â€¢ AI/ML integration",
+        "â€¢ Mobile app development",
+        "â€¢ Security hardening tools",
         "",
         "SALES & MARKETING ($375K):",
-        "• Direct sales team",
-        "• Digital marketing campaign",
-        "• Regional roadshows",
+        "â€¢ Direct sales team",
+        "â€¢ Digital marketing campaign",
+        "â€¢ Regional roadshows",
         "",
         "TEAM EXPANSION ($300K):",
-        "• 3 developers",
-        "• 2 sales professionals",
-        "• 1 product manager",
+        "â€¢ 3 developers",
+        "â€¢ 2 sales professionals",
+        "â€¢ 1 product manager",
         "",
         "OPERATIONS ($150K):",
-        "• Cloud infrastructure",
-        "• Support team",
-        "• Office expansion"
+        "â€¢ Cloud infrastructure",
+        "â€¢ Support team",
+        "â€¢ Office expansion"
     ])
     
     # ============================================================
     # SLIDE 16: FINANCIAL PROJECTIONS
     # ============================================================
-    add_slide("📊 Financial Projections", [
+    add_slide("ðŸ“Š Financial Projections", [
         "REVENUE PROJECTIONS:",
-        "• Year 1 (2025): $250K",
-        "• Year 2 (2026): $1.2M",
-        "• Year 3 (2027): $3.5M",
-        "• Year 4 (2028): $7.8M",
+        "â€¢ Year 1 (2025): $250K",
+        "â€¢ Year 2 (2026): $1.2M",
+        "â€¢ Year 3 (2027): $3.5M",
+        "â€¢ Year 4 (2028): $7.8M",
         "",
         "KEY METRICS:",
-        "• Customer Acquisition Cost: $500",
-        "• Lifetime Value: $15,000",
-        "• Churn Rate: <5%",
-        "• Gross Margin: 75%",
+        "â€¢ Customer Acquisition Cost: $500",
+        "â€¢ Lifetime Value: $15,000",
+        "â€¢ Churn Rate: <5%",
+        "â€¢ Gross Margin: 75%",
         "",
         "BREAK-EVEN:",
-        "• By end of Year 2"
+        "â€¢ By end of Year 2"
     ])
     
     # ============================================================
     # SLIDE 17: IMPACT
     # ============================================================
-    add_slide("🌟 Impact", [
+    add_slide("ðŸŒŸ Impact", [
         "SECURITY IMPACT:",
-        "• Protect 1M+ digital assets",
-        "• Prevent $500M+ in cyber losses",
-        "• Build African cybersecurity capacity",
+        "â€¢ Protect 1M+ digital assets",
+        "â€¢ Prevent $500M+ in cyber losses",
+        "â€¢ Build African cybersecurity capacity",
         "",
         "SOCIAL IMPACT:",
-        "• Create 50+ jobs",
-        "• Train 1,000+ cybersecurity professionals",
-        "• Develop local cybersecurity talent",
+        "â€¢ Create 50+ jobs",
+        "â€¢ Train 1,000+ cybersecurity professionals",
+        "â€¢ Develop local cybersecurity talent",
         "",
         "ECONOMIC IMPACT:",
-        "• $10M+ in economic value",
-        "• Support 500+ organizations",
-        "• Strengthen Malawi's digital economy"
+        "â€¢ $10M+ in economic value",
+        "â€¢ Support 500+ organizations",
+        "â€¢ Strengthen Malawi's digital economy"
     ])
     
     # ============================================================
     # SLIDE 18: TEAM
     # ============================================================
-    add_slide("👥 The Team", [
+    add_slide("ðŸ‘¥ The Team", [
         "FOUNDER & CEO:",
-        "• 10+ years cybersecurity experience",
-        "• Former Security Architect at major bank",
-        "• Certified Ethical Hacker (CEH)",
+        "â€¢ 10+ years cybersecurity experience",
+        "â€¢ Former Security Architect at major bank",
+        "â€¢ Certified Ethical Hacker (CEH)",
         "",
         "KEY HIRES:",
-        "• Lead Developer - Full-stack expert",
-        "• Security Engineer - Penetration testing",
-        "• Product Manager - SaaS experience",
-        "• Sales Director - Enterprise sales",
+        "â€¢ Lead Developer - Full-stack expert",
+        "â€¢ Security Engineer - Penetration testing",
+        "â€¢ Product Manager - SaaS experience",
+        "â€¢ Sales Director - Enterprise sales",
         "",
         "ADVISORS:",
-        "• Senior cybersecurity experts",
-        "• African tech ecosystem leaders"
+        "â€¢ Senior cybersecurity experts",
+        "â€¢ African tech ecosystem leaders"
     ])
     
     # ============================================================
     # SLIDE 19: WHY INVEST
     # ============================================================
-    add_slide("💡 Why Invest in DSTERMINAL", [
-        "1. 💰 MASSIVE MARKET OPPORTUNITY",
-        "   • African cybersecurity market: $3.5B",
-        "   • 35% annual growth",
+    add_slide("ðŸ’¡ Why Invest in DSTERMINAL", [
+        "1. ðŸ’° MASSIVE MARKET OPPORTUNITY",
+        "   â€¢ African cybersecurity market: $3.5B",
+        "   â€¢ 35% annual growth",
         "",
-        "2. 🚀 PROVEN PRODUCT",
-        "   • 95% user satisfaction",
-        "   • Working MVP with 25 enterprise clients",
+        "2. ðŸš€ PROVEN PRODUCT",
+        "   â€¢ 95% user satisfaction",
+        "   â€¢ Working MVP with 25 enterprise clients",
         "",
-        "3. 🏆 COMPETITIVE ADVANTAGE",
-        "   • 90% lower cost than competitors",
-        "   • African-focused threat intelligence",
+        "3. ðŸ† COMPETITIVE ADVANTAGE",
+        "   â€¢ 90% lower cost than competitors",
+        "   â€¢ African-focused threat intelligence",
         "",
-        "4. 💎 EXPERIENCED TEAM",
-        "   • Deep cybersecurity expertise",
-        "   • Strong industry connections",
+        "4. ðŸ’Ž EXPERIENCED TEAM",
+        "   â€¢ Deep cybersecurity expertise",
+        "   â€¢ Strong industry connections",
         "",
-        "5. 📈 SCALABLE BUSINESS MODEL",
-        "   • Recurring revenue",
-        "   • Expandable to 54 African countries"
+        "5. ðŸ“ˆ SCALABLE BUSINESS MODEL",
+        "   â€¢ Recurring revenue",
+        "   â€¢ Expandable to 54 African countries"
     ])
     
     # ============================================================
@@ -461,7 +461,7 @@ def create_dsterminal_pitch_deck():
     # Contact
     contact_box = slide.shapes.add_textbox(Inches(1), Inches(5.5), Inches(11), Inches(1.5))
     tf3 = contact_box.text_frame
-    tf3.text = "📧 info@dsterminal.com\n📞 +265 111 222 333\n🌐 www.dsterminal.com"
+    tf3.text = "ðŸ“§ info@dsterminal.com\nðŸ“ž +265 111 222 333\nðŸŒ www.dsterminal.com"
     tf3.paragraphs[0].font.size = Pt(24)
     tf3.paragraphs[0].font.color.rgb = GOLD
     tf3.paragraphs[0].alignment = PP_ALIGN.CENTER
@@ -471,9 +471,9 @@ def create_dsterminal_pitch_deck():
     # ============================================================
     output_file = f"DSTERMINAL_Pitch_Deck_{datetime.now().strftime('%Y%m%d')}.pptx"
     prs.save(output_file)
-    print(f"✅ Pitch deck created successfully!")
-    print(f"📁 File: {output_file}")
-    print(f"📊 Slides: {len(prs.slides)}")
+    print(f"âœ… Pitch deck created successfully!")
+    print(f"ðŸ“ File: {output_file}")
+    print(f"ðŸ“Š Slides: {len(prs.slides)}")
     return output_file
 
 if __name__ == "__main__":
@@ -481,7 +481,7 @@ if __name__ == "__main__":
     try:
         import pptx
     except ImportError:
-        print("📦 Installing python-pptx...")
+        print("ðŸ“¦ Installing python-pptx...")
         os.system("pip install python-pptx")
         import pptx
     

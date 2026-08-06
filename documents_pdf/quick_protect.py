@@ -1,4 +1,4 @@
-# quick_protect.py
+﻿# quick_protect.py
 import os
 from pypdf import PdfReader, PdfWriter
 import io
@@ -35,16 +35,16 @@ def protect_pdf_simple(input_file):
         
         return output_file
     except ImportError:
-        print("❌ Install: pip install PyMuPDF pillow")
+        print("âŒ Install: pip install PyMuPDF pillow")
         return None
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"âŒ Error: {e}")
         return None
 
 if __name__ == "__main__":
     file = input("Enter PDF path: ").strip().strip('"')
     result = protect_pdf_simple(file)
     if result:
-        print(f"✅ Protected: {result}")
+        print(f"âœ… Protected: {result}")
     else:
-        print("❌ Failed")
+        print("âŒ Failed")

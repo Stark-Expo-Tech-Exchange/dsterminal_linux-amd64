@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 DSTerminal Reconnaissance Module
 Usage: python recon.py <target>
@@ -102,37 +102,37 @@ def init_scan_directories(target):
 # -------------------------------
 
 ASCII_LOGO = """
-    ╔══════════════════════════════════════════════════════════╗
-    ║     ██████╗ ███████╗████████╗███████╗██████╗ ███╗   ███╗ ║
-    ║     ██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗████╗ ████║ ║
-    ║     ██║  ██║███████╗   ██║   █████╗  ██████╔╝██╔████╔██║ ║
-    ║     ██║  ██║╚════██║   ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║ ║
-    ║     ██████╔╝███████║   ██║   ███████╗██║  ██║██║ ╚═╝ ██║ ║
-    ║     ╚═════╝ ╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝ ║
-    ╚══════════════════════════════════════════════════════════╝
+    â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+    â•‘     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ–ˆâ•— â•‘
+    â•‘     â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•â•šâ•â•â–ˆâ–ˆâ•”â•â•â•â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ•‘ â•‘
+    â•‘     â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•”â–ˆâ–ˆâ–ˆâ–ˆâ•”â–ˆâ–ˆâ•‘ â•‘
+    â•‘     â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â•šâ•â•â•â•â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘ â•‘
+    â•‘     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘ â•šâ•â• â–ˆâ–ˆâ•‘ â•‘
+    â•‘     â•šâ•â•â•â•â•â• â•šâ•â•â•â•â•â•â•   â•šâ•â•   â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•â•šâ•â•     â•šâ•â• â•‘
+    â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 """
 
 # Circle rotation frames
 CIRCLE_FRAMES = [
-    "◐", "◓", "◑", "◒",  # Basic rotation
-    "⦾", "⦿", "⬤", "○",  # Solid/empty
-    "⟳", "⟲", "↻", "↺",  # Rotation arrows
-    "◜", "◝", "◞", "◟",  # Quarter circles
+    "â—", "â—“", "â—‘", "â—’",  # Basic rotation
+    "â¦¾", "â¦¿", "â¬¤", "â—‹",  # Solid/empty
+    "âŸ³", "âŸ²", "â†»", "â†º",  # Rotation arrows
+    "â—œ", "â—", "â—ž", "â—Ÿ",  # Quarter circles
 ]
 
 # Progress bar styles
 PROGRESS_BARS = [
-    "▱▱▱▱▱▱▱▱▱▱",
-    "▰▱▱▱▱▱▱▱▱▱",
-    "▰▰▱▱▱▱▱▱▱▱",
-    "▰▰▰▱▱▱▱▱▱▱",
-    "▰▰▰▰▱▱▱▱▱▱",
-    "▰▰▰▰▰▱▱▱▱▱",
-    "▰▰▰▰▰▰▱▱▱▱",
-    "▰▰▰▰▰▰▰▱▱▱",
-    "▰▰▰▰▰▰▰▰▱▱",
-    "▰▰▰▰▰▰▰▰▰▱",
-    "▰▰▰▰▰▰▰▰▰▰",
+    "â–±â–±â–±â–±â–±â–±â–±â–±â–±â–±",
+    "â–°â–±â–±â–±â–±â–±â–±â–±â–±â–±",
+    "â–°â–°â–±â–±â–±â–±â–±â–±â–±â–±",
+    "â–°â–°â–°â–±â–±â–±â–±â–±â–±â–±",
+    "â–°â–°â–°â–°â–±â–±â–±â–±â–±â–±",
+    "â–°â–°â–°â–°â–°â–±â–±â–±â–±â–±",
+    "â–°â–°â–°â–°â–°â–°â–±â–±â–±â–±",
+    "â–°â–°â–°â–°â–°â–°â–°â–±â–±â–±",
+    "â–°â–°â–°â–°â–°â–°â–°â–°â–±â–±",
+    "â–°â–°â–°â–°â–°â–°â–°â–°â–°â–±",
+    "â–°â–°â–°â–°â–°â–°â–°â–°â–°â–°",
 ]
 
 # -------------------------------
@@ -156,7 +156,7 @@ def clear():
 
 def matrix_rain_effect(lines=3):
     """Create a Matrix-style digital rain effect"""
-    chars = "01アイウエオカキクケコサシスセソタチツテト"
+    chars = "01ã‚¢ã‚¤ã‚¦ã‚¨ã‚ªã‚«ã‚­ã‚¯ã‚±ã‚³ã‚µã‚·ã‚¹ã‚»ã‚½ã‚¿ãƒãƒ„ãƒ†ãƒˆ"
     for _ in range(lines):
         line = ""
         for _ in range(width // 4):
@@ -243,19 +243,19 @@ class SOCDashboard:
             col1_status = self.get_status_color(self.scan_metrics['ports']['status'])
             col1_title = f"{col1_status}{circle}{RESET} PORTS"
             col1_prog = f"{CYAN}[{bar}]{RESET}"
-            col1_find = f"{GREEN}⚡{self.scan_metrics['ports']['findings']}{RESET}"
+            col1_find = f"{GREEN}âš¡{self.scan_metrics['ports']['findings']}{RESET}"
             
             # Column 2: DNS (CENTER)
             col2_status = self.get_status_color(self.scan_metrics['dns']['status'])
             col2_title = f"{col2_status}{circle}{RESET} DNS"
             col2_prog = f"{CYAN}[{bar}]{RESET}"
-            col2_find = f"{GREEN}⚡{self.scan_metrics['dns']['findings']}{RESET}"
+            col2_find = f"{GREEN}âš¡{self.scan_metrics['dns']['findings']}{RESET}"
             
             # Column 3: WHOIS (RIGHT)
             col3_status = self.get_status_color(self.scan_metrics['whois']['status'])
             col3_title = f"{col3_status}{circle}{RESET} WHOIS"
             col3_prog = f"{CYAN}[{bar}]{RESET}"
-            col3_find = f"{GREEN}⚡{self.scan_metrics['whois']['findings']}{RESET}"
+            col3_find = f"{GREEN}âš¡{self.scan_metrics['whois']['findings']}{RESET}"
             
             # Pad each column to exactly col_width characters
             col1_title_padded = col1_title.ljust(col_width)
@@ -340,15 +340,15 @@ class CinematicSpinner:
         print("\033[8A", end="")
         
         # Redraw SOC header
-        center_text(f"{BOLD}{CYAN}╔══════════════════════════════════════════════════════════════════╗{RESET}")
-        center_text(f"{BOLD}{CYAN}║                    🎯 SOC DASHBOARD 🎯                            ║{RESET}")
-        center_text(f"{BOLD}{CYAN}╚══════════════════════════════════════════════════════════════════╝{RESET}")
+        center_text(f"{BOLD}{CYAN}â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—{RESET}")
+        center_text(f"{BOLD}{CYAN}â•‘                    ðŸŽ¯ SOC DASHBOARD ðŸŽ¯                            â•‘{RESET}")
+        center_text(f"{BOLD}{CYAN}â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•{RESET}")
         
         # Render three-column circles
         self.dashboard.render_three_column_circles()
         
         # Separator
-        center_text(f"{BOLD}{CYAN}{'─' * 50}{RESET}")
+        center_text(f"{BOLD}{CYAN}{'â”€' * 50}{RESET}")
         
         # Show current scan info
         print()
@@ -422,7 +422,7 @@ def run_cinematic_scan(label, command, scan_name, dashboard, session_dir, timest
         
         # Display limited results
         print()
-        center_text(f"{BOLD}{GREEN}═════ SCAN RESULTS: {scan_name.upper()} ═════{RESET}")
+        center_text(f"{BOLD}{GREEN}â•â•â•â•â• SCAN RESULTS: {scan_name.upper()} â•â•â•â•â•{RESET}")
         for line in output_lines[:15]:  # Show first 15 lines
             if line.strip():
                 # Truncate long lines and clean for display
@@ -476,20 +476,20 @@ def run_recon(target=None):
     current_dashboard = dashboard
     
     # Initial dashboard render
-    center_text(f"{BOLD}{CYAN}╔══════════════════════════════════════════════════════════════════╗{RESET}")
-    center_text(f"{BOLD}{CYAN}║                    🎯 REAL-TIME SOC DASHBOARD 🎯                 ║{RESET}")
-    center_text(f"{BOLD}{CYAN}╚══════════════════════════════════════════════════════════════════╝{RESET}")
+    center_text(f"{BOLD}{CYAN}â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—{RESET}")
+    center_text(f"{BOLD}{CYAN}â•‘                    ðŸŽ¯ REAL-TIME SOC DASHBOARD ðŸŽ¯                 â•‘{RESET}")
+    center_text(f"{BOLD}{CYAN}â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•{RESET}")
     
     # Initial three-column circles
     dashboard.render_three_column_circles()
-    center_text(f"{BOLD}{CYAN}{'─' * 50}{RESET}")
+    center_text(f"{BOLD}{CYAN}{'â”€' * 50}{RESET}")
     
     # Target display
-    target_text = f"🎯 TARGET ACQUIRED: {target.upper()} 🎯"
+    target_text = f"ðŸŽ¯ TARGET ACQUIRED: {target.upper()} ðŸŽ¯"
     center_text(f"{BOLD}{GREEN}{target_text}{RESET}")
-    center_text(f"{BOLD}{CYAN}{'─' * 50}{RESET}")
+    center_text(f"{BOLD}{CYAN}{'â”€' * 50}{RESET}")
     print()
-    center_text(f"{BOLD}{YELLOW}📁 SCAN DIRECTORY: {session_dir}{RESET}")
+    center_text(f"{BOLD}{YELLOW}ðŸ“ SCAN DIRECTORY: {session_dir}{RESET}")
     print()
     
     time.sleep(1)
@@ -499,9 +499,9 @@ def run_recon(target=None):
     # -------------------------------
     
     scans = [
-        ("🔍 PORT SCAN", f"nmap -F {target}", "ports"),
-        ("🌐 DNS RESOLUTION", f"nslookup {target}", "dns"),
-        ("📋 WHOIS LOOKUP", f"whois {target}", "whois"),
+        ("ðŸ” PORT SCAN", f"nmap -F {target}", "ports"),
+        ("ðŸŒ DNS RESOLUTION", f"nslookup {target}", "dns"),
+        ("ðŸ“‹ WHOIS LOOKUP", f"whois {target}", "whois"),
     ]
     
     # -------------------------------
@@ -518,7 +518,7 @@ def run_recon(target=None):
         if check_command_exists(cmd_name) or cmd_name in ['nslookup', 'whois']:
             run_cinematic_scan(label, cmd, scan_name, dashboard, session_dir, timestamp, target)
         else:
-            center_text(f"{BOLD}{YELLOW}⚠ {cmd_name} not found - skipping{RESET}")
+            center_text(f"{BOLD}{YELLOW}âš  {cmd_name} not found - skipping{RESET}")
             dashboard.update_metric(scan_name, status='ERROR', findings=0)
         
         # Brief pause between scans
@@ -532,7 +532,7 @@ def run_recon(target=None):
     # Check if metasploit is available using cross-platform function
     if check_command_exists("msfconsole"):
         run_cinematic_scan(
-            "💀 METASPLOIT SEARCH",
+            "ðŸ’€ METASPLOIT SEARCH",
             f'msfconsole -q -x "search {target}; exit"',
             "metasploit",
             dashboard,
@@ -541,7 +541,7 @@ def run_recon(target=None):
             target
         )
     else:
-        center_text(f"{BOLD}{YELLOW}⚠ Metasploit not found - skipping{RESET}")
+        center_text(f"{BOLD}{YELLOW}âš  Metasploit not found - skipping{RESET}")
         dashboard.update_metric('metasploit', status='ERROR', findings=0)
     
     # -------------------------------
@@ -576,9 +576,9 @@ def run_recon(target=None):
     # -------------------------------
     
     print("\n" * 2)
-    center_text(f"{BOLD}{GREEN}╔══════════════════════════════════════════════════════════════════╗{RESET}")
-    center_text(f"{BOLD}{GREEN}║                    🏁 INFORMATION GATHERING COMPLETE 🏁           ║{RESET}")
-    center_text(f"{BOLD}{GREEN}╚══════════════════════════════════════════════════════════════════╝{RESET}")
+    center_text(f"{BOLD}{GREEN}â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—{RESET}")
+    center_text(f"{BOLD}{GREEN}â•‘                    ðŸ INFORMATION GATHERING COMPLETE ðŸ           â•‘{RESET}")
+    center_text(f"{BOLD}{GREEN}â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•{RESET}")
     
     # Final three-column summary
     dashboard.render_three_column_circles()
@@ -586,16 +586,16 @@ def run_recon(target=None):
     # Summary statistics
     summary = dashboard.get_summary()
     total_findings = sum(m['findings'] for m in summary.values())
-    center_text(f"{BOLD}{CYAN}{'─' * 50}{RESET}")
+    center_text(f"{BOLD}{CYAN}{'â”€' * 50}{RESET}")
     center_text(f"{BOLD}{YELLOW}TOTAL FINDINGS: {total_findings}{RESET}")
     center_text(f"{BOLD}{YELLOW}SCAN SESSION: {session_dir}{RESET}")
     center_text(f"{BOLD}{YELLOW}SUMMARY REPORT: {summary_file}{RESET}")
-    center_text(f"{BOLD}{GREEN}{'═' * 50}{RESET}")
+    center_text(f"{BOLD}{GREEN}{'â•' * 50}{RESET}")
     
     # Matrix rain outro
     matrix_rain_effect(2)
     print()
-    center_text(f"{BOLD}{CYAN}⚡ DSTERMINAL SOC - RECONNAISSANCE COMPLETE ⚡{RESET}")
+    center_text(f"{BOLD}{CYAN}âš¡ DSTERMINAL SOC - RECONNAISSANCE COMPLETE âš¡{RESET}")
     print()
     
     return True
@@ -606,9 +606,9 @@ def run_recon(target=None):
 
 def recon_menu():
     """Interactive menu for reconnaissance"""
-    print(f"{BOLD}{CYAN}╔══════════════════════════════════════════════╗{RESET}")
-    print(f"{BOLD}{CYAN}║           RECONNAISSANCE MENU                ║{RESET}")
-    print(f"{BOLD}{CYAN}╚══════════════════════════════════════════════╝{RESET}")
+    print(f"{BOLD}{CYAN}â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—{RESET}")
+    print(f"{BOLD}{CYAN}â•‘           RECONNAISSANCE MENU                â•‘{RESET}")
+    print(f"{BOLD}{CYAN}â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•{RESET}")
     print()
     print(f"{GREEN}1. Quick Scan (Ports, DNS, WHOIS){RESET}")
     print(f"{GREEN}2. Full Scan (with Metasploit){RESET}")

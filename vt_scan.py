@@ -1,4 +1,4 @@
-"""
+﻿"""
 DSTerminal - VirusTotal Integration Module
 Enhanced Cinematic SOC Dashboard with Hacking-Style Animation & Auto-Typing
 """
@@ -65,9 +65,9 @@ BRIGHT_MAGENTA = '\033[95;1m'
 BRIGHT_BLUE = '\033[94;1m'
 
 # Animation frames
-SCANNING_FRAMES = ["🔍", "🔎", "📡", "🛰️", "⚡", "💀", "🎯", "⚠️", "🔬", "🧬", "✨", "🌟"]
-THREAT_FRAMES = ["◐", "◓", "◑", "◒", "⦾", "⦿", "⬤", "○", "⟳", "⟲", "↻", "↺", "🌀", "⚡"]
-GLOW_FRAMES = ["✨", "⭐", "🌟", "💫", "⚡"]
+SCANNING_FRAMES = ["ðŸ”", "ðŸ”Ž", "ðŸ“¡", "ðŸ›°ï¸", "âš¡", "ðŸ’€", "ðŸŽ¯", "âš ï¸", "ðŸ”¬", "ðŸ§¬", "âœ¨", "ðŸŒŸ"]
+THREAT_FRAMES = ["â—", "â—“", "â—‘", "â—’", "â¦¾", "â¦¿", "â¬¤", "â—‹", "âŸ³", "âŸ²", "â†»", "â†º", "ðŸŒ€", "âš¡"]
+GLOW_FRAMES = ["âœ¨", "â­", "ðŸŒŸ", "ðŸ’«", "âš¡"]
 
 # -------------------------------
 # AUTO-TYPING ENGINE
@@ -127,7 +127,7 @@ class AutoTypeEngine:
             
         # Blinking cursor effect
         for _ in range(3):
-            sys.stdout.write('█')
+            sys.stdout.write('â–ˆ')
             sys.stdout.flush()
             time.sleep(0.1)
             sys.stdout.write('\b \b')
@@ -142,7 +142,7 @@ class AutoTypeEngine:
         """Type progress with auto-typing effect"""
         bar_length = 40
         filled = int(bar_length * progress / total)
-        bar = '█' * filled + '░' * (bar_length - filled)
+        bar = 'â–ˆ' * filled + 'â–‘' * (bar_length - filled)
         percent = int(progress / total * 100)
         
         text = f"\r{color}[{bar}] {percent:3d}% {message}{RESET}"
@@ -214,7 +214,7 @@ def clear_screen():
     os.system("cls" if os.name == "nt" else "clear")
 
 def matrix_rain(duration: float = 0.5, intensity: int = 3):
-    chars = "01アイウエオカキクケコサシスセソタチツテト"
+    chars = "01ã‚¢ã‚¤ã‚¦ã‚¨ã‚ªã‚«ã‚­ã‚¯ã‚±ã‚³ã‚µã‚·ã‚¹ã‚»ã‚½ã‚¿ãƒãƒ„ãƒ†ãƒˆ"
     width = get_terminal_width()
     
     for _ in range(intensity):
@@ -307,25 +307,25 @@ class SOCOperatorGuidance:
         if ratio == 0:
             risk = "LOW"
             color = BRIGHT_GREEN
-            glow = "🟢"
+            glow = "ðŸŸ¢"
             action = "No action required. System appears clean."
             priority = "ROUTINE"
         elif ratio < 0.3:
             risk = "MEDIUM"
             color = BRIGHT_YELLOW
-            glow = "🟡"
+            glow = "ðŸŸ¡"
             action = "Investigate detected files. Consider quarantine."
             priority = "URGENT"
         elif ratio < 0.7:
             risk = "HIGH"
             color = ORANGE
-            glow = "🟠"
+            glow = "ðŸŸ "
             action = "IMMEDIATE INVESTIGATION REQUIRED."
             priority = "CRITICAL"
         else:
             risk = "CRITICAL"
             color = BRIGHT_RED + BLINK
-            glow = "🔴"
+            glow = "ðŸ”´"
             action = "EMERGENCY RESPONSE NEEDED!"
             priority = "EMERGENCY"
         
@@ -343,18 +343,18 @@ class SOCOperatorGuidance:
         advice = []
         
         if scan_type == "hash_lookup":
-            advice.append(f"{BRIGHT_CYAN}▓▓▓ Hash Analysis Complete ▓▓▓{RESET}")
+            advice.append(f"{BRIGHT_CYAN}â–“â–“â–“ Hash Analysis Complete â–“â–“â–“{RESET}")
         elif scan_type == "file_scan":
-            advice.append(f"{BRIGHT_CYAN}▓▓▓ File Behavior Analysis ▓▓▓{RESET}")
+            advice.append(f"{BRIGHT_CYAN}â–“â–“â–“ File Behavior Analysis â–“â–“â–“{RESET}")
         elif scan_type == "bulk_scan":
-            advice.append(f"{BRIGHT_CYAN}▓▓▓ Bulk Scan Analysis ▓▓▓{RESET}")
+            advice.append(f"{BRIGHT_CYAN}â–“â–“â–“ Bulk Scan Analysis â–“â–“â–“{RESET}")
         
         threats = [f for f in findings if f.get('malicious', 0) > 0]
         if threats:
             advice.append(f"{BRIGHT_RED}[!] {len(threats)} malicious items detected{RESET}")
             advice.append(f"{BRIGHT_YELLOW}[>] Recommended: Immediate quarantine{RESET}")
         else:
-            advice.append(f"{BRIGHT_GREEN}[✓] No threats detected{RESET}")
+            advice.append(f"{BRIGHT_GREEN}[âœ“] No threats detected{RESET}")
             advice.append(f"{BRIGHT_GREEN}[>] System appears secure.{RESET}")
         
         return "\n".join(advice)
@@ -409,14 +409,14 @@ class SOCDashboard:
         seconds = elapsed % 60
         glow = GLOW_FRAMES[self.glow_idx % len(GLOW_FRAMES)]
         width = 85
-        title = f"{glow} 🔬 DSTERMINAL - THREAT INTELLIGENCE 🔬 {glow}"
+        title = f"{glow} ðŸ”¬ DSTERMINAL - THREAT INTELLIGENCE ðŸ”¬ {glow}"
 
         header = f"""
-{BRIGHT_CYAN}╔{'═' * width}╗{RESET}
-{BRIGHT_CYAN}║{RESET}{title.center(width)}{BRIGHT_CYAN}║{RESET}
-{BRIGHT_CYAN}╠{'═' * width}╣{RESET}
-{BRIGHT_CYAN}║{RESET} {BRIGHT_YELLOW}Operator:{RESET} {CONFIG['SOC_OPERATOR_NAME']:<18} {BRIGHT_YELLOW}Session:{RESET} {CONFIG['SOC_SESSION_ID']:<18} {BRIGHT_YELLOW}Uptime:{RESET} {hours:02d}:{minutes:02d}:{seconds:02d} {BRIGHT_CYAN}║{RESET}
-{BRIGHT_CYAN}╚{'═' * width}╝{RESET}
+{BRIGHT_CYAN}â•”{'â•' * width}â•—{RESET}
+{BRIGHT_CYAN}â•‘{RESET}{title.center(width)}{BRIGHT_CYAN}â•‘{RESET}
+{BRIGHT_CYAN}â• {'â•' * width}â•£{RESET}
+{BRIGHT_CYAN}â•‘{RESET} {BRIGHT_YELLOW}Operator:{RESET} {CONFIG['SOC_OPERATOR_NAME']:<18} {BRIGHT_YELLOW}Session:{RESET} {CONFIG['SOC_SESSION_ID']:<18} {BRIGHT_YELLOW}Uptime:{RESET} {hours:02d}:{minutes:02d}:{seconds:02d} {BRIGHT_CYAN}â•‘{RESET}
+{BRIGHT_CYAN}â•š{'â•' * width}â•{RESET}
 """
         print(self.center_block(header))
 
@@ -427,33 +427,33 @@ class SOCDashboard:
         if self.threat_level < 30:
             threat_color = BRIGHT_GREEN
             threat_text = "LOW"
-            threat_bar = "███░░░░░░░"
-            radar_sweep = "🟢"
+            threat_bar = "â–ˆâ–ˆâ–ˆâ–‘â–‘â–‘â–‘â–‘â–‘â–‘"
+            radar_sweep = "ðŸŸ¢"
         elif self.threat_level < 70:
             threat_color = BRIGHT_YELLOW
             threat_text = "MEDIUM"
-            threat_bar = "██████░░░░"
-            radar_sweep = "🟡"
+            threat_bar = "â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–‘â–‘â–‘â–‘"
+            radar_sweep = "ðŸŸ¡"
         else:
             threat_color = BRIGHT_RED + BLINK
             threat_text = "CRITICAL"
-            threat_bar = "██████████"
-            radar_sweep = "🔴"
+            threat_bar = "â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ"
+            radar_sweep = "ðŸ”´"
 
         return f"""
-{BRIGHT_CYAN}┌────────────────────────────────┐{RESET}
-{BRIGHT_CYAN}│{RESET} {threat_color}🛸 THREAT RADAR {threat_icon} {glow_icon}{RESET}            {BRIGHT_CYAN}│{RESET}
-{BRIGHT_CYAN}├────────────────────────────────┤{RESET}
-{BRIGHT_CYAN}│{RESET} Level: {threat_text:<22}{BRIGHT_CYAN}│{RESET}
-{BRIGHT_CYAN}│{RESET} Score: {self.threat_level}%{' ' * 20}{BRIGHT_CYAN}│{RESET}
-{BRIGHT_CYAN}│{RESET} Bar: [{threat_bar}]             {BRIGHT_CYAN}│{RESET}
-{BRIGHT_CYAN}│{RESET} Radar: {radar_sweep:<21}{BRIGHT_CYAN}│{RESET}
-{BRIGHT_CYAN}└────────────────────────────────┘{RESET}
+{BRIGHT_CYAN}â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”{RESET}
+{BRIGHT_CYAN}â”‚{RESET} {threat_color}ðŸ›¸ THREAT RADAR {threat_icon} {glow_icon}{RESET}            {BRIGHT_CYAN}â”‚{RESET}
+{BRIGHT_CYAN}â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤{RESET}
+{BRIGHT_CYAN}â”‚{RESET} Level: {threat_text:<22}{BRIGHT_CYAN}â”‚{RESET}
+{BRIGHT_CYAN}â”‚{RESET} Score: {self.threat_level}%{' ' * 20}{BRIGHT_CYAN}â”‚{RESET}
+{BRIGHT_CYAN}â”‚{RESET} Bar: [{threat_bar}]             {BRIGHT_CYAN}â”‚{RESET}
+{BRIGHT_CYAN}â”‚{RESET} Radar: {radar_sweep:<21}{BRIGHT_CYAN}â”‚{RESET}
+{BRIGHT_CYAN}â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜{RESET}
 """
 
     def render_scan_status(self):
         scan_icon = SCANNING_FRAMES[self.threat_frame_idx % len(SCANNING_FRAMES)]
-        bar = "█" * (self.scan_progress // 10) + "░" * (10 - (self.scan_progress // 10))
+        bar = "â–ˆ" * (self.scan_progress // 10) + "â–‘" * (10 - (self.scan_progress // 10))
 
         if self.scan_progress < 30:
             bar_color = BRIGHT_RED
@@ -463,13 +463,13 @@ class SOCDashboard:
             bar_color = BRIGHT_GREEN
 
         return f"""
-{BRIGHT_CYAN}┌──────────────────────────────────────┐{RESET}
-{BRIGHT_CYAN}│{RESET} {BRIGHT_MAGENTA}🎯 ACTIVE SCAN 🎯{RESET}                  {BRIGHT_CYAN}│{RESET}
-{BRIGHT_CYAN}├──────────────────────────────────────┤{RESET}
-{BRIGHT_CYAN}│{RESET} Target: {self.current_scan_target[:26]:<26}{BRIGHT_CYAN}│{RESET}
-{BRIGHT_CYAN}│{RESET} Action: {self.current_action[:26]:<26}{BRIGHT_CYAN}│{RESET}
-{BRIGHT_CYAN}│{RESET} Progress: {bar_color}[{bar}]{RESET} {self.scan_progress:>3}% {BRIGHT_CYAN}│{RESET}
-{BRIGHT_CYAN}└──────────────────────────────────────┘{RESET}
+{BRIGHT_CYAN}â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”{RESET}
+{BRIGHT_CYAN}â”‚{RESET} {BRIGHT_MAGENTA}ðŸŽ¯ ACTIVE SCAN ðŸŽ¯{RESET}                  {BRIGHT_CYAN}â”‚{RESET}
+{BRIGHT_CYAN}â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤{RESET}
+{BRIGHT_CYAN}â”‚{RESET} Target: {self.current_scan_target[:26]:<26}{BRIGHT_CYAN}â”‚{RESET}
+{BRIGHT_CYAN}â”‚{RESET} Action: {self.current_action[:26]:<26}{BRIGHT_CYAN}â”‚{RESET}
+{BRIGHT_CYAN}â”‚{RESET} Progress: {bar_color}[{bar}]{RESET} {self.scan_progress:>3}% {BRIGHT_CYAN}â”‚{RESET}
+{BRIGHT_CYAN}â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜{RESET}
 """
 
     def render_stats_panel(self):
@@ -477,14 +477,14 @@ class SOCDashboard:
         total_clean = len(self.findings) - total_threats
 
         return f"""
-{BRIGHT_CYAN}┌──────────────────────────────┐{RESET}
-{BRIGHT_CYAN}│{RESET} {BRIGHT_CYAN}📊 SOC STATISTICS 📊{RESET}       {BRIGHT_CYAN}│{RESET}
-{BRIGHT_CYAN}├──────────────────────────────┤{RESET}
-{BRIGHT_CYAN}│{RESET} Total Scans: {len(self.findings):<12}{BRIGHT_CYAN}│{RESET}
-{BRIGHT_CYAN}│{RESET} Clean: {total_clean:<19}{BRIGHT_CYAN}│{RESET}
-{BRIGHT_CYAN}│{RESET} Threats: {total_threats:<16}{BRIGHT_CYAN}│{RESET}
-{BRIGHT_CYAN}│{RESET} Detect Rate: {self.threat_level}%{' ' * 8}{BRIGHT_CYAN}│{RESET}
-{BRIGHT_CYAN}└──────────────────────────────┘{RESET}
+{BRIGHT_CYAN}â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”{RESET}
+{BRIGHT_CYAN}â”‚{RESET} {BRIGHT_CYAN}ðŸ“Š SOC STATISTICS ðŸ“Š{RESET}       {BRIGHT_CYAN}â”‚{RESET}
+{BRIGHT_CYAN}â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤{RESET}
+{BRIGHT_CYAN}â”‚{RESET} Total Scans: {len(self.findings):<12}{BRIGHT_CYAN}â”‚{RESET}
+{BRIGHT_CYAN}â”‚{RESET} Clean: {total_clean:<19}{BRIGHT_CYAN}â”‚{RESET}
+{BRIGHT_CYAN}â”‚{RESET} Threats: {total_threats:<16}{BRIGHT_CYAN}â”‚{RESET}
+{BRIGHT_CYAN}â”‚{RESET} Detect Rate: {self.threat_level}%{' ' * 8}{BRIGHT_CYAN}â”‚{RESET}
+{BRIGHT_CYAN}â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜{RESET}
 """
 
     def render_layer2(self):
@@ -531,27 +531,27 @@ class SOCDashboard:
         )
 
         return f"""
-{BRIGHT_YELLOW}╔════════════════════════════════════════════════════════════════════════════════╗{RESET}
-{BRIGHT_YELLOW}║{RESET} 🟢 🎯 SOC OPERATOR GUIDANCE 🟢                                               {BRIGHT_YELLOW}║{RESET}
-{BRIGHT_YELLOW}╠════════════════════════════════════════════════════════════════════════════════╣{RESET}
-{BRIGHT_YELLOW}║{RESET} Risk Assessment: {assessment['risk']} ({assessment['priority']}){' ' * 45}{BRIGHT_YELLOW}║{RESET}
-{BRIGHT_YELLOW}║{RESET} Action Required: {assessment['action'][:58]:<58}{' ' * 7}{BRIGHT_YELLOW}║{RESET}
-{BRIGHT_YELLOW}╚════════════════════════════════════════════════════════════════════════════════╝{RESET}
+{BRIGHT_YELLOW}â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—{RESET}
+{BRIGHT_YELLOW}â•‘{RESET} ðŸŸ¢ ðŸŽ¯ SOC OPERATOR GUIDANCE ðŸŸ¢                                               {BRIGHT_YELLOW}â•‘{RESET}
+{BRIGHT_YELLOW}â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£{RESET}
+{BRIGHT_YELLOW}â•‘{RESET} Risk Assessment: {assessment['risk']} ({assessment['priority']}){' ' * 45}{BRIGHT_YELLOW}â•‘{RESET}
+{BRIGHT_YELLOW}â•‘{RESET} Action Required: {assessment['action'][:58]:<58}{' ' * 7}{BRIGHT_YELLOW}â•‘{RESET}
+{BRIGHT_YELLOW}â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•{RESET}
 """
 
     def render_results_panel(self):
         if not self.findings:
             empty = f"""
-{BRIGHT_CYAN}┌────────────────────────────────────────────────────────────────────────────────┐{RESET}
-{BRIGHT_CYAN}│{RESET} 🔍 AWAITING SCAN RESULTS - STANDING BY 🔍                                 {BRIGHT_CYAN}│{RESET}
-{BRIGHT_CYAN}└────────────────────────────────────────────────────────────────────────────────┘{RESET}
+{BRIGHT_CYAN}â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”{RESET}
+{BRIGHT_CYAN}â”‚{RESET} ðŸ” AWAITING SCAN RESULTS - STANDING BY ðŸ”                                 {BRIGHT_CYAN}â”‚{RESET}
+{BRIGHT_CYAN}â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜{RESET}
 """
             return self.center_block(empty)
 
         panel = f"""
-{BRIGHT_GREEN}┌────────────────────────────────────────────────────────────────────────────────┐{RESET}
-{BRIGHT_GREEN}│{RESET} 📋 LIVE SCAN RESULTS & ALERTS 📋                                          {BRIGHT_GREEN}│{RESET}
-{BRIGHT_GREEN}├────────────────────────────────────────────────────────────────────────────────┤{RESET}
+{BRIGHT_GREEN}â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”{RESET}
+{BRIGHT_GREEN}â”‚{RESET} ðŸ“‹ LIVE SCAN RESULTS & ALERTS ðŸ“‹                                          {BRIGHT_GREEN}â”‚{RESET}
+{BRIGHT_GREEN}â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤{RESET}
 """
 
         for finding in self.findings[-5:]:
@@ -560,17 +560,17 @@ class SOCDashboard:
             timestamp = finding.get('timestamp', datetime.now()).strftime("%H:%M:%S")
 
             if malicious > 0:
-                icon = "🔴"
-                status = "⚠ THREAT"
+                icon = "ðŸ”´"
+                status = "âš  THREAT"
                 color = BRIGHT_RED
             else:
-                icon = "🟢"
-                status = "✓ CLEAN"
+                icon = "ðŸŸ¢"
+                status = "âœ“ CLEAN"
                 color = BRIGHT_GREEN
 
-            panel += f"\n{color}│ {icon} {timestamp} | {name:<45} | {status:>12} │{RESET}"
+            panel += f"\n{color}â”‚ {icon} {timestamp} | {name:<45} | {status:>12} â”‚{RESET}"
 
-        panel += f"\n{BRIGHT_GREEN}└────────────────────────────────────────────────────────────────────────────────┘{RESET}"
+        panel += f"\n{BRIGHT_GREEN}â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜{RESET}"
         return self.center_block(panel)
 
     def render_full(self):
@@ -657,7 +657,7 @@ class ReportGenerator:
         try:
             with open(json_file, 'w', encoding='utf-8') as f:
                 json.dump(report_data, f, indent=2, default=str)
-            print(f"{BRIGHT_GREEN}[✓] JSON report saved: {json_file}{RESET}")
+            print(f"{BRIGHT_GREEN}[âœ“] JSON report saved: {json_file}{RESET}")
         except Exception as e:
             print(f"{BRIGHT_RED}[!] Failed to save JSON report: {e}{RESET}")
         
@@ -696,7 +696,7 @@ class ReportGenerator:
         for finding in dashboard.findings[-20:]:
             name = finding.get('name', 'Unknown')[:40]
             malicious = finding.get('malicious', 0)
-            status = "🔴 INFECTED" if malicious > 0 else "🟢 CLEAN"
+            status = "ðŸ”´ INFECTED" if malicious > 0 else "ðŸŸ¢ CLEAN"
             time_str = finding.get('timestamp', datetime.now()).strftime("%H:%M:%S") if isinstance(finding.get('timestamp'), datetime) else "N/A"
             data.append([name, str(malicious), status, time_str])
         
@@ -710,7 +710,7 @@ class ReportGenerator:
         elements.append(table)
         
         doc.build(elements)
-        print(f"{BRIGHT_GREEN}[✓] PDF report saved: {pdf_file}{RESET}")
+        print(f"{BRIGHT_GREEN}[âœ“] PDF report saved: {pdf_file}{RESET}")
         return pdf_file
     
     @staticmethod
@@ -819,9 +819,9 @@ class VirusTotalScanner:
         
         # Auto-type the hash lookup initiation
         print("\n")
-        self.typer.type_text("🔍 INITIATING HASH LOOKUP...", color=BRIGHT_CYAN)
+        self.typer.type_text("ðŸ” INITIATING HASH LOOKUP...", color=BRIGHT_CYAN)
         time.sleep(0.2)
-        self.typer.type_text(f"📌 Target Hash: {file_hash[:32]}...", color=BRIGHT_YELLOW)
+        self.typer.type_text(f"ðŸ“Œ Target Hash: {file_hash[:32]}...", color=BRIGHT_YELLOW)
         time.sleep(0.2)
         
         try:
@@ -834,7 +834,7 @@ class VirusTotalScanner:
                 time.sleep(0.1)
             
             # Auto-type the API request
-            self.typer.type_text("📡 Querying VirusTotal database...", color=BRIGHT_CYAN)
+            self.typer.type_text("ðŸ“¡ Querying VirusTotal database...", color=BRIGHT_CYAN)
             
             response = requests.get(url, headers=headers, timeout=15)
             
@@ -851,14 +851,14 @@ class VirusTotalScanner:
                 
                 # Auto-type results
                 print("\n")
-                self.typer.type_text("✅ HASH LOOKUP COMPLETE!", color=BRIGHT_GREEN)
+                self.typer.type_text("âœ… HASH LOOKUP COMPLETE!", color=BRIGHT_GREEN)
                 time.sleep(0.1)
                 
                 if malicious > 0:
-                    self.typer.type_text(f"⚠️  MALICIOUS HASH DETECTED!", color=BRIGHT_RED)
-                    self.typer.type_text(f"📊 Detections: {malicious}/{sum(stats.values())}", color=BRIGHT_YELLOW)
+                    self.typer.type_text(f"âš ï¸  MALICIOUS HASH DETECTED!", color=BRIGHT_RED)
+                    self.typer.type_text(f"ðŸ“Š Detections: {malicious}/{sum(stats.values())}", color=BRIGHT_YELLOW)
                 else:
-                    self.typer.type_text("✅ Hash is CLEAN - No detections found", color=BRIGHT_GREEN)
+                    self.typer.type_text("âœ… Hash is CLEAN - No detections found", color=BRIGHT_GREEN)
                 
                 # Save to scan history
                 ScanHistoryManager.save_scan(file_hash, file_hash, "hash_lookup", {
@@ -868,7 +868,7 @@ class VirusTotalScanner:
                 
                 advice = self.dashboard.operator.generate_operator_advice("hash_lookup", self.dashboard.findings)
                 print(f"\n{BRIGHT_CYAN}{'='*80}{RESET}")
-                print(center_text(f"{BRIGHT_MAGENTA}📋 OPERATOR ADVISORY{RESET}"))
+                print(center_text(f"{BRIGHT_MAGENTA}ðŸ“‹ OPERATOR ADVISORY{RESET}"))
                 print(f"{BRIGHT_CYAN}{'='*80}{RESET}")
                 print(advice)
                 
@@ -877,10 +877,10 @@ class VirusTotalScanner:
                     if choice == 'y':
                         self.quarantine_item(file_hash=file_hash)
             else:
-                self.typer.type_text("❌ Hash not found in VirusTotal database", color=BRIGHT_RED)
+                self.typer.type_text("âŒ Hash not found in VirusTotal database", color=BRIGHT_RED)
                 
         except Exception as e:
-            self.typer.type_text(f"❌ Error: {e}", color=BRIGHT_RED)
+            self.typer.type_text(f"âŒ Error: {e}", color=BRIGHT_RED)
 
     def vt_file_scan(self, file_path: str):
         """Fast file scan with SOC Dashboard and auto-typing"""
@@ -890,7 +890,7 @@ class VirusTotalScanner:
         file_path = os.path.expanduser(file_path)
         
         if not os.path.exists(file_path):
-            self.typer.type_text(f"❌ File not found: {file_path}", color=BRIGHT_RED)
+            self.typer.type_text(f"âŒ File not found: {file_path}", color=BRIGHT_RED)
             return
         
         self.dashboard.current_action = f"LOCAL ANALYSIS"
@@ -900,17 +900,17 @@ class VirusTotalScanner:
         
         # Auto-type the scan initiation
         print("\n")
-        self.typer.type_text("🔬 INITIATING FILE SCAN...", color=BRIGHT_CYAN)
+        self.typer.type_text("ðŸ”¬ INITIATING FILE SCAN...", color=BRIGHT_CYAN)
         time.sleep(0.2)
-        self.typer.type_text(f"📄 Target: {os.path.basename(file_path)}", color=BRIGHT_YELLOW)
+        self.typer.type_text(f"ðŸ“„ Target: {os.path.basename(file_path)}", color=BRIGHT_YELLOW)
         time.sleep(0.2)
-        self.typer.type_text("🔍 Performing local threat analysis...", color=BRIGHT_CYAN)
+        self.typer.type_text("ðŸ” Performing local threat analysis...", color=BRIGHT_CYAN)
         
         # Quick local check
         threat_score, findings = LocalThreatDetector.analyze_file(file_path)
         
         if threat_score > 0:
-            self.typer.type_text(f"⚠️  Local detection score: {threat_score}%", color=BRIGHT_YELLOW)
+            self.typer.type_text(f"âš ï¸  Local detection score: {threat_score}%", color=BRIGHT_YELLOW)
         
         self.dashboard.add_finding(os.path.basename(file_path), threat_score, {
             'local_findings': findings,
@@ -924,7 +924,7 @@ class VirusTotalScanner:
         hashes = self.calculate_file_hash(file_path)
         
         try:
-            self.typer.type_text("📤 Uploading file to VirusTotal...", color=BRIGHT_CYAN)
+            self.typer.type_text("ðŸ“¤ Uploading file to VirusTotal...", color=BRIGHT_CYAN)
             
             with open(file_path, 'rb') as f:
                 files = {'file': (os.path.basename(file_path), f)}
@@ -947,9 +947,9 @@ class VirusTotalScanner:
                 scan_id = result['data']['id']
                 
                 # Auto-type scan ID
-                self.typer.type_text("✅ File uploaded successfully!", color=BRIGHT_GREEN)
-                self.typer.type_text(f"📌 Scan ID: {scan_id}", color=BRIGHT_CYAN)
-                self.typer.type_text("⏳ Results processing...", color=BRIGHT_YELLOW)
+                self.typer.type_text("âœ… File uploaded successfully!", color=BRIGHT_GREEN)
+                self.typer.type_text(f"ðŸ“Œ Scan ID: {scan_id}", color=BRIGHT_CYAN)
+                self.typer.type_text("â³ Results processing...", color=BRIGHT_YELLOW)
                 
                 # Save scan ID immediately
                 ScanHistoryManager.save_scan(scan_id, file_path, "file_scan", {
@@ -961,13 +961,13 @@ class VirusTotalScanner:
                 # Quick poll for results
                 self._quick_poll_results(scan_id, file_path, hashes, threat_score, findings)
             else:
-                self.typer.type_text(f"❌ Upload failed (HTTP {response.status_code})", color=BRIGHT_RED)
+                self.typer.type_text(f"âŒ Upload failed (HTTP {response.status_code})", color=BRIGHT_RED)
                 self.dashboard.scan_progress = 100
                 self.dashboard.current_action = "COMPLETE (LOCAL ONLY)"
                 self.dashboard.render_full()
                 
         except Exception as e:
-            self.typer.type_text(f"❌ Error: {e}", color=BRIGHT_RED)
+            self.typer.type_text(f"âŒ Error: {e}", color=BRIGHT_RED)
 
     def _quick_poll_results(self, scan_id: str, file_path: str, hashes: Dict, local_score: int = 0, local_findings: List = None):
         """Quick poll for results with auto-typing"""
@@ -1019,19 +1019,19 @@ class VirusTotalScanner:
                         
                         # Auto-type results
                         print("\n")
-                        self.typer.type_text("✅ SCAN COMPLETE!", color=BRIGHT_GREEN)
+                        self.typer.type_text("âœ… SCAN COMPLETE!", color=BRIGHT_GREEN)
                         time.sleep(0.1)
-                        self.typer.type_text(f"📊 VirusTotal Detections: {vt_malicious}/{total_scans}", color=BRIGHT_YELLOW)
+                        self.typer.type_text(f"ðŸ“Š VirusTotal Detections: {vt_malicious}/{total_scans}", color=BRIGHT_YELLOW)
                         
                         if final_score > 50:
-                            self.typer.type_text(f"⚠️  Risk Score: {final_score:.1f}% - HIGH RISK", color=BRIGHT_RED)
+                            self.typer.type_text(f"âš ï¸  Risk Score: {final_score:.1f}% - HIGH RISK", color=BRIGHT_RED)
                         else:
-                            self.typer.type_text(f"✅ Risk Score: {final_score:.1f}% - LOW RISK", color=BRIGHT_GREEN)
+                            self.typer.type_text(f"âœ… Risk Score: {final_score:.1f}% - LOW RISK", color=BRIGHT_GREEN)
                         
-                        self.typer.type_text(f"📌 Scan ID: {scan_id}", color=BRIGHT_CYAN)
+                        self.typer.type_text(f"ðŸ“Œ Scan ID: {scan_id}", color=BRIGHT_CYAN)
                         
                         print(f"\n{BRIGHT_CYAN}{'='*80}{RESET}")
-                        print(center_text(f"{BRIGHT_MAGENTA}📋 SCAN COMPLETE - RESULTS{RESET}"))
+                        print(center_text(f"{BRIGHT_MAGENTA}ðŸ“‹ SCAN COMPLETE - RESULTS{RESET}"))
                         print(f"{BRIGHT_CYAN}{'='*80}{RESET}")
                         
                         # Save report
@@ -1049,7 +1049,7 @@ class VirusTotalScanner:
                         
                         # Auto-quarantine if infected
                         if final_score > 70:
-                            self.typer.type_text("⚠️  THREAT DETECTED! Quarantine recommended.", color=BRIGHT_RED)
+                            self.typer.type_text("âš ï¸  THREAT DETECTED! Quarantine recommended.", color=BRIGHT_RED)
                             choice = input(f"\n{BRIGHT_RED}Quarantine infected file? (Y/n): {RESET}").lower()
                             if choice != 'n':
                                 self.quarantine_item(file_path=file_path)
@@ -1062,15 +1062,15 @@ class VirusTotalScanner:
             except:
                 continue
         
-        self.typer.type_text(f"\n⏳ Results still processing. Scan ID: {scan_id}", color=BRIGHT_YELLOW)
-        self.typer.type_text("📌 Use option 4 to check results later", color=BRIGHT_CYAN)
+        self.typer.type_text(f"\nâ³ Results still processing. Scan ID: {scan_id}", color=BRIGHT_YELLOW)
+        self.typer.type_text("ðŸ“Œ Use option 4 to check results later", color=BRIGHT_CYAN)
 
     def vt_bulk_scan(self, folder_path: str, max_files: int = 10):
         """Fast bulk scan with auto-typing"""
         folder_path = os.path.expanduser(folder_path)
         
         if not os.path.isdir(folder_path):
-            self.typer.type_text(f"❌ Invalid folder: {folder_path}", color=BRIGHT_RED)
+            self.typer.type_text(f"âŒ Invalid folder: {folder_path}", color=BRIGHT_RED)
             return
         
         self.dashboard.current_action = "BULK SCAN"
@@ -1079,9 +1079,9 @@ class VirusTotalScanner:
         
         # Auto-type bulk scan initiation
         print("\n")
-        self.typer.type_text("📁 INITIATING BULK SCAN...", color=BRIGHT_CYAN)
+        self.typer.type_text("ðŸ“ INITIATING BULK SCAN...", color=BRIGHT_CYAN)
         time.sleep(0.2)
-        self.typer.type_text(f"📂 Target Folder: {os.path.basename(folder_path)}", color=BRIGHT_YELLOW)
+        self.typer.type_text(f"ðŸ“‚ Target Folder: {os.path.basename(folder_path)}", color=BRIGHT_YELLOW)
         
         files = []
         for root, _, filenames in os.walk(folder_path):
@@ -1089,10 +1089,10 @@ class VirusTotalScanner:
                 files.append(os.path.join(root, filename))
         
         if not files:
-            self.typer.type_text("❌ No files found in folder", color=BRIGHT_RED)
+            self.typer.type_text("âŒ No files found in folder", color=BRIGHT_RED)
             return
         
-        self.typer.type_text(f"📄 Found {len(files)} files to scan", color=BRIGHT_CYAN)
+        self.typer.type_text(f"ðŸ“„ Found {len(files)} files to scan", color=BRIGHT_CYAN)
         
         # Scan files and collect results
         scanned_files = []
@@ -1117,18 +1117,18 @@ class VirusTotalScanner:
                         malicious = stats.get('malicious', 0)
                         # Add finding to dashboard
                         self.dashboard.add_finding(os.path.basename(file_path), malicious, stats)
-                        self.typer.type_text(f"  ✓ {os.path.basename(file_path)} - {malicious} detections", color=BRIGHT_GREEN)
+                        self.typer.type_text(f"  âœ“ {os.path.basename(file_path)} - {malicious} detections", color=BRIGHT_GREEN)
                     else:
                         # If VT doesn't have the file, mark as unknown
                         self.dashboard.add_finding(os.path.basename(file_path), 0, {'status': 'not_found'})
-                        self.typer.type_text(f"  ⚠ {os.path.basename(file_path)} - Not in VT database", color=BRIGHT_YELLOW)
+                        self.typer.type_text(f"  âš  {os.path.basename(file_path)} - Not in VT database", color=BRIGHT_YELLOW)
                 else:
                     self.dashboard.add_finding(os.path.basename(file_path), 0, {'status': 'hash_error'})
-                    self.typer.type_text(f"  ❌ {os.path.basename(file_path)} - Hash calculation failed", color=BRIGHT_RED)
+                    self.typer.type_text(f"  âŒ {os.path.basename(file_path)} - Hash calculation failed", color=BRIGHT_RED)
                     
             except Exception as e:
                 self.dashboard.add_finding(os.path.basename(file_path), 0, {'error': str(e)})
-                self.typer.type_text(f"  ❌ {os.path.basename(file_path)} - Error: {str(e)[:50]}", color=BRIGHT_RED)
+                self.typer.type_text(f"  âŒ {os.path.basename(file_path)} - Error: {str(e)[:50]}", color=BRIGHT_RED)
             
             total_scanned += 1
             scanned_files.append(file_path)
@@ -1161,17 +1161,17 @@ class VirusTotalScanner:
         
         # Auto-type completion with correct stats
         print("\n")
-        self.typer.type_text("✅ BULK SCAN COMPLETE!", color=BRIGHT_GREEN)
-        self.typer.type_text(f"📊 Files scanned: {len(files)}", color=BRIGHT_CYAN)
+        self.typer.type_text("âœ… BULK SCAN COMPLETE!", color=BRIGHT_GREEN)
+        self.typer.type_text(f"ðŸ“Š Files scanned: {len(files)}", color=BRIGHT_CYAN)
         
         # Calculate correct stats from dashboard findings
         total_threats = sum(1 for f in self.dashboard.findings if f.get('malicious', 0) > 0)
         total_clean = sum(1 for f in self.dashboard.findings if f.get('malicious', 0) == 0)
         
         if total_threats > 0:
-            self.typer.type_text(f"⚠️  Threats detected: {total_threats}", color=BRIGHT_RED)
+            self.typer.type_text(f"âš ï¸  Threats detected: {total_threats}", color=BRIGHT_RED)
         else:
-            self.typer.type_text(f"✅ No threats detected - All {total_clean} files clean", color=BRIGHT_GREEN)
+            self.typer.type_text(f"âœ… No threats detected - All {total_clean} files clean", color=BRIGHT_GREEN)
         
         # Final operator guidance
         final_assessment = self.dashboard.operator.assess_threat(
@@ -1196,7 +1196,7 @@ class VirusTotalScanner:
                     malicious = stats.get('malicious', 0)
                     # Add finding to dashboard
                     self.dashboard.add_finding(os.path.basename(file_path), malicious, stats)
-                    print(f"{BRIGHT_GREEN}[✓] Scanned: {os.path.basename(file_path)} - {malicious} detections{RESET}")
+                    print(f"{BRIGHT_GREEN}[âœ“] Scanned: {os.path.basename(file_path)} - {malicious} detections{RESET}")
                 else:
                     # If VT doesn't have the file, mark as unknown
                     self.dashboard.add_finding(os.path.basename(file_path), 0, {'status': 'not_found'})
@@ -1225,22 +1225,22 @@ class VirusTotalScanner:
         self.dashboard.render_full()
         
         print("\n")
-        self.typer.type_text("🔍 RETRIEVING SCAN RESULTS...", color=BRIGHT_CYAN)
+        self.typer.type_text("ðŸ” RETRIEVING SCAN RESULTS...", color=BRIGHT_CYAN)
         time.sleep(0.2)
         
         # Check local history first
         history_entry = ScanHistoryManager.get_scan_by_id(scan_id)
         if history_entry and history_entry.get('results', {}).get('status') == 'completed':
-            self.typer.type_text("✅ Results found in local history!", color=BRIGHT_GREEN)
+            self.typer.type_text("âœ… Results found in local history!", color=BRIGHT_GREEN)
             results = history_entry.get('results', {})
             print(f"{BRIGHT_CYAN}File: {results.get('file_name', 'Unknown')}{RESET}")
             print(f"{BRIGHT_YELLOW}Detections: {results.get('vt_detections', 0)}/{results.get('total_scans', 0)}{RESET}")
             
             risk_score = results.get('final_score', 0)
             if risk_score > 50:
-                self.typer.type_text(f"⚠️  Risk Score: {risk_score:.1f}% - HIGH RISK", color=BRIGHT_RED)
+                self.typer.type_text(f"âš ï¸  Risk Score: {risk_score:.1f}% - HIGH RISK", color=BRIGHT_RED)
             else:
-                self.typer.type_text(f"✅ Risk Score: {risk_score:.1f}% - LOW RISK", color=BRIGHT_GREEN)
+                self.typer.type_text(f"âœ… Risk Score: {risk_score:.1f}% - LOW RISK", color=BRIGHT_GREEN)
             return
         
         # If not in history, check VT API
@@ -1248,7 +1248,7 @@ class VirusTotalScanner:
         headers = {"x-apikey": CONFIG['VT_API_KEY']}
         
         try:
-            self.typer.type_text("📡 Querying VirusTotal API...", color=BRIGHT_CYAN)
+            self.typer.type_text("ðŸ“¡ Querying VirusTotal API...", color=BRIGHT_CYAN)
             response = requests.get(url, headers=headers, timeout=15)
             
             if response.status_code == 200:
@@ -1263,16 +1263,16 @@ class VirusTotalScanner:
                 self.dashboard.render_full()
                 
                 print(f"\n{BRIGHT_CYAN}{'='*80}{RESET}")
-                print(center_text(f"{BRIGHT_MAGENTA}📋 SCAN RESULTS{RESET}"))
+                print(center_text(f"{BRIGHT_MAGENTA}ðŸ“‹ SCAN RESULTS{RESET}"))
                 print(f"{BRIGHT_CYAN}{'='*80}{RESET}")
                 
-                self.typer.type_text(f"📊 Detections: {malicious}/{total_scans}", color=BRIGHT_YELLOW)
+                self.typer.type_text(f"ðŸ“Š Detections: {malicious}/{total_scans}", color=BRIGHT_YELLOW)
                 if malicious == 0:
-                    self.typer.type_text("✅ Status: CLEAN - No threats detected", color=BRIGHT_GREEN)
+                    self.typer.type_text("âœ… Status: CLEAN - No threats detected", color=BRIGHT_GREEN)
                 else:
-                    self.typer.type_text("⚠️  Status: INFECTED - Threats detected!", color=BRIGHT_RED)
+                    self.typer.type_text("âš ï¸  Status: INFECTED - Threats detected!", color=BRIGHT_RED)
                 
-                self.typer.type_text(f"📌 Scan ID: {scan_id}", color=BRIGHT_CYAN)
+                self.typer.type_text(f"ðŸ“Œ Scan ID: {scan_id}", color=BRIGHT_CYAN)
                 
                 # Save to history
                 ScanHistoryManager.save_scan(scan_id, scan_id, "check_scan", {
@@ -1282,10 +1282,10 @@ class VirusTotalScanner:
                     'status': 'completed'
                 })
             else:
-                self.typer.type_text("❌ Results not available", color=BRIGHT_RED)
-                self.typer.type_text("⏳ The scan may still be processing or doesn't exist", color=BRIGHT_YELLOW)
+                self.typer.type_text("âŒ Results not available", color=BRIGHT_RED)
+                self.typer.type_text("â³ The scan may still be processing or doesn't exist", color=BRIGHT_YELLOW)
         except Exception as e:
-            self.typer.type_text(f"❌ Error: {e}", color=BRIGHT_RED)
+            self.typer.type_text(f"âŒ Error: {e}", color=BRIGHT_RED)
     
     def quarantine_item(self, file_path: str = None, file_hash: str = None):
         if file_path and os.path.exists(file_path):
@@ -1293,7 +1293,7 @@ class VirusTotalScanner:
             dest = QUARANTINE_DIR / f"quarantined_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{filename}"
             shutil.move(file_path, dest)
             
-            self.typer.type_text(f"✅ Quarantined: {dest}", color=BRIGHT_GREEN)
+            self.typer.type_text(f"âœ… Quarantined: {dest}", color=BRIGHT_GREEN)
             
             log_file = WORKSPACE / "logs" / "quarantine.log"
             with open(log_file, 'a') as f:
@@ -1302,11 +1302,11 @@ class VirusTotalScanner:
             hash_file = QUARANTINE_DIR / "quarantined_hashes.txt"
             with open(hash_file, 'a') as f:
                 f.write(f"{datetime.now().isoformat()} | {CONFIG['SOC_OPERATOR_NAME']} | {file_hash}\n")
-            self.typer.type_text("✅ Malicious hash recorded in quarantine database", color=BRIGHT_GREEN)
+            self.typer.type_text("âœ… Malicious hash recorded in quarantine database", color=BRIGHT_GREEN)
     
     def view_quarantine(self):
         print(f"\n{BRIGHT_CYAN}{'='*80}{RESET}")
-        print(center_text(f"{BRIGHT_MAGENTA}📁 QUARANTINE DIRECTORY{RESET}"))
+        print(center_text(f"{BRIGHT_MAGENTA}ðŸ“ QUARANTINE DIRECTORY{RESET}"))
         print(f"{BRIGHT_CYAN}{'='*80}{RESET}")
         
         if QUARANTINE_DIR.exists():
@@ -1316,11 +1316,11 @@ class VirusTotalScanner:
                     if item.is_file():
                         size = item.stat().st_size
                         mod_time = datetime.fromtimestamp(item.stat().st_mtime).strftime("%Y-%m-%d %H:%M:%S")
-                        print(f"  {BRIGHT_RED}⚠️{RESET} {item.name:<50} {size:>10} bytes  {mod_time}")
+                        print(f"  {BRIGHT_RED}âš ï¸{RESET} {item.name:<50} {size:>10} bytes  {mod_time}")
                     else:
-                        print(f"  {BRIGHT_YELLOW}📁{RESET} {item.name:<50} {'DIR':>10}")
+                        print(f"  {BRIGHT_YELLOW}ðŸ“{RESET} {item.name:<50} {'DIR':>10}")
             else:
-                self.typer.type_text("✓ Quarantine is empty - System appears clean", color=BRIGHT_GREEN)
+                self.typer.type_text("âœ“ Quarantine is empty - System appears clean", color=BRIGHT_GREEN)
         else:
             self.typer.type_text("Quarantine directory not found", color=BRIGHT_YELLOW)
 
@@ -1335,25 +1335,25 @@ def vt_scan_menu(operator=None, session=None):
     while True:
         clear_screen()
         
-        print(f"{BRIGHT_RED}{'═' * 80}{RESET}")
-        print(center_text(f"{BRIGHT_MAGENTA}{BLINK}🔬 DSTERMINAL - THREAT INTELLIGENCE 🔬{RESET}"))
-        print(f"{BRIGHT_RED}{'═' * 80}{RESET}")
+        print(f"{BRIGHT_RED}{'â•' * 80}{RESET}")
+        print(center_text(f"{BRIGHT_MAGENTA}{BLINK}ðŸ”¬ DSTERMINAL - THREAT INTELLIGENCE ðŸ”¬{RESET}"))
+        print(f"{BRIGHT_RED}{'â•' * 80}{RESET}")
         
         matrix_rain(0.3, 2)
         
         print()
         menu_box = f"""
-{BRIGHT_CYAN}┌{'─' * 60}┐{RESET}
-{BRIGHT_CYAN}│{RESET} {BRIGHT_MAGENTA}🔍 OPERATION SELECTION{BRIGHT_CYAN}{' ' * 37}│{RESET}
-{BRIGHT_CYAN}├{'─' * 60}┤{RESET}
-{BRIGHT_CYAN}│{RESET} {BRIGHT_GREEN}1.{RESET} Hash Lookup (VT Intelligence){' ' * 30}{BRIGHT_CYAN}│{RESET}
-{BRIGHT_CYAN}│{RESET} {BRIGHT_GREEN}2.{RESET} File Scan (Upload & Analyze){' ' * 30}{BRIGHT_CYAN}│{RESET}
-{BRIGHT_CYAN}│{RESET} {BRIGHT_GREEN}3.{RESET} Bulk Scan Folder{' ' * 39}{BRIGHT_CYAN}│{RESET}
-{BRIGHT_CYAN}│{RESET} {BRIGHT_GREEN}4.{RESET} Check Previous Scan{' ' * 36}{BRIGHT_CYAN}│{RESET}
-{BRIGHT_CYAN}│{RESET} {BRIGHT_GREEN}5.{RESET} View Quarantine{' ' * 39}{BRIGHT_CYAN}│{RESET}
-{BRIGHT_CYAN}│{RESET} {BRIGHT_GREEN}6.{RESET} Show Scan History{' ' * 39}{BRIGHT_CYAN}│{RESET}
-{BRIGHT_CYAN}│{RESET} {BRIGHT_RED}0.{RESET} Exit & Shutdown{' ' * 40}{BRIGHT_CYAN}│{RESET}
-{BRIGHT_CYAN}└{'─' * 60}┘{RESET}"""
+{BRIGHT_CYAN}â”Œ{'â”€' * 60}â”{RESET}
+{BRIGHT_CYAN}â”‚{RESET} {BRIGHT_MAGENTA}ðŸ” OPERATION SELECTION{BRIGHT_CYAN}{' ' * 37}â”‚{RESET}
+{BRIGHT_CYAN}â”œ{'â”€' * 60}â”¤{RESET}
+{BRIGHT_CYAN}â”‚{RESET} {BRIGHT_GREEN}1.{RESET} Hash Lookup (VT Intelligence){' ' * 30}{BRIGHT_CYAN}â”‚{RESET}
+{BRIGHT_CYAN}â”‚{RESET} {BRIGHT_GREEN}2.{RESET} File Scan (Upload & Analyze){' ' * 30}{BRIGHT_CYAN}â”‚{RESET}
+{BRIGHT_CYAN}â”‚{RESET} {BRIGHT_GREEN}3.{RESET} Bulk Scan Folder{' ' * 39}{BRIGHT_CYAN}â”‚{RESET}
+{BRIGHT_CYAN}â”‚{RESET} {BRIGHT_GREEN}4.{RESET} Check Previous Scan{' ' * 36}{BRIGHT_CYAN}â”‚{RESET}
+{BRIGHT_CYAN}â”‚{RESET} {BRIGHT_GREEN}5.{RESET} View Quarantine{' ' * 39}{BRIGHT_CYAN}â”‚{RESET}
+{BRIGHT_CYAN}â”‚{RESET} {BRIGHT_GREEN}6.{RESET} Show Scan History{' ' * 39}{BRIGHT_CYAN}â”‚{RESET}
+{BRIGHT_CYAN}â”‚{RESET} {BRIGHT_RED}0.{RESET} Exit & Shutdown{' ' * 40}{BRIGHT_CYAN}â”‚{RESET}
+{BRIGHT_CYAN}â””{'â”€' * 60}â”˜{RESET}"""
         print(center_text(menu_box))
         print()
         
@@ -1364,23 +1364,23 @@ def vt_scan_menu(operator=None, session=None):
         choice = input(center_text(f"{BRIGHT_GREEN}Select operation: {RESET}")).strip()
         
         if choice == "1":
-            typer.type_text("🔍 Enter file hash (MD5/SHA1/SHA256):", color=BRIGHT_CYAN, end=" ")
+            typer.type_text("ðŸ” Enter file hash (MD5/SHA1/SHA256):", color=BRIGHT_CYAN, end=" ")
             file_hash = input().strip()
             if file_hash:
                 scanner.vt_hash_lookup(file_hash)
             input(center_text(f"{DIM}Press Enter to continue...{RESET}"))
             
         elif choice == "2":
-            typer.type_text("📄 Enter file path to scan:", color=BRIGHT_CYAN, end=" ")
+            typer.type_text("ðŸ“„ Enter file path to scan:", color=BRIGHT_CYAN, end=" ")
             file_path = input().strip()
             if file_path:
                 scanner.vt_file_scan(file_path)
             input(center_text(f"{DIM}Press Enter to continue...{RESET}"))
             
         elif choice == "3":
-            typer.type_text("📂 Enter folder path to scan:", color=BRIGHT_CYAN, end=" ")
+            typer.type_text("ðŸ“‚ Enter folder path to scan:", color=BRIGHT_CYAN, end=" ")
             folder_path = input().strip()
-            typer.type_text("📊 Max files to scan (default 10):", color=BRIGHT_CYAN, end=" ")
+            typer.type_text("ðŸ“Š Max files to scan (default 10):", color=BRIGHT_CYAN, end=" ")
             max_files = input().strip()
             max_files = int(max_files) if max_files and max_files.isdigit() else 10
             if folder_path:
@@ -1388,7 +1388,7 @@ def vt_scan_menu(operator=None, session=None):
             input(center_text(f"{DIM}Press Enter to continue...{RESET}"))
             
         elif choice == "4":
-            typer.type_text("📌 Enter scan ID:", color=BRIGHT_CYAN, end=" ")
+            typer.type_text("ðŸ“Œ Enter scan ID:", color=BRIGHT_CYAN, end=" ")
             scan_id = input().strip()
             if scan_id:
                 scanner.check_scan_result(scan_id)
@@ -1402,7 +1402,7 @@ def vt_scan_menu(operator=None, session=None):
             history = ScanHistoryManager.list_recent_scans(10)
             if history:
                 print(f"\n{BRIGHT_CYAN}{'='*80}{RESET}")
-                print(center_text(f"{BRIGHT_MAGENTA}📋 RECENT SCANS{RESET}"))
+                print(center_text(f"{BRIGHT_MAGENTA}ðŸ“‹ RECENT SCANS{RESET}"))
                 print(f"{BRIGHT_CYAN}{'='*80}{RESET}")
                 for i, entry in enumerate(reversed(history), 1):
                     scan_id = entry.get('scan_id', 'N/A')[:16]
@@ -1411,18 +1411,18 @@ def vt_scan_menu(operator=None, session=None):
                     timestamp = entry.get('timestamp', '')[:19]
                     print(f"  {i}. {BRIGHT_GREEN}{scan_id}{RESET} | {file_name} | {scan_type} | {timestamp}")
             else:
-                typer.type_text("📋 No scan history found", color=BRIGHT_YELLOW)
+                typer.type_text("ðŸ“‹ No scan history found", color=BRIGHT_YELLOW)
             input(center_text(f"{DIM}Press Enter to continue...{RESET}"))
             
         elif choice == "0":
-            print(center_text(f"{BRIGHT_RED}⚠️  CLOSING...{RESET}"))
+            print(center_text(f"{BRIGHT_RED}âš ï¸  CLOSING...{RESET}"))
             matrix_rain(0.5, 3)
-            print(center_text(f"{BRIGHT_GREEN}✅ DSTerminal SOC - Session Terminated{RESET}"))
+            print(center_text(f"{BRIGHT_GREEN}âœ… DSTerminal SOC - Session Terminated{RESET}"))
             print(center_text(f"{BRIGHT_CYAN}Operator: {CONFIG['SOC_OPERATOR_NAME']} | Session: {CONFIG['SOC_SESSION_ID']}{RESET}"))
             break
         
         else:
-            typer.type_text("❌ Invalid operation code", color=BRIGHT_RED)
+            typer.type_text("âŒ Invalid operation code", color=BRIGHT_RED)
             time.sleep(1)
 
 # -------------------------------
@@ -1434,19 +1434,19 @@ if __name__ == "__main__":
     
     typer = AutoTypeEngine(delay=0.025)
     
-    print(center_text(f"{BRIGHT_GREEN}╔{'═' * 80}╗{RESET}"))
-    print(center_text(f"{BRIGHT_GREEN}║{RESET} {BRIGHT_MAGENTA}🚀 DSTERMINAL SOC PLATFORM INITIALIZING 🚀{RESET} {BRIGHT_GREEN}║{RESET}"))
-    print(center_text(f"{BRIGHT_GREEN}╚{'═' * 80}╝{RESET}"))
+    print(center_text(f"{BRIGHT_GREEN}â•”{'â•' * 80}â•—{RESET}"))
+    print(center_text(f"{BRIGHT_GREEN}â•‘{RESET} {BRIGHT_MAGENTA}ðŸš€ DSTERMINAL SOC PLATFORM INITIALIZING ðŸš€{RESET} {BRIGHT_GREEN}â•‘{RESET}"))
+    print(center_text(f"{BRIGHT_GREEN}â•š{'â•' * 80}â•{RESET}"))
     
     matrix_rain(1, 5)
     
-    typer.type_text(center_text("🔐 Establishing secure session..."), color=BRIGHT_CYAN, delay=0.025)
+    typer.type_text(center_text("ðŸ” Establishing secure session..."), color=BRIGHT_CYAN, delay=0.025)
     time.sleep(0.5)
-    typer.type_text(center_text("🛡️ Loading threat intelligence modules..."), color=BRIGHT_CYAN, delay=0.025)
+    typer.type_text(center_text("ðŸ›¡ï¸ Loading threat intelligence modules..."), color=BRIGHT_CYAN, delay=0.025)
     time.sleep(0.5)
-    typer.type_text(center_text("📡 Connecting to VirusTotal API..."), color=BRIGHT_CYAN, delay=0.025)
+    typer.type_text(center_text("ðŸ“¡ Connecting to VirusTotal API..."), color=BRIGHT_CYAN, delay=0.025)
     time.sleep(0.5)
-    typer.type_text(center_text("✅ Session established"), color=BRIGHT_GREEN, delay=0.025)
+    typer.type_text(center_text("âœ… Session established"), color=BRIGHT_GREEN, delay=0.025)
     time.sleep(1)
     
     vt_scan_menu()

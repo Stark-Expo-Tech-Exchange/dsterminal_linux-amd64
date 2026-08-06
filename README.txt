@@ -1,7 +1,7 @@
-
+﻿
 # DSTerminal - Defensive Security Terminal
 
-[![Version](https://img.shields.io/badge/version-v3.1.113-blue.svg)](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/releases)
+[![Version](https://img.shields.io/badge/version-v4.0.0.113-blue.svg)](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/releases)
 [![Status](https://img.shields.io/badge/status-stable-brightgreen.svg)](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -9,19 +9,19 @@
 
 ---
 
-## 📋 Overview
+## ðŸ“‹ Overview
 
 DSTerminal is a powerful defensive security terminal that provides:
 
-- 🔍 **System Vulnerability Scanning** - Identify and assess system weaknesses
-- 🌐 **Network Monitoring** - Real-time threat detection and analysis
-- 🔐 **File Encryption/Decryption** - Secure your sensitive data
-- 🔬 **Forensic Analysis** - Investigate security incidents
-- 📊 **Report Generation** - Comprehensive security reports
+- ðŸ” **System Vulnerability Scanning** - Identify and assess system weaknesses
+- ðŸŒ **Network Monitoring** - Real-time threat detection and analysis
+- ðŸ” **File Encryption/Decryption** - Secure your sensitive data
+- ðŸ”¬ **Forensic Analysis** - Investigate security incidents
+- ðŸ“Š **Report Generation** - Comprehensive security reports
 
 ---
 
-## 🚀 Installation
+## ðŸš€ Installation
 
 ### System Requirements
 - Windows 10/11, Linux, or macOS
@@ -54,7 +54,7 @@ python main.py
 
 ---
 
-## 🎯 First Steps
+## ðŸŽ¯ First Steps
 
 After installation, follow these steps to get started:
 
@@ -89,7 +89,7 @@ update check
 
 ---
 
-## 📚 Documentation
+## ðŸ“š Documentation
 
 ### Official Documentation
 - **User Guide:** [https://starkexpotechexchange-mw.com/docs/user-guide](https://starkexpotechexchange-mw.com/docs)
@@ -103,28 +103,28 @@ update check
 
 ---
 
-## 🛠️ Features
+## ðŸ› ï¸ Features
 
 ### Core Features
 
 | Feature | Description | Status |
 |---------|-------------|--------|
-| **Vulnerability Scanning** | Detect system weaknesses and CVEs | ✅ |
-| **Network Monitoring** | Real-time traffic analysis | ✅ |
-| **Threat Detection** | Identify malicious activity | ✅ |
-| **File Encryption** | AES-256 encryption support | ✅ |
-| **Forensic Analysis** | Incident investigation tools | ✅ |
-| **Report Generation** | PDF, JSON, TXT reports | ✅ |
+| **Vulnerability Scanning** | Detect system weaknesses and CVEs | âœ… |
+| **Network Monitoring** | Real-time traffic analysis | âœ… |
+| **Threat Detection** | Identify malicious activity | âœ… |
+| **File Encryption** | AES-256 encryption support | âœ… |
+| **Forensic Analysis** | Incident investigation tools | âœ… |
+| **Report Generation** | PDF, JSON, TXT reports | âœ… |
 
 ### Additional Tools
-- 🔐 **Password Manager** - Secure credential storage
-- 📡 **Packet Analysis** - Deep packet inspection
-- 🛡️ **Firewall Management** - Rule configuration
-- 📊 **Dashboard** - Real-time security metrics
+- ðŸ” **Password Manager** - Secure credential storage
+- ðŸ“¡ **Packet Analysis** - Deep packet inspection
+- ðŸ›¡ï¸ **Firewall Management** - Rule configuration
+- ðŸ“Š **Dashboard** - Real-time security metrics
 
 ---
 
-## 🔧 Configuration
+## ðŸ”§ Configuration
 
 ### Environment Variables
 Create a `.env` file in the root directory:
@@ -137,7 +137,7 @@ GITHUB_TOKEN=your_github_token_here
 VT_API_KEY=your_vt_api_key_here
 
 # Current Version
-CURRENT_VERSION=3.1.113
+CURRENT_VERSION=4.0.0.113
 
 # Operator Configuration
 SOC_OPERATOR_NAME=your_name
@@ -163,7 +163,7 @@ monitoring:
 
 ---
 
-## 🧪 Testing
+## ðŸ§ª Testing
 
 ### Run Tests
 ```bash
@@ -178,13 +178,13 @@ pytest --cov=. tests/
 ```
 
 ### Test Coverage
-- ✅ Unit Tests: 92% coverage
-- ✅ Integration Tests: 85% coverage
-- ✅ Security Tests: 90% coverage
+- âœ… Unit Tests: 92% coverage
+- âœ… Integration Tests: 85% coverage
+- âœ… Security Tests: 90% coverage
 
 ---
 
-## 🤝 Contributing
+## ðŸ¤ Contributing
 
 We welcome contributions! Here's how:
 
@@ -212,15 +212,15 @@ pytest tests/
 
 ---
 
-## 📄 License
+## ðŸ“„ License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
-Copyright © 2024 Stark Expo Tech Exchange. All rights reserved.
+Copyright Â© 2024 Stark Expo Tech Exchange. All rights reserved.
 
 ---
 
-## 📞 Support
+## ðŸ“ž Support
 
 ### Contact Information
 - **Email:** [support@starkexpotechexchange-mw.com](mailto:support@starkexpotechexchange-mw.com)
@@ -233,7 +233,7 @@ Copyright © 2024 Stark Expo Tech Exchange. All rights reserved.
 
 ---
 
-## 📊 Status Badges
+## ðŸ“Š Status Badges
 
 [![Build Status](https://img.shields.io/github/actions/workflow/status/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/ci.yml?branch=main)](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/actions)
 [![Coverage](https://img.shields.io/codecov/c/github/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest)](https://codecov.io/gh/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest)
@@ -241,7 +241,7 @@ Copyright © 2024 Stark Expo Tech Exchange. All rights reserved.
 
 ---
 
-## ⚠️ Security Notice
+## âš ï¸ Security Notice
 
 **IMPORTANT:** 
 - Never commit `.env` files or hardcoded tokens
@@ -254,28 +254,28 @@ For security issues, please email: security@starkexpotechexchange-mw.com
 
 ---
 
-## 📝 Changelog
+## ðŸ“ Changelog
 
-### v3.1.113 (Latest)
-- ✅ Enhanced threat detection algorithms
-- ✅ Improved update mechanism
-- ✅ Fixed critical security vulnerabilities
-- ✅ Better error handling
-- ✅ UI/UX improvements
+### v4.0.0.113 (Latest)
+- âœ… Enhanced threat detection algorithms
+- âœ… Improved update mechanism
+- âœ… Fixed critical security vulnerabilities
+- âœ… Better error handling
+- âœ… UI/UX improvements
 
 ### v3.0.0
-- ✅ Major architecture overhaul
-- ✅ Added real-time monitoring
-- ✅ New forensic analysis tools
+- âœ… Major architecture overhaul
+- âœ… Added real-time monitoring
+- âœ… New forensic analysis tools
 
 ### v2.0.59
-- ✅ Initial public release
-- ✅ Core security features
-- ✅ Basic network monitoring
+- âœ… Initial public release
+- âœ… Core security features
+- âœ… Basic network monitoring
 
 ---
 
-## 🎯 Roadmap
+## ðŸŽ¯ Roadmap
 
 - [ ] AI-powered threat detection
 - [ ] Cloud integration
@@ -286,13 +286,13 @@ For security issues, please email: security@starkexpotechexchange-mw.com
 
 ---
 
-**© 2024 Stark Expo Tech Exchange. All rights reserved.**
+**Â© 2024 Stark Expo Tech Exchange. All rights reserved.**
 ```
 
 ## Key Improvements:
 
 1. **Removed Git conflict markers** - Cleaned up `<<<<<<< HEAD` and `=======` sections
-2. **Consistent version** - Uses v3.1.113 throughout
+2. **Consistent version** - Uses v4.0.0.113 throughout
 3. **Professional structure** - Well-organized sections
 4. **Table formatting** - Easy-to-read feature lists
 5. **Installation options** - Multiple installation methods

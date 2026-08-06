@@ -1,4 +1,4 @@
-# edu_typing_engine.py
+﻿# edu_typing_engine.py
 
 import sys
 import time
@@ -27,11 +27,11 @@ class EducationTypingEngine:
 
             elif key.lower() == "f":
                 self.speed = 0.005
-                console.print("\n[yellow]⚡ Fast mode[/yellow]")
+                console.print("\n[yellow]âš¡ Fast mode[/yellow]")
 
             elif key.lower() == "q":
                 self.running = False
-                console.print("\n[red]✖ Cancelled[/red]")
+                console.print("\n[red]âœ– Cancelled[/red]")
                 break
 
     def type_text(self, text):
@@ -72,4 +72,4 @@ class EducationTypingEngine:
 
         self.running = False
 
-        console.print("\n[green]✔ Training complete[/green]\n")
+        console.print("\n[green]âœ” Training complete[/green]\n")

@@ -1,4 +1,4 @@
-"""
+﻿"""
 PDF Copy Protection Tool - Working Version
 Converts PDF to images to prevent text copying
 """
@@ -17,7 +17,7 @@ try:
     PYMUPDF_AVAILABLE = True
 except ImportError:
     PYMUPDF_AVAILABLE = False
-    print("⚠️ PyMuPDF not installed. Run: pip install PyMuPDF pillow")
+    print("âš ï¸ PyMuPDF not installed. Run: pip install PyMuPDF pillow")
 
 def protect_pdf_by_image_conversion(input_pdf_path, output_pdf_path, dpi=200):
     """
@@ -103,7 +103,7 @@ class PDFProtectorApp:
         header.pack(fill="x")
         header.pack_propagate(False)
         
-        tk.Label(header, text="🔒 PDF Copy Protection", 
+        tk.Label(header, text="ðŸ”’ PDF Copy Protection", 
                 font=("Segoe UI", 22, "bold"), bg="#2196F3", fg="white").pack(pady=15)
         
         tk.Label(header, text="Convert PDF to images to prevent text selection and copying", 
@@ -114,7 +114,7 @@ class PDFProtectorApp:
         main_frame.pack(fill="both", expand=True)
         
         # Step 1: Select PDF
-        step1_frame = tk.LabelFrame(main_frame, text="📁 Step 1: Select PDF File", 
+        step1_frame = tk.LabelFrame(main_frame, text="ðŸ“ Step 1: Select PDF File", 
                                     font=("Segoe UI", 11, "bold"), bg="#f0f0f0",
                                     padx=10, pady=10)
         step1_frame.pack(fill="x", pady=5)
@@ -122,7 +122,7 @@ class PDFProtectorApp:
         file_select_frame = tk.Frame(step1_frame, bg="#f0f0f0")
         file_select_frame.pack(fill="x", pady=5)
         
-        tk.Button(file_select_frame, text="📂 Browse PDF", 
+        tk.Button(file_select_frame, text="ðŸ“‚ Browse PDF", 
                  command=self.browse_file,
                  bg="#4CAF50", fg="white", font=("Segoe UI", 10, "bold"),
                  padx=15, pady=8, cursor="hand2").pack(side="left")
@@ -145,7 +145,7 @@ class PDFProtectorApp:
         self.page_count_label.pack(side="left", padx=20)
         
         # Step 2: Settings
-        step2_frame = tk.LabelFrame(main_frame, text="⚙️ Step 2: Settings", 
+        step2_frame = tk.LabelFrame(main_frame, text="âš™ï¸ Step 2: Settings", 
                                     font=("Segoe UI", 11, "bold"), bg="#f0f0f0",
                                     padx=10, pady=10)
         step2_frame.pack(fill="x", pady=10)
@@ -170,14 +170,14 @@ class PDFProtectorApp:
         method_frame = tk.Frame(step2_frame, bg="#f0f0f0")
         method_frame.pack(fill="x", pady=5)
         
-        tk.Label(method_frame, text="🔒 Method: Convert to Images", 
+        tk.Label(method_frame, text="ðŸ”’ Method: Convert to Images", 
                 font=("Segoe UI", 10, "bold"), fg="#2196F3", bg="#f0f0f0").pack(side="left")
         
         tk.Label(method_frame, text="(Text becomes completely unselectable)", 
                 font=("Segoe UI", 9), fg="gray", bg="#f0f0f0").pack(side="left", padx=10)
         
         # Step 3: Output
-        step3_frame = tk.LabelFrame(main_frame, text="💾 Step 3: Output Location", 
+        step3_frame = tk.LabelFrame(main_frame, text="ðŸ’¾ Step 3: Output Location", 
                                     font=("Segoe UI", 11, "bold"), bg="#f0f0f0",
                                     padx=10, pady=10)
         step3_frame.pack(fill="x", pady=5)
@@ -188,7 +188,7 @@ class PDFProtectorApp:
         tk.Entry(output_frame, textvariable=self.output_path, 
                 font=("Segoe UI", 9), width=50).pack(side="left", padx=5)
         
-        tk.Button(output_frame, text="📂 Browse", 
+        tk.Button(output_frame, text="ðŸ“‚ Browse", 
                  command=self.browse_output,
                  bg="#2196F3", fg="white", font=("Segoe UI", 9),
                  padx=10, pady=5, cursor="hand2").pack(side="left", padx=5)
@@ -210,14 +210,14 @@ class PDFProtectorApp:
         button_frame = tk.Frame(main_frame, bg="#f0f0f0")
         button_frame.pack(pady=15)
         
-        self.protect_btn = tk.Button(button_frame, text="🔒 Protect PDF (Disable Copying)", 
+        self.protect_btn = tk.Button(button_frame, text="ðŸ”’ Protect PDF (Disable Copying)", 
                                      command=self.protect_pdf,
                                      bg="#FF5722", fg="white", font=("Segoe UI", 13, "bold"),
                                      padx=40, pady=12, state="disabled", cursor="hand2",
                                      relief="raised", bd=0)
         self.protect_btn.pack(side="left", padx=5)
         
-        self.clear_btn = tk.Button(button_frame, text="🗑️ Clear All", 
+        self.clear_btn = tk.Button(button_frame, text="ðŸ—‘ï¸ Clear All", 
                                    command=self.clear_all,
                                    bg="#757575", fg="white", font=("Segoe UI", 10),
                                    padx=15, pady=12, cursor="hand2",
@@ -230,22 +230,22 @@ class PDFProtectorApp:
         self.status_label.pack(pady=5)
         
         # Info box
-        info_frame = tk.LabelFrame(main_frame, text="ℹ️ How it works", 
+        info_frame = tk.LabelFrame(main_frame, text="â„¹ï¸ How it works", 
                                    font=("Segoe UI", 9, "bold"), bg="#f0f0f0",
                                    fg="#666", padx=10, pady=5)
         info_frame.pack(fill="x", pady=10)
         
-        info_text = """• Each page is converted to a high-quality image
-• Text becomes part of the image - cannot be selected or copied
-• PDF remains viewable and printable
-• No passwords required - opens like any normal PDF
-• Choose DPI: Higher = Better quality but larger file size"""
+        info_text = """â€¢ Each page is converted to a high-quality image
+â€¢ Text becomes part of the image - cannot be selected or copied
+â€¢ PDF remains viewable and printable
+â€¢ No passwords required - opens like any normal PDF
+â€¢ Choose DPI: Higher = Better quality but larger file size"""
         
         tk.Label(info_frame, text=info_text, font=("Segoe UI", 8), 
                 justify="left", fg="gray", bg="#f0f0f0").pack(padx=10, pady=5)
         
         # Footer
-        footer = tk.Label(self.root, text="⚠️ Note: Prevents casual copying. Determined users may use OCR tools.", 
+        footer = tk.Label(self.root, text="âš ï¸ Note: Prevents casual copying. Determined users may use OCR tools.", 
                          font=("Segoe UI", 8), fg="gray", bg="#f0f0f0")
         footer.pack(side="bottom", pady=5)
     
@@ -278,7 +278,7 @@ class PDFProtectorApp:
             self.output_path.set(f"{base}_protected_no_copy{ext}")
             
             self.protect_btn.config(state="normal")
-            self.status_label.config(text="✅ File loaded. Ready to protect.", fg="green")
+            self.status_label.config(text="âœ… File loaded. Ready to protect.", fg="green")
     
     def browse_output(self):
         """Browse for output PDF location"""
@@ -340,7 +340,7 @@ class PDFProtectorApp:
         self.progress_label.pack()
         self.progress['value'] = 0
         self.progress_label.config(text="Starting...")
-        self.status_label.config(text="🔄 Processing...", fg="blue")
+        self.status_label.config(text="ðŸ”„ Processing...", fg="blue")
         self.root.update()
         
         # Register progress callback
@@ -376,15 +376,15 @@ class PDFProtectorApp:
         self.progress_label.pack_forget()
         
         if success:
-            self.status_label.config(text="✅ Protection complete!", fg="green")
+            self.status_label.config(text="âœ… Protection complete!", fg="green")
             self.progress['value'] = 100
             
             # Show success dialog with options
             result = messagebox.askyesno(
-                "Success! 🎉",
-                f"✅ PDF protected successfully!\n\n"
-                f"📁 Output: {os.path.basename(self.output_path.get())}\n\n"
-                f"🔒 Text selection and copying has been disabled.\n\n"
+                "Success! ðŸŽ‰",
+                f"âœ… PDF protected successfully!\n\n"
+                f"ðŸ“ Output: {os.path.basename(self.output_path.get())}\n\n"
+                f"ðŸ”’ Text selection and copying has been disabled.\n\n"
                 f"Would you like to open the folder containing the protected PDF?"
             )
             
@@ -401,7 +401,7 @@ class PDFProtectorApp:
                         subprocess.run(['xdg-open', folder])
             
         else:
-            self.status_label.config(text=f"❌ {message}", fg="red")
+            self.status_label.config(text=f"âŒ {message}", fg="red")
             messagebox.showerror("Error", f"Failed to protect PDF:\n\n{message}")
 
 def quick_protect(input_file, output_file=None, dpi=200):
@@ -417,26 +417,26 @@ def quick_protect(input_file, output_file=None, dpi=200):
         str: Path to protected PDF or None if failed
     """
     if not os.path.exists(input_file):
-        print(f"❌ File not found: {input_file}")
+        print(f"âŒ File not found: {input_file}")
         return None
     
     if not output_file:
         base, ext = os.path.splitext(input_file)
         output_file = f"{base}_protected_no_copy{ext}"
     
-    print(f"🔄 Protecting: {os.path.basename(input_file)}")
-    print(f"📁 Output: {os.path.basename(output_file)}")
-    print("⏳ This may take a moment...")
+    print(f"ðŸ”„ Protecting: {os.path.basename(input_file)}")
+    print(f"ðŸ“ Output: {os.path.basename(output_file)}")
+    print("â³ This may take a moment...")
     
     success, message = protect_pdf_by_image_conversion(input_file, output_file, dpi)
     
     if success:
-        print("✅ Protection complete!")
-        print("🔒 Text selection and copying has been disabled")
-        print(f"📁 Saved as: {output_file}")
+        print("âœ… Protection complete!")
+        print("ðŸ”’ Text selection and copying has been disabled")
+        print(f"ðŸ“ Saved as: {output_file}")
         return output_file
     else:
-        print(f"❌ Failed: {message}")
+        print(f"âŒ Failed: {message}")
         return None
 
 def main():

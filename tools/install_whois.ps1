@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+﻿<<<<<<< HEAD
 # install_whois.ps1 - Uses bundled whois.exe (offline)
 # WHOIS Installation Script for DSTerminal
 
@@ -107,11 +107,11 @@ Write-Host "Verifying WHOIS installation..." -ForegroundColor Cyan
 
 if (Get-Command whois -ErrorAction SilentlyContinue) {
     $version = & whois --version 2>&1 | Select-Object -First 1
-    Write-Host "✅ WHOIS installed successfully!" -ForegroundColor Green
+    Write-Host "âœ… WHOIS installed successfully!" -ForegroundColor Green
     Write-Host "   $version" -ForegroundColor Gray
     Write-Host "   Location: $wrapperPath" -ForegroundColor Gray
 } else {
-    Write-Host "⚠️ WHOIS not in PATH. Please restart your terminal." -ForegroundColor Yellow
+    Write-Host "âš ï¸ WHOIS not in PATH. Please restart your terminal." -ForegroundColor Yellow
     Write-Host "   You can run it manually from: $whoisExe" -ForegroundColor Yellow
 }
 

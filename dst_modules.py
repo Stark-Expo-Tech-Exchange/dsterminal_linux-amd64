@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 DSTerminal Module Lister - Hacker Style Interactive Module Browser
 Pure hardcoded list of DSTerminal integrated modules
@@ -87,8 +87,8 @@ class ModuleManager:
                 'key': 'core',
                 'description': 'Main terminal engine and command processor',
                 'category': 'Core',
-                'status': '✓',
-                'version': '3.1.113',
+                'status': 'âœ“',
+                'version': '4.0.0.113',
                 'dependencies': ['Python 3.11+', 'psutil'],
                 'color': Colors.DARK_GREEN
             },
@@ -97,7 +97,7 @@ class ModuleManager:
                 'key': 'parser',
                 'description': 'Parse and execute terminal commands with argument handling',
                 'category': 'Core',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '2.0.0',
                 'dependencies': ['argparse', 'shlex'],
                 'color': Colors.DARK_GREEN
@@ -107,7 +107,7 @@ class ModuleManager:
                 'key': 'shell',
                 'description': 'Windows PowerShell and CMD integration layer',
                 'category': 'Core',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '1.5.0',
                 'dependencies': ['subprocess', 'os'],
                 'color': Colors.DARK_GREEN
@@ -117,7 +117,7 @@ class ModuleManager:
                 'key': 'fs',
                 'description': 'File and directory operations with advanced features',
                 'category': 'Core',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '2.1.0',
                 'dependencies': ['os', 'shutil', 'pathlib'],
                 'color': Colors.DARK_GREEN
@@ -127,7 +127,7 @@ class ModuleManager:
                 'key': 'network',
                 'description': 'Networking tools, diagnostics, and port scanning',
                 'category': 'Core',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '1.8.0',
                 'dependencies': ['socket', 'netifaces', 'requests'],
                 'color': Colors.DARK_GREEN
@@ -137,7 +137,7 @@ class ModuleManager:
                 'key': 'security',
                 'description': 'Encryption, hashing, and security features',
                 'category': 'Core',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '2.0.0',
                 'dependencies': ['cryptography', 'hashlib', 'secrets'],
                 'color': Colors.DARK_GREEN
@@ -147,7 +147,7 @@ class ModuleManager:
                 'key': 'ui',
                 'description': 'Terminal UI rendering engine with animations',
                 'category': 'Core',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '1.9.0',
                 'dependencies': ['curses', 'colorama', 'rich'],
                 'color': Colors.DARK_GREEN
@@ -157,7 +157,7 @@ class ModuleManager:
                 'key': 'plugins',
                 'description': 'Plugin system for extensions and third-party modules',
                 'category': 'Core',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '1.5.0',
                 'dependencies': ['importlib', 'pkgutil'],
                 'color': Colors.DARK_GREEN
@@ -167,7 +167,7 @@ class ModuleManager:
                 'key': 'logs',
                 'description': 'Event logging, debugging, and audit trails',
                 'category': 'Core',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '1.4.0',
                 'dependencies': ['logging', 'traceback'],
                 'color': Colors.DARK_GREEN
@@ -177,7 +177,7 @@ class ModuleManager:
                 'key': 'config',
                 'description': 'Settings management with JSON/YAML support',
                 'category': 'Core',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '1.6.0',
                 'dependencies': ['json', 'yaml', 'toml'],
                 'color': Colors.DARK_GREEN
@@ -187,7 +187,7 @@ class ModuleManager:
                 'key': 'terminal',
                 'description': 'VT100/xterm terminal emulation engine',
                 'category': 'Core',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '2.0.0',
                 'dependencies': ['pty', 'select', 'termios'],
                 'color': Colors.DARK_GREEN
@@ -197,7 +197,7 @@ class ModuleManager:
                 'key': 'process',
                 'description': 'Process management and monitoring tools',
                 'category': 'Core',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '1.3.0',
                 'dependencies': ['psutil', 'subprocess', 'signal'],
                 'color': Colors.DARK_GREEN
@@ -207,7 +207,7 @@ class ModuleManager:
                 'key': 'scheduler',
                 'description': 'Automated task scheduling and cron-like functionality',
                 'category': 'Core',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '1.2.0',
                 'dependencies': ['schedule', 'apscheduler'],
                 'color': Colors.DARK_GREEN
@@ -217,7 +217,7 @@ class ModuleManager:
                 'key': 'notify',
                 'description': 'System notifications and alerts engine',
                 'category': 'Core',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '1.0.0',
                 'dependencies': ['plyer', 'win10toast'],
                 'color': Colors.DARK_GREEN
@@ -233,7 +233,7 @@ class ModuleManager:
                 'key': 'folium',
                 'description': 'Interactive map generation and visualization',
                 'category': 'Extended',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '0.15.0',
                 'dependencies': ['folium', 'branca', 'geojson'],
                 'color': Colors.DARK_CYAN
@@ -243,7 +243,7 @@ class ModuleManager:
                 'key': 'plotly',
                 'description': 'Advanced data visualization and interactive charts',
                 'category': 'Extended',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '5.18.0',
                 'dependencies': ['plotly', 'kaleido', 'pandas'],
                 'color': Colors.DARK_CYAN
@@ -253,7 +253,7 @@ class ModuleManager:
                 'key': 'branca',
                 'description': 'Color map generation and management for visualizations',
                 'category': 'Extended',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '1.0.0',
                 'dependencies': ['branca', 'jinja2'],
                 'color': Colors.DARK_CYAN
@@ -263,7 +263,7 @@ class ModuleManager:
                 'key': 'netifaces',
                 'description': 'Network interface detection and management',
                 'category': 'Extended',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '0.11.0',
                 'dependencies': ['netifaces'],
                 'color': Colors.DARK_CYAN
@@ -273,7 +273,7 @@ class ModuleManager:
                 'key': 'jsonschema',
                 'description': 'JSON validation and schema handling',
                 'category': 'Extended',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '4.20.0',
                 'dependencies': ['jsonschema', 'referencing'],
                 'color': Colors.DARK_CYAN
@@ -283,7 +283,7 @@ class ModuleManager:
                 'key': 'webencodings',
                 'description': 'Character encoding detection and conversion',
                 'category': 'Extended',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '0.5.1',
                 'dependencies': ['webencodings'],
                 'color': Colors.DARK_CYAN
@@ -293,7 +293,7 @@ class ModuleManager:
                 'key': 'fastjsonschema',
                 'description': 'High-performance JSON schema validator',
                 'category': 'Extended',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '2.19.0',
                 'dependencies': ['fastjsonschema'],
                 'color': Colors.DARK_CYAN
@@ -303,7 +303,7 @@ class ModuleManager:
                 'key': 'pip',
                 'description': 'Python package management and installation',
                 'category': 'Extended',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '24.0',
                 'dependencies': ['pip', 'setuptools'],
                 'color': Colors.DARK_CYAN
@@ -313,7 +313,7 @@ class ModuleManager:
                 'key': 'venv',
                 'description': 'Python virtual environment management',
                 'category': 'Extended',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '1.0.0',
                 'dependencies': ['venv', 'virtualenv'],
                 'color': Colors.DARK_CYAN
@@ -329,7 +329,7 @@ class ModuleManager:
                 'key': 'text',
                 'description': 'Advanced text manipulation and processing tools',
                 'category': 'Tools',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '1.2.0',
                 'dependencies': ['re', 'string', 'textwrap'],
                 'color': Colors.DARK_PURPLE
@@ -339,7 +339,7 @@ class ModuleManager:
                 'key': 'data',
                 'description': 'Data manipulation, CSV, JSON, XML handling',
                 'category': 'Tools',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '1.1.0',
                 'dependencies': ['csv', 'json', 'xml'],
                 'color': Colors.DARK_PURPLE
@@ -349,7 +349,7 @@ class ModuleManager:
                 'key': 'sysmon',
                 'description': 'System resource monitoring and performance metrics',
                 'category': 'Tools',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '1.0.0',
                 'dependencies': ['psutil', 'platform', 'cpuinfo'],
                 'color': Colors.DARK_PURPLE
@@ -359,7 +359,7 @@ class ModuleManager:
                 'key': 'auto',
                 'description': 'Task automation and scripting engine',
                 'category': 'Tools',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '1.3.0',
                 'dependencies': ['schedule', 'apscheduler'],
                 'color': Colors.DARK_PURPLE
@@ -369,7 +369,7 @@ class ModuleManager:
                 'key': 'reports',
                 'description': 'PDF, HTML, and Markdown report generation',
                 'category': 'Tools',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '1.0.0',
                 'dependencies': ['reportlab', 'markdown', 'jinja2'],
                 'color': Colors.DARK_PURPLE
@@ -379,7 +379,7 @@ class ModuleManager:
                 'key': 'clip',
                 'description': 'System clipboard operations and history',
                 'category': 'Tools',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '1.0.0',
                 'dependencies': ['pyperclip', 'win32clipboard'],
                 'color': Colors.DARK_PURPLE
@@ -389,7 +389,7 @@ class ModuleManager:
                 'key': 'convert',
                 'description': 'File format conversion tools',
                 'category': 'Tools',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '1.0.0',
                 'dependencies': ['pillow', 'pypdf', 'python-docx'],
                 'color': Colors.DARK_PURPLE
@@ -399,7 +399,7 @@ class ModuleManager:
                 'key': 'archive',
                 'description': 'Compression and archive management',
                 'category': 'Tools',
-                'status': '✓',
+                'status': 'âœ“',
                 'version': '1.0.0',
                 'dependencies': ['zipfile', 'tarfile', 'py7zr'],
                 'color': Colors.DARK_PURPLE
@@ -415,7 +415,7 @@ class ModuleManager:
                 'key': 'git',
                 'description': 'Git version control operations and management',
                 'category': 'Community',
-                'status': '★',
+                'status': 'â˜…',
                 'version': '1.0.0',
                 'dependencies': ['gitpython', 'pygit2'],
                 'color': Colors.DARK_YELLOW
@@ -425,7 +425,7 @@ class ModuleManager:
                 'key': 'docker',
                 'description': 'Docker container management and orchestration',
                 'category': 'Community',
-                'status': '★',
+                'status': 'â˜…',
                 'version': '1.0.0',
                 'dependencies': ['docker', 'docker-compose'],
                 'color': Colors.DARK_YELLOW
@@ -435,7 +435,7 @@ class ModuleManager:
                 'key': 'k8s',
                 'description': 'Kubernetes cluster management and monitoring',
                 'category': 'Community',
-                'status': '★',
+                'status': 'â˜…',
                 'version': '1.0.0',
                 'dependencies': ['kubernetes', 'kubectl'],
                 'color': Colors.DARK_YELLOW
@@ -445,7 +445,7 @@ class ModuleManager:
                 'key': 'db',
                 'description': 'Database connections for SQL, MongoDB, Redis',
                 'category': 'Community',
-                'status': '★',
+                'status': 'â˜…',
                 'version': '1.0.0',
                 'dependencies': ['sqlalchemy', 'pymongo', 'redis'],
                 'color': Colors.DARK_YELLOW
@@ -455,7 +455,7 @@ class ModuleManager:
                 'key': 'cloud',
                 'description': 'AWS, Azure, GCP cloud service integration',
                 'category': 'Community',
-                'status': '★',
+                'status': 'â˜…',
                 'version': '1.0.0',
                 'dependencies': ['boto3', 'azure', 'google-cloud'],
                 'color': Colors.DARK_YELLOW
@@ -465,7 +465,7 @@ class ModuleManager:
                 'key': 'devops',
                 'description': 'DevOps automation and CI/CD integration',
                 'category': 'Community',
-                'status': '★',
+                'status': 'â˜…',
                 'version': '1.0.0',
                 'dependencies': ['jenkins', 'github', 'gitlab'],
                 'color': Colors.DARK_YELLOW
@@ -475,7 +475,7 @@ class ModuleManager:
                 'key': 'ml',
                 'description': 'Machine learning and AI integration',
                 'category': 'Community',
-                'status': '★',
+                'status': 'â˜…',
                 'version': '1.0.0',
                 'dependencies': ['tensorflow', 'pytorch', 'scikit-learn'],
                 'color': Colors.DARK_YELLOW
@@ -485,7 +485,7 @@ class ModuleManager:
                 'key': 'ds',
                 'description': 'Data science and analytics tools',
                 'category': 'Community',
-                'status': '★',
+                'status': 'â˜…',
                 'version': '1.0.0',
                 'dependencies': ['pandas', 'numpy', 'scipy'],
                 'color': Colors.DARK_YELLOW
@@ -523,10 +523,10 @@ class HackerUI:
     
     @staticmethod
     def draw_border(width: int = 80, color: str = Colors.DARK_GREEN, 
-                    top: str = "═", bottom: str = "═", 
-                    left: str = "║", right: str = "║",
-                    corner_tl: str = "╔", corner_tr: str = "╗",
-                    corner_bl: str = "╚", corner_br: str = "╝"):
+                    top: str = "â•", bottom: str = "â•", 
+                    left: str = "â•‘", right: str = "â•‘",
+                    corner_tl: str = "â•”", corner_tr: str = "â•—",
+                    corner_bl: str = "â•š", corner_br: str = "â•"):
         """Draw a border with custom characters"""
         print(f"{color}{corner_tl}{top * (width - 2)}{corner_tr}{Colors.RESET}")
         return {"color": color, "left": left, "right": right, 
@@ -565,19 +565,19 @@ class HackerUI:
         border = HackerUI.draw_border(80, Colors.DARK_GREEN)
         
         HackerUI.draw_line("", border)
-        title_text = f"{Colors.BOLD}{Colors.DARK_GREEN}▓▓▓▓▓ {Colors.BRIGHT_GREEN}{title}{Colors.DARK_GREEN} ▓▓▓▓▓{Colors.RESET}"
+        title_text = f"{Colors.BOLD}{Colors.DARK_GREEN}â–“â–“â–“â–“â–“ {Colors.BRIGHT_GREEN}{title}{Colors.DARK_GREEN} â–“â–“â–“â–“â–“{Colors.RESET}"
         HackerUI.draw_line(title_text, border, centered=True)
         HackerUI.draw_line("", border)
-        subtext = f"{Colors.DIM}DSTerminal Module Database v3.1.113{Colors.RESET}"
+        subtext = f"{Colors.DIM}DSTerminal Module Database v4.0.0.113{Colors.RESET}"
         HackerUI.draw_line(subtext, border, centered=True)
         HackerUI.draw_line("", border)
         HackerUI.draw_line("", border)
-        HackerUI.draw_line(f"{Colors.DARK_GREEN}├{'─' * (border['width'] - 4)}┤{Colors.RESET}", border)
+        HackerUI.draw_line(f"{Colors.DARK_GREEN}â”œ{'â”€' * (border['width'] - 4)}â”¤{Colors.RESET}", border)
         HackerUI.draw_line("", border)
         
-        stats = f"{Colors.DARK_CYAN}► System: Windows 11 {Colors.DIM}|{Colors.RESET} "
-        stats += f"{Colors.DARK_GREEN}► Python: {sys.version[:5]} {Colors.DIM}|{Colors.RESET} "
-        stats += f"{Colors.DARK_YELLOW}► Modules: {len(ModuleManager().modules)}{Colors.RESET}"
+        stats = f"{Colors.DARK_CYAN}â–º System: Windows 11 {Colors.DIM}|{Colors.RESET} "
+        stats += f"{Colors.DARK_GREEN}â–º Python: {sys.version[:5]} {Colors.DIM}|{Colors.RESET} "
+        stats += f"{Colors.DARK_YELLOW}â–º Modules: {len(ModuleManager().modules)}{Colors.RESET}"
         HackerUI.draw_line(stats, border)
         HackerUI.draw_line("", border)
         
@@ -587,15 +587,15 @@ class HackerUI:
     def draw_footer(border, start_time):
         """Draw the footer"""
         HackerUI.draw_line("", border)
-        HackerUI.draw_line(f"{Colors.DARK_GREEN}├{'─' * (border['width'] - 4)}┤{Colors.RESET}", border)
+        HackerUI.draw_line(f"{Colors.DARK_GREEN}â”œ{'â”€' * (border['width'] - 4)}â”¤{Colors.RESET}", border)
         HackerUI.draw_line("", border)
         
         footer_text = f"{Colors.DIM}Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} "
         footer_text += f"| Runtime: {(datetime.now() - start_time).total_seconds():.2f}s "
-        footer_text += f"| DSTerminal v3.1.113{Colors.RESET}"
+        footer_text += f"| DSTerminal v4.0.0.113{Colors.RESET}"
         HackerUI.draw_line(footer_text, border)
         
-        print(f"{Colors.DARK_GREEN}╚{'═' * (border['width'] - 2)}╝{Colors.RESET}")
+        print(f"{Colors.DARK_GREEN}â•š{'â•' * (border['width'] - 2)}â•{Colors.RESET}")
 
 class ModuleDisplay:
     """Display modules in hacker-style format"""
@@ -616,13 +616,13 @@ class ModuleDisplay:
         max_key_len = max([len(m['key']) for m in filtered])
         max_category_len = max([len(m['category']) for m in filtered])
         
-        print(f"\n{Colors.BOLD}{Colors.DARK_GREEN}┌{'─' * (max_name_len + max_key_len + max_category_len + 30)}┐{Colors.RESET}")
-        header = f"{Colors.BOLD}{Colors.DARK_CYAN}│ {Colors.BRIGHT_CYAN}MODULE{Colors.RESET}{Colors.DARK_CYAN} "
+        print(f"\n{Colors.BOLD}{Colors.DARK_GREEN}â”Œ{'â”€' * (max_name_len + max_key_len + max_category_len + 30)}â”{Colors.RESET}")
+        header = f"{Colors.BOLD}{Colors.DARK_CYAN}â”‚ {Colors.BRIGHT_CYAN}MODULE{Colors.RESET}{Colors.DARK_CYAN} "
         header += f"{' ' * (max_name_len - 6)}{Colors.BRIGHT_CYAN}KEY{Colors.RESET}{Colors.DARK_CYAN} "
         header += f"{' ' * (max_key_len - 3)}{Colors.BRIGHT_CYAN}STATUS{Colors.RESET}{Colors.DARK_CYAN} "
-        header += f"{Colors.BRIGHT_CYAN}CATEGORY{Colors.RESET}{Colors.DARK_CYAN} │{Colors.RESET}"
+        header += f"{Colors.BRIGHT_CYAN}CATEGORY{Colors.RESET}{Colors.DARK_CYAN} â”‚{Colors.RESET}"
         print(header)
-        print(f"{Colors.DARK_GREEN}├{'─' * (max_name_len + max_key_len + max_category_len + 30)}┤{Colors.RESET}")
+        print(f"{Colors.DARK_GREEN}â”œ{'â”€' * (max_name_len + max_key_len + max_category_len + 30)}â”¤{Colors.RESET}")
         
         for module in filtered:
             name = module['name']
@@ -634,11 +634,11 @@ class ModuleDisplay:
             version = module.get('version', 'N/A')
             deps = module.get('dependencies', [])
             
-            if status == '✓':
+            if status == 'âœ“':
                 status_colored = f"{Colors.BRIGHT_GREEN}{status}{Colors.RESET}"
-            elif status == '★':
+            elif status == 'â˜…':
                 status_colored = f"{Colors.BRIGHT_YELLOW}{status}{Colors.RESET}"
-            elif status == '✗':
+            elif status == 'âœ—':
                 status_colored = f"{Colors.DARK_RED}{status}{Colors.RESET}"
             else:
                 status_colored = f"{Colors.DARK_WHITE}{status}{Colors.RESET}"
@@ -653,7 +653,7 @@ class ModuleDisplay:
             else:
                 cat_colored = f"{Colors.DARK_YELLOW}{category}{Colors.RESET}"
             
-            line = f"{Colors.DARK_GREEN}│ {Colors.RESET}"
+            line = f"{Colors.DARK_GREEN}â”‚ {Colors.RESET}"
             line += f"{color}{name}{Colors.RESET}"
             line += " " * (max_name_len - len(name) + 2)
             line += f"{Colors.DARK_WHITE}{key}{Colors.RESET}"
@@ -661,26 +661,26 @@ class ModuleDisplay:
             line += f"{status_colored}  "
             line += f"{cat_colored}"
             line += " " * (max_category_len - len(category) + 2)
-            line += f"{Colors.DARK_GREEN}│{Colors.RESET}"
+            line += f"{Colors.DARK_GREEN}â”‚{Colors.RESET}"
             print(line)
             
             # Description
-            desc_line = f"{Colors.DARK_GREEN}│ {Colors.RESET}{Colors.DIM}{desc}{Colors.RESET}"
+            desc_line = f"{Colors.DARK_GREEN}â”‚ {Colors.RESET}{Colors.DIM}{desc}{Colors.RESET}"
             desc_line += " " * (max_name_len + max_key_len + max_category_len + 30 - len(desc) - 4)
-            desc_line += f"{Colors.DARK_GREEN}│{Colors.RESET}"
+            desc_line += f"{Colors.DARK_GREEN}â”‚{Colors.RESET}"
             print(desc_line)
             
             # Version and dependencies (in dim)
             if deps:
                 deps_str = ", ".join(deps)
-                info_line = f"{Colors.DARK_GREEN}│ {Colors.RESET}{Colors.DIM}v{version} | Deps: {deps_str}{Colors.RESET}"
+                info_line = f"{Colors.DARK_GREEN}â”‚ {Colors.RESET}{Colors.DIM}v{version} | Deps: {deps_str}{Colors.RESET}"
                 info_line += " " * (max_name_len + max_key_len + max_category_len + 30 - len(f"v{version} | Deps: {deps_str}") - 4)
-                info_line += f"{Colors.DARK_GREEN}│{Colors.RESET}"
+                info_line += f"{Colors.DARK_GREEN}â”‚{Colors.RESET}"
                 print(info_line)
             
-            print(f"{Colors.DARK_GREEN}├{'─' * (max_name_len + max_key_len + max_category_len + 30)}┤{Colors.RESET}")
+            print(f"{Colors.DARK_GREEN}â”œ{'â”€' * (max_name_len + max_key_len + max_category_len + 30)}â”¤{Colors.RESET}")
         
-        print(f"{Colors.DARK_GREEN}└{'─' * (max_name_len + max_key_len + max_category_len + 30)}┘{Colors.RESET}")
+        print(f"{Colors.DARK_GREEN}â””{'â”€' * (max_name_len + max_key_len + max_category_len + 30)}â”˜{Colors.RESET}")
         print(f"\n{Colors.DIM}Total modules: {len(filtered)} | Category: {filter_type}{Colors.RESET}")
 
 def interactive_menu():
@@ -708,17 +708,17 @@ def interactive_menu():
         ]
         
         ui.draw_line("", border)
-        ui.draw_line(f"{Colors.BOLD}{Colors.DARK_CYAN}═══ MENU OPTIONS ═══{Colors.RESET}", border, centered=True)
+        ui.draw_line(f"{Colors.BOLD}{Colors.DARK_CYAN}â•â•â• MENU OPTIONS â•â•â•{Colors.RESET}", border, centered=True)
         ui.draw_line("", border)
         
         for num, text, color in options:
-            option_line = f"{Colors.DARK_GREEN}► {Colors.RESET}{color}{num}. {text}{Colors.RESET}"
+            option_line = f"{Colors.DARK_GREEN}â–º {Colors.RESET}{color}{num}. {text}{Colors.RESET}"
             ui.draw_line(option_line, border, pad_left=4)
         
         ui.draw_line("", border)
         ui.draw_footer(border, start_time)
         
-        choice = input(f"\n{Colors.BRIGHT_GREEN}➜ {Colors.RESET}{Colors.BOLD}Enter choice: {Colors.RESET}").strip()
+        choice = input(f"\n{Colors.BRIGHT_GREEN}âžœ {Colors.RESET}{Colors.BOLD}Enter choice: {Colors.RESET}").strip()
         
         if choice == "0":
             print(f"\n{Colors.DARK_GREEN}Exiting DSTerminal Module Database...{Colors.RESET}")
@@ -726,40 +726,40 @@ def interactive_menu():
         
         elif choice == "1":
             ui.clear_screen()
-            print(f"\n{Colors.BOLD}{Colors.BRIGHT_GREEN}══ ALL MODULES ══{Colors.RESET}\n")
+            print(f"\n{Colors.BOLD}{Colors.BRIGHT_GREEN}â•â• ALL MODULES â•â•{Colors.RESET}\n")
             ModuleDisplay.display_modules(manager.modules, "all")
             input(f"\n{Colors.DIM}Press Enter to continue...{Colors.RESET}")
         
         elif choice == "2":
             ui.clear_screen()
-            print(f"\n{Colors.BOLD}{Colors.DARK_GREEN}══ CORE MODULES ══{Colors.RESET}\n")
+            print(f"\n{Colors.BOLD}{Colors.DARK_GREEN}â•â• CORE MODULES â•â•{Colors.RESET}\n")
             ModuleDisplay.display_modules(manager.modules, "core")
             input(f"\n{Colors.DIM}Press Enter to continue...{Colors.RESET}")
         
         elif choice == "3":
             ui.clear_screen()
-            print(f"\n{Colors.BOLD}{Colors.DARK_CYAN}══ EXTENDED MODULES ══{Colors.RESET}\n")
+            print(f"\n{Colors.BOLD}{Colors.DARK_CYAN}â•â• EXTENDED MODULES â•â•{Colors.RESET}\n")
             ModuleDisplay.display_modules(manager.modules, "extended")
             input(f"\n{Colors.DIM}Press Enter to continue...{Colors.RESET}")
         
         elif choice == "4":
             ui.clear_screen()
-            print(f"\n{Colors.BOLD}{Colors.DARK_PURPLE}══ TOOL MODULES ══{Colors.RESET}\n")
+            print(f"\n{Colors.BOLD}{Colors.DARK_PURPLE}â•â• TOOL MODULES â•â•{Colors.RESET}\n")
             ModuleDisplay.display_modules(manager.modules, "tools")
             input(f"\n{Colors.DIM}Press Enter to continue...{Colors.RESET}")
         
         elif choice == "5":
             ui.clear_screen()
-            print(f"\n{Colors.BOLD}{Colors.DARK_YELLOW}══ COMMUNITY MODULES ══{Colors.RESET}\n")
+            print(f"\n{Colors.BOLD}{Colors.DARK_YELLOW}â•â• COMMUNITY MODULES â•â•{Colors.RESET}\n")
             ModuleDisplay.display_modules(manager.modules, "community")
             input(f"\n{Colors.DIM}Press Enter to continue...{Colors.RESET}")
         
         elif choice == "6":
             ui.clear_screen()
-            search = input(f"\n{Colors.CYAN}🔍 Enter search term: {Colors.RESET}").strip().lower()
+            search = input(f"\n{Colors.CYAN}ðŸ” Enter search term: {Colors.RESET}").strip().lower()
             if search:
                 results = manager.search_modules(search)
-                print(f"\n{Colors.BOLD}{Colors.BRIGHT_GREEN}══ SEARCH RESULTS: '{search}' ══{Colors.RESET}\n")
+                print(f"\n{Colors.BOLD}{Colors.BRIGHT_GREEN}â•â• SEARCH RESULTS: '{search}' â•â•{Colors.RESET}\n")
                 if results:
                     ModuleDisplay.display_modules(results, "all")
                 else:
@@ -770,13 +770,13 @@ def interactive_menu():
         
         elif choice == "7":
             ui.clear_screen()
-            module_name = input(f"\n{Colors.CYAN}📦 Enter module name: {Colors.RESET}").strip()
+            module_name = input(f"\n{Colors.CYAN}ðŸ“¦ Enter module name: {Colors.RESET}").strip()
             if module_name:
                 module = next((m for m in manager.modules if 
                              m['name'].lower() == module_name.lower() or 
                              m['key'].lower() == module_name.lower()), None)
                 if module:
-                    print(f"\n{Colors.BOLD}{Colors.BRIGHT_GREEN}══ MODULE DETAILS ══{Colors.RESET}")
+                    print(f"\n{Colors.BOLD}{Colors.BRIGHT_GREEN}â•â• MODULE DETAILS â•â•{Colors.RESET}")
                     print(f"{Colors.DARK_GREEN}Name:{Colors.RESET} {module['name']}")
                     print(f"{Colors.DARK_GREEN}Key:{Colors.RESET} {module['key']}")
                     print(f"{Colors.DARK_GREEN}Status:{Colors.RESET} {module['status']}")
@@ -830,22 +830,22 @@ def interactive_menu():
                     f.write(f"  Grand Total: {len(manager.modules)}\n")
                     f.write("=" * 60 + "\n")
                     
-                print(f"\n{Colors.BRIGHT_GREEN}✅ Module list exported to: {filename}{Colors.RESET}")
+                print(f"\n{Colors.BRIGHT_GREEN}âœ… Module list exported to: {filename}{Colors.RESET}")
                 print(f"{Colors.DIM}File saved with UTF-8 encoding{Colors.RESET}")
                 
             except Exception as e:
-                print(f"\n{Colors.DARK_RED}❌ Export failed: {e}{Colors.RESET}")
+                print(f"\n{Colors.DARK_RED}âŒ Export failed: {e}{Colors.RESET}")
             
             input(f"\n{Colors.DIM}Press Enter to continue...{Colors.RESET}")
         
         else:
-            print(f"\n{Colors.DARK_RED}❌ Invalid choice. Please try again.{Colors.RESET}")
+            print(f"\n{Colors.DARK_RED}âŒ Invalid choice. Please try again.{Colors.RESET}")
             input(f"\n{Colors.DIM}Press Enter to continue...{Colors.RESET}")
 
 def main():
     """Main entry point"""
     if os.name != 'nt':
-        print(f"{Colors.DARK_YELLOW}⚠️ DSTerminal is optimized for Windows{Colors.RESET}")
+        print(f"{Colors.DARK_YELLOW}âš ï¸ DSTerminal is optimized for Windows{Colors.RESET}")
     
     try:
         interactive_menu()
@@ -853,7 +853,7 @@ def main():
         print(f"\n\n{Colors.DARK_GREEN}Exiting...{Colors.RESET}")
         sys.exit(0)
     except Exception as e:
-        print(f"\n{Colors.DARK_RED}❌ An error occurred: {e}{Colors.RESET}")
+        print(f"\n{Colors.DARK_RED}âŒ An error occurred: {e}{Colors.RESET}")
         import traceback
         traceback.print_exc()
         input(f"\n{Colors.DIM}Press Enter to exit...{Colors.RESET}")

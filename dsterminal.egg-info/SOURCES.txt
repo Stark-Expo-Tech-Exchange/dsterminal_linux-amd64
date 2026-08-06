@@ -1,4 +1,4 @@
-README.md
+﻿README.md
 setup.py
 dsterminal.egg-info/PKG-INFO
 dsterminal.egg-info/SOURCES.txt

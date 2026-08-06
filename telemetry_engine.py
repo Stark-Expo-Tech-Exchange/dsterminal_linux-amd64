@@ -1,4 +1,4 @@
-# telemetry_engine.py - Place this in your project root
+﻿# telemetry_engine.py - Place this in your project root
 
 import threading
 import time

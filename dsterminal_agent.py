@@ -1,4 +1,4 @@
-"""
+﻿"""
 DSTerminal Security Agent
 Persistent background service with real-time monitoring
 Auto-starts on system boot and runs silently
@@ -55,8 +55,8 @@ class SecurityAgent:
         signal.signal(signal.SIGINT, self._signal_handler)
         signal.signal(signal.SIGTERM, self._signal_handler)
         
-        logger.info("🛡️ DSTerminal Security Agent initialized")
-        logger.info(f"📁 Logs directory: {LOG_DIR}")
+        logger.info("ðŸ›¡ï¸ DSTerminal Security Agent initialized")
+        logger.info(f"ðŸ“ Logs directory: {LOG_DIR}")
     
     def _signal_handler(self, signum, frame):
         """Handle shutdown signals gracefully"""
@@ -74,7 +74,7 @@ class SecurityAgent:
         self.thread = threading.Thread(target=self._run, daemon=True)
         self.thread.start()
         
-        logger.info("✅ Security Agent started successfully")
+        logger.info("âœ… Security Agent started successfully")
         self._print_banner()
     
     def _run(self):
@@ -102,7 +102,7 @@ class SecurityAgent:
     
     def _handle_threat(self, status):
         """Handle detected threats"""
-        logger.warning(f"🚨 THREAT DETECTED: {status['threat_level']}")
+        logger.warning(f"ðŸš¨ THREAT DETECTED: {status['threat_level']}")
         self.stats['threats_blocked'] += 1
         
         # Create alert file
@@ -116,18 +116,18 @@ class SecurityAgent:
         with open(alert_file, 'w') as f:
             json.dump(alert_data, f, indent=2)
         
-        logger.info(f"📄 Alert saved to: {alert_file}")
+        logger.info(f"ðŸ“„ Alert saved to: {alert_file}")
     
     def _log_status(self, status):
         """Log current status"""
         if status['threat_level'] == 'CLEAN':
-            level_emoji = '🟢'
+            level_emoji = 'ðŸŸ¢'
         elif status['threat_level'] == 'SUSPICIOUS':
-            level_emoji = '🟡'
+            level_emoji = 'ðŸŸ¡'
         elif status['threat_level'] == 'HIGH_RISK':
-            level_emoji = '🟠'
+            level_emoji = 'ðŸŸ '
         else:
-            level_emoji = '🔴'
+            level_emoji = 'ðŸ”´'
         
         logger.debug(f"{level_emoji} Status: {status['threat_level']} | "
                     f"Events: {status['events_monitored']} | "
@@ -145,18 +145,18 @@ class SecurityAgent:
                 
                 # Log significant events
                 if event.operation == 'write':
-                    logger.info(f"📝 File modified: {os.path.basename(event.path)} by {event.process_name}")
+                    logger.info(f"ðŸ“ File modified: {os.path.basename(event.path)} by {event.process_name}")
     
     def _print_banner(self):
         """Print startup banner"""
         banner = f"""
-╔══════════════════════════════════════════════════════════════╗
-║              DSTERMINAL SECURITY AGENT ACTIVE                ║
-╠══════════════════════════════════════════════════════════════╣
-║  Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}                           ║
-║  PID: {os.getpid()}                                                     ║
-║  Logs: {LOG_DIR}                                   ║
-╚══════════════════════════════════════════════════════════════╝
+â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+â•‘              DSTERMINAL SECURITY AGENT ACTIVE                â•‘
+â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£
+â•‘  Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}                           â•‘
+â•‘  PID: {os.getpid()}                                                     â•‘
+â•‘  Logs: {LOG_DIR}                                   â•‘
+â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 """
         print(banner)
         logger.info("Agent banner displayed")
@@ -170,7 +170,7 @@ class SecurityAgent:
             self.thread.join(timeout=5)
         
         self.security.deactivate()
-        logger.info("✅ Security Agent stopped")
+        logger.info("âœ… Security Agent stopped")
     
     def get_report(self) -> Dict:
         """Generate agent report"""
@@ -212,7 +212,7 @@ def create_startup_entry():
                          f'"{python_path}" "{script_path}" --startup')
         winreg.CloseKey(key)
         
-        logger.info("✅ Startup entry created successfully")
+        logger.info("âœ… Startup entry created successfully")
         return True
     except Exception as e:
         logger.error(f"Failed to create startup entry: {e}")
@@ -240,9 +240,9 @@ def main():
             key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path, 0, winreg.KEY_SET_VALUE)
             winreg.DeleteValue(key, "DSTerminalSecurity")
             winreg.CloseKey(key)
-            print("✅ Startup entry removed")
+            print("âœ… Startup entry removed")
         except Exception as e:
-            print(f"❌ Failed to remove: {e}")
+            print(f"âŒ Failed to remove: {e}")
         return
     
     # Normal run

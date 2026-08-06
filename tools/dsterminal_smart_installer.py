@@ -1,4 +1,4 @@
-# dsterminal_smart_installer.py
+﻿# dsterminal_smart_installer.py
 import os
 import sys
 import platform
@@ -297,11 +297,11 @@ class SmartDSTerminalInstaller:
     
     def install_npcap(self):
         """Download and install Npcap"""
-        print("\n  📦 Installing Npcap (required for Nmap)...")
+        print("\n  ðŸ“¦ Installing Npcap (required for Nmap)...")
         
         # Check if already installed
         if self.check_npcap_installed():
-            print("  ✅ Npcap is already installed")
+            print("  âœ… Npcap is already installed")
             return True
         
         npcap_url = self.tool_definitions['nmap'].get('npcap_url', 'https://npcap.com/dist/npcap-1.79.exe')
@@ -314,7 +314,7 @@ class SmartDSTerminalInstaller:
         if not download_path.exists():
             print(f"  Downloading Npcap installer...")
             if not self.download_file(npcap_url, download_path):
-                print("  ❌ Failed to download Npcap")
+                print("  âŒ Failed to download Npcap")
                 return False
         
         # Install Npcap silently
@@ -331,22 +331,22 @@ class SmartDSTerminalInstaller:
                 )
                 try:
                     stdout, stderr = process.communicate(timeout=120)
-                    print("  ✅ Npcap installation completed")
+                    print("  âœ… Npcap installation completed")
                     return True
                 except subprocess.TimeoutExpired:
                     process.kill()
-                    print("  ⚠️ Npcap installation timed out")
+                    print("  âš ï¸ Npcap installation timed out")
                     return False
             else:
                 if self.run_as_admin(str(download_path), args):
-                    print("  ✅ Npcap installer started with admin privileges")
+                    print("  âœ… Npcap installer started with admin privileges")
                     time.sleep(10)
                     return True
                 else:
-                    print("  ❌ Failed to elevate for Npcap installation")
+                    print("  âŒ Failed to elevate for Npcap installation")
                     return False
         except Exception as e:
-            print(f"  ❌ Npcap installation error: {e}")
+            print(f"  âŒ Npcap installation error: {e}")
             return False
     
     def install_via_package_manager(self, tool_name, tool_config):
@@ -396,7 +396,7 @@ class SmartDSTerminalInstaller:
                             subprocess.run(['choco', 'install', package_name, '-y'], check=True)
                             return True
                         else:
-                            print("  ⚠️ Chocolatey requires admin privileges")
+                            print("  âš ï¸ Chocolatey requires admin privileges")
                             return False
                     
                     elif mgr == 'winget':
@@ -440,7 +440,7 @@ class SmartDSTerminalInstaller:
                     shutil.rmtree(tool_path)
                     print(f"  Removed existing directory: {tool_path}")
                 except PermissionError:
-                    print(f"  ⚠️ Permission denied removing {tool_path}")
+                    print(f"  âš ï¸ Permission denied removing {tool_path}")
                     print("  Attempting to clone into a new location...")
                     # Use a different name
                     tool_path = self.tools_dir / f"{tool_name}_new"
@@ -496,7 +496,7 @@ class SmartDSTerminalInstaller:
                 if self.is_admin:
                     subprocess.run([str(download_path), '/S'], check=False)
                 else:
-                    print("  ⚠️ Admin rights needed for installation")
+                    print("  âš ï¸ Admin rights needed for installation")
                     print(f"  Please run: {download_path}")
                 return self.create_wrapper(tool_name, tool_config)
             
@@ -550,9 +550,9 @@ class SmartDSTerminalInstaller:
         
         # For Nmap, also install Npcap first
         if tool_name == 'nmap':
-            print("\n  🔧 Nmap requires Npcap for packet capture functionality")
+            print("\n  ðŸ”§ Nmap requires Npcap for packet capture functionality")
             if not self.install_npcap():
-                print("  ⚠️ Npcap installation may have issues, but continuing with Nmap...")
+                print("  âš ï¸ Npcap installation may have issues, but continuing with Nmap...")
         
         # Get silent args - ONLY for the installer, not for git!
         silent_args = tool_config.get('silent_args', '/S')
@@ -574,34 +574,34 @@ class SmartDSTerminalInstaller:
                     
                     try:
                         stdout, stderr = process.communicate(timeout=600)
-                        print("  ✅ Installation command completed")
+                        print("  âœ… Installation command completed")
                     except subprocess.TimeoutExpired:
                         process.kill()
-                        print("  ⚠️ Installation timed out, but may still be in progress")
+                        print("  âš ï¸ Installation timed out, but may still be in progress")
                     
                     time.sleep(5)
                     
                 else:
                     if self.run_as_admin(str(download_path), silent_args):
-                        print("  ✅ Installer started with admin privileges")
+                        print("  âœ… Installer started with admin privileges")
                         time.sleep(30)
                     else:
-                        print("  ⚠️ Failed to elevate. Please run installer manually.")
+                        print("  âš ï¸ Failed to elevate. Please run installer manually.")
                         subprocess.Popen([str(download_path)])
                 
                 # Check if installed and add to PATH
                 install_success = self.check_tool_installed(tool_name)
                 if install_success:
-                    print(f"  ✅ {tool_name} installed successfully")
+                    print(f"  âœ… {tool_name} installed successfully")
                     self.add_tool_to_path(tool_name, tool_config)
                 else:
                     print("  Waiting additional 30 seconds for installation to complete...")
                     time.sleep(30)
                     if self.check_tool_installed(tool_name):
-                        print(f"  ✅ {tool_name} installed successfully")
+                        print(f"  âœ… {tool_name} installed successfully")
                         self.add_tool_to_path(tool_name, tool_config)
                     else:
-                        print(f"  ⚠️ {tool_name} may still be installing")
+                        print(f"  âš ï¸ {tool_name} may still be installing")
                         self.add_tool_to_path(tool_name, tool_config)
                 
             else:
@@ -615,7 +615,7 @@ class SmartDSTerminalInstaller:
             
             return self.create_wrapper(tool_name, tool_config)
         except subprocess.TimeoutExpired:
-            print(f"  ⚠️ Installation timed out after 10 minutes")
+            print(f"  âš ï¸ Installation timed out after 10 minutes")
             return self.create_wrapper(tool_name, tool_config)
         except Exception as e:
             print(f"  Installer error: {e}")
@@ -658,7 +658,7 @@ class SmartDSTerminalInstaller:
         if 'install_paths' not in tool_config:
             return False
         
-        print(f"  🔧 Adding {tool_name} to PATH...")
+        print(f"  ðŸ”§ Adding {tool_name} to PATH...")
         
         install_paths = tool_config['install_paths']
         executable_name = tool_config.get('executable_name', tool_config.get('executable', tool_name))
@@ -693,13 +693,13 @@ class SmartDSTerminalInstaller:
                     winreg.CloseKey(key)
                     
                     os.environ['PATH'] = f"{os.environ.get('PATH', '')};{found_path}"
-                    print(f"  ✅ Added {found_path} to PATH")
+                    print(f"  âœ… Added {found_path} to PATH")
                 else:
-                    print(f"  ✅ {found_path} already in PATH")
+                    print(f"  âœ… {found_path} already in PATH")
             except Exception as e:
-                print(f"  ⚠️ Could not add to PATH: {e}")
+                print(f"  âš ï¸ Could not add to PATH: {e}")
         else:
-            print(f"  ⚠️ Could not find {tool_name} installation directory")
+            print(f"  âš ï¸ Could not find {tool_name} installation directory")
         
         self.update_wrapper_with_full_path(tool_name, tool_config, found_path)
         return True
@@ -722,7 +722,7 @@ class SmartDSTerminalInstaller:
 '''
             with open(wrapper_path, 'w', encoding='ascii') as f:
                 f.write(content)
-            print(f"  ✅ Updated wrapper to use: {full_exe_path}")
+            print(f"  âœ… Updated wrapper to use: {full_exe_path}")
             return True
         
         # For whois, use powershell to run the script
@@ -732,7 +732,7 @@ powershell -ExecutionPolicy Bypass -File "{Path(install_path) / executable}" %*
 '''
             with open(wrapper_path, 'w', encoding='ascii') as f:
                 f.write(content)
-            print(f"  ✅ Updated whois wrapper to use PowerShell")
+            print(f"  âœ… Updated whois wrapper to use PowerShell")
             return True
         
         return False
@@ -979,46 +979,46 @@ if __name__ == "__main__":
     def smart_install(self, tool_name):
         """Install tool using best method"""
         if tool_name not in self.tool_definitions:
-            print(f"  ⚠️ Unknown tool: {tool_name}")
+            print(f"  âš ï¸ Unknown tool: {tool_name}")
             return False
         
         tool_config = self.tool_definitions[tool_name]
-        print(f"\n🔧 Installing {tool_name}...")
+        print(f"\nðŸ”§ Installing {tool_name}...")
         
         if tool_config.get('needs_admin', False) and not self.is_admin:
-            print("  ⚠️ This tool requires administrator privileges")
+            print("  âš ï¸ This tool requires administrator privileges")
             print("  Will attempt to auto-elevate and install...")
         
         for strategy in tool_config['priority']:
             if strategy in self.strategies:
-                print(f"  📦 Trying: {strategy}")
+                print(f"  ðŸ“¦ Trying: {strategy}")
                 try:
                     result = self.strategies[strategy](tool_name, tool_config)
                     if result:
-                        print(f"  ✅ {tool_name} installed successfully")
+                        print(f"  âœ… {tool_name} installed successfully")
                         self.log_installation(tool_name, strategy)
                         return True
                     else:
-                        print(f"  ❌ Failed via {strategy}")
+                        print(f"  âŒ Failed via {strategy}")
                 except Exception as e:
-                    print(f"  ❌ Error: {e}")
+                    print(f"  âŒ Error: {e}")
         
-        print(f"  ⚠️ Could not install {tool_name}")
+        print(f"  âš ï¸ Could not install {tool_name}")
         return False
     
     def install_all(self):
         """Install all tools"""
         print("=" * 60)
-        print(f"🚀 DSTerminal Smart Installer - {platform.system()} {platform.release()}")
+        print(f"ðŸš€ DSTerminal Smart Installer - {platform.system()} {platform.release()}")
         print("=" * 60)
         
         env = self.detect_environment()
-        print("\n📊 Environment Detection:")
+        print("\nðŸ“Š Environment Detection:")
         for key, value in env.items():
             print(f"  {key}: {value}")
         
         if not self.is_admin:
-            print("\n⚠️ Running without administrator/root privileges")
+            print("\nâš ï¸ Running without administrator/root privileges")
             print("   But the installer will attempt to auto-elevate when needed")
             print("   You may see UAC prompts for admin access")
         
@@ -1029,13 +1029,13 @@ if __name__ == "__main__":
             results[tool] = self.smart_install(tool)
         
         print("\n" + "=" * 60)
-        print("📊 Installation Summary:")
+        print("ðŸ“Š Installation Summary:")
         print("=" * 60)
         for tool, success in results.items():
-            status = "✅" if success else "❌"
+            status = "âœ…" if success else "âŒ"
             print(f"  {status} {tool}")
         
-        print(f"\n📁 Installation Directory:")
+        print(f"\nðŸ“ Installation Directory:")
         print(f"  {self.install_dir}")
         print(f"  Binaries: {self.bin_dir}")
         
@@ -1044,7 +1044,7 @@ if __name__ == "__main__":
         self.print_post_install_notes(results)
         
         print("\n" + "=" * 60)
-        print("🎉 Installation Complete!")
+        print("ðŸŽ‰ Installation Complete!")
         print("=" * 60)
         
         return results
@@ -1069,12 +1069,12 @@ if __name__ == "__main__":
                     winreg.SetValueEx(key, "Path", 0, winreg.REG_EXPAND_SZ, new_path)
                     winreg.CloseKey(key)
                     os.environ['PATH'] = f"{os.environ.get('PATH', '')};{bin_path}"
-                    print(f"\n✅ Added {bin_path} to user PATH")
+                    print(f"\nâœ… Added {bin_path} to user PATH")
                     print("   Please restart your terminal for changes to take effect")
                 else:
-                    print(f"\n✅ {bin_path} already in PATH")
+                    print(f"\nâœ… {bin_path} already in PATH")
             except Exception as e:
-                print(f"\n⚠️ Could not update PATH: {e}")
+                print(f"\nâš ï¸ Could not update PATH: {e}")
                 print(f"   Please manually add this to your PATH:")
                 print(f"   {bin_path}")
                 print(f'\n   [Environment]::SetEnvironmentVariable("Path", $env:Path + ";{bin_path}", "User")')
@@ -1085,15 +1085,15 @@ if __name__ == "__main__":
                     with open(rc_path, 'a') as f:
                         f.write(f'\n# DSTerminal\n')
                         f.write(f'export PATH="{bin_path}:$PATH"\n')
-                    print(f"\n✅ Added to {rc}")
+                    print(f"\nâœ… Added to {rc}")
                     print(f"   Run: source {rc}")
                     return
             
-            print(f"\n⚠️ Could not find shell config. Please add {bin_path} to PATH manually.")
+            print(f"\nâš ï¸ Could not find shell config. Please add {bin_path} to PATH manually.")
     
     def print_usage_instructions(self, results):
         """Print usage instructions"""
-        print("\n📖 Usage Instructions:")
+        print("\nðŸ“– Usage Instructions:")
         print("-" * 40)
         
         for tool, success in results.items():
@@ -1111,11 +1111,11 @@ if __name__ == "__main__":
     
     def print_post_install_notes(self, results):
         """Print post-installation notes"""
-        print("\n📝 Post-Installation Notes:")
+        print("\nðŸ“ Post-Installation Notes:")
         print("-" * 40)
         
         if self.os_type == 'windows' and not self.is_admin:
-            print("  ⚠️ Some tools may have triggered UAC prompts")
+            print("  âš ï¸ Some tools may have triggered UAC prompts")
             print("  Please check if any installation wizards are still open")
             if not results.get('nmap', False):
                 print(f"    - Nmap installer: {self.download_dir / 'nmap-7.95-setup.exe'}")
@@ -1124,16 +1124,16 @@ if __name__ == "__main__":
         
         if self.os_type == 'windows':
             if not self.check_npcap_installed():
-                print("\n  ⚠️ Npcap is not installed (required for Nmap scanning)")
+                print("\n  âš ï¸ Npcap is not installed (required for Nmap scanning)")
                 print("  Download from: https://npcap.com/")
         
         # Check if whois is in PATH
         whois_path = str(self.tools_dir / "whois")
         if whois_path not in os.environ.get('PATH', ''):
-            print(f"\n  💡 To use whois, add this to PATH:")
+            print(f"\n  ðŸ’¡ To use whois, add this to PATH:")
             print(f'    [Environment]::SetEnvironmentVariable("Path", $env:Path + ";{whois_path}", "User")')
         
-        print("\n  💡 To add tools to PATH permanently:")
+        print("\n  ðŸ’¡ To add tools to PATH permanently:")
         if self.os_type == 'windows':
             print(f'    [Environment]::SetEnvironmentVariable("Path", $env:Path + ";{self.bin_dir}", "User")')
         else:

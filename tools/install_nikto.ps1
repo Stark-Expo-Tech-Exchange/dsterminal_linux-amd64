@@ -1,4 +1,4 @@
-# install_nikto.ps1
+﻿# install_nikto.ps1
 # Nikto Installation Script for DSTerminal
 
 param(

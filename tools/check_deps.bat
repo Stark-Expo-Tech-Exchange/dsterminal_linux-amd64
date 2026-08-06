@@ -1,4 +1,4 @@
-@echo off
+﻿@echo off
 echo DSTerminal Dependency Check
 echo ==========================
 echo.

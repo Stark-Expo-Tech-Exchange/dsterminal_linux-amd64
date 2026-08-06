@@ -1,4 +1,4 @@
-
+﻿
 # DSTerminal Updates Test Repository
 
 [![Version](https://img.shields.io/badge/version-v1.0.0-blue.svg)](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/releases)
@@ -9,30 +9,30 @@
 
 ---
 
-## 📋 Latest Version
+## ðŸ“‹ Latest Version
 
 | Version | Release Date | Status |
 |---------|-------------|--------|
-| **v1.0.0** | 2026-07-30 | ✅ Stable |
+| **v1.0.0** | 2026-07-30 | âœ… Stable |
 
 ---
 
-## 🚀 Features Tested
+## ðŸš€ Features Tested
 
 This repository is used to validate the DSTerminal update mechanism:
 
 | Feature | Status |
 |---------|--------|
-| GitHub API Integration | ✅ |
-| Automatic Update Detection | ✅ |
-| Download Progress Tracking | ✅ |
-| Installer Execution | ✅ |
-| Version Comparison | ✅ |
-| Release Notes Display | ✅ |
+| GitHub API Integration | âœ… |
+| Automatic Update Detection | âœ… |
+| Download Progress Tracking | âœ… |
+| Installer Execution | âœ… |
+| Version Comparison | âœ… |
+| Release Notes Display | âœ… |
 
 ---
 
-## 📦 Installation
+## ðŸ“¦ Installation
 
 ### Option 1: Download Latest Release
 1. Visit the [Releases Page](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/releases)
@@ -59,7 +59,7 @@ python main.py
 
 ---
 
-## 🔧 Development
+## ðŸ”§ Development
 
 ### Prerequisites
 - Python 3.8+
@@ -89,12 +89,12 @@ Create a `.env` file with:
 ```env
 GITHUB_TOKEN=your_github_token_here
 VT_API_KEY=your_vt_api_key_here
-CURRENT_VERSION=3.1.113
+CURRENT_VERSION=4.0.0.113
 ```
 
 ---
 
-## 🧪 Testing
+## ðŸ§ª Testing
 
 ### Quick Test
 ```bash
@@ -113,7 +113,7 @@ pytest tests/
 # Run specific test
 pytest tests/test_update.py -v
 ```
-## 🛡️ Security Notes
+## ðŸ›¡ï¸ Security Notes
 
 - **Never commit** `.env` files or hardcoded tokens
 - **Use environment variables** for sensitive data
@@ -122,13 +122,13 @@ pytest tests/test_update.py -v
 
 ---
 
-## 📄 License
+## ðŸ“„ License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🤝 Contributing
+## ðŸ¤ Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -138,7 +138,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 📞 Support
+## ðŸ“ž Support
 
 For issues or questions:
 - Open an [Issue](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/issues)
@@ -146,7 +146,7 @@ For issues or questions:
 
 ---
 
-## 🔗 Related Repositories
+## ðŸ”— Related Repositories
 
 - [DSTerminal Main](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal)
 - [DSTerminal Docs](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal-docs)
@@ -154,11 +154,11 @@ For issues or questions:
 
 ---
 
-**⚠️ Note:** This is a **public test repository** for the DSTerminal update feature. The actual application is available in the main DSTerminal repository.
+**âš ï¸ Note:** This is a **public test repository** for the DSTerminal update feature. The actual application is available in the main DSTerminal repository.
 
 ---
 
-## 📊 Badges
+## ðŸ“Š Badges
 
 [![GitHub last commit](https://img.shields.io/github/last-commit/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest.svg)](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/commits/main)
 [![GitHub issues](https://img.shields.io/github/issues/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest.svg)](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/issues)
@@ -166,7 +166,7 @@ For issues or questions:
 [![GitHub stars](https://img.shields.io/github/stars/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest.svg)](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/stargazers)
 ```
 
-## 🎨 Alternative Minimal Version
+## ðŸŽ¨ Alternative Minimal Version
 
 If you prefer a cleaner, more minimal approach:
 
@@ -175,18 +175,18 @@ If you prefer a cleaner, more minimal approach:
 
 Public test repository for the DSTerminal automatic update feature.
 
-## 📦 Latest Release
+## ðŸ“¦ Latest Release
 - **Version:** v1.0.0
 - **Date:** 2026-07-30
 - **Download:** [Releases Page](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/releases)
 
-## ✅ Features Tested
+## âœ… Features Tested
 - GitHub API Integration
 - Automatic Update Detection
 - Download Progress Tracking
 - Installer Execution
 
-## 🚀 Quick Start
+## ðŸš€ Quick Start
 ```bash
 # Test update functionality
 python update.py
@@ -195,17 +195,17 @@ python update.py
 python verify_release.py
 ```
 
-## 🔧 Setup
+## ðŸ”§ Setup
 1. Clone the repository
 2. Install dependencies: `pip install -r requirements.txt`
 3. Configure `.env` file with your GitHub token
 
-## 📄 License
+## ðŸ“„ License
 MIT License
 
 ---
 
-⚠️ **Note:** This repository is for testing purposes only.
+âš ï¸ **Note:** This repository is for testing purposes only.
 ```
 
 ## Key Improvements Made:

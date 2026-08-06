@@ -1,4 +1,4 @@
-import ast
+﻿import ast
 import subprocess
 import sys
 import os
@@ -44,48 +44,48 @@ python_files = [f for f in os.listdir('.') if f.endswith('.py') and not f.starts
 
 all_imports = set()
 for py_file in python_files:
-    print(f"📂 Scanning: {py_file}")
+    print(f"ðŸ“‚ Scanning: {py_file}")
     try:
         imports = get_imports(py_file)
         all_imports.update(imports)
     except Exception as e:
-        print(f"⚠️  Error scanning {py_file}: {e}")
+        print(f"âš ï¸  Error scanning {py_file}: {e}")
 
 # Remove standard library modules
 third_party = [imp for imp in all_imports if imp.lower() not in STDLIB and not imp.startswith('_')]
 
 print("\n" + "="*50)
-print(f"📦 Found {len(third_party)} third-party packages to install:")
+print(f"ðŸ“¦ Found {len(third_party)} third-party packages to install:")
 print("="*50)
 
 # Install each package
 installed = []
 failed = []
 for package in sorted(third_party):
-    print(f"\n⬇️  Installing: {package}")
+    print(f"\nâ¬‡ï¸  Installing: {package}")
     try:
         subprocess.check_call([sys.executable, '-m', 'pip', 'install', package])
         installed.append(package)
     except Exception as e:
-        print(f"❌ Failed to install {package}: {e}")
+        print(f"âŒ Failed to install {package}: {e}")
         failed.append(package)
 
 print("\n" + "="*50)
-print("📊 Installation Summary:")
+print("ðŸ“Š Installation Summary:")
 print("="*50)
-print(f"✅ Installed: {len(installed)} packages")
+print(f"âœ… Installed: {len(installed)} packages")
 if installed:
     print(f"   {', '.join(installed)}")
-print(f"❌ Failed: {len(failed)} packages")
+print(f"âŒ Failed: {len(failed)} packages")
 if failed:
     print(f"   {', '.join(failed)}")
 
 # Save requirements
-print("\n📝 Saving to requirements.txt...")
+print("\nðŸ“ Saving to requirements.txt...")
 try:
     subprocess.check_call([sys.executable, '-m', 'pip', 'freeze'], stdout=open('requirements.txt', 'w'))
-    print("✅ requirements.txt created!")
+    print("âœ… requirements.txt created!")
 except:
-    print("⚠️  Could not create requirements.txt")
+    print("âš ï¸  Could not create requirements.txt")
 
-print("\n✅ Done! Run 'python dsterminal.py' to start the application.")
+print("\nâœ… Done! Run 'python dsterminal.py' to start the application.")

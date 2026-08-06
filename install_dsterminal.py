@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 DSTERMINAL Complete Installer - Automatically installs DSTERMINAL and all dependencies
 """
@@ -32,17 +32,17 @@ class DSTERMINALInstaller:
     def print_banner(self):
         """Display installer banner"""
         banner = f"""
-╔══════════════════════════════════════════════════════════════╗
-║                                                              ║
-║   ██████╗ ███████╗████████╗███████╗██████╗ ███╗   ███╗██╗███╗   ██╗ █████╗ ██╗
-║   ██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║████╗  ██║██╔══██╗██║
-║   ██║  ██║███████╗   ██║   █████╗  ██████╔╝██╔████╔██║██║██╔██╗ ██║███████║██║
-║   ██║  ██║╚════██║   ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██║██║╚██╗██║██╔══██║██║
-║   ██████╔╝███████║   ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║██║  ██║███████╗
-║   ╚═════╝ ╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝
-║                                                              ║
-║                    COMPLETE INSTALLER v2.0                   ║
-╚══════════════════════════════════════════════════════════════╝
+â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+â•‘                                                              â•‘
+â•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ•—
+â•‘   â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•â•šâ•â•â–ˆâ–ˆâ•”â•â•â•â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘
+â•‘   â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•”â–ˆâ–ˆâ–ˆâ–ˆâ•”â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â–ˆâ–ˆâ•— â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘
+â•‘   â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â•šâ•â•â•â•â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘
+â•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘ â•šâ•â• â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘ â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—
+â•‘   â•šâ•â•â•â•â•â• â•šâ•â•â•â•â•â•â•   â•šâ•â•   â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•â•šâ•â•     â•šâ•â•â•šâ•â•â•šâ•â•  â•šâ•â•â•â•â•šâ•â•  â•šâ•â•â•šâ•â•â•â•â•â•â•
+â•‘                                                              â•‘
+â•‘                    COMPLETE INSTALLER v2.0                   â•‘
+â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
         """
         print(banner)
         print(f"\n{'='*60}")
@@ -70,10 +70,10 @@ class DSTERMINALInstaller:
             status, version = check_func()
             if status:
                 self.installed.append((name, version))
-                print(f"  {self.green('✓')} {name:<15} {version}")
+                print(f"  {self.green('âœ“')} {name:<15} {version}")
             else:
                 self.missing.append(name)
-                print(f"  {self.red('✗')} {name:<15} Not installed")
+                print(f"  {self.red('âœ—')} {name:<15} Not installed")
         
         return len(self.missing) == 0
     
@@ -139,7 +139,7 @@ class DSTERMINALInstaller:
     def install_missing_dependencies(self):
         """Install missing dependencies based on user choice"""
         if not self.missing:
-            print(f"\n{self.green('[✓] All dependencies are already installed!')}")
+            print(f"\n{self.green('[âœ“] All dependencies are already installed!')}")
             return True
         
         print(f"\n{self.yellow('[!] Missing dependencies detected:')}")
@@ -188,7 +188,7 @@ class DSTERMINALInstaller:
                 success &= self.install_python_packages()
         
         if success:
-            print(f"\n{self.green('[✓] All dependencies installed successfully!')}")
+            print(f"\n{self.green('[âœ“] All dependencies installed successfully!')}")
         else:
             print(f"\n{self.red('[!] Some dependencies failed to install')}")
             self.show_manual_instructions()
@@ -227,10 +227,10 @@ class DSTERMINALInstaller:
                 subprocess.run(['sudo', 'apt', 'install', '-y', 'nmap'], check=True)
             elif self.system == "Darwin":  # macOS
                 subprocess.run(['brew', 'install', 'nmap'], check=True)
-            print(self.green("  ✓ nmap installed"))
+            print(self.green("  âœ“ nmap installed"))
             return True
         except:
-            print(self.red("  ✗ Failed to install nmap"))
+            print(self.red("  âœ— Failed to install nmap"))
             return False
     
     def install_whois(self):
@@ -242,12 +242,12 @@ class DSTERMINALInstaller:
             elif self.system == "Darwin":
                 subprocess.run(['brew', 'install', 'whois'], check=True)
             else:
-                print(self.yellow("  ℹ Manual installation required for Windows"))
+                print(self.yellow("  â„¹ Manual installation required for Windows"))
                 return False
-            print(self.green("  ✓ whois installed"))
+            print(self.green("  âœ“ whois installed"))
             return True
         except:
-            print(self.red("  ✗ Failed to install whois"))
+            print(self.red("  âœ— Failed to install whois"))
             return False
     
     def install_sqlmap(self):
@@ -260,10 +260,10 @@ class DSTERMINALInstaller:
                 subprocess.run(['brew', 'install', 'sqlmap'], check=True)
             elif self.system == "Windows":
                 subprocess.run(['choco', 'install', 'sqlmap', '-y'], check=True)
-            print(self.green("  ✓ sqlmap installed"))
+            print(self.green("  âœ“ sqlmap installed"))
             return True
         except:
-            print(self.red("  ✗ Failed to install sqlmap"))
+            print(self.red("  âœ— Failed to install sqlmap"))
             return False
     
     def install_metasploit(self):
@@ -278,10 +278,10 @@ class DSTERMINALInstaller:
                 subprocess.run(['rm', 'msfinstall'], check=True)
             elif self.system == "Windows":
                 subprocess.run(['choco', 'install', 'metasploit', '-y'], check=True)
-            print(self.green("  ✓ Metasploit installed"))
+            print(self.green("  âœ“ Metasploit installed"))
             return True
         except:
-            print(self.red("  ✗ Failed to install Metasploit"))
+            print(self.red("  âœ— Failed to install Metasploit"))
             return False
     
     def install_python_packages(self):
@@ -293,9 +293,9 @@ class DSTERMINALInstaller:
         for package in packages:
             try:
                 subprocess.run([sys.executable, '-m', 'pip', 'install', package], check=True, capture_output=True)
-                print(self.green(f"  ✓ {package}"))
+                print(self.green(f"  âœ“ {package}"))
             except:
-                print(self.red(f"  ✗ {package}"))
+                print(self.red(f"  âœ— {package}"))
                 success = False
         
         return success
@@ -340,9 +340,9 @@ class DSTERMINALInstaller:
         for file in files_to_copy:
             if os.path.exists(file):
                 shutil.copy2(file, self.install_path)
-                print(f"  ✓ Copied {file}")
+                print(f"  âœ“ Copied {file}")
             else:
-                print(self.yellow(f"  ℹ {file} not found in current directory"))
+                print(self.yellow(f"  â„¹ {file} not found in current directory"))
         
         # Create workspace
         workspace = os.path.expanduser("~/dsterminal_workspace")
@@ -374,7 +374,7 @@ python3 dsterminal.py
         with open(launcher_path, 'w') as f:
             f.write(launcher)
         
-        print(f"  ✓ Created launcher: {launcher_path}")
+        print(f"  âœ“ Created launcher: {launcher_path}")
     
     def create_shortcut(self):
         """Create desktop shortcut (Windows)"""
@@ -393,9 +393,9 @@ python3 dsterminal.py
                 shortcut.WorkingDirectory = self.install_path
                 shortcut.save()
                 
-                print(f"  ✓ Created desktop shortcut")
+                print(f"  âœ“ Created desktop shortcut")
             except:
-                print(self.yellow("  ℹ Could not create desktop shortcut"))
+                print(self.yellow("  â„¹ Could not create desktop shortcut"))
     
     def green(self, text):
         return f"\033[92m{text}\033[0m"
@@ -425,7 +425,7 @@ python3 dsterminal.py
             # Ask user if they want to install missing dependencies
             self.install_missing_dependencies()
         else:
-            print(f"\n{self.green('[✓] All dependencies are already installed!')}")
+            print(f"\n{self.green('[âœ“] All dependencies are already installed!')}")
         
         # Install DSTERMINAL files
         self.install_dsterminal_files()
@@ -436,7 +436,7 @@ python3 dsterminal.py
         
         # Installation complete
         print(f"\n{self.green('='*60)}")
-        print(self.green("[✓] DSTERMINAL Installation Complete!"))
+        print(self.green("[âœ“] DSTERMINAL Installation Complete!"))
         print(f"{self.green('='*60)}")
         print(f"\nInstallation Location: {self.install_path}")
         print(f"Workspace: ~/dsterminal_workspace")

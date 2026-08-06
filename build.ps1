@@ -1,4 +1,4 @@
-# build.ps1 - Simplified Build Script
+﻿# build.ps1 - Simplified Build Script
 param(
     [switch]$Clean,
     [switch]$BuildPy,
@@ -9,7 +9,7 @@ param(
 
 $ErrorActionPreference = "Continue"
 
-Write-Host "DSTerminal Build Script v3.1.113" -ForegroundColor Cyan
+Write-Host "DSTerminal Build Script v4.0.0.113" -ForegroundColor Cyan
 Write-Host "================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -25,7 +25,7 @@ if ($Clean) {
     if (Test-Path "dist") { Remove-Item -Recurse -Force "dist" -ErrorAction SilentlyContinue }
     if (Test-Path "build") { Remove-Item -Recurse -Force "build" -ErrorAction SilentlyContinue }
     if (Test-Path "installer_output") { Remove-Item -Recurse -Force "installer_output" -ErrorAction SilentlyContinue }
-    Get-ChildItem "*.spec" | Where-Object { $_.Name -ne "dsterminal_win-3.1.113_x64-amd64.spec" } | Remove-Item -Force -ErrorAction SilentlyContinue
+    Get-ChildItem "*.spec" | Where-Object { $_.Name -ne "dsterminal_win-4.0.0.113_x64-amd64.spec" } | Remove-Item -Force -ErrorAction SilentlyContinue
     Get-ChildItem -Path "." -Directory -Filter "__pycache__" -Recurse -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
     Write-Host "Clean complete!" -ForegroundColor Green
     Write-Host ""
@@ -45,7 +45,7 @@ if ($BuildPy) {
         pip install pyinstaller
     }
     
-    $specFile = "dsterminal_win-3.1.113_x64-amd64.spec"
+    $specFile = "dsterminal_win-4.0.0.113_x64-amd64.spec"
     if (-not (Test-Path $specFile)) {
         Write-Host "ERROR: Spec file not found!" -ForegroundColor Red
         exit 1
@@ -55,10 +55,10 @@ if ($BuildPy) {
     
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Executable built successfully!" -ForegroundColor Green
-        Write-Host "Location: dist\dsterminal_win-3.1.113_x64-amd64.exe" -ForegroundColor Green
+        Write-Host "Location: dist\dsterminal_win-4.0.0.113_x64-amd64.exe" -ForegroundColor Green
         
-        if (Test-Path "dist\dsterminal_win-3.1.113_x64-amd64.exe") {
-            $exeSize = [math]::Round((Get-Item "dist\dsterminal_win-3.1.113_x64-amd64.exe").Length / 1MB, 2)
+        if (Test-Path "dist\dsterminal_win-4.0.0.113_x64-amd64.exe") {
+            $exeSize = [math]::Round((Get-Item "dist\dsterminal_win-4.0.0.113_x64-amd64.exe").Length / 1MB, 2)
             Write-Host "File size: $exeSize MB" -ForegroundColor Green
         }
     } else {
@@ -71,7 +71,7 @@ if ($BuildPy) {
 if ($BuildInstaller) {
     Write-Host "[3/4] Building Inno Setup installer..." -ForegroundColor Yellow
     
-    if (-not (Test-Path "dist\dsterminal_win-3.1.113_x64-amd64.exe")) {
+    if (-not (Test-Path "dist\dsterminal_win-4.0.0.113_x64-amd64.exe")) {
         Write-Host "ERROR: Executable not found!" -ForegroundColor Red
         exit 1
     }
@@ -118,15 +118,15 @@ if ($BuildInstaller) {
 if ($BuildPortable) {
     Write-Host "[4/4] Creating portable version..." -ForegroundColor Yellow
     
-    $version = "3.1.113"
+    $version = "4.0.0.113"
     $portableDir = "DSTerminal_Portable_v$version"
     $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
     
     if (Test-Path $portableDir) { Remove-Item -Recurse -Force $portableDir -ErrorAction SilentlyContinue }
     New-Item -ItemType Directory -Path $portableDir -Force | Out-Null
     
-    if (Test-Path "dist\dsterminal_win-3.1.113_x64-amd64.exe") {
-        Copy-Item "dist\dsterminal_win-3.1.113_x64-amd64.exe" "$portableDir\dsterminal.exe" -Force
+    if (Test-Path "dist\dsterminal_win-4.0.0.113_x64-amd64.exe") {
+        Copy-Item "dist\dsterminal_win-4.0.0.113_x64-amd64.exe" "$portableDir\dsterminal.exe" -Force
         Write-Host "Copied executable" -ForegroundColor Green
     }
     

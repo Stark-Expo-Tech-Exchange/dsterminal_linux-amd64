@@ -1,4 +1,4 @@
-@echo off
+﻿@echo off
 echo ====================================================================
 echo            DSTERMINAL TEST INSTALLER v1.0.0
 echo            Testing Update Feature

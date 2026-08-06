@@ -1,4 +1,4 @@
-"""
+﻿"""
 DSTerminal Security Integration Module
 Integrates the security dashboard into the main DSTerminal class
 """
@@ -250,46 +250,46 @@ class DSTerminalSecurity:
             </style>
         </head>
         <body>
-            <div id="alertBox" class="alert-box hidden">🚨 RANSOMWARE DETECTED - QUARANTINE FILE IMMEDIATELY 🚨</div>
+            <div id="alertBox" class="alert-box hidden">ðŸš¨ RANSOMWARE DETECTED - QUARANTINE FILE IMMEDIATELY ðŸš¨</div>
             <div class="header">
-                <h1>🔮 DSTERMINAL SECURITY</h1>
-                <span id="statusText" style="color:#2a5a4a;">🟢 PROTECTED</span>
+                <h1>ðŸ”® DSTERMINAL SECURITY</h1>
+                <span id="statusText" style="color:#2a5a4a;">ðŸŸ¢ PROTECTED</span>
             </div>
             <div class="grid">
                 <div class="card">
-                    <div class="card-title">🛡️ Threat Level</div>
+                    <div class="card-title">ðŸ›¡ï¸ Threat Level</div>
                     <div id="threatDisplay"><span class="badge badge-clean">CLEAN</span></div>
                 </div>
                 <div class="card">
-                    <div class="card-title">📁 Events</div>
+                    <div class="card-title">ðŸ“ Events</div>
                     <div class="value" id="eventCount">0</div>
                 </div>
                 <div class="card">
-                    <div class="card-title">🍯 Honeypots</div>
+                    <div class="card-title">ðŸ¯ Honeypots</div>
                     <div class="value" id="honeypotCount">0</div>
                 </div>
                 <div class="card">
-                    <div class="card-title">💻 CPU</div>
+                    <div class="card-title">ðŸ’» CPU</div>
                     <div class="value" id="cpuValue">0%</div>
                 </div>
             </div>
             <div class="grid">
                 <div class="card">
-                    <div class="card-title">🔒 Quarantine</div>
+                    <div class="card-title">ðŸ”’ Quarantine</div>
                     <div id="quarantineList"><div class="text-muted text-center">No files pending</div></div>
                 </div>
                 <div class="card">
-                    <div class="card-title">🚨 Detected Files</div>
+                    <div class="card-title">ðŸš¨ Detected Files</div>
                     <div id="detectedFiles"><div class="text-muted text-center">None</div></div>
                 </div>
             </div>
             <div class="grid">
                 <div class="card">
-                    <div class="card-title">📋 Event Log</div>
+                    <div class="card-title">ðŸ“‹ Event Log</div>
                     <div class="event-log" id="eventLog"><div class="text-muted text-center">Monitoring...</div></div>
                 </div>
             </div>
-            <div class="footer">DSTERMINAL CYBER OPS v3.1.113 • <span id="footerTime"></span> • 🛡️ PROTECTED</div>
+            <div class="footer">DSTERMINAL CYBER OPS v4.0.0.113 â€¢ <span id="footerTime"></span> â€¢ ðŸ›¡ï¸ PROTECTED</div>
             <script>
                 const socket = io();
                 function quarantineFile(filePath) {
@@ -298,18 +298,18 @@ class DSTerminalSecurity:
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ file_path: filePath })
                     }).then(r => r.json()).then(data => {
-                        if (data.success) { alert('✅ File quarantined!'); fetch('/api/status').then(r => r.json()).then(updateStatus); }
-                        else { alert('❌ Failed: ' + (data.error || 'Unknown')); }
+                        if (data.success) { alert('âœ… File quarantined!'); fetch('/api/status').then(r => r.json()).then(updateStatus); }
+                        else { alert('âŒ Failed: ' + (data.error || 'Unknown')); }
                     }).catch(err => console.error(err));
                 }
                 function updateStatus(data) {
                     const map = {
                         'CLEAN': { class: 'badge-clean', text: 'CLEAN', alert: false },
-                        'RANSOMWARE_DETECTED': { class: 'badge-ransomware', text: '🚨 RANSOMWARE!', alert: true }
+                        'RANSOMWARE_DETECTED': { class: 'badge-ransomware', text: 'ðŸš¨ RANSOMWARE!', alert: true }
                     };
                     const t = map[data.threat_level] || map['CLEAN'];
                     document.getElementById('threatDisplay').innerHTML = `<span class="badge ${t.class}">${t.text}</span>`;
-                    document.getElementById('statusText').textContent = t.alert ? '🔴 ATTACK' : '🟢 PROTECTED';
+                    document.getElementById('statusText').textContent = t.alert ? 'ðŸ”´ ATTACK' : 'ðŸŸ¢ PROTECTED';
                     document.getElementById('alertBox').className = 'alert-box' + (t.alert ? '' : ' hidden');
                     document.getElementById('eventCount').textContent = data.events || 0;
                     document.getElementById('honeypotCount').textContent = data.honeypots || 0;
@@ -318,7 +318,7 @@ class DSTerminalSecurity:
                     if (data.pending_quarantine && data.pending_quarantine.length > 0) {
                         document.getElementById('quarantineList').innerHTML = data.pending_quarantine.map(item =>
                             `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(0,255,136,0.04);">
-                                <span style="color:#ff0033;">🔴 ${item.path.split('\\\\').pop()}</span>
+                                <span style="color:#ff0033;">ðŸ”´ ${item.path.split('\\\\').pop()}</span>
                                 <button class="quarantine-btn" onclick="quarantineFile('${item.path}')">QUARANTINE</button>
                             </div>`
                         ).join('');
@@ -362,10 +362,10 @@ class DSTerminalSecurity:
         def run_dashboard():
             try:
                 print("\n" + "=" * 60)
-                print("🔮 DSTERMINAL SECURITY DASHBOARD")
+                print("ðŸ”® DSTERMINAL SECURITY DASHBOARD")
                 print("=" * 60)
-                print(f"📍 Dashboard URL: {self.dashboard_url}")
-                print(f"🛡️ Threat Level: {self.shield.threat_level.name if self.shield else 'N/A'}")
+                print(f"ðŸ“ Dashboard URL: {self.dashboard_url}")
+                print(f"ðŸ›¡ï¸ Threat Level: {self.shield.threat_level.name if self.shield else 'N/A'}")
                 print("=" * 60 + "\n")
                 self.socketio.run(self.app, debug=False, host='0.0.0.0', port=self.port, allow_unsafe_werkzeug=True)
             except Exception as e:
@@ -463,17 +463,17 @@ def cmd_security_report(args):
 def cmd_security_help(args):
     """Show security commands"""
     return """
-╔══════════════════════════════════════════════════════════════╗
-║              DSTERMINAL SECURITY COMMANDS                   ║
-╠══════════════════════════════════════════════════════════════╣
-║  security dashboard    - Start the security dashboard       ║
-║  security stop         - Stop the dashboard                 ║
-║  security status       - Show security status               ║
-║  security scan <file>  - Scan a file or directory           ║
-║  security quarantine   - Quarantine a file                  ║
-║  security report       - Generate forensic report           ║
-║  security help         - Show this help                     ║
-╚══════════════════════════════════════════════════════════════╝
+â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+â•‘              DSTERMINAL SECURITY COMMANDS                   â•‘
+â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£
+â•‘  security dashboard    - Start the security dashboard       â•‘
+â•‘  security stop         - Stop the dashboard                 â•‘
+â•‘  security status       - Show security status               â•‘
+â•‘  security scan <file>  - Scan a file or directory           â•‘
+â•‘  security quarantine   - Quarantine a file                  â•‘
+â•‘  security report       - Generate forensic report           â•‘
+â•‘  security help         - Show this help                     â•‘
+â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 """
 
 # ============================================================
@@ -482,7 +482,7 @@ def cmd_security_help(args):
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("🧪 DSTERMINAL SECURITY MODULE TEST")
+    print("ðŸ§ª DSTERMINAL SECURITY MODULE TEST")
     print("=" * 60)
     print(security.status())
     print("\nType 'security dashboard' to start the dashboard")

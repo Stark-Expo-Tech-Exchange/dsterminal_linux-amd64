@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 DSTERMINAL Dependency Checker & Auto-Installer
 """
@@ -50,7 +50,7 @@ class DependencyManager:
         missing = [name for name, check in self.dependencies.items() if not check()]
         
         if not missing:
-            print("[✓] All dependencies satisfied!")
+            print("[âœ“] All dependencies satisfied!")
             return True
         
         print(f"[!] Missing dependencies: {', '.join(missing)}")
@@ -86,25 +86,25 @@ def check_dependencies(self):
     missing_tools = []
     for tool in ['nmap', 'whois', 'sqlmap']:
         if shutil.which(tool):
-            print(f"{Fore.GREEN}✓ {tool}{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}âœ“ {tool}{Style.RESET_ALL}")
         else:
-            print(f"{Fore.RED}✗ {tool} (missing){Style.RESET_ALL}")
+            print(f"{Fore.RED}âœ— {tool} (missing){Style.RESET_ALL}")
             missing_tools.append(tool)
     
     # Check Metasploit
     if shutil.which('msfconsole'):
-        print(f"{Fore.GREEN}✓ metasploit{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}âœ“ metasploit{Style.RESET_ALL}")
     else:
-        print(f"{Fore.RED}✗ metasploit (optional){Style.RESET_ALL}")
+        print(f"{Fore.RED}âœ— metasploit (optional){Style.RESET_ALL}")
     
     # Check Python packages
     missing_packages = []
     for pkg in ['colorama', 'requests', 'folium', 'plotly', 'reportlab']:
         try:
             __import__(pkg)
-            print(f"{Fore.GREEN}✓ {pkg}{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}âœ“ {pkg}{Style.RESET_ALL}")
         except ImportError:
-            print(f"{Fore.RED}✗ {pkg}{Style.RESET_ALL}")
+            print(f"{Fore.RED}âœ— {pkg}{Style.RESET_ALL}")
             missing_packages.append(pkg)
     
     if missing_tools or missing_packages:
@@ -112,7 +112,7 @@ def check_dependencies(self):
         print(f"{Fore.YELLOW}[*] Run 'setup' to install missing dependencies{Style.RESET_ALL}")
         return False
     
-    print(f"\n{Fore.GREEN}[✓] All dependencies satisfied!{Style.RESET_ALL}")
+    print(f"\n{Fore.GREEN}[âœ“] All dependencies satisfied!{Style.RESET_ALL}")
     return True
 
 def cmd_setup(self):
@@ -131,4 +131,4 @@ def cmd_setup(self):
     # Install Python packages
     subprocess.run([sys.executable, '-m', 'pip', 'install', '-r', 'requirements.txt'])
     
-    print(f"{Fore.GREEN}[✓] Setup complete!{Style.RESET_ALL}")
+    print(f"{Fore.GREEN}[âœ“] Setup complete!{Style.RESET_ALL}")

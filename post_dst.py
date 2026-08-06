@@ -1,4 +1,4 @@
-# dsterminal.py - Complete DSTerminal with Bundled Package Support
+﻿# dsterminal.py - Complete DSTerminal with Bundled Package Support
 import os
 import sys
 import platform
@@ -142,7 +142,7 @@ class BundledPackageManager:
                 actual_checksum = sha256_hash.hexdigest()
                 
                 if actual_checksum != expected_checksum:
-                    print(f"❌ Checksum mismatch for {file_name}")
+                    print(f"âŒ Checksum mismatch for {file_name}")
                     return False
         
         return True
@@ -154,13 +154,13 @@ class BundledPackageManager:
         
         # Verify bundle integrity
         if not self.verify_bundle(package_name):
-            print(f"❌ Bundle verification failed for {package_name}")
+            print(f"âŒ Bundle verification failed for {package_name}")
             return False
         
         package_dir = self.bundle_dir / package_name
         bundle_info = self.bundle_structure[package_name]
         
-        print(f"📦 Installing {package_name} from bundled package...")
+        print(f"ðŸ“¦ Installing {package_name} from bundled package...")
         
         if bundle_info['install_type'] == 'executable':
             # Find the executable file
@@ -180,24 +180,24 @@ class BundledPackageManager:
                                 )
                                 try:
                                     stdout, stderr = process.communicate(timeout=300)
-                                    print(f"  ✅ {package_name} installed from bundle")
+                                    print(f"  âœ… {package_name} installed from bundle")
                                     return True
                                 except subprocess.TimeoutExpired:
                                     process.kill()
-                                    print(f"  ⚠️ Installation timed out")
+                                    print(f"  âš ï¸ Installation timed out")
                                     return False
                             else:
                                 installer.run_as_admin(str(exe_path), silent_args)
-                                print(f"  ✅ {package_name} installer started with admin privileges")
+                                print(f"  âœ… {package_name} installer started with admin privileges")
                                 return True
                         else:
                             exe_path.chmod(0o755)
                             subprocess.run([str(exe_path), '--mode', 'unattended'], 
                                          check=False, timeout=300)
-                            print(f"  ✅ {package_name} installed from bundle")
+                            print(f"  âœ… {package_name} installed from bundle")
                             return True
                     except Exception as e:
-                        print(f"  ❌ Installation failed: {e}")
+                        print(f"  âŒ Installation failed: {e}")
                         return False
             
             return False
@@ -218,10 +218,10 @@ class BundledPackageManager:
                             
                             with zipfile.ZipFile(archive_path, 'r') as zip_ref:
                                 zip_ref.extractall(extract_to.parent)
-                            print(f"  ✅ {package_name} extracted from bundle")
+                            print(f"  âœ… {package_name} extracted from bundle")
                             return True
                         except Exception as e:
-                            print(f"  ❌ Extraction failed: {e}")
+                            print(f"  âŒ Extraction failed: {e}")
                             return False
             
             return False
@@ -235,7 +235,7 @@ class BundledPackageManager:
                     install_path.mkdir(parents=True, exist_ok=True)
                     target_path = install_path / file_name
                     shutil.copy2(script_path, target_path)
-                    print(f"  ✅ {package_name} script copied from bundle")
+                    print(f"  âœ… {package_name} script copied from bundle")
                     return True
             
             return False
@@ -586,10 +586,10 @@ class SmartDSTerminalInstaller:
     
     def install_npcap(self):
         """Download and install Npcap"""
-        self.log("\n  📦 Installing Npcap (required for Nmap)...", "CYAN")
+        self.log("\n  ðŸ“¦ Installing Npcap (required for Nmap)...", "CYAN")
         
         if self.check_npcap_installed():
-            self.log("  ✅ Npcap is already installed", "GREEN")
+            self.log("  âœ… Npcap is already installed", "GREEN")
             return True
         
         npcap_url = self.tool_definitions['nmap'].get('npcap_url', 'https://npcap.com/dist/npcap-1.79.exe')
@@ -601,7 +601,7 @@ class SmartDSTerminalInstaller:
         if not download_path.exists():
             self.log("  Downloading Npcap installer...", "YELLOW")
             if not self.download_file(npcap_url, download_path):
-                self.log("  ❌ Failed to download Npcap", "RED")
+                self.log("  âŒ Failed to download Npcap", "RED")
                 return False
         
         self.log("  Installing Npcap silently...", "YELLOW")
@@ -617,22 +617,22 @@ class SmartDSTerminalInstaller:
                 )
                 try:
                     stdout, stderr = process.communicate(timeout=120)
-                    self.log("  ✅ Npcap installation completed", "GREEN")
+                    self.log("  âœ… Npcap installation completed", "GREEN")
                     return True
                 except subprocess.TimeoutExpired:
                     process.kill()
-                    self.log("  ⚠️ Npcap installation timed out", "YELLOW")
+                    self.log("  âš ï¸ Npcap installation timed out", "YELLOW")
                     return False
             else:
                 if self.run_as_admin(str(download_path), args):
-                    self.log("  ✅ Npcap installer started with admin privileges", "GREEN")
+                    self.log("  âœ… Npcap installer started with admin privileges", "GREEN")
                     time.sleep(10)
                     return True
                 else:
-                    self.log("  ❌ Failed to elevate for Npcap installation", "RED")
+                    self.log("  âŒ Failed to elevate for Npcap installation", "RED")
                     return False
         except Exception as e:
-            self.log(f"  ❌ Npcap installation error: {e}", "RED")
+            self.log(f"  âŒ Npcap installation error: {e}", "RED")
             return False
     
     def install_via_package_manager(self, tool_name, tool_config):
@@ -682,7 +682,7 @@ class SmartDSTerminalInstaller:
                             subprocess.run(['choco', 'install', package_name, '-y'], check=True)
                             return True
                         else:
-                            self.log("  ⚠️ Chocolatey requires admin privileges", "YELLOW")
+                            self.log("  âš ï¸ Chocolatey requires admin privileges", "YELLOW")
                             return False
                     
                     elif mgr == 'winget':
@@ -725,7 +725,7 @@ class SmartDSTerminalInstaller:
                     shutil.rmtree(tool_path)
                     self.log(f"  Removed existing directory: {tool_path}", "YELLOW")
                 except PermissionError:
-                    self.log(f"  ⚠️ Permission denied removing {tool_path}", "YELLOW")
+                    self.log(f"  âš ï¸ Permission denied removing {tool_path}", "YELLOW")
                     self.log("  Attempting to clone into a new location...", "YELLOW")
                     tool_path = self.tools_dir / f"{tool_name}_new"
                     if tool_path.exists():
@@ -780,7 +780,7 @@ class SmartDSTerminalInstaller:
                 if self.is_admin:
                     subprocess.run([str(download_path), '/S'], check=False)
                 else:
-                    self.log("  ⚠️ Admin rights needed for installation", "YELLOW")
+                    self.log("  âš ï¸ Admin rights needed for installation", "YELLOW")
                     self.log(f"  Please run: {download_path}", "YELLOW")
                 return self.create_wrapper(tool_name, tool_config)
             
@@ -832,9 +832,9 @@ class SmartDSTerminalInstaller:
                 return False
         
         if tool_name == 'nmap':
-            self.log("\n  🔧 Nmap requires Npcap for packet capture functionality", "CYAN")
+            self.log("\n  ðŸ”§ Nmap requires Npcap for packet capture functionality", "CYAN")
             if not self.install_npcap():
-                self.log("  ⚠️ Npcap installation may have issues, but continuing with Nmap...", "YELLOW")
+                self.log("  âš ï¸ Npcap installation may have issues, but continuing with Nmap...", "YELLOW")
         
         silent_args = tool_config.get('silent_args', '/S')
         
@@ -854,33 +854,33 @@ class SmartDSTerminalInstaller:
                     
                     try:
                         stdout, stderr = process.communicate(timeout=600)
-                        self.log("  ✅ Installation command completed", "GREEN")
+                        self.log("  âœ… Installation command completed", "GREEN")
                     except subprocess.TimeoutExpired:
                         process.kill()
-                        self.log("  ⚠️ Installation timed out, but may still be in progress", "YELLOW")
+                        self.log("  âš ï¸ Installation timed out, but may still be in progress", "YELLOW")
                     
                     time.sleep(5)
                     
                 else:
                     if self.run_as_admin(str(download_path), silent_args):
-                        self.log("  ✅ Installer started with admin privileges", "GREEN")
+                        self.log("  âœ… Installer started with admin privileges", "GREEN")
                         time.sleep(30)
                     else:
-                        self.log("  ⚠️ Failed to elevate. Please run installer manually.", "YELLOW")
+                        self.log("  âš ï¸ Failed to elevate. Please run installer manually.", "YELLOW")
                         subprocess.Popen([str(download_path)])
                 
                 install_success = self.check_tool_installed(tool_name)
                 if install_success:
-                    self.log(f"  ✅ {tool_name} installed successfully", "GREEN")
+                    self.log(f"  âœ… {tool_name} installed successfully", "GREEN")
                     self.add_tool_to_path(tool_name, tool_config)
                 else:
                     self.log("  Waiting additional 30 seconds for installation to complete...", "YELLOW")
                     time.sleep(30)
                     if self.check_tool_installed(tool_name):
-                        self.log(f"  ✅ {tool_name} installed successfully", "GREEN")
+                        self.log(f"  âœ… {tool_name} installed successfully", "GREEN")
                         self.add_tool_to_path(tool_name, tool_config)
                     else:
-                        self.log(f"  ⚠️ {tool_name} may still be installing", "YELLOW")
+                        self.log(f"  âš ï¸ {tool_name} may still be installing", "YELLOW")
                         self.add_tool_to_path(tool_name, tool_config)
                 
             else:
@@ -893,7 +893,7 @@ class SmartDSTerminalInstaller:
             
             return self.create_wrapper(tool_name, tool_config)
         except subprocess.TimeoutExpired:
-            self.log(f"  ⚠️ Installation timed out after 10 minutes", "YELLOW")
+            self.log(f"  âš ï¸ Installation timed out after 10 minutes", "YELLOW")
             return self.create_wrapper(tool_name, tool_config)
         except Exception as e:
             self.log(f"  Installer error: {e}", "RED")
@@ -935,7 +935,7 @@ class SmartDSTerminalInstaller:
         if 'install_paths' not in tool_config:
             return False
         
-        self.log(f"  🔧 Adding {tool_name} to PATH...", "CYAN")
+        self.log(f"  ðŸ”§ Adding {tool_name} to PATH...", "CYAN")
         
         install_paths = tool_config['install_paths']
         executable_name = tool_config.get('executable_name', tool_config.get('executable', tool_name))
@@ -969,13 +969,13 @@ class SmartDSTerminalInstaller:
                     winreg.CloseKey(key)
                     
                     os.environ['PATH'] = f"{os.environ.get('PATH', '')};{found_path}"
-                    self.log(f"  ✅ Added {found_path} to PATH", "GREEN")
+                    self.log(f"  âœ… Added {found_path} to PATH", "GREEN")
                 else:
-                    self.log(f"  ✅ {found_path} already in PATH", "GREEN")
+                    self.log(f"  âœ… {found_path} already in PATH", "GREEN")
             except Exception as e:
-                self.log(f"  ⚠️ Could not add to PATH: {e}", "YELLOW")
+                self.log(f"  âš ï¸ Could not add to PATH: {e}", "YELLOW")
         else:
-            self.log(f"  ⚠️ Could not find {tool_name} installation directory", "YELLOW")
+            self.log(f"  âš ï¸ Could not find {tool_name} installation directory", "YELLOW")
         
         self.update_wrapper_with_full_path(tool_name, tool_config, found_path)
         return True
@@ -998,7 +998,7 @@ class SmartDSTerminalInstaller:
 '''
             with open(wrapper_path, 'w', encoding='ascii') as f:
                 f.write(content)
-            self.log(f"  ✅ Updated wrapper to use: {full_exe_path}", "GREEN")
+            self.log(f"  âœ… Updated wrapper to use: {full_exe_path}", "GREEN")
             return True
         
         if tool_name == 'whois':
@@ -1007,7 +1007,7 @@ powershell -ExecutionPolicy Bypass -File "{Path(install_path) / executable}" %*
 '''
             with open(wrapper_path, 'w', encoding='ascii') as f:
                 f.write(content)
-            self.log(f"  ✅ Updated whois wrapper to use PowerShell", "GREEN")
+            self.log(f"  âœ… Updated whois wrapper to use PowerShell", "GREEN")
             return True
         
         return False
@@ -1238,54 +1238,54 @@ if __name__ == "__main__":
     def smart_install(self, tool_name):
         """Intelligently install a tool using best available method"""
         if tool_name not in self.tool_definitions:
-            self.log(f"  ⚠️ Unknown tool: {tool_name}", "RED")
+            self.log(f"  âš ï¸ Unknown tool: {tool_name}", "RED")
             return False
         
         tool_config = self.tool_definitions[tool_name]
-        self.log(f"\n🔧 Installing {tool_name}...", "CYAN")
+        self.log(f"\nðŸ”§ Installing {tool_name}...", "CYAN")
         
         # Check if tool needs admin and warn
         if tool_config.get('needs_admin', False) and not self.is_admin:
-            self.log("  ⚠️ This tool requires administrator privileges", "YELLOW")
+            self.log("  âš ï¸ This tool requires administrator privileges", "YELLOW")
             self.log("  Will attempt to auto-elevate and install...", "YELLOW")
         
         # Try strategies in priority order
         for strategy in tool_config['priority']:
             if strategy in self.strategies:
-                self.log(f"  📦 Trying: {strategy}", "YELLOW")
+                self.log(f"  ðŸ“¦ Trying: {strategy}", "YELLOW")
                 try:
                     result = self.strategies[strategy](tool_name, tool_config)
                     if result:
-                        self.log(f"  ✅ {tool_name} installed successfully", "GREEN")
+                        self.log(f"  âœ… {tool_name} installed successfully", "GREEN")
                         self.log_installation(tool_name, strategy)
                         return True
                     else:
-                        self.log(f"  ❌ Failed via {strategy}", "RED")
+                        self.log(f"  âŒ Failed via {strategy}", "RED")
                 except Exception as e:
-                    self.log(f"  ❌ Error: {e}", "RED")
+                    self.log(f"  âŒ Error: {e}", "RED")
         
-        self.log(f"  ⚠️ Could not install {tool_name}", "RED")
+        self.log(f"  âš ï¸ Could not install {tool_name}", "RED")
         return False
     
     def install_all(self):
         """Install all tools"""
         self.log("=" * 60, "CYAN")
-        self.log(f"🚀 DSTerminal Smart Installer - {platform.system()} {platform.release()}", "CYAN")
+        self.log(f"ðŸš€ DSTerminal Smart Installer - {platform.system()} {platform.release()}", "CYAN")
         self.log("=" * 60, "CYAN")
         
         env = self.detect_environment()
-        self.log("\n📊 Environment Detection:", "CYAN")
+        self.log("\nðŸ“Š Environment Detection:", "CYAN")
         for key, value in env.items():
             self.log(f"  {key}: {value}")
         
         # Show bundled packages
         bundled = self.bundle_manager.list_bundled_packages()
         if bundled:
-            self.log(f"\n📦 Bundled packages available: {', '.join(bundled)}", "GREEN")
+            self.log(f"\nðŸ“¦ Bundled packages available: {', '.join(bundled)}", "GREEN")
             self.log("   These will be installed first before downloading.", "GREEN")
         
         if not self.is_admin:
-            self.log("\n⚠️ Running without administrator/root privileges", "YELLOW")
+            self.log("\nâš ï¸ Running without administrator/root privileges", "YELLOW")
             self.log("   But the installer will attempt to auto-elevate when needed", "YELLOW")
             self.log("   You may see UAC prompts for admin access", "YELLOW")
         
@@ -1296,13 +1296,13 @@ if __name__ == "__main__":
             results[tool] = self.smart_install(tool)
         
         self.log("\n" + "=" * 60, "CYAN")
-        self.log("📊 Installation Summary:", "CYAN")
+        self.log("ðŸ“Š Installation Summary:", "CYAN")
         self.log("=" * 60, "CYAN")
         for tool, success in results.items():
-            status = "✅" if success else "❌"
+            status = "âœ…" if success else "âŒ"
             self.log(f"  {status} {tool}")
         
-        self.log(f"\n📁 Installation Directory:", "CYAN")
+        self.log(f"\nðŸ“ Installation Directory:", "CYAN")
         self.log(f"  {self.install_dir}")
         self.log(f"  Binaries: {self.bin_dir}")
         
@@ -1311,7 +1311,7 @@ if __name__ == "__main__":
         self.print_post_install_notes(results)
         
         self.log("\n" + "=" * 60, "CYAN")
-        self.log("🎉 Installation Complete!", "CYAN")
+        self.log("ðŸŽ‰ Installation Complete!", "CYAN")
         self.log("=" * 60, "CYAN")
         
         return results
@@ -1336,12 +1336,12 @@ if __name__ == "__main__":
                     winreg.SetValueEx(key, "Path", 0, winreg.REG_EXPAND_SZ, new_path)
                     winreg.CloseKey(key)
                     os.environ['PATH'] = f"{os.environ.get('PATH', '')};{bin_path}"
-                    self.log(f"\n✅ Added {bin_path} to user PATH", "GREEN")
+                    self.log(f"\nâœ… Added {bin_path} to user PATH", "GREEN")
                     self.log("   Please restart your terminal for changes to take effect", "YELLOW")
                 else:
-                    self.log(f"\n✅ {bin_path} already in PATH", "GREEN")
+                    self.log(f"\nâœ… {bin_path} already in PATH", "GREEN")
             except Exception as e:
-                self.log(f"\n⚠️ Could not update PATH: {e}", "YELLOW")
+                self.log(f"\nâš ï¸ Could not update PATH: {e}", "YELLOW")
                 self.log(f"   Please manually add this to your PATH:", "YELLOW")
                 self.log(f"   {bin_path}", "YELLOW")
                 self.log(f'\n   [Environment]::SetEnvironmentVariable("Path", $env:Path + ";{bin_path}", "User")', "YELLOW")
@@ -1352,15 +1352,15 @@ if __name__ == "__main__":
                     with open(rc_path, 'a') as f:
                         f.write(f'\n# DSTerminal\n')
                         f.write(f'export PATH="{bin_path}:$PATH"\n')
-                    self.log(f"\n✅ Added to {rc}", "GREEN")
+                    self.log(f"\nâœ… Added to {rc}", "GREEN")
                     self.log(f"   Run: source {rc}", "YELLOW")
                     return
             
-            self.log(f"\n⚠️ Could not find shell config. Please add {bin_path} to PATH manually.", "YELLOW")
+            self.log(f"\nâš ï¸ Could not find shell config. Please add {bin_path} to PATH manually.", "YELLOW")
     
     def print_usage_instructions(self, results):
         """Print usage instructions"""
-        self.log("\n📖 Usage Instructions:", "CYAN")
+        self.log("\nðŸ“– Usage Instructions:", "CYAN")
         self.log("-" * 40, "CYAN")
         
         for tool, success in results.items():
@@ -1378,11 +1378,11 @@ if __name__ == "__main__":
     
     def print_post_install_notes(self, results):
         """Print post-installation notes"""
-        self.log("\n📝 Post-Installation Notes:", "CYAN")
+        self.log("\nðŸ“ Post-Installation Notes:", "CYAN")
         self.log("-" * 40, "CYAN")
         
         if self.os_type == 'windows' and not self.is_admin:
-            self.log("  ⚠️ Some tools may have triggered UAC prompts", "YELLOW")
+            self.log("  âš ï¸ Some tools may have triggered UAC prompts", "YELLOW")
             self.log("  Please check if any installation wizards are still open", "YELLOW")
             if not results.get('nmap', False):
                 self.log(f"    - Nmap installer: {self.download_dir / 'nmap-7.95-setup.exe'}")
@@ -1391,15 +1391,15 @@ if __name__ == "__main__":
         
         if self.os_type == 'windows':
             if not self.check_npcap_installed():
-                self.log("\n  ⚠️ Npcap is not installed (required for Nmap scanning)", "YELLOW")
+                self.log("\n  âš ï¸ Npcap is not installed (required for Nmap scanning)", "YELLOW")
                 self.log("  Download from: https://npcap.com/", "YELLOW")
         
         whois_path = str(self.tools_dir / "whois")
         if whois_path not in os.environ.get('PATH', ''):
-            self.log(f"\n  💡 To use whois, add this to PATH:", "YELLOW")
+            self.log(f"\n  ðŸ’¡ To use whois, add this to PATH:", "YELLOW")
             self.log(f'    [Environment]::SetEnvironmentVariable("Path", $env:Path + ";{whois_path}", "User")', "YELLOW")
         
-        self.log("\n  💡 To add tools to PATH permanently:", "YELLOW")
+        self.log("\n  ðŸ’¡ To add tools to PATH permanently:", "YELLOW")
         if self.os_type == 'windows':
             self.log(f'    [Environment]::SetEnvironmentVariable("Path", $env:Path + ";{self.bin_dir}", "User")', "YELLOW")
         else:
@@ -1470,10 +1470,10 @@ def main():
     if args.list_bundles:
         bundle_manager = BundledPackageManager()
         available = bundle_manager.list_bundled_packages()
-        print("\n📦 Available Bundled Packages:")
+        print("\nðŸ“¦ Available Bundled Packages:")
         print("-" * 40)
         for package in bundle_manager.bundle_structure:
-            status = "✅" if package in available else "❌"
+            status = "âœ…" if package in available else "âŒ"
             size = bundle_manager.get_bundle_size(package)
             size_str = f"({size:.2f} MB)" if size > 0 else ""
             print(f"  {status} {package:<12} {size_str}")
@@ -1489,17 +1489,17 @@ def main():
             installer.smart_install(tool)
     elif args.check:
         # Check installation status
-        print("\n🔍 Tool Status:")
+        print("\nðŸ” Tool Status:")
         print("-" * 40)
         for tool in installer.tool_definitions:
             installed = installer.check_tool_installed(tool)
             bundled = installer.bundle_manager.is_bundle_available(tool)
-            status = "✅" if installed else ("📦" if bundled else "❌")
+            status = "âœ…" if installed else ("ðŸ“¦" if bundled else "âŒ")
             print(f"  {status} {tool:<12} {'Installed' if installed else ('Bundled' if bundled else 'Missing')}")
     else:
         # Interactive mode
         print("=" * 60)
-        print("🚀 DSTerminal - Security Tools Management Console")
+        print("ðŸš€ DSTerminal - Security Tools Management Console")
         print("=" * 60)
         print(f"OS: {platform.system()} {platform.release()}")
         print(f"Python: {sys.version.split()[0]}")
@@ -1508,10 +1508,10 @@ def main():
         bundle_manager = BundledPackageManager()
         available = bundle_manager.list_bundled_packages()
         if available:
-            print(f"\n📦 Bundled packages available: {', '.join(available)}")
+            print(f"\nðŸ“¦ Bundled packages available: {', '.join(available)}")
             print("   These will be used first during installation.")
         
-        print("\n📋 Commands:")
+        print("\nðŸ“‹ Commands:")
         print("  --install-all    Install all tools")
         print("  --install <tool> Install specific tool")
         print("  --check          Check tool status")

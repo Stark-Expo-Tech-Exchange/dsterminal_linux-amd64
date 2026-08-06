@@ -1,4 +1,4 @@
-# Install Metasploit Framework - Requires Administrator
+﻿# Install Metasploit Framework - Requires Administrator
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "  Installing Metasploit Framework" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Cyan

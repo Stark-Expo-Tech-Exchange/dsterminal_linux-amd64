@@ -1,5 +1,5 @@
-"""
-DSTerminal Security Dashboard - COMPLETE v3.1.113
+﻿"""
+DSTerminal Security Dashboard - COMPLETE v4.0.0.113
 Includes: Reports section, Quarantine, Ransomware detection
 """
 
@@ -154,7 +154,7 @@ def detect_threat_actors():
     
     if suspicious_processes:
         threats.append({
-            'name': '🚨 Suspicious Process Detected',
+            'name': 'ðŸš¨ Suspicious Process Detected',
             'risk': 'High',
             'activities': len(suspicious_processes),
             'trend': 'up'
@@ -175,16 +175,16 @@ def detect_active_mitre_techniques():
 def get_recommendations(threat_level, file_path=None):
     if threat_level == 'RANSOMWARE_DETECTED':
         return [
-            f'🔴 IMMEDIATE: Quarantine the infected file: {os.path.basename(file_path) if file_path else "unknown"}',
-            '🔴 IMMEDIATE: Do not pay the ransom',
-            '🟡 Identify the ransomware variant',
-            '🟡 Restore files from backups',
-            '🟢 Report to IT Security team'
+            f'ðŸ”´ IMMEDIATE: Quarantine the infected file: {os.path.basename(file_path) if file_path else "unknown"}',
+            'ðŸ”´ IMMEDIATE: Do not pay the ransom',
+            'ðŸŸ¡ Identify the ransomware variant',
+            'ðŸŸ¡ Restore files from backups',
+            'ðŸŸ¢ Report to IT Security team'
         ]
     elif threat_level == 'SUSPICIOUS':
-        return ['🟡 Investigate suspicious processes', '🟡 Run full antivirus scan']
+        return ['ðŸŸ¡ Investigate suspicious processes', 'ðŸŸ¡ Run full antivirus scan']
     else:
-        return ['✅ No action required', '✅ Continue monitoring']
+        return ['âœ… No action required', 'âœ… Continue monitoring']
 
 # ============================================================
 # REPORT GENERATOR - FIXED PDF
@@ -194,13 +194,13 @@ def generate_report(incident_data):
     global report_history
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     report_id = f"DST-{timestamp}"
-    watermark = "DSTERMINAL CYBER OPS v3.1.113"
+    watermark = "DSTERMINAL CYBER OPS v4.0.0.113"
     
     # JSON Report
     json_data = {
         'report_id': report_id,
         'timestamp': datetime.now().isoformat(),
-        'version': '3.1.113',
+        'version': '4.0.0.113',
         'watermark': watermark,
         'incident': incident_data,
         'system_info': {
@@ -231,15 +231,15 @@ body {{ font-family: 'Segoe UI', sans-serif; background: #0a0e17; color: #00ff88
 <body>
 <div class="watermark">{watermark}</div>
 <div class="header"><h1>DSTERMINAL CYBER OPS - INCIDENT REPORT</h1>
-<p>Report ID: {report_id} | Version: 3.1.113 | Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p></div>
+<p>Report ID: {report_id} | Version: 4.0.0.113 | Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p></div>
 <div class="incident">
-<h2>🚨 {incident_data.get('threat_level', 'INCIDENT')}</h2>
+<h2>ðŸš¨ {incident_data.get('threat_level', 'INCIDENT')}</h2>
 <p><b>File:</b> {incident_data.get('file_path', 'Unknown')}</p>
 <p>{incident_data.get('description', 'Security incident detected and contained')}</p>
 </div>
-<h3>📋 Recommendations</h3>
-{''.join([f'<div class="recommendation">✅ {r}</div>' for r in incident_data.get('recommendations', ['Run full system scan', 'Update security patches', 'Review access logs'])])}
-<h3>📊 System Metrics</h3>
+<h3>ðŸ“‹ Recommendations</h3>
+{''.join([f'<div class="recommendation">âœ… {r}</div>' for r in incident_data.get('recommendations', ['Run full system scan', 'Update security patches', 'Review access logs'])])}
+<h3>ðŸ“Š System Metrics</h3>
 <div><span class="metric">CPU: {psutil.cpu_percent()}%</span>
 <span class="metric">RAM: {psutil.virtual_memory().percent}%</span>
 <span class="metric">DISK: {psutil.disk_usage('/').percent}%</span></div>
@@ -254,26 +254,26 @@ body {{ font-family: 'Segoe UI', sans-serif; background: #0a0e17; color: #00ff88
     # PDF Report - Proper text-based PDF
     pdf_path = os.path.join(REPORTS_DIR, f'{report_id}.pdf')
     pdf_content = f"""
-    ╔══════════════════════════════════════════════════════════════╗
-    ║              DSTERMINAL CYBER OPS                           ║
-    ║                   INCIDENT REPORT                           ║
-    ╚══════════════════════════════════════════════════════════════╝
+    â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+    â•‘              DSTERMINAL CYBER OPS                           â•‘
+    â•‘                   INCIDENT REPORT                           â•‘
+    â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     
     Report ID: {report_id}
-    Version: 3.1.113
+    Version: 4.0.0.113
     Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
     
-    ╔══════════════════════════════════════════════════════════════╗
-    ║                    INCIDENT DETAILS                         ║
-    ╚══════════════════════════════════════════════════════════════╝
+    â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+    â•‘                    INCIDENT DETAILS                         â•‘
+    â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     
     Threat Level: {incident_data.get('threat_level', 'INCIDENT')}
     File: {incident_data.get('file_path', 'Unknown')}
     Description: {incident_data.get('description', 'Security incident detected')}
     
-    ╔══════════════════════════════════════════════════════════════╗
-    ║                  SYSTEM INFORMATION                         ║
-    ╚══════════════════════════════════════════════════════════════╝
+    â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+    â•‘                  SYSTEM INFORMATION                         â•‘
+    â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     
     Hostname: {platform.node()}
     OS: {platform.platform()}
@@ -281,16 +281,16 @@ body {{ font-family: 'Segoe UI', sans-serif; background: #0a0e17; color: #00ff88
     Memory: {psutil.virtual_memory().percent}%
     Disk: {psutil.disk_usage('/').percent}%
     
-    ╔══════════════════════════════════════════════════════════════╗
-    ║                  RECOMMENDATIONS                            ║
-    ╚══════════════════════════════════════════════════════════════╝
+    â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+    â•‘                  RECOMMENDATIONS                            â•‘
+    â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     
-    {chr(10).join(['• ' + r for r in incident_data.get('recommendations', ['Run full system scan', 'Update security patches'])])}
+    {chr(10).join(['â€¢ ' + r for r in incident_data.get('recommendations', ['Run full system scan', 'Update security patches'])])}
     
-    ╔══════════════════════════════════════════════════════════════╗
-    ║              {watermark}                                    ║
-    ║              Classified - Confidential                      ║
-    ╚══════════════════════════════════════════════════════════════╝
+    â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+    â•‘              {watermark}                                    â•‘
+    â•‘              Classified - Confidential                      â•‘
+    â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     """
     with open(pdf_path, 'w', encoding='utf-8') as f:
         f.write(pdf_content)
@@ -620,10 +620,10 @@ HTML_TEMPLATE = """
 </head>
 <body>
 
-<div class="attack-banner" id="attackBanner">🚨 RANSOMWARE DETECTED - QUARANTINE FILE IMMEDIATELY 🚨</div>
+<div class="attack-banner" id="attackBanner">ðŸš¨ RANSOMWARE DETECTED - QUARANTINE FILE IMMEDIATELY ðŸš¨</div>
 
 <header class="header">
-    <h1>🔮 DSTERMINAL SECURITY</h1>
+    <h1>ðŸ”® DSTERMINAL SECURITY</h1>
     <div><span id="statusText">PROTECTED</span> <span id="headerTime" style="color:#2a5a4a;font-size:12px;"></span></div>
 </header>
 
@@ -645,7 +645,7 @@ HTML_TEMPLATE = """
         <div class="mitre-grid" id="mitreGrid"><div class="text-muted text-center">Loading...</div></div>
     </div>
     <div class="card col-span-4">
-        <div class="card-title">🔒 Quarantine</div>
+        <div class="card-title">ðŸ”’ Quarantine</div>
         <div id="quarantineList"><div class="text-muted text-center">No files pending</div></div>
     </div>
     <div class="card col-span-4">
@@ -656,28 +656,28 @@ HTML_TEMPLATE = """
 
 <div class="grid">
     <div class="card col-span-6">
-        <div class="card-title">📋 Event Log</div>
+        <div class="card-title">ðŸ“‹ Event Log</div>
         <div class="event-log" id="eventLog"><div class="text-muted text-center">Monitoring...</div></div>
     </div>
     <div class="card col-span-6">
-        <div class="card-title">📄 Incident Reports</div>
+        <div class="card-title">ðŸ“„ Incident Reports</div>
         <div id="reportList"><div class="text-muted text-center">No reports generated</div></div>
     </div>
 </div>
 
 <div class="grid">
     <div class="card col-span-6">
-        <div class="card-title">🚨 Detected Ransomware Files</div>
+        <div class="card-title">ðŸš¨ Detected Ransomware Files</div>
         <div id="ransomwareFiles"><div class="text-muted text-center">No ransomware detected</div></div>
     </div>
     <div class="card col-span-6">
-        <div class="card-title">🔓 Vulnerabilities</div>
+        <div class="card-title">ðŸ”“ Vulnerabilities</div>
         <div id="vulnList"><div class="text-muted text-center">Scanning...</div></div>
     </div>
 </div>
 
 <div style="text-align:center;margin-top:15px;color:#2a5a4a;font-size:9px;border-top:1px solid rgba(0,255,136,0.05);padding-top:10px;">
-    DSTERMINAL CYBER OPS v3.1.113 • <span id="footerTime"></span>
+    DSTERMINAL CYBER OPS v4.0.0.113 â€¢ <span id="footerTime"></span>
 </div>
 
 <script>
@@ -709,10 +709,10 @@ HTML_TEMPLATE = """
             body: JSON.stringify({ file_path: path, threat_type: 'Ransomware' })
         }).then(r => r.json()).then(data => {
             if (data.success) {
-                console.log('✅ Quarantined');
+                console.log('âœ… Quarantined');
                 fetch('/api/status').then(r => r.json()).then(updateStatus);
             } else {
-                alert('❌ Failed: ' + (data.error || 'Unknown'));
+                alert('âŒ Failed: ' + (data.error || 'Unknown'));
             }
         }).catch(err => console.error(err));
     }
@@ -720,14 +720,14 @@ HTML_TEMPLATE = """
     function updateStatus(data) {
         const maps = { 
             'CLEAN': { class: 'badge-clean', text: 'CLEAN' }, 
-            'RANSOMWARE_DETECTED': { class: 'badge-ransomware', text: '🚨 RANSOMWARE!' }, 
+            'RANSOMWARE_DETECTED': { class: 'badge-ransomware', text: 'ðŸš¨ RANSOMWARE!' }, 
             'SUSPICIOUS': { class: 'badge-suspicious', text: 'SUSPICIOUS' }, 
             'HIGH_RISK': { class: 'badge-high', text: 'HIGH RISK' } 
         };
         const t = maps[data.threat_level] || maps['CLEAN'];
         document.getElementById('threatDisplay').innerHTML = `<span class="threat-badge ${t.class}">${t.text}</span>`;
         document.getElementById('attackBanner').className = `attack-banner${data.threat_level === 'RANSOMWARE_DETECTED' ? ' show' : ''}`;
-        document.getElementById('statusText').textContent = data.threat_level === 'RANSOMWARE_DETECTED' ? '🔴 ATTACK' : '🟢 PROTECTED';
+        document.getElementById('statusText').textContent = data.threat_level === 'RANSOMWARE_DETECTED' ? 'ðŸ”´ ATTACK' : 'ðŸŸ¢ PROTECTED';
         
         document.getElementById('riskScore').textContent = Math.round(data.risk_score || 0);
         document.getElementById('riskTrend').textContent = `Trend: ${data.risk_trend || 'stable'}`;
@@ -771,12 +771,12 @@ HTML_TEMPLATE = """
 
     function updateQuarantine(pending) {
         if (!pending || pending.length === 0) {
-            document.getElementById('quarantineList').innerHTML = '<div class="text-muted text-center">✅ No files pending</div>';
+            document.getElementById('quarantineList').innerHTML = '<div class="text-muted text-center">âœ… No files pending</div>';
             return;
         }
         document.getElementById('quarantineList').innerHTML = pending.map(item => `
             <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,255,136,0.04);font-size:11px;">
-                <span style="color:#ff0033;">🔴 ${item.path.split('\\\\').pop()}</span>
+                <span style="color:#ff0033;">ðŸ”´ ${item.path.split('\\\\').pop()}</span>
                 <button class="quarantine-btn" onclick="quarantineFile('${item.path}')">QUARANTINE</button>
             </div>
         `).join('');
@@ -784,7 +784,7 @@ HTML_TEMPLATE = """
 
     function updateRecommendations(recs) {
         if (!recs || recs.length === 0) {
-            document.getElementById('recommendationList').innerHTML = '<div class="text-muted text-center">✅ No recommendations</div>';
+            document.getElementById('recommendationList').innerHTML = '<div class="text-muted text-center">âœ… No recommendations</div>';
             return;
         }
         document.getElementById('recommendationList').innerHTML = recs.map(r => `<div class="recommendation-box">${r}</div>`).join('');
@@ -797,7 +797,7 @@ HTML_TEMPLATE = """
         }
         document.getElementById('reportList').innerHTML = reports.map(r => `
             <div class="report-item">
-                <span class="report-id">📄 ${r.id}</span>
+                <span class="report-id">ðŸ“„ ${r.id}</span>
                 <span style="color:#2a5a4a;font-size:9px;">${r.type}</span>
                 <span class="report-links">
                     <a href="#" onclick="downloadReport('${r.id}','json')">JSON</a>
@@ -810,12 +810,12 @@ HTML_TEMPLATE = """
 
     function updateRansomware(files) {
         if (!files || files.length === 0) {
-            document.getElementById('ransomwareFiles').innerHTML = '<div class="text-muted text-center">✅ No ransomware detected</div>';
+            document.getElementById('ransomwareFiles').innerHTML = '<div class="text-muted text-center">âœ… No ransomware detected</div>';
             return;
         }
         document.getElementById('ransomwareFiles').innerHTML = files.map(f => `
             <div class="ransomware-file">
-                <span class="file-path">📁 ${f.path.split('\\\\').pop()}</span>
+                <span class="file-path">ðŸ“ ${f.path.split('\\\\').pop()}</span>
                 <span style="color:#2a5a4a;font-size:9px;">${f.process}</span>
                 <span style="color:#2a5a4a;font-size:9px;">${new Date(f.timestamp).toLocaleTimeString()}</span>
             </div>
@@ -824,7 +824,7 @@ HTML_TEMPLATE = """
 
     function updateVulns(vulns) {
         if (!vulns || vulns.length === 0) {
-            document.getElementById('vulnList').innerHTML = '<div class="text-muted text-center">✅ No vulnerabilities</div>';
+            document.getElementById('vulnList').innerHTML = '<div class="text-muted text-center">âœ… No vulnerabilities</div>';
             return;
         }
         document.getElementById('vulnList').innerHTML = vulns.map(v => `
@@ -884,14 +884,14 @@ def open_browser():
 
 if __name__ == '__main__':
     print("=" * 70)
-    print("🔮 DSTERMINAL SECURITY DASHBOARD (COMPLETE)")
+    print("ðŸ”® DSTERMINAL SECURITY DASHBOARD (COMPLETE)")
     print("=" * 70)
-    print(f"📁 Reports: {REPORTS_DIR}")
-    print(f"📁 Quarantine: {QUARANTINE_DIR}")
-    print("📍 http://localhost:5000")
-    print("✅ Reports section with JSON/HTML/PDF download")
-    print("✅ Quarantine button for infected files")
-    print("✅ Detected ransomware files shown")
+    print(f"ðŸ“ Reports: {REPORTS_DIR}")
+    print(f"ðŸ“ Quarantine: {QUARANTINE_DIR}")
+    print("ðŸ“ http://localhost:5000")
+    print("âœ… Reports section with JSON/HTML/PDF download")
+    print("âœ… Quarantine button for infected files")
+    print("âœ… Detected ransomware files shown")
     print("=" * 70)
     
     threading.Thread(target=open_browser, daemon=True).start()

@@ -1,7 +1,7 @@
-{
+﻿{
   "manifest": {
     "title": "DSTERMINAL PLATFORM MANIFEST",
-    "version": "3.1.113",
+    "version": "4.0.0.113",
     "company": "Dsterminal Security Labs",
     "date": "2026-07-20T20:32:57.196378",
     "contact": "manifest@dsterminal.dev",
@@ -9,8 +9,8 @@
     "url": "https://dsterminal.dev/verify/manifest",
     "spdx": {
       "version": "SPDX-2.3",
-      "namespace": "https://dsterminal.dev/spdx/Dsterminal-3.1.113",
-      "file": "Dsterminal_SPDX_v3.1.113.json"
+      "namespace": "https://dsterminal.dev/spdx/Dsterminal-4.0.0.113",
+      "file": "Dsterminal_SPDX_v4.0.0.113.json"
     }
   },
   "sections": [
@@ -57,12 +57,12 @@
     {
       "id": "signature",
       "title": "9. SIGNATURE & VERIFICATION",
-      "content": "This manifest is digitally signed using the Dsterminal GPG Key \n(Key ID: 0xA4F5C123D7E8F9AB) and is valid for version 3.1.113.\n\nVerification Methods:\n1. GPG Signature Verification:\n   gpg --verify Dsterminal_Manifest_v3.1.113.pdf.sig Dsterminal_Manifest_v3.1.113.pdf\n\n2. SHA-256 Checksum:\n   sha256sum Dsterminal_Manifest_v3.1.113.pdf\n\n3. QR Code Verification:\n   Scan the QR code included in this document to verify on our website\n\n4. SPDX SBOM Verification:\n   The SPDX bill of materials is included as Dsterminal_SPDX_v3.1.113.json\n\n-----BEGIN PGP SIGNATURE-----\nVersion: GnuPG v2.4\n\niQIzBAEBCgAdFiEE...\nwE4HfJkLmNpQrStUvWxYz...\n-----END PGP SIGNATURE-----\n\nIssued By: Dsterminal Security Labs\nDate: July 20, 2026\nContact: manifest@dsterminal.dev\nVersion: 3.1.113"
+      "content": "This manifest is digitally signed using the Dsterminal GPG Key \n(Key ID: 0xA4F5C123D7E8F9AB) and is valid for version 4.0.0.113.\n\nVerification Methods:\n1. GPG Signature Verification:\n   gpg --verify Dsterminal_Manifest_v4.0.0.113.pdf.sig Dsterminal_Manifest_v4.0.0.113.pdf\n\n2. SHA-256 Checksum:\n   sha256sum Dsterminal_Manifest_v4.0.0.113.pdf\n\n3. QR Code Verification:\n   Scan the QR code included in this document to verify on our website\n\n4. SPDX SBOM Verification:\n   The SPDX bill of materials is included as Dsterminal_SPDX_v4.0.0.113.json\n\n-----BEGIN PGP SIGNATURE-----\nVersion: GnuPG v2.4\n\niQIzBAEBCgAdFiEE...\nwE4HfJkLmNpQrStUvWxYz...\n-----END PGP SIGNATURE-----\n\nIssued By: Dsterminal Security Labs\nDate: July 20, 2026\nContact: manifest@dsterminal.dev\nVersion: 4.0.0.113"
     },
     {
       "id": "sbom",
       "title": "10. SOFTWARE BILL OF MATERIALS (SBOM)",
-      "content": "Dsterminal provides a comprehensive Software Bill of Materials (SBOM) in SPDX format \nto ensure transparency and compliance with cybersecurity standards including:\n- Executive Order 14028 (US)\n- NIST SP 800-218 (SSDF)\n- CISA requirements for software supply chain security\n\nThe SBOM includes:\n- All direct and transitive dependencies\n- Version information for each component\n- License information\n- Supplier information\n- Known vulnerabilities (when available)\n\nSPDX File: Dsterminal_SPDX_v3.1.113.json\nSPDX Version: SPDX-2.3\nDocument Namespace: https://dsterminal.dev/spdx/Dsterminal-3.1.113\n\nThe SBOM can be verified using SPDX-compliant tools:\n- spdx-sbom-generator --file Dsterminal_SPDX_v3.1.113.json --verify\n- spdx-tools --validate Dsterminal_SPDX_v3.1.113.json\n\nKey Dependencies:\n| Component           | Version     | License              |\n|---------------------|-------------|----------------------|\n| Python              | 3.x         | PSF-2.0              |\n| reportlab           | 5.0.0       | BSD-3-Clause         |\n| Pillow              | 12.3.0      | HPND                 |\n| qrcode              | 8.0         | BSD-3-Clause         |\n| Dsterminal Platform | 3.1.113   | Proprietary          |\n\nFor a complete list, refer to the SPDX JSON file or run:\ndsterminal sbom --export=spdx"
+      "content": "Dsterminal provides a comprehensive Software Bill of Materials (SBOM) in SPDX format \nto ensure transparency and compliance with cybersecurity standards including:\n- Executive Order 14028 (US)\n- NIST SP 800-218 (SSDF)\n- CISA requirements for software supply chain security\n\nThe SBOM includes:\n- All direct and transitive dependencies\n- Version information for each component\n- License information\n- Supplier information\n- Known vulnerabilities (when available)\n\nSPDX File: Dsterminal_SPDX_v4.0.0.113.json\nSPDX Version: SPDX-2.3\nDocument Namespace: https://dsterminal.dev/spdx/Dsterminal-4.0.0.113\n\nThe SBOM can be verified using SPDX-compliant tools:\n- spdx-sbom-generator --file Dsterminal_SPDX_v4.0.0.113.json --verify\n- spdx-tools --validate Dsterminal_SPDX_v4.0.0.113.json\n\nKey Dependencies:\n| Component           | Version     | License              |\n|---------------------|-------------|----------------------|\n| Python              | 3.x         | PSF-2.0              |\n| reportlab           | 5.0.0       | BSD-3-Clause         |\n| Pillow              | 12.3.0      | HPND                 |\n| qrcode              | 8.0         | BSD-3-Clause         |\n| Dsterminal Platform | 4.0.0.113   | Proprietary          |\n\nFor a complete list, refer to the SPDX JSON file or run:\ndsterminal sbom --export=spdx"
     }
   ]
 }

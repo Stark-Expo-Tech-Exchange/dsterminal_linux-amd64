@@ -1,4 +1,4 @@
-#!/usr/bin/env python3 financial_forensic.py
+﻿#!/usr/bin/env python3 financial_forensic.py
 """
 DSTerminal Financial Forensics Module
 Cinematic simulation of global banking fraud scenarios
@@ -22,7 +22,7 @@ from rich.layout import Layout
 from rich.text import Text
 from rich import box
 from rich.columns import Columns
-import shutil  # ← ADD THIS LINE
+import shutil  # â† ADD THIS LINE
 from datetime import datetime, timedelta
 from pathlib import Path
 # PDF Generation imports
@@ -63,7 +63,7 @@ console = Console()
 
 FRAUD_SCENARIOS = {
     "money_laundering": {
-        "name": "💰 MONEY LAUNDERING DETECTION",
+        "name": "ðŸ’° MONEY LAUNDERING DETECTION",
         "stages": [
             "Placement - Funds entering system",
             "Layering - Complex transaction chain",
@@ -80,7 +80,7 @@ FRAUD_SCENARIOS = {
         ]
     },
     "wire_fraud": {
-        "name": "🌐 WIRE TRANSFER FRAUD",
+        "name": "ðŸŒ WIRE TRANSFER FRAUD",
         "stages": [
             "Business Email Compromise detected",
             "Unauthorized wire authorization",
@@ -97,7 +97,7 @@ FRAUD_SCENARIOS = {
         ]
     },
     "crypto_scam": {
-        "name": "🪙 CRYPTOCURRENCY SCAM",
+        "name": "ðŸª™ CRYPTOCURRENCY SCAM",
         "stages": [
             "Fake exchange platform identified",
             "Pump and dump pattern detected",
@@ -114,7 +114,7 @@ FRAUD_SCENARIOS = {
         ]
     },
     "identity_theft": {
-        "name": "🆔 IDENTITY THEFT",
+        "name": "ðŸ†” IDENTITY THEFT",
         "stages": [
             "Synthetic identity created",
             "Credit application fraud",
@@ -131,7 +131,7 @@ FRAUD_SCENARIOS = {
         ]
     },
     "insider_trading": {
-        "name": "📈 INSIDER TRADING",
+        "name": "ðŸ“ˆ INSIDER TRADING",
         "stages": [
             "Unusual option activity",
             "Pre-announcement trading",
@@ -148,7 +148,7 @@ FRAUD_SCENARIOS = {
         ]
     },
     "shell_company": {
-        "name": "🏢 SHELL COMPANY FRAUD",
+        "name": "ðŸ¢ SHELL COMPANY FRAUD",
         "stages": [
             "Fake invoicing scheme",
             "Round-tripping funds",
@@ -165,7 +165,7 @@ FRAUD_SCENARIOS = {
         ]
     },
     "mobile_money_fraud": {
-        "name": "📱 MOBILE MONEY FRAUD",
+        "name": "ðŸ“± MOBILE MONEY FRAUD",
         "stages": [
             "SIM swap or account takeover",
             "Unauthorized mobile wallet access",
@@ -182,7 +182,7 @@ FRAUD_SCENARIOS = {
         ]
     },
     "procurement_fraud": {
-        "name": "📋 PROCUREMENT FRAUD",
+        "name": "ðŸ“‹ PROCUREMENT FRAUD",
         "stages": [
             "Bid rigging or collusion",
             "Inflated invoice submission",
@@ -199,7 +199,7 @@ FRAUD_SCENARIOS = {
         ]
     },
     "agricultural_fraud": {
-        "name": "🌾 AGRICULTURAL SUBSIDY FRAUD",
+        "name": "ðŸŒ¾ AGRICULTURAL SUBSIDY FRAUD",
         "stages": [
             "Fake farmer registration",
             "Inflated harvest claims",
@@ -451,7 +451,7 @@ SUSPICIOUS_PATTERNS = {
         "thresholds": {
             "Malawi": "MWK 5,000,000 (approx. $5,000)",
             "International": "$10,000",
-            "EU": "€10,000"
+            "EU": "â‚¬10,000"
         }
     },
     "rapid_movement": {
@@ -507,9 +507,9 @@ class FinancialForensics:
         """Create a three-column layout for cinematic display"""
         layout = Layout()
         layout.split_row(
-            Layout(Panel(left_content, title="[bold cyan]📊 ANALYSIS[/bold cyan]", border_style="cyan"), ratio=1),
-            Layout(Panel(center_content, title="[bold yellow]🔍 INVESTIGATION[/bold yellow]", border_style="yellow"), ratio=1),
-            Layout(Panel(right_content, title="[bold red]⚠️ ALERTS[/bold red]", border_style="red"), ratio=1)
+            Layout(Panel(left_content, title="[bold cyan]ðŸ“Š ANALYSIS[/bold cyan]", border_style="cyan"), ratio=1),
+            Layout(Panel(center_content, title="[bold yellow]ðŸ” INVESTIGATION[/bold yellow]", border_style="yellow"), ratio=1),
+            Layout(Panel(right_content, title="[bold red]âš ï¸ ALERTS[/bold red]", border_style="red"), ratio=1)
         )
         return layout
     
@@ -694,7 +694,7 @@ class FinancialForensics:
             
             evidence_items = self._generate_evidence_analysis(investigation_type)
             for evidence in evidence_items:
-                story.append(Paragraph(f"• {evidence}", evidence_style))
+                story.append(Paragraph(f"â€¢ {evidence}", evidence_style))
             story.append(Spacer(1, 0.2 * inch))
             
             # Risk Assessment
@@ -733,7 +733,7 @@ class FinancialForensics:
             ]
             
             for rec in recommendations:
-                story.append(Paragraph(f"✓ {rec}", normal_style))
+                story.append(Paragraph(f"âœ“ {rec}", normal_style))
             story.append(Spacer(1, 0.2 * inch))
             
             # Footer
@@ -742,11 +742,11 @@ class FinancialForensics:
             # Build PDF
             doc.build(story)
             
-            console.print(f"[green]✓ PDF Report generated: {pdf_filename}[/green]")
+            console.print(f"[green]âœ“ PDF Report generated: {pdf_filename}[/green]")
             return pdf_filename
             
         except Exception as e:
-            console.print(f"[red]✗ Failed to generate PDF report: {e}[/red]")
+            console.print(f"[red]âœ— Failed to generate PDF report: {e}[/red]")
             import traceback
             traceback.print_exc()
             return None
@@ -829,21 +829,21 @@ class FinancialForensics:
         while True:
             # Create menu items for three columns
             left_items = [
-                "[cyan]1.[/cyan] 🔍 Trace Money Laundering",
-                "[cyan]2.[/cyan] 💸 Investigate Wire Fraud",
-                "[cyan]3.[/cyan] 🪙 Analyze Crypto Scams",
-                "[cyan]4.[/cyan] 🆔 Identity Theft Investigation"
+                "[cyan]1.[/cyan] ðŸ” Trace Money Laundering",
+                "[cyan]2.[/cyan] ðŸ’¸ Investigate Wire Fraud",
+                "[cyan]3.[/cyan] ðŸª™ Analyze Crypto Scams",
+                "[cyan]4.[/cyan] ðŸ†” Identity Theft Investigation"
             ]
             
             center_items = [
-                "[cyan]5.[/cyan] 📊 Insider Trading Detection",
-                "[cyan]6.[/cyan] 🏢 Shell Company Analysis",
-                "[cyan]7.[/cyan] 📋 View Investigation Reports",
-                "[cyan]8.[/cyan] 🌐 Live Financial Crime Monitor"
+                "[cyan]5.[/cyan] ðŸ“Š Insider Trading Detection",
+                "[cyan]6.[/cyan] ðŸ¢ Shell Company Analysis",
+                "[cyan]7.[/cyan] ðŸ“‹ View Investigation Reports",
+                "[cyan]8.[/cyan] ðŸŒ Live Financial Crime Monitor"
             ]
             
             right_items = [
-                "[cyan]9.[/cyan] 📄 Generate PDF Report",
+                "[cyan]9.[/cyan] ðŸ“„ Generate PDF Report",
                 "[cyan]0.[/cyan] Exit Financial Suite",
                 "",
                 f"[dim]Active Cases: {len(self.case_files)}[/dim]",
@@ -886,7 +886,7 @@ class FinancialForensics:
             # Main container with fixed dimensions
             main_panel = Panel(
                 menu_layout,
-                title="[bold white]🌍 GLOBAL FINANCIAL FRAUD INVESTIGATION SUITE 🌍[/bold white]",
+                title="[bold white]ðŸŒ GLOBAL FINANCIAL FRAUD INVESTIGATION SUITE ðŸŒ[/bold white]",
                 border_style="bright_red",
                 width=180,
                 height=25
@@ -894,7 +894,7 @@ class FinancialForensics:
             
             console.print(Align.center(main_panel))
             
-            choice = console.input("\n[bold cyan]└─$ Select investigation type: [/]").strip()
+            choice = console.input("\n[bold cyan]â””â”€$ Select investigation type: [/]").strip()
             
             if choice == "0":
                 console.print("\n[bold red]Exiting Financial Forensics Suite...[/bold red]")
@@ -933,7 +933,7 @@ class FinancialForensics:
             return
         
         console.print(Panel(
-            Align.center("[bold cyan]📄 SELECT CASE FOR PDF REPORT 📄[/bold cyan]"),
+            Align.center("[bold cyan]ðŸ“„ SELECT CASE FOR PDF REPORT ðŸ“„[/bold cyan]"),
             border_style="blue"
         ))
         
@@ -958,7 +958,7 @@ class FinancialForensics:
             )
             
             if pdf_file:
-                console.print(f"\n[bold green]✓ PDF Report Generated Successfully![/bold green]")
+                console.print(f"\n[bold green]âœ“ PDF Report Generated Successfully![/bold green]")
                 console.print(f"[cyan]Location:[/cyan] {pdf_file}")
         else:
             console.print("[yellow]No report generated.[/yellow]")
@@ -1002,45 +1002,45 @@ class FinancialForensics:
         main_color, shimmer_color, blink_color, border_accent = get_auto_colors()
         
         # Shimmer characters
-        shimmer_chars = ['✦', '✧', '⋆', '✴', '❖', '◆', '◈', '⬟']
+        shimmer_chars = ['âœ¦', 'âœ§', 'â‹†', 'âœ´', 'â–', 'â—†', 'â—ˆ', 'â¬Ÿ']
         shimmer_top = ''.join(choice(shimmer_chars) for _ in range(3))
         shimmer_bottom = ''.join(choice(shimmer_chars) for _ in range(3))
         
         # Single banner - NO leading spaces
         title_art = f"""
-    {shimmer_top}╔{'═' * banner_width}╗{shimmer_top}
-    ║{' ' * banner_width}║
-    ║{'███████╗██╗███╗   ██╗ █████╗ ███╗   ██╗ ██████╗██╗ █████╗ ██╗'.center(banner_width)}║
-    ║{'██╔════╝██║████╗  ██║██╔══██╗████╗  ██║██╔════╝██║██╔══██╗██║'.center(banner_width)}║
-    ║{'█████╗  ██║██╔██╗ ██║███████║██╔██╗ ██║██║     ██║███████║██║'.center(banner_width)}║
-    ║{'██╔══╝  ██║██║╚██╗██║██╔══██║██║╚██╗██║██║     ██║██╔══██║██║'.center(banner_width)}║
-    ║{'██║     ██║██║ ╚████║██║  ██║██║ ╚████║╚██████╗██║██║  ██║███████╗'.center(banner_width)}║
-    ║{'╚═╝     ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝╚═╝╚═╝  ╚═╝╚══════╝'.center(banner_width)}║
-    ║{' ' * banner_width}║
-    ║{'███████╗ ██████╗ ██████╗ ███████╗███╗   ██╗███████╗██╗ ██████╗'.center(banner_width)}║
-    ║{'██╔════╝██╔═══██╗██╔══██╗██╔════╝████╗  ██║██╔════╝██║██╔════╝'.center(banner_width)}║
-    ║{'█████╗  ██║   ██║██████╔╝█████╗  ██╔██╗ ██║███████╗██║██║'.center(banner_width)}║
-    ║{'██╔══╝  ██║   ██║██╔══██╗██╔══╝  ██║╚██╗██║╚════██║██║██║'.center(banner_width)}║
-    ║{'██║     ╚██████╔╝██║  ██║███████╗██║ ╚████║███████║██║╚██████╗'.center(banner_width)}║
-    ║{'╚═╝      ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝╚══════╝╚═╝ ╚═════╝'.center(banner_width)}║
-    ║{' ' * banner_width}║
-    ║{'██╗███╗   ██╗██╗   ██╗███████╗███████╗████████╗██╗ ██████╗  █████╗ ████████╗██╗ ██████╗ ███╗   ██╗'.center(banner_width)}║
-    ║{'██║████╗  ██║██║   ██║██╔════╝██╔════╝╚══██╔══╝██║██╔════╝ ██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║'.center(banner_width)}║
-    ║{'██║██╔██╗ ██║██║   ██║█████╗  ███████╗   ██║   ██║██║  ███╗███████║   ██║   ██║██║   ██║██╔██╗ ██║'.center(banner_width)}║
-    ║{'██║██║╚██╗██║╚██╗ ██╔╝██╔══╝  ╚════██║   ██║   ██║██║   ██║██╔══██║   ██║   ██║██║   ██║██║╚██╗██║'.center(banner_width)}║
-    ║{'██║██║ ╚████║ ╚████╔╝ ███████╗███████║   ██║   ██║╚██████╔╝██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║'.center(banner_width)}║
-    ║{'╚═╝╚═╝  ╚═══╝  ╚═══╝  ╚══════╝╚══════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝'.center(banner_width)}║
-    ║{' ' * banner_width}║
-    ║{'█████╗ ███╗   ██╗ █████╗ ██╗  ██╗   ██╗███████╗██╗███████╗'.center(banner_width)}║
-    ║{'██╔══██╗████╗  ██║██╔══██╗██║  ╚██╗ ██╔╝██╔════╝██║██╔════╝'.center(banner_width)}║
-    ║{'███████║██╔██╗ ██║███████║██║   ╚████╔╝ ███████╗██║███████╗'.center(banner_width)}║
-    ║{'██╔══██║██║╚██╗██║██╔══██║██║    ╚██╔╝  ╚════██║██║╚════██║'.center(banner_width)}║
-    ║{'██║  ██║██║ ╚████║██║  ██║███████╗██║   ███████║██║███████║'.center(banner_width)}║
-    ║{'╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚═╝   ╚══════╝╚═╝╚══════╝'.center(banner_width)}║
-    ║{' ' * banner_width}║
-    ║{'◢◤  F I N A N C I A L   F O R E N S I C   I N V E S T I G A T I O N   A N A L Y S I S  ◥◣'.center(banner_width)}║
-    ║{' ' * banner_width}║
-    ╚{'═' * banner_width}╝{shimmer_bottom}
+    {shimmer_top}â•”{'â•' * banner_width}â•—{shimmer_top}
+    â•‘{' ' * banner_width}â•‘
+    â•‘{'â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ•—'.center(banner_width)}â•‘
+    â•‘{'â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘'.center(banner_width)}â•‘
+    â•‘{'â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â–ˆâ–ˆâ•— â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â–ˆâ–ˆâ•— â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘'.center(banner_width)}â•‘
+    â•‘{'â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘'.center(banner_width)}â•‘
+    â•‘{'â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘ â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘ â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—'.center(banner_width)}â•‘
+    â•‘{'â•šâ•â•     â•šâ•â•â•šâ•â•  â•šâ•â•â•â•â•šâ•â•  â•šâ•â•â•šâ•â•  â•šâ•â•â•â• â•šâ•â•â•â•â•â•â•šâ•â•â•šâ•â•  â•šâ•â•â•šâ•â•â•â•â•â•â•'.center(banner_width)}â•‘
+    â•‘{' ' * banner_width}â•‘
+    â•‘{'â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—'.center(banner_width)}â•‘
+    â•‘{'â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•â•â•'.center(banner_width)}â•‘
+    â•‘{'â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•”â–ˆâ–ˆâ•— â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘'.center(banner_width)}â•‘
+    â•‘{'â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â•šâ•â•â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘'.center(banner_width)}â•‘
+    â•‘{'â–ˆâ–ˆâ•‘     â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘ â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—'.center(banner_width)}â•‘
+    â•‘{'â•šâ•â•      â•šâ•â•â•â•â•â• â•šâ•â•  â•šâ•â•â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•â•â•â•šâ•â•â•â•â•â•â•â•šâ•â• â•šâ•â•â•â•â•â•'.center(banner_width)}â•‘
+    â•‘{' ' * banner_width}â•‘
+    â•‘{'â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•—â–ˆâ–ˆâ•—   â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•—'.center(banner_width)}â•‘
+    â•‘{'â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â•â•â•â•šâ•â•â–ˆâ–ˆâ•”â•â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•â•â• â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â•šâ•â•â–ˆâ–ˆâ•”â•â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘'.center(banner_width)}â•‘
+    â•‘{'â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â–ˆâ–ˆâ•— â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â–ˆâ–ˆâ•— â–ˆâ–ˆâ•‘'.center(banner_width)}â•‘
+    â•‘{'â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•— â–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•”â•â•â•  â•šâ•â•â•â•â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘'.center(banner_width)}â•‘
+    â•‘{'â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘ â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•‘ â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•”â• â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘ â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•‘'.center(banner_width)}â•‘
+    â•‘{'â•šâ•â•â•šâ•â•  â•šâ•â•â•â•  â•šâ•â•â•â•  â•šâ•â•â•â•â•â•â•â•šâ•â•â•â•â•â•â•   â•šâ•â•   â•šâ•â• â•šâ•â•â•â•â•â• â•šâ•â•  â•šâ•â•   â•šâ•â•   â•šâ•â• â•šâ•â•â•â•â•â• â•šâ•â•  â•šâ•â•â•â•'.center(banner_width)}â•‘
+    â•‘{' ' * banner_width}â•‘
+    â•‘{'â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ•—  â–ˆâ–ˆâ•—   â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—'.center(banner_width)}â•‘
+    â•‘{'â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘  â•šâ–ˆâ–ˆâ•— â–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•â•â•'.center(banner_width)}â•‘
+    â•‘{'â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â–ˆâ–ˆâ•— â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘   â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•”â• â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—'.center(banner_width)}â•‘
+    â•‘{'â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘    â•šâ–ˆâ–ˆâ•”â•  â•šâ•â•â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â•šâ•â•â•â•â–ˆâ–ˆâ•‘'.center(banner_width)}â•‘
+    â•‘{'â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘ â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘'.center(banner_width)}â•‘
+    â•‘{'â•šâ•â•  â•šâ•â•â•šâ•â•  â•šâ•â•â•â•â•šâ•â•  â•šâ•â•â•šâ•â•â•â•â•â•â•â•šâ•â•   â•šâ•â•â•â•â•â•â•â•šâ•â•â•šâ•â•â•â•â•â•â•'.center(banner_width)}â•‘
+    â•‘{' ' * banner_width}â•‘
+    â•‘{'â—¢â—¤  F I N A N C I A L   F O R E N S I C   I N V E S T I G A T I O N   A N A L Y S I S  â—¥â—£'.center(banner_width)}â•‘
+    â•‘{' ' * banner_width}â•‘
+    â•š{'â•' * banner_width}â•{shimmer_bottom}
     """
         
         # Display banner ONCE
@@ -1051,14 +1051,14 @@ class FinancialForensics:
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         
         panel_content = (
-            f"[bold {shimmer_color}]🌐 GLOBAL FINANCIAL CRIME INTELLIGENCE GRID 🌐[/bold {shimmer_color}]\n\n"
-            f"[{main_color}]🔍 Real-Time Fraud Detection • AML Monitoring • Crypto Tracing[/{main_color}]\n"
-            f"[{blink_color}]💳 SWIFT Analysis • Transaction Correlation • Threat Intelligence[/{blink_color}]\n"
-            f"[{shimmer_color}]📊 Forensic Accounting • Asset Tracing • KYC Verification[/{shimmer_color}]\n\n"
-            f"[dim]⏰ SESSION INITIALIZED : {current_time}[/dim]\n"
-            f"[dim]📁 FORENSIC REPORTS : {self.reports_dir}[/dim]\n"
-            f"[dim]🖥️  SYSTEM STATUS : [green]● ACTIVE[/green] | [yellow]SECURE CHANNEL[/yellow][/dim]\n"
-            f"[bold {border_accent}]⚠️  AUTHORIZED ACCESS ONLY - ALL ACTIVITIES ARE MONITORED ⚠️[/bold {border_accent}]"
+            f"[bold {shimmer_color}]ðŸŒ GLOBAL FINANCIAL CRIME INTELLIGENCE GRID ðŸŒ[/bold {shimmer_color}]\n\n"
+            f"[{main_color}]ðŸ” Real-Time Fraud Detection â€¢ AML Monitoring â€¢ Crypto Tracing[/{main_color}]\n"
+            f"[{blink_color}]ðŸ’³ SWIFT Analysis â€¢ Transaction Correlation â€¢ Threat Intelligence[/{blink_color}]\n"
+            f"[{shimmer_color}]ðŸ“Š Forensic Accounting â€¢ Asset Tracing â€¢ KYC Verification[/{shimmer_color}]\n\n"
+            f"[dim]â° SESSION INITIALIZED : {current_time}[/dim]\n"
+            f"[dim]ðŸ“ FORENSIC REPORTS : {self.reports_dir}[/dim]\n"
+            f"[dim]ðŸ–¥ï¸  SYSTEM STATUS : [green]â— ACTIVE[/green] | [yellow]SECURE CHANNEL[/yellow][/dim]\n"
+            f"[bold {border_accent}]âš ï¸  AUTHORIZED ACCESS ONLY - ALL ACTIVITIES ARE MONITORED âš ï¸[/bold {border_accent}]"
         )
         
         console.print(
@@ -1067,8 +1067,8 @@ class FinancialForensics:
                     Align.center(panel_content, vertical="middle"),
                     border_style=border_accent,
                     width=min(110, banner_width),
-                    title=f"[bold {shimmer_color}]🔒 FINANCIAL FORENSICS COMMAND CENTER 🔒[/bold {shimmer_color}]",
-                    subtitle=f"[bold {border_accent}]⚡ CLASSIFIED - TOP SECRET ⚡[/bold {border_accent}]",
+                    title=f"[bold {shimmer_color}]ðŸ”’ FINANCIAL FORENSICS COMMAND CENTER ðŸ”’[/bold {shimmer_color}]",
+                    subtitle=f"[bold {border_accent}]âš¡ CLASSIFIED - TOP SECRET âš¡[/bold {border_accent}]",
                     padding=(1, 2)
                 )
             )
@@ -1086,7 +1086,7 @@ class FinancialForensics:
         # Create header panel
         header = Panel(
             Align.center(
-                f"[bold red]💰 MONEY LAUNDERING INVESTIGATION 💰[/bold red]\n\n"
+                f"[bold red]ðŸ’° MONEY LAUNDERING INVESTIGATION ðŸ’°[/bold red]\n\n"
                 f"[yellow]Case ID:[/yellow] {case_id}\n"
                 f"[yellow]Suspected Amount:[/yellow] ${amount:,}\n"
                 f"[yellow]Risk Level:[/yellow] [red]CRITICAL[/red]",
@@ -1099,12 +1099,12 @@ class FinancialForensics:
         
         # Animated investigation stages with progress bars
         stages = [
-            ("🔍 Initial Detection", "Pattern recognition systems flagged unusual activity"),
-            ("📊 Transaction Analysis", "Analyzing 2,847 transactions..."),
-            ("🌐 Network Mapping", "Identifying connected accounts..."),
-            ("🏦 Bank Identification", "Tracing through 3 offshore jurisdictions..."),
-            ("🎯 Suspect Identification", "Beneficial ownership analysis..."),
-            ("📋 Evidence Collection", "Gathering admissible evidence...")
+            ("ðŸ” Initial Detection", "Pattern recognition systems flagged unusual activity"),
+            ("ðŸ“Š Transaction Analysis", "Analyzing 2,847 transactions..."),
+            ("ðŸŒ Network Mapping", "Identifying connected accounts..."),
+            ("ðŸ¦ Bank Identification", "Tracing through 3 offshore jurisdictions..."),
+            ("ðŸŽ¯ Suspect Identification", "Beneficial ownership analysis..."),
+            ("ðŸ“‹ Evidence Collection", "Gathering admissible evidence...")
         ]
         
         with Progress(
@@ -1120,7 +1120,7 @@ class FinancialForensics:
                 for i in range(100):
                     progress.update(task, advance=1)
                     time.sleep(0.02)
-                console.print(f"[green]✓[/green] {desc}")
+                console.print(f"[green]âœ“[/green] {desc}")
                 time.sleep(0.3)
         
         # Generate findings as animated table
@@ -1163,7 +1163,7 @@ class FinancialForensics:
         # Generate PDF report
         pdf_file = self._generate_pdf_report(case_id, "Money Laundering", findings, amount)
         
-        console.print(f"\n[bold green]✓ Investigation Complete![/bold green]")
+        console.print(f"\n[bold green]âœ“ Investigation Complete![/bold green]")
         console.print(f"[cyan]JSON Report:[/cyan] {report_file}")
         if pdf_file:
             console.print(f"[cyan]PDF Report:[/cyan] {pdf_file}")
@@ -1179,7 +1179,7 @@ class FinancialForensics:
         
         header = Panel(
             Align.center(
-                f"[bold red]🌐 WIRE TRANSFER FRAUD INVESTIGATION 🌐[/bold red]\n\n"
+                f"[bold red]ðŸŒ WIRE TRANSFER FRAUD INVESTIGATION ðŸŒ[/bold red]\n\n"
                 f"[yellow]Case ID:[/yellow] {case_id}\n"
                 f"[yellow]Stolen Amount:[/yellow] ${amount:,}\n"
                 f"[yellow]Fraud Type:[/yellow] [red]Business Email Compromise[/red]",
@@ -1191,14 +1191,14 @@ class FinancialForensics:
         console.print(header)
         
         # Animated wire trace with table
-        console.print("\n[bold cyan]⚡ TRACING WIRE TRANSFER PATH ⚡[/bold cyan]\n")
+        console.print("\n[bold cyan]âš¡ TRACING WIRE TRANSFER PATH âš¡[/bold cyan]\n")
         
         wire_path = [
-            ("Origin Bank", "First National Bank - New York", "🇺🇸", "Step 1"),
-            ("Correspondent Bank", "Deutsche Bank - Frankfurt", "🇩🇪", "Step 2"),
-            ("Intermediary", "HSBC - London", "🇬🇧", "Step 3"),
-            ("Mule Account", "DBS Bank - Singapore", "🇸🇬", "Step 4"),
-            ("Final Destination", "Cayman National - Grand Cayman", "🇰🇾", "Step 5")
+            ("Origin Bank", "First National Bank - New York", "ðŸ‡ºðŸ‡¸", "Step 1"),
+            ("Correspondent Bank", "Deutsche Bank - Frankfurt", "ðŸ‡©ðŸ‡ª", "Step 2"),
+            ("Intermediary", "HSBC - London", "ðŸ‡¬ðŸ‡§", "Step 3"),
+            ("Mule Account", "DBS Bank - Singapore", "ðŸ‡¸ðŸ‡¬", "Step 4"),
+            ("Final Destination", "Cayman National - Grand Cayman", "ðŸ‡°ðŸ‡¾", "Step 5")
         ]
         
         trace_table = Table(title="WIRE TRANSFER PATH", box=box.HEAVY_EDGE, border_style="cyan")
@@ -1252,7 +1252,7 @@ class FinancialForensics:
         # Generate PDF report
         pdf_file = self._generate_pdf_report(case_id, "Wire Fraud", findings, amount)
         
-        console.print(f"\n[bold green]✓ Wire traced successfully![/bold green]")
+        console.print(f"\n[bold green]âœ“ Wire traced successfully![/bold green]")
         console.print(f"[cyan]JSON Report:[/cyan] {report_file}")
         if pdf_file:
             console.print(f"[cyan]PDF Report:[/cyan] {pdf_file}")
@@ -1276,7 +1276,7 @@ class FinancialForensics:
         
         header = Panel(
             Align.center(
-                f"[bold red]🪙 CRYPTOCURRENCY SCAM INVESTIGATION 🪙[/bold red]\n\n"
+                f"[bold red]ðŸª™ CRYPTOCURRENCY SCAM INVESTIGATION ðŸª™[/bold red]\n\n"
                 f"[yellow]Case ID:[/yellow] {case_id}\n"
                 f"[yellow]Scam Type:[/yellow] [red]{scam_type}[/red]\n"
                 f"[yellow]Amount Lost:[/yellow] ${amount:,}\n"
@@ -1289,7 +1289,7 @@ class FinancialForensics:
         console.print(header)
         
         # Blockchain analysis with progress
-        console.print("\n[bold cyan]🔗 BLOCKCHAIN FORENSIC ANALYSIS 🔗[/bold cyan]\n")
+        console.print("\n[bold cyan]ðŸ”— BLOCKCHAIN FORENSIC ANALYSIS ðŸ”—[/bold cyan]\n")
         
         analysis_steps = [
             ("Wallet Clustering", "Identifying connected wallets..."),
@@ -1311,7 +1311,7 @@ class FinancialForensics:
                 for i in range(100):
                     progress.update(task, advance=1)
                     time.sleep(0.02)
-                console.print(f"[green]✓ {desc}[/green]\n")
+                console.print(f"[green]âœ“ {desc}[/green]\n")
         
         # Generate findings
         findings = self._generate_crypto_findings(scam_type, amount, token)
@@ -1353,7 +1353,7 @@ class FinancialForensics:
         # Generate PDF report
         pdf_file = self._generate_pdf_report(case_id, f"Crypto Scam - {scam_type}", findings, amount)
         
-        console.print(f"\n[bold green]✓ Blockchain analysis complete![/bold green]")
+        console.print(f"\n[bold green]âœ“ Blockchain analysis complete![/bold green]")
         console.print(f"[cyan]JSON Report:[/cyan] {report_file}")
         if pdf_file:
             console.print(f"[cyan]PDF Report:[/cyan] {pdf_file}")
@@ -1370,7 +1370,7 @@ class FinancialForensics:
         
         header = Panel(
             Align.center(
-                f"[bold red]🆔 IDENTITY THEFT INVESTIGATION 🆔[/bold red]\n\n"
+                f"[bold red]ðŸ†” IDENTITY THEFT INVESTIGATION ðŸ†”[/bold red]\n\n"
                 f"[yellow]Case ID:[/yellow] {case_id}\n"
                 f"[yellow]Victims Identified:[/yellow] {victim_count}\n"
                 f"[yellow]Financial Loss:[/yellow] ${loss_amount:,}",
@@ -1382,7 +1382,7 @@ class FinancialForensics:
         console.print(header)
         
         # Identity tracing with animated progress
-        console.print("\n[bold cyan]🕵️ DIGITAL IDENTITY FORENSICS 🕵️[/bold cyan]\n")
+        console.print("\n[bold cyan]ðŸ•µï¸ DIGITAL IDENTITY FORENSICS ðŸ•µï¸[/bold cyan]\n")
         
         trace_steps = [
             ("Dark Web Monitoring", "Scanning for stolen credentials..."),
@@ -1404,7 +1404,7 @@ class FinancialForensics:
                 for i in range(100):
                     progress.update(task, advance=1)
                     time.sleep(0.02)
-                console.print(f"[green]✓ {desc}[/green]\n")
+                console.print(f"[green]âœ“ {desc}[/green]\n")
         
         # Generate findings
         findings = self._generate_identity_findings()
@@ -1446,7 +1446,7 @@ class FinancialForensics:
         # Generate PDF report
         pdf_file = self._generate_pdf_report(case_id, "Identity Theft", findings, loss_amount)
         
-        console.print(f"\n[bold green]✓ Identity theft network mapped![/bold green]")
+        console.print(f"\n[bold green]âœ“ Identity theft network mapped![/bold green]")
         console.print(f"[cyan]JSON Report:[/cyan] {report_file}")
         if pdf_file:
             console.print(f"[cyan]PDF Report:[/cyan] {pdf_file}")
@@ -1465,7 +1465,7 @@ class FinancialForensics:
         
         header = Panel(
             Align.center(
-                f"[bold red]📈 INSIDER TRADING DETECTION 📈[/bold red]\n\n"
+                f"[bold red]ðŸ“ˆ INSIDER TRADING DETECTION ðŸ“ˆ[/bold red]\n\n"
                 f"[yellow]Case ID:[/yellow] {case_id}\n"
                 f"[yellow]Target Company:[/yellow] {company}\n"
                 f"[yellow]Suspicious Profit:[/yellow] ${profit:,}",
@@ -1477,7 +1477,7 @@ class FinancialForensics:
         console.print(header)
         
         # Trading pattern analysis with animated table
-        console.print("\n[bold cyan]📊 MARKET SURVEILLANCE ANALYSIS 📊[/bold cyan]\n")
+        console.print("\n[bold cyan]ðŸ“Š MARKET SURVEILLANCE ANALYSIS ðŸ“Š[/bold cyan]\n")
         
         analysis_data = [
             ("Unusual Options Activity", "2000% increase in call options", "CRITICAL"),
@@ -1537,7 +1537,7 @@ class FinancialForensics:
         # Generate PDF report
         pdf_file = self._generate_pdf_report(case_id, f"Insider Trading - {company}", findings, profit)
         
-        console.print(f"\n[bold green]✓ Insider trading pattern confirmed![/bold green]")
+        console.print(f"\n[bold green]âœ“ Insider trading pattern confirmed![/bold green]")
         console.print(f"[cyan]JSON Report:[/cyan] {report_file}")
         if pdf_file:
             console.print(f"[cyan]PDF Report:[/cyan] {pdf_file}")
@@ -1556,7 +1556,7 @@ class FinancialForensics:
         
         header = Panel(
             Align.center(
-                f"[bold red]🏢 SHELL COMPANY ANALYSIS 🏢[/bold red]\n\n"
+                f"[bold red]ðŸ¢ SHELL COMPANY ANALYSIS ðŸ¢[/bold red]\n\n"
                 f"[yellow]Case ID:[/yellow] {case_id}\n"
                 f"[yellow]Jurisdiction:[/yellow] {jurisdiction}\n"
                 f"[yellow]Suspected Tax Evasion:[/yellow] ${tax_evasion:,}",
@@ -1568,7 +1568,7 @@ class FinancialForensics:
         console.print(header)
         
         # Corporate structure analysis with table
-        console.print("\n[bold cyan]🏛️ CORPORATE STRUCTURE DECODING 🏛️[/bold cyan]\n")
+        console.print("\n[bold cyan]ðŸ›ï¸ CORPORATE STRUCTURE DECODING ðŸ›ï¸[/bold cyan]\n")
         
         layers = [
             ("Layer 1", "Nominee Directors", "Panama", "IDENTIFIED"),
@@ -1630,7 +1630,7 @@ class FinancialForensics:
         # Generate PDF report
         pdf_file = self._generate_pdf_report(case_id, f"Shell Company - {jurisdiction}", findings, tax_evasion)
         
-        console.print(f"\n[bold green]✓ Corporate structure decoded![/bold green]")
+        console.print(f"\n[bold green]âœ“ Corporate structure decoded![/bold green]")
         console.print(f"[cyan]JSON Report:[/cyan] {report_file}")
         if pdf_file:
             console.print(f"[cyan]PDF Report:[/cyan] {pdf_file}")
@@ -1643,7 +1643,7 @@ class FinancialForensics:
         
         header = Panel(
             Align.center(
-                "[bold red]🌐 LIVE FINANCIAL CRIME MONITOR 🌐[/bold red]\n\n"
+                "[bold red]ðŸŒ LIVE FINANCIAL CRIME MONITOR ðŸŒ[/bold red]\n\n"
                 "[yellow]Monitoring global financial transactions in real-time...[/yellow]\n"
                 "[dim]Press Ctrl+C to stop monitoring[/dim]",
                 vertical="middle"
@@ -1654,14 +1654,14 @@ class FinancialForensics:
         console.print(header)
         
         crimes = [
-            ("💰 Suspicious Transaction", "JPMorgan Chase", "$2.5M", "High", "🇺🇸"),
-            ("🌐 Crypto Alert", "Binance", "500 BTC", "Critical", "🌍"),
-            ("🏦 Wire Fraud", "HSBC", "$750K", "High", "🇬🇧"),
-            ("🆔 Identity Theft", "Multiple", "$150K", "Medium", "🌍"),
-            ("📈 Insider Trading", "Goldman Sachs", "$3.2M", "Critical", "🇺🇸"),
-            ("🏢 Shell Company", "Delaware", "$8M", "High", "🇺🇸"),
-            ("💸 Money Laundering", "Cayman Islands", "$12M", "Critical", "🇰🇾"),
-            ("🪙 Scam Alert", "Ethereum", "2000 ETH", "High", "🌍")
+            ("ðŸ’° Suspicious Transaction", "JPMorgan Chase", "$2.5M", "High", "ðŸ‡ºðŸ‡¸"),
+            ("ðŸŒ Crypto Alert", "Binance", "500 BTC", "Critical", "ðŸŒ"),
+            ("ðŸ¦ Wire Fraud", "HSBC", "$750K", "High", "ðŸ‡¬ðŸ‡§"),
+            ("ðŸ†” Identity Theft", "Multiple", "$150K", "Medium", "ðŸŒ"),
+            ("ðŸ“ˆ Insider Trading", "Goldman Sachs", "$3.2M", "Critical", "ðŸ‡ºðŸ‡¸"),
+            ("ðŸ¢ Shell Company", "Delaware", "$8M", "High", "ðŸ‡ºðŸ‡¸"),
+            ("ðŸ’¸ Money Laundering", "Cayman Islands", "$12M", "Critical", "ðŸ‡°ðŸ‡¾"),
+            ("ðŸª™ Scam Alert", "Ethereum", "2000 ETH", "High", "ðŸŒ")
         ]
         
         alert_count = 0
@@ -1698,7 +1698,7 @@ class FinancialForensics:
                         f"[{severity_color}]{severity}[/{severity_color}] {crime}\n"
                         f"Institution: {institution}\n"
                         f"Location: {location}",
-                        title="[bold red]⚠️ ALERT[/bold red]",
+                        title="[bold red]âš ï¸ ALERT[/bold red]",
                         border_style="red"
                     )
                     
@@ -1730,7 +1730,7 @@ class FinancialForensics:
                     live.update(layout)
                     time.sleep(random.uniform(0.5, 1.5))
             
-            console.print(f"\n[bold green]✓ Monitoring session complete. {alert_count} potential crimes detected.[/bold green]")
+            console.print(f"\n[bold green]âœ“ Monitoring session complete. {alert_count} potential crimes detected.[/bold green]")
             console.print(f"[bold yellow]Total suspicious value: ${total_amount:,.0f}[/bold yellow]")
             
         except KeyboardInterrupt:
@@ -1780,7 +1780,7 @@ class FinancialForensics:
             Layout(right_panel, ratio=1)
         )
         
-        console.print(Align.center(Panel(layout, title="[bold white]📋 INVESTIGATION REPORTS 📋[/bold white]", border_style="bright_blue", width=120)))
+        console.print(Align.center(Panel(layout, title="[bold white]ðŸ“‹ INVESTIGATION REPORTS ðŸ“‹[/bold white]", border_style="bright_blue", width=120)))
         
         choice = console.input("\n[cyan]Enter report number to view (0 to exit): [/]").strip()
         
@@ -1850,13 +1850,13 @@ class FinancialForensics:
             f"Amount: [green]${data['amount']:,}[/green]\n"
             f"Status: [red]{data['status']}[/red]\n\n"
             f"[dim]PDF Reports: {data.get('pdf_reports_dir', 'N/A')}[/dim]",
-            title="[bold white]📋 CASE DETAILS[/bold white]",
+            title="[bold white]ðŸ“‹ CASE DETAILS[/bold white]",
             border_style="blue"
         )
         
         center_panel = Panel(
             findings_table,
-            title="[bold red]🔍 EVIDENCE[/bold red]",
+            title="[bold red]ðŸ” EVIDENCE[/bold red]",
             border_style="red"
         )
         
@@ -1866,7 +1866,7 @@ class FinancialForensics:
             f"Confidence Score: {random.randint(75, 95)}%\n"
             f"Referral Status: [red]PENDING[/red]\n\n"
             f"[dim]Investigator: {data['investigator']}[/dim]",
-            title="[bold green]📊 SUMMARY[/bold green]",
+            title="[bold green]ðŸ“Š SUMMARY[/bold green]",
             border_style="green"
         )
         
@@ -1972,9 +1972,9 @@ if __name__ == "__main__":
     Run this file directly for testing the financial forensics suite
     without the full DSTerminal environment.
     """
-    print(f"{Fore.CYAN}╔══════════════════════════════════════════════════════════════╗{Style.RESET_ALL}")
-    print(f"{Fore.CYAN}║     DSTERMINAL FINANCIAL FORENSICS - STANDALONE MODE        ║{Style.RESET_ALL}")
-    print(f"{Fore.CYAN}╚══════════════════════════════════════════════════════════════╝{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}â•‘     DSTERMINAL FINANCIAL FORENSICS - STANDALONE MODE        â•‘{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•{Style.RESET_ALL}")
     print(f"{Fore.YELLOW}[*] Running in standalone test mode{Style.RESET_ALL}")
     print(f"{Fore.YELLOW}[*] JSON Reports: ~/dsterminal_workspace/financial_reports/{Style.RESET_ALL}")
     print(f"{Fore.YELLOW}[*] PDF Reports: ~/dsterminal_workspace/financial_reports/pdf_reports/{Style.RESET_ALL}")

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Patch Script - Environment Variable Setup for update.py
 Creates .env file and updates update.py to use environment variables
@@ -46,7 +46,7 @@ GITHUB_TOKEN={token}
 VT_API_KEY=957166d424812a397e328022b84594a8c02757814f6c04518dce7e81179b4b79
 
 # Current version
-CURRENT_VERSION=3.1.113
+CURRENT_VERSION=4.0.0.113
 
 # Optional: Set your operator name and session ID
 # SOC_OPERATOR_NAME=OP-USERNAME
@@ -66,7 +66,7 @@ def create_env_file(token, workspace_dir=None):
     
     # Check if .env already exists
     if env_path.exists():
-        print_color(f"⚠️  .env file already exists at: {env_path}", Colors.YELLOW)
+        print_color(f"âš ï¸  .env file already exists at: {env_path}", Colors.YELLOW)
         response = input(f"{Colors.YELLOW}Overwrite? (y/N): {Colors.RESET}").strip().lower()
         if response != 'y':
             print_color("Keeping existing .env file", Colors.GREEN)
@@ -83,17 +83,17 @@ def create_env_file(token, workspace_dir=None):
     try:
         with open(env_path, 'w') as f:
             f.write(env_content)
-        print_color(f"✅ .env file created at: {env_path}", Colors.GREEN)
+        print_color(f"âœ… .env file created at: {env_path}", Colors.GREEN)
         return env_path
     except Exception as e:
-        print_color(f"❌ Failed to create .env file: {e}", Colors.RED)
+        print_color(f"âŒ Failed to create .env file: {e}", Colors.RED)
         return None
 
 def patch_update_py(file_path, token_to_replace, env_var_name='GITHUB_TOKEN'):
     """Patch update.py to use environment variable instead of hardcoded token"""
     
     if not os.path.exists(file_path):
-        print_color(f"❌ File not found: {file_path}", Colors.RED)
+        print_color(f"âŒ File not found: {file_path}", Colors.RED)
         return False
     
     # Read the file
@@ -111,9 +111,9 @@ def patch_update_py(file_path, token_to_replace, env_var_name='GITHUB_TOKEN'):
     if re.search(pattern1, content):
         content = re.sub(pattern1, replacement1, content)
         changes_made = True
-        print_color("  ✓ Replaced hardcoded token with environment variable", Colors.GREEN)
+        print_color("  âœ“ Replaced hardcoded token with environment variable", Colors.GREEN)
     else:
-        print_color("  ⚠️ Pattern 1 not found - token may already be using environment variable", Colors.YELLOW)
+        print_color("  âš ï¸ Pattern 1 not found - token may already be using environment variable", Colors.YELLOW)
     
     # Pattern 2: Replace the specific token string directly (if present)
     if token_to_replace in content:
@@ -122,7 +122,7 @@ def patch_update_py(file_path, token_to_replace, env_var_name='GITHUB_TOKEN'):
         content = content.replace(token_to_replace, f'os.environ.get("{env_var_name}", "")')
         if count > 0:
             changes_made = True
-            print_color(f"  ✓ Replaced {count} occurrence(s) of hardcoded token", Colors.GREEN)
+            print_color(f"  âœ“ Replaced {count} occurrence(s) of hardcoded token", Colors.GREEN)
     
     # Pattern 3: Ensure os is imported (if not already)
     if 'import os' not in content and 'from os import' not in content:
@@ -133,15 +133,15 @@ def patch_update_py(file_path, token_to_replace, env_var_name='GITHUB_TOKEN'):
             last_import = import_lines[-1]
             content = content.replace(last_import, f"{last_import}\nimport os")
             changes_made = True
-            print_color("  ✓ Added os import", Colors.GREEN)
+            print_color("  âœ“ Added os import", Colors.GREEN)
     
     # If no changes were made, check if the file already uses environment variables
     if not changes_made:
         if 'os.environ.get' in content and 'GITHUB_TOKEN' in content:
-            print_color("  ✓ File already uses environment variables", Colors.GREEN)
+            print_color("  âœ“ File already uses environment variables", Colors.GREEN)
             return True
         else:
-            print_color("  ⚠️ No changes made - file may need manual update", Colors.YELLOW)
+            print_color("  âš ï¸ No changes made - file may need manual update", Colors.YELLOW)
             return False
     
     # Create backup before writing
@@ -149,25 +149,25 @@ def patch_update_py(file_path, token_to_replace, env_var_name='GITHUB_TOKEN'):
     try:
         with open(backup_path, 'w', encoding='utf-8') as f:
             f.write(original_content)
-        print_color(f"  ✓ Backup created: {backup_path}", Colors.CYAN)
+        print_color(f"  âœ“ Backup created: {backup_path}", Colors.CYAN)
     except Exception as e:
-        print_color(f"  ⚠️ Could not create backup: {e}", Colors.YELLOW)
+        print_color(f"  âš ï¸ Could not create backup: {e}", Colors.YELLOW)
     
     # Write the patched content
     try:
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(content)
-        print_color(f"  ✅ Successfully patched: {file_path}", Colors.GREEN)
+        print_color(f"  âœ… Successfully patched: {file_path}", Colors.GREEN)
         return True
     except Exception as e:
-        print_color(f"  ❌ Failed to write patch: {e}", Colors.RED)
+        print_color(f"  âŒ Failed to write patch: {e}", Colors.RED)
         # Restore backup
         try:
             with open(backup_path, 'r', encoding='utf-8') as f:
                 content = f.read()
             with open(file_path, 'w', encoding='utf-8') as f:
                 f.write(content)
-            print_color(f"  ✓ Restored from backup", Colors.GREEN)
+            print_color(f"  âœ“ Restored from backup", Colors.GREEN)
         except:
             pass
         return False
@@ -183,7 +183,7 @@ def create_dotenv_import(file_path):
     
     # Check if dotenv is already imported
     if 'from dotenv import load_dotenv' in content or 'import dotenv' in content:
-        print_color("  ✓ python-dotenv already imported", Colors.GREEN)
+        print_color("  âœ“ python-dotenv already imported", Colors.GREEN)
         return True
     
     # Find the first import line
@@ -202,7 +202,7 @@ def create_dotenv_import(file_path):
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(content)
         
-        print_color("  ✓ Added python-dotenv import", Colors.GREEN)
+        print_color("  âœ“ Added python-dotenv import", Colors.GREEN)
         return True
     
     return False
@@ -222,15 +222,15 @@ def verify_patch(file_path):
     
     # Check if hardcoded token is gone
     if HARDCODED_TOKEN in content:
-        print_color(f"  ❌ Hardcoded token still found in {file_path}", Colors.RED)
+        print_color(f"  âŒ Hardcoded token still found in {file_path}", Colors.RED)
         return False
     
     # Check if environment variable is used
     if 'os.environ.get' in content and 'GITHUB_TOKEN' in content:
-        print_color(f"  ✅ {file_path} is using environment variables", Colors.GREEN)
+        print_color(f"  âœ… {file_path} is using environment variables", Colors.GREEN)
         return True
     else:
-        print_color(f"  ⚠️ {file_path} may not be using environment variables correctly", Colors.YELLOW)
+        print_color(f"  âš ï¸ {file_path} may not be using environment variables correctly", Colors.YELLOW)
         return False
 
 # ============================================================
@@ -241,15 +241,15 @@ def main():
     """Main patch execution"""
     
     print_color("=" * 60, Colors.CYAN)
-    print_color("🔧 DSTERMINAL PATCH - ENVIRONMENT VARIABLE SETUP", Colors.MAGENTA + Colors.BOLD)
+    print_color("ðŸ”§ DSTERMINAL PATCH - ENVIRONMENT VARIABLE SETUP", Colors.MAGENTA + Colors.BOLD)
     print_color("=" * 60, Colors.CYAN)
     
     # Get the current directory
     current_dir = Path.cwd()
-    print_color(f"\n📁 Working directory: {current_dir}", Colors.CYAN)
+    print_color(f"\nðŸ“ Working directory: {current_dir}", Colors.CYAN)
     
     # Step 1: Create .env file
-    print_color("\n📝 Step 1: Creating .env file...", Colors.YELLOW)
+    print_color("\nðŸ“ Step 1: Creating .env file...", Colors.YELLOW)
     
     # Ask for new token or use existing
     print_color(f"\nCurrent hardcoded token: {HARDCODED_TOKEN[:10]}...{HARDCODED_TOKEN[-10:]}", Colors.CYAN)
@@ -258,27 +258,27 @@ def main():
     if use_new_token == 'y':
         new_token = input(f"{Colors.CYAN}Enter new GitHub token: {Colors.RESET}").strip()
         if not new_token:
-            print_color("⚠️  No token entered, using existing token", Colors.YELLOW)
+            print_color("âš ï¸  No token entered, using existing token", Colors.YELLOW)
             new_token = HARDCODED_TOKEN
     else:
         new_token = HARDCODED_TOKEN
     
     env_file = create_env_file(new_token, current_dir)
     if not env_file:
-        print_color("❌ Failed to create .env file. Exiting.", Colors.RED)
+        print_color("âŒ Failed to create .env file. Exiting.", Colors.RED)
         return
     
     # Step 2: Patch update.py only
-    print_color("\n📝 Step 2: Patching update.py...", Colors.YELLOW)
+    print_color("\nðŸ“ Step 2: Patching update.py...", Colors.YELLOW)
     
     for file_path in FILES_TO_PATCH:
         full_path = current_dir / file_path
         
         if not full_path.exists():
-            print_color(f"❌ File not found: {file_path}", Colors.RED)
+            print_color(f"âŒ File not found: {file_path}", Colors.RED)
             continue
         
-        print_color(f"\n🔧 Processing: {file_path}", Colors.CYAN)
+        print_color(f"\nðŸ”§ Processing: {file_path}", Colors.CYAN)
         
         # Create backup
         backup_path = full_path.parent / f"{full_path.name}.backup"
@@ -301,7 +301,7 @@ def main():
             verify_patch(full_path)
     
     # Step 3: Create .gitignore if it doesn't exist
-    print_color("\n📝 Step 3: Updating .gitignore...", Colors.YELLOW)
+    print_color("\nðŸ“ Step 3: Updating .gitignore...", Colors.YELLOW)
     
     gitignore_path = current_dir / '.gitignore'
     env_pattern = '.env'
@@ -313,26 +313,26 @@ def main():
         if env_pattern not in gitignore_content:
             with open(gitignore_path, 'a') as f:
                 f.write(f"\n# Environment variables\n.env\n*.env\n*.key\n*.secret\n")
-            print_color("  ✓ Added .env to .gitignore", Colors.GREEN)
+            print_color("  âœ“ Added .env to .gitignore", Colors.GREEN)
         else:
-            print_color("  ✓ .env already in .gitignore", Colors.GREEN)
+            print_color("  âœ“ .env already in .gitignore", Colors.GREEN)
     else:
         with open(gitignore_path, 'w') as f:
             f.write(f"# Environment variables\n.env\n*.env\n*.key\n*.secret\n\n# Python\n__pycache__/\n*.pyc\n*.pyo\n*.pyd\nvenv/\nenv/\n")
-        print_color("  ✓ Created .gitignore with .env pattern", Colors.GREEN)
+        print_color("  âœ“ Created .gitignore with .env pattern", Colors.GREEN)
     
     # Step 4: Add instructions
     print_color("\n" + "=" * 60, Colors.CYAN)
-    print_color("✅ PATCH COMPLETED SUCCESSFULLY!", Colors.GREEN + Colors.BOLD)
+    print_color("âœ… PATCH COMPLETED SUCCESSFULLY!", Colors.GREEN + Colors.BOLD)
     print_color("=" * 60, Colors.CYAN)
     
-    print_color("\n📋 What was done:", Colors.MAGENTA)
+    print_color("\nðŸ“‹ What was done:", Colors.MAGENTA)
     print_color("  1. Created .env file with your GitHub token", Colors.GREEN)
     print_color("  2. Patched update.py to use environment variables", Colors.GREEN)
     print_color("  3. Added python-dotenv import to update.py", Colors.GREEN)
     print_color("  4. Updated .gitignore to exclude .env files", Colors.GREEN)
     
-    print_color("\n🔑 Next steps:", Colors.MAGENTA)
+    print_color("\nðŸ”‘ Next steps:", Colors.MAGENTA)
     print_color(f"  1. Review the changes in update.py", Colors.CYAN)
     print_color(f"  2. Test the update functionality", Colors.CYAN)
     print_color(f"  3. Commit the changes:", Colors.CYAN)
@@ -340,14 +340,14 @@ def main():
     print_color(f"     git commit -m \"Use environment variables for GitHub token\"", Colors.YELLOW)
     print_color(f"     git push --set-upstream origin test-update-feature", Colors.YELLOW)
     
-    print_color(f"\n⚠️  IMPORTANT: Never commit the .env file!", Colors.RED + Colors.BOLD)
+    print_color(f"\nâš ï¸  IMPORTANT: Never commit the .env file!", Colors.RED + Colors.BOLD)
     print_color(f"   The .env file contains secrets and should stay local only.", Colors.RED)
     
-    print_color(f"\n📌 To use the new environment variable:", Colors.MAGENTA)
+    print_color(f"\nðŸ“Œ To use the new environment variable:", Colors.MAGENTA)
     print_color(f"   In your code, use: os.environ.get('GITHUB_TOKEN', '')", Colors.CYAN)
     print_color(f"   Or with dotenv: load_dotenv() then os.environ.get('GITHUB_TOKEN')", Colors.CYAN)
     
-    print_color("\n🎉 Patch complete! Your update.py is now using environment variables.", Colors.GREEN)
+    print_color("\nðŸŽ‰ Patch complete! Your update.py is now using environment variables.", Colors.GREEN)
 
 # ============================================================
 # RUN THE PATCH
@@ -357,10 +357,10 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print_color("\n\n⚠️  Patch cancelled by user", Colors.YELLOW)
+        print_color("\n\nâš ï¸  Patch cancelled by user", Colors.YELLOW)
         sys.exit(1)
     except Exception as e:
-        print_color(f"\n❌ Unexpected error: {e}", Colors.RED)
+        print_color(f"\nâŒ Unexpected error: {e}", Colors.RED)
         import traceback
         traceback.print_exc()
         sys.exit(1)

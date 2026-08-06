@@ -1,4 +1,4 @@
-# fix_nmap_wrapper.ps1
+﻿# fix_nmap_wrapper.ps1
 Write-Host "Fixing Nmap wrapper..." -ForegroundColor Cyan
 
 # Find actual Nmap installation

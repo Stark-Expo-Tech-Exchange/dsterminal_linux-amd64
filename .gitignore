@@ -16,3 +16,10 @@ DSTerminal_Portable_*.zip
 *.env
 *.key
 *.secret
+
+.vs/
+.vscode/
+build/
+dist/
+venv/
+__pycache__/

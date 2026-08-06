@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 DSTERMINAL License Agreement PDF Generator
 Clean, professional legal document with no background colors
@@ -19,7 +19,7 @@ from reportlab.pdfgen import canvas
 from PIL import Image as PILImage
 
 # Version constant
-VERSION = "3.1.113"
+VERSION = "4.0.0.113"
 
 class DSTERMINALEULAGenerator:
     """Generate professional EULA PDF with clean formatting"""
@@ -168,7 +168,7 @@ class DSTERMINALEULAGenerator:
                     logo_img = Image(temp_logo, width=60, height=60)
                     break
                 except Exception as e:
-                    print(f"⚠️ Logo load warning: {e}")
+                    print(f"âš ï¸ Logo load warning: {e}")
                     continue
         
         # Build story
@@ -350,7 +350,7 @@ class DSTERMINALEULAGenerator:
         
         licensee_sig_data = [
             ["Organization Name:", "_________________________", ""],
-            ["Organization Type:", "□ Enterprise  □ Education  □ Government  □ Individual", ""],
+            ["Organization Type:", "â–¡ Enterprise  â–¡ Education  â–¡ Government  â–¡ Individual", ""],
             ["License ID:", "_________________________", ""],
             ["Number of Users:", "_________", ""],
             ["Authorized Representative:", "_________________________", ""],
@@ -394,7 +394,7 @@ class DSTERMINALEULAGenerator:
         
         # Copyright notice
         copyright_text = f"""
-        © {datetime.now().year} Stark Expo Tech Exchange. All Rights Reserved.<br/>
+        Â© {datetime.now().year} Stark Expo Tech Exchange. All Rights Reserved.<br/>
         DSTERMINAL is a trademark of Stark Expo Tech Exchange.<br/>
         Unauthorized reproduction or distribution of this document is prohibited.<br/>
         <br/>
@@ -437,9 +437,9 @@ class DSTERMINALEULAGenerator:
             except:
                 pass
         
-        print(f"\n✅ License Agreement Generated Successfully!")
-        print(f"📄 File: {pdf_path}")
-        print(f"📅 Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f"\nâœ… License Agreement Generated Successfully!")
+        print(f"ðŸ“„ File: {pdf_path}")
+        print(f"ðŸ“… Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         
         return pdf_path
 
@@ -460,23 +460,23 @@ def main():
     
     try:
         import webbrowser
-        open_pdf = input("\n📄 Open PDF file? (y/n): ").strip().lower()
+        open_pdf = input("\nðŸ“„ Open PDF file? (y/n): ").strip().lower()
         if open_pdf == 'y':
             webbrowser.open(f"file://{pdf_path}")
-            print("✅ PDF opened")
+            print("âœ… PDF opened")
     except KeyboardInterrupt:
-        print("\n\n✅ PDF generated successfully!")
+        print("\n\nâœ… PDF generated successfully!")
     except Exception as e:
-        print(f"\n⚠️ Could not open PDF: {e}")
-        print(f"📄 File location: {pdf_path}")
+        print(f"\nâš ï¸ Could not open PDF: {e}")
+        print(f"ðŸ“„ File location: {pdf_path}")
 
 
 if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("\n\n⚠️ Generation cancelled by user")
+        print("\n\nâš ï¸ Generation cancelled by user")
         sys.exit(0)
     except Exception as e:
-        print(f"\n❌ Error: {e}")
+        print(f"\nâŒ Error: {e}")
         sys.exit(1)

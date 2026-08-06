@@ -1,5 +1,5 @@
 ﻿; DSTerminal Installer Script - With License Key Validation
-; Version: 3.1.113
+; Version: 4.0.0.113
 ; Date: 2026
 ; FEATURE: License key validation during installation with 3-trial limit and rollback
 
@@ -7,8 +7,8 @@
 ; Basic Setup Information
 AppId={{1EFF5130-85AF-4EE9-B818-5634A06408D2}}
 AppName=DSTerminal
-AppVersion=3.1.113
-AppVerName=DSTerminal v3.1.113
+AppVersion=4.0.0.113
+AppVerName=DSTerminal v4.0.0.113
 AppPublisher=Stark Expo Tech Exchange
 AppPublisherURL=https://starkexpotechexchange.mw
 AppSupportURL=https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/issues
@@ -22,7 +22,7 @@ DefaultDirName={userappdata}\DSTerminal
 DefaultGroupName=DSTerminal
 LicenseFile=license.txt
 OutputDir=installer_output
-OutputBaseFilename=DSTerminal_Installer_2026_v3.1.113
+OutputBaseFilename=DSTerminal_Installer_2026_v4.0.0.113
 Compression=lzma2/fast
 SolidCompression=no
 InternalCompressLevel=fast
@@ -41,14 +41,14 @@ PrivilegesRequired=admin
 PrivilegesRequiredOverridesAllowed=dialog
 MinVersion=10.0
 UninstallDisplayIcon={app}\dsterminal.exe
-UninstallDisplayName=DSTerminal v3.1.113
-VersionInfoVersion=3.1.113
+UninstallDisplayName=DSTerminal v4.0.0.113
+VersionInfoVersion=4.0.0.113
 VersionInfoCompany=Stark Expo Tech Exchange
 VersionInfoDescription=DSTerminal Cyber-Ops Platform
-VersionInfoTextVersion=3.1.113
+VersionInfoTextVersion=4.0.0.113
 VersionInfoCopyright=© 2024-2026 Stark Expo Tech Exchange
 VersionInfoProductName=DSTerminal
-VersionInfoProductVersion=3.1.113
+VersionInfoProductVersion=4.0.0.113
 
 ; Create uninstaller in registry
 CreateUninstallRegKey=yes
@@ -89,7 +89,7 @@ Name: "installdeps"; Description: "Install/Update missing dependencies on comple
 
 [Files]
 ; ========== CORE APPLICATION ==========
-Source: "dist\dsterminal_win-3.1.113_x64-amd64.exe"; DestDir: "{app}"; DestName: "dsterminal.exe"; Flags: ignoreversion; Components: core
+Source: "dist\dsterminal_win-4.0.0.113_x64-amd64.exe"; DestDir: "{app}"; DestName: "dsterminal.exe"; Flags: ignoreversion; Components: core
 Source: "dist\dsterminal_console.exe"; DestDir: "{app}"; DestName: "dsterminal-console.exe"; Flags: ignoreversion skipifsourcedoesntexist; Components: core
 
 ; ========== ICON FILES ==========
@@ -485,8 +485,8 @@ begin
 end;
 
 [Messages]
-BeveledLabel=DSTerminal Cyber-Ops Platform v3.1.113
+BeveledLabel=DSTerminal Cyber-Ops Platform v4.0.0.113
 
 [CustomMessages]
 SetupAppTitle=DSTerminal Installer
-SetupWindowTitle=DSTerminal v3.1.113 Setup
+SetupWindowTitle=DSTerminal v4.0.0.113 Setup

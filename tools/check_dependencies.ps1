@@ -1,4 +1,4 @@
-# Simple dependency checker - No complex quotes
+﻿# Simple dependency checker - No complex quotes
 Write-Host "DSTerminal Dependency Check" -ForegroundColor Cyan
 Write-Host "==========================" -ForegroundColor Cyan
 Write-Host ""

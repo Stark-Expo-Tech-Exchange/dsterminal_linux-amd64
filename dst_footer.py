@@ -1,4 +1,4 @@
-# dst_footer.py - DSTERMINAL ENTERPRISE FIXED FOOTER ENGINE
+﻿# dst_footer.py - DSTERMINAL ENTERPRISE FIXED FOOTER ENGINE
 
 import os
 import sys
@@ -87,15 +87,15 @@ class DSTerminalFooter:
         width = self.terminal_width()
         
         threat_icon = {
-            "LOW": "🟢",
-            "MEDIUM": "🟡",
-            "HIGH": "🔴",
-            "CRITICAL": "💀"
-        }.get(self.threat_level, "⚪")
+            "LOW": "ðŸŸ¢",
+            "MEDIUM": "ðŸŸ¡",
+            "HIGH": "ðŸ”´",
+            "CRITICAL": "ðŸ’€"
+        }.get(self.threat_level, "âšª")
         
         left = f" {threat_icon} DSTerminal {self.version} "
-        center = f" 💻CPU:{self.cpu}% | 💾RAM:{self.ram}% | MODULE:{self.current_module[:22]}"
-        right = f" STATUS:{self.current_status} | ⚡{self.threat_level} "
+        center = f" ðŸ’»CPU:{self.cpu}% | ðŸ’¾RAM:{self.ram}% | MODULE:{self.current_module[:22]}"
+        right = f" STATUS:{self.current_status} | âš¡{self.threat_level} "
         
         total = len(left) + len(center) + len(right)
         remaining = width - total - 4
@@ -176,7 +176,7 @@ class FooterBootAnimation:
         title = f" DSTerminal {version} | Enterprise Cyber Defense Matrix "
         
         for color in colors:
-            top = "▄" * min(width, 100)
+            top = "â–„" * min(width, 100)
             print(color + top + FooterColors.RESET)
             print(color + FooterColors.BOLD + title.center(min(width, 100)) + FooterColors.RESET)
             print(color + top + FooterColors.RESET)
@@ -185,9 +185,9 @@ class FooterBootAnimation:
         
         # Final render
         final_color = FooterColors.BG_BRIGHT_GREEN
-        print(final_color + "▄" * min(width, 100) + FooterColors.RESET)
+        print(final_color + "â–„" * min(width, 100) + FooterColors.RESET)
         print(final_color + FooterColors.BOLD + title.center(min(width, 100)) + FooterColors.RESET)
-        print(final_color + "▄" * min(width, 100) + FooterColors.RESET)
+        print(final_color + "â–„" * min(width, 100) + FooterColors.RESET)
         print()
 
 

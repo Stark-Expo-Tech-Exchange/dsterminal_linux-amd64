@@ -1,4 +1,4 @@
-# create_bundles.py - Complete Fixed Version
+﻿# create_bundles.py - Complete Fixed Version
 import os
 import sys
 import shutil
@@ -12,7 +12,7 @@ import json  # <-- Added missing import
 def create_bundles():
     """Create bundled packages from downloaded installers"""
     print("=" * 60)
-    print("📦 DSTerminal Bundle Creator")
+    print("ðŸ“¦ DSTerminal Bundle Creator")
     print("=" * 60)
     
     # Setup paths
@@ -24,19 +24,19 @@ def create_bundles():
     temp_dir.mkdir(parents=True, exist_ok=True)
     
     if not source_dir.exists():
-        print(f"❌ Source directory not found: {source_dir}")
+        print(f"âŒ Source directory not found: {source_dir}")
         print("Please run the installer first to download the files.")
         return
     
     # Clean up temp directory
-    print(f"\n🧹 Cleaning temp directory: {temp_dir}")
+    print(f"\nðŸ§¹ Cleaning temp directory: {temp_dir}")
     try:
         shutil.rmtree(temp_dir, ignore_errors=True)
         time.sleep(1)
         temp_dir.mkdir(parents=True, exist_ok=True)
-        print("  ✅ Temp directory cleaned")
+        print("  âœ… Temp directory cleaned")
     except Exception as e:
-        print(f"  ⚠️ Could not clean temp directory: {e}")
+        print(f"  âš ï¸ Could not clean temp directory: {e}")
     
     # Create bundle structure
     packages = {
@@ -77,7 +77,7 @@ def create_bundles():
     
     # Bundle each package
     for package_name, info in packages.items():
-        print(f"\n📦 Processing {package_name} ({info['description']})...")
+        print(f"\nðŸ“¦ Processing {package_name} ({info['description']})...")
         
         # Create package directory
         package_dir = bundle_dir / package_name
@@ -116,7 +116,7 @@ try {
                 dest_file = package_dir / 'whois.ps1'
                 with open(dest_file, 'w', encoding='utf-8') as f:
                     f.write(script_content)
-                print(f"  ✅ Created whois script")
+                print(f"  âœ… Created whois script")
                 
                 # Create checksum
                 sha256_hash = hashlib.sha256()
@@ -128,7 +128,7 @@ try {
                 checksum_file = package_dir / f"{package_name}.sha256"
                 with open(checksum_file, 'w') as f:
                     f.write(checksum)
-                print(f"  ✅ Created checksum for whois")
+                print(f"  âœ… Created checksum for whois")
         
         elif info.get('create_from_git'):
             # Clone from git and create zip
@@ -144,7 +144,7 @@ try {
                     shutil.rmtree(repo_dir, ignore_errors=True)
                     time.sleep(1)
                 except Exception as e:
-                    print(f"  ⚠️ Could not remove directory: {e}")
+                    print(f"  âš ï¸ Could not remove directory: {e}")
                     # Try using system command
                     try:
                         if sys.platform == 'win32':
@@ -165,12 +165,12 @@ try {
                     check=False
                 )
                 if result.returncode == 0:
-                    print(f"  ✅ Clone completed")
+                    print(f"  âœ… Clone completed")
                 else:
-                    print(f"  ❌ Clone failed: {result.stderr}")
+                    print(f"  âŒ Clone failed: {result.stderr}")
                     continue
             except Exception as e:
-                print(f"  ❌ Clone error: {e}")
+                print(f"  âŒ Clone error: {e}")
                 continue
             
             if repo_dir.exists():
@@ -182,7 +182,7 @@ try {
                     # Check if directory has content
                     files_count = sum(1 for _ in repo_dir.rglob('*') if _.is_file())
                     if files_count == 0:
-                        print(f"  ⚠️ No files found in repository")
+                        print(f"  âš ï¸ No files found in repository")
                         continue
                     
                     with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
@@ -200,7 +200,7 @@ try {
                                     continue
                     
                     if zip_path.exists() and zip_path.stat().st_size > 0:
-                        print(f"  ✅ Created zip from git: {info['file']}")
+                        print(f"  âœ… Created zip from git: {info['file']}")
                         
                         # Create checksum
                         sha256_hash = hashlib.sha256()
@@ -212,12 +212,12 @@ try {
                         checksum_file = package_dir / f"{package_name}.sha256"
                         with open(checksum_file, 'w') as f:
                             f.write(checksum)
-                        print(f"  ✅ Created checksum for {package_name}")
+                        print(f"  âœ… Created checksum for {package_name}")
                     else:
-                        print(f"  ❌ Failed to create zip (empty or missing)")
+                        print(f"  âŒ Failed to create zip (empty or missing)")
                         
                 except Exception as e:
-                    print(f"  ❌ Failed to create zip: {e}")
+                    print(f"  âŒ Failed to create zip: {e}")
                     continue
         
         else:
@@ -228,7 +228,7 @@ try {
             if src_file.exists():
                 # Copy file
                 shutil.copy2(src_file, dest_file)
-                print(f"  ✅ Copied: {info['file']}")
+                print(f"  âœ… Copied: {info['file']}")
                 
                 # Create checksum
                 sha256_hash = hashlib.sha256()
@@ -240,9 +240,9 @@ try {
                 checksum_file = package_dir / f"{package_name}.sha256"
                 with open(checksum_file, 'w') as f:
                     f.write(checksum)
-                print(f"  ✅ Created checksum for {package_name}")
+                print(f"  âœ… Created checksum for {package_name}")
             else:
-                print(f"  ⚠️ Source file not found: {src_file}")
+                print(f"  âš ï¸ Source file not found: {src_file}")
                 print(f"     Please download {info['file']} first.")
     
     # Also create a bundle manifest
@@ -268,19 +268,19 @@ try {
     
     with open(manifest_path, 'w') as f:
         json.dump(manifest, f, indent=2)
-    print(f"\n✅ Created bundle manifest: {manifest_path}")
+    print(f"\nâœ… Created bundle manifest: {manifest_path}")
     
     print("\n" + "=" * 60)
-    print("🎉 Bundle creation complete!")
-    print(f"📁 Bundles are in: {bundle_dir}")
+    print("ðŸŽ‰ Bundle creation complete!")
+    print(f"ðŸ“ Bundles are in: {bundle_dir}")
     print("=" * 60)
-    print("\n📋 Next steps:")
+    print("\nðŸ“‹ Next steps:")
     print("1. The 'bundled' folder is now ready")
     print("2. Run DSTerminal - it will use bundled packages first")
     print("3. To force using bundles: python dsterminal.py --install-all")
     
     # Display bundle sizes
-    print("\n📊 Bundle Summary:")
+    print("\nðŸ“Š Bundle Summary:")
     total_size = 0
     for package_name in packages:
         package_dir = bundle_dir / package_name

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 DSTerminal Financial Forensics Module
 Enhanced Global Banking Fraud Investigation with User Input Integration
@@ -269,13 +269,13 @@ class InvestigationInputCollector:
     def collect_institution_details(self) -> InstitutionDetails:
         """Collect details about the investigating institution"""
         print("\n" + "="*60)
-        print("🏛️  INSTITUTION DETAILS (REQUIRED FOR REPORT)")
+        print("ðŸ›ï¸  INSTITUTION DETAILS (REQUIRED FOR REPORT)")
         print("="*60)
         print("The following information will appear in every generated report.\n")
         
         # Bank selection for African banks
         if self._safe_confirm("\nIs this investigation being conducted by an African bank?", default=True):
-            print("\n🌍 Select Country:")
+            print("\nðŸŒ Select Country:")
             countries = list(AFRICAN_BANKS.keys())
             for i, country in enumerate(countries, 1):
                 print(f"  {i}. {country}")
@@ -286,7 +286,7 @@ class InvestigationInputCollector:
             except:
                 country = "Malawi"
             
-            print(f"\n🏦 Banks in {country}:")
+            print(f"\nðŸ¦ Banks in {country}:")
             banks = AFRICAN_BANKS.get(country, AFRICAN_BANKS["Malawi"])
             for i, bank in enumerate(banks, 1):
                 print(f"  {i}. {bank['name']} (SWIFT: {bank['swift']})")
@@ -339,14 +339,14 @@ class InvestigationInputCollector:
     def collect_case_details(self) -> CaseDetails:
         """Collect core case details"""
         print("\n" + "="*60)
-        print("📋 CASE DETAILS")
+        print("ðŸ“‹ CASE DETAILS")
         print("="*60)
         
         # Generate default case number
         default_case = f"FIU-{datetime.now().strftime('%Y%m%d')}-{random.randint(100, 999)}"
         case_number = self._safe_input("Case Number", default_case)
         
-        print("\n📊 Investigation Type:")
+        print("\nðŸ“Š Investigation Type:")
         investigation_types = [t.value for t in InvestigationType]
         for i, itype in enumerate(investigation_types, 1):
             print(f"  {i}. {itype}")
@@ -360,7 +360,7 @@ class InvestigationInputCollector:
         case_title = self._safe_input("Case Title", f"{investigation_type} Investigation")
         reporting_date = self._safe_input("Reporting Date", datetime.now().strftime("%Y-%m-%d"))
         
-        print("\n📌 Status:")
+        print("\nðŸ“Œ Status:")
         statuses = [s.value for s in InvestigationStatus]
         for i, status in enumerate(statuses, 1):
             print(f"  {i}. {status}")
@@ -371,7 +371,7 @@ class InvestigationInputCollector:
         except:
             status = "IN_PROGRESS"
         
-        print("\n⚠️ Priority:")
+        print("\nâš ï¸ Priority:")
         priorities = ["URGENT", "HIGH", "MEDIUM", "LOW"]
         for i, priority in enumerate(priorities, 1):
             print(f"  {i}. {priority}")
@@ -384,7 +384,7 @@ class InvestigationInputCollector:
         
         jurisdiction = self._safe_input("Jurisdiction (Country/Region)", "Malawi / Global")
         
-        print("\n💰 Amount Involved:")
+        print("\nðŸ’° Amount Involved:")
         amount_str = self._safe_input("Amount", "0")
         try:
             amount = float(amount_str.replace(',', '').replace('$', ''))
@@ -408,7 +408,7 @@ class InvestigationInputCollector:
     def collect_subject_details(self) -> SubjectDetails:
         """Collect details about the investigation subject"""
         print("\n" + "="*60)
-        print("👤 SUBJECT DETAILS (SUSPECT/ENTITY)")
+        print("ðŸ‘¤ SUBJECT DETAILS (SUSPECT/ENTITY)")
         print("="*60)
         
         has_subject = self._safe_confirm("Do you have subject information to enter?", default=False)
@@ -447,7 +447,7 @@ class InvestigationInputCollector:
             if not acc:
                 break
             account_numbers.append(acc)
-            print(f"  ✓ Added: {acc}")
+            print(f"  âœ“ Added: {acc}")
         
         # Addresses
         known_addresses = []
@@ -456,7 +456,7 @@ class InvestigationInputCollector:
             if not addr:
                 break
             known_addresses.append(addr)
-            print(f"  ✓ Added address")
+            print(f"  âœ“ Added address")
         
         # Phone numbers
         phone_numbers = []
@@ -465,7 +465,7 @@ class InvestigationInputCollector:
             if not phone:
                 break
             phone_numbers.append(phone)
-            print(f"  ✓ Added: {phone}")
+            print(f"  âœ“ Added: {phone}")
         
         # Emails
         email_addresses = []
@@ -474,7 +474,7 @@ class InvestigationInputCollector:
             if not email:
                 break
             email_addresses.append(email)
-            print(f"  ✓ Added: {email}")
+            print(f"  âœ“ Added: {email}")
         
         registration_number = self._safe_input("Company Registration Number (if applicable)", "")
         
@@ -492,7 +492,7 @@ class InvestigationInputCollector:
     def collect_transaction_details(self) -> Optional[TransactionDetails]:
         """Collect transaction details"""
         print("\n" + "="*60)
-        print("💸 TRANSACTION DETAILS")
+        print("ðŸ’¸ TRANSACTION DETAILS")
         print("="*60)
         
         has_transactions = self._safe_confirm("Do you have transaction details to enter?", default=False)
@@ -506,7 +506,7 @@ class InvestigationInputCollector:
             if not txn_id:
                 break
             transaction_ids.append(txn_id)
-            print(f"  ✓ Added: {txn_id}")
+            print(f"  âœ“ Added: {txn_id}")
         
         date_range_start = self._safe_input("Date Range Start (YYYY-MM-DD)", (datetime.now() - timedelta(days=90)).strftime("%Y-%m-%d"))
         date_range_end = self._safe_input("Date Range End (YYYY-MM-DD)", datetime.now().strftime("%Y-%m-%d"))
@@ -554,7 +554,7 @@ class InvestigationInputCollector:
     def collect_evidence_details(self) -> EvidenceCollected:
         """Collect evidence details"""
         print("\n" + "="*60)
-        print("📎 EVIDENCE COLLECTED")
+        print("ðŸ“Ž EVIDENCE COLLECTED")
         print("="*60)
         
         evidence_items = []
@@ -569,7 +569,7 @@ class InvestigationInputCollector:
                 "description": evidence_desc,
                 "reference": evidence_ref
             })
-            print(f"  ✓ Added evidence: {evidence_type}")
+            print(f"  âœ“ Added evidence: {evidence_type}")
         
         document_references = []
         while True:
@@ -610,7 +610,7 @@ class InvestigationInputCollector:
     def collect_additional_notes(self) -> str:
         """Collect additional investigation notes"""
         print("\n" + "="*60)
-        print("📝 ADDITIONAL INVESTIGATION NOTES")
+        print("ðŸ“ ADDITIONAL INVESTIGATION NOTES")
         print("="*60)
         print("Enter any additional notes (type 'END' on a new line to finish):\n")
         
@@ -869,14 +869,14 @@ class InvestigationReport:
             if self.recommendations:
                 story.append(Paragraph("6. RECOMMENDATIONS", section_style))
                 for rec in self.recommendations:
-                    story.append(Paragraph(f"✓ {rec}", normal_style))
+                    story.append(Paragraph(f"âœ“ {rec}", normal_style))
                 story.append(Spacer(1, 0.2 * inch))
             
             # Evidence Summary
             if self.evidence and self.evidence.evidence_items:
                 story.append(Paragraph("7. EVIDENCE SUMMARY", section_style))
                 for item in self.evidence.evidence_items:
-                    story.append(Paragraph(f"• {item['type']}: {item['description']} (Ref: {item['reference']})", normal_style))
+                    story.append(Paragraph(f"â€¢ {item['type']}: {item['description']} (Ref: {item['reference']})", normal_style))
                 story.append(Spacer(1, 0.2 * inch))
             
             # Additional Notes
@@ -933,7 +933,7 @@ class EnhancedFinancialForensics:
         if self.institution_details and console:
             header = Panel(
                 f"""
-[bold cyan]🏛️ {self.institution_details.institution_name}[/bold cyan]
+[bold cyan]ðŸ›ï¸ {self.institution_details.institution_name}[/bold cyan]
 [dim]{self.institution_details.department}[/dim]
 [dim]Country: {self.institution_details.country} | City: {self.institution_details.city}[/dim]
 [dim]SWIFT: {self.institution_details.swift_bic_code} | Bank Code: {self.institution_details.bank_code}[/dim]
@@ -1087,12 +1087,12 @@ class EnhancedFinancialForensics:
         pdf_file = self.current_investigation.generate_pdf_report(self.reports_dir)
         
         if console:
-            console.print(f"\n[bold green]✓ Investigation Complete![/bold green]")
+            console.print(f"\n[bold green]âœ“ Investigation Complete![/bold green]")
             console.print(f"[cyan]JSON Report:[/cyan] {json_file}")
             if pdf_file:
                 console.print(f"[cyan]PDF Report:[/cyan] {pdf_file}")
         else:
-            print(f"\n✓ Investigation Complete!")
+            print(f"\nâœ“ Investigation Complete!")
             print(f"JSON Report: {json_file}")
             if pdf_file:
                 print(f"PDF Report: {pdf_file}")
@@ -1120,7 +1120,7 @@ class EnhancedFinancialForensics:
 [bold yellow]Jurisdiction:[/bold yellow] {self.current_investigation.case.jurisdiction}
 [bold yellow]Amount:[/bold yellow] [green]{self.current_investigation.case.currency} {self.current_investigation.case.amount_involved:,.2f}[/green]
             """,
-            title="[bold red]📋 CASE DETAILS[/bold red]",
+            title="[bold red]ðŸ“‹ CASE DETAILS[/bold red]",
             border_style="red"
         )
         
@@ -1139,7 +1139,7 @@ class EnhancedFinancialForensics:
             
             subject_panel = Panel(
                 "\n".join(subject_lines),
-                title="[bold yellow]👤 SUBJECT DETAILS[/bold yellow]",
+                title="[bold yellow]ðŸ‘¤ SUBJECT DETAILS[/bold yellow]",
                 border_style="yellow"
             )
             if console:
@@ -1147,7 +1147,7 @@ class EnhancedFinancialForensics:
         
         # Findings Table
         if self.current_investigation.findings:
-            findings_table = Table(title="🔍 INVESTIGATION FINDINGS", box=box.DOUBLE_EDGE)
+            findings_table = Table(title="ðŸ” INVESTIGATION FINDINGS", box=box.DOUBLE_EDGE)
             findings_table.add_column("#", style="dim", width=4)
             findings_table.add_column("Finding", style="cyan", width=25)
             findings_table.add_column("Details", style="white", width=45)
@@ -1162,10 +1162,10 @@ class EnhancedFinancialForensics:
         
         # Recommendations
         if self.current_investigation.recommendations:
-            rec_text = "\n".join([f"✓ {rec}" for rec in self.current_investigation.recommendations[:8]])
+            rec_text = "\n".join([f"âœ“ {rec}" for rec in self.current_investigation.recommendations[:8]])
             rec_panel = Panel(
                 rec_text,
-                title="[bold green]📋 RECOMMENDATIONS[/bold green]",
+                title="[bold green]ðŸ“‹ RECOMMENDATIONS[/bold green]",
                 border_style="green"
             )
             if console:
@@ -1175,7 +1175,7 @@ class EnhancedFinancialForensics:
         if self.current_investigation.additional_notes:
             notes_panel = Panel(
                 self.current_investigation.additional_notes[:500],
-                title="[bold cyan]📝 ADDITIONAL NOTES[/bold cyan]",
+                title="[bold cyan]ðŸ“ ADDITIONAL NOTES[/bold cyan]",
                 border_style="cyan"
             )
             if console:
@@ -1184,19 +1184,19 @@ class EnhancedFinancialForensics:
     def _display_investigation_title(self):
         """Display animated investigation title"""
         title_art = """
-╔═══════════════════════════════════════════════════════════════════════════════╗
-║                                                                               ║
-║    ███████╗██╗███╗   ██╗ █████╗ ███╗   ██╗ ██████╗██╗ █████╗ ██╗              ║
-║    ██╔════╝██║████╗  ██║██╔══██╗████╗  ██║██╔════╝██║██╔══██╗██║              ║
-║    █████╗  ██║██╔██╗ ██║███████║██╔██╗ ██║██║     ██║███████║██║              ║
-║    ██╔══╝  ██║██║╚██╗██║██╔══██║██║╚██╗██║██║     ██║██╔══██║██║              ║
-║    ██║     ██║██║ ╚████║██║  ██║██║ ╚████║╚██████╗██║██║  ██║███████╗         ║
-║    ╚═╝     ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝╚═╝╚═╝  ╚═╝╚══════╝         ║
-║                                                                               ║
-║                  🔍 ENHANCED FINANCIAL INVESTIGATION SUITE 🔍                 ║
-║                      🌍 GLOBAL BANKING SUPPORT 🌍                              ║
-║                    🇲🇼 Malawi | Africa | Worldwide 🇲🇼                          ║
-╚═══════════════════════════════════════════════════════════════════════════════╝
+â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+â•‘                                                                               â•‘
+â•‘    â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ•—              â•‘
+â•‘    â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘              â•‘
+â•‘    â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â–ˆâ–ˆâ•— â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â–ˆâ–ˆâ•— â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘              â•‘
+â•‘    â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘              â•‘
+â•‘    â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘ â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘ â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—         â•‘
+â•‘    â•šâ•â•     â•šâ•â•â•šâ•â•  â•šâ•â•â•â•â•šâ•â•  â•šâ•â•â•šâ•â•  â•šâ•â•â•â• â•šâ•â•â•â•â•â•â•šâ•â•â•šâ•â•  â•šâ•â•â•šâ•â•â•â•â•â•â•         â•‘
+â•‘                                                                               â•‘
+â•‘                  ðŸ” ENHANCED FINANCIAL INVESTIGATION SUITE ðŸ”                 â•‘
+â•‘                      ðŸŒ GLOBAL BANKING SUPPORT ðŸŒ                              â•‘
+â•‘                    ðŸ‡²ðŸ‡¼ Malawi | Africa | Worldwide ðŸ‡²ðŸ‡¼                          â•‘
+â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
         """
         if console:
             for line in title_art.split('\n'):
@@ -1219,18 +1219,18 @@ class EnhancedFinancialForensics:
                 self._display_investigation_title()
                 
                 menu_items = [
-                    "[cyan]1.[/cyan] 🔍 Start New Investigation (Full Input)",
-                    "[cyan]2.[/cyan] 📋 View Current Investigation Report",
-                    "[cyan]3.[/cyan] 📁 View Saved Investigation Reports",
-                    "[cyan]4.[/cyan] 🏛️ Update Institution Details",
-                    "[cyan]5.[/cyan] 📊 Quick Investigation (Auto-Generated)",
-                    "[cyan]6.[/cyan] 🌐 Live Financial Crime Monitor",
+                    "[cyan]1.[/cyan] ðŸ” Start New Investigation (Full Input)",
+                    "[cyan]2.[/cyan] ðŸ“‹ View Current Investigation Report",
+                    "[cyan]3.[/cyan] ðŸ“ View Saved Investigation Reports",
+                    "[cyan]4.[/cyan] ðŸ›ï¸ Update Institution Details",
+                    "[cyan]5.[/cyan] ðŸ“Š Quick Investigation (Auto-Generated)",
+                    "[cyan]6.[/cyan] ðŸŒ Live Financial Crime Monitor",
                     "[cyan]0.[/cyan] Exit"
                 ]
                 
                 menu_panel = Panel(
                     "\n".join(menu_items),
-                    title="[bold white]📊 FINANCIAL INVESTIGATION MENU[/bold white]",
+                    title="[bold white]ðŸ“Š FINANCIAL INVESTIGATION MENU[/bold white]",
                     border_style="bright_blue"
                 )
                 console.print(Align.center(menu_panel))
@@ -1281,7 +1281,7 @@ class EnhancedFinancialForensics:
             console.print("[bold yellow]Updating Institution Details...[/bold yellow]\n")
         self.institution_details = self.input_collector.collect_institution_details()
         if console:
-            console.print("[bold green]✓ Institution details updated![/bold green]")
+            console.print("[bold green]âœ“ Institution details updated![/bold green]")
             console.print("\n[bold yellow]Press Enter to continue...[/bold yellow]")
             input()
     
@@ -1298,7 +1298,7 @@ class EnhancedFinancialForensics:
         
         if console:
             console.clear()
-            console.print("[bold cyan]📁 SAVED INVESTIGATION REPORTS[/bold cyan]\n")
+            console.print("[bold cyan]ðŸ“ SAVED INVESTIGATION REPORTS[/bold cyan]\n")
             
             for i, report in enumerate(reports, 1):
                 with open(report, 'r') as f:
@@ -1335,7 +1335,7 @@ class EnhancedFinancialForensics:
             if data.get('institution'):
                 inst = data['institution']
                 header = Panel(
-                    f"[bold cyan]🏛️ {inst.get('institution_name', 'Unknown')}[/bold cyan]\n"
+                    f"[bold cyan]ðŸ›ï¸ {inst.get('institution_name', 'Unknown')}[/bold cyan]\n"
                     f"[dim]{inst.get('department', 'N/A')}[/dim]\n"
                     f"[dim]Country: {inst.get('country', 'N/A')} | Investigator: {inst.get('investigator_name', 'N/A')}[/dim]",
                     title="[bold red]INVESTIGATING INSTITUTION[/bold red]",
@@ -1410,7 +1410,7 @@ class EnhancedFinancialForensics:
         self._save_complete_report()
         
         if console:
-            console.print("\n[bold green]✓ Quick investigation completed![/bold green]")
+            console.print("\n[bold green]âœ“ Quick investigation completed![/bold green]")
             console.print("\n[bold yellow]Press Enter to continue...[/bold yellow]")
             input()
     
@@ -1424,7 +1424,7 @@ class EnhancedFinancialForensics:
         
         header = Panel(
             Align.center(
-                "[bold red]🌐 LIVE FINANCIAL CRIME MONITOR 🌐[/bold red]\n\n"
+                "[bold red]ðŸŒ LIVE FINANCIAL CRIME MONITOR ðŸŒ[/bold red]\n\n"
                 f"[yellow]Monitoring Institution: {self.institution_details.institution_name if self.institution_details else 'Global Monitor'}[/yellow]\n"
                 "[dim]Press Ctrl+C to stop monitoring[/dim]",
                 vertical="middle"
@@ -1435,13 +1435,13 @@ class EnhancedFinancialForensics:
         console.print(header)
         
         crimes = [
-            ("💰 Suspicious Transaction", "National Bank of Malawi", "$2.5M", "High", "🇲🇼"),
-            ("🌐 Crypto Alert", "Binance", "500 BTC", "Critical", "🌍"),
-            ("🏦 Wire Fraud", "Standard Bank Malawi", "$750K", "High", "🇲🇼"),
-            ("🆔 Identity Theft", "FDH Bank", "$150K", "Medium", "🇲🇼"),
-            ("📈 Insider Trading", "London Stock Exchange", "$3.2M", "Critical", "🇬🇧"),
-            ("🏢 Shell Company", "Delaware", "$8M", "High", "🇺🇸"),
-            ("💸 Money Laundering", "Cayman Islands", "$12M", "Critical", "🇰🇾")
+            ("ðŸ’° Suspicious Transaction", "National Bank of Malawi", "$2.5M", "High", "ðŸ‡²ðŸ‡¼"),
+            ("ðŸŒ Crypto Alert", "Binance", "500 BTC", "Critical", "ðŸŒ"),
+            ("ðŸ¦ Wire Fraud", "Standard Bank Malawi", "$750K", "High", "ðŸ‡²ðŸ‡¼"),
+            ("ðŸ†” Identity Theft", "FDH Bank", "$150K", "Medium", "ðŸ‡²ðŸ‡¼"),
+            ("ðŸ“ˆ Insider Trading", "London Stock Exchange", "$3.2M", "Critical", "ðŸ‡¬ðŸ‡§"),
+            ("ðŸ¢ Shell Company", "Delaware", "$8M", "High", "ðŸ‡ºðŸ‡¸"),
+            ("ðŸ’¸ Money Laundering", "Cayman Islands", "$12M", "Critical", "ðŸ‡°ðŸ‡¾")
         ]
         
         alert_count = 0
@@ -1474,7 +1474,7 @@ class EnhancedFinancialForensics:
                         f"[{severity_color}]{severity}[/{severity_color}] {crime}\n"
                         f"Institution: {institution}\n"
                         f"Location: {location}",
-                        title="[bold red]⚠️ ALERT[/bold red]",
+                        title="[bold red]âš ï¸ ALERT[/bold red]",
                         border_style="red"
                     )
                     
@@ -1506,7 +1506,7 @@ class EnhancedFinancialForensics:
                     live.update(layout)
                     time.sleep(random.uniform(0.5, 1.5))
             
-            console.print(f"\n[bold green]✓ Monitoring session complete. {alert_count} potential crimes detected.[/bold green]")
+            console.print(f"\n[bold green]âœ“ Monitoring session complete. {alert_count} potential crimes detected.[/bold green]")
             
         except KeyboardInterrupt:
             console.print(f"\n[bold yellow]Monitoring stopped by user[/bold yellow]")
@@ -1538,9 +1538,9 @@ def financial_forensics_menu():
 
 
 if __name__ == "__main__":
-    print(f"{Fore.CYAN}╔══════════════════════════════════════════════════════════════╗{Style.RESET_ALL}" if 'Fore' in dir() else "="*60)
-    print(f"{Fore.CYAN}║     DSTERMINAL FINANCIAL FORENSICS - ENHANCED MODE           ║{Style.RESET_ALL}" if 'Fore' in dir() else "DSTERMINAL FINANCIAL FORENSICS - ENHANCED MODE")
-    print(f"{Fore.CYAN}╚══════════════════════════════════════════════════════════════╝{Style.RESET_ALL}" if 'Fore' in dir() else "="*60)
+    print(f"{Fore.CYAN}â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—{Style.RESET_ALL}" if 'Fore' in dir() else "="*60)
+    print(f"{Fore.CYAN}â•‘     DSTERMINAL FINANCIAL FORENSICS - ENHANCED MODE           â•‘{Style.RESET_ALL}" if 'Fore' in dir() else "DSTERMINAL FINANCIAL FORENSICS - ENHANCED MODE")
+    print(f"{Fore.CYAN}â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•{Style.RESET_ALL}" if 'Fore' in dir() else "="*60)
     print(f"{Fore.YELLOW}[*] Reports saved to: ~/dsterminal_workspace/financial_reports/{Style.RESET_ALL}" if 'Fore' in dir() else "[*] Reports saved to: ~/dsterminal_workspace/financial_reports/")
     print(f"{Fore.YELLOW}[*] PDF Reports saved to: ~/dsterminal_workspace/financial_reports/pdf_reports/{Style.RESET_ALL}" if 'Fore' in dir() else "[*] PDF Reports saved to: ~/dsterminal_workspace/financial_reports/pdf_reports/")
     print(f"{Fore.YELLOW}[*] Install reportlab for PDF generation: pip install reportlab{Style.RESET_ALL}\n" if 'Fore' in dir() else "\n[*] Install reportlab for PDF generation: pip install reportlab\n")

@@ -1,7 +1,7 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 DSTerminal Cyber-Ops Platform - Complete User Guide PDF Generator
-Version: 3.1.113
+Version: 4.0.0.113
 Author: Spark Wilson Spink
 Organization: Stark Expo Tech Exchange
 """
@@ -90,8 +90,8 @@ def header(canvas, doc, content):
     # Version on right
     canvas.setFillColor(colors.HexColor('#8899aa'))
     canvas.setFont('Helvetica', 8)
-    canvas.drawRightString(545, 830, "v3.1.113")
-    canvas.drawRightString(545, 812, "© 2024 Stark Expo Tech Exchange")
+    canvas.drawRightString(545, 830, "v4.0.0.113")
+    canvas.drawRightString(545, 812, "Â© 2024 Stark Expo Tech Exchange")
     
     # Header line
     canvas.setStrokeColor(COLORS['accent2'])
@@ -140,7 +140,7 @@ def watermark(canvas, doc, content):
     # Diagonal watermark
     canvas.translate(300, 400)
     canvas.rotate(45)
-    canvas.drawString(-200, -100, "DSTERMINAL v3.1.113")
+    canvas.drawString(-200, -100, "DSTERMINAL v4.0.0.113")
     canvas.drawString(-200, -50, "CYBER-OPS PLATFORM")
     
     # Additional watermark pattern
@@ -267,17 +267,17 @@ def create_title_style():
 def create_ascii_banner():
     """Create DSTERMINAL ASCII banner (correct spelling)"""
     return [
-        "╔════════════════════════════════════════════════════════════════════════╗",
-        "║                                                                        ║",
-        "║  ██████╗ ███████╗████████╗███████╗██████╗ ███╗   ███╗██╗███╗   ██╗ █████╗ ██╗  ║",
-        "║  ██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║████╗  ██║██╔══██╗██║  ║",
-        "║  ██║  ██║███████╗   ██║   █████╗  ██████╔╝██╔████╔██║██║██╔██╗ ██║███████║██║  ║",
-        "║  ██║  ██║╚════██║   ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██║██║╚██╗██║██╔══██║██║  ║",
-        "║  ██████╔╝███████║   ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║██║  ██║███████╗║",
-        "║  ╚═════╝ ╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝║",
-        "║                                                                        ║",
-        "╚════════════════════════════════════════════════════════════════════════╝",
-        "                        [ ENCRYPTION SUITE v3.1.113 - EDITION ]"
+        "â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—",
+        "â•‘                                                                        â•‘",
+        "â•‘  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ•—  â•‘",
+        "â•‘  â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•â•šâ•â•â–ˆâ–ˆâ•”â•â•â•â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘  â•‘",
+        "â•‘  â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•”â–ˆâ–ˆâ–ˆâ–ˆâ•”â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â–ˆâ–ˆâ•— â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘  â•‘",
+        "â•‘  â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â•šâ•â•â•â•â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘  â•‘",
+        "â•‘  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘ â•šâ•â• â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘ â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â•‘",
+        "â•‘  â•šâ•â•â•â•â•â• â•šâ•â•â•â•â•â•â•   â•šâ•â•   â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•â•šâ•â•     â•šâ•â•â•šâ•â•â•šâ•â•  â•šâ•â•â•â•â•šâ•â•  â•šâ•â•â•šâ•â•â•â•â•â•â•â•‘",
+        "â•‘                                                                        â•‘",
+        "â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•",
+        "                        [ ENCRYPTION SUITE v4.0.0.113 - EDITION ]"
     ]
 
 
@@ -288,9 +288,9 @@ def generate_pdf():
     
     # Get absolute path for the PDF in the current directory
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    filename = os.path.join(current_dir, "DSTerminal_User_Guide_v3.1.113.pdf")
+    filename = os.path.join(current_dir, "DSTerminal_User_Guide_v4.0.0.113.pdf")
     
-    print(f"📄 Generating PDF at: {filename}")
+    print(f"ðŸ“„ Generating PDF at: {filename}")
     
     doc = SimpleDocTemplate(
         filename,
@@ -334,7 +334,7 @@ def generate_pdf():
         textColor=COLORS['accent'],
         alignment=TA_CENTER
     )
-    story.append(Paragraph("═" * 60, line_style))
+    story.append(Paragraph("â•" * 60, line_style))
     
     story.append(Spacer(1, 0.5*inch))
     
@@ -345,7 +345,7 @@ def generate_pdf():
         textColor=COLORS['text_dim'],
         alignment=TA_CENTER
     )
-    story.append(Paragraph("<b>Version:</b> 3.1.113", info_style))
+    story.append(Paragraph("<b>Version:</b> 4.0.0.113", info_style))
     story.append(Paragraph("<b>Platforms:</b> Windows / Linux (macOS Coming Soon)", info_style))
     story.append(Paragraph("<b>Developer:</b> Spark Wilson Spink", info_style))
     story.append(Paragraph("<b>Powered by:</b> Stark Expo Tech Exchange", info_style))
@@ -360,7 +360,7 @@ def generate_pdf():
         textColor=COLORS['warning'],
         alignment=TA_CENTER
     )
-    story.append(Paragraph("⚠️ FOR AUTHORIZED USE ONLY - ALL ACTIVITIES ARE MONITORED ⚠️", warning_style))
+    story.append(Paragraph("âš ï¸ FOR AUTHORIZED USE ONLY - ALL ACTIVITIES ARE MONITORED âš ï¸", warning_style))
     
     story.append(Spacer(1, 0.3*inch))
     
@@ -382,7 +382,7 @@ def generate_pdf():
     # ====================================================================
     story.append(Paragraph("TABLE OF CONTENTS", styles['chapter']))
     story.append(Spacer(1, 0.2*inch))
-    story.append(Paragraph("═" * 50, styles['body']))
+    story.append(Paragraph("â•" * 50, styles['body']))
     story.append(Spacer(1, 0.2*inch))
     
     toc_items = [
@@ -481,13 +481,13 @@ def generate_pdf():
     
     story.append(Paragraph("1.2 Key Capabilities", styles['section']))
     capabilities = [
-        ("🔍 Threat Intelligence", "Real-time IOC feeds, VirusTotal integration, APT tracking"),
-        ("🛡️ Vulnerability Assessment", "Exploit checking, CVE scanning, web security testing"),
-        ("🔐 Encryption & Cryptography", "AES-256-GCM, QR key sharing, quantum-resistant keys"),
-        ("📡 Network Security", "Port scanning, WiFi auditing, traffic analysis"),
-        ("🔄 Incident Response", "Ransomware monitoring, file integrity, forensic analysis"),
-        ("💰 Financial Forensics", "Money laundering detection, fraud investigation"),
-        ("🎓 Security Education", "SQL Injection Learning Lab, interactive training"),
+        ("ðŸ” Threat Intelligence", "Real-time IOC feeds, VirusTotal integration, APT tracking"),
+        ("ðŸ›¡ï¸ Vulnerability Assessment", "Exploit checking, CVE scanning, web security testing"),
+        ("ðŸ” Encryption & Cryptography", "AES-256-GCM, QR key sharing, quantum-resistant keys"),
+        ("ðŸ“¡ Network Security", "Port scanning, WiFi auditing, traffic analysis"),
+        ("ðŸ”„ Incident Response", "Ransomware monitoring, file integrity, forensic analysis"),
+        ("ðŸ’° Financial Forensics", "Money laundering detection, fraud investigation"),
+        ("ðŸŽ“ Security Education", "SQL Injection Learning Lab, interactive training"),
     ]
     
     # Fixed: Use item[0] and item[1] to access tuple elements
@@ -533,11 +533,11 @@ def generate_pdf():
     
     story.append(Paragraph("1.4 AI-Powered Features", styles['section']))
     ai_features = [
-        ("🧠 AI Scoring", "Risk assessment with machine learning"),
-        ("🤖 Smart Command Suggestions", "Tab completion with context awareness"),
-        ("📊 Predictive Analytics", "Anomaly detection and threat prediction"),
-        ("🎯 Intelligent Reconnaissance", "Automated asset discovery"),
-        ("🔮 Zero-Day Intelligence", "Real-time CVE monitoring"),
+        ("ðŸ§  AI Scoring", "Risk assessment with machine learning"),
+        ("ðŸ¤– Smart Command Suggestions", "Tab completion with context awareness"),
+        ("ðŸ“Š Predictive Analytics", "Anomaly detection and threat prediction"),
+        ("ðŸŽ¯ Intelligent Reconnaissance", "Automated asset discovery"),
+        ("ðŸ”® Zero-Day Intelligence", "Real-time CVE monitoring"),
     ]
     
     # Fixed: Use item[0] and item[1] to access tuple elements
@@ -590,10 +590,10 @@ def generate_pdf():
     
     story.append(Spacer(1, 0.1*inch))
     story.append(Paragraph("<b>Windows Dependencies:</b>", styles['subsection']))
-    story.append(Paragraph("• Windows 10/11 (64-bit)", styles['body']))
-    story.append(Paragraph("• PowerShell 5.0+", styles['body']))
-    story.append(Paragraph("• .NET Framework 4.7.2+", styles['body']))
-    story.append(Paragraph("• Web browser (for SQL Lab)", styles['body']))
+    story.append(Paragraph("â€¢ Windows 10/11 (64-bit)", styles['body']))
+    story.append(Paragraph("â€¢ PowerShell 5.0+", styles['body']))
+    story.append(Paragraph("â€¢ .NET Framework 4.7.2+", styles['body']))
+    story.append(Paragraph("â€¢ Web browser (for SQL Lab)", styles['body']))
     
     story.append(Spacer(1, 0.2*inch))
     story.append(Paragraph("2.2 Linux", styles['section']))
@@ -624,12 +624,12 @@ def generate_pdf():
     
     story.append(Spacer(1, 0.1*inch))
     story.append(Paragraph("<b>Linux Dependencies:</b>", styles['subsection']))
-    story.append(Paragraph("• Python 3.8+", styles['body']))
-    story.append(Paragraph("• pip3", styles['body']))
-    story.append(Paragraph("• nmap", styles['body']))
-    story.append(Paragraph("• openssl", styles['body']))
-    story.append(Paragraph("• curl/wget", styles['body']))
-    story.append(Paragraph("• Web browser", styles['body']))
+    story.append(Paragraph("â€¢ Python 3.8+", styles['body']))
+    story.append(Paragraph("â€¢ pip3", styles['body']))
+    story.append(Paragraph("â€¢ nmap", styles['body']))
+    story.append(Paragraph("â€¢ openssl", styles['body']))
+    story.append(Paragraph("â€¢ curl/wget", styles['body']))
+    story.append(Paragraph("â€¢ Web browser", styles['body']))
     
     code_lines = [
         "sudo apt update",
@@ -687,19 +687,19 @@ def generate_pdf():
     story.append(Spacer(1, 0.2*inch))
     story.append(Paragraph("<b>Initial Startup Sequence</b>", styles['subsection']))
     init_output = [
-        "┌─────────────────────────────────────────────────────────────────┐",
-        "│  DSTERMINAL CYBER-OPS PLATFORM                                 │",
-        "│  ─────────────────────────────                                 │",
-        "│  [████████████████████████████████████████] 100%              │",
-        "│                                                                 │",
-        "│  ✅ System Initializing...                                     │",
-        "│  ✅ Encryption Suite v3.1.113 loaded                           │",
-        "│  ✅ SQL Injection Lab initialized                              │",
-        "│  ✅ Forensic Analyzer initialized                              │",
-        "│  ✅ System Integrity Monitor initialized                       │",
-        "│                                                                 │",
-        "│  🔹 OP-21C2BF @ soc-terminal : ~$                             │",
-        "└─────────────────────────────────────────────────────────────────┘"
+        "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”",
+        "â”‚  DSTERMINAL CYBER-OPS PLATFORM                                 â”‚",
+        "â”‚  â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€                                 â”‚",
+        "â”‚  [â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ] 100%              â”‚",
+        "â”‚                                                                 â”‚",
+        "â”‚  âœ… System Initializing...                                     â”‚",
+        "â”‚  âœ… Encryption Suite v4.0.0.113 loaded                           â”‚",
+        "â”‚  âœ… SQL Injection Lab initialized                              â”‚",
+        "â”‚  âœ… Forensic Analyzer initialized                              â”‚",
+        "â”‚  âœ… System Integrity Monitor initialized                       â”‚",
+        "â”‚                                                                 â”‚",
+        "â”‚  ðŸ”¹ OP-21C2BF @ soc-terminal : ~$                             â”‚",
+        "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜"
     ]
     for line in init_output:
         story.append(Paragraph(line, styles['code']))
@@ -740,34 +740,34 @@ def generate_pdf():
     
     story.append(Paragraph("4.1 Stage 1: Core System Bootstrap", styles['section']))
     story.append(Paragraph("<b>What Happens</b>", styles['subsection']))
-    story.append(Paragraph("• ASCII Banner - DSTERMINAL branding display", styles['body']))
-    story.append(Paragraph("• Encryption Suite - Core cryptographic engine loads", styles['body']))
-    story.append(Paragraph("• Operator ID - Unique operator identifier assigned", styles['body']))
-    story.append(Paragraph("• Session ID - Unique session tracking created", styles['body']))
-    story.append(Paragraph("• Timestamp - System start time recorded", styles['body']))
+    story.append(Paragraph("â€¢ ASCII Banner - DSTERMINAL branding display", styles['body']))
+    story.append(Paragraph("â€¢ Encryption Suite - Core cryptographic engine loads", styles['body']))
+    story.append(Paragraph("â€¢ Operator ID - Unique operator identifier assigned", styles['body']))
+    story.append(Paragraph("â€¢ Session ID - Unique session tracking created", styles['body']))
+    story.append(Paragraph("â€¢ Timestamp - System start time recorded", styles['body']))
     
     story.append(Spacer(1, 0.1*inch))
     story.append(Paragraph("<b>Components Initialized</b>", styles['subsection']))
-    story.append(Paragraph("✅ SQL Injection Lab database", styles['body']))
-    story.append(Paragraph("✅ Bundled SQLMap integration", styles['body']))
-    story.append(Paragraph("✅ Auto-remediation engine", styles['body']))
-    story.append(Paragraph("✅ Forensic Analyzer", styles['body']))
-    story.append(Paragraph("✅ System Integrity Monitor", styles['body']))
-    story.append(Paragraph("✅ Workspace created", styles['body']))
+    story.append(Paragraph("âœ… SQL Injection Lab database", styles['body']))
+    story.append(Paragraph("âœ… Bundled SQLMap integration", styles['body']))
+    story.append(Paragraph("âœ… Auto-remediation engine", styles['body']))
+    story.append(Paragraph("âœ… Forensic Analyzer", styles['body']))
+    story.append(Paragraph("âœ… System Integrity Monitor", styles['body']))
+    story.append(Paragraph("âœ… Workspace created", styles['body']))
     
     story.append(Spacer(1, 0.1*inch))
     stage1_lines = [
-        "╔══════════════════════════════════════════════════════════════╗",
-        "║  ██████╗ ███████╗████████╗███████╗██████╗ ███╗   ███╗██╗███╗║",
-        "║  ██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║████╗║",
-        "║  ██║  ██║███████╗   ██║   █████╗  ██████╔╝██╔████╔██║██║██╔██╗║",
-        "║  ██║  ██║╚════██║   ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██║██║╚██╗║",
-        "║  ██████╔╝███████║   ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║",
-        "║  ╚═════╝ ╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝║",
-        "╚══════════════════════════════════════════════════════════════╝",
-        "                        [ ENCRYPTION SUITE v3.1.113 - EDITION ]",
+        "â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—",
+        "â•‘  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ•—â•‘",
+        "â•‘  â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•â•šâ•â•â–ˆâ–ˆâ•”â•â•â•â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ•—â•‘",
+        "â•‘  â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•”â–ˆâ–ˆâ–ˆâ–ˆâ•”â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â–ˆâ–ˆâ•—â•‘",
+        "â•‘  â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â•šâ•â•â•â•â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•—â•‘",
+        "â•‘  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘ â•šâ•â• â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘ â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•‘",
+        "â•‘  â•šâ•â•â•â•â•â• â•šâ•â•â•â•â•â•â•   â•šâ•â•   â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•â•šâ•â•     â•šâ•â•â•šâ•â•â•šâ•â•  â•šâ•â•â•â•â•‘",
+        "â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•",
+        "                        [ ENCRYPTION SUITE v4.0.0.113 - EDITION ]",
         "",
-        "✅ System Initializatizing...",
+        "âœ… System Initializatizing...",
         "   Operator ID: OP-21C2BF",
         "   Session ID: SESSION-856B6",
         "   Start Time: 2026-07-22 14:21:14"
@@ -779,15 +779,15 @@ def generate_pdf():
     story.append(Paragraph("4.2 Stage 2: Multi-Color Dashboard", styles['section']))
     story.append(Paragraph("<b>Metrics Panel (Left)</b>", styles['subsection']))
     metrics = [
-        "┌─────────────────────────┐",
-        "│   📊 METRICS PANEL       │",
-        "├─────────────────────────┤",
-        "│ • Alerts/h:    247       │",
-        "│ • Incidents:   12        │",
-        "│ • MTTR:        4.2m      │",
-        "│ • Uptime:      99.97%    │",
-        "│ • Risk Score:  76/100    │",
-        "└─────────────────────────┘"
+        "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”",
+        "â”‚   ðŸ“Š METRICS PANEL       â”‚",
+        "â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤",
+        "â”‚ â€¢ Alerts/h:    247       â”‚",
+        "â”‚ â€¢ Incidents:   12        â”‚",
+        "â”‚ â€¢ MTTR:        4.2m      â”‚",
+        "â”‚ â€¢ Uptime:      99.97%    â”‚",
+        "â”‚ â€¢ Risk Score:  76/100    â”‚",
+        "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜"
     ]
     for line in metrics:
         story.append(Paragraph(line, styles['code']))
@@ -795,15 +795,15 @@ def generate_pdf():
     story.append(Spacer(1, 0.1*inch))
     story.append(Paragraph("<b>Intelligence Panel (Right)</b>", styles['subsection']))
     intel = [
-        "┌─────────────────────────┐",
-        "│   📡 INTELLIGENCE        │",
-        "├─────────────────────────┤",
-        "│ • New IOCs:  47          │",
-        "│ • Campaign:  APT29       │",
-        "│ • TTPs Updated           │",
-        "│ • Zero-day:  CVE-2024    │",
-        "│ • Patch:     83%         │",
-        "└─────────────────────────┘"
+        "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”",
+        "â”‚   ðŸ“¡ INTELLIGENCE        â”‚",
+        "â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤",
+        "â”‚ â€¢ New IOCs:  47          â”‚",
+        "â”‚ â€¢ Campaign:  APT29       â”‚",
+        "â”‚ â€¢ TTPs Updated           â”‚",
+        "â”‚ â€¢ Zero-day:  CVE-2024    â”‚",
+        "â”‚ â€¢ Patch:     83%         â”‚",
+        "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜"
     ]
     for line in intel:
         story.append(Paragraph(line, styles['code']))
@@ -811,12 +811,12 @@ def generate_pdf():
     story.append(Spacer(1, 0.1*inch))
     story.append(Paragraph("<b>Status Bar</b>", styles['subsection']))
     status_lines = [
-        "╔════════════════════════════════════════════════════════════════════════════╗",
-        "║     Defensive Security Terminal v3.1.113 | Windows 10                  ║",
-        "║     Developer: Spark Wilson Spink | © 2024 | Powered by Stark Expo Tech Exchange ║",
-        "║     Type 'help' for available commands:                                                 ║",
-        "║     CLI Mode: ADMIN 🔒                             ║",
-        "╚════════════════════════════════════════════════════════════════════════════╝"
+        "â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—",
+        "â•‘     Defensive Security Terminal v4.0.0.113 | Windows 10                  â•‘",
+        "â•‘     Developer: Spark Wilson Spink | Â© 2024 | Powered by Stark Expo Tech Exchange â•‘",
+        "â•‘     Type 'help' for available commands:                                                 â•‘",
+        "â•‘     CLI Mode: ADMIN ðŸ”’                             â•‘",
+        "â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•"
     ]
     for line in status_lines:
         story.append(Paragraph(line, styles['code']))
@@ -825,7 +825,7 @@ def generate_pdf():
     story.append(Paragraph("4.3 Stage 3: System Ready", styles['section']))
     story.append(Paragraph("<b>Ready State Indicators</b>", styles['subsection']))
     story.append(Paragraph("[14:24:08] DESKTOP-UT7D76J [PROD] NORMAL [SESSION-856B6]", styles['code']))
-    story.append(Paragraph("🔹 OP-21C2BF @ soc-terminal : ~$", styles['code']))
+    story.append(Paragraph("ðŸ”¹ OP-21C2BF @ soc-terminal : ~$", styles['code']))
     
     story.append(Spacer(1, 0.1*inch))
     story.append(Paragraph("<b>What the Prompt Means</b>", styles['subsection']))
@@ -835,7 +835,7 @@ def generate_pdf():
         ("[PROD]", "Production environment"),
         ("NORMAL", "System status"),
         ("[SESSION-856B6]", "Unique session ID"),
-        ("🔹", "Operator indicator"),
+        ("ðŸ”¹", "Operator indicator"),
         ("OP-21C2BF", "Operator ID"),
         ("@ soc-terminal", "SOC terminal context"),
         (":~$", "Ready for input"),
@@ -863,12 +863,12 @@ def generate_pdf():
     
     story.append(Paragraph("5.1 Command Prompt Structure", styles['section']))
     story.append(Paragraph("[Timestamp] HOSTNAME [ENVIRONMENT] STATUS [SESSION-ID]", styles['code']))
-    story.append(Paragraph("🔹 OPERATOR @ soc-terminal : ~$ [COMMAND]", styles['code']))
+    story.append(Paragraph("ðŸ”¹ OPERATOR @ soc-terminal : ~$ [COMMAND]", styles['code']))
     
     story.append(Spacer(1, 0.1*inch))
     story.append(Paragraph("<b>Example:</b>", styles['subsection']))
     story.append(Paragraph("[15:47:17] DESKTOP-UT7D76J [PROD] NORMAL [SESSION-F339E]", styles['code']))
-    story.append(Paragraph("🔹 OP-285A78 @ soc-terminal : ~$ help", styles['code']))
+    story.append(Paragraph("ðŸ”¹ OP-285A78 @ soc-terminal : ~$ help", styles['code']))
     
     story.append(Spacer(1, 0.2*inch))
     story.append(Paragraph("5.2 Command Categories", styles['section']))
@@ -910,21 +910,21 @@ def generate_pdf():
     story.append(Paragraph("<b>SOC Terminal Dashboard</b>", styles['subsection']))
     
     soc_lines = [
-        "╔══════════════════════╗                                        ╔════════════════════════════════════════════════════════════════════════════╗                                          ╔══════════════════════╗",
-        "║   📊 METRICS PANEL    ║                                        ║                                                                            ║                                          ║   📡 INTELLIGENCE      ║",
-        "╠══════════════════════╣                                        ║     ██████╗ ███████╗███████╗███████╗███╗   ██╗███████╗██╗  ██╗            ║                                           ╠══════════════════════╣",
-        "║ • Alerts/h:    247    ║                                        ║     ██╔══██╗██╔════╝██╔════╝██╔════╝████╗  ██║██╔════╝╚██╗██╔╝            ║                                           ║ • New IOCs:  47       ║",
-        "║ • Incidents:   12     ║                                        ║     ██║  ██║█████╗  █████╗  █████╗  ██╔██╗ ██║█████╗   ╚███╔╝             ║                                           ║ • Campaign:  APT29    ║",
-        "║ • MTTR:        4.2m   ║                                        ║     ██║  ██║██╔══╝  ██╔══╝  ██╔══╝  ██║╚██╗██║██╔══╝   ██╔██╗             ║                                           ║ • TTPs Updated        ║",
-        "║ • Uptime:      99.97% ║                                        ║     ██████╔╝██║     ██║     ███████╗██║ ╚████║███████╗██╔╝ ██╗            ║                                           ║ • Zero-day:  CVE-2024 ║",
-        "║ • Risk Score:  76/100 ║                                        ║     ╚═════╝ ╚═╝     ╚═╝     ╚══════╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝            ║                                           ║ • Patch:     83%      ║",
-        "╚══════════════════════╝                                        ║                                                                            ║                                          ╚══════════════════════╝",
-        "                                                                    ╠════════════════════════════════════════════════════════════════════════════╣",
-        "                                                                    ║     Defensive Security Terminal v3.1.113 | Windows 10                  ║",
-        "                                                                    ║     Developer: Spark Wilson Spink | © 2024 | Powered by Stark Expo Tech Exchange     ║",
-        "                                                                    ║     Type 'help' for available commands:                                                 ║",
-        "                                                                    ║     CLI Mode: ADMIN 🔒                             ║",
-        "                                                                    ╚════════════════════════════════════════════════════════════════════════════╝"
+        "â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—                                        â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—                                          â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—",
+        "â•‘   ðŸ“Š METRICS PANEL    â•‘                                        â•‘                                                                            â•‘                                          â•‘   ðŸ“¡ INTELLIGENCE      â•‘",
+        "â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£                                        â•‘     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•—  â–ˆâ–ˆâ•—            â•‘                                           â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£",
+        "â•‘ â€¢ Alerts/h:    247    â•‘                                        â•‘     â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•â•â•â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•            â•‘                                           â•‘ â€¢ New IOCs:  47       â•‘",
+        "â•‘ â€¢ Incidents:   12     â•‘                                        â•‘     â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•”â–ˆâ–ˆâ•— â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â•šâ–ˆâ–ˆâ–ˆâ•”â•             â•‘                                           â•‘ â€¢ Campaign:  APT29    â•‘",
+        "â•‘ â€¢ MTTR:        4.2m   â•‘                                        â•‘     â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•   â–ˆâ–ˆâ•”â–ˆâ–ˆâ•—             â•‘                                           â•‘ â€¢ TTPs Updated        â•‘",
+        "â•‘ â€¢ Uptime:      99.97% â•‘                                        â•‘     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘ â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â• â–ˆâ–ˆâ•—            â•‘                                           â•‘ â€¢ Zero-day:  CVE-2024 â•‘",
+        "â•‘ â€¢ Risk Score:  76/100 â•‘                                        â•‘     â•šâ•â•â•â•â•â• â•šâ•â•     â•šâ•â•     â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•â•â•â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•            â•‘                                           â•‘ â€¢ Patch:     83%      â•‘",
+        "â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•                                        â•‘                                                                            â•‘                                          â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•",
+        "                                                                    â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£",
+        "                                                                    â•‘     Defensive Security Terminal v4.0.0.113 | Windows 10                  â•‘",
+        "                                                                    â•‘     Developer: Spark Wilson Spink | Â© 2024 | Powered by Stark Expo Tech Exchange     â•‘",
+        "                                                                    â•‘     Type 'help' for available commands:                                                 â•‘",
+        "                                                                    â•‘     CLI Mode: ADMIN ðŸ”’                             â•‘",
+        "                                                                    â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•"
     ]
     for line in soc_lines:
         story.append(Paragraph(line, styles['code']))
@@ -942,24 +942,24 @@ def generate_pdf():
     
     story.append(Paragraph("<b>Help Output Sections</b>", styles['subsection']))
     help_lines = [
-        "┌─🔥 CORE SECURITY─────────────────────────────────────────────────┐",
-        "│ system scan -All               System threat scan              │",
-        "│ system                         System security management      │",
-        "│ system help                    Show system command help        │",
-        "│ system scan                    Run system security scan        │",
-        "│ system status                  Show system scan status         │",
-        "│ net -n mon                     Live network monitoring         │",
-        "│ exploitcheck                   Check for critical CVEs         │",
-        "│ vtscan                         VirusTotal file analysis        │",
-        "└─────────────────────────────────────────────────────────────────┘",
+        "â”Œâ”€ðŸ”¥ CORE SECURITYâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”",
+        "â”‚ system scan -All               System threat scan              â”‚",
+        "â”‚ system                         System security management      â”‚",
+        "â”‚ system help                    Show system command help        â”‚",
+        "â”‚ system scan                    Run system security scan        â”‚",
+        "â”‚ system status                  Show system scan status         â”‚",
+        "â”‚ net -n mon                     Live network monitoring         â”‚",
+        "â”‚ exploitcheck                   Check for critical CVEs         â”‚",
+        "â”‚ vtscan                         VirusTotal file analysis        â”‚",
+        "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜",
         "",
-        "┌─🌐 NETWORK TOOLS────────────────────────────────────────────────┐",
-        "│ nmap <TARGET>                  Basic port scan                 │",
-        "│ nmap -sV <TARGET>              Service/version detection       │",
-        "│ nmap -A <TARGET>               Aggressive OS and service       │",
-        "│ portsweep [IP]                 Scan target for open ports      │",
-        "│ traceroute [IP]                Network path analysis           │",
-        "└─────────────────────────────────────────────────────────────────┘"
+        "â”Œâ”€ðŸŒ NETWORK TOOLSâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”",
+        "â”‚ nmap <TARGET>                  Basic port scan                 â”‚",
+        "â”‚ nmap -sV <TARGET>              Service/version detection       â”‚",
+        "â”‚ nmap -A <TARGET>               Aggressive OS and service       â”‚",
+        "â”‚ portsweep [IP]                 Scan target for open ports      â”‚",
+        "â”‚ traceroute [IP]                Network path analysis           â”‚",
+        "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜"
     ]
     for line in help_lines:
         story.append(Paragraph(line, styles['code']))
@@ -1015,10 +1015,10 @@ def generate_pdf():
     
     story.append(Spacer(1, 0.1*inch))
     story.append(Paragraph("<b>Pro Tips</b>", styles['subsection']))
-    story.append(Paragraph("💡 Use Tab for command completion", styles['body']))
-    story.append(Paragraph("⚡ Combine commands with '&&'", styles['body']))
-    story.append(Paragraph("🔧 Check /var/log/dsterminal for logs", styles['body']))
-    story.append(Paragraph("🌐 Access web interface at https://www.dsterminal.com", styles['body']))
+    story.append(Paragraph("ðŸ’¡ Use Tab for command completion", styles['body']))
+    story.append(Paragraph("âš¡ Combine commands with '&&'", styles['body']))
+    story.append(Paragraph("ðŸ”§ Check /var/log/dsterminal for logs", styles['body']))
+    story.append(Paragraph("ðŸŒ Access web interface at https://www.dsterminal.com", styles['body']))
     
     story.append(PageBreak())
     
@@ -1068,16 +1068,16 @@ def generate_pdf():
     story.append(Paragraph("<b>Command:</b> vt-scan", styles['body']))
     story.append(Paragraph("<b>Dashboard:</b>", styles['subsection']))
     vt_lines = [
-        "┌────────────────────────────────────────────────────────────┐",
-        "│ 🔍 OPERATION SELECTION                                     │",
-        "├────────────────────────────────────────────────────────────┤",
-        "│ 1. Hash Lookup (VT Intelligence)                              │",
-        "│ 2. File Scan (Upload & Analyze)                              │",
-        "│ 3. Bulk Scan Folder                                       │",
-        "│ 4. Check Previous Scan                                    │",
-        "│ 5. View Quarantine                                       │",
-        "│ 0. Exit & Shutdown                                        │",
-        "└────────────────────────────────────────────────────────────┘"
+        "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”",
+        "â”‚ ðŸ” OPERATION SELECTION                                     â”‚",
+        "â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤",
+        "â”‚ 1. Hash Lookup (VT Intelligence)                              â”‚",
+        "â”‚ 2. File Scan (Upload & Analyze)                              â”‚",
+        "â”‚ 3. Bulk Scan Folder                                       â”‚",
+        "â”‚ 4. Check Previous Scan                                    â”‚",
+        "â”‚ 5. View Quarantine                                       â”‚",
+        "â”‚ 0. Exit & Shutdown                                        â”‚",
+        "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜"
     ]
     for line in vt_lines:
         story.append(Paragraph(line, styles['code']))
@@ -1093,28 +1093,28 @@ def generate_pdf():
     story.append(Paragraph("<b>Command:</b> sqllab", styles['body']))
     story.append(Paragraph("<b>Lab Information:</b>", styles['subsection']))
     sql_lines = [
-        "╭─────────────────────────────────────────────────────────────╮",
-        "│ 📋 Lab Information:                                         │",
-        "│                                                             │",
-        "│ 👥 Available Users:                                         │",
-        "│   • admin (Role: administrator, Dept: IT Security)          │",
-        "│   • john_doe (Role: user, Dept: Sales)                      │",
-        "│   • jane_smith (Role: user, Dept: Marketing)                │",
-        "│   • bob_wilson (Role: user, Dept: Engineering)              │",
-        "│   • ... and 6 more users                                    │",
-        "│                                                             │",
-        "│ 🔑 Admin Credentials:                                       │",
-        "│   Username: admin                                           │",
-        "│   Password: admin123                                        │",
-        "│                                                             │",
-        "│ 💉 SQL Injection Techniques Available:                      │",
-        "│   • Basic SQL Injection                                     │",
-        "│   • Union-Based SQL Injection                               │",
-        "│   • Error-Based SQL Injection                               │",
-        "│   • Boolean-Based Blind SQL Injection                       │",
-        "│   • Time-Based Blind SQL Injection                          │",
-        "│   • Stacked Queries SQL Injection                           │",
-        "╰─────────────────────────────────────────────────────────────╯"
+        "â•­â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•®",
+        "â”‚ ðŸ“‹ Lab Information:                                         â”‚",
+        "â”‚                                                             â”‚",
+        "â”‚ ðŸ‘¥ Available Users:                                         â”‚",
+        "â”‚   â€¢ admin (Role: administrator, Dept: IT Security)          â”‚",
+        "â”‚   â€¢ john_doe (Role: user, Dept: Sales)                      â”‚",
+        "â”‚   â€¢ jane_smith (Role: user, Dept: Marketing)                â”‚",
+        "â”‚   â€¢ bob_wilson (Role: user, Dept: Engineering)              â”‚",
+        "â”‚   â€¢ ... and 6 more users                                    â”‚",
+        "â”‚                                                             â”‚",
+        "â”‚ ðŸ”‘ Admin Credentials:                                       â”‚",
+        "â”‚   Username: admin                                           â”‚",
+        "â”‚   Password: admin123                                        â”‚",
+        "â”‚                                                             â”‚",
+        "â”‚ ðŸ’‰ SQL Injection Techniques Available:                      â”‚",
+        "â”‚   â€¢ Basic SQL Injection                                     â”‚",
+        "â”‚   â€¢ Union-Based SQL Injection                               â”‚",
+        "â”‚   â€¢ Error-Based SQL Injection                               â”‚",
+        "â”‚   â€¢ Boolean-Based Blind SQL Injection                       â”‚",
+        "â”‚   â€¢ Time-Based Blind SQL Injection                          â”‚",
+        "â”‚   â€¢ Stacked Queries SQL Injection                           â”‚",
+        "â•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯"
     ]
     for line in sql_lines:
         story.append(Paragraph(line, styles['code']))
@@ -1155,8 +1155,8 @@ def generate_pdf():
     story.append(Paragraph("# Select all modules", styles['code']))
     story.append(Paragraph("Selection: all", styles['code']))
     story.append(Paragraph("# Execute hardening", styles['code']))
-    story.append(Paragraph("┌─[ SELECT OPTION ]─┐", styles['code']))
-    story.append(Paragraph("└─>> 3", styles['code']))
+    story.append(Paragraph("â”Œâ”€[ SELECT OPTION ]â”€â”", styles['code']))
+    story.append(Paragraph("â””â”€>> 3", styles['code']))
     
     story.append(Paragraph("<b>Step 4: Monitoring</b>", styles['subsection']))
     story.append(Paragraph("# Start real-time monitoring", styles['code']))
@@ -1261,11 +1261,11 @@ def generate_pdf():
     story.append(Paragraph("10.1 Security Best Practices", styles['section']))
     story.append(Paragraph("<b>Before Using DSTerminal</b>", styles['subsection']))
     before_practices = [
-        ("✅ Get Authorization", "Always have written permission"),
-        ("✅ Document Activities", "Keep audit trails"),
-        ("✅ Use Proper Credentials", "Run as admin/sudo when needed"),
-        ("✅ Secure Your Workspace", "Protect report files"),
-        ("✅ Regular Updates", "Keep DSTerminal updated"),
+        ("âœ… Get Authorization", "Always have written permission"),
+        ("âœ… Document Activities", "Keep audit trails"),
+        ("âœ… Use Proper Credentials", "Run as admin/sudo when needed"),
+        ("âœ… Secure Your Workspace", "Protect report files"),
+        ("âœ… Regular Updates", "Keep DSTerminal updated"),
     ]
     before_data = [[f"<b>{p}</b>", desc] for p, desc in before_practices]
     before_table = Table(before_data, colWidths=[130, 340])
@@ -1284,11 +1284,11 @@ def generate_pdf():
     story.append(Spacer(1, 0.1*inch))
     story.append(Paragraph("<b>During Usage</b>", styles['subsection']))
     during_practices = [
-        ("✅ Start with Help", "Learn before using"),
-        ("✅ Use Tab Completion", "Faster, fewer errors"),
-        ("✅ Monitor Resource Usage", "Watch CPU/RAM"),
-        ("✅ Generate Reports", "Document findings"),
-        ("✅ Verify Results", "Double-check critical findings"),
+        ("âœ… Start with Help", "Learn before using"),
+        ("âœ… Use Tab Completion", "Faster, fewer errors"),
+        ("âœ… Monitor Resource Usage", "Watch CPU/RAM"),
+        ("âœ… Generate Reports", "Document findings"),
+        ("âœ… Verify Results", "Double-check critical findings"),
     ]
     during_data = [[f"<b>{p}</b>", desc] for p, desc in during_practices]
     during_table = Table(during_data, colWidths=[130, 340])
@@ -1307,10 +1307,10 @@ def generate_pdf():
     story.append(Spacer(1, 0.1*inch))
     story.append(Paragraph("<b>After Usage</b>", styles['subsection']))
     after_practices = [
-        ("✅ Logout Properly", "Use exit command"),
-        ("✅ Secure Reports", "Encrypt sensitive reports"),
-        ("✅ Share Findings", "Report to security team"),
-        ("✅ Update Knowledge", "Learn from findings"),
+        ("âœ… Logout Properly", "Use exit command"),
+        ("âœ… Secure Reports", "Encrypt sensitive reports"),
+        ("âœ… Share Findings", "Report to security team"),
+        ("âœ… Update Knowledge", "Learn from findings"),
     ]
     after_data = [[f"<b>{p}</b>", desc] for p, desc in after_practices]
     after_table = Table(after_data, colWidths=[130, 340])
@@ -1336,19 +1336,19 @@ def generate_pdf():
     story.append(Paragraph("11.1 Common Issues", styles['section']))
     story.append(Paragraph("<b>Issue: DSTerminal Won't Start</b>", styles['subsection']))
     story.append(Paragraph("<b>Windows:</b>", styles['body']))
-    story.append(Paragraph("• Run as Administrator", styles['body']))
-    story.append(Paragraph("• Check antivirus", styles['body']))
-    story.append(Paragraph("• Reinstall", styles['body']))
+    story.append(Paragraph("â€¢ Run as Administrator", styles['body']))
+    story.append(Paragraph("â€¢ Check antivirus", styles['body']))
+    story.append(Paragraph("â€¢ Reinstall", styles['body']))
     story.append(Paragraph("<b>Linux:</b>", styles['body']))
-    story.append(Paragraph("• Check permissions: chmod +x dsterminal", styles['code']))
-    story.append(Paragraph("• Check dependencies", styles['code']))
-    story.append(Paragraph("• Run with sudo", styles['code']))
+    story.append(Paragraph("â€¢ Check permissions: chmod +x dsterminal", styles['code']))
+    story.append(Paragraph("â€¢ Check dependencies", styles['code']))
+    story.append(Paragraph("â€¢ Run with sudo", styles['code']))
     
     story.append(Spacer(1, 0.1*inch))
     story.append(Paragraph("<b>Issue: Feature Not Working</b>", styles['subsection']))
-    story.append(Paragraph("• No Network Scan: Install nmap, check internet, check firewall", styles['body']))
-    story.append(Paragraph("• Encryption Fails: Check permissions, generate new key, check disk space", styles['body']))
-    story.append(Paragraph("• Ransomware Monitor Fails: Run as admin, check workspace path, restart service", styles['body']))
+    story.append(Paragraph("â€¢ No Network Scan: Install nmap, check internet, check firewall", styles['body']))
+    story.append(Paragraph("â€¢ Encryption Fails: Check permissions, generate new key, check disk space", styles['body']))
+    story.append(Paragraph("â€¢ Ransomware Monitor Fails: Run as admin, check workspace path, restart service", styles['body']))
     
     story.append(Spacer(1, 0.2*inch))
     story.append(Paragraph("11.2 Log Location", styles['section']))
@@ -1362,10 +1362,10 @@ def generate_pdf():
     
     story.append(Spacer(1, 0.2*inch))
     story.append(Paragraph("11.3 Support Resources", styles['section']))
-    story.append(Paragraph("• Help Command: help in terminal", styles['body']))
-    story.append(Paragraph("• Built-in Manual: Command reference", styles['body']))
-    story.append(Paragraph("• Online Docs: https://www.dsterminal.com/docs", styles['body']))
-    story.append(Paragraph("• Email: support@dsterminal.com", styles['body']))
+    story.append(Paragraph("â€¢ Help Command: help in terminal", styles['body']))
+    story.append(Paragraph("â€¢ Built-in Manual: Command reference", styles['body']))
+    story.append(Paragraph("â€¢ Online Docs: https://www.dsterminal.com/docs", styles['body']))
+    story.append(Paragraph("â€¢ Email: support@dsterminal.com", styles['body']))
     
     story.append(PageBreak())
     
@@ -1432,27 +1432,27 @@ def generate_pdf():
     story.append(Paragraph("13. GETTING STARTED CHECKLIST", styles['chapter']))
     
     story.append(Paragraph("<b>First Launch</b>", styles['section']))
-    story.append(Paragraph("☐ Download DSTerminal installer", styles['body']))
-    story.append(Paragraph("☐ Install with default settings", styles['body']))
-    story.append(Paragraph("☐ Launch as Administrator (Windows) / sudo (Linux)", styles['body']))
-    story.append(Paragraph("☐ Wait for all 3 initialization stages", styles['body']))
-    story.append(Paragraph("☐ Type help to view all commands", styles['body']))
+    story.append(Paragraph("â˜ Download DSTerminal installer", styles['body']))
+    story.append(Paragraph("â˜ Install with default settings", styles['body']))
+    story.append(Paragraph("â˜ Launch as Administrator (Windows) / sudo (Linux)", styles['body']))
+    story.append(Paragraph("â˜ Wait for all 3 initialization stages", styles['body']))
+    story.append(Paragraph("â˜ Type help to view all commands", styles['body']))
     
     story.append(Spacer(1, 0.1*inch))
     story.append(Paragraph("<b>First Steps</b>", styles['section']))
-    story.append(Paragraph("☐ Try system status to check health", styles['body']))
-    story.append(Paragraph("☐ Try scan-quick for quick system scan", styles['body']))
-    story.append(Paragraph("☐ Explore websec for web security testing", styles['body']))
-    story.append(Paragraph("☐ Test sqllab for SQL injection learning", styles['body']))
-    story.append(Paragraph("☐ Generate first report", styles['body']))
+    story.append(Paragraph("â˜ Try system status to check health", styles['body']))
+    story.append(Paragraph("â˜ Try scan-quick for quick system scan", styles['body']))
+    story.append(Paragraph("â˜ Explore websec for web security testing", styles['body']))
+    story.append(Paragraph("â˜ Test sqllab for SQL injection learning", styles['body']))
+    story.append(Paragraph("â˜ Generate first report", styles['body']))
     
     story.append(Spacer(1, 0.1*inch))
     story.append(Paragraph("<b>Regular Usage</b>", styles['section']))
-    story.append(Paragraph("☐ Monitor daily with rmon", styles['body']))
-    story.append(Paragraph("☐ Run periodic vulnerability scans", styles['body']))
-    story.append(Paragraph("☐ Keep modules updated", styles['body']))
-    story.append(Paragraph("☐ Generate reports for documentation", styles['body']))
-    story.append(Paragraph("☐ Review findings and apply fixes", styles['body']))
+    story.append(Paragraph("â˜ Monitor daily with rmon", styles['body']))
+    story.append(Paragraph("â˜ Run periodic vulnerability scans", styles['body']))
+    story.append(Paragraph("â˜ Keep modules updated", styles['body']))
+    story.append(Paragraph("â˜ Generate reports for documentation", styles['body']))
+    story.append(Paragraph("â˜ Review findings and apply fixes", styles['body']))
     
     story.append(PageBreak())
     
@@ -1530,7 +1530,7 @@ def generate_pdf():
         ("Organization", "Stark Expo Tech Exchange"),
         ("Email", "support@dsterminal.com"),
         ("Website", "https://www.dsterminal.com"),
-        ("Version", "v3.1.113"),
+        ("Version", "v4.0.0.113"),
         ("License", "Commercial / Educational"),
     ]
     dev_data = [[f"<b>{item}</b>", value] for item, value in dev_info]
@@ -1550,7 +1550,7 @@ def generate_pdf():
     story.append(Spacer(1, 0.2*inch))
     story.append(Paragraph("<b>Disclaimer</b>", styles['section']))
     story.append(Paragraph(
-        "⚠️ NOTICE: DSTerminal is designed for use in LEGITIMATE and AUTHORIZED "
+        "âš ï¸ NOTICE: DSTerminal is designed for use in LEGITIMATE and AUTHORIZED "
         "environments ONLY. Always obtain proper authorization before scanning systems. "
         "Unauthorized testing is illegal and unethical. All activities are logged for "
         "audit purposes.",
@@ -1578,36 +1578,36 @@ def generate_pdf():
     """, footer_style))
     
     story.append(Spacer(1, 0.2*inch))
-    story.append(Paragraph("═" * 50, styles['body']))
+    story.append(Paragraph("â•" * 50, styles['body']))
     story.append(Spacer(1, 0.2*inch))
     
-    story.append(Paragraph("© 2024 Stark Expo Tech Exchange", footer_style))
+    story.append(Paragraph("Â© 2024 Stark Expo Tech Exchange", footer_style))
     story.append(Paragraph(f"Generated: {datetime.now().strftime('%B %d, %Y at %I:%M %p')}", footer_style))
     story.append(Paragraph("Document Version: 1.0", footer_style))
-    story.append(Paragraph("Based on DSTerminal v3.1.113", footer_style))
+    story.append(Paragraph("Based on DSTerminal v4.0.0.113", footer_style))
     
     # ====================================================================
     # Build PDF with header/footer functions
     # ====================================================================
     doc.build(story, onFirstPage=first_page, onLaterPages=later_pages)
     
-    print(f"\n✅ PDF Generated Successfully!")
-    print(f"📄 File: {filename}")
-    print(f"📏 Pages: {page_counter['count']}")
-    print(f"📅 Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print("\n📊 Document Statistics:")
-    print(f"   • Total Pages: {page_counter['count']}")
-    print(f"   • Chapters: 15")
-    print(f"   • Modules: 15")
-    print(f"   • Commands: 50+")
-    print(f"   • Tables: 20+")
-    print(f"   • Code Blocks: 60+")
-    print("\n🔐 Document Features:")
-    print("   • Diagonal Watermark")
-    print("   • Custom Headers & Footers")
-    print("   • Cyber Security Theme")
-    print("   • Professional Formatting")
-    print("   • Complete Module Coverage")
+    print(f"\nâœ… PDF Generated Successfully!")
+    print(f"ðŸ“„ File: {filename}")
+    print(f"ðŸ“ Pages: {page_counter['count']}")
+    print(f"ðŸ“… Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print("\nðŸ“Š Document Statistics:")
+    print(f"   â€¢ Total Pages: {page_counter['count']}")
+    print(f"   â€¢ Chapters: 15")
+    print(f"   â€¢ Modules: 15")
+    print(f"   â€¢ Commands: 50+")
+    print(f"   â€¢ Tables: 20+")
+    print(f"   â€¢ Code Blocks: 60+")
+    print("\nðŸ” Document Features:")
+    print("   â€¢ Diagonal Watermark")
+    print("   â€¢ Custom Headers & Footers")
+    print("   â€¢ Cyber Security Theme")
+    print("   â€¢ Professional Formatting")
+    print("   â€¢ Complete Module Coverage")
 
 
 if __name__ == "__main__":

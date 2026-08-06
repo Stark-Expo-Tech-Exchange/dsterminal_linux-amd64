@@ -1,4 +1,4 @@
-# ============================================================================
+﻿# ============================================================================
 # DSTERMINAL BUNDLE CREATOR - PowerShell Version
 # Version: 2.1.327
 # Description: Creates bundled packages from downloaded installers

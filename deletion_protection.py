@@ -1,4 +1,4 @@
-# deletion_protection.py
+﻿# deletion_protection.py
 """
 DSTerminal - Deletion Protection Module
 Import this into the main DSTerminal class.
@@ -641,7 +641,7 @@ class DSTerminalMonitor(FileSystemEventHandler):
             if self.interactive and self.ui:
                 self.ui.display_notification(
                     "DELETION DETECTED",
-                    f"✓ {filename}\nBackup exists - can restore!",
+                    f"âœ“ {filename}\nBackup exists - can restore!",
                     "warning"
                 )
             self.db.add_deletion_event(filepath, backup_dict['file_hash'], backup_dict['id'])
@@ -650,7 +650,7 @@ class DSTerminalMonitor(FileSystemEventHandler):
             if self.interactive and self.ui:
                 self.ui.display_notification(
                     "DELETION DETECTED",
-                    f"⚠ {filename}\nNo backup available",
+                    f"âš  {filename}\nNo backup available",
                     "error"
                 )
             self.db.add_deletion_event(filepath, "NO_BACKUP")
@@ -729,7 +729,7 @@ class NewFolderWatcher(FileSystemEventHandler):
                     recursive=True
                 )
             self.logger.info(f"New folder auto-monitored: {new_folder}")
-            print(f"  ✓ New folder detected & monitored: {new_folder}")
+            print(f"  âœ“ New folder detected & monitored: {new_folder}")
 
 
 # ============================================================
@@ -810,10 +810,10 @@ class RestoreManager:
             self.db.conn.commit()
             os.chmod(target_path, 0o644)
             size_mb = backup['file_size'] / (1024 * 1024)
-            print(f"✓ Restored: {backup['filename']} -> {target_path} ({size_mb:.2f} MB)")
+            print(f"âœ“ Restored: {backup['filename']} -> {target_path} ({size_mb:.2f} MB)")
             return True
         except Exception as e:
-            print(f"✗ Restore failed: {backup['filename']} - {str(e)}")
+            print(f"âœ— Restore failed: {backup['filename']} - {str(e)}")
             return False
 
     def restore_last_deleted(self) -> bool:
@@ -856,7 +856,7 @@ class ServiceManager:
                 
                 # Find and update PID
                 self._find_and_update_pid()
-                print(f"✅ Service started")
+                print(f"âœ… Service started")
                 return True
             else:
                 terminals = ['xterm', 'gnome-terminal', 'konsole', 'terminator']
@@ -871,14 +871,14 @@ class ServiceManager:
                 
                 time.sleep(2)
                 if self.is_running():
-                    print(f"✅ Service started with PID: {self._read_pid()}")
+                    print(f"âœ… Service started with PID: {self._read_pid()}")
                     return True
                 else:
                     self._find_and_update_pid()
                     return self.is_running()
                 
         except Exception as e:
-            print(f"❌ Failed to start service: {e}")
+            print(f"âŒ Failed to start service: {e}")
             return False
     
     def _find_and_update_pid(self):
@@ -898,7 +898,7 @@ class ServiceManager:
                             if part.isdigit() and len(part) > 3:
                                 with open(self.pid_file, 'w') as f:
                                     f.write(part)
-                                print(f"✅ Found and updated PID: {part}")
+                                print(f"âœ… Found and updated PID: {part}")
                                 return True
             else:
                 result = subprocess.run(
@@ -910,10 +910,10 @@ class ServiceManager:
                         pid = int(line.strip())
                         with open(self.pid_file, 'w') as f:
                             f.write(str(pid))
-                        print(f"✅ Found and updated PID: {pid}")
+                        print(f"âœ… Found and updated PID: {pid}")
                         return True
         except Exception as e:
-            print(f"⚠️ Could not find process: {e}")
+            print(f"âš ï¸ Could not find process: {e}")
         
         return False
 
@@ -974,19 +974,19 @@ class ServiceManager:
                         ['taskkill', '/F', '/T', '/PID', str(pid)],
                         capture_output=True, timeout=5, check=False
                     )
-                    print(f"✅ Killed process: {pid}")
+                    print(f"âœ… Killed process: {pid}")
                 else:
                     try:
                         os.killpg(os.getpgid(pid), signal.SIGTERM)
                         time.sleep(1)
                         os.killpg(os.getpgid(pid), signal.SIGKILL)
-                        print(f"✅ Killed process group: {pid}")
+                        print(f"âœ… Killed process group: {pid}")
                     except ProcessLookupError:
                         print("  Process already terminated")
                     except Exception as e:
-                        print(f"⚠️ Could not kill process: {e}")
+                        print(f"âš ï¸ Could not kill process: {e}")
             except Exception as e:
-                print(f"⚠️ Error reading PID file: {e}")
+                print(f"âš ï¸ Error reading PID file: {e}")
         
         # Kill by window title (Windows)
         if platform.system() == 'Windows':
@@ -995,21 +995,21 @@ class ServiceManager:
                     ['taskkill', '/F', '/FI', 'WINDOWTITLE eq DSTERMINAL MONITOR*'],
                     capture_output=True, timeout=5, check=False
                 )
-                print("✅ Closed monitoring windows")
+                print("âœ… Closed monitoring windows")
             except Exception:
                 pass
         
         self.remove_pid_file()
-        print("✅ Deletion protection service stopped.")
+        print("âœ… Deletion protection service stopped.")
 
     def status(self):
         """Check service status"""
         if self.is_running():
             pid = self._read_pid()
-            print(f"🟢 SERVICE STATUS: RUNNING (PID: {pid})")
-            print("▶️  Monitoring: ACTIVE")
+            print(f"ðŸŸ¢ SERVICE STATUS: RUNNING (PID: {pid})")
+            print("â–¶ï¸  Monitoring: ACTIVE")
         else:
-            print("🔴 SERVICE STATUS: INACTIVE")
+            print("ðŸ”´ SERVICE STATUS: INACTIVE")
             print("[i] To start: service-start")
 
 
@@ -1062,8 +1062,8 @@ if __name__ == "__main__":
                 'max_file_size': 100 * 1024 * 1024
             }
             
-            print(f"✅ Monitoring {len(monitor_paths)} folders")
-            print("🟢 Press Ctrl+C to stop\n")
+            print(f"âœ… Monitoring {len(monitor_paths)} folders")
+            print("ðŸŸ¢ Press Ctrl+C to stop\n")
             
             # Start monitoring
             monitor = DSTerminalMonitor(config, workspace, interactive=True)
@@ -1074,7 +1074,7 @@ if __name__ == "__main__":
             for path in monitor_paths:
                 if os.path.exists(path):
                     observer.schedule(monitor, path, recursive=True)
-                    print(f"  ✓ Monitoring: {path}")
+                    print(f"  âœ“ Monitoring: {path}")
             
             observer.start()
             
@@ -1087,16 +1087,16 @@ if __name__ == "__main__":
                 while True:
                     time.sleep(1)
             except KeyboardInterrupt:
-                print("\n  🛑 Shutting down...")
+                print("\n  ðŸ›‘ Shutting down...")
                 observer.stop()
                 observer.join()
-                print("  ✅ Monitoring stopped.")
+                print("  âœ… Monitoring stopped.")
                 if os.path.exists(pid_file):
                     os.remove(pid_file)
                 sys.exit(0)
                 
         except Exception as e:
-            print(f"\n❌ Error: {str(e)}")
+            print(f"\nâŒ Error: {str(e)}")
             import traceback
             traceback.print_exc()
             sys.exit(1)
@@ -1104,16 +1104,16 @@ if __name__ == "__main__":
     else:
         # Interactive mode - show module info
         print("=" * 70)
-        print("🛡️  DSTERMINAL DELETION PROTECTION MODULE")
+        print("ðŸ›¡ï¸  DSTERMINAL DELETION PROTECTION MODULE")
         print("=" * 70)
         print("")
-        print("  🚀 To run as a service:")
+        print("  ðŸš€ To run as a service:")
         print("  python deletion_protection.py --daemon")
         print("")
-        print("  📌 Import this module into the main DSTerminal class:")
+        print("  ðŸ“Œ Import this module into the main DSTerminal class:")
         print("  from deletion_protection import DSTerminalMonitor, BackupDatabase, RestoreManager, ServiceManager")
         print("")
-        print("  💡 Available classes:")
+        print("  ðŸ’¡ Available classes:")
         print("     - DSTerminalMonitor: Real-time file change monitoring")
         print("     - BackupDatabase: SQLite backup storage")
         print("     - RestoreManager: File restoration")

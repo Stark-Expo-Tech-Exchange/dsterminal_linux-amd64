@@ -1,4 +1,4 @@
-# check_release_status.py
+﻿# check_release_status.py
 import requests
 
 GITHUB_TOKEN = "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"
@@ -14,13 +14,13 @@ print("Checking release status...")
 print("=" * 50)
 
 # Check if the release exists via the tag
-tag = "v3.1.113"
+tag = "v4.0.0.113"
 url = f"https://api.github.com/repos/{REPO}/releases/tags/{tag}"
 response = requests.get(url, headers=headers)
 
 if response.status_code == 200:
     release = response.json()
-    print(f"✅ Release found!")
+    print(f"âœ… Release found!")
     print(f"   Name: {release.get('name', 'N/A')}")
     print(f"   Draft: {release.get('draft', 'N/A')}")
     print(f"   Prerelease: {release.get('prerelease', 'N/A')}")
@@ -28,10 +28,10 @@ if response.status_code == 200:
     assets = release.get('assets', [])
     print(f"   Assets: {len(assets)}")
     for asset in assets:
-        print(f"     📦 {asset['name']} ({asset['size']} bytes)")
+        print(f"     ðŸ“¦ {asset['name']} ({asset['size']} bytes)")
         print(f"        URL: {asset['browser_download_url']}")
 else:
-    print(f"❌ Release not found: {response.status_code}")
+    print(f"âŒ Release not found: {response.status_code}")
     
     # Check all releases
     print("\nChecking all releases...")

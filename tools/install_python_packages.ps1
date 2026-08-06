@@ -1,4 +1,4 @@
-# Python Packages Installer
+﻿# Python Packages Installer
 Write-Host "Installing Python packages..." -ForegroundColor Cyan
 Write-Host ""
 
@@ -191,9 +191,9 @@ foreach ($package in $packages) {
     Write-Host "Installing: $package..." -ForegroundColor Cyan
     try {
         python -m pip install --upgrade $package
-        Write-Host "✅ $package installed successfully" -ForegroundColor Green
+        Write-Host "âœ… $package installed successfully" -ForegroundColor Green
     } catch {
-        Write-Host "❌ Failed to install: $package" -ForegroundColor Red
+        Write-Host "âŒ Failed to install: $package" -ForegroundColor Red
         $failed += $package
 =======
 $packages = @("colorama", "requests", "folium", "plotly", "reportlab")
@@ -215,12 +215,12 @@ foreach ($pkg in $packages) {
 Write-Host ""
 <<<<<<< HEAD
 if ($failed.Count -gt 0) {
-    Write-Host "`n⚠️ Failed packages:" -ForegroundColor Yellow
+    Write-Host "`nâš ï¸ Failed packages:" -ForegroundColor Yellow
     foreach ($pkg in $failed) {
         Write-Host "  - $pkg" -ForegroundColor Red
     }
 } else {
-    Write-Host "`n✅ All packages installed successfully!" -ForegroundColor Green
+    Write-Host "`nâœ… All packages installed successfully!" -ForegroundColor Green
 =======
 if ($failed.Count -eq 0) {
     Write-Host "SUCCESS: All packages installed" -ForegroundColor Green

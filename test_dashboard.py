@@ -1,11 +1,11 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 """Debug script to test dashboard commands"""
 
 import sys
 sys.path.insert(0, '.')
 
 print("="*60)
-print("🧪 DSTERMINAL DASHBOARD DEBUG TEST")
+print("ðŸ§ª DSTERMINAL DASHBOARD DEBUG TEST")
 print("="*60)
 
 try:
@@ -31,12 +31,12 @@ try:
             # It's a direct function
             result = cmd_entry(['arg1', 'arg2'])
         else:
-            print(f"    ❌ Unknown command type: {type(cmd_entry)}")
+            print(f"    âŒ Unknown command type: {type(cmd_entry)}")
             result = None
         
         print(f"    Result: {result}")
     else:
-        print("    ❌ 'test' command not found!")
+        print("    âŒ 'test' command not found!")
     
     print("\n[4] Testing 'dashboard' command...")
     if 'dashboard' in terminal.commands:
@@ -48,20 +48,20 @@ try:
         elif callable(cmd_entry):
             result = cmd_entry([])
         else:
-            print(f"    ❌ Unknown command type: {type(cmd_entry)}")
+            print(f"    âŒ Unknown command type: {type(cmd_entry)}")
             result = None
         
         print(f"    Result: {result}")
     else:
-        print("    ❌ 'dashboard' command not found!")
+        print("    âŒ 'dashboard' command not found!")
     
     print("\n[5] Checking dashboard status...")
     print(f"    soc_dashboard_active: {terminal.soc_dashboard_active}")
     
-    print("\n✅ Test complete!")
+    print("\nâœ… Test complete!")
     
 except Exception as e:
-    print(f"\n❌ Error: {e}")
+    print(f"\nâŒ Error: {e}")
     import traceback
     traceback.print_exc()
 

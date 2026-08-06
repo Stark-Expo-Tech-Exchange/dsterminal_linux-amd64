@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+﻿from setuptools import setup, find_packages
 import os
 
 # Read requirements from requirements.txt
@@ -11,7 +11,7 @@ requirements = [req.strip() for req in requirements if req.strip() and not req.s
 setup(
     name='dsterminal',
 <<<<<<< HEAD
-    version='3.1.113',
+    version='4.0.0.113',
 =======
     version='2.1.0',
 >>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44

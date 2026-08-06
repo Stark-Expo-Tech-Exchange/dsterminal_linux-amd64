@@ -1,4 +1,4 @@
-#     def check_ssl(self, domain=None):
+﻿#     def check_ssl(self, domain=None):
 #         """Comprehensive SSL certificate analyzer with export options"""
 #         try:
            
@@ -84,27 +84,27 @@
 #         color = random.choice(colors)
 
 #     # Top border
-#         print("\n" + color + "+" + "═" * box_width + "+" + Style.RESET_ALL)
-#         print(color + "│" + title.center(box_width) + "│" + Style.RESET_ALL)
-#         print(color + "+" + "─" * box_width + "+" + Style.RESET_ALL)
+#         print("\n" + color + "+" + "â•" * box_width + "+" + Style.RESET_ALL)
+#         print(color + "â”‚" + title.center(box_width) + "â”‚" + Style.RESET_ALL)
+#         print(color + "+" + "â”€" * box_width + "+" + Style.RESET_ALL)
 
-#         spinner = ["⠋","⠙","⠹","⠸","⠼","⠴","⠦","⠧","⠇","⠏"]
+#         spinner = ["â ‹","â ™","â ¹","â ¸","â ¼","â ´","â ¦","â §","â ‡","â "]
 #         flickers = ["[Scanning...]", "[TLS Check]", "[OCSP Query]", "[Certificate Verify]", "[Risk Assessment]"]
 #         end_time = time.time() + seconds
 #         i = 0
 
 #         while time.time() < end_time:
 #             progress = int(((time.time() % seconds) / seconds) * box_width)
-#             bar = "█" * progress + "-" * (box_width - progress)
+#             bar = "â–ˆ" * progress + "-" * (box_width - progress)
 #             flicker_text = random.choice(flickers).ljust(box_width)
-#             sys.stdout.write(f"\r{color}│{spinner[i%len(spinner)]} {bar[:box_width-2]} {Style.BRIGHT}{flicker_text[:box_width-4]}{Style.RESET_ALL}{color}│{Style.RESET_ALL}")
+#             sys.stdout.write(f"\r{color}â”‚{spinner[i%len(spinner)]} {bar[:box_width-2]} {Style.BRIGHT}{flicker_text[:box_width-4]}{Style.RESET_ALL}{color}â”‚{Style.RESET_ALL}")
 #             sys.stdout.flush()
 #             time.sleep(0.1)
 #             i += 1
 
 #     # Bottom border
-#         sys.stdout.write(f"\r{color}│{' ' * box_width}│{Style.RESET_ALL}\n")
-#         print(color + "+" + "═" * box_width + "+" + Style.RESET_ALL)
+#         sys.stdout.write(f"\r{color}â”‚{' ' * box_width}â”‚{Style.RESET_ALL}\n")
+#         print(color + "+" + "â•" * box_width + "+" + Style.RESET_ALL)
 #         sys.stdout.flush()
 # # ---------- Example usage in your certcheck sequence ----------
 #     def _animated_ssl_scan(self):
@@ -142,18 +142,18 @@
 
 #         colors = [Fore.GREEN, Fore.CYAN, Fore.MAGENTA, Fore.YELLOW]
 
-#         print("\n" + Fore.BLUE + "╔" + "═"*table_width + "╗" + Style.RESET_ALL)
-#         print(Fore.BLUE + f"║ {'DSTerminal SSL/TLS Security Audit'.center(table_width)} ║" + Style.RESET_ALL)
-#         print(Fore.BLUE + "╠" + "═"*table_width + "╣" + Style.RESET_ALL)
+#         print("\n" + Fore.BLUE + "â•”" + "â•"*table_width + "â•—" + Style.RESET_ALL)
+#         print(Fore.BLUE + f"â•‘ {'DSTerminal SSL/TLS Security Audit'.center(table_width)} â•‘" + Style.RESET_ALL)
+#         print(Fore.BLUE + "â• " + "â•"*table_width + "â•£" + Style.RESET_ALL)
 
 #         for row in cert_data:
 #             k, v = row
 #             color = random.choice(colors)
 #             blink = "\033[5m"  # ANSI blink
-#             print(Fore.BLUE + "║ " + Style.RESET_ALL + f"{color}{blink}{k:<15}{Style.RESET_ALL}: {v:<{table_width-20}}" + Fore.BLUE + " ║" + Style.RESET_ALL)
+#             print(Fore.BLUE + "â•‘ " + Style.RESET_ALL + f"{color}{blink}{k:<15}{Style.RESET_ALL}: {v:<{table_width-20}}" + Fore.BLUE + " â•‘" + Style.RESET_ALL)
 #             time.sleep(0.05)
 
-#         print(Fore.BLUE + "╚" + "═"*table_width + "╝" + Style.RESET_ALL)
+#         print(Fore.BLUE + "â•š" + "â•"*table_width + "â•" + Style.RESET_ALL)
 
 #     def _print_ssl_report(self, domain, ssock, cert_obj, chain, ocsp_status, valid_days):
 
@@ -174,20 +174,20 @@
 #         renewal_warning = valid_days < 60
 
 #     # Basic Info
-#         print("\n╔" + "═"*70 + "╗")
-#         print(f"║ {'DSTerminal SSL/TLS Security Audit':^68} ║")
-#         print("╠" + "═"*70 + "╣")
+#         print("\nâ•”" + "â•"*70 + "â•—")
+#         print(f"â•‘ {'DSTerminal SSL/TLS Security Audit':^68} â•‘")
+#         print("â• " + "â•"*70 + "â•£")
 
-#         print(f"║ {'Domain:':<20} {domain:<46} ║")
-#         print(f"║ {'Issuer:':<20} {cert_obj.get_issuer().CN:<46} ║")
-#         print(f"║ {'Subject:':<20} {cert_obj.get_subject().CN:<46} ║")
-#         print(f"║ {'Expires:':<20} {cert_obj.get_notAfter().decode()} ({valid_days} days) ║")
-#         print(f"║ {'Protocol:':<20} {protocol:<46} ║")
-#         print(f"║ {'Cipher:':<20} {cipher:<46} ║")
-#         print(f"║ {'Signature:':<20} {sig_algo:<46} ║")
-#         print(f"║ {'OCSP Status:':<20} {ocsp_status:<46} ║")
+#         print(f"â•‘ {'Domain:':<20} {domain:<46} â•‘")
+#         print(f"â•‘ {'Issuer:':<20} {cert_obj.get_issuer().CN:<46} â•‘")
+#         print(f"â•‘ {'Subject:':<20} {cert_obj.get_subject().CN:<46} â•‘")
+#         print(f"â•‘ {'Expires:':<20} {cert_obj.get_notAfter().decode()} ({valid_days} days) â•‘")
+#         print(f"â•‘ {'Protocol:':<20} {protocol:<46} â•‘")
+#         print(f"â•‘ {'Cipher:':<20} {cipher:<46} â•‘")
+#         print(f"â•‘ {'Signature:':<20} {sig_algo:<46} â•‘")
+#         print(f"â•‘ {'OCSP Status:':<20} {ocsp_status:<46} â•‘")
 
-#         print("╚" + "═"*70 + "╝")
+#         print("â•š" + "â•"*70 + "â•")
 
 #     # Stage 4: Chain Mapping
 #         self._loading_animation("Mapping Trust Relationships", 10)
@@ -195,7 +195,7 @@
 #         print("\n[ Certificate Chain ]")
 
 #         for i, cert in enumerate(chain):
-#             print(f"{'  '*i}└─ {cert['subject'].get(b'CN', b'Unknown').decode()}")
+#             print(f"{'  '*i}â””â”€ {cert['subject'].get(b'CN', b'Unknown').decode()}")
 #             if i == 0:
 #                 print(f"    Issuer: {cert['issuer'].get(b'CN', b'Unknown').decode()}")
 #                 print(f"    Valid Until: {cert['expires']}")
@@ -236,7 +236,7 @@
 #         else:
 #             level = "CRITICAL"
 
-#         print(f"\n[✓] Overall Risk Level: {level}")
+#         print(f"\n[âœ“] Overall Risk Level: {level}")
 
 #         # Build report data
 #         data = {
@@ -273,16 +273,16 @@
 #         print("\n[ Recommendations ]")
 
 #         if renewal_warning:
-#             print("→ Renew SSL certificate immediately")
+#             print("â†’ Renew SSL certificate immediately")
 
 #         if not tls13_supported:
-#             print("→ Upgrade server to support TLS 1.3")
+#             print("â†’ Upgrade server to support TLS 1.3")
 
 #         if ocsp_status != "VALID":
-#             print("→ Enable OCSP stapling")
+#             print("â†’ Enable OCSP stapling")
 
 #         if risk == 0:
-#             print("→ No action required. System secure.")
+#             print("â†’ No action required. System secure.")
 
 #     # Stage 7: Export Prompt
 #         choice = input("\nExport security report to file? (y/N): ").lower()
@@ -367,7 +367,7 @@
 #         with open(filename, "w") as f:
 #             json.dump(data, f, indent=2)
 
-#         print(f"\n[✓] Encrypted audit report saved: {filename}")
+#         print(f"\n[âœ“] Encrypted audit report saved: {filename}")
 
 #     def _bytes_to_str_dict(self, data):
 #         """Convert bytes dictionary to string dictionary"""
@@ -518,7 +518,7 @@
 #         elements.append(Paragraph("Recommendations", section_style))
 #         recs = self._build_recommendations(data)
 #         for rec in recs:
-#             elements.append(Paragraph(f"• {rec}", normal))
+#             elements.append(Paragraph(f"â€¢ {rec}", normal))
 #             elements.append(Spacer(1, 5))
 
 #     # Footer
@@ -532,18 +532,18 @@
 #             scale_ratio = max_footer_width / footer_logo.imageWidth
 #             footer_logo.drawWidth = footer_logo.imageWidth * scale_ratio
 #             footer_logo.drawHeight = footer_logo.imageHeight * scale_ratio
-#             footer_data.append([footer_logo, Paragraph("AUTOGENERATED CERTIFICATE REPORT | DSTerminal Platform\n© Stark Expo Tech Exchange", normal)])
+#             footer_data.append([footer_logo, Paragraph("AUTOGENERATED CERTIFICATE REPORT | DSTerminal Platform\nÂ© Stark Expo Tech Exchange", normal)])
 #             footer_table = Table(footer_data, colWidths=[60, page_width - 60 - doc.leftMargin - doc.rightMargin])
 #             footer_table.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'MIDDLE')]))
 #             elements.append(footer_table)
 #         else:
 #         # fallback if logo missing
 #             elements.append(Paragraph("AUTOGENERATED REPORT | DSTerminal Platform", normal))
-#             elements.append(Paragraph("© Stark Expo Tech Exchange LTD", normal))
+#             elements.append(Paragraph("Â© Stark Expo Tech Exchange LTD", normal))
 
    
 #         doc.build(elements)
-#         print(f"\n[✓] PDF Compliance Report Created: {filename}")
+#         print(f"\n[âœ“] PDF Compliance Report Created: {filename}")
 
 #     def _styled_table(self, data):
 
@@ -604,7 +604,7 @@
 #         terminal_width = 80
 #         print("\n" + text.center(terminal_width))
     
-#         spinner = ["⠋","⠙","⠹","⠸","⠼","⠴","⠦","⠧","⠇","⠏"]
+#         spinner = ["â ‹","â ™","â ¹","â ¸","â ¼","â ´","â ¦","â §","â ‡","â "]
 #         end_time = time.time() + seconds
 #         i = 0
 
@@ -622,7 +622,7 @@
 #         # Animated spinner + sliding progress
 #             bar_length = 30
 #             progress = int(((time.time() % seconds) / seconds) * bar_length)
-#             bar = "█" * progress + "-" * (bar_length - progress)
+#             bar = "â–ˆ" * progress + "-" * (bar_length - progress)
 
 #         # Random colors
 #             color = random.choice([Fore.GREEN, Fore.CYAN, Fore.MAGENTA, Fore.YELLOW])
@@ -632,5 +632,5 @@
 #             i += 1
 
 #     # Finish with a completed checkmark
-#         sys.stdout.write(f"\r{Fore.GREEN}[✓] {text} Completed{' ' * 40}{Style.RESET_ALL}\n")
+#         sys.stdout.write(f"\r{Fore.GREEN}[âœ“] {text} Completed{' ' * 40}{Style.RESET_ALL}\n")
 #         sys.stdout.flush()

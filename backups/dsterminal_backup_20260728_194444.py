@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 import sys
 import subprocess
 import os
@@ -362,7 +362,7 @@ SOC_NMAP_AVAILABLE = False
 try:
     from soc_nmap_dashboard import SOCNmapDashboard, SOCNmapIntegration
     SOC_NMAP_AVAILABLE = True
-    print(f"{Fore.GREEN}[✓] SOC Nmap Dashboard loaded successfully{Style.RESET_ALL}")
+    print(f"{Fore.GREEN}[âœ“] SOC Nmap Dashboard loaded successfully{Style.RESET_ALL}")
 except ImportError as e:
     print(f"{Fore.YELLOW}[!] SOC Nmap Dashboard not available: {e}{Style.RESET_ALL}")
     print(f"{Fore.CYAN}[*] Make sure soc_nmap_dashboard.py exists in the same directory{Style.RESET_ALL}")
@@ -381,22 +381,22 @@ try:
     )
     INTEGRITY_AVAILABLE = True
     if COLORS_AVAILABLE:
-        print(f"{Fore.GREEN}✓ Integrity Monitor loaded successfully{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}âœ“ Integrity Monitor loaded successfully{Style.RESET_ALL}")
     else:
-        print("✓ Integrity Monitor loaded successfully")
+        print("âœ“ Integrity Monitor loaded successfully")
 except ImportError as e:
     INTEGRITY_AVAILABLE = False
     if COLORS_AVAILABLE:
-        print(f"{Fore.YELLOW}⚠ Integrity Monitor not found: {e}{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}âš  Integrity Monitor not found: {e}{Style.RESET_ALL}")
         print(f"{Fore.YELLOW}  Make sure integrity_monitor.py is in the same directory{Style.RESET_ALL}")
     else:
-        print(f"⚠ Integrity Monitor not found: {e}")
+        print(f"âš  Integrity Monitor not found: {e}")
 except Exception as e:
     INTEGRITY_AVAILABLE = False
     if COLORS_AVAILABLE:
-        print(f"{Fore.RED}⚠ Integrity Monitor error: {e}{Style.RESET_ALL}")
+        print(f"{Fore.RED}âš  Integrity Monitor error: {e}{Style.RESET_ALL}")
     else:
-        print(f"⚠ Integrity Monitor error: {e}")
+        print(f"âš  Integrity Monitor error: {e}")
 # ===ends here=====
 # Try to import psutil for real system metrics
 try:
@@ -424,7 +424,7 @@ try:
     FINANCIAL_FORENSICS_AVAILABLE = True
 except ImportError:
     FINANCIAL_FORENSICS_AVAILABLE = False
-    print(f"{Fore.YELLOW}⚠ Financial Forensics module not found: {e}{Style.RESET_ALL}")
+    print(f"{Fore.YELLOW}âš  Financial Forensics module not found: {e}{Style.RESET_ALL}")
 
 # Import crypto_engine
 try:
@@ -437,10 +437,10 @@ try:
         CryptoEngine = crypto_engine_module.CryptoEngine
         crypto_engine = CryptoEngine(BASE_PATH)
     else:
-        print(f"⚠ crypto_engine.py not found at: {crypto_path}")
+        print(f"âš  crypto_engine.py not found at: {crypto_path}")
         crypto_engine = None
 except Exception as e:
-    print(f"⚠ Crypto engine import error: {e}")
+    print(f"âš  Crypto engine import error: {e}")
     crypto_engine = None
 
 
@@ -451,7 +451,7 @@ try:
     from vt_scan import VirusTotalScanner, sync_operator_session
     VT_AVAILABLE = True
 except ImportError:
-    print("⚠ VT module not found")
+    print("âš  VT module not found")
     VT_AVAILABLE = False
 
 try:
@@ -469,15 +469,15 @@ try:
         vt_scan_menu = vt_scan_module.vt_scan_menu
 
         VT_AVAILABLE = True
-        print(f"{Fore.GREEN}✓ VirusTotal module loaded successfully{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}âœ“ VirusTotal module loaded successfully{Style.RESET_ALL}")
 
     else:
         VT_AVAILABLE = False
-        print(f"{Fore.YELLOW}⚠ vt_scan.py not found at: {vt_scan_path}{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}âš  vt_scan.py not found at: {vt_scan_path}{Style.RESET_ALL}")
 
 except Exception as e:
     VT_AVAILABLE = False
-    print(f"{Fore.RED}⚠ VirusTotal module import error: {e}{Style.RESET_ALL}")
+    print(f"{Fore.RED}âš  VirusTotal module import error: {e}{Style.RESET_ALL}")
 # ===
 # try import recon and recon_full here======
 # =====
@@ -496,13 +496,13 @@ try:
         recon_menu = getattr(recon_module, 'recon_menu', None)
         
         RECON_AVAILABLE = True
-        print(f"{Fore.GREEN}✓ Recon module loaded successfully{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}âœ“ Recon module loaded successfully{Style.RESET_ALL}")
     else:
         RECON_AVAILABLE = False
-        print(f"{Fore.YELLOW}⚠ recon.py not found at: {recon_path}{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}âš  recon.py not found at: {recon_path}{Style.RESET_ALL}")
 except Exception as e:
     RECON_AVAILABLE = False
-    print(f"{Fore.RED}⚠ Recon module import error: {e}{Style.RESET_ALL}")
+    print(f"{Fore.RED}âš  Recon module import error: {e}{Style.RESET_ALL}")
 
 # =====
 # Import Recon Full Module (recon_full.py)
@@ -520,13 +520,13 @@ try:
         full_recon_menu = getattr(recon_full_module, 'full_recon_menu', None)
         
         RECON_FULL_AVAILABLE = True
-        print(f"{Fore.GREEN}✓ Recon Full module loaded successfully{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}âœ“ Recon Full module loaded successfully{Style.RESET_ALL}")
     else:
         RECON_FULL_AVAILABLE = False
-        print(f"{Fore.YELLOW}⚠ recon_full.py not found at: {recon_full_path}{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}âš  recon_full.py not found at: {recon_full_path}{Style.RESET_ALL}")
 except Exception as e:
     RECON_FULL_AVAILABLE = False
-    print(f"{Fore.RED}⚠ Recon Full module import error: {e}{Style.RESET_ALL}")
+    print(f"{Fore.RED}âš  Recon Full module import error: {e}{Style.RESET_ALL}")
 # ====added recon and recon_full debug like
 # After importing recon modules, add fallback assignments:
 
@@ -578,10 +578,10 @@ try:
         EducationTypingEngine = edu_module.EducationTypingEngine
         engine = EducationTypingEngine(speed=0.03)
     else:
-        print(f"⚠ edu_typing_engine.py not found at: {edu_path}")
+        print(f"âš  edu_typing_engine.py not found at: {edu_path}")
         engine = None
 except Exception as e:
-    print(f"⚠ Education typing engine import error: {e}")
+    print(f"âš  Education typing engine import error: {e}")
     engine = None
 import math
 import shlex
@@ -782,7 +782,7 @@ class SimpleWorkspace:
         os.makedirs(os.path.join(base_path, 'database'), exist_ok=True)
         os.makedirs(os.path.join(base_path, 'logs'), exist_ok=True)
         os.makedirs(os.path.join(base_path, 'config'), exist_ok=True)        
-        os.makedirs(os.path.join(base_path, 'backups_protected'), exist_ok=True)  # ← ADD THIS
+        os.makedirs(os.path.join(base_path, 'backups_protected'), exist_ok=True)  # â† ADD THIS
         for cat in ['images','documents','spreadsheets','code','config','archives','media','other','protected','encrypted']:
             os.makedirs(os.path.join(base_path, 'backups', cat), exist_ok=True)
     
@@ -874,7 +874,7 @@ console = Console()
 #       ==
 # VERSION INFO - FAST
 #       ==
-VERSION = "3.1.113"
+VERSION = "4.0.0.113"
 APP_NAME = "DSTerminal"
 DESCRIPTION = "Defensive Security Terminal"
 AUTHOR = "Spark Wilson Spink | Powered By Stark Expo Tech Exchange"
@@ -948,10 +948,10 @@ try:
         CryptoEngine = crypto_engine_module.CryptoEngine
         crypto_engine = CryptoEngine(BASE_PATH)
     else:
-        print(f"⚠ crypto_engine.py not found at: {crypto_path}")
+        print(f"âš  crypto_engine.py not found at: {crypto_path}")
         crypto_engine = None
 except Exception as e:
-    print(f"⚠ Crypto engine import error: {e}")
+    print(f"âš  Crypto engine import error: {e}")
     crypto_engine = None
 
 # 1. Crypto Engine - Silent
@@ -1140,11 +1140,11 @@ CONFIG = {
     'UPDATE_URL': 'https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest.git',
     'LOG_FILE': 'secure_audit.log',
     'ENCRYPT_KEY': 'generated_on_init',
-    'CURRENT_VERSION': '3.1.113'
+    'CURRENT_VERSION': '4.0.0.113'
 }
 EDUCATION_TIPS = {
     "system scan -all": """
-[bold]💡 Did You Know?[/bold]
+[bold]ðŸ’¡ Did You Know?[/bold]
 Regular system scans help detect malware persistence mechanisms like:
 - [red]Rootkits[/red] hiding in kernel modules
 - [yellow]Malicious scheduled tasks[/yellow] (check `crontab -l` or Task Scheduler)
@@ -1152,73 +1152,73 @@ Regular system scans help detect malware persistence mechanisms like:
 """,
 
     "net -n mon": """
-[bold cyan]🌐 NETWORK MONITORING: THREAT VISUALIZATION[/bold cyan]
+[bold cyan]ðŸŒ NETWORK MONITORING: THREAT VISUALIZATION[/bold cyan]
 
-[bold yellow]📡 WHAT YOU'RE SEEING ON THE MAP[/bold yellow]
+[bold yellow]ðŸ“¡ WHAT YOU'RE SEEING ON THE MAP[/bold yellow]
 
 The threat map shows [green]live connections[/green] from your system to servers worldwide.
 Each colored line tells a story about your network traffic.
 
-[bold red]🔴 RED LINES = HIGH RISK[/bold red]
-→ Known malicious IP addresses
-→ Active C2 (Command & Control) communication
-→ Connections to sanctioned countries (North Korea, Iran, Russia)
-→ High threat score (3-5 out of 5)
+[bold red]ðŸ”´ RED LINES = HIGH RISK[/bold red]
+â†’ Known malicious IP addresses
+â†’ Active C2 (Command & Control) communication
+â†’ Connections to sanctioned countries (North Korea, Iran, Russia)
+â†’ High threat score (3-5 out of 5)
 
-[bold yellow]🟡 YELLOW/ORANGE LINES = MEDIUM RISK[/bold yellow]
-→ Unusual ports or protocols
-→ Recently registered domains (<30 days old)
-→ Geographic anomalies (unexpected server locations)
-→ Hosting providers frequently abused by attackers
+[bold yellow]ðŸŸ¡ YELLOW/ORANGE LINES = MEDIUM RISK[/bold yellow]
+â†’ Unusual ports or protocols
+â†’ Recently registered domains (<30 days old)
+â†’ Geographic anomalies (unexpected server locations)
+â†’ Hosting providers frequently abused by attackers
 
-[bold green]🟢 GREEN LINES = LOW RISK[/bold green]
-→ Normal HTTPS web browsing (ports 443/80)
-→ Trusted services (Microsoft, Google, Cloudflare, AWS)
-→ Expected geographic locations
-→ Established connections with clean reputation
+[bold green]ðŸŸ¢ GREEN LINES = LOW RISK[/bold green]
+â†’ Normal HTTPS web browsing (ports 443/80)
+â†’ Trusted services (Microsoft, Google, Cloudflare, AWS)
+â†’ Expected geographic locations
+â†’ Established connections with clean reputation
 
-[bold cyan]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold cyan]
+[bold cyan]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold cyan]
 
-[bold white]🎯 WHAT TO INVESTIGATE IMMEDIATELY[/bold white]
+[bold white]ðŸŽ¯ WHAT TO INVESTIGATE IMMEDIATELY[/bold white]
 
-✓ Multiple [red]red lines[/red] from the same process
-✓ Connections to [yellow]unusual ports[/yellow] (not 80,443,22,3389)
-✓ [cyan]Beaconing patterns[/cyan] - regular intervals to same IP
-✓ [magenta]High data upload[/magenta] without user action
-✓ Processes with [red]no digital signature[/red] making network calls
+âœ“ Multiple [red]red lines[/red] from the same process
+âœ“ Connections to [yellow]unusual ports[/yellow] (not 80,443,22,3389)
+âœ“ [cyan]Beaconing patterns[/cyan] - regular intervals to same IP
+âœ“ [magenta]High data upload[/magenta] without user action
+âœ“ Processes with [red]no digital signature[/red] making network calls
 
-[bold cyan]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold cyan]
+[bold cyan]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold cyan]
 
-[bold green]📏 UNDERSTANDING DISTANCE METRICS[/bold green]
+[bold green]ðŸ“ UNDERSTANDING DISTANCE METRICS[/bold green]
 
 Each connection line displays the [yellow]great-circle distance[/yellow] between you and the server:
 
-→ [cyan]Short distances[/cyan] (<1000km) = Low latency, likely regional services
-→ [yellow]Medium distances[/yellow] (1000-5000km) = Typical cross-continent traffic
-→ [red]Long distances[/red] (>5000km) = Potentially abnormal routing
+â†’ [cyan]Short distances[/cyan] (<1000km) = Low latency, likely regional services
+â†’ [yellow]Medium distances[/yellow] (1000-5000km) = Typical cross-continent traffic
+â†’ [red]Long distances[/red] (>5000km) = Potentially abnormal routing
 
 [bold]Watch for geographic mismatches:[/bold] A "local" bank connecting to Eastern Europe
 or a software update fetching from 15,000km away when local mirrors exist.
 
-[bold cyan]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold cyan]
+[bold cyan]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold cyan]
 
-[bold magenta]🔬 BROWSER CONNECTION ANALYSIS[/bold magenta]
+[bold magenta]ðŸ”¬ BROWSER CONNECTION ANALYSIS[/bold magenta]
 
-Browser connections (🌐 WEB) require special attention because:
+Browser connections (ðŸŒ WEB) require special attention because:
 
-• [red]Drive-by downloads[/red] - Malicious scripts establishing hidden connections
-• [yellow]Cryptominers[/yellow] - Running in tabs, connecting to mining pools
-• [cyan]Data exfiltration[/cyan] - Form data sent to unexpected domains
-• [magenta]C2 via WebSockets[/magenta] - Real-time communication channels
+â€¢ [red]Drive-by downloads[/red] - Malicious scripts establishing hidden connections
+â€¢ [yellow]Cryptominers[/yellow] - Running in tabs, connecting to mining pools
+â€¢ [cyan]Data exfiltration[/cyan] - Form data sent to unexpected domains
+â€¢ [magenta]C2 via WebSockets[/magenta] - Real-time communication channels
 
 [bold]Suspicious indicators:[/bold]
-→ Connections to [red]non-standard ports[/red] (not 443/80)
-→ [cyan]Multiple connections[/cyan] from different tabs to same IP
-→ [yellow]WebRTC leaks[/yellow] revealing local IP addresses
+â†’ Connections to [red]non-standard ports[/red] (not 443/80)
+â†’ [cyan]Multiple connections[/cyan] from different tabs to same IP
+â†’ [yellow]WebRTC leaks[/yellow] revealing local IP addresses
 
-[bold cyan]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold cyan]
+[bold cyan]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold cyan]
 
-[bold red]⚠️ IMMEDIATE ACTION REQUIRED - RED FLAGS[/bold red]
+[bold red]âš ï¸ IMMEDIATE ACTION REQUIRED - RED FLAGS[/bold red]
 
 If you observe ANY of these, investigate immediately:
 
@@ -1228,44 +1228,44 @@ If you observe ANY of these, investigate immediately:
 4. [magenta]Outbound [red]ICMP tunneling[/red] (unusual ping patterns)[/magenta]
 5. [green]Large data [red]exfiltration[/red] to unrecognized destinations[/green]
 
-[bold cyan]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold cyan]
+[bold cyan]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold cyan]
 
-[bold white]🎯 INCIDENT RESPONSE WORKFLOW[/bold white]
+[bold white]ðŸŽ¯ INCIDENT RESPONSE WORKFLOW[/bold white]
 
 [white]1. IMMEDIATE[/white]
-→ [red]Document everything[/red] (screenshots, logs, timestamps)
-→ [yellow]Disconnect[/yellow] confirmed malicious hosts from network
+â†’ [red]Document everything[/red] (screenshots, logs, timestamps)
+â†’ [yellow]Disconnect[/yellow] confirmed malicious hosts from network
 
 [white]2. ANALYSIS[/white]
-→ [cyan]Capture traffic[/cyan] (Wireshark/tcpdump) for deeper inspection
-→ [green]Memory analysis[/green] of suspicious processes (Volatility)
-→ [magenta]Check against threat intel[/magenta] (VirusTotal, MISP)
+â†’ [cyan]Capture traffic[/cyan] (Wireshark/tcpdump) for deeper inspection
+â†’ [green]Memory analysis[/green] of suspicious processes (Volatility)
+â†’ [magenta]Check against threat intel[/magenta] (VirusTotal, MISP)
 
 [white]3. REMEDIATION[/white]
-→ [red]Kill malicious processes[/red]
-→ [yellow]Remove persistence[/yellow]
-→ [cyan]Block IOCs[/cyan] (firewall, DNS sinkhole)
+â†’ [red]Kill malicious processes[/red]
+â†’ [yellow]Remove persistence[/yellow]
+â†’ [cyan]Block IOCs[/cyan] (firewall, DNS sinkhole)
 
 [white]4. RECOVERY[/white]
-→ [green]Restore from known-good backups[/green]
-→ [magenta]Apply security patches[/magenta]
-→ [blue]Reset compromised credentials[/blue]
+â†’ [green]Restore from known-good backups[/green]
+â†’ [magenta]Apply security patches[/magenta]
+â†’ [blue]Reset compromised credentials[/blue]
 
-[bold cyan]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold cyan]
+[bold cyan]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold cyan]
 
-[bold blue]📚 CONTINUOUS LEARNING RESOURCES[/bold blue]
+[bold blue]ðŸ“š CONTINUOUS LEARNING RESOURCES[/bold blue]
 
-• [cyan]MITRE ATT&CK Framework[/cyan] - Understand adversary tactics & techniques
-• [yellow]SANS Reading Room[/yellow] - Network monitoring white papers
-• [red]CISA Alerts[/red] - Current threat intelligence
-• [green]VirusTotal[/green] - Hash lookups and sandbox analysis
-• [magenta]Any.Run[/magenta] - Interactive malware analysis
+â€¢ [cyan]MITRE ATT&CK Framework[/cyan] - Understand adversary tactics & techniques
+â€¢ [yellow]SANS Reading Room[/yellow] - Network monitoring white papers
+â€¢ [red]CISA Alerts[/red] - Current threat intelligence
+â€¢ [green]VirusTotal[/green] - Hash lookups and sandbox analysis
+â€¢ [magenta]Any.Run[/magenta] - Interactive malware analysis
 
 [dim italic]"The network doesn't lie - it just waits for someone to read its story."[/dim italic]
 """,
 
     "harden -t sys": """
-[bold]🛡️ Hardening Pro Tip[/bold]
+[bold]ðŸ›¡ï¸ Hardening Pro Tip[/bold]
 Always follow the [yellow]Principle of Least Privilege[/yellow]:
 - Disable unnecessary services
 - Apply OS-specific benchmarks (e.g., [blue]CIS Benchmarks[/blue])
@@ -1273,135 +1273,135 @@ Always follow the [yellow]Principle of Least Privilege[/yellow]:
 """,
 
     "exploitcheck": """
-[bold cyan]🔍 EXPLOIT VULNERABILITY ASSESSMENT ENGINE[/bold cyan]
+[bold cyan]ðŸ” EXPLOIT VULNERABILITY ASSESSMENT ENGINE[/bold cyan]
 
-[bold red]⚡ CRITICAL VULNERABILITY CHECKS:[/bold red]
+[bold red]âš¡ CRITICAL VULNERABILITY CHECKS:[/bold red]
 
 [bold yellow]1. KERNEL & SYSTEM EXPLOITS[/bold yellow]
-• [red]Dirty Pipe (CVE-2022-0847)[/red] - Kernel privilege escalation (Linux 5.8+)
+â€¢ [red]Dirty Pipe (CVE-2022-0847)[/red] - Kernel privilege escalation (Linux 5.8+)
     Check: `uname -r | grep -E '5\.([8-9]|1[0-9])'`
-• [red]Dirty Cow (CVE-2016-5195)[/red] - Kernel race condition
+â€¢ [red]Dirty Cow (CVE-2016-5195)[/red] - Kernel race condition
     Check: `uname -r | grep -E '2\.6\.(2[2-9]|3[0-9])|3\.'`
-• [red]PwnKit (CVE-2021-4034)[/red] - pkexec local privilege escalation
+â€¢ [red]PwnKit (CVE-2021-4034)[/red] - pkexec local privilege escalation
     Check: `dpkg -l policykit-1 | grep -E '0\.105-[0-9]'` (Debian)
-• [red]Baron Samedit (CVE-2021-3156)[/red] - Sudo heap overflow
+â€¢ [red]Baron Samedit (CVE-2021-3156)[/red] - Sudo heap overflow
     Check: `sudo -V | grep "Sudo version 1\.[8-9]\.[0-9]"`
-• [red]regreSSHion (CVE-2024-6387)[/red] - OpenSSH signal handler race
+â€¢ [red]regreSSHion (CVE-2024-6387)[/red] - OpenSSH signal handler race
     Check: `ssh -V | grep -E 'OpenSSH_[0-8]\.[0-9]'`
 
 [bold magenta]2. NETWORK SERVICE VULNERABILITIES[/bold magenta]
-• [red]Log4Shell (CVE-2021-44228)[/red] - Apache Log4j RCE
+â€¢ [red]Log4Shell (CVE-2021-44228)[/red] - Apache Log4j RCE
     Check: `find / -name "*log4j*" -type f 2>/dev/null`
-• [red]Heartbleed (CVE-2014-0160)[/red] - OpenSSL memory leak
+â€¢ [red]Heartbleed (CVE-2014-0160)[/red] - OpenSSL memory leak
     Check: `openssl version | grep -E '1\.0\.[1-9]'`
-• [red]Shellshock (CVE-2014-6271)[/red] - Bash environment variable
+â€¢ [red]Shellshock (CVE-2014-6271)[/red] - Bash environment variable
     Check: `env 'x=() { :;}; echo vulnerable' bash -c "echo test"`
-• [red]POODLE (CVE-2014-3566)[/red] - SSLv3 padding oracle
+â€¢ [red]POODLE (CVE-2014-3566)[/red] - SSLv3 padding oracle
     Check: `openssl s_client -connect localhost:443 -ssl3 2>&1`
-• [red]Ghost (CVE-2015-0235)[/red] - Glibc gethostbyname overflow
+â€¢ [red]Ghost (CVE-2015-0235)[/red] - Glibc gethostbyname overflow
     Check: `ldd --version | grep -E '2\.1[0-7]'`
 
 [bold yellow]3. PRIVILEGE ESCALATION VECTORS[/bold yellow]
-• [red]SUID Binaries[/red]: `find / -perm -4000 -type f 2>/dev/null`
+â€¢ [red]SUID Binaries[/red]: `find / -perm -4000 -type f 2>/dev/null`
     - Check for: `pkexec`, `sudo`, `mount`, `passwd`
     - Exploitable: `CVE-2021-4034 (pkexec)`, `CVE-2021-3156 (sudo)`
-• [red]Sudo Misconfigurations[/red]: `sudo -l`
+â€¢ [red]Sudo Misconfigurations[/red]: `sudo -l`
     - Look for: `NOPASSWD`, `(ALL)`, `(root)`
     - Common attacks: `sudoedit`, `CVE-2023-22809`
-• [red]Writable Files[/red]: `find / -writable -type f 2>/dev/null`
+â€¢ [red]Writable Files[/red]: `find / -writable -type f 2>/dev/null`
     - Check: `/etc/passwd`, `/etc/shadow`, `/etc/sudoers`
-• [red]Cron Jobs[/red]: `crontab -l`, `ls -la /etc/cron*`
+â€¢ [red]Cron Jobs[/red]: `crontab -l`, `ls -la /etc/cron*`
     - Malicious: Cryptominers, backdoors, data exfiltration
-• [red]Kernel Modules[/red]: `lsmod`
+â€¢ [red]Kernel Modules[/red]: `lsmod`
     - Check for: Unknown modules, rootkits
 
 [bold cyan]4. MISCONFIGURATION CHECKS[/bold cyan]
-• [red]SSH Hardening[/red]:
+â€¢ [red]SSH Hardening[/red]:
     - Check: `cat /etc/ssh/sshd_config | grep -E '(PermitRootLogin|PasswordAuthentication)'`
     - Weak: `PermitRootLogin yes`, `PasswordAuthentication yes`
-• [red]FTP/SMB Services[/red]:
+â€¢ [red]FTP/SMB Services[/red]:
     - Check: `netstat -tulpn | grep -E '(21|139|445)'`
-• [red]Web Servers[/red]:
+â€¢ [red]Web Servers[/red]:
     - Check: `apache2 -v`, `nginx -v`, `php -v`
 
 [bold magenta]5. DATABASE VULNERABILITIES[/bold magenta]
-• [red]MySQL[/red]: `mysql --version`
-• [red]PostgreSQL[/red]: `psql --version`
-• [red]MongoDB[/red]: `mongod --version`
-• [red]Redis[/red]: `redis-server --version`
+â€¢ [red]MySQL[/red]: `mysql --version`
+â€¢ [red]PostgreSQL[/red]: `psql --version`
+â€¢ [red]MongoDB[/red]: `mongod --version`
+â€¢ [red]Redis[/red]: `redis-server --version`
 
 [bold yellow]6. CLOUD & CONTAINER EXPLOITS[/bold yellow]
-• [red]Docker[/red]: `docker --version`
+â€¢ [red]Docker[/red]: `docker --version`
     - Check: `docker info | grep "Security Options"`
-• [red]Kubernetes[/red]: `kubectl version`
+â€¢ [red]Kubernetes[/red]: `kubectl version`
     - Check: `kubectl auth can-i --list`
-• [red]Cloud Metadata[/red]:
+â€¢ [red]Cloud Metadata[/red]:
     - AWS: `curl http://169.254.169.254/latest/meta-data/`
     - Azure: `curl http://169.254.169.254/metadata/instance?api-version=2017-08-01`
     - GCP: `curl http://metadata.google.internal/computeMetadata/v1/`
 
-[bold green]💡 EXPLOIT DETECTION TOOLS:[/bold green]
-• [cyan]searchsploit[/cyan] - Offensive Security exploit database
-• [cyan]Metasploit[/cyan] - Exploit framework
-• [cyan]Nessus/OpenVAS[/cyan] - Vulnerability scanners
-• [cyan]Lynis[/cyan] - Security auditing tool
-• [cyan]Vuls[/cyan] - Vulnerability scanner
+[bold green]ðŸ’¡ EXPLOIT DETECTION TOOLS:[/bold green]
+â€¢ [cyan]searchsploit[/cyan] - Offensive Security exploit database
+â€¢ [cyan]Metasploit[/cyan] - Exploit framework
+â€¢ [cyan]Nessus/OpenVAS[/cyan] - Vulnerability scanners
+â€¢ [cyan]Lynis[/cyan] - Security auditing tool
+â€¢ [cyan]Vuls[/cyan] - Vulnerability scanner
 
-[bold red]⚠️ DETECTION & RESPONSE:[/bold red]
-• Check exploit signs:
+[bold red]âš ï¸ DETECTION & RESPONSE:[/bold red]
+â€¢ Check exploit signs:
     - Unusual processes: `ps aux | grep -E '(miner|backdoor|shell|reverse)'`
     - Suspicious logs: `journalctl -f | grep -E '(exploit|attack|hacked|breach)'`
     - Network anomalies: `tcpdump -i any | grep -E '(port (4444|5555|6666))'`
-• Immediate actions:
+â€¢ Immediate actions:
     1. Isolate the system
     2. Collect forensic evidence
     3. Identify the exploit vector
     4. Apply patches
     5. Monitor for persistence
 
-[bold cyan]🔐 HARDENING AGAINST EXPLOITS:[/bold cyan]
-• [green]✓[/green] Regularly patch all software
-• [green]✓[/green] Disable unnecessary services
-• [green]✓[/green] Implement least privilege
-• [green]✓[/green] Enable SELinux/AppArmor
-• [green]✓[/green] Use strong encryption (TLS 1.3)
-• [green]✓[/green] Monitor logs continuously
-• [green]✓[/green] Use intrusion detection systems
+[bold cyan]ðŸ” HARDENING AGAINST EXPLOITS:[/bold cyan]
+â€¢ [green]âœ“[/green] Regularly patch all software
+â€¢ [green]âœ“[/green] Disable unnecessary services
+â€¢ [green]âœ“[/green] Implement least privilege
+â€¢ [green]âœ“[/green] Enable SELinux/AppArmor
+â€¢ [green]âœ“[/green] Use strong encryption (TLS 1.3)
+â€¢ [green]âœ“[/green] Monitor logs continuously
+â€¢ [green]âœ“[/green] Use intrusion detection systems
 """,
 
     "macspoof": """
-[bold]📡 MAC Spoofing Tip[/bold]
+[bold]ðŸ“¡ MAC Spoofing Tip[/bold]
 Remember:
 1. Spoofing only works until [red]next reboot[/red]
 2. For persistence, modify [yellow]/etc/network/interfaces[/yellow]
 3. Some networks use [blue]MAC filtering[/blue] (check ARP tables)
 [green]Example:[/green] macspoof wlan0
 
-[bold]🎭 MAC Spoofing Caution[/bold]
+[bold]ðŸŽ­ MAC Spoofing Caution[/bold]
 - Changing MAC addresses can evade network tracking but might disrupt connections.
 - Always reset your original MAC for stability.
 
 [bold]Benefits of MAC Spoofing:[/bold]
-- 🟢 Privacy & Anonymity: Prevents tracking across different networks
-- 🟢 Security Testing: Simulate different devices for security assessments
-- 🟢 Network Bypass: Circumvent MAC-based network restrictions
-- 🟢 Forensics & OSINT: Obfuscate identity during legitimate security research
+- ðŸŸ¢ Privacy & Anonymity: Prevents tracking across different networks
+- ðŸŸ¢ Security Testing: Simulate different devices for security assessments
+- ðŸŸ¢ Network Bypass: Circumvent MAC-based network restrictions
+- ðŸŸ¢ Forensics & OSINT: Obfuscate identity during legitimate security research
 
 [bold]When to Use MAC Spoofing:[/bold]
-✅ Legitimate penetration testing
-✅ Privacy protection on public networks
-✅ Security research in controlled environments
-✅ Red team operations (with authorization)
+âœ… Legitimate penetration testing
+âœ… Privacy protection on public networks
+âœ… Security research in controlled environments
+âœ… Red team operations (with authorization)
 
 [bold]When NOT to Use MAC Spoofing:[/bold]
-❌ Malicious activities (illegal)
-❌ Production enterprise networks (without authorization)
-❌ Networks with 802.1X authentication
-❌ If it violates terms of service
+âŒ Malicious activities (illegal)
+âŒ Production enterprise networks (without authorization)
+âŒ Networks with 802.1X authentication
+âŒ If it violates terms of service
 """,
 
     "clearlogs": """
-[bold]🧹 Log Cleaning Tip[/bold]
+[bold]ðŸ§¹ Log Cleaning Tip[/bold]
 Targets common log locations:
 - [red]/var/log/[/red] (syslog, auth.log)
 - [yellow]~/.bash_history[/yellow]
@@ -1414,7 +1414,7 @@ Clearing logs should be used ethically. Logs are vital for:
 """,
 
     "portsweep": """
-[bold]🔎 Port Scanning Tip[/bold]
+[bold]ðŸ”Ž Port Scanning Tip[/bold]
 Advanced techniques:
 - [red]SYN stealth scan[/red] (-sS)
 - [yellow]Service version detection[/yellow] (-sV)
@@ -1425,7 +1425,7 @@ Scan with `-sS`, `-sV`, `-sT`, `-sS`, `-sV`, `-Pn`, `-p`, `-T4` flags in [green]
 """,
 
     "hashfile": """
-[bold]🔐 Hashing Tip[/bold]
+[bold]ðŸ” Hashing Tip[/bold]
 Why multiple hashes matter:
 - [red]MD5[/red] - Fast but broken
 - [yellow]SHA1[/yellow] - Deprecated but common
@@ -1441,80 +1441,80 @@ Example: `sha256sum file.txt`
 """,
 
     "sysinfo": """
-[bold cyan]🖥️ SYSTEM RECONNAISSANCE & HARDWARE INTELLIGENCE[/bold cyan]
+[bold cyan]ðŸ–¥ï¸ SYSTEM RECONNAISSANCE & HARDWARE INTELLIGENCE[/bold cyan]
 
-[bold yellow]🔍 CRITICAL SYSTEM INFORMATION TO GATHER:[/bold yellow]
+[bold yellow]ðŸ” CRITICAL SYSTEM INFORMATION TO GATHER:[/bold yellow]
 
 [bold red]1. KERNEL & OS INTELLIGENCE[/bold red]
-• Kernel version: `uname -a` (Identify CVEs like Dirty Pipe, Dirty COW)
-• OS distribution: `lsb_release -a` or `cat /etc/os-release`
-• Architecture: `uname -m` (x86_64, ARM, etc.)
-• Boot time: `uptime -s` (Detect unauthorized restarts)
+â€¢ Kernel version: `uname -a` (Identify CVEs like Dirty Pipe, Dirty COW)
+â€¢ OS distribution: `lsb_release -a` or `cat /etc/os-release`
+â€¢ Architecture: `uname -m` (x86_64, ARM, etc.)
+â€¢ Boot time: `uptime -s` (Detect unauthorized restarts)
 
 [bold yellow]2. PROCESSOR & HARDWARE SECURITY[/bold yellow]
-• CPU flags: `lscpu` or `cat /proc/cpuinfo`
+â€¢ CPU flags: `lscpu` or `cat /proc/cpuinfo`
     - Check for: [green]VMX/SVM[/green] (Virtualization support)
     - Check for: [green]SMEP/SMAP[/green] (Kernel hardening)
     - Check for: [red]MDS/Meltdown/Spectre[/red] (Vulnerability indicators)
-• Hardware model: `dmidecode -t system` (Physical asset tracking)
-• RAM configuration: `dmidecode -t memory` (Memory integrity checks)
-• BIOS version: `dmidecode -t bios` (Firmware vulnerabilities)
+â€¢ Hardware model: `dmidecode -t system` (Physical asset tracking)
+â€¢ RAM configuration: `dmidecode -t memory` (Memory integrity checks)
+â€¢ BIOS version: `dmidecode -t bios` (Firmware vulnerabilities)
 
 [bold magenta]3. SOFTWARE & PACKAGE SECURITY[/bold magenta]
-• Installed packages: `dpkg -l` (Debian) or `rpm -qa` (RHEL)
-• Sudo version: `sudo -V` → [red]CVE-2021-3156 (Baron Samedit)[/red]
-• OpenSSL version: `openssl version` → [red]Heartbleed, POODLE[/red]
-• SSH version: `ssh -V` → [red]CVE-2024-6387 (regreSSHion)[/red]
-• Python version: `python --version` (Deprecation risks)
-• Docker version: `docker --version` (Container escape risks)
+â€¢ Installed packages: `dpkg -l` (Debian) or `rpm -qa` (RHEL)
+â€¢ Sudo version: `sudo -V` â†’ [red]CVE-2021-3156 (Baron Samedit)[/red]
+â€¢ OpenSSL version: `openssl version` â†’ [red]Heartbleed, POODLE[/red]
+â€¢ SSH version: `ssh -V` â†’ [red]CVE-2024-6387 (regreSSHion)[/red]
+â€¢ Python version: `python --version` (Deprecation risks)
+â€¢ Docker version: `docker --version` (Container escape risks)
 
 [bold cyan]4. NETWORK & SECURITY CONFIGURATION[/bold cyan]
-• Firewall status: `ufw status` or `iptables -L`
-• Open ports: `ss -tulpn` or `netstat -tulpn` (Attack surface)
-• SELinux/AppArmor: `getenforce` or `aa-status` (Access controls)
-• SSH config: `cat /etc/ssh/sshd_config` (Protocol hardening)
-• Failed login attempts: `lastb` (Brute force detection)
+â€¢ Firewall status: `ufw status` or `iptables -L`
+â€¢ Open ports: `ss -tulpn` or `netstat -tulpn` (Attack surface)
+â€¢ SELinux/AppArmor: `getenforce` or `aa-status` (Access controls)
+â€¢ SSH config: `cat /etc/ssh/sshd_config` (Protocol hardening)
+â€¢ Failed login attempts: `lastb` (Brute force detection)
 
 [bold red]5. PRIVILEGE ESCALATION VECTORS[/bold red]
-• Sudo permissions: `sudo -l` (Misconfigurations)
-• SUID binaries: `find / -perm -4000 -type f` (Privilege escalation)
-• Writable files: `find / -writable -type f` (Lateral movement)
-• Cron jobs: `crontab -l` (Persistence mechanisms)
-• Kernel modules: `lsmod` (Rootkit detection)
+â€¢ Sudo permissions: `sudo -l` (Misconfigurations)
+â€¢ SUID binaries: `find / -perm -4000 -type f` (Privilege escalation)
+â€¢ Writable files: `find / -writable -type f` (Lateral movement)
+â€¢ Cron jobs: `crontab -l` (Persistence mechanisms)
+â€¢ Kernel modules: `lsmod` (Rootkit detection)
 
-[bold green]💡 SECURITY PRO TIPS:[/bold green]
-• Check hardware with: [cyan]`lshw -short`[/cyan] or [cyan]`inxi -Fxz`[/cyan]
-• List PCI devices: [cyan]`lspci -v`[/cyan] (Network cards, GPUs)
-• USB devices: [cyan]`lsusb`[/cyan] (External device detection)
-• Disk health: [cyan]`smartctl -a /dev/sda`[/cyan] (Hardware failure)
+[bold green]ðŸ’¡ SECURITY PRO TIPS:[/bold green]
+â€¢ Check hardware with: [cyan]`lshw -short`[/cyan] or [cyan]`inxi -Fxz`[/cyan]
+â€¢ List PCI devices: [cyan]`lspci -v`[/cyan] (Network cards, GPUs)
+â€¢ USB devices: [cyan]`lsusb`[/cyan] (External device detection)
+â€¢ Disk health: [cyan]`smartctl -a /dev/sda`[/cyan] (Hardware failure)
 
-[bold red]⚠️ CRITICAL CVEs TO CHECK:[/bold red]
-• Kernel: Dirty Pipe (CVE-2022-0847), Dirty COW (CVE-2016-5195)
-• Sudo: Baron Samedit (CVE-2021-3156) - [red]PRIVILEGE ESCALATION[/red]
-• OpenSSH: regreSSHion (CVE-2024-6387) - [red]RCE VULNERABILITY[/red]
-• Log4j: Log4Shell (CVE-2021-44228) - [red]CRITICAL RCE[/red]
+[bold red]âš ï¸ CRITICAL CVEs TO CHECK:[/bold red]
+â€¢ Kernel: Dirty Pipe (CVE-2022-0847), Dirty COW (CVE-2016-5195)
+â€¢ Sudo: Baron Samedit (CVE-2021-3156) - [red]PRIVILEGE ESCALATION[/red]
+â€¢ OpenSSH: regreSSHion (CVE-2024-6387) - [red]RCE VULNERABILITY[/red]
+â€¢ Log4j: Log4Shell (CVE-2021-44228) - [red]CRITICAL RCE[/red]
 
-[bold cyan]🔐 HARDENING CHECKLIST:[/bold cyan]
-• [green]✓[/green] All security patches applied
-• [green]✓[/green] Unnecessary services disabled
-• [green]✓[/green] SSH key-only authentication
-• [green]✓[/green] Firewall rules validated
-• [green]✓[/green] File integrity monitoring active
-• [green]✓[/green] Audit logging configured
+[bold cyan]ðŸ” HARDENING CHECKLIST:[/bold cyan]
+â€¢ [green]âœ“[/green] All security patches applied
+â€¢ [green]âœ“[/green] Unnecessary services disabled
+â€¢ [green]âœ“[/green] SSH key-only authentication
+â€¢ [green]âœ“[/green] Firewall rules validated
+â€¢ [green]âœ“[/green] File integrity monitoring active
+â€¢ [green]âœ“[/green] Audit logging configured
 
-[bold yellow]📊 CYBER THREAT INTELLIGENCE:[/bold yellow]
-• Reconnaissance is the first stage of the Cyber Kill Chain
-• Attackers use system info to identify: [red]Exploitable CVEs[/red], [red]Misconfigurations[/red]
-• Monitor kernel modules: [red]Rootkits[/red] hide in [cyan]`/lib/modules`[/cyan]
+[bold yellow]ðŸ“Š CYBER THREAT INTELLIGENCE:[/bold yellow]
+â€¢ Reconnaissance is the first stage of the Cyber Kill Chain
+â€¢ Attackers use system info to identify: [red]Exploitable CVEs[/red], [red]Misconfigurations[/red]
+â€¢ Monitor kernel modules: [red]Rootkits[/red] hide in [cyan]`/lib/modules`[/cyan]
 
-[bold magenta]🛡️ DSTERMINAL DEFENSE TIP:[/bold magenta]
+[bold magenta]ðŸ›¡ï¸ DSTERMINAL DEFENSE TIP:[/bold magenta]
 This system intelligence helps you:
-• [green]Identify[/green] vulnerable software before attackers do
-• [green]Harden[/green] your system configuration
-• [green]Detect[/green] unauthorized hardware changes
-• [green]Track[/green] compliance with security standards
+â€¢ [green]Identify[/green] vulnerable software before attackers do
+â€¢ [green]Harden[/green] your system configuration
+â€¢ [green]Detect[/green] unauthorized hardware changes
+â€¢ [green]Track[/green] compliance with security standards
 
-[bold cyan]📝 COMMAND REFERENCE:[/bold cyan]
+[bold cyan]ðŸ“ COMMAND REFERENCE:[/bold cyan]
 Quick recon: `sudo lshw -short` | `inxi -Fxz` | `neofetch`
 Vulnerability scan: `sudo apt update && sudo apt audit` (Debian)
 Package audit: `sudo rpm -q --changelog` (RHEL)
@@ -1522,7 +1522,7 @@ CVE database: `searchsploit` | `cve-check`
 """,
 
     "killproc": """
-[bold]💀 Process Killing Tip[/bold]
+[bold]ðŸ’€ Process Killing Tip[/bold]
 Advanced methods:
 - [red]SIGKILL[/red] (-9) for stubborn processes
 - [yellow]pkill[/yellow] for name-based termination
@@ -1531,7 +1531,7 @@ Advanced methods:
 """,
 
     "check integrity": """
-[bold]🛡️ Integrity Check Tip[/bold]
+[bold]ðŸ›¡ï¸ Integrity Check Tip[/bold]
 Checks for:
 - [red]Modified system binaries[/red] (ls, ps, netstat)
 - [yellow]Unexpected setuid files[/yellow] (find / -perm -4000)
@@ -1540,7 +1540,7 @@ Checks for:
 """,
 
     "encrypt": """
-[bold]🔒 Encryption Tip[/bold]
+[bold]ðŸ”’ Encryption Tip[/bold]
 Best practices:
 - Use [red]strong passwords[/red] (12+ chars, special symbols)
 - Consider [yellow]GPG[/yellow] for asymmetric encryption
@@ -1549,7 +1549,7 @@ Best practices:
 """,
 
     "decrypt": """
-[bold]🔓 Decryption Tip[/bold]
+[bold]ðŸ”“ Decryption Tip[/bold]
 Key management:
 - Store keys in [red]separate secure location[/red]
 - Use [yellow]key derivation functions[/yellow] (PBKDF2)
@@ -1558,7 +1558,7 @@ Key management:
 """,
 
     "watchfolder": """
-[bold]👀 Folder Monitoring Tip[/bold]
+[bold]ðŸ‘€ Folder Monitoring Tip[/bold]
 Detects:
 - [red]New files[/red] (ransomware indicators)
 - [yellow]Permission changes[/yellow] (chmod/chown)
@@ -1567,7 +1567,7 @@ Detects:
 """,
 
     "traceroute": """
-[bold]🌐 Network Tracing Tip[/bold]
+[bold]ðŸŒ Network Tracing Tip[/bold]
 Advanced options:
 - [red]TCP SYN[/red] probes (-T)
 - [yellow]ICMP[/yellow] echo (-I)
@@ -1576,7 +1576,7 @@ Advanced options:
 """,
 
     "ransomwatch": """
-[bold]💰 Ransomware Tip[/bold]
+[bold]ðŸ’° Ransomware Tip[/bold]
 Detection signs:
 - [red]Mass file renames[/red] (.enc, .locked)
 - [yellow]Unusual process[/yellow] (encryption patterns)
@@ -1585,7 +1585,7 @@ Detection signs:
 """,
 
     "wifi-audit": """
-[bold]📶 WiFi Auditing Tip[/bold]
+[bold]ðŸ“¶ WiFi Auditing Tip[/bold]
 Common attacks:
 - [red]WPA2 handshake[/red] capture
 - [yellow]Evil Twin[/yellow] access points
@@ -1603,15 +1603,15 @@ Common attacks:
 [green]Requires:[/green] Monitor mode capable adapter
 
 [bold]Security Impact:[/bold]
-- 🔴 Rogue AP Detection - Identifies unauthorized access points
-- 🔐 Security Protocol Analysis - Detects deprecated and vulnerable encryption
-- 📊 Compliance Monitoring - Helps ensure security standards are met
-- 🛡️ Threat Intelligence - MAC addresses can be cross-referenced with threat feeds
-- 🔍 Incident Response - Provides forensic data for security incidents
+- ðŸ”´ Rogue AP Detection - Identifies unauthorized access points
+- ðŸ” Security Protocol Analysis - Detects deprecated and vulnerable encryption
+- ðŸ“Š Compliance Monitoring - Helps ensure security standards are met
+- ðŸ›¡ï¸ Threat Intelligence - MAC addresses can be cross-referenced with threat feeds
+- ðŸ” Incident Response - Provides forensic data for security incidents
 """,
 
     "stegcheck": """
-[bold]🖼️ Steganography Awareness & Forensics Tip[/bold]
+[bold]ðŸ–¼ï¸ Steganography Awareness & Forensics Tip[/bold]
 Steganography is the practice of hiding information inside seemingly normal files
 such as images, audio, or video. It is often used to bypass security controls.
 
@@ -1643,7 +1643,7 @@ or educational purposes with proper authorization.
 """,
 
     "certcheck": """
-[bold]🔖 SSL Cert Tip[/bold]
+[bold]ðŸ”– SSL Cert Tip[/bold]
 Critical checks:
 - [red]Expiration date[/red]
 - [yellow]Weak algorithms[/yellow] (SHA1, RC4)
@@ -1652,7 +1652,7 @@ Critical checks:
 """,
 
     "memdump": """
-[bold]🧠 Memory Forensics Tip[/bold]
+[bold]ðŸ§  Memory Forensics Tip[/bold]
 What to look for:
 - [red]Process memory[/red] (passwords, keys)
 - [yellow]Network connections[/yellow] (raw sockets)
@@ -1661,7 +1661,7 @@ What to look for:
 """,
 
     "torify": """
-[bold]🧅 Tor Networking Tip[/bold]
+[bold]ðŸ§… Tor Networking Tip[/bold]
 Important notes:
 - [red]Not 100% anonymous[/red] (exit node risks)
 - [yellow]DNS leaks[/yellow] still possible
@@ -1670,7 +1670,7 @@ Important notes:
 """,
 
     "update": """
-[bold cyan]🔄 DSTERMINAL SECURITY UPDATE PROTOCOL[/bold cyan]
+[bold cyan]ðŸ”„ DSTERMINAL SECURITY UPDATE PROTOCOL[/bold cyan]
 
 [bold underline]WHY SYSTEMATIC UPDATES ARE NON-NEGOTIABLE FOR SECURITY TOOLS[/bold underline]
 
@@ -1678,106 +1678,106 @@ As a defensive security platform, DSTerminal occupies a privileged position with
 Its capabilities require constant evolution to counter the rapidly advancing threat landscape.
 
 [bold red]ZERO-DAY & N-DAY VULNERABILITY MITIGATION[/bold red]
-• [white]▸ Preemptive Patch Deployment[/white] – Closing security gaps before widespread exploitation
-• [yellow]▸ CVE-Responsive Updates[/yellow] – Direct responses to published advisories
-• [red]▸ Memory Corruption Protections[/red] – Enhanced buffer overflow defenses
-• [magenta]▸ Sandbox Escape Prevention[/magenta] – Hardening against container/VM breakout techniques
+â€¢ [white]â–¸ Preemptive Patch Deployment[/white] â€“ Closing security gaps before widespread exploitation
+â€¢ [yellow]â–¸ CVE-Responsive Updates[/yellow] â€“ Direct responses to published advisories
+â€¢ [red]â–¸ Memory Corruption Protections[/red] â€“ Enhanced buffer overflow defenses
+â€¢ [magenta]â–¸ Sandbox Escape Prevention[/magenta] â€“ Hardening against container/VM breakout techniques
 
 [bold yellow]PRIVILEGE & ACCESS CONTROL REINFORCEMENT[/bold yellow]
-• [white]▸ Least Privilege Enforcement[/white] – Tighter restrictions on DSTerminal's system access
-• [cyan]▸ Credential Handling Security[/cyan] – Improved encryption for stored API keys
-• [green]▸ SUID/SGID Vulnerability Remediation[/green] – Fixes for privilege escalation vectors
+â€¢ [white]â–¸ Least Privilege Enforcement[/white] â€“ Tighter restrictions on DSTerminal's system access
+â€¢ [cyan]â–¸ Credential Handling Security[/cyan] â€“ Improved encryption for stored API keys
+â€¢ [green]â–¸ SUID/SGID Vulnerability Remediation[/green] â€“ Fixes for privilege escalation vectors
 
 [bold blue]THREAT INTELLIGENCE & DETECTION ENHANCEMENT[/bold blue]
-• [white]▸ Real-Time Signature Updates[/white] – Integration of latest malware hashes and IOCs
-• [yellow]▸ Behavioral Analysis Improvements[/yellow] – Enhanced heuristic detection
-• [cyan]▸ Attack Pattern Recognition[/cyan] – Updated MITRE ATT&CK framework mapping
+â€¢ [white]â–¸ Real-Time Signature Updates[/white] â€“ Integration of latest malware hashes and IOCs
+â€¢ [yellow]â–¸ Behavioral Analysis Improvements[/yellow] â€“ Enhanced heuristic detection
+â€¢ [cyan]â–¸ Attack Pattern Recognition[/cyan] â€“ Updated MITRE ATT&CK framework mapping
 
 [bold magenta]CRYPTOGRAPHIC & COMMUNICATIONS SECURITY[/bold magenta]
-• [white]▸ TLS/SSL Implementation Updates[/white] – Protection against protocol-level vulnerabilities
-• [yellow]▸ Certificate Validation Enhancements[/yellow] – Improved PKI verification
-• [red]▸ Cryptographic Algorithm Rotation[/red] – Migration from deprecated to current standards
+â€¢ [white]â–¸ TLS/SSL Implementation Updates[/white] â€“ Protection against protocol-level vulnerabilities
+â€¢ [yellow]â–¸ Certificate Validation Enhancements[/yellow] â€“ Improved PKI verification
+â€¢ [red]â–¸ Cryptographic Algorithm Rotation[/red] â€“ Migration from deprecated to current standards
 
 [bold green]BEST PRACTICES FOR DSTERMINAL UPDATE MANAGEMENT[/bold green]
-• [white]Weekly Update Checks[/white] – Minimum frequency for security tools
-• [yellow]Critical Update Immediate Application[/yellow] – Zero-day patches within 24 hours
-• [cyan]Change Window Coordination[/cyan] – Integration with organizational maintenance schedules
-• [red]Pre-Update Validation[/red] – Testing in isolated environments before production deployment
+â€¢ [white]Weekly Update Checks[/white] â€“ Minimum frequency for security tools
+â€¢ [yellow]Critical Update Immediate Application[/yellow] â€“ Zero-day patches within 24 hours
+â€¢ [cyan]Change Window Coordination[/cyan] â€“ Integration with organizational maintenance schedules
+â€¢ [red]Pre-Update Validation[/red] â€“ Testing in isolated environments before production deployment
 
 [bold cyan]FINAL ADVISORY:[/bold cyan]
 In cybersecurity, your defensive tools are only as strong as their most recent update.
-DSTerminal's capabilities evolve continuously—ensure your installation does too.
+DSTerminal's capabilities evolve continuouslyâ€”ensure your installation does too.
 
 [dim italic]"The only truly secure system is one that is powered off, cast in a block of concrete,
-and sealed in a lead-lined room with armed guards—and even then I have my doubts."[/dim italic]
+and sealed in a lead-lined room with armed guardsâ€”and even then I have my doubts."[/dim italic]
 """,
 
     "vt-scan": """
-╭─────────────────────────────────────────────────────────────────────────────╮
-│                         🦠 VIRUSTOTAL EDUCATIONAL TIP                        │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│  📚 WHAT IS VIRUSTOTAL?                                                     │
-│     • Advanced service that scans files & URLs with 70+ AV engines          │
-│     • Owned by Google (since 2012) - Enterprise & Community editions        │
-│     • Provides threat intelligence & behavioral analysis                    │
-│                                                                             │
-│  🔬 ADVANCED FEATURES:                                                      │
-│     • Behavioral analysis (Cuckoo/VT Sandbox) - See what files DO           │
-│     • YARA rule scanning - Pattern-based threat detection                   │
-│     • Relationship graphs - Visualize threat connections                    │
-│     • VirusTotal Enterprise - API access for automation                     │
-│     • Retrohunt - Search historical scan data                               │
-│                                                                             │
-│  📊 COMMUNITY INSIGHTS:                                                     │
-│     • Vote on detections (False Positive / Malicious)                       │
-│     • Comment on samples with analysis findings                             │
-│     • Share YARA rules with security community                              │
-│     • Create collections of related malware                                 │
-│                                                                             │
-│  🎯 USE CASES FOR SOC OPERATORS:                                            │
-│     1. Incident Response - Verify suspicious file detections                │
-│     2. Threat Hunting - Research new malware families                       │
-│     3. IOC Validation - Check hash/domain reputation                        │
-│     4. Malware Analysis - Understand file behavior                          │
-│                                                                             │
-│  ⚠️ CRITICAL WARNINGS:                                                      │
-│     • Files uploaded become PUBLIC - Never upload sensitive data!           │
-│     • Free API has rate limits (4 requests/min, 500/day)                    │
-│     • Some AV engines may have false positives                              │
-│     • Not all samples get sandbox analysis                                  │
-│                                                                             │
-│  💡 PRO TIPS FOR DSTERMINAL:                                                │
-│     → Hash lookup first (faster, anonymous)                                 │
-│     → Enable VT Enterprise for corporate use                                │
-│     → Combine with local YARA rules for better detection                    │
-│     → Automate with Python API for bulk scanning                            │
-│                                                                             │
-│  📈 STATISTICS (2024):                                                      │
-│     • 70+ antivirus engines                                                 │
-│     • 2M+ daily submissions                                                 │
-│     • 6B+ historical scans                                                  │
-│     • 60+ URL scanners                                                      │
-│                                                                             │
-│  🎓 RECOMMENDED LEARNING PATH:                                              │
-│     1. Start with hash lookups (no exposure)                                │
-│     2. Learn to read analysis reports                                       │
-│     3. Study YARA rule syntax                                               │
-│     4. Experiment with API automation                                       │
-│     5. Contribute community insights                                        │
-│                                                                             │
-│  🛡️ BEST PRACTICES FOR SOC:                                                │
-│     • Always sanitize files before upload                                   │
-│     • Use API keys with restricted permissions                              │
-│     • Maintain local database of known threats                              │
-│     • Cross-reference with other threat intel feeds                         │
-│     • Document findings in incident reports                                 │
-│                                                                             │
-╰─────────────────────────────────────────────────────────────────────────────╯
+â•­â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•®
+â”‚                         ðŸ¦  VIRUSTOTAL EDUCATIONAL TIP                        â”‚
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚                                                                             â”‚
+â”‚  ðŸ“š WHAT IS VIRUSTOTAL?                                                     â”‚
+â”‚     â€¢ Advanced service that scans files & URLs with 70+ AV engines          â”‚
+â”‚     â€¢ Owned by Google (since 2012) - Enterprise & Community editions        â”‚
+â”‚     â€¢ Provides threat intelligence & behavioral analysis                    â”‚
+â”‚                                                                             â”‚
+â”‚  ðŸ”¬ ADVANCED FEATURES:                                                      â”‚
+â”‚     â€¢ Behavioral analysis (Cuckoo/VT Sandbox) - See what files DO           â”‚
+â”‚     â€¢ YARA rule scanning - Pattern-based threat detection                   â”‚
+â”‚     â€¢ Relationship graphs - Visualize threat connections                    â”‚
+â”‚     â€¢ VirusTotal Enterprise - API access for automation                     â”‚
+â”‚     â€¢ Retrohunt - Search historical scan data                               â”‚
+â”‚                                                                             â”‚
+â”‚  ðŸ“Š COMMUNITY INSIGHTS:                                                     â”‚
+â”‚     â€¢ Vote on detections (False Positive / Malicious)                       â”‚
+â”‚     â€¢ Comment on samples with analysis findings                             â”‚
+â”‚     â€¢ Share YARA rules with security community                              â”‚
+â”‚     â€¢ Create collections of related malware                                 â”‚
+â”‚                                                                             â”‚
+â”‚  ðŸŽ¯ USE CASES FOR SOC OPERATORS:                                            â”‚
+â”‚     1. Incident Response - Verify suspicious file detections                â”‚
+â”‚     2. Threat Hunting - Research new malware families                       â”‚
+â”‚     3. IOC Validation - Check hash/domain reputation                        â”‚
+â”‚     4. Malware Analysis - Understand file behavior                          â”‚
+â”‚                                                                             â”‚
+â”‚  âš ï¸ CRITICAL WARNINGS:                                                      â”‚
+â”‚     â€¢ Files uploaded become PUBLIC - Never upload sensitive data!           â”‚
+â”‚     â€¢ Free API has rate limits (4 requests/min, 500/day)                    â”‚
+â”‚     â€¢ Some AV engines may have false positives                              â”‚
+â”‚     â€¢ Not all samples get sandbox analysis                                  â”‚
+â”‚                                                                             â”‚
+â”‚  ðŸ’¡ PRO TIPS FOR DSTERMINAL:                                                â”‚
+â”‚     â†’ Hash lookup first (faster, anonymous)                                 â”‚
+â”‚     â†’ Enable VT Enterprise for corporate use                                â”‚
+â”‚     â†’ Combine with local YARA rules for better detection                    â”‚
+â”‚     â†’ Automate with Python API for bulk scanning                            â”‚
+â”‚                                                                             â”‚
+â”‚  ðŸ“ˆ STATISTICS (2024):                                                      â”‚
+â”‚     â€¢ 70+ antivirus engines                                                 â”‚
+â”‚     â€¢ 2M+ daily submissions                                                 â”‚
+â”‚     â€¢ 6B+ historical scans                                                  â”‚
+â”‚     â€¢ 60+ URL scanners                                                      â”‚
+â”‚                                                                             â”‚
+â”‚  ðŸŽ“ RECOMMENDED LEARNING PATH:                                              â”‚
+â”‚     1. Start with hash lookups (no exposure)                                â”‚
+â”‚     2. Learn to read analysis reports                                       â”‚
+â”‚     3. Study YARA rule syntax                                               â”‚
+â”‚     4. Experiment with API automation                                       â”‚
+â”‚     5. Contribute community insights                                        â”‚
+â”‚                                                                             â”‚
+â”‚  ðŸ›¡ï¸ BEST PRACTICES FOR SOC:                                                â”‚
+â”‚     â€¢ Always sanitize files before upload                                   â”‚
+â”‚     â€¢ Use API keys with restricted permissions                              â”‚
+â”‚     â€¢ Maintain local database of known threats                              â”‚
+â”‚     â€¢ Cross-reference with other threat intel feeds                         â”‚
+â”‚     â€¢ Document findings in incident reports                                 â”‚
+â”‚                                                                             â”‚
+â•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯
 """,
 
     "registry -n mon": """
-[bold]💾 Registry Monitoring Tip[/bold]
+[bold]ðŸ’¾ Registry Monitoring Tip[/bold]
 Critical keys to watch:
 - [red]Run/RunOnce[/red] (persistence)
 - [yellow]AppInit_DLLs[/yellow] (code injection)
@@ -1790,343 +1790,343 @@ Critical keys to watch:
     #         ====
     
     "ioc education": """
-[bold cyan]🛡️ INDICATORS OF COMPROMISE (IOCs) - COMPLETE GUIDE[/bold cyan]
+[bold cyan]ðŸ›¡ï¸ INDICATORS OF COMPROMISE (IOCs) - COMPLETE GUIDE[/bold cyan]
 
-[bold yellow]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold yellow]
+[bold yellow]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold yellow]
 
-[bold white]📌 WHAT ARE IOCS?[/bold white]
+[bold white]ðŸ“Œ WHAT ARE IOCS?[/bold white]
 
 Indicators of Compromise are [bold red]forensic artifacts[/bold red] that provide evidence 
 of a potential security breach. They are the [bold yellow]digital breadcrumbs[/bold yellow] 
 left behind by attackers that security teams use to detect, investigate, 
 and respond to cyber threats.
 
-[bold green]💡 Think of IOCs like fingerprints at a crime scene[/bold green] - they don't 
+[bold green]ðŸ’¡ Think of IOCs like fingerprints at a crime scene[/bold green] - they don't 
 tell you who committed the crime, but they prove that someone was there 
 and help you track them down.
 
-[bold yellow]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold yellow]
+[bold yellow]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold yellow]
 
-[bold white]📊 IOC VS IOA - WHAT'S THE DIFFERENCE?[/bold white]
+[bold white]ðŸ“Š IOC VS IOA - WHAT'S THE DIFFERENCE?[/bold white]
 
-[bold red]🔍 IOC (Indicator of Compromise) - PAST/FORENSIC[/bold red]
-• Evidence that an attack has ALREADY happened
-• Things you look for AFTER a breach
-• Example: Malware hash, malicious domain, changed registry key
-• Question: "What did the attacker leave behind?"
+[bold red]ðŸ” IOC (Indicator of Compromise) - PAST/FORENSIC[/bold red]
+â€¢ Evidence that an attack has ALREADY happened
+â€¢ Things you look for AFTER a breach
+â€¢ Example: Malware hash, malicious domain, changed registry key
+â€¢ Question: "What did the attacker leave behind?"
 
-[bold yellow]⚡ IOA (Indicator of Attack) - PRESENT/ACTIVE[/bold yellow]
-• Evidence that an attack is HAPPENING RIGHT NOW
-• Things you look for DURING an active attack
-• Example: Unusual login attempts, data exfiltration
-• Question: "What is the attacker doing right now?"
+[bold yellow]âš¡ IOA (Indicator of Attack) - PRESENT/ACTIVE[/bold yellow]
+â€¢ Evidence that an attack is HAPPENING RIGHT NOW
+â€¢ Things you look for DURING an active attack
+â€¢ Example: Unusual login attempts, data exfiltration
+â€¢ Question: "What is the attacker doing right now?"
 
-[bold green]🎯 BOTH are essential for a complete security strategy![/bold green]
+[bold green]ðŸŽ¯ BOTH are essential for a complete security strategy![/bold green]
 
-[bold yellow]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold yellow]
+[bold yellow]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold yellow]
 
-[bold white]📋 TYPES OF IOCS[/bold white]
+[bold white]ðŸ“‹ TYPES OF IOCS[/bold white]
 
 [bold cyan]1. FILE HASHES (MD5, SHA-1, SHA-256)[/bold cyan]
-• Unique fingerprint of a file
-• Used to identify known malware
-• Example: 5d41402abc4b2a76b9719d911017c592
+â€¢ Unique fingerprint of a file
+â€¢ Used to identify known malware
+â€¢ Example: 5d41402abc4b2a76b9719d911017c592
 
 [bold magenta]2. DOMAINS[/bold magenta]
-• Malicious websites used for C2, phishing, malware delivery
-• Can be typosquatting (g00gle.com) or lookalike domains
-• Example: malware-phishing-site.com
+â€¢ Malicious websites used for C2, phishing, malware delivery
+â€¢ Can be typosquatting (g00gle.com) or lookalike domains
+â€¢ Example: malware-phishing-site.com
 
 [bold yellow]3. IP ADDRESSES[/bold yellow]
-• Command & Control (C2) servers
-• Malicious infrastructure
-• Example: 185.130.5.253
+â€¢ Command & Control (C2) servers
+â€¢ Malicious infrastructure
+â€¢ Example: 185.130.5.253
 
 [bold green]4. URLS[/bold green]
-• Specific malicious web addresses
-• Phishing pages, malware download locations
-• Example: http://bad-site.com/payload.exe
+â€¢ Specific malicious web addresses
+â€¢ Phishing pages, malware download locations
+â€¢ Example: http://bad-site.com/payload.exe
 
 [bold red]5. FILE PATHS[/bold red]
-• Locations where malware is installed
-• Temporary folders, system directories
-• Example: C:\\Windows\\Temp\\malware.exe
+â€¢ Locations where malware is installed
+â€¢ Temporary folders, system directories
+â€¢ Example: C:\\Windows\\Temp\\malware.exe
 
 [bold blue]6. REGISTRY KEYS (Windows)[/bold blue]
-• Persistence mechanisms
-• Malware configuration settings
-• Example: HKLM\\Software\\Microsoft\\Windows\\Run\\Evil
+â€¢ Persistence mechanisms
+â€¢ Malware configuration settings
+â€¢ Example: HKLM\\Software\\Microsoft\\Windows\\Run\\Evil
 
 [bold cyan]7. PROCESS NAMES[/bold cyan]
-• Known malicious processes
-• Crypto miners, ransomware, backdoors
-• Example: cryptolocker.exe
+â€¢ Known malicious processes
+â€¢ Crypto miners, ransomware, backdoors
+â€¢ Example: cryptolocker.exe
 
 [bold magenta]8. EMAIL ADDRESSES[/bold magenta]
-• Phishing sender addresses
-• Malware distribution emails
-• Example: security@fake-update.com
+â€¢ Phishing sender addresses
+â€¢ Malware distribution emails
+â€¢ Example: security@fake-update.com
 
-[bold yellow]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold yellow]
+[bold yellow]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold yellow]
 
-[bold white]🎯 MITRE ATT&CK & IOC MAPPING[/bold white]
+[bold white]ðŸŽ¯ MITRE ATT&CK & IOC MAPPING[/bold white]
 
 [bold red]TACTIC: Initial Access (TA0001)[/bold red]
-• Technique: Phishing (T1566) → IOC: Email, domain, URL
+â€¢ Technique: Phishing (T1566) â†’ IOC: Email, domain, URL
 
 [bold yellow]TACTIC: Execution (TA0002)[/bold yellow]
-• Technique: Command and Scripting Interpreter (T1059) → IOC: Process name, file path
+â€¢ Technique: Command and Scripting Interpreter (T1059) â†’ IOC: Process name, file path
 
 [bold blue]TACTIC: Persistence (TA0003)[/bold blue]
-• Technique: Registry Run Keys (T1547.001) → IOC: Registry key, scheduled task
+â€¢ Technique: Registry Run Keys (T1547.001) â†’ IOC: Registry key, scheduled task
 
 [bold magenta]TACTIC: Privilege Escalation (TA0004)[/bold magenta]
-• Technique: Valid Accounts (T1078) → IOC: Account changes, privilege modifications
+â€¢ Technique: Valid Accounts (T1078) â†’ IOC: Account changes, privilege modifications
 
 [bold cyan]TACTIC: Defense Evasion (TA0005)[/bold cyan]
-• Technique: File Deletion (T1070.004) → IOC: Missing logs, deleted files
+â€¢ Technique: File Deletion (T1070.004) â†’ IOC: Missing logs, deleted files
 
 [bold red]TACTIC: Credential Access (TA0006)[/bold red]
-• Technique: Credential Dumping (T1003) → IOC: LSASS access, memory dumps
+â€¢ Technique: Credential Dumping (T1003) â†’ IOC: LSASS access, memory dumps
 
 [bold yellow]TACTIC: Discovery (TA0007)[/bold yellow]
-• Technique: Network Service Scanning (T1046) → IOC: Scanning activity, unusual traffic
+â€¢ Technique: Network Service Scanning (T1046) â†’ IOC: Scanning activity, unusual traffic
 
 [bold green]TACTIC: Lateral Movement (TA0008)[/bold green]
-• Technique: Remote Services (T1021) → IOC: SMB/SSH/RDP connections
+â€¢ Technique: Remote Services (T1021) â†’ IOC: SMB/SSH/RDP connections
 
 [bold blue]TACTIC: Collection (TA0009)[/bold blue]
-• Technique: Data Staged (T1074) → IOC: Large file copies, compressed archives
+â€¢ Technique: Data Staged (T1074) â†’ IOC: Large file copies, compressed archives
 
 [bold magenta]TACTIC: Exfiltration (TA0010)[/bold magenta]
-• Technique: Exfiltration Over C2 Channel (T1041) → IOC: Outbound data transfers
+â€¢ Technique: Exfiltration Over C2 Channel (T1041) â†’ IOC: Outbound data transfers
 
 [bold cyan]TACTIC: Command and Control (TA0011)[/bold cyan]
-• Technique: Application Layer Protocol (T1071) → IOC: C2 domain, IP, unusual protocol
+â€¢ Technique: Application Layer Protocol (T1071) â†’ IOC: C2 domain, IP, unusual protocol
 
 [bold red]TACTIC: Impact (TA0040)[/bold red]
-• Technique: Data Encrypted for Impact (T1486) → IOC: Changed file extensions
+â€¢ Technique: Data Encrypted for Impact (T1486) â†’ IOC: Changed file extensions
 
-[bold yellow]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold yellow]
+[bold yellow]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold yellow]
 
-[bold white]🔍 HOW IOCS ARE DISCOVERED[/bold white]
+[bold white]ðŸ” HOW IOCS ARE DISCOVERED[/bold white]
 
 [bold green]1. INCIDENT RESPONSE[/bold green]
-→ During investigation of a breach
-→ Analysts find artifacts left by attackers
-→ Example: Finding malware hash in memory dump
+â†’ During investigation of a breach
+â†’ Analysts find artifacts left by attackers
+â†’ Example: Finding malware hash in memory dump
 
 [bold cyan]2. THREAT HUNTING[/bold cyan]
-→ Proactively searching for threats
-→ Using hypothesis-driven investigations
-→ Example: Hunting for C2 communication patterns
+â†’ Proactively searching for threats
+â†’ Using hypothesis-driven investigations
+â†’ Example: Hunting for C2 communication patterns
 
 [bold yellow]3. MALWARE ANALYSIS[/bold yellow]
-→ Reverse engineering malware samples
-→ Extracting C2 domains, IPs, and other IOCs
-→ Example: Finding domain in malware strings
+â†’ Reverse engineering malware samples
+â†’ Extracting C2 domains, IPs, and other IOCs
+â†’ Example: Finding domain in malware strings
 
 [bold magenta]4. THREAT INTELLIGENCE FEEDS[/bold magenta]
-→ External sources (VirusTotal, MISP, ISACs)
-→ Community-shared IOCs
-→ Example: VirusTotal hash lookup
+â†’ External sources (VirusTotal, MISP, ISACs)
+â†’ Community-shared IOCs
+â†’ Example: VirusTotal hash lookup
 
 [bold red]5. LOG ANALYSIS[/bold red]
-→ Reviewing firewall, DNS, and proxy logs
-→ Finding suspicious connections
-→ Example: DNS logs showing requests to malicious domains
+â†’ Reviewing firewall, DNS, and proxy logs
+â†’ Finding suspicious connections
+â†’ Example: DNS logs showing requests to malicious domains
 
 [bold blue]6. NETWORK ANALYSIS[/bold blue]
-→ Packet capture and analysis
-→ Finding C2 traffic patterns
-→ Example: Beaconing traffic analysis
+â†’ Packet capture and analysis
+â†’ Finding C2 traffic patterns
+â†’ Example: Beaconing traffic analysis
 
-[bold yellow]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold yellow]
+[bold yellow]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold yellow]
 
-[bold white]🛡️ IOC CATEGORIES AND CONFIDENCE LEVELS[/bold white]
+[bold white]ðŸ›¡ï¸ IOC CATEGORIES AND CONFIDENCE LEVELS[/bold white]
 
-[bold green]🟢 CATEGORY: CLEAN[/bold green]
-→ Confidence: 100%
-→ Description: Confirmed safe, false positive
-→ Example: notepad.exe (legitimate Windows file)
-→ Action: Do not block, archive for reference
+[bold green]ðŸŸ¢ CATEGORY: CLEAN[/bold green]
+â†’ Confidence: 100%
+â†’ Description: Confirmed safe, false positive
+â†’ Example: notepad.exe (legitimate Windows file)
+â†’ Action: Do not block, archive for reference
 
-[bold yellow]🟡 CATEGORY: SUSPICIOUS[/bold yellow]
-→ Confidence: 50-70%
-→ Description: Potentially malicious, needs investigation
-→ Example: Unknown file in Temp folder
-→ Action: Investigate, monitor, alert
+[bold yellow]ðŸŸ¡ CATEGORY: SUSPICIOUS[/bold yellow]
+â†’ Confidence: 50-70%
+â†’ Description: Potentially malicious, needs investigation
+â†’ Example: Unknown file in Temp folder
+â†’ Action: Investigate, monitor, alert
 
-[bold red]🔴 CATEGORY: MALICIOUS[/bold red]
-→ Confidence: 80-100%
-→ Description: Confirmed malicious
-→ Example: Known ransomware hash
-→ Action: Block immediately, quarantine, alert
+[bold red]ðŸ”´ CATEGORY: MALICIOUS[/bold red]
+â†’ Confidence: 80-100%
+â†’ Description: Confirmed malicious
+â†’ Example: Known ransomware hash
+â†’ Action: Block immediately, quarantine, alert
 
-[bold white]📊 CONFIDENCE SCORING:[/bold white]
-• Multiple sources = Higher confidence
-• Freshness = More recent = Higher confidence
-• Source reliability = Trusted source = Higher confidence
-• Context = Attack relevance = Higher confidence
+[bold white]ðŸ“Š CONFIDENCE SCORING:[/bold white]
+â€¢ Multiple sources = Higher confidence
+â€¢ Freshness = More recent = Higher confidence
+â€¢ Source reliability = Trusted source = Higher confidence
+â€¢ Context = Attack relevance = Higher confidence
 
-[bold yellow]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold yellow]
+[bold yellow]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold yellow]
 
-[bold white]🌐 IOC SHARING FRAMEWORKS[/bold white]
+[bold white]ðŸŒ IOC SHARING FRAMEWORKS[/bold white]
 
-[bold green]📤 MISP (Malware Information Sharing Platform)[/bold green]
-→ Open-source threat intelligence platform
-→ Standardized IOC format (STIX)
-→ Used by security teams worldwide
+[bold green]ðŸ“¤ MISP (Malware Information Sharing Platform)[/bold green]
+â†’ Open-source threat intelligence platform
+â†’ Standardized IOC format (STIX)
+â†’ Used by security teams worldwide
 
-[bold cyan]📤 STIX/TAXII[/bold cyan]
-→ Structured Threat Information Expression
-→ Trusted Automated eXchange of Intelligence Information
-→ Industry standard for threat intel sharing
+[bold cyan]ðŸ“¤ STIX/TAXII[/bold cyan]
+â†’ Structured Threat Information Expression
+â†’ Trusted Automated eXchange of Intelligence Information
+â†’ Industry standard for threat intel sharing
 
-[bold magenta]📤 VirusTotal[/bold magenta]
-→ Largest online threat intelligence database
-→ 70+ antivirus engines
-→ 6B+ historical scans
+[bold magenta]ðŸ“¤ VirusTotal[/bold magenta]
+â†’ Largest online threat intelligence database
+â†’ 70+ antivirus engines
+â†’ 6B+ historical scans
 
-[bold yellow]📤 ISACs (Information Sharing and Analysis Centers)[/bold yellow]
-→ Industry-specific threat sharing
-→ FS-ISAC (Financial Services)
-→ Energy ISAC, Healthcare ISAC
+[bold yellow]ðŸ“¤ ISACs (Information Sharing and Analysis Centers)[/bold yellow]
+â†’ Industry-specific threat sharing
+â†’ FS-ISAC (Financial Services)
+â†’ Energy ISAC, Healthcare ISAC
 
-[bold blue]📤 AlienVault OTX[/bold blue]
-→ Open Threat Exchange
-→ Community-driven threat intelligence
-→ 100,000+ active users
+[bold blue]ðŸ“¤ AlienVault OTX[/bold blue]
+â†’ Open Threat Exchange
+â†’ Community-driven threat intelligence
+â†’ 100,000+ active users
 
-[bold yellow]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold yellow]
+[bold yellow]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold yellow]
 
-[bold white]🎓 IOC BEST PRACTICES[/bold white]
+[bold white]ðŸŽ“ IOC BEST PRACTICES[/bold white]
 
 [bold green]1. ALWAYS VALIDATE[/bold green]
-→ Cross-reference multiple sources
-→ Verify before blocking
-→ Consider false positives
+â†’ Cross-reference multiple sources
+â†’ Verify before blocking
+â†’ Consider false positives
 
 [bold cyan]2. CONTEXT IS KEY[/bold cyan]
-→ Understand the attack scenario
-→ Know your environment
-→ Relevance matters
+â†’ Understand the attack scenario
+â†’ Know your environment
+â†’ Relevance matters
 
 [bold yellow]3. TIMELINESS MATTERS[/bold yellow]
-→ Use fresh IOCs
-→ Remove outdated IOCs
-→ Regular updates
+â†’ Use fresh IOCs
+â†’ Remove outdated IOCs
+â†’ Regular updates
 
 [bold magenta]4. SHARE RESPONSIBLY[/bold magenta]
-→ Protect sensitive information
-→ Use standard formats (STIX)
-→ Follow sharing protocols
+â†’ Protect sensitive information
+â†’ Use standard formats (STIX)
+â†’ Follow sharing protocols
 
 [bold red]5. AUTOMATE WHERE POSSIBLE[/bold red]
-→ Auto-block known threats
-→ Auto-update IOC feeds
-→ Auto-generate alerts
+â†’ Auto-block known threats
+â†’ Auto-update IOC feeds
+â†’ Auto-generate alerts
 
 [bold blue]6. DOCUMENT EVERYTHING[/bold blue]
-→ Source of IOC
-→ Discovery date
-→ Confidence level
-→ Related incidents
+â†’ Source of IOC
+â†’ Discovery date
+â†’ Confidence level
+â†’ Related incidents
 
-[bold yellow]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold yellow]
+[bold yellow]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold yellow]
 
-[bold white]🚨 REAL-WORLD IOC EXAMPLES[/bold white]
+[bold white]ðŸš¨ REAL-WORLD IOC EXAMPLES[/bold white]
 
 [bold red]RANSOMWARE DETECTION[/bold red]
 IOC: File Hash: 5d41402abc4b2a76b9719d911017c592
 IOC: File Name: decrypt_me.exe
 IOC: Registry: HKLM\\Software\\Microsoft\\Windows\\Run\\Ransom
-Action: Quarantine → Terminate → Remove Registry → Block Network
+Action: Quarantine â†’ Terminate â†’ Remove Registry â†’ Block Network
 
 [bold yellow]PHISHING CAMPAIGN[/bold yellow]
 IOC: Domain: phishing-login-site.com
 IOC: URL: https://phishing-login-site.com/verify
 IOC: Email: security@fake-update.com
-Action: Block Domain → Update Email Filter → Alert Users
+Action: Block Domain â†’ Update Email Filter â†’ Alert Users
 
 [bold cyan]APT DETECTION[/bold cyan]
 IOC: IP: 185.130.5.253 (Known C2)
 IOC: Process: backdoor.exe
 IOC: Network: Beaconing every 60 seconds
-Action: Isolate → Block C2 → Remove Backdoor → Forensic Analysis
+Action: Isolate â†’ Block C2 â†’ Remove Backdoor â†’ Forensic Analysis
 
-[bold yellow]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold yellow]
+[bold yellow]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold yellow]
 
-[bold white]💡 WHY IOCS ARE CRITICAL[/bold white]
+[bold white]ðŸ’¡ WHY IOCS ARE CRITICAL[/bold white]
 
 [bold green]1. EARLY DETECTION[/bold green]
-→ Identify threats before they cause damage
-→ Reduce dwell time (time from compromise to detection)
+â†’ Identify threats before they cause damage
+â†’ Reduce dwell time (time from compromise to detection)
 
 [bold cyan]2. FAST RESPONSE[/bold cyan]
-→ Automated blocking of known threats
-→ Quick containment and remediation
+â†’ Automated blocking of known threats
+â†’ Quick containment and remediation
 
 [bold yellow]3. THREAT INTELLIGENCE[/bold yellow]
-→ Understand attacker TTPs
-→ Identify trends and patterns
-→ Stay ahead of emerging threats
+â†’ Understand attacker TTPs
+â†’ Identify trends and patterns
+â†’ Stay ahead of emerging threats
 
 [bold magenta]4. COMPLIANCE REQUIREMENTS[/bold magenta]
-→ GDPR (breach notification)
-→ HIPAA (patient data protection)
-→ PCI-DSS (cardholder data security)
-→ NIST CSF (cybersecurity framework)
+â†’ GDPR (breach notification)
+â†’ HIPAA (patient data protection)
+â†’ PCI-DSS (cardholder data security)
+â†’ NIST CSF (cybersecurity framework)
 
 [bold red]5. PROACTIVE HUNTING[/bold red]
-→ Search for threats proactively
-→ Find attackers before they strike
-→ Improve security posture
+â†’ Search for threats proactively
+â†’ Find attackers before they strike
+â†’ Improve security posture
 
 [bold blue]6. ATTRIBUTION[/bold blue]
-→ Identify threat actors
-→ Link attacks to known groups
-→ Understand motivations
+â†’ Identify threat actors
+â†’ Link attacks to known groups
+â†’ Understand motivations
 
 [bold green]7. SHARING & COLLABORATION[/bold green]
-→ Share intelligence with others
-→ Benefit from community knowledge
-→ Contribute to global security
+â†’ Share intelligence with others
+â†’ Benefit from community knowledge
+â†’ Contribute to global security
 
-[bold yellow]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold yellow]
+[bold yellow]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold yellow]
 
-[bold white]🔧 USING IOCS IN SOC LAB[/bold white]
+[bold white]ðŸ”§ USING IOCS IN SOC LAB[/bold white]
 
 [bold green]STEP 1: Add an IOC[/bold green]
-→ Type: soc ioc
-→ Select type: hash, domain, ip, url, file, registry
-→ Enter value
-→ Categorize: malicious, suspicious, clean
+â†’ Type: soc ioc
+â†’ Select type: hash, domain, ip, url, file, registry
+â†’ Enter value
+â†’ Categorize: malicious, suspicious, clean
 
 [bold cyan]STEP 2: Test the IOC[/bold cyan]
-→ The lab will scan your system
-→ Find matching files, processes, or configurations
-→ Identify potential compromises
+â†’ The lab will scan your system
+â†’ Find matching files, processes, or configurations
+â†’ Identify potential compromises
 
 [bold yellow]STEP 3: View All IOCs[/bold yellow]
-→ See all loaded IOCs
-→ Review categories and sources
-→ Export for sharing
+â†’ See all loaded IOCs
+â†’ Review categories and sources
+â†’ Export for sharing
 
 [bold magenta]STEP 4: Monitor for IOC Matches[/bold magenta]
-→ Real-time file system monitoring
-→ Process behavior analysis
-→ Automatic alerts on matches
+â†’ Real-time file system monitoring
+â†’ Process behavior analysis
+â†’ Automatic alerts on matches
 
 [bold red]STEP 5: Respond to IOC Matches[/bold red]
-→ Quarantine malicious files
-→ Block malicious domains and IPs
-→ Terminate malicious processes
-→ Generate incident reports
+â†’ Quarantine malicious files
+â†’ Block malicious domains and IPs
+â†’ Terminate malicious processes
+â†’ Generate incident reports
 
-[bold yellow]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold yellow]
+[bold yellow]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold yellow]
 
-[bold green]🎓 QUICK REFERENCE[/bold green]
+[bold green]ðŸŽ“ QUICK REFERENCE[/bold green]
 
 [bold cyan]IOC TYPES:[/bold cyan] hash, domain, ip, url, file, registry
 [bold cyan]CATEGORIES:[/bold cyan] malicious, suspicious, clean
@@ -2134,50 +2134,50 @@ Action: Isolate → Block C2 → Remove Backdoor → Forensic Analysis
 [bold cyan]SOURCES:[/bold cyan] Internal, External, Vendor, Open Source, Other
 [bold cyan]ACTIONS:[/bold cyan] Block, Quarantine, Alert, Monitor, Investigate
 
-[bold yellow]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold yellow]
+[bold yellow]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold yellow]
 
-[bold white]📚 LEARNING RESOURCES[/bold white]
+[bold white]ðŸ“š LEARNING RESOURCES[/bold white]
 
 [bold cyan]Online Platforms:[/bold cyan]
-• VirusTotal: https://www.virustotal.com
-• MISP: https://www.misp-project.org
-• AlienVault OTX: https://otx.alienvault.com
-• AbuseIPDB: https://www.abuseipdb.com
+â€¢ VirusTotal: https://www.virustotal.com
+â€¢ MISP: https://www.misp-project.org
+â€¢ AlienVault OTX: https://otx.alienvault.com
+â€¢ AbuseIPDB: https://www.abuseipdb.com
 
 [bold yellow]Threat Intelligence Feeds:[/bold yellow]
-• CISA Alerts: https://www.cisa.gov/cybersecurity-advisories
-• Talos Intelligence: https://talosintelligence.com
-• SANS ISC: https://isc.sans.edu
+â€¢ CISA Alerts: https://www.cisa.gov/cybersecurity-advisories
+â€¢ Talos Intelligence: https://talosintelligence.com
+â€¢ SANS ISC: https://isc.sans.edu
 
 [bold green]Certifications:[/bold green]
-• CISSP - Certified Information Systems Security Professional
-• CISA - Certified Information Systems Auditor
-• CEH - Certified Ethical Hacker
-• GIAC - Global Information Assurance Certification
+â€¢ CISSP - Certified Information Systems Security Professional
+â€¢ CISA - Certified Information Systems Auditor
+â€¢ CEH - Certified Ethical Hacker
+â€¢ GIAC - Global Information Assurance Certification
 
-[bold yellow]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold yellow]
+[bold yellow]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold yellow]
 
-[bold green]🏁 CONCLUSION[/bold green]
+[bold green]ðŸ CONCLUSION[/bold green]
 
 Indicators of Compromise are the [bold red]foundation of modern cybersecurity[/bold red] 
 detection and response. They enable organizations to:
 
-[bold green]✅ Detect[/bold green] threats early
-[bold cyan]✅ Respond[/bold cyan] quickly and effectively
-[bold yellow]✅ Share[/bold yellow] intelligence with the community
-[bold magenta]✅ Hunt[/bold magenta] proactively for threats
-[bold red]✅ Attribute[/bold red] attacks to specific groups
-[bold blue]✅ Comply[/bold blue] with regulations
-[bold white]✅ Improve[/bold white] overall security posture
+[bold green]âœ… Detect[/bold green] threats early
+[bold cyan]âœ… Respond[/bold cyan] quickly and effectively
+[bold yellow]âœ… Share[/bold yellow] intelligence with the community
+[bold magenta]âœ… Hunt[/bold magenta] proactively for threats
+[bold red]âœ… Attribute[/bold red] attacks to specific groups
+[bold blue]âœ… Comply[/bold blue] with regulations
+[bold white]âœ… Improve[/bold white] overall security posture
 
-[bold cyan]💡 Remember:[/bold cyan] IOCs are not just about blocking threats—
+[bold cyan]ðŸ’¡ Remember:[/bold cyan] IOCs are not just about blocking threatsâ€”
 they're about [bold yellow]understanding the threat landscape[/bold yellow], 
 [bold green]identifying attacker patterns[/bold green], and 
 [bold magenta]continuously improving your security defenses[/bold magenta].
 
-[bold yellow]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold yellow]
+[bold yellow]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold yellow]
 
-[bold red]🛡️ STAY VIGILANT | STAY SECURE | STAY INFORMED[/bold red]
+[bold red]ðŸ›¡ï¸ STAY VIGILANT | STAY SECURE | STAY INFORMED[/bold red]
 
 [dim italic]"The best defense is a good offense - know your IOCs!"[/dim italic]
 """,
@@ -2194,80 +2194,80 @@ they're about [bold yellow]understanding the threat landscape[/bold yellow],
 # Add this near CONFIG or __init__
 EDUCATION_TIPS = {
     "system scan -all": """
-    [bold]💡 Did You Know?[/bold]\n
+    [bold]ðŸ’¡ Did You Know?[/bold]\n
     Regular system scans help detect malware persistence mechanisms like:\n
     - [red]Rootkits[/red] hiding in kernel modules\n
     - [yellow]Malicious scheduled tasks[/yellow] (check `crontab -l` or Task Scheduler)\n
     - [blue]Unusual network listeners[/blue] (`netstat -tulnp`)\n
     """,
     "net -n mon": """
-    [bold cyan]🌐 NETWORK MONITORING: REAL-TIME THREAT VISUALIZATION[/bold cyan]
+    [bold cyan]ðŸŒ NETWORK MONITORING: REAL-TIME THREAT VISUALIZATION[/bold cyan]
 
-    [bold yellow]📡 WHAT YOU'RE SEEING ON THE MAP[/bold yellow]
+    [bold yellow]ðŸ“¡ WHAT YOU'RE SEEING ON THE MAP[/bold yellow]
 
     The threat map shows [green]live connections[/green] from your system to servers worldwide.
     Each colored line tells a story about your network traffic.
 
-    [bold red]🔴 RED LINES = HIGH RISK[/bold red]
-    → Known malicious IP addresses
-    → Active C2 (Command & Control) communication
-    → Connections to sanctioned countries (North Korea, Iran, Russia)
-    → High threat score (3-5 out of 5)
+    [bold red]ðŸ”´ RED LINES = HIGH RISK[/bold red]
+    â†’ Known malicious IP addresses
+    â†’ Active C2 (Command & Control) communication
+    â†’ Connections to sanctioned countries (North Korea, Iran, Russia)
+    â†’ High threat score (3-5 out of 5)
 
-    [bold yellow]🟡 YELLOW/ORANGE LINES = MEDIUM RISK[/bold yellow]
-    → Unusual ports or protocols
-    → Recently registered domains (<30 days old)
-    → Geographic anomalies (unexpected server locations)
-    → Hosting providers frequently abused by attackers
+    [bold yellow]ðŸŸ¡ YELLOW/ORANGE LINES = MEDIUM RISK[/bold yellow]
+    â†’ Unusual ports or protocols
+    â†’ Recently registered domains (<30 days old)
+    â†’ Geographic anomalies (unexpected server locations)
+    â†’ Hosting providers frequently abused by attackers
 
-    [bold green]🟢 GREEN LINES = LOW RISK[/bold green]
-    → Normal HTTPS web browsing (ports 443/80)
-    → Trusted services (Microsoft, Google, Cloudflare, AWS)
-    → Expected geographic locations
-    → Established connections with clean reputation
+    [bold green]ðŸŸ¢ GREEN LINES = LOW RISK[/bold green]
+    â†’ Normal HTTPS web browsing (ports 443/80)
+    â†’ Trusted services (Microsoft, Google, Cloudflare, AWS)
+    â†’ Expected geographic locations
+    â†’ Established connections with clean reputation
 
-    [bold cyan]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold cyan]
+    [bold cyan]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold cyan]
 
-    [bold white]🎯 WHAT TO INVESTIGATE IMMEDIATELY[/bold white]
+    [bold white]ðŸŽ¯ WHAT TO INVESTIGATE IMMEDIATELY[/bold white]
 
-    ✓ Multiple [red]red lines[/red] from the same process
-    ✓ Connections to [yellow]unusual ports[/yellow] (not 80,443,22,3389)
-    ✓ [cyan]Beaconing patterns[/cyan] - regular intervals to same IP
-    ✓ [magenta]High data upload[/magenta] without user action
-    ✓ Processes with [red]no digital signature[/red] making network calls
+    âœ“ Multiple [red]red lines[/red] from the same process
+    âœ“ Connections to [yellow]unusual ports[/yellow] (not 80,443,22,3389)
+    âœ“ [cyan]Beaconing patterns[/cyan] - regular intervals to same IP
+    âœ“ [magenta]High data upload[/magenta] without user action
+    âœ“ Processes with [red]no digital signature[/red] making network calls
 
-    [bold cyan]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold cyan]
+    [bold cyan]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold cyan]
 
-    [bold green]📏 UNDERSTANDING DISTANCE METRICS[/bold green]
+    [bold green]ðŸ“ UNDERSTANDING DISTANCE METRICS[/bold green]
 
     Each connection line displays the [yellow]great-circle distance[/yellow] between you and the server:
 
-    → [cyan]Short distances[/cyan] (<1000km) = Low latency, likely regional services
-    → [yellow]Medium distances[/yellow] (1000-5000km) = Typical cross-continent traffic
-    → [red]Long distances[/red] (>5000km) = Potentially abnormal routing
+    â†’ [cyan]Short distances[/cyan] (<1000km) = Low latency, likely regional services
+    â†’ [yellow]Medium distances[/yellow] (1000-5000km) = Typical cross-continent traffic
+    â†’ [red]Long distances[/red] (>5000km) = Potentially abnormal routing
 
     [bold]Watch for geographic mismatches:[/bold] A "local" bank connecting to Eastern Europe
     or a software update fetching from 15,000km away when local mirrors exist.
 
-    [bold cyan]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold cyan]
+    [bold cyan]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold cyan]
 
-    [bold magenta]🔬 BROWSER CONNECTION ANALYSIS[/bold magenta]
+    [bold magenta]ðŸ”¬ BROWSER CONNECTION ANALYSIS[/bold magenta]
 
-    Browser connections (🌐 WEB) require special attention because:
+    Browser connections (ðŸŒ WEB) require special attention because:
 
-    • [red]Drive-by downloads[/red] - Malicious scripts establishing hidden connections
-    • [yellow]Cryptominers[/yellow] - Running in tabs, connecting to mining pools
-    • [cyan]Data exfiltration[/cyan] - Form data sent to unexpected domains
-    • [magenta]C2 via WebSockets[/magenta] - Real-time communication channels
+    â€¢ [red]Drive-by downloads[/red] - Malicious scripts establishing hidden connections
+    â€¢ [yellow]Cryptominers[/yellow] - Running in tabs, connecting to mining pools
+    â€¢ [cyan]Data exfiltration[/cyan] - Form data sent to unexpected domains
+    â€¢ [magenta]C2 via WebSockets[/magenta] - Real-time communication channels
 
     [bold]Suspicious indicators:[/bold]
-    → Connections to [red]non-standard ports[/red] (not 443/80)
-    → [cyan]Multiple connections[/cyan] from different tabs to same IP
-    → [yellow]WebRTC leaks[/yellow] revealing local IP addresses
+    â†’ Connections to [red]non-standard ports[/red] (not 443/80)
+    â†’ [cyan]Multiple connections[/cyan] from different tabs to same IP
+    â†’ [yellow]WebRTC leaks[/yellow] revealing local IP addresses
 
-    [bold cyan]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold cyan]
+    [bold cyan]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold cyan]
 
-    [bold red]⚠️ IMMEDIATE ACTION REQUIRED - RED FLAGS[/bold red]
+    [bold red]âš ï¸ IMMEDIATE ACTION REQUIRED - RED FLAGS[/bold red]
 
     If you observe ANY of these, investigate immediately:
 
@@ -2277,74 +2277,74 @@ EDUCATION_TIPS = {
     4. [magenta]Outbound [red]ICMP tunneling[/red] (unusual ping patterns)[/magenta]
     5. [green]Large data [red]exfiltration[/red] to unrecognized destinations[/green]
 
-    [bold cyan]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold cyan]
+    [bold cyan]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold cyan]
 
-    [bold white]🎯 INCIDENT RESPONSE WORKFLOW[/bold white]
+    [bold white]ðŸŽ¯ INCIDENT RESPONSE WORKFLOW[/bold white]
 
     [white]1. IMMEDIATE[/white]
-    → [red]Document everything[/red] (screenshots, logs, timestamps)
-    → [yellow]Disconnect[/yellow] confirmed malicious hosts from network
+    â†’ [red]Document everything[/red] (screenshots, logs, timestamps)
+    â†’ [yellow]Disconnect[/yellow] confirmed malicious hosts from network
 
     [white]2. ANALYSIS[/white]
-    → [cyan]Capture traffic[/cyan] (Wireshark/tcpdump) for deeper inspection
-    → [green]Memory analysis[/green] of suspicious processes (Volatility)
-    → [magenta]Check against threat intel[/magenta] (VirusTotal, MISP)
+    â†’ [cyan]Capture traffic[/cyan] (Wireshark/tcpdump) for deeper inspection
+    â†’ [green]Memory analysis[/green] of suspicious processes (Volatility)
+    â†’ [magenta]Check against threat intel[/magenta] (VirusTotal, MISP)
 
     [white]3. REMEDIATION[/white]
-    → [red]Kill malicious processes[/red]
-    → [yellow]Remove persistence[/yellow]
-    → [cyan]Block IOCs[/cyan] (firewall, DNS sinkhole)
+    â†’ [red]Kill malicious processes[/red]
+    â†’ [yellow]Remove persistence[/yellow]
+    â†’ [cyan]Block IOCs[/cyan] (firewall, DNS sinkhole)
 
     [white]4. RECOVERY[/white]
-    → [green]Restore from known-good backups[/green]
-    → [magenta]Apply security patches[/magenta]
-    → [blue]Reset compromised credentials[/blue]
+    â†’ [green]Restore from known-good backups[/green]
+    â†’ [magenta]Apply security patches[/magenta]
+    â†’ [blue]Reset compromised credentials[/blue]
 
-    [bold cyan]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold cyan]
+    [bold cyan]â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”[/bold cyan]
 
-    [bold blue]📚 CONTINUOUS LEARNING RESOURCES[/bold blue]
+    [bold blue]ðŸ“š CONTINUOUS LEARNING RESOURCES[/bold blue]
 
-    • [cyan]MITRE ATT&CK Framework[/cyan] - Understand adversary tactics & techniques
-    • [yellow]SANS Reading Room[/yellow] - Network monitoring white papers
-    • [red]CISA Alerts[/red] - Current threat intelligence
-    • [green]VirusTotal[/green] - Hash lookups and sandbox analysis
-    • [magenta]Any.Run[/magenta] - Interactive malware analysis
+    â€¢ [cyan]MITRE ATT&CK Framework[/cyan] - Understand adversary tactics & techniques
+    â€¢ [yellow]SANS Reading Room[/yellow] - Network monitoring white papers
+    â€¢ [red]CISA Alerts[/red] - Current threat intelligence
+    â€¢ [green]VirusTotal[/green] - Hash lookups and sandbox analysis
+    â€¢ [magenta]Any.Run[/magenta] - Interactive malware analysis
 
     [dim italic]"The network doesn't lie - it just waits for someone to read its story."[/dim italic]
     """,
     "harden -t sys": """
-    [bold]🛡️ Hardening Pro Tip[/bold]\n
+    [bold]ðŸ›¡ï¸ Hardening Pro Tip[/bold]\n
     Always follow the [yellow]Principle of Least Privilege[/yellow]:\n
     - Disable unnecessary services\n
     - Apply OS-specific benchmarks (e.g., [blue]CIS Benchmarks[/blue])\n
     - Use [green]SELinux/AppArmor[/green] for mandatory access control.\n
     """,
     "exploitcheck": """
-    [bold]🔍 Exploit Check Tip[/bold]\n
+    [bold]ðŸ” Exploit Check Tip[/bold]\n
     Checks for common vulnerabilities like:\n
     - [red]Unpatched CVEs[/red] (check with `cve-search`)\n
     - [yellow]Misconfigured services[/yellow] (SSH, FTP, SMB)\n
     - [blue]Kernel exploits[/blue] (DirtyPipe, DirtyCow)\n
     [green]Pro Tip:[/green] Cross-reference with exploit-db.com\n
-    [bold]🧠 Exploit Check Insight[/bold]\n
+    [bold]ðŸ§  Exploit Check Insight[/bold]\n
     - Regularly scan for known vulnerabilities (CVEs).\n
     - Tools like [cyan]searchsploit[/cyan], [magenta]exploitdb[/magenta], and vulnerability scanners (Nessus, OpenVAS) are critical.
     """,
     
     "macspoof": """
-    [bold]📡 MAC Spoofing Tip[/bold]\n
+    [bold]ðŸ“¡ MAC Spoofing Tip[/bold]\n
     Remember:\n
     1. Spoofing only works until [red]next reboot[/red]\n
     2. For persistence, modify [yellow]/etc/network/interfaces[/yellow]\n
     3. Some networks use [blue]MAC filtering[/blue] (check ARP tables)\n
     [green]Example:[/green] macspoof wlan0\n
-    [bold]🎭 MAC Spoofing Caution[/bold]\n
+    [bold]ðŸŽ­ MAC Spoofing Caution[/bold]\n
     - Changing MAC addresses can evade network tracking but might disrupt connections.\n
     - Always reset your original MAC for stability.
     """,
     
     "clearlogs": """
-    [bold]🧹 Log Cleaning Tip[/bold]\n
+    [bold]ðŸ§¹ Log Cleaning Tip[/bold]\n
     Targets common log locations:\n
     - [red]/var/log/[/red] (syslog, auth.log)\n
     - [yellow]~/.bash_history[/yellow]\n
@@ -2358,7 +2358,7 @@ EDUCATION_TIPS = {
     """,
     
     "portsweep": """
-    [bold]🔎 Port Scanning Tip[/bold]\n
+    [bold]ðŸ”Ž Port Scanning Tip[/bold]\n
     Advanced techniques:\n
     - [red]SYN stealth scan[/red] (-sS)\n
     - [yellow]Service version detection[/yellow] (-sV)\n
@@ -2370,7 +2370,7 @@ EDUCATION_TIPS = {
     """,
     
     "hashfile": """
-    [bold]🔐 Hashing Tip[/bold]\n
+    [bold]ðŸ” Hashing Tip[/bold]\n
     Why multiple hashes matter:\n
     - [red]MD5[/red] - Fast but broken\n
     - [yellow]SHA1[/yellow] - Deprecated but common\n
@@ -2381,7 +2381,7 @@ EDUCATION_TIPS = {
     """,
     
     "sysinfo": """
-    [bold]🖥️ System Recon Tip[/bold]\n
+    [bold]ðŸ–¥ï¸ System Recon Tip[/bold]\n
     Critical info to check:\n
     - [red]Kernel version[/red] (uname -a)\n
     - [yellow]CPU flags[/yellow] (/proc/cpuinfo)\n
@@ -2390,7 +2390,7 @@ EDUCATION_TIPS = {
     """,
     
     "killproc": """
-    [bold]💀 Process Killing Tip[/bold]\n
+    [bold]ðŸ’€ Process Killing Tip[/bold]\n
     Advanced methods:\n
     - [red]SIGKILL[/red] (-9) for stubborn processes\n
     - [yellow]pkill[/yellow] for name-based termination\n
@@ -2399,7 +2399,7 @@ EDUCATION_TIPS = {
     """,
     
     "check integrity": """
-    [bold]🛡️ Integrity Check Tip[/bold]\n
+    [bold]ðŸ›¡ï¸ Integrity Check Tip[/bold]\n
     Checks for:\n
     - [red]Modified system binaries[/red] (ls, ps, netstat)\n
     - [yellow]Unexpected setuid files[/yellow] (find / -perm -4000)\n
@@ -2408,7 +2408,7 @@ EDUCATION_TIPS = {
     """,
     
     "encrypt": """
-    [bold]🔒 Encryption Tip[/bold]\n
+    [bold]ðŸ”’ Encryption Tip[/bold]\n
     Best practices:\n
     - Use [red]strong passwords[/red] (12+ chars, special symbols)\n
     - Consider [yellow]GPG[/yellow] for asymmetric encryption\n
@@ -2417,7 +2417,7 @@ EDUCATION_TIPS = {
     """,
     
     "decrypt": """
-    [bold]🔓 Decryption Tip[/bold]\n
+    [bold]ðŸ”“ Decryption Tip[/bold]\n
     Key management:\n
     - Store keys in [red]separate secure location[/red]\n
     - Use [yellow]key derivation functions[/yellow] (PBKDF2)\n
@@ -2426,7 +2426,7 @@ EDUCATION_TIPS = {
     """,
     
     "watchfolder": """
-    [bold]👀 Folder Monitoring Tip[/bold]\n
+    [bold]ðŸ‘€ Folder Monitoring Tip[/bold]\n
     Detects:\n
     - [red]New files[/red] (ransomware indicators)\n
     - [yellow]Permission changes[/yellow] (chmod/chown)\n
@@ -2435,7 +2435,7 @@ EDUCATION_TIPS = {
     """,
     
     "traceroute": """
-    [bold]🌐 Network Tracing Tip[/bold]\n
+    [bold]ðŸŒ Network Tracing Tip[/bold]\n
     Advanced options:\n
     - [red]TCP SYN[/red] probes (-T)\n
     - [yellow]ICMP[/yellow] echo (-I)\n
@@ -2444,7 +2444,7 @@ EDUCATION_TIPS = {
     """,
     
     "ransomwatch": """
-    [bold]💰 Ransomware Tip[/bold]\n
+    [bold]ðŸ’° Ransomware Tip[/bold]\n
     Detection signs:\n
     - [red]Mass file renames[/red] (.enc, .locked)\n
     - [yellow]Unusual process[/yellow] (encryption patterns)\n
@@ -2453,7 +2453,7 @@ EDUCATION_TIPS = {
     """,
     
     "wificrack": """
-    [bold]📶 WiFi Auditing Tip[/bold]\n
+    [bold]ðŸ“¶ WiFi Auditing Tip[/bold]\n
     Common attacks:\n
     - [red]WPA2 handshake[/red] capture\n
     - [yellow]Evil Twin[/yellow] access points\n
@@ -2462,7 +2462,7 @@ EDUCATION_TIPS = {
     """,
     
     "stegcheck": """
-    [bold]🖼️ Steganography Awareness & Forensics Tip[/bold]\n
+    [bold]ðŸ–¼ï¸ Steganography Awareness & Forensics Tip[/bold]\n
     Steganography is the practice of hiding information inside seemingly normal files
     such as images, audio, or video. It is often used to bypass security controls.\n
 
@@ -2494,7 +2494,7 @@ EDUCATION_TIPS = {
     """,
 
     "certcheck": """
-    [bold]🔖 SSL Cert Tip[/bold]\n
+    [bold]ðŸ”– SSL Cert Tip[/bold]\n
     Critical checks:\n
     - [red]Expiration date[/red]\n
     - [yellow]Weak algorithms[/yellow] (SHA1, RC4)\n
@@ -2503,7 +2503,7 @@ EDUCATION_TIPS = {
     """,
     
     "memdump": """
-    [bold]🧠 Memory Forensics Tip[/bold]\n
+    [bold]ðŸ§  Memory Forensics Tip[/bold]\n
     What to look for:\n
     - [red]Process memory[/red] (passwords, keys)\n
     - [yellow]Network connections[/yellow] (raw sockets)\n
@@ -2512,7 +2512,7 @@ EDUCATION_TIPS = {
     """,
     
     "torify": """
-    [bold]🧅 Tor Networking Tip[/bold]\n
+    [bold]ðŸ§… Tor Networking Tip[/bold]\n
     Important notes:\n
     - [red]Not 100% anonymous[/red] (exit node risks)\n
     - [yellow]DNS leaks[/yellow] still possible\n
@@ -2521,186 +2521,186 @@ EDUCATION_TIPS = {
     """,
     
     "update": """
-    [bold cyan]🔄 DSTERMINAL SECURITY UPDATE PROTOCOL[/bold cyan]
+    [bold cyan]ðŸ”„ DSTERMINAL SECURITY UPDATE PROTOCOL[/bold cyan]
 
     [bold underline]WHY SYSTEMATIC UPDATES ARE NON-NEGOTIABLE FOR SECURITY TOOLS[/bold underline]
 
     As a defensive security platform, DSTerminal occupies a privileged position within your infrastructure. 
-    Its capabilities—from network reconnaissance to forensic analysis—require constant evolution to counter 
+    Its capabilitiesâ€”from network reconnaissance to forensic analysisâ€”require constant evolution to counter 
     the rapidly advancing threat landscape. Each update represents not just new features, but essential 
     adaptations to emerging attack methodologies.
 
     [underline]CRITICAL SECURITY IMPERATIVES ADDRESSED THROUGH UPDATES[/underline]
 
     [bold red]ZERO-DAY & N-DAY VULNERABILITY MITIGATION[/bold red]
-    • [white]▸ Preemptive Patch Deployment[/white] – Closing security gaps before widespread exploitation
-    • [yellow]▸ CVE-Responsive Updates[/yellow] – Direct responses to published advisories affecting scanning engines
-    • [red]▸ Memory Corruption Protections[/red] – Enhanced buffer overflow and code injection defenses
-    • [magenta]▸ Sandbox Escape Prevention[/magenta] – Hardening against container/VM breakout techniques
+    â€¢ [white]â–¸ Preemptive Patch Deployment[/white] â€“ Closing security gaps before widespread exploitation
+    â€¢ [yellow]â–¸ CVE-Responsive Updates[/yellow] â€“ Direct responses to published advisories affecting scanning engines
+    â€¢ [red]â–¸ Memory Corruption Protections[/red] â€“ Enhanced buffer overflow and code injection defenses
+    â€¢ [magenta]â–¸ Sandbox Escape Prevention[/magenta] â€“ Hardening against container/VM breakout techniques
 
     [bold yellow]PRIVILEGE & ACCESS CONTROL REINFORCEMENT[/bold yellow]
-    • [white]▸ Least Privilege Enforcement[/white] – Tighter restrictions on DSTerminal's own system access
-    • [cyan]▸ Credential Handling Security[/cyan] – Improved encryption for stored API keys and credentials  
-    • [green]▸ SUID/SGID Vulnerability Remediation[/green] – Fixes for potential local privilege escalation vectors
-    • [red]▸ Race Condition Elimination[/red] – Preventing TOCTOU (Time-of-Check-Time-of-Use) vulnerabilities
+    â€¢ [white]â–¸ Least Privilege Enforcement[/white] â€“ Tighter restrictions on DSTerminal's own system access
+    â€¢ [cyan]â–¸ Credential Handling Security[/cyan] â€“ Improved encryption for stored API keys and credentials  
+    â€¢ [green]â–¸ SUID/SGID Vulnerability Remediation[/green] â€“ Fixes for potential local privilege escalation vectors
+    â€¢ [red]â–¸ Race Condition Elimination[/red] â€“ Preventing TOCTOU (Time-of-Check-Time-of-Use) vulnerabilities
 
     [bold blue]THREAT INTELLIGENCE & DETECTION ENHANCEMENT[/bold blue]
-    • [white]▸ Real-Time Signature Updates[/white] – Integration of latest malware hashes and IOCs (Indicators of Compromise)
-    • [yellow]▸ Behavioral Analysis Improvements[/yellow] – Enhanced heuristic detection for polymorphic malware
-    • [cyan]▸ Attack Pattern Recognition[/cyan] – Updated MITRE ATT&CK framework mapping for detected activities
-    • [green]▸ Threat Actor TTP Updates[/green] – Detection rules for emerging adversary tactics and procedures
+    â€¢ [white]â–¸ Real-Time Signature Updates[/white] â€“ Integration of latest malware hashes and IOCs (Indicators of Compromise)
+    â€¢ [yellow]â–¸ Behavioral Analysis Improvements[/yellow] â€“ Enhanced heuristic detection for polymorphic malware
+    â€¢ [cyan]â–¸ Attack Pattern Recognition[/cyan] â€“ Updated MITRE ATT&CK framework mapping for detected activities
+    â€¢ [green]â–¸ Threat Actor TTP Updates[/green] â€“ Detection rules for emerging adversary tactics and procedures
 
     [bold magenta]CRYPTOGRAPHIC & COMMUNICATIONS SECURITY[/bold magenta]
-    • [white]▸ TLS/SSL Implementation Updates[/white] – Protection against protocol-level vulnerabilities
-    • [yellow]▸ Certificate Validation Enhancements[/yellow] – Improved PKI verification for API communications
-    • [red]▸ Cryptographic Algorithm Rotation[/red] – Migration from deprecated to current standards
-    • [cyan]▸ Secure Channel Reinforcement[/cyan] – Hardened connections to VirusTotal, threat feeds, and update servers
+    â€¢ [white]â–¸ TLS/SSL Implementation Updates[/white] â€“ Protection against protocol-level vulnerabilities
+    â€¢ [yellow]â–¸ Certificate Validation Enhancements[/yellow] â€“ Improved PKI verification for API communications
+    â€¢ [red]â–¸ Cryptographic Algorithm Rotation[/red] â€“ Migration from deprecated to current standards
+    â€¢ [cyan]â–¸ Secure Channel Reinforcement[/cyan] â€“ Hardened connections to VirusTotal, threat feeds, and update servers
 
     [bold green]COMPLIANCE & GOVERNANCE REQUIREMENTS[/bold green]
-    • [white]▸ Regulatory Framework Alignment[/white] – Updates for GDPR, HIPAA, PCI-DSS, NIST, ISO 27001 compliance
-    • [yellow]▸ Audit Trail Enhancements[/yellow] – Improved logging for forensic reconstruction and compliance audits
-    • [cyan]▸ Reporting Template Updates[/cyan] – Formats meeting current regulatory and executive briefing standards
-    • [red]▸ Data Handling Improvements[/red] – Enhanced privacy protections for scanned data retention
+    â€¢ [white]â–¸ Regulatory Framework Alignment[/white] â€“ Updates for GDPR, HIPAA, PCI-DSS, NIST, ISO 27001 compliance
+    â€¢ [yellow]â–¸ Audit Trail Enhancements[/yellow] â€“ Improved logging for forensic reconstruction and compliance audits
+    â€¢ [cyan]â–¸ Reporting Template Updates[/cyan] â€“ Formats meeting current regulatory and executive briefing standards
+    â€¢ [red]â–¸ Data Handling Improvements[/red] â€“ Enhanced privacy protections for scanned data retention
 
     [bold underline]OPERATIONAL & FUNCTIONAL ENHANCEMENTS[/bold underline]
 
     [white]NETWORK DEFENSE CAPABILITIES[/white]
-    • [cyan]▸ Protocol Analysis Updates[/cyan] – Detection for newer network protocols and encapsulated traffic
-    • [yellow]▸ Evasion Technique Countermeasures[/yellow] – Detection of port knocking, tunneling, and protocol smuggling
-    • [green]▸ IoT/OT Device Recognition[/green] – Expanded fingerprinting for industrial and embedded systems
-    • [red]▸ Cloud Environment Adaptations[/red] – Scanning optimizations for AWS, Azure, GCP infrastructures
+    â€¢ [cyan]â–¸ Protocol Analysis Updates[/cyan] â€“ Detection for newer network protocols and encapsulated traffic
+    â€¢ [yellow]â–¸ Evasion Technique Countermeasures[/yellow] â€“ Detection of port knocking, tunneling, and protocol smuggling
+    â€¢ [green]â–¸ IoT/OT Device Recognition[/green] â€“ Expanded fingerprinting for industrial and embedded systems
+    â€¢ [red]â–¸ Cloud Environment Adaptations[/red] â€“ Scanning optimizations for AWS, Azure, GCP infrastructures
 
     [white]FORENSIC & INCIDENT RESPONSE IMPROVEMENTS[/white]
-    • [yellow]▸ Memory Forensics Enhancements[/yellow] – Updated Volatility profiles and memory analysis techniques
-    • [cyan]▸ Disk Imaging Compatibility[/cyan] – Support for newer filesystems and storage technologies
-    • [green]▸ Timeline Analysis Upgrades[/green] – Improved event correlation and attack chain reconstruction
-    • [red]▸ Anti-Forensics Detection[/red] – Identification of evidence tampering and artifact wiping
+    â€¢ [yellow]â–¸ Memory Forensics Enhancements[/yellow] â€“ Updated Volatility profiles and memory analysis techniques
+    â€¢ [cyan]â–¸ Disk Imaging Compatibility[/cyan] â€“ Support for newer filesystems and storage technologies
+    â€¢ [green]â–¸ Timeline Analysis Upgrades[/green] â€“ Improved event correlation and attack chain reconstruction
+    â€¢ [red]â–¸ Anti-Forensics Detection[/red] â€“ Identification of evidence tampering and artifact wiping
 
     [white]PERFORMANCE & SCALABILITY OPTIMIZATIONS[/white]
-    • [cyan]▸ Parallel Processing Improvements[/cyan] – Faster large-scale network sweeps and distributed scanning
-    • [yellow]▸ Resource Utilization Optimization[/yellow] – Reduced memory and CPU overhead during operations
-    • [green]▸ Database Schema Updates[/green] – Enhanced storage efficiency for scan results and historical data
-    • [red]▸ Cache Mechanism Refinements[/red] – Intelligent caching for frequently accessed threat intelligence
+    â€¢ [cyan]â–¸ Parallel Processing Improvements[/cyan] â€“ Faster large-scale network sweeps and distributed scanning
+    â€¢ [yellow]â–¸ Resource Utilization Optimization[/yellow] â€“ Reduced memory and CPU overhead during operations
+    â€¢ [green]â–¸ Database Schema Updates[/green] â€“ Enhanced storage efficiency for scan results and historical data
+    â€¢ [red]â–¸ Cache Mechanism Refinements[/red] â€“ Intelligent caching for frequently accessed threat intelligence
 
     [bold underline]RISK ASSESSMENT: CONSEQUENCES OF UPDATE NEGLECT[/bold underline]
 
     [red]IMMEDIATE THREATS[/red]
-    • [white]Known Exploit Vulnerability[/white] – Attackers targeting published DSTerminal CVEs
-    • [yellow]Detection Blind Spots[/yellow] – Failure to identify current malware variants
-    • [cyan]False Negative Inflation[/cyan] – Missed compromise indicators due to outdated signatures
-    • [magenta]Toolchain Exploitation[/magenta] – Using DSTerminal as an initial attack vector
+    â€¢ [white]Known Exploit Vulnerability[/white] â€“ Attackers targeting published DSTerminal CVEs
+    â€¢ [yellow]Detection Blind Spots[/yellow] â€“ Failure to identify current malware variants
+    â€¢ [cyan]False Negative Inflation[/cyan] â€“ Missed compromise indicators due to outdated signatures
+    â€¢ [magenta]Toolchain Exploitation[/magenta] â€“ Using DSTerminal as an initial attack vector
 
     [red]STRATEGIC VULNERABILITIES[/red]
-    • [white]Security Posture Degradation[/white] – Weakened defensive capabilities across monitored infrastructure
-    • [yellow]Compliance Failures[/yellow] – Violations of mandatory security tool maintenance requirements
-    • [cyan]Incident Response Impairment[/cyan] – Compromised forensic accuracy during security incidents
-    • [magenta]Resource Inefficiency[/magenta] – Wasted time with false positives from outdated detection logic
+    â€¢ [white]Security Posture Degradation[/white] â€“ Weakened defensive capabilities across monitored infrastructure
+    â€¢ [yellow]Compliance Failures[/yellow] â€“ Violations of mandatory security tool maintenance requirements
+    â€¢ [cyan]Incident Response Impairment[/cyan] â€“ Compromised forensic accuracy during security incidents
+    â€¢ [magenta]Resource Inefficiency[/magenta] â€“ Wasted time with false positives from outdated detection logic
 
     [bold underline]BEST PRACTICES FOR DSTERMINAL UPDATE MANAGEMENT[/bold underline]
 
     [green]FREQUENCY & SCHEDULING[/green]
-    • [white]Weekly Update Checks[/white] – Minimum frequency for security tools in active environments
-    • [yellow]Critical Update Immediate Application[/yellow] – Zero-day patches within 24 hours of release
-    • [cyan]Change Window Coordination[/cyan] – Integration with organizational maintenance schedules
-    • [red]Pre-Update Validation[/red] – Testing in isolated environments before production deployment
+    â€¢ [white]Weekly Update Checks[/white] â€“ Minimum frequency for security tools in active environments
+    â€¢ [yellow]Critical Update Immediate Application[/yellow] â€“ Zero-day patches within 24 hours of release
+    â€¢ [cyan]Change Window Coordination[/cyan] â€“ Integration with organizational maintenance schedules
+    â€¢ [red]Pre-Update Validation[/red] â€“ Testing in isolated environments before production deployment
 
     [green]VERIFICATION & INTEGRITY CHECKS[/green]
-    • [white]Digital Signature Validation[/white] – Confirming authenticity of all downloaded updates
-    • [yellow]Hash Verification[/yellow] – SHA-256 checksum confirmation for update packages
-    • [cyan]Source Authenticity[/cyan] – Ensuring updates originate from official GitHub repository
-    • [red]Rollback Preparedness[/red] – Maintaining ability to revert problematic updates
+    â€¢ [white]Digital Signature Validation[/white] â€“ Confirming authenticity of all downloaded updates
+    â€¢ [yellow]Hash Verification[/yellow] â€“ SHA-256 checksum confirmation for update packages
+    â€¢ [cyan]Source Authenticity[/cyan] â€“ Ensuring updates originate from official GitHub repository
+    â€¢ [red]Rollback Preparedness[/red] â€“ Maintaining ability to revert problematic updates
 
     [green]EDUCATION & AWARENESS[/green]
-    • [white]CVE Monitoring Subscriptions[/white] – Automatic alerts for DSTerminal-related vulnerabilities
-    • [yellow]Change Log Review[/yellow] – Understanding security implications of each update
-    • [cyan]Training Updates[/cyan] – Incorporating new features into security team workflows
-    • [red]Vendor Communication[/red] – Reporting potential vulnerabilities discovered during use
+    â€¢ [white]CVE Monitoring Subscriptions[/white] â€“ Automatic alerts for DSTerminal-related vulnerabilities
+    â€¢ [yellow]Change Log Review[/yellow] â€“ Understanding security implications of each update
+    â€¢ [cyan]Training Updates[/cyan] â€“ Incorporating new features into security team workflows
+    â€¢ [red]Vendor Communication[/red] â€“ Reporting potential vulnerabilities discovered during use
 
     [bold underline]DSTERMINAL'S UPDATE ARCHITECTURE[/bold underline]
 
     [dim]Our update system employs a multi-layered verification approach:
-    1. [white]GitHub API Integration[/white] – Secure communication with official release repository
-    2. [yellow]Version Validation[/yellow] – Semantic version comparison with integrity checking
-    3. [cyan]Fallback Mechanisms[/cyan] – Redundant update sources for resilience
-    4. [green]Privilege Escalation Controls[/green] – Admin rights required only for installation phase
-    5. [red]Rollback Capabilities[/red] – Automated restoration points before major updates[/dim]
+    1. [white]GitHub API Integration[/white] â€“ Secure communication with official release repository
+    2. [yellow]Version Validation[/yellow] â€“ Semantic version comparison with integrity checking
+    3. [cyan]Fallback Mechanisms[/cyan] â€“ Redundant update sources for resilience
+    4. [green]Privilege Escalation Controls[/green] â€“ Admin rights required only for installation phase
+    5. [red]Rollback Capabilities[/red] â€“ Automated restoration points before major updates[/dim]
 
     [bold cyan]FINAL ADVISORY:[/bold cyan]
     In cybersecurity, your defensive tools are only as strong as their most recent update.
-    DSTerminal's capabilities evolve continuously—ensure your installation does too.
+    DSTerminal's capabilities evolve continuouslyâ€”ensure your installation does too.
 
     [dim italic]"The only truly secure system is one that is powered off, cast in a block of concrete,
-    and sealed in a lead-lined room with armed guards—and even then I have my doubts."[/dim italic]
-    [dim]— Updated for the modern threat landscape[/dim]
+    and sealed in a lead-lined room with armed guardsâ€”and even then I have my doubts."[/dim italic]
+    [dim]â€” Updated for the modern threat landscape[/dim]
     CER
     """,
     
     "vt-scan": """
-    ╭─────────────────────────────────────────────────────────────────────────────╮
-    │                         🦠 VIRUSTOTAL EDUCATIONAL TIP                        │
-    ├─────────────────────────────────────────────────────────────────────────────┤
-    │                                                                             │
-    │  📚 WHAT IS VIRUSTOTAL?                                                     │
-    │     • Advanced service that scans files & URLs with 70+ AV engines      │
-    │     • Owned by Google (since 2012) - Enterprise & Community editions       │
-    │     • Provides threat intelligence & behavioral analysis                    │
-    │                                                                             │
-    │  🔬 ADVANCED FEATURES:                                                      │
-    │     • Behavioral analysis (Cuckoo/VT Sandbox) - See what files DO          │
-    │     • YARA rule scanning - Pattern-based threat detection                  │
-    │     • Relationship graphs - Visualize threat connections                   │
-    │     • VirusTotal Enterprise - API access for automation                    │
-    │     • Retrohunt - Search historical scan data                             │
-    │                                                                             │
-    │  📊 COMMUNITY INSIGHTS:                                                     │
-    │     • Vote on detections (False Positive / Malicious)                      │
-    │     • Comment on samples with analysis findings                           │
-    │     • Share YARA rules with security community                            │
-    │     • Create collections of related malware                               │
-    │                                                                             │
-    │  🎯 USE CASES FOR SOC OPERATORS:                                           │
-    │     1. Incident Response - Verify suspicious file detections              │
-    │     2. Threat Hunting - Research new malware families                     │
-    │     3. IOC Validation - Check hash/domain reputation                      │
-    │     4. Malware Analysis - Understand file behavior                        │
-    │                                                                             │
-    │  ⚠️ CRITICAL WARNINGS:                                                      │
-    │     • Files uploaded become PUBLIC - Never upload sensitive data!         │
-    │     • Free API has rate limits (4 requests/min, 500/day)                  │
-    │     • Some AV engines may have false positives                            │
-    │     • Not all samples get sandbox analysis                                │
-    │                                                                           │
-    │  💡 PRO TIPS FOR DSTERMINAL:                                              │
-    │     → Hash lookup first (faster, anonymous)                               │
-    │     → Enable VT Enterprise for corporate use                              │
-    │     → Combine with local YARA rules for better detection                  │
-    │     → Automate with Python API for bulk scanning                          │
-    │                                                                           │
-    │  📈 STATISTICS (2024):                                                    │
-    │     • 70+ antivirus engines                                               │
-    │     • 2M+ daily submissions                                               │
-    │     • 6B+ historical scans                                                │
-    │     • 60+ URL scanners                                                    │
-    │                                                                             │
-    │  🎓 RECOMMENDED LEARNING PATH:                                             │
-    │     1. Start with hash lookups (no exposure)                              │
-    │     2. Learn to read analysis reports                                     │
-    │     3. Study YARA rule syntax                                             │
-    │     4. Experiment with API automation                                     │
-    │     5. Contribute community insights                                      │
-    │                                                                             │
-    │  🛡️ BEST PRACTICES FOR SOC:                                                │
-    │     • Always sanitize files before upload                                 │
-    │     • Use API keys with restricted permissions                           │
-    │     • Maintain local database of known threats                           │
-    │     • Cross-reference with other threat intel feeds                      │
-    │     • Document findings in incident reports                              │
-    │                                                                             │
-    ╰─────────────────────────────────────────────────────────────────────────────╯
+    â•­â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•®
+    â”‚                         ðŸ¦  VIRUSTOTAL EDUCATIONAL TIP                        â”‚
+    â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+    â”‚                                                                             â”‚
+    â”‚  ðŸ“š WHAT IS VIRUSTOTAL?                                                     â”‚
+    â”‚     â€¢ Advanced service that scans files & URLs with 70+ AV engines      â”‚
+    â”‚     â€¢ Owned by Google (since 2012) - Enterprise & Community editions       â”‚
+    â”‚     â€¢ Provides threat intelligence & behavioral analysis                    â”‚
+    â”‚                                                                             â”‚
+    â”‚  ðŸ”¬ ADVANCED FEATURES:                                                      â”‚
+    â”‚     â€¢ Behavioral analysis (Cuckoo/VT Sandbox) - See what files DO          â”‚
+    â”‚     â€¢ YARA rule scanning - Pattern-based threat detection                  â”‚
+    â”‚     â€¢ Relationship graphs - Visualize threat connections                   â”‚
+    â”‚     â€¢ VirusTotal Enterprise - API access for automation                    â”‚
+    â”‚     â€¢ Retrohunt - Search historical scan data                             â”‚
+    â”‚                                                                             â”‚
+    â”‚  ðŸ“Š COMMUNITY INSIGHTS:                                                     â”‚
+    â”‚     â€¢ Vote on detections (False Positive / Malicious)                      â”‚
+    â”‚     â€¢ Comment on samples with analysis findings                           â”‚
+    â”‚     â€¢ Share YARA rules with security community                            â”‚
+    â”‚     â€¢ Create collections of related malware                               â”‚
+    â”‚                                                                             â”‚
+    â”‚  ðŸŽ¯ USE CASES FOR SOC OPERATORS:                                           â”‚
+    â”‚     1. Incident Response - Verify suspicious file detections              â”‚
+    â”‚     2. Threat Hunting - Research new malware families                     â”‚
+    â”‚     3. IOC Validation - Check hash/domain reputation                      â”‚
+    â”‚     4. Malware Analysis - Understand file behavior                        â”‚
+    â”‚                                                                             â”‚
+    â”‚  âš ï¸ CRITICAL WARNINGS:                                                      â”‚
+    â”‚     â€¢ Files uploaded become PUBLIC - Never upload sensitive data!         â”‚
+    â”‚     â€¢ Free API has rate limits (4 requests/min, 500/day)                  â”‚
+    â”‚     â€¢ Some AV engines may have false positives                            â”‚
+    â”‚     â€¢ Not all samples get sandbox analysis                                â”‚
+    â”‚                                                                           â”‚
+    â”‚  ðŸ’¡ PRO TIPS FOR DSTERMINAL:                                              â”‚
+    â”‚     â†’ Hash lookup first (faster, anonymous)                               â”‚
+    â”‚     â†’ Enable VT Enterprise for corporate use                              â”‚
+    â”‚     â†’ Combine with local YARA rules for better detection                  â”‚
+    â”‚     â†’ Automate with Python API for bulk scanning                          â”‚
+    â”‚                                                                           â”‚
+    â”‚  ðŸ“ˆ STATISTICS (2024):                                                    â”‚
+    â”‚     â€¢ 70+ antivirus engines                                               â”‚
+    â”‚     â€¢ 2M+ daily submissions                                               â”‚
+    â”‚     â€¢ 6B+ historical scans                                                â”‚
+    â”‚     â€¢ 60+ URL scanners                                                    â”‚
+    â”‚                                                                             â”‚
+    â”‚  ðŸŽ“ RECOMMENDED LEARNING PATH:                                             â”‚
+    â”‚     1. Start with hash lookups (no exposure)                              â”‚
+    â”‚     2. Learn to read analysis reports                                     â”‚
+    â”‚     3. Study YARA rule syntax                                             â”‚
+    â”‚     4. Experiment with API automation                                     â”‚
+    â”‚     5. Contribute community insights                                      â”‚
+    â”‚                                                                             â”‚
+    â”‚  ðŸ›¡ï¸ BEST PRACTICES FOR SOC:                                                â”‚
+    â”‚     â€¢ Always sanitize files before upload                                 â”‚
+    â”‚     â€¢ Use API keys with restricted permissions                           â”‚
+    â”‚     â€¢ Maintain local database of known threats                           â”‚
+    â”‚     â€¢ Cross-reference with other threat intel feeds                      â”‚
+    â”‚     â€¢ Document findings in incident reports                              â”‚
+    â”‚                                                                             â”‚
+    â•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯
     """,
     
     "registry -n mon": """
-    [bold]💾 Registry Monitoring Tip[/bold]\n
+    [bold]ðŸ’¾ Registry Monitoring Tip[/bold]\n
     Critical keys to watch:\n
     - [red]Run/RunOnce[/red] (persistence)\n
     - [yellow]AppInit_DLLs[/yellow] (code injection)\n
@@ -2719,17 +2719,17 @@ def typewrite_effect(text, delay=0.02, color_effects=True):
         for char in line:
             if color_effects:
                 # Color coding for special characters
-                if char == '•':
+                if char == 'â€¢':
                     console.print(f"[bold yellow]{char}[/bold yellow]", end='')
-                elif char == '→':
+                elif char == 'â†’':
                     console.print(f"[cyan]{char}[/cyan]", end='')
-                elif char == '✓':
+                elif char == 'âœ“':
                     console.print(f"[bold green]{char}[/bold green]", end='')
-                elif char == '⚠':
+                elif char == 'âš ':
                     console.print(f"[bold red]{char}[/bold red]", end='')
-                elif char == '★':
+                elif char == 'â˜…':
                     console.print(f"[bold magenta]{char}[/bold magenta]", end='')
-                elif char == '📡' or char == '🌐' or char == '🔍' or char == '💡' or char == '🔐':
+                elif char == 'ðŸ“¡' or char == 'ðŸŒ' or char == 'ðŸ”' or char == 'ðŸ’¡' or char == 'ðŸ”':
                     console.print(f"[cyan]{char}[/cyan]", end='')
                 elif char.isdigit() and line.strip().startswith(char):
                     console.print(f"[bold red]{char}[/bold red]", end='')
@@ -2753,9 +2753,9 @@ def show_educational_tip(tip_key, education_tips_dict):
     
     # Animated border top
     for _ in range(2):
-        console.print("[dim]╭─────────────────────────────────────────────────────────────────────────────╮[/dim]", end='\r')
+        console.print("[dim]â•­â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•®[/dim]", end='\r')
         time.sleep(0.03)
-    console.print("[dim]╭─────────────────────────────────────────────────────────────────────────────╮[/dim]")
+    console.print("[dim]â•­â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•®[/dim]")
     
     time.sleep(0.1)
     
@@ -2766,9 +2766,9 @@ def show_educational_tip(tip_key, education_tips_dict):
     
     # Animated border bottom
     for _ in range(2):
-        console.print("[dim]╰─────────────────────────────────────────────────────────────────────────────╯[/dim]", end='\r')
+        console.print("[dim]â•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯[/dim]", end='\r')
         time.sleep(0.03)
-    console.print("[dim]╰─────────────────────────────────────────────────────────────────────────────╯[/dim]")
+    console.print("[dim]â•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯[/dim]")
     console.print()
 #       =
 #        =
@@ -2780,7 +2780,7 @@ def calculate_threat_score(conn, geo=None):
     score = 0
 
     if not conn.raddr:
-        return "LOW", "✓", 0
+        return "LOW", "âœ“", 0
 
     ip = conn.raddr.ip
     port = conn.raddr.port
@@ -2798,11 +2798,11 @@ def calculate_threat_score(conn, geo=None):
         score += 3
 
     if score >= 7:
-        return "HIGH", "✖", score
+        return "HIGH", "âœ–", score
     elif score >= 4:
-        return "MEDIUM", "⚠", score
+        return "MEDIUM", "âš ", score
     else:
-        return "LOW", "✓", score
+        return "LOW", "âœ“", score
 
 
 def get_geo_ip(ip):
@@ -2826,17 +2826,17 @@ def typewrite_effect(text, delay=0.02, color_effects=True):
         for char in line:
             if color_effects:
                 # Color coding for special characters
-                if char == '•':
+                if char == 'â€¢':
                     console.print(f"[bold yellow]{char}[/bold yellow]", end='')
-                elif char == '→':
+                elif char == 'â†’':
                     console.print(f"[cyan]{char}[/cyan]", end='')
-                elif char == '✓':
+                elif char == 'âœ“':
                     console.print(f"[bold green]{char}[/bold green]", end='')
-                elif char == '⚠':
+                elif char == 'âš ':
                     console.print(f"[bold red]{char}[/bold red]", end='')
-                elif char == '★':
+                elif char == 'â˜…':
                     console.print(f"[bold magenta]{char}[/bold magenta]", end='')
-                elif char == '📡' or char == '🌐' or char == '🔍' or char == '💡' or char == '🔐':
+                elif char == 'ðŸ“¡' or char == 'ðŸŒ' or char == 'ðŸ”' or char == 'ðŸ’¡' or char == 'ðŸ”':
                     console.print(f"[cyan]{char}[/cyan]", end='')
                 elif char.isdigit() and line.strip().startswith(char):
                     console.print(f"[bold red]{char}[/bold red]", end='')
@@ -2857,9 +2857,9 @@ class SecurityTerminal:
     
 class SecurityTerminal:
         #   Neon SOC colors for log viewer  
-    NEON_HEADER = "<ansimagenta><b>╔══════════════════════════════════════════════╗</b></ansimagenta>"
-    NEON_FOOTER = "<ansimagenta><b>╚══════════════════════════════════════════════╝</b></ansimagenta>"
-    NEON_LINE = "<ansicyan>║</ansicyan>"
+    NEON_HEADER = "<ansimagenta><b>â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—</b></ansimagenta>"
+    NEON_FOOTER = "<ansimagenta><b>â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•</b></ansimagenta>"
+    NEON_LINE = "<ansicyan>â•‘</ansicyan>"
     NEON_COMMAND = "<ansigreen>"
     RESET = "</ansigreen>"
 
@@ -2890,9 +2890,9 @@ class SecurityTerminal:
                 workspace = os.path.expanduser('~/soc_lab_workspace')
                 os.makedirs(workspace, exist_ok=True)
                 self.soc_lab = SOCAutomatedLab(workspace)
-                print("✅ SOC Automated Lab initialized")
+                print("âœ… SOC Automated Lab initialized")
             except Exception as e:
-                print(f"⚠️ SOC Lab initialization failed: {e}")
+                print(f"âš ï¸ SOC Lab initialization failed: {e}")
                 self.soc_lab = None
                 
         #  === WORKSPACE - Fast  ===
@@ -3159,22 +3159,22 @@ class SecurityTerminal:
                 self.autoremediation = AutoRemediation(self.integrity)  
 
                 if COLORS_AVAILABLE:
-                    print(f"{Fore.GREEN}✓ Integrity Monitor initialized{Style.RESET_ALL}")
+                    print(f"{Fore.GREEN}âœ“ Integrity Monitor initialized{Style.RESET_ALL}")
                 else:
-                    print("✓ Integrity Monitor initialized")
+                    print("âœ“ Integrity Monitor initialized")
                     
             except Exception as e:
                 if COLORS_AVAILABLE:
-                    print(f"{Fore.RED}✗ Failed to initialize Integrity Monitor: {e}{Style.RESET_ALL}")
+                    print(f"{Fore.RED}âœ— Failed to initialize Integrity Monitor: {e}{Style.RESET_ALL}")
                 else:
-                    print(f"✗ Failed to initialize Integrity Monitor: {e}")
+                    print(f"âœ— Failed to initialize Integrity Monitor: {e}")
                 self.integrity = None
                 self.alert_manager = None
         else:
             if COLORS_AVAILABLE:
-                print(f"{Fore.YELLOW}⚠ Integrity Monitor disabled{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}âš  Integrity Monitor disabled{Style.RESET_ALL}")
             else:
-                print("⚠ Integrity Monitor disabled")
+                print("âš  Integrity Monitor disabled")
     # initialize vt_scan module
     #    =
         self.vt_scanner = None
@@ -3232,7 +3232,7 @@ class SecurityTerminal:
             from deletion_protection import PlatformDetector
             pd = PlatformDetector()
             self.config = {
-                'version': '3.1.113',
+                'version': '4.0.0.113',
                 'monitor_paths': pd.get_trash_paths(),
                 'exclude_patterns': ['*.tmp', '*.temp', '*~', '.DS_Store', 'Thumbs.db'],
                 'max_file_size': 100 * 1024 * 1024,
@@ -3240,7 +3240,7 @@ class SecurityTerminal:
             }
         except:
             self.config = {
-                'version': '3.1.113',
+                'version': '4.0.0.113',
                 'monitor_paths': [],
                 'exclude_patterns': ['*.tmp', '*.temp', '*~', '.DS_Store', 'Thumbs.db'],
                 'max_file_size': 100 * 1024 * 1024,
@@ -3368,7 +3368,7 @@ class SecurityTerminal:
                     time.sleep(base_delay * 2)
                 elif char == " ":
                     time.sleep(base_delay * 0.3)
-                elif char in "═╔╗║╠╣╚╝":
+                elif char in "â•â•”â•—â•‘â• â•£â•šâ•":
                     time.sleep(base_delay * 0.1)
                 else:
                     time.sleep(base_delay * 0.7)
@@ -3387,7 +3387,7 @@ class SecurityTerminal:
         from colorama import Fore
         color = color or Fore.CYAN
         self._ultra_type(f"\n{text}", color=color, speed='fast')
-        self._ultra_type("━" * min(len(text), 70), color=Fore.CYAN, speed='ultra')
+        self._ultra_type("â”" * min(len(text), 70), color=Fore.CYAN, speed='ultra')
 
     def _ultra_type_status(self, text, color=None):
         """Print a status message with ultra-fast typewriter"""
@@ -3425,11 +3425,11 @@ class SecurityTerminal:
             "INFO": Fore.WHITE
         }
         severity_prefix = {
-            "CRITICAL": "🚨",
-            "HIGH": "⚠️",
-            "MEDIUM": "🔍",
-            "LOW": "ℹ️",
-            "INFO": "📌"
+            "CRITICAL": "ðŸš¨",
+            "HIGH": "âš ï¸",
+            "MEDIUM": "ðŸ”",
+            "LOW": "â„¹ï¸",
+            "INFO": "ðŸ“Œ"
         }
         
         color = color or severity_colors.get(severity, Fore.WHITE)
@@ -3461,9 +3461,9 @@ class SecurityTerminal:
                 continue
             wrapped.extend(textwrap.wrap(line, inner, break_long_words=False, replace_whitespace=False))
         
-        top = "╔" + "═" * (width - 2) + "╗"
-        mid = "╠" + "═" * (width - 2) + "╣"
-        bot = "╚" + "═" * (width - 2) + "╝"
+        top = "â•”" + "â•" * (width - 2) + "â•—"
+        mid = "â• " + "â•" * (width - 2) + "â•£"
+        bot = "â•š" + "â•" * (width - 2) + "â•"
         title_text = f" {title} ".center(width - 2)
         
         print()
@@ -3472,16 +3472,16 @@ class SecurityTerminal:
         sys.stdout.write(" " * left_margin + border_color + top + Style.RESET_ALL + "\n")
         
         # Title - ultra fast
-        sys.stdout.write(" " * left_margin + title_color + "║" + title_text + "║" + Style.RESET_ALL + "\n")
+        sys.stdout.write(" " * left_margin + title_color + "â•‘" + title_text + "â•‘" + Style.RESET_ALL + "\n")
         
         # Separator - instant
         sys.stdout.write(" " * left_margin + border_color + mid + Style.RESET_ALL + "\n")
         
         # Content - ultra fast typewriter
         for line in wrapped:
-            sys.stdout.write(" " * left_margin + border_color + "║ " + Style.RESET_ALL)
+            sys.stdout.write(" " * left_margin + border_color + "â•‘ " + Style.RESET_ALL)
             self._ultra_type(line.ljust(inner), color=content_color, speed='ultra')
-            sys.stdout.write(" " * left_margin + border_color + "║" + Style.RESET_ALL + "\n")
+            sys.stdout.write(" " * left_margin + border_color + "â•‘" + Style.RESET_ALL + "\n")
         
         # Bottom border - instant
         sys.stdout.write(" " * left_margin + border_color + bot + Style.RESET_ALL + "\n")
@@ -3499,11 +3499,11 @@ class SecurityTerminal:
         from colorama import Fore
         
         # Use ultra-fast header
-        self._ultra_type_header("🛡️ INDICATORS OF COMPROMISE", Fore.CYAN)
+        self._ultra_type_header("ðŸ›¡ï¸ INDICATORS OF COMPROMISE", Fore.CYAN)
         
         # Use ultra-fast box
         self._ultra_type_box(
-            "📌 WHAT ARE IOCS?",
+            "ðŸ“Œ WHAT ARE IOCS?",
             [
                 "Indicators of Compromise are forensic artifacts that provide evidence",
                 "of a potential security breach. They are the digital breadcrumbs"
@@ -3525,7 +3525,7 @@ class SecurityTerminal:
         from colorama import Fore
         
         # Ultra-fast header
-        self._ultra_type_header("🔍 EXPLOIT VULNERABILITY SCANNER", Fore.MAGENTA)
+        self._ultra_type_header("ðŸ” EXPLOIT VULNERABILITY SCANNER", Fore.MAGENTA)
         
         # Ultra-fast status updates
         self._ultra_type_status("Initializing scan...")
@@ -3545,9 +3545,9 @@ class SecurityTerminal:
         
         # Ultra-fast box
         self._ultra_type_box(
-            "🛡️ RANSOMWARE MONITOR STATUS",
+            "ðŸ›¡ï¸ RANSOMWARE MONITOR STATUS",
             [
-                f"Status: {'🚨 ACTIVE' if detected else '✅ CLEAN'}",
+                f"Status: {'ðŸš¨ ACTIVE' if detected else 'âœ… CLEAN'}",
                 f"Threat Level: {threat_level}",
                 f"Uptime: {uptime}"
             ],
@@ -3563,7 +3563,7 @@ class SecurityTerminal:
         from colorama import Fore
         
         # Ultra-fast header with ASCII art
-        self._ultra_type_header("🔐 WIFI SECURITY AUDIT", Fore.LIGHTCYAN_EX)
+        self._ultra_type_header("ðŸ” WIFI SECURITY AUDIT", Fore.LIGHTCYAN_EX)
         
         # Ultra-fast scanning status
         self._ultra_type_status("Scanning for networks...")
@@ -3646,9 +3646,9 @@ class SecurityTerminal:
                 interactive=True,
                 ui=self
             )
-            print("✅ Deletion Protection initialized")
+            print("âœ… Deletion Protection initialized")
         except Exception as e:
-            print(f"⚠️ Could not initialize deletion protection: {e}")
+            print(f"âš ï¸ Could not initialize deletion protection: {e}")
             
     def _init_web_security(self):
         """Initialize web security analyzer - Fast"""
@@ -3714,9 +3714,9 @@ class SecurityTerminal:
                 )
             )
 
-        top = "╔" + "═" * (width - 2) + "╗"
-        mid = "╠" + "═" * (width - 2) + "╣"
-        bot = "╚" + "═" * (width - 2) + "╝"
+        top = "â•”" + "â•" * (width - 2) + "â•—"
+        mid = "â• " + "â•" * (width - 2) + "â•£"
+        bot = "â•š" + "â•" * (width - 2) + "â•"
 
         print()
 
@@ -3727,9 +3727,9 @@ class SecurityTerminal:
         print(
             " " * left_margin +
             title_color +
-            "║" +
+            "â•‘" +
             title_text.center(width - 2) +
-            "║"
+            "â•‘"
         )
 
         print(" " * left_margin + border_color + mid)
@@ -3739,7 +3739,7 @@ class SecurityTerminal:
             print(
                 " " * left_margin +
                 border_color +
-                "║ " +
+                "â•‘ " +
                 Style.RESET_ALL,
                 end=""
             )
@@ -3753,7 +3753,7 @@ class SecurityTerminal:
             print(
                 " " * left_margin +
                 border_color +
-                "║"
+                "â•‘"
             )
 
         print(" " * left_margin + border_color + bot)
@@ -3871,17 +3871,17 @@ class SecurityTerminal:
         
         # Header
         header_art = [
-            "  ██╗  ██╗ ██████╗  ██████╗██╗  ██╗",
-            "  ██║  ██║██╔═══██╗██╔════╝██║ ██╔╝",
-            "  ███████║██║   ██║██║     █████╔╝ ",
-            "  ██╔══██║██║   ██║██║     ██╔═██╗ ",
-            "  ██║  ██║╚██████╔╝╚██████╗██║  ██╗",
-            "  ╚═╝  ╚═╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝"
+            "  â–ˆâ–ˆâ•—  â–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•—  â–ˆâ–ˆâ•—",
+            "  â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•‘ â–ˆâ–ˆâ•”â•",
+            "  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â• ",
+            "  â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•— ",
+            "  â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•—",
+            "  â•šâ•â•  â•šâ•â• â•šâ•â•â•â•â•â•  â•šâ•â•â•â•â•â•â•šâ•â•  â•šâ•â•"
         ]
         
         self._draw_hacker_box(
-            "🛡️ INDICATORS OF COMPROMISE - MASTER CLASS",
-            header_art + ["", "💻 Cybersecurity Education Series"],
+            "ðŸ›¡ï¸ INDICATORS OF COMPROMISE - MASTER CLASS",
+            header_art + ["", "ðŸ’» Cybersecurity Education Series"],
             title_color=BRIGHT_GREEN,
             border_color=BRIGHT_CYAN,
             content_color=GREEN,
@@ -3892,14 +3892,14 @@ class SecurityTerminal:
         
         # Section 1: What are IOCs
         self._draw_hacker_box(
-            "📌 WHAT ARE IOCS?",
+            "ðŸ“Œ WHAT ARE IOCS?",
             [
                 "Indicators of Compromise are forensic artifacts that provide evidence",
                 "of a potential security breach. They are the digital breadcrumbs",
                 "left behind by attackers that security teams use to detect,",
                 "investigate, and respond to cyber threats.",
                 "",
-                "💡 Think of IOCs like fingerprints at a crime scene - they don't",
+                "ðŸ’¡ Think of IOCs like fingerprints at a crime scene - they don't",
                 "tell you who committed the crime, but they prove that someone was",
                 "there and help you track them down."
             ],
@@ -3913,22 +3913,22 @@ class SecurityTerminal:
         
         # Section 2: IOC vs IOA
         self._draw_hacker_box(
-            "📊 IOC VS IOA - WHAT'S THE DIFFERENCE?",
+            "ðŸ“Š IOC VS IOA - WHAT'S THE DIFFERENCE?",
             [
                 "",
-                "🔍 IOC (Indicator of Compromise) - PAST/FORENSIC",
-                "   • Evidence that an attack has ALREADY happened",
-                "   • Things you look for AFTER a breach",
-                "   • Example: Malware hash, malicious domain",
-                "   • Question: 'What did the attacker leave behind?'",
+                "ðŸ” IOC (Indicator of Compromise) - PAST/FORENSIC",
+                "   â€¢ Evidence that an attack has ALREADY happened",
+                "   â€¢ Things you look for AFTER a breach",
+                "   â€¢ Example: Malware hash, malicious domain",
+                "   â€¢ Question: 'What did the attacker leave behind?'",
                 "",
-                "⚡ IOA (Indicator of Attack) - PRESENT/ACTIVE",
-                "   • Evidence that an attack is HAPPENING RIGHT NOW",
-                "   • Things you look for DURING an active attack",
-                "   • Example: Unusual login attempts, data exfiltration",
-                "   • Question: 'What is the attacker doing right now?'",
+                "âš¡ IOA (Indicator of Attack) - PRESENT/ACTIVE",
+                "   â€¢ Evidence that an attack is HAPPENING RIGHT NOW",
+                "   â€¢ Things you look for DURING an active attack",
+                "   â€¢ Example: Unusual login attempts, data exfiltration",
+                "   â€¢ Question: 'What is the attacker doing right now?'",
                 "",
-                "🎯 BOTH are essential for a complete security strategy!"
+                "ðŸŽ¯ BOTH are essential for a complete security strategy!"
             ],
             title_color=MAGENTA,
             border_color=CYAN,
@@ -3940,39 +3940,39 @@ class SecurityTerminal:
         
         # Section 3: Types of IOCs - Two column
         ioc_types_left = [
-            "🔑 1. FILE HASHES",
-            "   • Unique file fingerprint",
-            "   • Example: 5d41402abc4...",
+            "ðŸ”‘ 1. FILE HASHES",
+            "   â€¢ Unique file fingerprint",
+            "   â€¢ Example: 5d41402abc4...",
             "",
-            "🌐 2. DOMAINS",
-            "   • Malicious websites",
-            "   • Example: bad-site.com",
+            "ðŸŒ 2. DOMAINS",
+            "   â€¢ Malicious websites",
+            "   â€¢ Example: bad-site.com",
             "",
-            "📍 3. IP ADDRESSES",
-            "   • C2 servers",
-            "   • Example: 185.130.5.253",
+            "ðŸ“ 3. IP ADDRESSES",
+            "   â€¢ C2 servers",
+            "   â€¢ Example: 185.130.5.253",
             "",
-            "🔗 4. URLS",
-            "   • Malicious web addresses",
-            "   • Example: /payload.exe"
+            "ðŸ”— 4. URLS",
+            "   â€¢ Malicious web addresses",
+            "   â€¢ Example: /payload.exe"
         ]
         
         ioc_types_right = [
-            "📁 5. FILE PATHS",
-            "   • Malware installation",
-            "   • Example: C:\\Temp\\evil.exe",
+            "ðŸ“ 5. FILE PATHS",
+            "   â€¢ Malware installation",
+            "   â€¢ Example: C:\\Temp\\evil.exe",
             "",
-            "🔧 6. REGISTRY KEYS",
-            "   • Persistence mechanisms",
-            "   • Example: HKLM\\Run\\Evil",
+            "ðŸ”§ 6. REGISTRY KEYS",
+            "   â€¢ Persistence mechanisms",
+            "   â€¢ Example: HKLM\\Run\\Evil",
             "",
-            "🧠 7. PROCESS NAMES",
-            "   • Malicious processes",
-            "   • Example: cryptolocker.exe",
+            "ðŸ§  7. PROCESS NAMES",
+            "   â€¢ Malicious processes",
+            "   â€¢ Example: cryptolocker.exe",
             "",
-            "📧 8. EMAIL ADDRESSES",
-            "   • Phishing senders",
-            "   • Example: fake@update.com"
+            "ðŸ“§ 8. EMAIL ADDRESSES",
+            "   â€¢ Phishing senders",
+            "   â€¢ Example: fake@update.com"
         ]
         
         combined_types = []
@@ -3984,7 +3984,7 @@ class SecurityTerminal:
             combined_types.append(f"{left:<{col_width}}  {right}")
         
         self._draw_hacker_box(
-            "📋 TYPES OF IOCS",
+            "ðŸ“‹ TYPES OF IOCS",
             combined_types,
             title_color=CYAN,
             border_color=CYAN,
@@ -3996,22 +3996,22 @@ class SecurityTerminal:
         
         # Section 4: MITRE ATT&CK
         mitre_content = [
-            "🔴 Initial Access (TA0001) → Phishing → Email, domain, URL",
-            "🟡 Execution (TA0002) → Command Interpreter → Process, file path",
-            "🔵 Persistence (TA0003) → Registry Run Keys → Registry, task",
-            "🟣 Privilege Escalation → Valid Accounts → Account changes",
-            "🟢 Defense Evasion (TA0005) → File Deletion → Missing logs",
-            "🔴 Credential Access (TA0006) → Dumping → LSASS access",
-            "🟡 Discovery (TA0007) → Network Scanning → Scanning activity",
-            "🔵 Lateral Movement (TA0008) → Remote Services → Connections",
-            "🟣 Collection (TA0009) → Data Staged → Large file copies",
-            "🟢 Exfiltration (TA0010) → Over C2 → Outbound data",
-            "🔴 Command and Control → Application Protocol → C2 traffic",
-            "🟡 Impact (TA0040) → Data Encrypted → Changed extensions"
+            "ðŸ”´ Initial Access (TA0001) â†’ Phishing â†’ Email, domain, URL",
+            "ðŸŸ¡ Execution (TA0002) â†’ Command Interpreter â†’ Process, file path",
+            "ðŸ”µ Persistence (TA0003) â†’ Registry Run Keys â†’ Registry, task",
+            "ðŸŸ£ Privilege Escalation â†’ Valid Accounts â†’ Account changes",
+            "ðŸŸ¢ Defense Evasion (TA0005) â†’ File Deletion â†’ Missing logs",
+            "ðŸ”´ Credential Access (TA0006) â†’ Dumping â†’ LSASS access",
+            "ðŸŸ¡ Discovery (TA0007) â†’ Network Scanning â†’ Scanning activity",
+            "ðŸ”µ Lateral Movement (TA0008) â†’ Remote Services â†’ Connections",
+            "ðŸŸ£ Collection (TA0009) â†’ Data Staged â†’ Large file copies",
+            "ðŸŸ¢ Exfiltration (TA0010) â†’ Over C2 â†’ Outbound data",
+            "ðŸ”´ Command and Control â†’ Application Protocol â†’ C2 traffic",
+            "ðŸŸ¡ Impact (TA0040) â†’ Data Encrypted â†’ Changed extensions"
         ]
         
         self._draw_hacker_box(
-            "🎯 MITRE ATT&CK & IOC MAPPING",
+            "ðŸŽ¯ MITRE ATT&CK & IOC MAPPING",
             mitre_content,
             title_color=YELLOW,
             border_color=CYAN,
@@ -4023,25 +4023,25 @@ class SecurityTerminal:
         
         # Section 5: Categories
         self._draw_hacker_box(
-            "🛡️ IOC CATEGORIES & CONFIDENCE LEVELS",
+            "ðŸ›¡ï¸ IOC CATEGORIES & CONFIDENCE LEVELS",
             [
                 "",
-                "🟢 CATEGORY: CLEAN",
-                "   → Confidence: 100%  |  Action: Do not block",
-                "   → Confirmed safe, false positive",
+                "ðŸŸ¢ CATEGORY: CLEAN",
+                "   â†’ Confidence: 100%  |  Action: Do not block",
+                "   â†’ Confirmed safe, false positive",
                 "",
-                "🟡 CATEGORY: SUSPICIOUS",
-                "   → Confidence: 50-70%  |  Action: Investigate",
-                "   → Potentially malicious, needs investigation",
+                "ðŸŸ¡ CATEGORY: SUSPICIOUS",
+                "   â†’ Confidence: 50-70%  |  Action: Investigate",
+                "   â†’ Potentially malicious, needs investigation",
                 "",
-                "🔴 CATEGORY: MALICIOUS",
-                "   → Confidence: 80-100%  |  Action: Block immediately",
-                "   → Confirmed malicious, quarantine and alert",
+                "ðŸ”´ CATEGORY: MALICIOUS",
+                "   â†’ Confidence: 80-100%  |  Action: Block immediately",
+                "   â†’ Confirmed malicious, quarantine and alert",
                 "",
-                "📊 CONFIDENCE SCORING:",
-                "   • Multiple sources = Higher confidence",
-                "   • Freshness = More recent = Higher confidence",
-                "   • Source reliability = Trusted source = Higher confidence",
+                "ðŸ“Š CONFIDENCE SCORING:",
+                "   â€¢ Multiple sources = Higher confidence",
+                "   â€¢ Freshness = More recent = Higher confidence",
+                "   â€¢ Source reliability = Trusted source = Higher confidence",
             ],
             title_color=MAGENTA,
             border_color=CYAN,
@@ -4054,39 +4054,39 @@ class SecurityTerminal:
         # Section 6: Best Practices
         best_practices = [
             "1. ALWAYS VALIDATE",
-            "   → Cross-reference multiple sources",
-            "   → Verify before blocking",
-            "   → Consider false positives",
+            "   â†’ Cross-reference multiple sources",
+            "   â†’ Verify before blocking",
+            "   â†’ Consider false positives",
             "",
             "2. CONTEXT IS KEY",
-            "   → Understand the attack scenario",
-            "   → Know your environment",
-            "   → Relevance matters",
+            "   â†’ Understand the attack scenario",
+            "   â†’ Know your environment",
+            "   â†’ Relevance matters",
             "",
             "3. TIMELINESS MATTERS",
-            "   → Use fresh IOCs",
-            "   → Remove outdated IOCs",
-            "   → Regular updates",
+            "   â†’ Use fresh IOCs",
+            "   â†’ Remove outdated IOCs",
+            "   â†’ Regular updates",
             "",
             "4. SHARE RESPONSIBLY",
-            "   → Protect sensitive information",
-            "   → Use standard formats (STIX)",
-            "   → Follow sharing protocols",
+            "   â†’ Protect sensitive information",
+            "   â†’ Use standard formats (STIX)",
+            "   â†’ Follow sharing protocols",
             "",
             "5. AUTOMATE WHERE POSSIBLE",
-            "   → Auto-block known threats",
-            "   → Auto-update IOC feeds",
-            "   → Auto-generate alerts",
+            "   â†’ Auto-block known threats",
+            "   â†’ Auto-update IOC feeds",
+            "   â†’ Auto-generate alerts",
             "",
             "6. DOCUMENT EVERYTHING",
-            "   → Source of IOC",
-            "   → Discovery date",
-            "   → Confidence level",
-            "   → Related incidents"
+            "   â†’ Source of IOC",
+            "   â†’ Discovery date",
+            "   â†’ Confidence level",
+            "   â†’ Related incidents"
         ]
         
         self._draw_hacker_box(
-            "🎓 IOC BEST PRACTICES",
+            "ðŸŽ“ IOC BEST PRACTICES",
             best_practices,
             title_color=CYAN,
             border_color=CYAN,
@@ -4098,7 +4098,7 @@ class SecurityTerminal:
         
         # Section 7: Why Critical
         self._draw_hacker_box(
-            "💡 WHY IOCS ARE CRITICAL",
+            "ðŸ’¡ WHY IOCS ARE CRITICAL",
             [
                 "1. EARLY DETECTION - Identify threats before they cause damage",
                 "2. FAST RESPONSE - Automated blocking of known threats",
@@ -4118,28 +4118,28 @@ class SecurityTerminal:
         
         # Section 8: SOC Lab Usage
         self._draw_hacker_box(
-            "🔧 USING IOCS IN SOC LAB",
+            "ðŸ”§ USING IOCS IN SOC LAB",
             [
                 "STEP 1: Add an IOC",
-                "   → Type: soc ioc",
-                "   → Select type: hash, domain, ip, url, file, registry",
-                "   → Enter value and categorize",
+                "   â†’ Type: soc ioc",
+                "   â†’ Select type: hash, domain, ip, url, file, registry",
+                "   â†’ Enter value and categorize",
                 "",
                 "STEP 2: Test the IOC",
-                "   → The lab will scan your system",
-                "   → Find matching files, processes, or configurations",
+                "   â†’ The lab will scan your system",
+                "   â†’ Find matching files, processes, or configurations",
                 "",
                 "STEP 3: View All IOCs",
-                "   → See all loaded IOCs with categories and sources",
+                "   â†’ See all loaded IOCs with categories and sources",
                 "",
                 "STEP 4: Monitor for IOC Matches",
-                "   → Real-time file system monitoring",
-                "   → Process behavior analysis",
+                "   â†’ Real-time file system monitoring",
+                "   â†’ Process behavior analysis",
                 "",
                 "STEP 5: Respond to IOC Matches",
-                "   → Quarantine malicious files",
-                "   → Block malicious domains and IPs",
-                "   → Terminate malicious processes"
+                "   â†’ Quarantine malicious files",
+                "   â†’ Block malicious domains and IPs",
+                "   â†’ Terminate malicious processes"
             ],
             title_color=YELLOW,
             border_color=CYAN,
@@ -4151,7 +4151,7 @@ class SecurityTerminal:
         
         # Section 9: Quick Reference
         self._draw_hacker_box(
-            "🎓 QUICK REFERENCE",
+            "ðŸŽ“ QUICK REFERENCE",
             [
                 "IOC TYPES:     hash, domain, ip, url, file, registry",
                 "CATEGORIES:    malicious, suspicious, clean",
@@ -4170,25 +4170,25 @@ class SecurityTerminal:
         # Section 10: Resources
         resources = [
             "Online Platforms:",
-            "   • VirusTotal: https://www.virustotal.com",
-            "   • MISP: https://www.misp-project.org",
-            "   • AlienVault OTX: https://otx.alienvault.com",
-            "   • AbuseIPDB: https://www.abuseipdb.com",
+            "   â€¢ VirusTotal: https://www.virustotal.com",
+            "   â€¢ MISP: https://www.misp-project.org",
+            "   â€¢ AlienVault OTX: https://otx.alienvault.com",
+            "   â€¢ AbuseIPDB: https://www.abuseipdb.com",
             "",
             "Threat Intelligence Feeds:",
-            "   • CISA Alerts: https://www.cisa.gov",
-            "   • Talos Intelligence: https://talosintelligence.com",
-            "   • SANS ISC: https://isc.sans.edu",
+            "   â€¢ CISA Alerts: https://www.cisa.gov",
+            "   â€¢ Talos Intelligence: https://talosintelligence.com",
+            "   â€¢ SANS ISC: https://isc.sans.edu",
             "",
             "Certifications:",
-            "   • CISSP - Certified Information Systems Security Professional",
-            "   • CISA - Certified Information Systems Auditor",
-            "   • CEH - Certified Ethical Hacker",
-            "   • GIAC - Global Information Assurance Certification"
+            "   â€¢ CISSP - Certified Information Systems Security Professional",
+            "   â€¢ CISA - Certified Information Systems Auditor",
+            "   â€¢ CEH - Certified Ethical Hacker",
+            "   â€¢ GIAC - Global Information Assurance Certification"
         ]
         
         self._draw_hacker_box(
-            "📚 LEARNING RESOURCES",
+            "ðŸ“š LEARNING RESOURCES",
             resources,
             title_color=MAGENTA,
             border_color=CYAN,
@@ -4200,13 +4200,13 @@ class SecurityTerminal:
         
         # Footer
         footer_content = [
-            "🛡️ STAY VIGILANT | STAY SECURE | STAY INFORMED",
+            "ðŸ›¡ï¸ STAY VIGILANT | STAY SECURE | STAY INFORMED",
             "",
-            "💡 Press Enter to continue..."
+            "ðŸ’¡ Press Enter to continue..."
         ]
         
         self._draw_hacker_box(
-            "⚡ SOC LAB SECURITY EDUCATION",
+            "âš¡ SOC LAB SECURITY EDUCATION",
             footer_content,
             title_color=RED,
             border_color=CYAN,
@@ -4231,7 +4231,7 @@ class SecurityTerminal:
         
         # Quick overview boxes
         self._draw_hacker_box(
-            "📌 WHAT ARE IOCS?",
+            "ðŸ“Œ WHAT ARE IOCS?",
             [
                 "Indicators of Compromise are forensic artifacts that provide",
                 "evidence of a potential security breach. They are the digital",
@@ -4245,7 +4245,7 @@ class SecurityTerminal:
         time.sleep(0.2)
         
         self._draw_hacker_box(
-            "📋 TYPES OF IOCS",
+            "ðŸ“‹ TYPES OF IOCS",
             [
                 "1. File Hashes - Unique file fingerprints",
                 "2. Domains - Malicious websites for C2, phishing",
@@ -4264,11 +4264,11 @@ class SecurityTerminal:
         time.sleep(0.2)
         
         self._draw_hacker_box(
-            "🎯 IOC CATEGORIES",
+            "ðŸŽ¯ IOC CATEGORIES",
             [
-                "🔴 MALICIOUS - Confirmed malicious (80-100% confidence)",
-                "🟡 SUSPICIOUS - Potentially malicious (50-70% confidence)",
-                "🟢 CLEAN - Confirmed safe (100% confidence)"
+                "ðŸ”´ MALICIOUS - Confirmed malicious (80-100% confidence)",
+                "ðŸŸ¡ SUSPICIOUS - Potentially malicious (50-70% confidence)",
+                "ðŸŸ¢ CLEAN - Confirmed safe (100% confidence)"
             ],
             title_color=MAGENTA,
             border_color=CYAN,
@@ -4278,12 +4278,12 @@ class SecurityTerminal:
         time.sleep(0.2)
         
         self._draw_hacker_box(
-            "📊 WHY IOCS ARE CRITICAL",
+            "ðŸ“Š WHY IOCS ARE CRITICAL",
             [
-                "✅ Early Detection - Identify threats before damage",
-                "✅ Fast Response - Automated blocking of known threats",
-                "✅ Threat Intelligence - Understand attacker TTPs",
-                "✅ Proactive Hunting - Search for threats proactively"
+                "âœ… Early Detection - Identify threats before damage",
+                "âœ… Fast Response - Automated blocking of known threats",
+                "âœ… Threat Intelligence - Understand attacker TTPs",
+                "âœ… Proactive Hunting - Search for threats proactively"
             ],
             title_color=BRIGHT_GREEN,
             border_color=CYAN,
@@ -4294,7 +4294,7 @@ class SecurityTerminal:
         
         # Quick reference footer
         self._draw_hacker_box(
-            "💡 TIP",
+            "ðŸ’¡ TIP",
             [
                 "For the complete education guide, type: ioc-education",
                 "Press Enter to continue..."
@@ -4507,16 +4507,16 @@ class SecurityTerminal:
         
         banner = f"""
 {color}{BOLD}
-╔══════════════════════════════════════════════════════════════╗
-║  ██████╗ ███████╗████████╗███████╗██████╗ ███╗   ███╗██╗███╗   ██╗ █████╗ ██╗         ║
-║  ██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║████╗  ██║██╔══██╗██║         ║
-║  ██║  ██║███████╗   ██║   █████╗  ██████╔╝██╔████╔██║██║██╔██╗ ██║███████║██║         ║
-║  ██║  ██║╚════██║   ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██║██║╚██╗██║██╔══██║██║         ║
-║  ██████╔╝███████║   ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║██║  ██║███████╗    ║
-║  ╚═════╝ ╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝    ║
-╚══════════════════════════════════════════════════════════════╝
-                        [ ENCRYPTION SUITE v3.1.113 - EDITION ]
-                       ══════════════════════════════════════════
+â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+â•‘  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ•—         â•‘
+â•‘  â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•â•šâ•â•â–ˆâ–ˆâ•”â•â•â•â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘         â•‘
+â•‘  â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•”â–ˆâ–ˆâ–ˆâ–ˆâ•”â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â–ˆâ–ˆâ•— â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘         â•‘
+â•‘  â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â•šâ•â•â•â•â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘         â•‘
+â•‘  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘ â•šâ•â• â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘ â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—    â•‘
+â•‘  â•šâ•â•â•â•â•â• â•šâ•â•â•â•â•â•â•   â•šâ•â•   â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•â•šâ•â•     â•šâ•â•â•šâ•â•â•šâ•â•  â•šâ•â•â•â•â•šâ•â•  â•šâ•â•â•šâ•â•â•â•â•â•â•    â•‘
+â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+                        [ ENCRYPTION SUITE v4.0.0.113 - EDITION ]
+                       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 {RESET}"""
         print(banner)
     
@@ -4544,22 +4544,22 @@ class SecurityTerminal:
         self.log_file = os.path.join(operator_dir, "session_log.txt")
         
         with open(self.log_file, "w", encoding="utf-8") as f:
-            f.write("╔══════════════════════════════════════════════╗\n")
-            f.write("║       DSTERMINAL Operator Security Audit Log ║\n")
-            f.write("╠══════════════════════════════════════════════╣\n")
-            f.write(f"║ Operator   : {self.operator_username}\n")
-            f.write(f"║ Session ID : {self.session_id}\n")
-            f.write(f"║ Host       : {socket.gethostname()}\n")
-            f.write(f"║ Start Time : {self.session_start.strftime('%Y-%m-%d %H:%M:%S')}\n")
-            f.write("╠══════════════════════════════════════════════╣\n")
-            f.write("║ Command Activity                             ║\n")
-            f.write("╠══════════════════════════════════════════════╣\n")
+            f.write("â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—\n")
+            f.write("â•‘       DSTERMINAL Operator Security Audit Log â•‘\n")
+            f.write("â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£\n")
+            f.write(f"â•‘ Operator   : {self.operator_username}\n")
+            f.write(f"â•‘ Session ID : {self.session_id}\n")
+            f.write(f"â•‘ Host       : {socket.gethostname()}\n")
+            f.write(f"â•‘ Start Time : {self.session_start.strftime('%Y-%m-%d %H:%M:%S')}\n")
+            f.write("â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£\n")
+            f.write("â•‘ Command Activity                             â•‘\n")
+            f.write("â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£\n")
     
     def show_ready_status(self):
         """Show ready status - Fast"""
         from colorama import Fore, Style
         
-        print(f"\n{Fore.GREEN}✅ System Initializing...{Style.RESET_ALL}")
+        print(f"\n{Fore.GREEN}âœ… System Initializing...{Style.RESET_ALL}")
         print(f"{Style.DIM}   Operator ID: {self.operator_username}{Style.RESET_ALL}")
         print(f"{Style.DIM}   Session ID: {self.session_id}{Style.RESET_ALL}")
         if self.session_start:
@@ -4572,7 +4572,7 @@ class SecurityTerminal:
                 import ctypes
                 is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
             if not is_admin:
-                print(f"{Fore.YELLOW}⚠️  Warning: Running without administrator privileges. Some features may be limited.{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}âš ï¸  Warning: Running without administrator privileges. Some features may be limited.{Style.RESET_ALL}")
         except:
             pass
         print()
@@ -4583,16 +4583,16 @@ class SecurityTerminal:
         width = self._get_terminal_width()
         
         banner = f"""
-╔══════════════════════════════════════════════════════════════╗
-║                    DSTERMINAL Cyber-Ops                      ║
-╠══════════════════════════════════════════════════════════════╣
-║ Version    : {self.config.get('version', '3.1.113')}
-║ Operator   : {self.operator_username}
-║ ID         : {self.session_id}
-║ Started    : {self.session_start.strftime('%Y-%m-%d %H:%M:%S') if self.session_start else 'N/A'}
-║ Host       : {platform.node()}
-║ Workspace  : {self.workspace_root}
-╚══════════════════════════════════════════════════════════════╝
+â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+â•‘                    DSTERMINAL Cyber-Ops                      â•‘
+â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£
+â•‘ Version    : {self.config.get('version', '4.0.0.113')}
+â•‘ Operator   : {self.operator_username}
+â•‘ ID         : {self.session_id}
+â•‘ Started    : {self.session_start.strftime('%Y-%m-%d %H:%M:%S') if self.session_start else 'N/A'}
+â•‘ Host       : {platform.node()}
+â•‘ Workspace  : {self.workspace_root}
+â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
         """
         # Print the banner instantly without any delays
         print(banner)
@@ -4632,35 +4632,35 @@ class SecurityTerminal:
             if color:
                 text = f"{color}{text}{Style.RESET_ALL}"
             padding = max(0, (width - len(text) - 2))  # -2 for borders
-            return f"{glow}║{Style.RESET_ALL}{' ' * (padding // 2)}{text}{' ' * (padding - padding // 2)}{glow}║{Style.RESET_ALL}"
+            return f"{glow}â•‘{Style.RESET_ALL}{' ' * (padding // 2)}{text}{' ' * (padding - padding // 2)}{glow}â•‘{Style.RESET_ALL}"
         
-        def center_border(char='═'):
-            return f"{glow}╔{char * (width - 2)}╗{Style.RESET_ALL}"
+        def center_border(char='â•'):
+            return f"{glow}â•”{char * (width - 2)}â•—{Style.RESET_ALL}"
         
-        def center_border_mid(char='═'):
-            return f"{glow}╠{char * (width - 2)}╣{Style.RESET_ALL}"
+        def center_border_mid(char='â•'):
+            return f"{glow}â• {char * (width - 2)}â•£{Style.RESET_ALL}"
         
-        def center_border_bottom(char='═'):
-            return f"{glow}╚{char * (width - 2)}╝{Style.RESET_ALL}"
+        def center_border_bottom(char='â•'):
+            return f"{glow}â•š{char * (width - 2)}â•{Style.RESET_ALL}"
         
         # Top border
         print(f"\n{center_border()}")
         
         # ASCII Art Header - Centered
         ascii_lines = [
-            "███████╗ ██████╗  ██████╗      ██╗     █████╗ ██████╗",
-            "██╔════╝██╔═══██╗██╔════╝      ██║    ██╔══██╗██╔══██╗",
-            "███████╗██║   ██║██║           ██║    ███████║██████╔╝",
-            "╚════██║██║   ██║██║           ██║    ██╔══██║██╔══██╗",
-            "███████║╚██████╔╝╚██████╗      ██║    ██║  ██║██████╔╝",
-            "╚══════╝ ╚═════╝  ╚═════╝      ╚═╝███ █╗ ╚═╝  ╚═╝╚═════╝",
+            "â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—      â–ˆâ–ˆâ•—     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—",
+            "â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•      â–ˆâ–ˆâ•‘    â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—",
+            "â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘           â–ˆâ–ˆâ•‘    â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•",
+            "â•šâ•â•â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘           â–ˆâ–ˆâ•‘    â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—",
+            "â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—      â–ˆâ–ˆâ•‘    â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•",
+            "â•šâ•â•â•â•â•â•â• â•šâ•â•â•â•â•â•  â•šâ•â•â•â•â•â•      â•šâ•â•â–ˆâ–ˆâ–ˆ â–ˆâ•— â•šâ•â•  â•šâ•â•â•šâ•â•â•â•â•â•",
         ]
         
         for line in ascii_lines:
             print(center_text(line, glow))
         
         # SOC AUTOMATED LAB Title
-        print(center_text("═══ SOC AUTOMATED LAB ═══", Fore.CYAN))
+        print(center_text("â•â•â• SOC AUTOMATED LAB â•â•â•", Fore.CYAN))
         
         # Mid border
         print(center_border_mid())
@@ -4669,13 +4669,13 @@ class SecurityTerminal:
         # STATUS - Centered
         #         ====
         if not SOC_LAB_AVAILABLE:
-            print(center_text("❌ SOC Lab module not available", Fore.RED))
+            print(center_text("âŒ SOC Lab module not available", Fore.RED))
             print(center_text("Make sure soc_automated_lab.py is in the same directory", Fore.YELLOW))
             print(center_border_bottom())
             return
         
         if not self.soc_lab:
-            print(center_text("❌ SOC Lab not initialized", Fore.RED))
+            print(center_text("âŒ SOC Lab not initialized", Fore.RED))
             print(center_border_bottom())
             return
         
@@ -4686,7 +4686,7 @@ class SecurityTerminal:
         
         # Status line
         status_color = Fore.GREEN if status.get('running') else Fore.RED
-        status_text = "🟢 RUNNING" if status.get('running') else "🔴 STOPPED"
+        status_text = "ðŸŸ¢ RUNNING" if status.get('running') else "ðŸ”´ STOPPED"
         print(center_text(f"STATUS: {status_color}{status_text}{Style.RESET_ALL}", Fore.CYAN))
         
         if status.get('running'):
@@ -4710,16 +4710,16 @@ class SecurityTerminal:
         # MENU - Centered
         #         ====
         menu_items = [
-            ("1", "🚀 Start Lab", Fore.GREEN),
-            ("2", "🛑 Stop Lab", Fore.RED),
-            ("3", "📊 Status", Fore.CYAN),
-            ("4", "🖥️ Dashboard", Fore.MAGENTA),
-            ("5", "🔧 Enhanced Modules", Fore.YELLOW),
-            ("6", "📌 Add IOC", Fore.BLUE),
-            ("7", "🔍 Run Scan", Fore.WHITE),
-            ("8", "📄 Generate Report", Fore.LIGHTYELLOW_EX),
-            ("h", "❓ Help", Fore.LIGHTCYAN_EX),
-            ("q", "🚪 Quit", Fore.LIGHTRED_EX),
+            ("1", "ðŸš€ Start Lab", Fore.GREEN),
+            ("2", "ðŸ›‘ Stop Lab", Fore.RED),
+            ("3", "ðŸ“Š Status", Fore.CYAN),
+            ("4", "ðŸ–¥ï¸ Dashboard", Fore.MAGENTA),
+            ("5", "ðŸ”§ Enhanced Modules", Fore.YELLOW),
+            ("6", "ðŸ“Œ Add IOC", Fore.BLUE),
+            ("7", "ðŸ” Run Scan", Fore.WHITE),
+            ("8", "ðŸ“„ Generate Report", Fore.LIGHTYELLOW_EX),
+            ("h", "â“ Help", Fore.LIGHTCYAN_EX),
+            ("q", "ðŸšª Quit", Fore.LIGHTRED_EX),
         ]
         
         for key, label, color in menu_items:
@@ -4734,7 +4734,7 @@ class SecurityTerminal:
         # INPUT PROMPT - Centered
         #         ====
         # Create centered prompt
-        prompt_text = f"{Fore.CYAN}┌─ {Fore.YELLOW}┌─[ {Fore.GREEN}SOC {Fore.CYAN}]{Style.RESET_ALL} {Fore.MAGENTA}SELECT OPTION {Fore.CYAN}─►{Style.RESET_ALL}"
+        prompt_text = f"{Fore.CYAN}â”Œâ”€ {Fore.YELLOW}â”Œâ”€[ {Fore.GREEN}SOC {Fore.CYAN}]{Style.RESET_ALL} {Fore.MAGENTA}SELECT OPTION {Fore.CYAN}â”€â–º{Style.RESET_ALL}"
         padding = max(0, (width - len(prompt_text) - 2))
         print(f"\n{' ' * (padding // 2)}{prompt_text}", end="")
         
@@ -4763,61 +4763,61 @@ class SecurityTerminal:
             return
         else:
             # Centered error box
-            error_msg = "❌ INVALID OPTION - Press Enter to continue..."
+            error_msg = "âŒ INVALID OPTION - Press Enter to continue..."
             padding = max(0, (width - len(error_msg) - 4))
-            print(f"\n{Fore.RED}╔{'═' * (width - 2)}╗{Style.RESET_ALL}")
-            print(f"{Fore.RED}║{' ' * (padding // 2)}{error_msg}{' ' * (padding - padding // 2)}║{Style.RESET_ALL}")
-            print(f"{Fore.RED}╚{'═' * (width - 2)}╝{Style.RESET_ALL}")
+            print(f"\n{Fore.RED}â•”{'â•' * (width - 2)}â•—{Style.RESET_ALL}")
+            print(f"{Fore.RED}â•‘{' ' * (padding // 2)}{error_msg}{' ' * (padding - padding // 2)}â•‘{Style.RESET_ALL}")
+            print(f"{Fore.RED}â•š{'â•' * (width - 2)}â•{Style.RESET_ALL}")
             input()
             self.cmd_soc(args)
                     
     def _soc_start(self):
         """Start SOC Lab"""
         if not self.soc_lab:
-            print("❌ SOC Lab not initialized")
+            print("âŒ SOC Lab not initialized")
             return
         
         if self.soc_lab.running:
-            print("ℹ️ SOC Lab is already running")
+            print("â„¹ï¸ SOC Lab is already running")
             return
         
-        print("🔄 Starting SOC Automated Lab...")
+        print("ðŸ”„ Starting SOC Automated Lab...")
         try:
             success = self.soc_lab.start()
             if success:
-                print("✅ SOC Automated Lab started successfully!")
+                print("âœ… SOC Automated Lab started successfully!")
             else:
-                print("❌ Failed to start SOC Lab")
+                print("âŒ Failed to start SOC Lab")
         except Exception as e:
-            print(f"❌ Error starting SOC Lab: {e}")
+            print(f"âŒ Error starting SOC Lab: {e}")
 
     def _soc_stop(self):
         """Stop SOC Lab"""
         if not self.soc_lab:
-            print("❌ SOC Lab not initialized")
+            print("âŒ SOC Lab not initialized")
             return
         
         if not self.soc_lab.running:
-            print("ℹ️ SOC Lab is not running")
+            print("â„¹ï¸ SOC Lab is not running")
             return
         
-        print("🔄 Stopping SOC Automated Lab...")
+        print("ðŸ”„ Stopping SOC Automated Lab...")
         try:
             self.soc_lab.stop()
-            print("✅ SOC Lab stopped")
+            print("âœ… SOC Lab stopped")
         except Exception as e:
-            print(f"❌ Error stopping SOC Lab: {e}")
+            print(f"âŒ Error stopping SOC Lab: {e}")
 
     def _soc_status(self):
         """Show SOC Lab status - GLOWING HACKER STYLE CENTERED"""
         if not self.soc_lab:
-            print("❌ SOC Lab not initialized")
+            print("âŒ SOC Lab not initialized")
             return
         
         try:
             status = self.soc_lab.get_status()
         except Exception as e:
-            print(f"❌ Error getting status: {e}")
+            print(f"âŒ Error getting status: {e}")
             return
         
         # Get terminal width for centering
@@ -4847,16 +4847,16 @@ class SecurityTerminal:
             if color:
                 text = f"{color}{text}{Style.RESET_ALL}"
             padding = max(0, (width - len(text) - 2))
-            return f"{glow}║{Style.RESET_ALL}{' ' * (padding // 2)}{text}{' ' * (padding - padding // 2)}{glow}║{Style.RESET_ALL}"
+            return f"{glow}â•‘{Style.RESET_ALL}{' ' * (padding // 2)}{text}{' ' * (padding - padding // 2)}{glow}â•‘{Style.RESET_ALL}"
         
-        def center_border(char='═'):
-            return f"{glow}╔{char * (width - 2)}╗{Style.RESET_ALL}"
+        def center_border(char='â•'):
+            return f"{glow}â•”{char * (width - 2)}â•—{Style.RESET_ALL}"
         
-        def center_border_mid(char='═'):
-            return f"{glow}╠{char * (width - 2)}╣{Style.RESET_ALL}"
+        def center_border_mid(char='â•'):
+            return f"{glow}â• {char * (width - 2)}â•£{Style.RESET_ALL}"
         
-        def center_border_bottom(char='═'):
-            return f"{glow}╚{char * (width - 2)}╝{Style.RESET_ALL}"
+        def center_border_bottom(char='â•'):
+            return f"{glow}â•š{char * (width - 2)}â•{Style.RESET_ALL}"
         
         def center_header(text, color=Fore.CYAN):
             """Center header with color"""
@@ -4871,18 +4871,18 @@ class SecurityTerminal:
         
         # ASCII Art Header
         ascii_lines = [
-            "███████╗ ██████╗  ██████╗      ██╗     █████╗ ██████╗",
-            "██╔════╝██╔═══██╗██╔════╝      ██║    ██╔══██╗██╔══██╗",
-            "███████╗██║   ██║██║           ██║    ███████║██████╔╝",
-            "╚════██║██║   ██║██║           ██║    ██╔══██║██╔══██╗",
-            "███████║╚██████╔╝╚██████╗      ██║    ██║  ██║██████╔╝",
-            "╚══════╝ ╚═════╝  ╚═════╝      ╚═╝    ╚═╝  ╚═╝╚═════╝",
+            "â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—      â–ˆâ–ˆâ•—     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—",
+            "â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•      â–ˆâ–ˆâ•‘    â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—",
+            "â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘           â–ˆâ–ˆâ•‘    â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•",
+            "â•šâ•â•â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘           â–ˆâ–ˆâ•‘    â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—",
+            "â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—      â–ˆâ–ˆâ•‘    â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•",
+            "â•šâ•â•â•â•â•â•â• â•šâ•â•â•â•â•â•  â•šâ•â•â•â•â•â•      â•šâ•â•    â•šâ•â•  â•šâ•â•â•šâ•â•â•â•â•â•",
         ]
         
         for line in ascii_lines:
             print(center_text(line, glow))
         
-        print(center_text("═══ SOC LAB STATUS ═══", Fore.CYAN))
+        print(center_text("â•â•â• SOC LAB STATUS â•â•â•", Fore.CYAN))
         print(center_border_mid())
         
         #         ====
@@ -4904,13 +4904,13 @@ class SecurityTerminal:
         # Running status
         running = status.get('running', False)
         run_color = Fore.GREEN if running else Fore.RED
-        run_text = "✅ YES" if running else "❌ NO"
+        run_text = "âœ… YES" if running else "âŒ NO"
         print(center_text(f"RUNNING: {run_color}{run_text}{Style.RESET_ALL}", Fore.CYAN))
         
         # Monitoring status
         monitoring = status.get('monitoring', False)
         mon_color = Fore.GREEN if monitoring else Fore.RED
-        mon_text = "✅ ACTIVE" if monitoring else "❌ INACTIVE"
+        mon_text = "âœ… ACTIVE" if monitoring else "âŒ INACTIVE"
         print(center_text(f"MONITORING: {mon_color}{mon_text}{Style.RESET_ALL}", Fore.CYAN))
         
         # Uptime
@@ -4956,133 +4956,133 @@ class SecurityTerminal:
         #         ====
         # FOOTER WITH OPTIONS
         #         ====
-        print(f"\n{Fore.CYAN}┌─ {Fore.YELLOW}┌─[ {Fore.GREEN}SOC {Fore.CYAN}]{Style.RESET_ALL} {Fore.MAGENTA}PRESS ENTER TO CONTINUE {Fore.CYAN}─►{Style.RESET_ALL}")
+        print(f"\n{Fore.CYAN}â”Œâ”€ {Fore.YELLOW}â”Œâ”€[ {Fore.GREEN}SOC {Fore.CYAN}]{Style.RESET_ALL} {Fore.MAGENTA}PRESS ENTER TO CONTINUE {Fore.CYAN}â”€â–º{Style.RESET_ALL}")
         input()
         
     def _soc_dashboard(self):
         """Launch SOC Lab dashboard"""
         if not self.soc_lab:
-            print("❌ SOC Lab not initialized")
+            print("âŒ SOC Lab not initialized")
             return
         
         if not self.soc_lab.running:
-            print("❌ SOC Lab is not running. Start it first (option 1)")
+            print("âŒ SOC Lab is not running. Start it first (option 1)")
             return
         
-        print("📊 Launching SOC Lab dashboard...")
+        print("ðŸ“Š Launching SOC Lab dashboard...")
         print("Press Ctrl+C to return to main terminal")
-        print("─" * 80)
+        print("â”€" * 80)
         
         try:
             if self.soc_lab.dashboard:
                 self.soc_lab.dashboard.start_dashboard()
         except KeyboardInterrupt:
-            print("\n🔄 Returning to main terminal...")
+            print("\nðŸ”„ Returning to main terminal...")
         except Exception as e:
-            print(f"❌ Dashboard error: {e}")
+            print(f"âŒ Dashboard error: {e}")
 
     def _soc_enhanced(self):
         """Launch Enhanced Modules"""
         if not self.soc_lab:
-            print("❌ SOC Lab not initialized")
+            print("âŒ SOC Lab not initialized")
             return
         
         if not self.soc_lab.running:
-            print("❌ SOC Lab is not running. Start it first (option 1)")
+            print("âŒ SOC Lab is not running. Start it first (option 1)")
             return
         
         if self.soc_lab.dashboard:
             try:
                 self.soc_lab.dashboard._cmd_enhanced()
             except Exception as e:
-                print(f"❌ Enhanced modules error: {e}")
+                print(f"âŒ Enhanced modules error: {e}")
         else:
-            print("❌ Enhanced modules not available")
+            print("âŒ Enhanced modules not available")
 
     def _soc_ioc_add(self):
         """Add an IOC"""
         if not self.soc_lab:
-            print("❌ SOC Lab not initialized")
+            print("âŒ SOC Lab not initialized")
             return
         
         if not self.soc_lab.running:
-            print("❌ SOC Lab is not running. Start it first (option 1)")
+            print("âŒ SOC Lab is not running. Start it first (option 1)")
             return
         
         if self.soc_lab.dashboard:
             try:
                 self.soc_lab.dashboard._cmd_ioc_add()
             except Exception as e:
-                print(f"❌ IOC addition error: {e}")
+                print(f"âŒ IOC addition error: {e}")
         else:
-            print("❌ IOC addition not available")
+            print("âŒ IOC addition not available")
 
     def _soc_scan(self):
         """Run a threat scan"""
         if not self.soc_lab:
-            print("❌ SOC Lab not initialized")
+            print("âŒ SOC Lab not initialized")
             return
         
         if not self.soc_lab.running:
-            print("❌ SOC Lab is not running. Start it first (option 1)")
+            print("âŒ SOC Lab is not running. Start it first (option 1)")
             return
         
-        print("🔍 Running threat scan...")
+        print("ðŸ” Running threat scan...")
         try:
             if self.soc_lab.dashboard:
                 self.soc_lab.dashboard._cmd_scan()
             else:
-                print("❌ Scan not available")
+                print("âŒ Scan not available")
         except Exception as e:
-            print(f"❌ Scan error: {e}")
+            print(f"âŒ Scan error: {e}")
 
     def _soc_report(self):
         """Generate a report"""
         if not self.soc_lab:
-            print("❌ SOC Lab not initialized")
+            print("âŒ SOC Lab not initialized")
             return
         
         if not self.soc_lab.running:
-            print("❌ SOC Lab is not running. Start it first (option 1)")
+            print("âŒ SOC Lab is not running. Start it first (option 1)")
             return
         
-        print("📄 Generating report...")
+        print("ðŸ“„ Generating report...")
         try:
             result = self.soc_lab.generate_report()
             if result:
-                print(f"✅ Report generated: {result}")
+                print(f"âœ… Report generated: {result}")
             else:
-                print("❌ Failed to generate report")
+                print("âŒ Failed to generate report")
         except Exception as e:
-            print(f"❌ Report error: {e}")
+            print(f"âŒ Report error: {e}")
 
     def _soc_help(self):
         """Show SOC Lab help - including IOC education"""
         help_text = """
-    ╔══════════════════════════════════════════════════════════════╗
-    ║  🛡️ SOC AUTOMATED LAB - HELP                                 ║
-    ╠══════════════════════════════════════════════════════════════╣
-    ║                                                              ║
-    ║  Start Lab    - Begin 24/7 monitoring and threat detection  ║
-    ║  Stop Lab     - Stop all monitoring activities              ║
-    ║  Status       - Show current lab status and statistics      ║
-    ║  Dashboard    - Launch interactive dashboard                ║
-    ║  Enhanced     - MITRE ATT&CK, Alert Dashboard, Threat Intel ║
-    ║  Add IOC      - Add Indicator of Compromise                 ║
-    ║  Run Scan     - Run a system-wide threat scan               ║
-    ║  Generate     - Generate a security report                  ║
-    ║  Report                                                      ║
-    ║  IOC Learn    - Learn about Indicators of Compromise        ║
-    ║                                                              ║
-    ║  The SOC Lab provides:                                       ║
-    ║  • 24/7 Real-time file system monitoring                    ║
-    ║  • Process and application monitoring                       ║
-    ║  • AI-powered threat detection                              ║
-    ║  • MITRE ATT&CK mapping                                     ║
-    ║  • Threat intelligence with IOC management                  ║
-    ║  • Automated reporting with visual analytics                ║
-    ║                                                              ║
-    ╚══════════════════════════════════════════════════════════════╝
+    â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+    â•‘  ðŸ›¡ï¸ SOC AUTOMATED LAB - HELP                                 â•‘
+    â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£
+    â•‘                                                              â•‘
+    â•‘  Start Lab    - Begin 24/7 monitoring and threat detection  â•‘
+    â•‘  Stop Lab     - Stop all monitoring activities              â•‘
+    â•‘  Status       - Show current lab status and statistics      â•‘
+    â•‘  Dashboard    - Launch interactive dashboard                â•‘
+    â•‘  Enhanced     - MITRE ATT&CK, Alert Dashboard, Threat Intel â•‘
+    â•‘  Add IOC      - Add Indicator of Compromise                 â•‘
+    â•‘  Run Scan     - Run a system-wide threat scan               â•‘
+    â•‘  Generate     - Generate a security report                  â•‘
+    â•‘  Report                                                      â•‘
+    â•‘  IOC Learn    - Learn about Indicators of Compromise        â•‘
+    â•‘                                                              â•‘
+    â•‘  The SOC Lab provides:                                       â•‘
+    â•‘  â€¢ 24/7 Real-time file system monitoring                    â•‘
+    â•‘  â€¢ Process and application monitoring                       â•‘
+    â•‘  â€¢ AI-powered threat detection                              â•‘
+    â•‘  â€¢ MITRE ATT&CK mapping                                     â•‘
+    â•‘  â€¢ Threat intelligence with IOC management                  â•‘
+    â•‘  â€¢ Automated reporting with visual analytics                â•‘
+    â•‘                                                              â•‘
+    â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     """
         print(help_text)
         
@@ -5108,7 +5108,7 @@ class SecurityTerminal:
         from datetime import datetime
         
         if not hasattr(self, 'log_file') or not self.log_file:
-            print("⚠ No active session to close")
+            print("âš  No active session to close")
             return
         
         try:
@@ -5116,15 +5116,15 @@ class SecurityTerminal:
             duration = session_end - self.session_start
 
             with open(self.log_file, "a", encoding="utf-8") as f:
-                f.write("╠══════════════════════════════════════════════╣\n")
-                f.write(f"║ Session End : {session_end.strftime('%Y-%m-%d %H:%M:%S')}\n")
-                f.write(f"║ Duration    : {str(duration).split('.')[0]}\n")
-                f.write("╚══════════════════════════════════════════════╝\n")
+                f.write("â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£\n")
+                f.write(f"â•‘ Session End : {session_end.strftime('%Y-%m-%d %H:%M:%S')}\n")
+                f.write(f"â•‘ Duration    : {str(duration).split('.')[0]}\n")
+                f.write("â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•\n")
             
-            print(f"\n✅ Session {self.session_id} closed successfully")
-            print(f"📁 Log saved to: {self.log_file}")
+            print(f"\nâœ… Session {self.session_id} closed successfully")
+            print(f"ðŸ“ Log saved to: {self.log_file}")
         except Exception as e:
-            print(f"⚠ Error closing session: {e}")
+            print(f"âš  Error closing session: {e}")
 
     #    = VIEW SESSION LOG    =
     def view_session_log(self, log_path=None):
@@ -5276,25 +5276,25 @@ class SecurityTerminal:
         missing_tools = []
         for tool in ['nmap', 'whois', 'sqlmap']:
             if shutil.which(tool):
-                print(f"{Fore.GREEN}✓ {tool}{Style.RESET_ALL}")
+                print(f"{Fore.GREEN}âœ“ {tool}{Style.RESET_ALL}")
             else:
-                print(f"{Fore.RED}✗ {tool} (missing){Style.RESET_ALL}")
+                print(f"{Fore.RED}âœ— {tool} (missing){Style.RESET_ALL}")
                 missing_tools.append(tool)
         
         # Check Metasploit
         if shutil.which('msfconsole'):
-            print(f"{Fore.GREEN}✓ metasploit{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}âœ“ metasploit{Style.RESET_ALL}")
         else:
-            print(f"{Fore.RED}✗ metasploit (optional){Style.RESET_ALL}")
+            print(f"{Fore.RED}âœ— metasploit (optional){Style.RESET_ALL}")
         
         # Check Python packages
         missing_packages = []
         for pkg in ['colorama', 'requests', 'folium', 'plotly', 'reportlab']:
             try:
                 __import__(pkg)
-                print(f"{Fore.GREEN}✓ {pkg}{Style.RESET_ALL}")
+                print(f"{Fore.GREEN}âœ“ {pkg}{Style.RESET_ALL}")
             except ImportError:
-                print(f"{Fore.RED}✗ {pkg}{Style.RESET_ALL}")
+                print(f"{Fore.RED}âœ— {pkg}{Style.RESET_ALL}")
                 missing_packages.append(pkg)
         
         if missing_tools or missing_packages:
@@ -5302,7 +5302,7 @@ class SecurityTerminal:
             print(f"{Fore.YELLOW}[*] Run 'setup' to install missing dependencies{Style.RESET_ALL}")
             return False
         
-        print(f"\n{Fore.GREEN}[✓] All dependencies satisfied!{Style.RESET_ALL}")
+        print(f"\n{Fore.GREEN}[âœ“] All dependencies satisfied!{Style.RESET_ALL}")
         return True
 
 #     =====soc_ai_threat_hunting module initialization====
@@ -5339,7 +5339,7 @@ class SecurityTerminal:
         # Install Python packages
         subprocess.run([sys.executable, '-m', 'pip', 'install', '-r', 'requirements.txt'])
         
-        print(f"{Fore.GREEN}[✓] Setup complete!{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}[âœ“] Setup complete!{Style.RESET_ALL}")
 
     def cmd_soc_nmap(self):
         """Launch SOC-grade Nmap dashboard with AI vulnerability scoring"""
@@ -5407,7 +5407,7 @@ class SecurityTerminal:
             self.print_status("Recent Scan History:", "INFO")
             print("\n")
             for i, hist in enumerate(self.soc_nmap.dashboard.scan_history[-10:], 1):
-                risk_color = "🔴" if hist.risk_score >= 7 else "🟡" if hist.risk_score >= 4 else "🟢"
+                risk_color = "ðŸ”´" if hist.risk_score >= 7 else "ðŸŸ¡" if hist.risk_score >= 4 else "ðŸŸ¢"
                 print(f"  {i}. {risk_color} {hist.target} | Ports: {hist.open_ports} | Risk: {hist.risk_score:.1f} | Duration: {hist.duration}s")
                 print(f"     Services: {', '.join(hist.services[:3])}")
                 print(f"     Time: {hist.timestamp.strftime('%Y-%m-%d %H:%M:%S')}")
@@ -5431,7 +5431,7 @@ class SecurityTerminal:
             countries[country].append(domain)
         
         for country, domains in sorted(countries.items()):
-            flag = OrganizationLocationDB.ORGANIZATIONS[domains[0]].get("flag", "🌐")
+            flag = OrganizationLocationDB.ORGANIZATIONS[domains[0]].get("flag", "ðŸŒ")
             print(f"  {flag} {country}: {len(domains)} organizations")
             for domain in domains[:3]:
                 print(f"      - {domain}")
@@ -5486,7 +5486,7 @@ class SecurityTerminal:
             self.config['monitor_paths'].append(path)
             if self.observer and self.observer.is_alive():
                 self.observer.schedule(self.monitor, path=path, recursive=True)
-            print(f"  ✓ Auto-discovered: {path}")
+            print(f"  âœ“ Auto-discovered: {path}")
         
         return new_paths
 
@@ -5494,9 +5494,9 @@ class SecurityTerminal:
     #    recon & recon_full fallback
     def run_recon_basic(self, target=None):
         """Fallback basic recon if recon.py not available"""
-        print(f"\n{Fore.CYAN}╔══════════════════════════════════════════════╗")
-        print(f"║           BASIC RECONNAISSANCE TOOL            ║")
-        print(f"╚══════════════════════════════════════════════════╝{Style.RESET_ALL}")
+        print(f"\n{Fore.CYAN}â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—")
+        print(f"â•‘           BASIC RECONNAISSANCE TOOL            â•‘")
+        print(f"â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•{Style.RESET_ALL}")
     
         if not target:
             target = input("Enter target (IP or domain): ").strip()
@@ -5529,17 +5529,17 @@ class SecurityTerminal:
         param = '-n' if platform.system().lower() == 'windows' else '-c'
         response = subprocess.run(['ping', param, '1', target], capture_output=True)
         if response.returncode == 0:
-            print(f"{Fore.GREEN}[✓] Host is reachable{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}[âœ“] Host is reachable{Style.RESET_ALL}")
         else:
-            print(f"{Fore.RED}[✗] Host is not responding{Style.RESET_ALL}")
+            print(f"{Fore.RED}[âœ—] Host is not responding{Style.RESET_ALL}")
     
         print(f"\n{Fore.YELLOW}[!] Full recon module not available. Install recon.py for advanced features.{Style.RESET_ALL}")
 
     def run_full_recon_basic(self, target=None):
         """Fallback full recon if recon_full.py not available"""
-        print(f"\n{Fore.CYAN}╔══════════════════════════════════════════════╗")
-        print(f"║         FULL RECONNAISSANCE TOOL (BASIC)        ║")
-        print(f"╚══════════════════════════════════════════════════╝{Style.RESET_ALL}")
+        print(f"\n{Fore.CYAN}â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—")
+        print(f"â•‘         FULL RECONNAISSANCE TOOL (BASIC)        â•‘")
+        print(f"â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•{Style.RESET_ALL}")
     
         if not target:
             target = input("Enter target (IP or domain): ").strip()
@@ -5609,9 +5609,9 @@ class SecurityTerminal:
         print()
    
 # Example neon style constants
-    NEON_HEADER = "╔══════════════════════════════════════════════╗"
-    NEON_FOOTER = "╚══════════════════════════════════════════════╝"
-    NEON_LINE = "║"
+    NEON_HEADER = "â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—"
+    NEON_FOOTER = "â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•"
+    NEON_LINE = "â•‘"
     NEON_COMMAND = "<ansigreen>"
     RESET = "</ansigreen>"
     
@@ -5629,16 +5629,16 @@ class SecurityTerminal:
         operators_root = os.path.join(self.workspace_root, "operators")
         os.makedirs(operators_root, exist_ok=True)
 
-    # ✅ Generate ONE global operator identity (USED EVERYWHERE)
+    # âœ… Generate ONE global operator identity (USED EVERYWHERE)
         self.operator_username = f"OP-{uuid.uuid4().hex[:6].upper()}"
         self.session_id = f"SESSION-{uuid.uuid4().hex[:5].upper()}"
         try:
             from vt_scan import sync_operator_session
             sync_operator_session(self.operator_username, self.session_id)
         except Exception as e:
-            print(f"⚠ VT sync failed: {e}")
+            print(f"âš  VT sync failed: {e}")
 
-    # ✅ OPTIONAL: also expose globally (for VT module sync)
+    # âœ… OPTIONAL: also expose globally (for VT module sync)
         global GLOBAL_OPERATOR, GLOBAL_SESSION
         GLOBAL_OPERATOR = self.operator_username
         GLOBAL_SESSION = self.session_id
@@ -5653,42 +5653,42 @@ class SecurityTerminal:
         self.session_start = datetime.now()
 
         with open(log_file, "w", encoding="utf-8") as f:
-            f.write("╔══════════════════════════════════════════════╗\n")
-            f.write("║       DSTerminal Operator Security Audit Log ║\n")
-            f.write("╠══════════════════════════════════════════════╣\n")
-            f.write(f"║ Operator   : {self.operator_username}\n")
-            f.write(f"║ Session ID : {self.session_id}\n")
-            f.write(f"║ Host       : {socket.gethostname()}\n")
-            f.write(f"║ Start Time : {self.session_start.strftime('%Y-%m-%d %H:%M:%S')}\n")
-            f.write("╠══════════════════════════════════════════════╣\n")
-            f.write("║ Command Activity                             ║\n")
-            f.write("╠══════════════════════════════════════════════╣\n")
+            f.write("â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—\n")
+            f.write("â•‘       DSTerminal Operator Security Audit Log â•‘\n")
+            f.write("â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£\n")
+            f.write(f"â•‘ Operator   : {self.operator_username}\n")
+            f.write(f"â•‘ Session ID : {self.session_id}\n")
+            f.write(f"â•‘ Host       : {socket.gethostname()}\n")
+            f.write(f"â•‘ Start Time : {self.session_start.strftime('%Y-%m-%d %H:%M:%S')}\n")
+            f.write("â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£\n")
+            f.write("â•‘ Command Activity                             â•‘\n")
+            f.write("â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£\n")
 
     # Save references
         self.operator_dir = operator_dir
         self.log_file = log_file
 
-        # ✅ Sync with VT module
+        # âœ… Sync with VT module
         if 'sync_operator_session' in globals():
             try:
                 sync_operator_session(self.operator_username, self.session_id)
             except Exception as e:
-                print(f"⚠ VT sync failed: {e}")
+                print(f"âš  VT sync failed: {e}")
     #   === CINEMATIC INITIALIZATION   ===
 
         start_time = time.time()
 
         self.typewriter("\n[ DSTerminal Initialization ]\n", 0.03)
-        self.typewriter("✔ Generating Operator Identity...", 0.03)
+        self.typewriter("âœ” Generating Operator Identity...", 0.03)
         time.sleep(1.5)
 
-        self.typewriter("✔ Creating Secure Session...", 0.05)
+        self.typewriter("âœ” Creating Secure Session...", 0.05)
         time.sleep(1.5)
 
-        self.typewriter("✔ Logging Enabled\n", 0.03)
+        self.typewriter("âœ” Logging Enabled\n", 0.03)
         time.sleep(1)
 
-        self.typewriter(f" 🛡️   🌐   ⚡ OPERATOR SESSION USERNAME: {GLOBAL_OPERATOR}\n", 0.04)
+        self.typewriter(f" ðŸ›¡ï¸   ðŸŒ   âš¡ OPERATOR SESSION USERNAME: {GLOBAL_OPERATOR}\n", 0.04)
 
         elapsed = time.time() - start_time
         if elapsed < 10:
@@ -5716,10 +5716,10 @@ class SecurityTerminal:
 
         with open(self.log_file, "a", encoding="utf-8") as f:
 
-            f.write("╠══════════════════════════════════════════════╣\n")
-            f.write(f"║ Session End : {session_end.strftime('%Y-%m-%d %H:%M:%S')}\n")
-            f.write(f"║ Duration    : {str(duration).split('.')[0]}\n")
-            f.write("╚══════════════════════════════════════════════╝\n")
+            f.write("â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£\n")
+            f.write(f"â•‘ Session End : {session_end.strftime('%Y-%m-%d %H:%M:%S')}\n")
+            f.write(f"â•‘ Duration    : {str(duration).split('.')[0]}\n")
+            f.write("â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•\n")
 
 
 #    = VIEW SESSION LOG    =
@@ -5736,7 +5736,7 @@ class SecurityTerminal:
         # Header
             print_formatted_text(HTML(" " * ((width - 50)//2) + NEON_HEADER))
             print_formatted_text(HTML(" " * ((width - 50)//2) + f"{NEON_LINE}    <b>DSTerminal SOC SESSION LOG</b> {NEON_LINE}"))
-            print_formatted_text(HTML(" " * ((width - 50)//2) + NEON_HEADER.replace("╔", "╠").replace("╗", "╣")))
+            print_formatted_text(HTML(" " * ((width - 50)//2) + NEON_HEADER.replace("â•”", "â• ").replace("â•—", "â•£")))
 
         # Log lines
             for line in lines:
@@ -5804,9 +5804,9 @@ class SecurityTerminal:
 
         try:
             with open(self.log_file, "a") as f:
-                f.write("╠══════════════════════════════════════════════╣\n")
-                f.write(f"║ Session End : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-                f.write("╚══════════════════════════════════════════════╝\n")
+                f.write("â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£\n")
+                f.write(f"â•‘ Session End : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+                f.write("â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•\n")
         except:
             pass
 
@@ -5844,7 +5844,7 @@ class SecurityTerminal:
             return
 
         console.clear()
-        console.print("\n[cyan]📘 Loading Training Module...[/cyan]\n")
+        console.print("\n[cyan]ðŸ“˜ Loading Training Module...[/cyan]\n")
         time.sleep(1)
 
         engine._ultra_type(tip)
@@ -5944,98 +5944,98 @@ class SecurityTerminal:
     # Side content generators (rotating)
         left_panels = [
             [
-                "╔══════════════════════╗",
-                "║   📊 METRICS PANEL    ║",
-                "╠══════════════════════╣",
-                "║ • Alerts/h:    247    ║",
-                "║ • Incidents:   12     ║",
-                "║ • MTTR:        4.2m   ║",
-                "║ • Uptime:      99.97% ║",
-                "║ • Risk Score:  76/100 ║",
-                "╚══════════════════════╝"
+                "â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—",
+                "â•‘   ðŸ“Š METRICS PANEL    â•‘",
+                "â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£",
+                "â•‘ â€¢ Alerts/h:    247    â•‘",
+                "â•‘ â€¢ Incidents:   12     â•‘",
+                "â•‘ â€¢ MTTR:        4.2m   â•‘",
+                "â•‘ â€¢ Uptime:      99.97% â•‘",
+                "â•‘ â€¢ Risk Score:  76/100 â•‘",
+                "â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•"
             ],
             [
-                "╔══════════════════════╗",
-                "║   🛡️ DEFENSE STATUS    ║",
-                "╠══════════════════════╣",
-                "║ • Firewall:    ACTIVE ║",
-                "║ • EDR:         ONLINE ║",
-                "║ • SIEM:        12k eps║",
-                "║ • Honeypot:    4 nodes║",
-                "║ • SOAR:        READY  ║",
-                "╚══════════════════════╝"
+                "â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—",
+                "â•‘   ðŸ›¡ï¸ DEFENSE STATUS    â•‘",
+                "â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£",
+                "â•‘ â€¢ Firewall:    ACTIVE â•‘",
+                "â•‘ â€¢ EDR:         ONLINE â•‘",
+                "â•‘ â€¢ SIEM:        12k epsâ•‘",
+                "â•‘ â€¢ Honeypot:    4 nodesâ•‘",
+                "â•‘ â€¢ SOAR:        READY  â•‘",
+                "â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•"
             ],
             [
-                "╔══════════════════════╗",
-                "║   🔴 ACTIVE THREATS   ║",
-                "╠══════════════════════╣",
-                "║ • Cobalt Strike ████╗║",
-                "║ • Metasploit     ██╔═╝║",
-                "║ • PowerShell EDR ═╗  ║",
-                "║ • LSASS Dump     █║  ║",
-                "║ • Persistence    █║  ║",
-                "╚══════════════════════╝"
+                "â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—",
+                "â•‘   ðŸ”´ ACTIVE THREATS   â•‘",
+                "â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£",
+                "â•‘ â€¢ Cobalt Strike â–ˆâ–ˆâ–ˆâ–ˆâ•—â•‘",
+                "â•‘ â€¢ Metasploit     â–ˆâ–ˆâ•”â•â•â•‘",
+                "â•‘ â€¢ PowerShell EDR â•â•—  â•‘",
+                "â•‘ â€¢ LSASS Dump     â–ˆâ•‘  â•‘",
+                "â•‘ â€¢ Persistence    â–ˆâ•‘  â•‘",
+                "â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•"
             ],
         ]
     
         right_panels = [
             [
-                "╔══════════════════════╗",
-                "║   📡 INTELLIGENCE      ║",
-                "╠══════════════════════╣",
-                "║ • New IOCs:  47       ║",
-                "║ • Campaign:  APT29    ║",
-                "║ • TTPs Updated        ║",
-                "║ • Zero-day:  CVE-2024 ║",
-                "║ • Patch:     83%      ║",
-                "╚══════════════════════╝"
+                "â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—",
+                "â•‘   ðŸ“¡ INTELLIGENCE      â•‘",
+                "â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£",
+                "â•‘ â€¢ New IOCs:  47       â•‘",
+                "â•‘ â€¢ Campaign:  APT29    â•‘",
+                "â•‘ â€¢ TTPs Updated        â•‘",
+                "â•‘ â€¢ Zero-day:  CVE-2024 â•‘",
+                "â•‘ â€¢ Patch:     83%      â•‘",
+                "â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•"
             ],
             [
-                "╔══════════════════════╗",
-                "║   🎯 MITRE ATT&CK      ║",
-                "╠══════════════════════╣",
-                "║ T1021 • Lateral MV    ║",
-                "║ T1059 • Cmd Script    ║",
-                "║ T1566 • Phishing      ║",
-                "║ T1003 • Cred Dump     ║",
-                "║ T1078 • Valid Accts   ║",
-                "╚══════════════════════╝"
+                "â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—",
+                "â•‘   ðŸŽ¯ MITRE ATT&CK      â•‘",
+                "â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£",
+                "â•‘ T1021 â€¢ Lateral MV    â•‘",
+                "â•‘ T1059 â€¢ Cmd Script    â•‘",
+                "â•‘ T1566 â€¢ Phishing      â•‘",
+                "â•‘ T1003 â€¢ Cred Dump     â•‘",
+                "â•‘ T1078 â€¢ Valid Accts   â•‘",
+                "â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•"
             ],
             [
-                "╔══════════════════════╗",
-                "║   ⚡ RECENT EVENTS     ║",
-                "╠══════════════════════╣",
-                "║ 16:32:17 │ Port Scan  ║",
-                "║ 16:31:45 │ Auth Fail  ║",
-                "║ 16:30:12 │ Malware DL ║",
-                "║ 16:28:33 │ Lateral MV ║",
-                "║ 16:25:01 │ Susp Proc  ║",
-                "╚══════════════════════╝"
+                "â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—",
+                "â•‘   âš¡ RECENT EVENTS     â•‘",
+                "â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£",
+                "â•‘ 16:32:17 â”‚ Port Scan  â•‘",
+                "â•‘ 16:31:45 â”‚ Auth Fail  â•‘",
+                "â•‘ 16:30:12 â”‚ Malware DL â•‘",
+                "â•‘ 16:28:33 â”‚ Lateral MV â•‘",
+                "â•‘ 16:25:01 â”‚ Susp Proc  â•‘",
+                "â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•"
             ],
         ]
     
     # Main banner (centered)
         main_banner = [
-            "╔════════════════════════════════════════════════════════════════════════════╗",
-            "║                                                                            ║",
-            "║     ██████╗ ███████╗███████╗███████╗███╗   ██╗███████╗██╗  ██╗            ║",
-            "║     ██╔══██╗██╔════╝██╔════╝██╔════╝████╗  ██║██╔════╝╚██╗██╔╝            ║",
-            "║     ██║  ██║█████╗  █████╗  █████╗  ██╔██╗ ██║█████╗   ╚███╔╝             ║",
-            "║     ██║  ██║██╔══╝  ██╔══╝  ██╔══╝  ██║╚██╗██║██╔══╝   ██╔██╗             ║",
-            "║     ██████╔╝██║     ██║     ███████╗██║ ╚████║███████╗██╔╝ ██╗            ║",
-            "║     ╚═════╝ ╚═╝     ╚═╝     ╚══════╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝            ║",
-            "║                                                                            ║",
-            "╠════════════════════════════════════════════════════════════════════════════╣",
-            f"║     Defensive Security Terminal v3.1.113 | {platform.system()} {platform.release():<20}║",
-            "║     Developer: Spark Wilson Spink | © 2024 | Powered by Stark Expo Tech Exchange     ║",
-            "║     Type 'help' for available commands:                                                 ║",
-            f"║     CLI Mode: {'ADMIN' if self.is_admin() else 'USER'} 🔒                             ║",
+            "â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—",
+            "â•‘                                                                            â•‘",
+            "â•‘     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•—  â–ˆâ–ˆâ•—            â•‘",
+            "â•‘     â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•â•â•â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•            â•‘",
+            "â•‘     â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•”â–ˆâ–ˆâ•— â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â•šâ–ˆâ–ˆâ–ˆâ•”â•             â•‘",
+            "â•‘     â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•   â–ˆâ–ˆâ•”â–ˆâ–ˆâ•—             â•‘",
+            "â•‘     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘ â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â• â–ˆâ–ˆâ•—            â•‘",
+            "â•‘     â•šâ•â•â•â•â•â• â•šâ•â•     â•šâ•â•     â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•â•â•â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•            â•‘",
+            "â•‘                                                                            â•‘",
+            "â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£",
+            f"â•‘     Defensive Security Terminal v4.0.0.113 | {platform.system()} {platform.release():<20}â•‘",
+            "â•‘     Developer: Spark Wilson Spink | Â© 2024 | Powered by Stark Expo Tech Exchange     â•‘",
+            "â•‘     Type 'help' for available commands:                                                 â•‘",
+            f"â•‘     CLI Mode: {'ADMIN' if self.is_admin() else 'USER'} ðŸ”’                             â•‘",
  
-            f"║     Defensive Security Terminal v2.1.327 | {platform.system()} {platform.release():<20}║",
-            "║     Developed by: Spark Wilson Spink | © 2024 | Powered by Stark Expo Tech Exchange    ║",
-            "║     Type 'help' for available commands: Always Operate as an Administrator              ║",
-            f"║     CLI Mode: {'ADMIN' if self.is_admin() else 'USER'} 🔒                              ║",
-            "╚════════════════════════════════════════════════════════════════════════════╝"    
+            f"â•‘     Defensive Security Terminal v2.1.327 | {platform.system()} {platform.release():<20}â•‘",
+            "â•‘     Developed by: Spark Wilson Spink | Â© 2024 | Powered by Stark Expo Tech Exchange    â•‘",
+            "â•‘     Type 'help' for available commands: Always Operate as an Administrator              â•‘",
+            f"â•‘     CLI Mode: {'ADMIN' if self.is_admin() else 'USER'} ðŸ”’                              â•‘",
+            "â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•"    
         ]
     
     # Animation state
@@ -6111,17 +6111,17 @@ class SecurityTerminal:
                 # Left panel (with rotation animation indicator)
                     left_text = left_panel_padded[i]
                     if i == 1 and frame_count % 2 == 0:
-                        left_text = left_text.replace('╔', '◈').replace('╗', '◈')
+                        left_text = left_text.replace('â•”', 'â—ˆ').replace('â•—', 'â—ˆ')
                 
                 # Center banner (with breathing effect)
                     banner_text = banner_padded[i]
                     if i == 2 and frame_count % 4 < 2:
-                        banner_text = banner_text.replace('█', '▓')
+                        banner_text = banner_text.replace('â–ˆ', 'â–“')
                 
                 # Right panel (pulse effect)
                     right_text = right_panel_padded[i]
                     if i == 2 and frame_count % 3 == 0:
-                        right_text = right_text.replace('║', '┃')
+                        right_text = right_text.replace('â•‘', 'â”ƒ')
                 
                 # Print 3 columns with spacing
                     sys.stdout.write(f"{color}{left_text:<{panel_width}}")
@@ -6132,12 +6132,12 @@ class SecurityTerminal:
                     sys.stdout.write('\n')
             
             # Print bottom status bar with animation
-                status_frame = ['▰', '▱', '▰', '▱', '▰', '▱']
+                status_frame = ['â–°', 'â–±', 'â–°', 'â–±', 'â–°', 'â–±']
                 anim_char = status_frame[frame_count % len(status_frame)]
             
-                footer = f"\n{color}{'═' * terminal_width}{RESET}\n"
+                footer = f"\n{color}{'â•' * terminal_width}{RESET}\n"
                 footer += f"{color}{BOLD}{anim_char} SOC MONITORING ACTIVE {anim_char} | "
-                footer += f"Threat Level: {'█' * (frame_count % 5)}{'░' * (5 - (frame_count % 5))} | "
+                footer += f"Threat Level: {'â–ˆ' * (frame_count % 5)}{'â–‘' * (5 - (frame_count % 5))} | "
                 footer += f"Active Sessions: {frame_count % 10 + 1} | "
                 footer += f"Response Time: {3 - (frame_count % 4)}.{frame_count % 10}s{RESET}"
             
@@ -6173,27 +6173,27 @@ class SecurityTerminal:
             sys.stdout.write('\n')
 
         if not self.is_admin():
-            print(f"\n{color}{BOLD}✅ System Ready | [!] Warning: Running without administrator privileges. Some features may be limited.{RESET}\n")
+            print(f"\n{color}{BOLD}âœ… System Ready | [!] Warning: Running without administrator privileges. Some features may be limited.{RESET}\n")
     #         #    banner print ends here     ===
     
  
-            print(f"\n{color}{BOLD}✅ System Ready | \n[!] Warning: Running without administrator privileges. Some features may be limited.{RESET}\n")
+            print(f"\n{color}{BOLD}âœ… System Ready | \n[!] Warning: Running without administrator privileges. Some features may be limited.{RESET}\n")
     #         #    banner print ends here     ===
     def system_info(self):
         """Enhanced system information display with security context"""
         print("\n" + "="*60)
-        print("🔍 SYSTEM INFORMATION & SECURITY ASSESSMENT")
+        print("ðŸ” SYSTEM INFORMATION & SECURITY ASSESSMENT")
         print("="*60)
     
     # Basic system info
-        print(f"\n📁 [BASIC SYSTEM]")
+        print(f"\nðŸ“ [BASIC SYSTEM]")
         print(f"  OS: {platform.system()} {platform.release()}")
         print(f"  Kernel: {platform.version().split('#')[0] if '#' in platform.version() else platform.version()}")
         print(f"  Architecture: {platform.machine()}")
         print(f"  Hostname: {socket.gethostname()}")
     
     # Enhanced processor info
-        print(f"\n⚡ [PROCESSOR]")
+        print(f"\nâš¡ [PROCESSOR]")
         try:
             with open('/proc/cpuinfo', 'r') as f:
                 cpuinfo = f.read()
@@ -6210,7 +6210,7 @@ class SecurityTerminal:
             print("  Info: Unable to read CPU info")
     
     # Memory info with psutil
-        print(f"\n💾 [MEMORY]")
+        print(f"\nðŸ’¾ [MEMORY]")
         if psutil:
             mem = psutil.virtual_memory()
             swap = psutil.swap_memory()
@@ -6220,7 +6220,7 @@ class SecurityTerminal:
             print("  Info: psutil not available")
     
     # Disk info
-        print(f"\n💿 [STORAGE]")
+        print(f"\nðŸ’¿ [STORAGE]")
         if psutil:
             try:
                 disk = psutil.disk_usage('/')
@@ -6230,28 +6230,28 @@ class SecurityTerminal:
                 print("  Info: Disk info unavailable")
     
     # Security context
-        print(f"\n🛡️ [SECURITY CONTEXT]")
-        print(f"  Privileges: {'🔴 ADMIN/ROOT' if self.is_admin() else '🟢 USER'}")
+        print(f"\nðŸ›¡ï¸ [SECURITY CONTEXT]")
+        print(f"  Privileges: {'ðŸ”´ ADMIN/ROOT' if self.is_admin() else 'ðŸŸ¢ USER'}")
         print(f"  Workspace: {self.current_dir}")
     
     # Network info
-        print(f"\n🌐 [NETWORK]")
+        print(f"\nðŸŒ [NETWORK]")
         try:
             interfaces = netifaces.interfaces()
             print(f"  Interfaces: {len(interfaces)} found")
             for iface in interfaces[:3]:  # Show first 3
-                print(f"    • {iface}")
+                print(f"    â€¢ {iface}")
         except ImportError:
             print("  Info: Install 'netifaces' for network details")
     
  
     # Security recommendations
-        print(f"\n📋 [RECOMMENDATIONS]")
+        print(f"\nðŸ“‹ [RECOMMENDATIONS]")
         if not self.is_admin():
-            print("  ⚠️  Run with sudo for full security features")
-            print("  🔍 Run 'exploitcheck' for vulnerability assessment")
-            print("  🛡️  Run 'check integrity' for system file verification")
-            print("  📊 Run 'system scan -All' for comprehensive scan")
+            print("  âš ï¸  Run with sudo for full security features")
+            print("  ðŸ” Run 'exploitcheck' for vulnerability assessment")
+            print("  ðŸ›¡ï¸  Run 'check integrity' for system file verification")
+            print("  ðŸ“Š Run 'system scan -All' for comprehensive scan")
     
             print("\n" + "="*60)
 
@@ -6322,7 +6322,7 @@ class SecurityTerminal:
         try:
             path = self.safe_path(dirname)
             os.makedirs(path, exist_ok=True)
-            print(f"{Fore.GREEN}[+]📁 Safe directory created successfully: {os.path.basename(path)}{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}[+]ðŸ“ Safe directory created successfully: {os.path.basename(path)}{Style.RESET_ALL}")
         except PermissionError as e:
             print(f"{Fore.RED}[!] {e}{Style.RESET_ALL}")
         except Exception as e:
@@ -6439,27 +6439,27 @@ class SecurityTerminal:
     def cmd_debug(self):
         """Debug command to show current paths"""
         print("\n" + "="*50)
-        print("🔍 DEBUG INFORMATION")
+        print("ðŸ” DEBUG INFORMATION")
         print("="*50)
         print(f"Current directory: {self.current_dir}")
         print(f"Workspace root:    {self.workspace_root}")
         print(f"Home directory:    {os.path.expanduser('~')}")
-        print("\n📁 Directory contents:")
+        print("\nðŸ“ Directory contents:")
         try:
             items = os.listdir(self.current_dir)
             for item in sorted(items)[:10]:  # Show first 10 items
                 item_path = os.path.join(self.current_dir, item)
                 if os.path.isdir(item_path):
-                    print(f"  📁 {item}/")
+                    print(f"  ðŸ“ {item}/")
                 else:
                     size = os.path.getsize(item_path)
-                    print(f"  📄 {item} ({size} bytes)")
+                    print(f"  ðŸ“„ {item} ({size} bytes)")
             if len(items) > 10:
                 print(f"  ... and {len(items) - 10} more items")
         except Exception as e:
             print(f"  Error reading directory: {e}")
     
-        print("\n🔐 Workspace permissions:")
+        print("\nðŸ” Workspace permissions:")
         print(f"  Workspace exists: {os.path.exists(self.workspace_root)}")
         if os.path.exists(self.workspace_root):
             print(f"  Workspace writable: {os.access(self.workspace_root, os.W_OK)}")
@@ -6580,7 +6580,7 @@ class SecurityTerminal:
         print(f"\r", end="")  # Clear current line
     
     # Show current directory
-        print(f"\n📁 Current directory: {self.current_dir}")
+        print(f"\nðŸ“ Current directory: {self.current_dir}")
     
     # List files in current directory
         try:
@@ -6591,7 +6591,7 @@ class SecurityTerminal:
                 for item in sorted(items)[:15]:  # Show first 15 items
                     item_path = os.path.join(self.current_dir, item)
                     if os.path.isdir(item_path):
-                        print(f"      📁 {item}/")
+                        print(f"      ðŸ“ {item}/")
                     else:
                         size = os.path.getsize(item_path)
                     # Format size
@@ -6601,7 +6601,7 @@ class SecurityTerminal:
                             size_str = f"{size/1024:.1f} KB"
                         else:
                             size_str = f"{size/(1024*1024):.1f} MB"
-                        print(f"      📄 {item} ({size_str})")
+                        print(f"      ðŸ“„ {item} ({size_str})")
             
                 if len(items) > 15:
                     print(f"      ... and {len(items) - 15} more items")
@@ -6611,14 +6611,14 @@ class SecurityTerminal:
         # Show disk usage info
             import shutil
             total, used, free = shutil.disk_usage(self.current_dir)
-            print(f"\n   💾 Disk space:")
+            print(f"\n   ðŸ’¾ Disk space:")
             print(f"      Free: {free // (1024**3)} GB")
             print(f"      Used: {used // (1024**3)} GB")
         
         except PermissionError:
-            print(f"\n   ⚠️  Permission denied reading directory")
+            print(f"\n   âš ï¸  Permission denied reading directory")
         except Exception as e:
-            print(f"\n   ⚠️  Error reading directory: {e}")
+            print(f"\n   âš ï¸  Error reading directory: {e}")
     
         print("")  # Empty line for spacing
 
@@ -6666,7 +6666,7 @@ class SecurityTerminal:
             elif subcmd in ["help", "-h", "--help"]:
                 self._soc_help()
             else:
-                print(f"❌ Unknown SOC command: {subcmd}")
+                print(f"âŒ Unknown SOC command: {subcmd}")
                 print("   Available: start, stop, status, dashboard, enhanced, ioc, scan, report, help")
             return True
         
@@ -6996,7 +6996,7 @@ class SecurityTerminal:
                 try:
                     cmd_info['func'](args)
                 except Exception as e:
-                    print(f"❌ Error executing {cmd}: {e}")
+                    print(f"âŒ Error executing {cmd}: {e}")
                 return True
         
         #         ====
@@ -7161,7 +7161,7 @@ class SecurityTerminal:
             #  ==
     def cinematic_spinner(self, stop_event, message, color=Fore.CYAN):
         """Enhanced spinner with cinematic effects"""
-        spinner_chars = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+        spinner_chars = ["â ‹", "â ™", "â ¹", "â ¸", "â ¼", "â ´", "â ¦", "â §", "â ‡", "â "]
         i = 0
         while not stop_event.is_set():
             sys.stdout.write(f"\r{color}{spinner_chars[i]} {message}{Style.RESET_ALL}")
@@ -7194,7 +7194,7 @@ class SecurityTerminal:
         """Animated progress bar"""
         print(f"\n{title}")
         for i in range(101):
-            bar = "█" * (i // 2) + "░" * (50 - (i // 2))
+            bar = "â–ˆ" * (i // 2) + "â–‘" * (50 - (i // 2))
             print(f"\r[{bar}] {i}%", end="", flush=True)
             time.sleep(duration / 100)
         print()
@@ -7229,7 +7229,7 @@ class SecurityTerminal:
                 sys.stdout.flush()
                 time.sleep(delay/3)
         
-            print(f" {Fore.GREEN}✓{Style.RESET_ALL}")
+            print(f" {Fore.GREEN}âœ“{Style.RESET_ALL}")
         
         # Random progress simulation
             if "exploit" in phase.lower():
@@ -7241,7 +7241,7 @@ class SecurityTerminal:
     # Final loading animation
         print(f"\n{Fore.YELLOW}[*] Finalizing initialization...")
         for i in range(5):
-            print(f"  {Fore.YELLOW}▶ Loading component {i+1}/5", end="\r")
+            print(f"  {Fore.YELLOW}â–¶ Loading component {i+1}/5", end="\r")
             time.sleep(0.2)
     
         self.play_beep()
@@ -7273,7 +7273,7 @@ class SecurityTerminal:
             print(f"  {Fore.YELLOW}cd C:\\metasploit-framework && bin\\msfconsole.bat{Style.RESET_ALL}\n")
         
             print(Fore.CYAN + "[Option 1: Add to PATH]:" + Style.RESET_ALL)
-            print("  1. Open System Properties → Environment Variables")
+            print("  1. Open System Properties â†’ Environment Variables")
             print("  2. Add C:\\metasploit-framework\\bin to Path")
             print("  3. Restart DSTerminal\n")
         
@@ -7371,7 +7371,7 @@ class SecurityTerminal:
     
     # Matrix-like falling code effect
         print(f"\n{Fore.GREEN}")
-        matrix_chars = "01█▓▒░█▓▒░"
+        matrix_chars = "01â–ˆâ–“â–’â–‘â–ˆâ–“â–’â–‘"
         for _ in range(10):
             line = ''.join([matrix_chars[i % len(matrix_chars)] for i in range(50)])
             print(line, end="\r")
@@ -7380,9 +7380,9 @@ class SecurityTerminal:
 
     def debug_metasploit(self):
         """Debug method to check Metasploit installation details"""
-        print(f"\n{Fore.CYAN}╔══════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║         METASPLOIT DEBUG INFORMATION         ║{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}╚══════════════════════════════════════════════╝{Style.RESET_ALL}")
+        print(f"\n{Fore.CYAN}â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â•‘         METASPLOIT DEBUG INFORMATION         â•‘{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•{Style.RESET_ALL}")
     
         print(f"\n{Fore.YELLOW}[System Information]{Style.RESET_ALL}")
         print(f"  OS: {platform.system()} {platform.release()}")
@@ -7393,10 +7393,10 @@ class SecurityTerminal:
         found_metasploit = False
         for p in path_dirs:
             if 'metasploit' in p.lower() or 'framework' in p.lower():
-                print(f"  {Fore.GREEN}✓ {p}{Style.RESET_ALL}")
+                print(f"  {Fore.GREEN}âœ“ {p}{Style.RESET_ALL}")
                 found_metasploit = True
         if not found_metasploit:
-            print(f"  {Fore.RED}✗ No Metasploit paths found in SYSTEM PATH{Style.RESET_ALL}")
+            print(f"  {Fore.RED}âœ— No Metasploit paths found in SYSTEM PATH{Style.RESET_ALL}")
     
         print(f"\n{Fore.YELLOW}[Common Installation Paths]{Style.RESET_ALL}")
         common_paths = [
@@ -7409,28 +7409,28 @@ class SecurityTerminal:
     
         for path in common_paths:
             if os.path.exists(path):
-                print(f"  {Fore.GREEN}✓ Found: {path}{Style.RESET_ALL}")
+                print(f"  {Fore.GREEN}âœ“ Found: {path}{Style.RESET_ALL}")
             else:
-                print(f"  {Fore.RED}✗ Not found: {path}{Style.RESET_ALL}")
+                print(f"  {Fore.RED}âœ— Not found: {path}{Style.RESET_ALL}")
     
         print(f"\n{Fore.YELLOW}[Command Availability]{Style.RESET_ALL}")
         commands = ["msfconsole", "msfconsole.bat", "msf"]
         for cmd in commands:
             result = shutil.which(cmd)
             if result:
-                print(f"  {Fore.GREEN}✓ '{cmd}' found at: {result}{Style.RESET_ALL}")
+                print(f"  {Fore.GREEN}âœ“ '{cmd}' found at: {result}{Style.RESET_ALL}")
             else:
-                print(f"  {Fore.RED}✗ '{cmd}' not found in PATH{Style.RESET_ALL}")
+                print(f"  {Fore.RED}âœ— '{cmd}' not found in PATH{Style.RESET_ALL}")
     
         print(f"\n{Fore.YELLOW}[WSL Check]{Style.RESET_ALL}")
         try:
             result = subprocess.run(["wsl", "which", "msfconsole"], capture_output=True, timeout=5)
             if result.returncode == 0:
-                print(f"  {Fore.GREEN}✓ Metasploit found in WSL{Style.RESET_ALL}")
+                print(f"  {Fore.GREEN}âœ“ Metasploit found in WSL{Style.RESET_ALL}")
             else:
-                print(f"  {Fore.RED}✗ Metasploit not found in WSL{Style.RESET_ALL}")
+                print(f"  {Fore.RED}âœ— Metasploit not found in WSL{Style.RESET_ALL}")
         except Exception as e:
-            print(f"  {Fore.RED}✗ WSL check failed: {e}{Style.RESET_ALL}")
+            print(f"  {Fore.RED}âœ— WSL check failed: {e}{Style.RESET_ALL}")
     
         print(f"\n{Fore.CYAN}{'='*50}{Style.RESET_ALL}\n")
 
@@ -7452,7 +7452,7 @@ class SecurityTerminal:
         
         # Check if file exists
         if os.path.exists("soc_nmap_dashboard.py"):
-            print(f"{Fore.GREEN}[✓] soc_nmap_dashboard.py found{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}[âœ“] soc_nmap_dashboard.py found{Style.RESET_ALL}")
             
             # Try to read the file
             try:
@@ -7464,23 +7464,23 @@ class SecurityTerminal:
             except Exception as e:
                 print(f"{Fore.RED}[!] Cannot read file: {e}{Style.RESET_ALL}")
         else:
-            print(f"{Fore.RED}[✗] soc_nmap_dashboard.py NOT found!{Style.RESET_ALL}")
+            print(f"{Fore.RED}[âœ—] soc_nmap_dashboard.py NOT found!{Style.RESET_ALL}")
             return
         
         # Try to import
         try:
             import soc_nmap_dashboard
-            print(f"{Fore.GREEN}[✓] Module imported successfully{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}[âœ“] Module imported successfully{Style.RESET_ALL}")
             print(f"{Fore.CYAN}[*] Module location: {soc_nmap_dashboard.__file__}{Style.RESET_ALL}")
             
             # Check if class exists
             if hasattr(soc_nmap_dashboard, 'SOCNmapIntegration'):
-                print(f"{Fore.GREEN}[✓] SOCNmapIntegration class found{Style.RESET_ALL}")
+                print(f"{Fore.GREEN}[âœ“] SOCNmapIntegration class found{Style.RESET_ALL}")
             else:
-                print(f"{Fore.RED}[✗] SOCNmapIntegration class NOT found{Style.RESET_ALL}")
+                print(f"{Fore.RED}[âœ—] SOCNmapIntegration class NOT found{Style.RESET_ALL}")
                 print(f"{Fore.YELLOW}[*] Available attributes: {[a for a in dir(soc_nmap_dashboard) if not a.startswith('_')]}{Style.RESET_ALL}")
         except ImportError as e:
-            print(f"{Fore.RED}[✗] Import failed: {e}{Style.RESET_ALL}")
+            print(f"{Fore.RED}[âœ—] Import failed: {e}{Style.RESET_ALL}")
             import traceback
             traceback.print_exc()
  
@@ -7530,12 +7530,12 @@ class SecurityTerminal:
         
         # Ask if user wants to auto-open the dashboard
         if not auto_open:
-            print(f"\n{Fore.CYAN}╔{'═' * 50}╗{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}║{Style.RESET_ALL} {Fore.YELLOW}Dashboard Auto-Open{Style.RESET_ALL} {Fore.CYAN}║{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}╠{'═' * 50}╣{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}║{Style.RESET_ALL} Open dashboard automatically after scan?{Fore.CYAN}║{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}║{Style.RESET_ALL} {Fore.GREEN}[Y] Yes{Style.RESET_ALL}  {Fore.RED}[N] No (I'll open manually){Style.RESET_ALL} {Fore.CYAN}║{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}╚{'═' * 50}╝{Style.RESET_ALL}")
+            print(f"\n{Fore.CYAN}â•”{'â•' * 50}â•—{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}â•‘{Style.RESET_ALL} {Fore.YELLOW}Dashboard Auto-Open{Style.RESET_ALL} {Fore.CYAN}â•‘{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}â• {'â•' * 50}â•£{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}â•‘{Style.RESET_ALL} Open dashboard automatically after scan?{Fore.CYAN}â•‘{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}â•‘{Style.RESET_ALL} {Fore.GREEN}[Y] Yes{Style.RESET_ALL}  {Fore.RED}[N] No (I'll open manually){Style.RESET_ALL} {Fore.CYAN}â•‘{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}â•š{'â•' * 50}â•{Style.RESET_ALL}")
             choice = input(f"{Fore.GREEN}[?] > {Style.RESET_ALL}").strip().lower()
             auto_open = choice == 'y' or choice == 'yes'
         
@@ -7583,12 +7583,12 @@ class SecurityTerminal:
         
         # Ask if user wants to auto-open the dashboard
         if not auto_open:
-            print(f"\n{Fore.CYAN}╔{'═' * 50}╗{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}║{Style.RESET_ALL} {Fore.YELLOW}Dashboard Auto-Open{Style.RESET_ALL} {Fore.CYAN}║{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}╠{'═' * 50}╣{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}║{Style.RESET_ALL} Open dashboard automatically after scan?{Fore.CYAN}║{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}║{Style.RESET_ALL} {Fore.GREEN}[Y] Yes{Style.RESET_ALL}  {Fore.RED}[N] No (I'll open manually){Style.RESET_ALL} {Fore.CYAN}║{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}╚{'═' * 50}╝{Style.RESET_ALL}")
+            print(f"\n{Fore.CYAN}â•”{'â•' * 50}â•—{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}â•‘{Style.RESET_ALL} {Fore.YELLOW}Dashboard Auto-Open{Style.RESET_ALL} {Fore.CYAN}â•‘{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}â• {'â•' * 50}â•£{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}â•‘{Style.RESET_ALL} Open dashboard automatically after scan?{Fore.CYAN}â•‘{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}â•‘{Style.RESET_ALL} {Fore.GREEN}[Y] Yes{Style.RESET_ALL}  {Fore.RED}[N] No (I'll open manually){Style.RESET_ALL} {Fore.CYAN}â•‘{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}â•š{'â•' * 50}â•{Style.RESET_ALL}")
             choice = input(f"{Fore.GREEN}[?] > {Style.RESET_ALL}").strip().lower()
             auto_open = choice == 'y' or choice == 'yes'
         
@@ -7673,28 +7673,28 @@ class SecurityTerminal:
             print(f"{Fore.CYAN}{'='*70}{Style.RESET_ALL}\n")
             
             if html_reports:
-                print(f"{Fore.YELLOW}📄 HTML Reports:{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}ðŸ“„ HTML Reports:{Style.RESET_ALL}")
                 for report in sorted(html_reports, reverse=True)[:5]:
                     report_path = os.path.join(workspace, report)
                     mod_time = datetime.fromtimestamp(os.path.getmtime(report_path))
                     size_kb = os.path.getsize(report_path) / 1024
-                    print(f"   {Fore.GREEN}→{Style.RESET_ALL} {report}")
+                    print(f"   {Fore.GREEN}â†’{Style.RESET_ALL} {report}")
                     print(f"     {Fore.WHITE}Size: {size_kb:.1f} KB | Modified: {mod_time.strftime('%Y-%m-%d %H:%M:%S')}{Style.RESET_ALL}")
 
             if pdf_reports:
-                print(f"\n{Fore.YELLOW}📑 PDF Reports:{Style.RESET_ALL}")
+                print(f"\n{Fore.YELLOW}ðŸ“‘ PDF Reports:{Style.RESET_ALL}")
                 for report in sorted(pdf_reports, reverse=True)[:5]:
                     report_path = os.path.join(workspace, report)
                     mod_time = datetime.fromtimestamp(os.path.getmtime(report_path))
                     size_kb = os.path.getsize(report_path) / 1024
-                    print(f"   {Fore.GREEN}→{Style.RESET_ALL} {report}")
+                    print(f"   {Fore.GREEN}â†’{Style.RESET_ALL} {report}")
                     print(f"     {Fore.DIM}Size: {size_kb:.1f} KB | Modified: {mod_time.strftime('%Y-%m-%d %H:%M:%S')}{Style.RESET_ALL}")
             
             if not html_reports and not pdf_reports:
                 print(f"{Fore.YELLOW}[!] No reports found{Style.RESET_ALL}")
                 print(f"{Fore.YELLOW}[*] Run a scan first: soc-quick <target>{Style.RESET_ALL}")
             
-            print(f"\n{Fore.CYAN}📁 Location: {workspace}{Style.RESET_ALL}")
+            print(f"\n{Fore.CYAN}ðŸ“ Location: {workspace}{Style.RESET_ALL}")
         else:
             print(f"{Fore.YELLOW}[!] No reports directory found{Style.RESET_ALL}")
             print(f"{Fore.YELLOW}[*] Run a scan first to create the directory{Style.RESET_ALL}")
@@ -7750,7 +7750,7 @@ class SecurityTerminal:
         if html_reports:
             latest_html = max(html_reports, key=os.path.getctime)
             html_time = datetime.fromtimestamp(os.path.getmtime(latest_html))
-            print(f"{Fore.YELLOW}📄 HTML Report:{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}ðŸ“„ HTML Report:{Style.RESET_ALL}")
             print(f"   {os.path.basename(latest_html)}")
             print(f"   {Fore.DIM}Modified: {html_time.strftime('%Y-%m-%d %H:%M:%S')}{Style.RESET_ALL}")
         
@@ -7758,11 +7758,11 @@ class SecurityTerminal:
         if pdf_reports:
             latest_pdf = max(pdf_reports, key=os.path.getctime)
             pdf_time = datetime.fromtimestamp(os.path.getmtime(latest_pdf))
-            print(f"\n{Fore.YELLOW}📑 PDF Report:{Style.RESET_ALL}")
+            print(f"\n{Fore.YELLOW}ðŸ“‘ PDF Report:{Style.RESET_ALL}")
             print(f"   {os.path.basename(latest_pdf)}")
             print(f"   {Fore.DIM}Modified: {pdf_time.strftime('%Y-%m-%d %H:%M:%S')}{Style.RESET_ALL}")
         
-        print(f"\n{Fore.CYAN}📁 Location: {workspace}{Style.RESET_ALL}")
+        print(f"\n{Fore.CYAN}ðŸ“ Location: {workspace}{Style.RESET_ALL}")
         
         # Ask which to open
         choice = input(f"\n{Fore.YELLOW}[?] Open (1=HTML, 2=PDF, 3=Both, n=None): {Style.RESET_ALL}").strip()
@@ -7799,13 +7799,13 @@ class SecurityTerminal:
                     # Determine risk indicator
                     if hist.risk_score >= 7:
                         risk_color = Fore.RED
-                        risk_icon = "🔴"
+                        risk_icon = "ðŸ”´"
                     elif hist.risk_score >= 4:
                         risk_color = Fore.YELLOW
-                        risk_icon = "🟡"
+                        risk_icon = "ðŸŸ¡"
                     else:
                         risk_color = Fore.GREEN
-                        risk_icon = "🟢"
+                        risk_icon = "ðŸŸ¢"
                     
                     print(f"{risk_color}{risk_icon} Scan #{i}{Style.RESET_ALL}")
                     print(f"   {Fore.CYAN}Target:{Style.RESET_ALL} {hist.target}")
@@ -7842,14 +7842,14 @@ class SecurityTerminal:
             
             for country in sorted(countries.keys()):
                 orgs = countries[country]
-                flag = orgs[0][1].get("flag", "🌐")
+                flag = orgs[0][1].get("flag", "ðŸŒ")
                 print(f"{Fore.YELLOW}{flag} {country}: {Fore.GREEN}{len(orgs)} organizations{Style.RESET_ALL}")
                 
                 for domain, info in orgs[:5]:
                     city = info.get("city", "Unknown")
                     region = info.get("region", "")
                     region_str = f" ({region})" if region else ""
-                    print(f"   {Fore.CYAN}→{Style.RESET_ALL} {domain} - {city}{region_str}")
+                    print(f"   {Fore.CYAN}â†’{Style.RESET_ALL} {domain} - {city}{region_str}")
                 
                 if len(orgs) > 5:
                     print(f"   {Fore.MAGENTA}... and {len(orgs) - 5} more{Style.RESET_ALL}")
@@ -7888,16 +7888,16 @@ class SecurityTerminal:
             return
         
         if hasattr(soc.dashboard, 'scan_output') and soc.dashboard.scan_output:
-            print(f"\n{Fore.CYAN}{'═' * 70}{Style.RESET_ALL}")
-            print(f"{Fore.GREEN}📊 PREVIOUS SCAN RESULTS - {soc.dashboard.current_target}{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}{'═' * 70}{Style.RESET_ALL}\n")
+            print(f"\n{Fore.CYAN}{'â•' * 70}{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}ðŸ“Š PREVIOUS SCAN RESULTS - {soc.dashboard.current_target}{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}{'â•' * 70}{Style.RESET_ALL}\n")
             
             for line in soc.dashboard.scan_output:
                 print(line)
             
-            print(f"\n{Fore.CYAN}{'═' * 70}{Style.RESET_ALL}")
-            print(f"{Fore.GREEN}💡 Tip: Run a new scan to see updated results{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}{'═' * 70}{Style.RESET_ALL}")
+            print(f"\n{Fore.CYAN}{'â•' * 70}{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}ðŸ’¡ Tip: Run a new scan to see updated results{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}{'â•' * 70}{Style.RESET_ALL}")
         else:
             print(f"{Fore.YELLOW}[!] No scan results available. Run a scan first.{Style.RESET_ALL}")
                 
@@ -7911,25 +7911,25 @@ class SecurityTerminal:
         # Check if file exists
         import os
         if os.path.exists("soc_nmap_dashboard.py"):
-            print(f"{Fore.GREEN}✅ {Style.RESET_ALL}")
+            print(f"{Fore.GREEN}âœ… {Style.RESET_ALL}")
             
             # Check file size
             size = os.path.getsize("soc_nmap_dashboard.py")
             print(f"   {Fore.CYAN}Size: {size} bytes{Style.RESET_ALL}")
         else:
-            print(f"{Fore.RED}❌ {Style.RESET_ALL}")
+            print(f"{Fore.RED}âŒ {Style.RESET_ALL}")
             print(f"   {Fore.YELLOW}Current directory: {os.getcwd()}{Style.RESET_ALL}")
         
         # Check nmap
         nmap_installed = shutil.which("nmap") is not None
-        print(f"\n{'✅' if nmap_installed else '❌'} Network Mapper: {'✅' if nmap_installed else '❌'}")
+        print(f"\n{'âœ…' if nmap_installed else 'âŒ'} Network Mapper: {'âœ…' if nmap_installed else 'âŒ'}")
         
         
         # Check workspace
         workspace = os.path.expanduser("~/dsterminal_workspace/scans")
         if os.path.exists(workspace):
             report_count = len([f for f in os.listdir(workspace) if f.endswith(('.html', '.pdf'))])
-            print(f"\n{Fore.GREEN}📁 Workspace: {workspace}{Style.RESET_ALL}")
+            print(f"\n{Fore.GREEN}ðŸ“ Workspace: {workspace}{Style.RESET_ALL}")
             print(f"   {Fore.CYAN}Reports generated: {report_count}{Style.RESET_ALL}")
         
         print()
@@ -7939,7 +7939,7 @@ class SecurityTerminal:
         """Display SOC Nmap Dashboard help"""
         help_text = f"""
     {Fore.CYAN}{'='*70}{Style.RESET_ALL}
-    {Fore.GREEN}🛡️ SOC Nmap Dashboard Commands{Style.RESET_ALL}
+    {Fore.GREEN}ðŸ›¡ï¸ SOC Nmap Dashboard Commands{Style.RESET_ALL}
     {Fore.CYAN}{'='*70}{Style.RESET_ALL}
 
     {Fore.YELLOW}Interactive Mode:{Style.RESET_ALL}
@@ -7983,20 +7983,20 @@ class SecurityTerminal:
         import os
         
         if shutil.which("nmap"):
-            print(f"{Fore.GREEN}[✓] Nmap found at: {shutil.which('nmap')}{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}[âœ“] Nmap found at: {shutil.which('nmap')}{Style.RESET_ALL}")
         else:
-            print(f"{Fore.RED}[✗] Nmap not found{Style.RESET_ALL}")
+            print(f"{Fore.RED}[âœ—] Nmap not found{Style.RESET_ALL}")
         
         if os.path.exists("soc_nmap_dashboard.py"):
-            print(f"{Fore.GREEN}[✓] soc_nmap_dashboard.py found{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}[âœ“] soc_nmap_dashboard.py found{Style.RESET_ALL}")
         else:
-            print(f"{Fore.RED}[✗] soc_nmap_dashboard.py not found{Style.RESET_ALL}")
+            print(f"{Fore.RED}[âœ—] soc_nmap_dashboard.py not found{Style.RESET_ALL}")
         
         try:
             from soc_nmap_dashboard import SOCNmapDashboard
-            print(f"{Fore.GREEN}[✓] SOCNmapDashboard imported successfully{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}[âœ“] SOCNmapDashboard imported successfully{Style.RESET_ALL}")
         except ImportError as e:
-            print(f"{Fore.RED}[✗] Import failed: {e}{Style.RESET_ALL}")
+            print(f"{Fore.RED}[âœ—] Import failed: {e}{Style.RESET_ALL}")
 
 #       websec   
     def launch_web_security_analyzer(self, args=None):
@@ -8008,7 +8008,7 @@ class SecurityTerminal:
         
         print(f"\n{Fore.CYAN}{'='*60}{Style.RESET_ALL}")
         print(f"{Fore.GREEN}  LAUNCHING WEB SECURITY ANALYZER DASHBOARD{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}  DSTERMINAL Enterprise Edition v3.1.113{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}  DSTERMINAL Enterprise Edition v4.0.0.113{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'='*60}{Style.RESET_ALL}")
         print(f"\n{Fore.GREEN}[+] Initializing Web Security Analyzer...{Style.RESET_ALL}")
         print(f"{Fore.GREEN}[+] Platform-Specific Remediation Engine Active{Style.RESET_ALL}")
@@ -8140,7 +8140,7 @@ class SecurityTerminal:
         self.scan_timestamp = datetime.now()
         self.report_id = self.generate_report_id()
         
-        self.log_to_terminal(f"🚀 Starting system scan on {platform.system()}...", "INFO")
+        self.log_to_terminal(f"ðŸš€ Starting system scan on {platform.system()}...", "INFO")
         self.scan_thread = Thread(target=self.run_scan, daemon=False)
         self.scan_thread.start()
         return self.scan_thread
@@ -8519,7 +8519,7 @@ class SecurityTerminal:
         if not hasattr(self, "console"):
             self.console = Console()
 
-    # ✅ instance attributes (THREAD SAFE)
+    # âœ… instance attributes (THREAD SAFE)
         self.found_threats = False
         self.scan_stages = [
             ("[cyan]Scanning Memory...", "Memory Scan"),
@@ -8628,24 +8628,24 @@ class SecurityTerminal:
                     results = self.generate_scan_results(stage)
                     self.scan_results[stage] = results
                     self.display_stage_results(stage)
-                    self.log_to_terminal(f"✓ Completed: {stage}", "INFO")
+                    self.log_to_terminal(f"âœ“ Completed: {stage}", "INFO")
                     time.sleep(0.3)
 
                 severity = "HIGH" if self.found_threats else "LOW"
-                self.log_to_terminal(f"🔍 Scan complete. Threat level: {severity}", "INFO")
+                self.log_to_terminal(f"ðŸ” Scan complete. Threat level: {severity}", "INFO")
                 
                 if self.found_threats:
                     self.console.print(Panel(
-                        "[bold red]⚠ THREATS DETECTED[/bold red]\n\n"
+                        "[bold red]âš  THREATS DETECTED[/bold red]\n\n"
                         "System may be compromised on [bold]{}[/bold].\n"
                         "Threat Level: [bold red]HIGH[/bold red]\n\n"
                         "Recommended actions:\n"
-                        "• Run a full antivirus/anti-malware scan\n"
-                        "• Update all software and OS patches\n"
-                        "• Review suspicious processes and software\n"
-                        "• Check for unauthorized user accounts\n"
-                        "• Change passwords for all accounts\n"
-                        "• Consider a system restore if needed\n\n"
+                        "â€¢ Run a full antivirus/anti-malware scan\n"
+                        "â€¢ Update all software and OS patches\n"
+                        "â€¢ Review suspicious processes and software\n"
+                        "â€¢ Check for unauthorized user accounts\n"
+                        "â€¢ Change passwords for all accounts\n"
+                        "â€¢ Consider a system restore if needed\n\n"
                         "[dim]Report ID: {} | Timestamp: {}[/dim]".format(
                             platform.system(),
                             self.report_id,
@@ -8656,15 +8656,15 @@ class SecurityTerminal:
                     ))
                 else:
                     self.console.print(Panel(
-                        "[bold green]✓ SYSTEM SECURE[/bold green]\n\n"
+                        "[bold green]âœ“ SYSTEM SECURE[/bold green]\n\n"
                         "Your [bold]{}[/bold] system appears clean.\n"
                         "Threat Level: [bold green]LOW[/bold green]\n\n"
                         "Recommendations:\n"
-                        "• Keep software and OS updated\n"
-                        "• Run regular security scans\n"
-                        "• Maintain regular backups\n"
-                        "• Use strong passwords\n"
-                        "• Enable firewall and antivirus\n\n"
+                        "â€¢ Keep software and OS updated\n"
+                        "â€¢ Run regular security scans\n"
+                        "â€¢ Maintain regular backups\n"
+                        "â€¢ Use strong passwords\n"
+                        "â€¢ Enable firewall and antivirus\n\n"
                         "[dim]Report ID: {} | Timestamp: {}[/dim]".format(
                             platform.system(),
                             self.report_id,
@@ -8743,7 +8743,7 @@ class SecurityTerminal:
                 (f"<b>Timestamp:</b> {self.scan_timestamp.strftime('%Y-%m-%d %H:%M:%S') if self.scan_timestamp else 'N/A'}", normal_style),
                 (f"<b>System:</b> {platform.system()} {platform.version()}", normal_style),
                 (f"<b>Hostname:</b> {socket.gethostname()}", normal_style),
-                (f"<b>Threat Level:</b> {'⚠ THREATS DETECTED' if self.found_threats else '✓ SYSTEM SECURE'}", normal_style)
+                (f"<b>Threat Level:</b> {'âš  THREATS DETECTED' if self.found_threats else 'âœ“ SYSTEM SECURE'}", normal_style)
             ]
             
             # Create header table
@@ -8817,7 +8817,7 @@ class SecurityTerminal:
             )
             
             story.append(Spacer(1, 20))
-            story.append(Paragraph(f"Generated by DSTerminal v3.1.113 | Report ID: {self.report_id}", footer_style))
+            story.append(Paragraph(f"Generated by DSTerminal v4.0.0.113 | Report ID: {self.report_id}", footer_style))
             story.append(Paragraph("This report is confidential and intended for authorized personnel only.", footer_style))
             
             # Build PDF
@@ -8922,13 +8922,13 @@ class SecurityTerminal:
     <div class="container">
         <div class="content">
             <div class="header">
-                <h2>🔒 DSTerminal Security Scan Report</h2>
+                <h2>ðŸ”’ DSTerminal Security Scan Report</h2>
                 <p><strong>Report ID:</strong> <span class="report-id">{self.report_id}</span></p>
                 <p><strong>Scan ID:</strong> {self.session_id}</p>
                 <p><strong>Timestamp:</strong> {self.scan_timestamp.strftime('%Y-%m-%d %H:%M:%S') if self.scan_timestamp else 'N/A'}</p>
                 <p><strong>System:</strong> {platform.system()} {platform.version()}</p>
                 <p><strong>Hostname:</strong> {socket.gethostname()}</p>
-                <p><strong>Threat Level:</strong> <span style="color: {'#ff4444' if self.found_threats else '#4CAF50'}; font-weight: bold;">{'⚠ THREATS DETECTED' if self.found_threats else '✓ SYSTEM SECURE'}</span></p>
+                <p><strong>Threat Level:</strong> <span style="color: {'#ff4444' if self.found_threats else '#4CAF50'}; font-weight: bold;">{'âš  THREATS DETECTED' if self.found_threats else 'âœ“ SYSTEM SECURE'}</span></p>
             </div>"""
                 
                 for stage, results in self.scan_results.items():
@@ -8955,7 +8955,7 @@ class SecurityTerminal:
                 
                 html_content += f"""
             <div class="footer">
-                <p>Generated by DSTerminal v3.1.113 | Report ID: {self.report_id}</p>
+                <p>Generated by DSTerminal v4.0.0.113 | Report ID: {self.report_id}</p>
                 <p style="font-size: 0.8em; color: #999;">This report is confidential and intended for authorized personnel only.</p>
             </div>
         </div>
@@ -8968,7 +8968,7 @@ class SecurityTerminal:
             elif format == "pdf":
                 # Use the dedicated PDF export method
                 if self.export_to_pdf(filepath):
-                    print(f"{Fore.GREEN}[✓] Results exported to: {filepath}{Style.RESET_ALL}")
+                    print(f"{Fore.GREEN}[âœ“] Results exported to: {filepath}{Style.RESET_ALL}")
                     return str(filepath)
                 else:
                     return None
@@ -8977,7 +8977,7 @@ class SecurityTerminal:
                 print(f"{Fore.RED}[!] Unsupported format: {format}{Style.RESET_ALL}")
                 return None
             
-            print(f"{Fore.GREEN}[✓] Results exported to: {filepath}{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}[âœ“] Results exported to: {filepath}{Style.RESET_ALL}")
             return str(filepath)
             
         except Exception as e:
@@ -8996,10 +8996,10 @@ class SecurityTerminal:
             print(f"{Fore.YELLOW}[!] No exported scans found.{Style.RESET_ALL}")
             return []
         
-        print(f"\n{Fore.CYAN}📁 Exported Scan Files:{Style.RESET_ALL}")
-        print(f"{'─' * 90}")
+        print(f"\n{Fore.CYAN}ðŸ“ Exported Scan Files:{Style.RESET_ALL}")
+        print(f"{'â”€' * 90}")
         print(f"{'Filename':<50} {'Format':<10} {'Size':<12} {'Modified'}")
-        print(f"{'─' * 90}")
+        print(f"{'â”€' * 90}")
         
         for file in sorted(files, key=lambda x: x.stat().st_mtime, reverse=True):
             size = file.stat().st_size
@@ -9007,7 +9007,7 @@ class SecurityTerminal:
             modified = datetime.fromtimestamp(file.stat().st_mtime).strftime("%Y-%m-%d %H:%M:%S")
             print(f"{file.name:<50} {file.suffix[1:].upper():<10} {size_str:<12} {modified}")
         
-        print(f"{'─' * 90}")
+        print(f"{'â”€' * 90}")
         print(f"\n{Fore.GREEN}Total: {len(files)} files{Style.RESET_ALL}")
         return files
 
@@ -9024,7 +9024,7 @@ class SecurityTerminal:
             with open(filepath, 'r', encoding='utf-8') as f:
                 if filepath.suffix == '.json':
                     data = json.load(f)
-                    print(f"{Fore.GREEN}[✓] Scan results loaded successfully{Style.RESET_ALL}")
+                    print(f"{Fore.GREEN}[âœ“] Scan results loaded successfully{Style.RESET_ALL}")
                     print(f"  Report ID: {data.get('report_id', 'N/A')}")
                     print(f"  Scan ID: {data.get('scan_id', 'N/A')}")
                     print(f"  Timestamp: {data.get('timestamp', 'N/A')}")
@@ -9078,7 +9078,7 @@ class SecurityTerminal:
                 for fmt in formats:
                     result = self.export_results(fmt, filename)
                     if result:
-                        print(f"{Fore.GREEN}[✓] Exported {fmt.upper()}: {result}{Style.RESET_ALL}")
+                        print(f"{Fore.GREEN}[âœ“] Exported {fmt.upper()}: {result}{Style.RESET_ALL}")
                     else:
                         if fmt == 'pdf' and not PDF_AVAILABLE:
                             print(f"{Fore.YELLOW}[!] PDF export skipped - reportlab not installed. Install with: pip install reportlab{Style.RESET_ALL}")
@@ -9087,7 +9087,7 @@ class SecurityTerminal:
             else:
                 result = self.export_results(format_type, filename)
                 if result:
-                    print(f"{Fore.GREEN}[✓] Exported to: {result}{Style.RESET_ALL}")
+                    print(f"{Fore.GREEN}[âœ“] Exported to: {result}{Style.RESET_ALL}")
                 else:
                     print(f"{Fore.RED}[!] Export failed{Style.RESET_ALL}")
         
@@ -9100,7 +9100,7 @@ class SecurityTerminal:
                 return
             result = self.load_scan_results(parts[2])
             if result:
-                print(f"{Fore.GREEN}[✓] Scan data loaded successfully{Style.RESET_ALL}")
+                print(f"{Fore.GREEN}[âœ“] Scan data loaded successfully{Style.RESET_ALL}")
             else:
                 print(f"{Fore.RED}[!] Load failed{Style.RESET_ALL}")
         
@@ -9177,15 +9177,15 @@ class SecurityTerminal:
                 self.display_stage_results(stage)
                 time.sleep(0.6)
 
-    # ✅ Final verdict
+    # âœ… Final verdict
         if self.found_threats:
             self.console.print(Panel(
-                "[bold red]⚠ THREATS DETECTED[/bold red]",
+                "[bold red]âš  THREATS DETECTED[/bold red]",
                 border_style="red",
             ))
         else:
             self.console.print(Panel(
-                "[bold green]✓ SYSTEM SECURE[/bold green]",
+                "[bold green]âœ“ SYSTEM SECURE[/bold green]",
                 border_style="green",
             ))
 #       =secure deletion protection section     =
@@ -9213,12 +9213,12 @@ class SecurityTerminal:
             if os.path.exists(path):
                 self.observer.schedule(self.monitor, path=path, recursive=True)
                 if self.interactive:
-                    self.ui.cinematic_print(f"  ✓ Monitoring: {path}", 0.01, "GREEN")
+                    self.ui.cinematic_print(f"  âœ“ Monitoring: {path}", 0.01, "GREEN")
                 else:
                     logging.info(f"Monitoring: {path}")
             else:
                 if self.interactive:
-                    self.ui.cinematic_print(f"  ✗ Path not found: {path}", 0.01, "YELLOW")
+                    self.ui.cinematic_print(f"  âœ— Path not found: {path}", 0.01, "YELLOW")
                 else:
                     logging.warning(f"Path not found: {path}")
 
@@ -9226,7 +9226,7 @@ class SecurityTerminal:
         self.running = True
 
         if self.interactive:
-            print(f"\n{self.ui.colors.BRIGHT_CYAN}✨ System Active - Protecting Your Data ✨{self.ui.colors.RESET}")
+            print(f"\n{self.ui.colors.BRIGHT_CYAN}âœ¨ System Active - Protecting Your Data âœ¨{self.ui.colors.RESET}")
             print(f"{self.ui.colors.DIM}Press Ctrl+C to stop monitoring{self.ui.colors.RESET}\n")
             stats_thread = threading.Thread(target=self._display_stats, daemon=True)
             stats_thread.start()
@@ -9249,14 +9249,14 @@ class SecurityTerminal:
                 stats = self.monitor.get_statistics()
                 if stats['session_backups'] > 0:
                     size_mb = stats['session_size'] / (1024 * 1024)
-                    print(f"\n{self.ui.colors.DIM}📊 Session: {stats['session_backups']} files ({size_mb:.2f} MB) backed up{self.ui.colors.RESET}")
+                    print(f"\n{self.ui.colors.DIM}ðŸ“Š Session: {stats['session_backups']} files ({size_mb:.2f} MB) backed up{self.ui.colors.RESET}")
                 last_update = time.time()
             time.sleep(1)
 
     def stop(self):
         self.running = False
         if self.interactive:
-            print(f"\n{self.ui.colors.YELLOW}🛑 Shutting down...{self.ui.colors.RESET}")
+            print(f"\n{self.ui.colors.YELLOW}ðŸ›‘ Shutting down...{self.ui.colors.RESET}")
         else:
             logging.info("Shutting down DSTerminal service...")
         if self.observer:
@@ -9280,7 +9280,7 @@ class SecurityTerminal:
         self.ui = None
         self.start()
 
-    # ── COMMAND HANDLERS (imported module methods) ──
+    # â”€â”€ COMMAND HANDLERS (imported module methods) â”€â”€
 
     def _show_startup_banner(self):
         # Your existing banner code
@@ -9295,7 +9295,7 @@ class SecurityTerminal:
 
     def cmd_monitor(self, args):
  
-    # ── Deletion Protection Command Methods ──
+    # â”€â”€ Deletion Protection Command Methods â”€â”€
 
     def cmd_monitor(self):
         """Start interactive monitoring in background thread."""
@@ -9323,14 +9323,14 @@ class SecurityTerminal:
             if os.path.exists(path):
                 try:
                     self.observer.schedule(self.monitor, path=path, recursive=True)
-                    print(f"  ✓ Monitoring: {path}")
+                    print(f"  âœ“ Monitoring: {path}")
                 except Exception as e:
-                    print(f"  ✗ Could not monitor: {path} - {e}")
+                    print(f"  âœ— Could not monitor: {path} - {e}")
         
         monitor_thread = threading.Thread(target=self._run_observer, daemon=True)
         monitor_thread.start()
         self.running = True
-        print("[✓] Deletion protection started in background.")
+        print("[âœ“] Deletion protection started in background.")
 
     def cmd_monitor_all(self, args):
  
@@ -9373,18 +9373,18 @@ class SecurityTerminal:
                                 self.observer.schedule(self.monitor, path=item_path, recursive=True)
                             except Exception:
                                 pass
-                        print(f"  ✓ Monitoring: {item_path}")
+                        print(f"  âœ“ Monitoring: {item_path}")
                         count += 1
         
-        print(f"[✓] Full profile monitoring active. Monitoring {count} folders.")
+        print(f"[âœ“] Full profile monitoring active. Monitoring {count} folders.")
 
     def cmd_kill_monitor(self, args):
  
                             except:
                                 pass
-                        print(f"  ✓ Monitoring: {item_path}")
+                        print(f"  âœ“ Monitoring: {item_path}")
         
-        print("[✓] Full profile monitoring active.")
+        print("[âœ“] Full profile monitoring active.")
 
     def cmd_kill_monitor(self):
         """Force kill the monitoring window by finding the process."""
@@ -9411,16 +9411,16 @@ class SecurityTerminal:
                         pid = parts[-1].strip()
                         if pid.isdigit():
                             subprocess.run(['taskkill', '/PID', pid, '/F'], capture_output=True)
-                            print(f"  ✓ Killed process {pid}")
+                            print(f"  âœ“ Killed process {pid}")
                             killed += 1
             
             if killed == 0:
                 print("[i] No monitoring processes found.")
             else:
-                print(f"[✓] Killed {killed} monitoring process(es).")
+                print(f"[âœ“] Killed {killed} monitoring process(es).")
  
             
-            print("[✓] Monitoring stopped.")
+            print("[âœ“] Monitoring stopped.")
         except Exception as e:
             print(f"[!] Error: {e}")
             print("[i] Close the 'DSTerminal Deletion Protection' window manually.")
@@ -9462,7 +9462,7 @@ class SecurityTerminal:
         self.folder_observer.schedule(self.folder_watcher, path=home, recursive=False)
         self.folder_observer.start()
         
-        print(f"[✓] Folder watcher active on: {home}")
+        print(f"[âœ“] Folder watcher active on: {home}")
         print("[i] New folders will be automatically monitored.")
 
  
@@ -9480,12 +9480,12 @@ class SecurityTerminal:
         for path in self.config.get('monitor_paths', []):
             if os.path.exists(path):
                 self.observer.schedule(self.monitor, path=path, recursive=True)
-                print(f"  ✓ Monitoring: {path}")
+                print(f"  âœ“ Monitoring: {path}")
     
         monitor_thread = threading.Thread(target=self._run_observer, daemon=True)
         monitor_thread.start()
         self.running = True
-        print("[✓] Deletion protection started in background.")
+        print("[âœ“] Deletion protection started in background.")
 
 
     def _run_observer(self):
@@ -9500,12 +9500,12 @@ class SecurityTerminal:
     def cmd_service_pause(self, args):
         """Pause deletion protection monitoring"""
         if not hasattr(self, 'service_manager'):
-            print("❌ Service manager not initialized.")
+            print("âŒ Service manager not initialized.")
             return
         
         # FIX: Call is_running() without arguments
         if not self.service_manager.is_running():
-            print("❌ Service is not running.")
+            print("âŒ Service is not running.")
             return
         
         # Create pause flag
@@ -9513,48 +9513,48 @@ class SecurityTerminal:
         with open(pause_file, 'w') as f:
             f.write('paused')
         
-        print("⏸️  Deletion protection monitoring PAUSED.")
+        print("â¸ï¸  Deletion protection monitoring PAUSED.")
         print("   No backups will be created until resumed.")
         print("   Use 'service resume' to continue monitoring.")
 
     def cmd_service_resume(self, args):
         """Resume deletion protection monitoring"""
         if not hasattr(self, 'service_manager'):
-            print("❌ Service manager not initialized.")
+            print("âŒ Service manager not initialized.")
             return
         
         pause_file = os.path.join(os.path.dirname(self.service_manager.pid_file), 'pause.flag')
         if os.path.exists(pause_file):
             os.remove(pause_file)
-            print("▶️  Deletion protection monitoring RESUMED.")
+            print("â–¶ï¸  Deletion protection monitoring RESUMED.")
             print("   Backups are now active again.")
         else:
-            print("ℹ️ Service is not paused.")
+            print("â„¹ï¸ Service is not paused.")
             
     def cmd_service_status(self, args):
         """Show detailed service status"""
         if not hasattr(self, 'service_manager'):
-            print("❌ Service manager not initialized.")
+            print("âŒ Service manager not initialized.")
             return
         
         # Get status from service manager
         status = self.service_manager.get_detailed_status()
         
         print("\n" + "=" * 60)
-        print("🛡️  DELETION PROTECTION STATUS")
+        print("ðŸ›¡ï¸  DELETION PROTECTION STATUS")
         print("=" * 60)
         
         if status['running']:
-            print("✅ Status: RUNNING")
-            print(f"📌 PID: {status['pid']}")
-            print(f"📁 PID File: {status['pid_file']}")
+            print("âœ… Status: RUNNING")
+            print(f"ðŸ“Œ PID: {status['pid']}")
+            print(f"ðŸ“ PID File: {status['pid_file']}")
         else:
-            print("❌ Status: STOPPED")
+            print("âŒ Status: STOPPED")
         
         if status['paused']:
-            print("⏸️  Monitoring: PAUSED")
+            print("â¸ï¸  Monitoring: PAUSED")
         else:
-            print("▶️  Monitoring: ACTIVE")
+            print("â–¶ï¸  Monitoring: ACTIVE")
         
         # Check if the monitor window is actually running
         if status['running']:
@@ -9568,19 +9568,19 @@ class SecurityTerminal:
                         capture_output=True, text=True, timeout=5
                     )
                     if str(status['pid']) in result.stdout:
-                        print("🟢 Process: ACTIVE")
+                        print("ðŸŸ¢ Process: ACTIVE")
                     else:
-                        print("🔴 Process: NOT FOUND (stale PID)")
+                        print("ðŸ”´ Process: NOT FOUND (stale PID)")
                 except:
-                    print("⚠️ Could not verify process")
+                    print("âš ï¸ Could not verify process")
         
         print("=" * 60)
         
         # Additional info about monitored paths
         if hasattr(self, 'config') and 'monitor_paths' in self.config:
-            print(f"\n📁 Monitored Paths: {len(self.config['monitor_paths'])}")
+            print(f"\nðŸ“ Monitored Paths: {len(self.config['monitor_paths'])}")
             for path in self.config['monitor_paths'][:5]:
-                print(f"  • {path}")
+                print(f"  â€¢ {path}")
             if len(self.config['monitor_paths']) > 5:
                 print(f"  ... and {len(self.config['monitor_paths']) - 5} more")
                 
@@ -9618,13 +9618,13 @@ class SecurityTerminal:
                 drive = f"{letter}:\\"
                 if os.path.exists(drive):
                     monitor_paths.append(drive)
-                    print(f"  ✓ Drive {drive} detected")
+                    print(f"  âœ“ Drive {drive} detected")
         else:
             # Linux/macOS - monitor root and common paths
             monitor_paths = ['/', '/home', '/usr', '/var', '/opt', '/etc', '/tmp']
             for path in monitor_paths:
                 if os.path.exists(path):
-                    print(f"  ✓ {path} detected")
+                    print(f"  âœ“ {path} detected")
         
         # Add user directories
         home = os.path.expanduser('~')
@@ -9643,7 +9643,7 @@ class SecurityTerminal:
         for path in user_paths:
             if os.path.exists(path) and path not in monitor_paths:
                 monitor_paths.append(path)
-                print(f"  ✓ {os.path.basename(path)}")
+                print(f"  âœ“ {os.path.basename(path)}")
         
         # Remove duplicates and invalid paths
         monitor_paths = list(set([p for p in monitor_paths if os.path.exists(p)]))
@@ -9712,7 +9712,7 @@ class SecurityTerminal:
         pause_file = os.path.join(workspace_base, 'pause.flag')
         if os.path.exists(pause_file):
             os.remove(pause_file)
-            print("  ✓ Pause flag cleaned up")
+            print("  âœ“ Pause flag cleaned up")
         
         # 2. Kill by PID from service manager
         if hasattr(self, 'service_manager'):
@@ -9724,19 +9724,19 @@ class SecurityTerminal:
                             ['taskkill', '/F', '/T', '/PID', str(pid)],
                             capture_output=True, timeout=5, check=False
                         )
-                        print(f"  ✓ Killed process: {pid}")
+                        print(f"  âœ“ Killed process: {pid}")
                         killed_count += 1
                     except Exception as e:
-                        print(f"  ⚠️ Could not kill PID {pid}: {e}")
+                        print(f"  âš ï¸ Could not kill PID {pid}: {e}")
                 else:
                     try:
                         os.killpg(os.getpgid(pid), signal.SIGTERM)
                         time.sleep(1)
                         os.killpg(os.getpgid(pid), signal.SIGKILL)
-                        print(f"  ✓ Killed process group: {pid}")
+                        print(f"  âœ“ Killed process group: {pid}")
                         killed_count += 1
                     except Exception as e:
-                        print(f"  ⚠️ Could not kill process: {e}")
+                        print(f"  âš ï¸ Could not kill process: {e}")
         
         # 3. Try to close by window title
         if platform.system() == 'Windows':
@@ -9747,9 +9747,9 @@ class SecurityTerminal:
                 )
                 if result.returncode == 0:
                     killed_count += 1
-                    print("  ✓ Monitoring window closed")
+                    print("  âœ“ Monitoring window closed")
             except Exception as e:
-                print(f"  ⚠️ Could not close window: {e}")
+                print(f"  âš ï¸ Could not close window: {e}")
             
             # Kill any remaining python processes with deletion_protection
             try:
@@ -9764,32 +9764,32 @@ class SecurityTerminal:
                             if part.isdigit() and len(part) > 3:
                                 try:
                                     subprocess.run(['taskkill', '/F', '/PID', part], capture_output=True, timeout=5)
-                                    print(f"  ✓ Killed process: {part}")
+                                    print(f"  âœ“ Killed process: {part}")
                                     killed_count += 1
                                 except:
                                     pass
             except Exception as e:
-                print(f"  ⚠️ Could not kill processes: {e}")
+                print(f"  âš ï¸ Could not kill processes: {e}")
         
         else:  # Linux/macOS
             try:
                 subprocess.run(['pkill', '-f', 'deletion_protection.*--daemon'], capture_output=True, timeout=5)
                 killed_count += 1
-                print("  ✓ Monitor processes killed")
+                print("  âœ“ Monitor processes killed")
             except:
                 pass
         
         # 4. Clean up PID file
         if hasattr(self, 'service_manager'):
             self.service_manager.remove_pid_file()
-            print("  ✓ PID file cleaned up")
+            print("  âœ“ PID file cleaned up")
         
         # 5. Clean up any other PID files
         pid_file = os.path.join(workspace_base, 'dsterminal.pid')
         if os.path.exists(pid_file):
             try:
                 os.remove(pid_file)
-                print("  ✓ Additional PID file cleaned up")
+                print("  âœ“ Additional PID file cleaned up")
             except:
                 pass
         
@@ -9803,9 +9803,9 @@ class SecurityTerminal:
             self.monitor = None
         
         if killed_count > 0:
-            print(f"\n[✓] Deletion protection service stopped. (killed {killed_count} process(es))")
+            print(f"\n[âœ“] Deletion protection service stopped. (killed {killed_count} process(es))")
         else:
-            print("\n[✓] Deletion protection service stopped. (No processes found)")
+            print("\n[âœ“] Deletion protection service stopped. (No processes found)")
             
     def cmd_list_backups(self, args):
         """List recent backups."""
@@ -9858,7 +9858,7 @@ class SecurityTerminal:
             subprocess.Popen(cmd)
         
         self.running = True
-        print("[✓] Deletion protection launched in separate window.")
+        print("[âœ“] Deletion protection launched in separate window.")
         print(f"[i] Monitoring {len(self.config['monitor_paths'])} folders")
         print("[i] Close that window to stop monitoring.")
 
@@ -9875,14 +9875,14 @@ class SecurityTerminal:
                     capture_output=True,
                     timeout=5
                 )
-                print("[✓] Monitoring window closed.")
+                print("[âœ“] Monitoring window closed.")
             except Exception as e:
                 print(f"[!] Could not close window: {e}")
                 print("[i] Close the 'DSTerminal Deletion Protection' window manually.")
         else:
             try:
                 subprocess.run(['pkill', '-f', '--monitor-only'], capture_output=True, timeout=5)
-                print("[✓] Monitoring window closed.")
+                print("[âœ“] Monitoring window closed.")
             except:
                 print("[i] Close the monitoring window manually.")
         
@@ -9987,14 +9987,14 @@ class SecurityTerminal:
             success = rm.restore_file(backup_id, target)
             
             if success:
-                print(f"✅ Successfully restored backup ID: {backup_id}")
+                print(f"âœ… Successfully restored backup ID: {backup_id}")
             else:
-                print(f"❌ Failed to restore backup ID: {backup_id}")
+                print(f"âŒ Failed to restore backup ID: {backup_id}")
         except ValueError:
-            print(f"❌ Invalid backup ID: {args[0]}")
+            print(f"âŒ Invalid backup ID: {args[0]}")
             print("Usage: restore-id <backup_id> [target_path]")
         except Exception as e:
-            print(f"❌ Error restoring backup: {e}")
+            print(f"âŒ Error restoring backup: {e}")
 
     def cmd_restore_last(self, args):
         """Restore most recently deleted."""
@@ -10003,13 +10003,13 @@ class SecurityTerminal:
         ws = SimpleWorkspace(self.workspace)
         rm = RestoreManager(ws, ui=None)
         
-        print("🔄 Restoring most recently deleted file...")
+        print("ðŸ”„ Restoring most recently deleted file...")
         success = rm.restore_last_deleted()
         
         if success:
-            print("✅ Successfully restored most recently deleted file.")
+            print("âœ… Successfully restored most recently deleted file.")
         else:
-            print("❌ No backed-up deletions found to restore.")
+            print("âŒ No backed-up deletions found to restore.")
 
     def cmd_add_path(self, args):
         """Add monitoring path."""
@@ -10019,7 +10019,7 @@ class SecurityTerminal:
         
         path = os.path.abspath(os.path.expanduser(args[0]))
         if not os.path.isdir(path):
-            print(f"✗ Not a directory: {path}")
+            print(f"âœ— Not a directory: {path}")
             return
         
         if path not in self.config['monitor_paths']:
@@ -10028,9 +10028,9 @@ class SecurityTerminal:
                 try:
                     self.observer.schedule(self.monitor, path=path, recursive=True)
                 except Exception as e:
-                    print(f"⚠ Could not add to observer: {e}")
+                    print(f"âš  Could not add to observer: {e}")
         
-        print(f"✓ Now monitoring: {path}")
+        print(f"âœ“ Now monitoring: {path}")
 
     def cmd_workspace_info(self, args):
         """Show workspace info."""
@@ -10072,13 +10072,13 @@ class SecurityTerminal:
         """Add monitoring path."""
         path = os.path.abspath(os.path.expanduser(path))
         if not os.path.isdir(path):
-            print(f"✗ Not a directory: {path}")
+            print(f"âœ— Not a directory: {path}")
             return
         if path not in self.config['monitor_paths']:
             self.config['monitor_paths'].append(path)
         if self.observer and self.observer.is_alive():
             self.observer.schedule(self.monitor, path=path, recursive=True)
-        print(f"✓ Now monitoring: {path}")
+        print(f"âœ“ Now monitoring: {path}")
 
     def cmd_workspace_info(self):
         """Show workspace info."""
@@ -10097,9 +10097,9 @@ class SecurityTerminal:
         else:
             total_backups = 0
             total_size = 0
-        print(f"\n📁 Workspace: {info}")
-        print(f"📊 Total Backups: {total_backups}")
-        print(f"💾 Total Size: {total_size / (1024**3):.2f} GB\n")
+        print(f"\nðŸ“ Workspace: {info}")
+        print(f"ðŸ“Š Total Backups: {total_backups}")
+        print(f"ðŸ’¾ Total Size: {total_size / (1024**3):.2f} GB\n")
 
     def cmd_cleanup(self, args):
  
@@ -10118,9 +10118,9 @@ class SecurityTerminal:
                         count += 1
                     except Exception:
                         pass
-            print(f"✅ Cleaned up {count} temporary files")
+            print(f"âœ… Cleaned up {count} temporary files")
         else:
-            print("✅ No temp directory found")
+            print("âœ… No temp directory found")
 
     def cmd_platform_info(self, args):
         """Show platform info."""
@@ -10129,11 +10129,11 @@ class SecurityTerminal:
         pd = PlatformDetector()
         info = pd.get_system_info()
         
-        print(f"\n🌍 Platform Information:")
+        print(f"\nðŸŒ Platform Information:")
         for key, value in info.items():
             print(f"   {key}: {value}")
         
-        print(f"\n📁 Monitor Paths:")
+        print(f"\nðŸ“ Monitor Paths:")
         for path in self.config.get('monitor_paths', []):
             print(f"   {path}")
 
@@ -10158,16 +10158,16 @@ class SecurityTerminal:
  
                     except:
                         pass
-        print("✅ Temporary files cleaned up")
+        print("âœ… Temporary files cleaned up")
 
     def cmd_platform_info(self):
         """Show platform info."""
         pd = PlatformDetector()
         info = pd.get_system_info()
-        print(f"\n🌍 Platform Information:")
+        print(f"\nðŸŒ Platform Information:")
         for key, value in info.items():
             print(f"   {key}: {value}")
-        print(f"\n📁 Monitor Paths:")
+        print(f"\nðŸ“ Monitor Paths:")
         for path in pd.get_trash_paths():
             print(f"   {path}")
 
@@ -10232,7 +10232,7 @@ class SecurityTerminal:
         
         # Get URL if not provided
         if not url:
-            url = console.input("\n[bold cyan]🎯 Enter target URL (with http:// or https://): [/]").strip()
+            url = console.input("\n[bold cyan]ðŸŽ¯ Enter target URL (with http:// or https://): [/]").strip()
         
         # Clean URL - remove any sqlmap flags if user accidentally added them
         if ' --' in url:
@@ -10244,7 +10244,7 @@ class SecurityTerminal:
         
         if not url.startswith(("http://", "https://")):
             console.print(Panel(
-                "[red]❌ Invalid URL format! Must include http:// or https://[/red]",
+                "[red]âŒ Invalid URL format! Must include http:// or https://[/red]",
                 title="[bold red]Input Error[/bold red]",
                 border_style="red"
             ))
@@ -10254,9 +10254,9 @@ class SecurityTerminal:
         # Check sqlmap installation
         if not which("sqlmap"):
             console.print(Panel(
-                "[red]❌ sqlmap not found![/red]\n\n"
+                "[red]âŒ sqlmap not found![/red]\n\n"
                 "Install with:\n"
-                "[green]▶ pip install sqlmap[/green]\n\n"
+                "[green]â–¶ pip install sqlmap[/green]\n\n"
                 "Or visit: [blue]https://sqlmap.org[/blue]",
                 title="[bold red]Dependency Missing[/bold red]",
                 border_style="red"
@@ -10294,26 +10294,26 @@ class SecurityTerminal:
             log_content = "\n".join(scan_log[-8:]) if scan_log else "[dim]Waiting for scan output...[/dim]"
             layout["log"].update(create_panel(
                 log_content,
-                title="📊 SCAN LOG",
+                title="ðŸ“Š SCAN LOG",
                 border_style="blue"
             ))
             
             stats_content = f"""
-    [green]• Target:[/green] {url[:50]}
-    [cyan]• Status:[/cyan] {status_msg}
-    [yellow]• Tests Run:[/yellow] {scan_stats['tests']}
-    [magenta]• Vulnerabilities:[/magenta] {scan_stats['vulns_found']}
-    [red]• Time Elapsed:[/red] {scan_stats['elapsed']}s
+    [green]â€¢ Target:[/green] {url[:50]}
+    [cyan]â€¢ Status:[/cyan] {status_msg}
+    [yellow]â€¢ Tests Run:[/yellow] {scan_stats['tests']}
+    [magenta]â€¢ Vulnerabilities:[/magenta] {scan_stats['vulns_found']}
+    [red]â€¢ Time Elapsed:[/red] {scan_stats['elapsed']}s
             """
             layout["status"].update(create_panel(
                 stats_content,
-                title="⚡ STATUS",
+                title="âš¡ STATUS",
                 border_style="green"
             ))
             
             layout["injection"].update(create_panel(
                 f"\n[bold red]{animation_frame}[/bold red]\n\n[dim]Testing injection techniques...[/dim]",
-                title="💉 SQL INJECTION",
+                title="ðŸ’‰ SQL INJECTION",
                 border_style="red"
             ))
             
@@ -10345,7 +10345,7 @@ class SecurityTerminal:
         ]
         
         # Ask for advanced options
-        console.print("\n[bold yellow]⚡ SQLMap Configuration[/bold yellow]")
+        console.print("\n[bold yellow]âš¡ SQLMap Configuration[/bold yellow]")
         console.print("[dim]Press Enter to use defaults[/dim]\n")
         
         db_choice = console.input("[cyan]Database type (MySQL/MSSQL/Oracle/PostgreSQL/All) [All]: [/]").strip()
@@ -10379,8 +10379,8 @@ class SecurityTerminal:
                     transient=False,
                     screen=True) as live:
                 
-                scan_log.append(f"[bold cyan]▶ Starting scan on: {url}[/bold cyan]")
-                status_msg = "[yellow]🔍 Scanning target...[/yellow]"
+                scan_log.append(f"[bold cyan]â–¶ Starting scan on: {url}[/bold cyan]")
+                status_msg = "[yellow]ðŸ” Scanning target...[/yellow]"
                 scan_stats['elapsed'] = int(time.time() - start_time)
                 live.update(generate_display(scan_log, status_msg, current_frame, scan_stats))
                 
@@ -10391,7 +10391,7 @@ class SecurityTerminal:
                     TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
                     transient=False
                 ) as progress:
-                    task = progress.add_task("[cyan]🧪 Testing parameters", total=100)
+                    task = progress.add_task("[cyan]ðŸ§ª Testing parameters", total=100)
                     
                     process = subprocess.Popen(
                         cmd,
@@ -10425,11 +10425,11 @@ class SecurityTerminal:
                             if any(keyword in last_line.lower() for keyword in ["testing", "checking", "trying"]):
                                 status_msg = f"[yellow]{last_line[:50]}[/yellow]"
                             elif "vulnerable" in last_line.lower():
-                                status_msg = f"[red]⚠️ {last_line[:50]}[/red]"
+                                status_msg = f"[red]âš ï¸ {last_line[:50]}[/red]"
                                 scan_stats['vulns_found'] += 1
                                 vulnerabilities.append(last_line)
                             elif "payload" in last_line.lower():
-                                scan_log.append(f"[red]💉 {last_line}[/red]")
+                                scan_log.append(f"[red]ðŸ’‰ {last_line}[/red]")
                             else:
                                 scan_log.append(f"[dim]{last_line}[/dim]")
                             
@@ -10443,7 +10443,7 @@ class SecurityTerminal:
                     progress.update(task, completed=100)
                 
                 scan_stats['elapsed'] = int(time.time() - start_time)
-                status_msg = "[green]✅ Scan completed![/green]"
+                status_msg = "[green]âœ… Scan completed![/green]"
                 live.update(generate_display(scan_log, status_msg, current_frame, scan_stats))
                 
                 report_file = os.path.join(report_dir, "log")
@@ -10456,13 +10456,13 @@ class SecurityTerminal:
                                     vulnerabilities.append(line.strip())
         
         except KeyboardInterrupt:
-            console.print("\n[bold yellow]⚠️ Scan interrupted by user[/bold yellow]")
+            console.print("\n[bold yellow]âš ï¸ Scan interrupted by user[/bold yellow]")
             if process:
                 process.terminate()
                 process.wait()
         except Exception as e:
             console.print(Panel(
-                f"[red]❌ Error: {str(e)}[/red]\n\n"
+                f"[red]âŒ Error: {str(e)}[/red]\n\n"
                 f"[dim]Command: {' '.join(cmd)}[/dim]",
                 title="[bold red]Scan Failed[/bold red]",
                 border_style="red"
@@ -10554,7 +10554,7 @@ class SecurityTerminal:
                     canvas_obj.setFont('Helvetica', 8)
                     canvas_obj.setFillAlpha(0.5)
                     canvas_obj.setFillColor(colors.HexColor('#666666'))
-                    canvas_obj.drawCentredString(center_x, 20, f"Page {doc.page} | DSTERMINAL CyberOps v3.1.113")
+                    canvas_obj.drawCentredString(center_x, 20, f"Page {doc.page} | DSTERMINAL CyberOps v4.0.0.113")
                     canvas_obj.restoreState()
                 
                 # Styles
@@ -10626,7 +10626,7 @@ class SecurityTerminal:
                 
                 metadata_data = [
                     ["Report ID:", report_id],
-                    ["Generated By:", "DSTERMINAL Cyber-Ops Platform v3.1.113"],
+                    ["Generated By:", "DSTERMINAL Cyber-Ops Platform v4.0.0.113"],
                     ["Classification:", "CONFIDENTIAL - Security Team Only"],
                     ["Target URL:", url[:80]],
                     ["Scan Date:", datetime.now().strftime('%Y-%m-%d %H:%M:%S')],
@@ -10654,25 +10654,25 @@ class SecurityTerminal:
                 
                 if scan_stats['vulns_found'] > 0:
                     summary_text = f"""
-                    <b><font color="#ff0000">⚠️ RISK ASSESSMENT: CRITICAL</font></b><br/>
+                    <b><font color="#ff0000">âš ï¸ RISK ASSESSMENT: CRITICAL</font></b><br/>
                     <br/>
                     The security assessment of <b>{url[:60]}</b> has identified <b>{scan_stats['vulns_found']} potential SQL injection vulnerabilities</b>.
                     SQL injection is a critical vulnerability that allows attackers to manipulate database queries,
                     potentially leading to unauthorized data access, data manipulation, or complete system compromise.
                     <br/>
                     <br/>
-                    <b><font color="#ff0000">⚠️ IMMEDIATE REMEDIATION REQUIRED</font></b>
+                    <b><font color="#ff0000">âš ï¸ IMMEDIATE REMEDIATION REQUIRED</font></b>
                     """
                     story.append(Paragraph(summary_text, body_style))
                 else:
                     summary_text = f"""
-                    <b><font color="#33ff33">✅ RISK ASSESSMENT: LOW</font></b><br/>
+                    <b><font color="#33ff33">âœ… RISK ASSESSMENT: LOW</font></b><br/>
                     <br/>
                     <font color="#33ff33">The security assessment of <b>{url[:60]}</b> did not detect any SQL injection vulnerabilities.
                     The application appears to implement proper input validation and parameterized queries.</font>
                     <br/>
                     <br/>
-                    <b><font color="#33ff33">✓ No immediate action required. Continue regular security monitoring.</font></b>
+                    <b><font color="#33ff33">âœ“ No immediate action required. Continue regular security monitoring.</font></b>
                     """
                     story.append(Paragraph(summary_text, body_style))
                 
@@ -10750,7 +10750,7 @@ class SecurityTerminal:
                     story.append(Paragraph("No Vulnerabilities Detected", heading_style))
                     story.append(Spacer(1, 15))
                     story.append(Paragraph(
-                        '<font color="#33ff33">✓ The application passed all SQL injection tests. No exploitable vulnerabilities were found.</font>',
+                        '<font color="#33ff33">âœ“ The application passed all SQL injection tests. No exploitable vulnerabilities were found.</font>',
                         body_style
                     ))
                 
@@ -10785,7 +10785,7 @@ class SecurityTerminal:
                 # Footer Information
                 story.append(Paragraph("Report Information", heading_style))
                 footer_text = f"""
-                <font color="#33ff33"><b>Generated by:</b> DSTERMINAL Cyber-Ops Platform v3.1.113</font><br/>
+                <font color="#33ff33"><b>Generated by:</b> DSTERMINAL Cyber-Ops Platform v4.0.0.113</font><br/>
                 <font color="#33ff33"><b>Report Type:</b> SQL Injection Security Assessment</font><br/>
                 <font color="#33ff33"><b>Classification:</b> CONFIDENTIAL - Security Team Only</font><br/>
                 <font color="#33ff33"><b>Retention Policy:</b> 90 days</font><br/>
@@ -10807,15 +10807,15 @@ class SecurityTerminal:
                     except:
                         pass
                 
-                console.print(f"\n[bold green]📄 PDF Report Generated: {pdf_path}[/bold green]")
+                console.print(f"\n[bold green]ðŸ“„ PDF Report Generated: {pdf_path}[/bold green]")
                 return pdf_path
                 
             except ImportError as e:
-                console.print(f"[yellow]⚠️ Missing module: {e}. PDF report skipped.[/yellow]")
+                console.print(f"[yellow]âš ï¸ Missing module: {e}. PDF report skipped.[/yellow]")
                 console.print("[dim]Install with: pip install reportlab Pillow[/dim]")
                 return None
             except Exception as e:
-                console.print(f"[red]❌ PDF generation failed: {e}[/red]")
+                console.print(f"[red]âŒ PDF generation failed: {e}[/red]")
                 return None
         # Generate PDF
         pdf_path = generate_sqlmap_pdf_report()
@@ -10835,7 +10835,7 @@ class SecurityTerminal:
         
         # Create the results table
         results_table = Table(
-            title="[bold cyan]🔍 SQLMap Scan Results[/bold cyan]",
+            title="[bold cyan]ðŸ” SQLMap Scan Results[/bold cyan]",
             box=box.ROUNDED,
             width=70,
             show_header=True,
@@ -10860,14 +10860,14 @@ class SecurityTerminal:
         
         # Show vulnerabilities if found
         if vulnerabilities:
-            console.print("\n[bold red]⚠️ VULNERABILITIES DETECTED![/bold red]\n")
+            console.print("\n[bold red]âš ï¸ VULNERABILITIES DETECTED![/bold red]\n")
             for v in vulnerabilities[:5]:
-                console.print(f"  [red]•[/red] {v[:80]}")
+                console.print(f"  [red]â€¢[/red] {v[:80]}")
             
             if len(vulnerabilities) > 5:
                 console.print(f"\n[dim]... and {len(vulnerabilities) - 5} more (see full report)[/dim]")
         else:
-            console.print("\n[green]✅ No SQL injection vulnerabilities detected.[/green]")
+            console.print("\n[green]âœ… No SQL injection vulnerabilities detected.[/green]")
             console.print("[dim]The application appears to be secure against SQL injection attacks.[/dim]")
         
         # Separator line
@@ -10875,11 +10875,11 @@ class SecurityTerminal:
         
         # Open PDF if requested
         if pdf_path and os.path.exists(pdf_path):
-            open_pdf = console.input("\n[bold cyan]📄 Open PDF report? (y/n): [/]").strip().lower()
+            open_pdf = console.input("\n[bold cyan]ðŸ“„ Open PDF report? (y/n): [/]").strip().lower()
             if open_pdf == 'y':
                 import webbrowser
                 webbrowser.open(f"file://{pdf_path}")
-                console.print("[green]✓ PDF report opened[/green]")
+                console.print("[green]âœ“ PDF report opened[/green]")
         
         console.print("\n[bold]Press Enter to continue...[/]", end="")
         input()
@@ -10919,7 +10919,7 @@ class SecurityTerminal:
         """Toggle secure mode on/off"""
         self.scanner.lab.set_secure_mode(not self.scanner.lab.secure_mode)
         status = "ENABLED" if self.scanner.lab.secure_mode else "DISABLED"
-        print(f"🔒 Secure mode: {status}")
+        print(f"ðŸ”’ Secure mode: {status}")
 
     def cmd_sqlmap_status(self, args):
         """Show SQL Injection Learning Lab status"""
@@ -10927,55 +10927,55 @@ class SecurityTerminal:
             lab = self.scanner.lab
             
             print("\n" + "=" * 50)
-            print("📊 SQL Injection Lab Status")
+            print("ðŸ“Š SQL Injection Lab Status")
             print("=" * 50)
             
             # Secure mode status
             if lab.secure_mode:
-                print("🔒 Secure Mode: ENABLED ✅")
+                print("ðŸ”’ Secure Mode: ENABLED âœ…")
                 print("   SQL injection is PREVENTED (parameterized queries)")
             else:
-                print("🔓 Secure Mode: DISABLED ❌")
+                print("ðŸ”“ Secure Mode: DISABLED âŒ")
                 print("   SQL injection is POSSIBLE (vulnerable)")
             
             print("")
             
             # Database stats
-            print(f"👥 Users: {len(lab.get_users())}")
-            print(f"📦 Products: {len(lab.get_all_products())}")
-            print(f"📊 Logs: {len(lab.get_logs(100))}")
+            print(f"ðŸ‘¥ Users: {len(lab.get_users())}")
+            print(f"ðŸ“¦ Products: {len(lab.get_all_products())}")
+            print(f"ðŸ“Š Logs: {len(lab.get_logs(100))}")
             
             print("")
             
             # Server status
             if lab.running:
-                print(f"🖥️ Server: RUNNING ✅")
-                print(f"🌐 URL: http://localhost:{lab.port}")
+                print(f"ðŸ–¥ï¸ Server: RUNNING âœ…")
+                print(f"ðŸŒ URL: http://localhost:{lab.port}")
             else:
-                print("🖥️ Server: STOPPED ❌")
+                print("ðŸ–¥ï¸ Server: STOPPED âŒ")
                 print("   Use 'sqllab' to start the server")
             
             print("")
             
             # Admin credentials
-            print("🔑 Admin Credentials:")
+            print("ðŸ”‘ Admin Credentials:")
             print(f"   Username: {lab.current_credentials['username']}")
             print(f"   Password: {lab.current_credentials['password']}")
             
             print("")
             
             # SQL Injection Examples
-            print("💉 SQL Injection Examples:")
+            print("ðŸ’‰ SQL Injection Examples:")
             print("   Username: ' OR '1'='1' --")
             print("   Password: anything (it doesn't matter)")
             
             print("")
-            print("💡 To start the lab: sqllab")
-            print("💡 To toggle secure mode: sqlmap-secure")
+            print("ðŸ’¡ To start the lab: sqllab")
+            print("ðŸ’¡ To toggle secure mode: sqlmap-secure")
             print("=" * 50)
             
         except Exception as e:
-            print(f"❌ Error retrieving status: {e}")
+            print(f"âŒ Error retrieving status: {e}")
 
 #         ====
 # SQLMAP COMMAND METHODS FOR SECURITYTERMINAL CLASS
@@ -10990,7 +10990,7 @@ class SecurityTerminal:
             console = Console()
             
             # Create help table
-            help_table = Table(title="[bold cyan]📖 SQLMap Commands Reference[/bold cyan]", 
+            help_table = Table(title="[bold cyan]ðŸ“– SQLMap Commands Reference[/bold cyan]", 
                             box=box.ROUNDED, 
                             show_header=True,
                             header_style="bold cyan")
@@ -11013,22 +11013,22 @@ class SecurityTerminal:
             help_table.add_row("sqlmap-export <path>", "Export latest report", "sqlmap-export report.pdf")
             help_table.add_row("sqlmap-help", "Show this help message", "sqlmap-help")
             
-            console.print(Panel(help_table, title="[bold cyan]🔐 DSTERMINAL SQLMap Suite[/bold cyan]", 
+            console.print(Panel(help_table, title="[bold cyan]ðŸ” DSTERMINAL SQLMap Suite[/bold cyan]", 
                             border_style="cyan", padding=(1, 1)))
             
             # Examples section
-            console.print("\n[bold cyan]💡 Quick Examples:[/bold cyan]")
+            console.print("\n[bold cyan]ðŸ’¡ Quick Examples:[/bold cyan]")
             console.print("  [yellow]1.[/yellow] Start lab: [green]sqllab[/green]")
             console.print("  [yellow]2.[/yellow] Scan for vulnerabilities: [green]sqlmap http://localhost:8080/products?id=1[/green]")
             console.print("  [yellow]3.[/yellow] Toggle secure mode: [green]sqlmap-secure[/green]")
             console.print("  [yellow]4.[/yellow] Toggle WAF mode: [green]sqlmap-waf[/green]")
             console.print("  [yellow]5.[/yellow] Check status: [green]sqlmap-status[/green]")
             
-            console.print("\n[bold cyan]🔐 Default Credentials:[/bold cyan]")
+            console.print("\n[bold cyan]ðŸ” Default Credentials:[/bold cyan]")
             console.print("  Username: [green]admin[/green]")
             console.print("  Password: [green]admin123[/green]")
             
-            console.print("\n[bold cyan]💉 SQL Injection Example:[/bold cyan]")
+            console.print("\n[bold cyan]ðŸ’‰ SQL Injection Example:[/bold cyan]")
             console.print("  Username: [red]' OR '1'='1' --[/red]")
             console.print("  Password: [dim]anything (it doesn't matter)[/dim]")
             console.print("  [dim](This bypasses authentication to demonstrate SQL injection)[/dim]")
@@ -11036,14 +11036,14 @@ class SecurityTerminal:
         except Exception as e:
             # Fallback to simple print if rich is not available
             print("\n" + "=" * 60)
-            print("📖 SQLMap Commands Reference")
+            print("ðŸ“– SQLMap Commands Reference")
             print("=" * 60)
-            print("\n🔍 SCANNING COMMANDS:")
+            print("\nðŸ” SCANNING COMMANDS:")
             print("  sqlmap <url>")
             print("      Run SQLMap scan on a target URL")
             print("      Example: sqlmap http://localhost:8080/products?id=1")
             print("")
-            print("🏫 LAB COMMANDS:")
+            print("ðŸ« LAB COMMANDS:")
             print("  sqllab [port]")
             print("      Start SQL Injection Learning Lab")
             print("      Default port: 8080")
@@ -11052,7 +11052,7 @@ class SecurityTerminal:
             print("  sqllab-stop")
             print("      Stop the SQL Injection Learning Lab server")
             print("")
-            print("⚙️ MANAGEMENT COMMANDS:")
+            print("âš™ï¸ MANAGEMENT COMMANDS:")
             print("  sqlmap-install")
             print("      Install SQLMap via pip")
             print("")
@@ -11069,7 +11069,7 @@ class SecurityTerminal:
             print("      Enabled: WAF blocks injection attempts")
             print("      Disabled: WAF does not block injection")
             print("")
-            print("📊 INFORMATION COMMANDS:")
+            print("ðŸ“Š INFORMATION COMMANDS:")
             print("  sqlmap-status")
             print("      Show lab status, database info, and credentials")
             print("")
@@ -11085,18 +11085,18 @@ class SecurityTerminal:
             print("  sqlmap-help")
             print("      Show this help message")
             print("")
-            print("💡 QUICK START:")
+            print("ðŸ’¡ QUICK START:")
             print("  1. sqllab - Start the lab")
             print("  2. sqlmap http://localhost:8080/products?id=1 - Scan for vulnerabilities")
             print("  3. sqlmap-secure - Toggle secure mode")
             print("  4. sqlmap-waf - Toggle WAF mode")
             print("  5. sqlmap-status - Check status")
             print("")
-            print("🔐 DEFAULT CREDENTIALS:")
+            print("ðŸ” DEFAULT CREDENTIALS:")
             print("  Username: admin")
             print("  Password: admin123")
             print("")
-            print("💉 SQL INJECTION EXAMPLE:")
+            print("ðŸ’‰ SQL INJECTION EXAMPLE:")
             print("  Username: ' OR '1'='1' --")
             print("  Password: anything")
             print("  (This bypasses authentication to demonstrate SQL injection)")
@@ -11114,7 +11114,7 @@ class SecurityTerminal:
             
             if self.scanner and self.scanner.sqlmap_cmd:
                 info_text = f"""
-    [green]✅ SQLMap found:[/green] {' '.join(self.scanner.sqlmap_cmd)}
+    [green]âœ… SQLMap found:[/green] {' '.join(self.scanner.sqlmap_cmd)}
                 """
                 
                 # Try to get version
@@ -11122,47 +11122,47 @@ class SecurityTerminal:
                     version_cmd = self.scanner.sqlmap_cmd + ["--version"]
                     result = subprocess.run(version_cmd, capture_output=True, text=True, timeout=10)
                     if result.returncode == 0:
-                        info_text += f"\n[cyan]📌 SQLMap Version:[/cyan]\n{result.stdout.strip()}"
+                        info_text += f"\n[cyan]ðŸ“Œ SQLMap Version:[/cyan]\n{result.stdout.strip()}"
                 except Exception as e:
                     info_text += f"\n[yellow]Could not get version: {e}[/yellow]"
             else:
                 info_text = """
-    [red]❌ SQLMap not installed[/red]
+    [red]âŒ SQLMap not installed[/red]
 
     [yellow]Install with:[/yellow]
     sqlmap-install
                 """
             
-            console.print(Panel(info_text, title="[bold cyan]🔍 SQLMap Information[/bold cyan]", 
+            console.print(Panel(info_text, title="[bold cyan]ðŸ” SQLMap Information[/bold cyan]", 
                             border_style="cyan"))
             
         except Exception as e:
-            print(f"❌ Error: {e}")
+            print(f"âŒ Error: {e}")
 
 
     def cmd_sqlmap_secure(self, args=None):
         """Toggle secure mode on/off"""
         if not self.scanner:
-            print("❌ Scanner not initialized")
+            print("âŒ Scanner not initialized")
             return
         
         try:
             self.scanner.lab.set_secure_mode(not self.scanner.lab.secure_mode)
             status = "ENABLED" if self.scanner.lab.secure_mode else "DISABLED"
             color = "green" if self.scanner.lab.secure_mode else "red"
-            print(f"{color}🔒 Secure mode: {status}")
+            print(f"{color}ðŸ”’ Secure mode: {status}")
             if self.scanner.lab.secure_mode:
-                print("✅ SQL injection is now PREVENTED")
+                print("âœ… SQL injection is now PREVENTED")
             else:
-                print("⚠️ SQL injection is now POSSIBLE (vulnerable)")
+                print("âš ï¸ SQL injection is now POSSIBLE (vulnerable)")
         except Exception as e:
-            print(f"❌ Error: {e}")
+            print(f"âŒ Error: {e}")
 
 
     def cmd_sqlmap_waf(self, args=None):
         """Toggle WAF mode on/off"""
         if not self.scanner:
-            print("❌ Scanner not initialized")
+            print("âŒ Scanner not initialized")
             return
         
         try:
@@ -11173,104 +11173,104 @@ class SecurityTerminal:
                 # Use the scanner's console for output
                 if hasattr(self.scanner, 'console') and self.scanner.console:
                     color = "green" if self.scanner.lab.waf_mode else "red"
-                    self.scanner.console.print(f"[{color}]🛡️ WAF mode: {status}[/{color}]")
+                    self.scanner.console.print(f"[{color}]ðŸ›¡ï¸ WAF mode: {status}[/{color}]")
                     if self.scanner.lab.waf_mode:
-                        self.scanner.console.print("✅ WAF is now actively blocking injection attempts")
+                        self.scanner.console.print("âœ… WAF is now actively blocking injection attempts")
                     else:
-                        self.scanner.console.print("[red]⚠️ WAF is now disabled - injections may pass through[/red]")
+                        self.scanner.console.print("[red]âš ï¸ WAF is now disabled - injections may pass through[/red]")
                 else:
                     # Fallback if scanner console isn't available
-                    print(f"🛡️ WAF mode: {status}")
+                    print(f"ðŸ›¡ï¸ WAF mode: {status}")
                     if self.scanner.lab.waf_mode:
-                        print("✅ WAF is now actively blocking injection attempts")
+                        print("âœ… WAF is now actively blocking injection attempts")
                     else:
-                        print("⚠️ WAF is now disabled - injections may pass through")
+                        print("âš ï¸ WAF is now disabled - injections may pass through")
             else:
-                print("❌ WAF mode not available in this lab version")
+                print("âŒ WAF mode not available in this lab version")
         except Exception as e:
-            print(f"❌ Error: {e}")
+            print(f"âŒ Error: {e}")
                 
     def cmd_sqlmap_pdf(self, args=None):
         """Generate PDF notes for SQL Injection"""
         if not self.scanner:
-            print("❌ Scanner not initialized")
+            print("âŒ Scanner not initialized")
             return
         
-        print("📄 Generating SQL Injection PDF Notes...")
+        print("ðŸ“„ Generating SQL Injection PDF Notes...")
         try:
             pdf_path = self.scanner.lab.generate_pdf_notes()
             if pdf_path:
-                print(f"✅ PDF Notes generated: {pdf_path}")
+                print(f"âœ… PDF Notes generated: {pdf_path}")
                 try:
                     import webbrowser
                     webbrowser.open(f"file://{pdf_path}")
-                    print("✅ PDF opened in default viewer")
+                    print("âœ… PDF opened in default viewer")
                 except:
                     pass
             else:
-                print("❌ PDF generation failed")
+                print("âŒ PDF generation failed")
         except Exception as e:
-            print(f"❌ Error: {e}")
+            print(f"âŒ Error: {e}")
 
 
     def cmd_sqlmap_techniques(self, args=None):
         """Show all SQL injection techniques"""
         if not self.scanner:
-            print("❌ Scanner not initialized")
+            print("âŒ Scanner not initialized")
             return
         
         try:
             self.scanner.cmd_advanced_techniques(args)
         except Exception as e:
-            print(f"❌ Error: {e}")
+            print(f"âŒ Error: {e}")
 
 
     def cmd_sqlmap_reset(self, args=None):
         """Reset SQL Injection Lab database"""
         if not self.scanner:
-            print("❌ Scanner not initialized")
+            print("âŒ Scanner not initialized")
             return
         
-        print("🔄 Resetting SQL Injection Lab database...")
+        print("ðŸ”„ Resetting SQL Injection Lab database...")
         try:
             self.scanner.lab.reset_database()
-            print("✅ Database reset successfully!")
+            print("âœ… Database reset successfully!")
         except Exception as e:
-            print(f"❌ Error: {e}")
+            print(f"âŒ Error: {e}")
 
 
     def cmd_sqlmap_install(self, args=None):
         """Install SQLMap via pip"""
         if not self.scanner:
-            print("❌ Scanner not initialized")
+            print("âŒ Scanner not initialized")
             return
         
-        print("📦 Installing SQLMap...")
+        print("ðŸ“¦ Installing SQLMap...")
         try:
             if self.scanner.install_sqlmap():
-                print("✅ SQLMap installed successfully!")
+                print("âœ… SQLMap installed successfully!")
             else:
-                print("❌ SQLMap installation failed")
+                print("âŒ SQLMap installation failed")
         except Exception as e:
-            print(f"❌ Error: {e}")
+            print(f"âŒ Error: {e}")
 
 
     def cmd_sqlmap_status(self, args=None):
         """Show SQLMap lab status"""
         if not self.scanner:
-            print("❌ Scanner not initialized")
+            print("âŒ Scanner not initialized")
             return
         
         try:
             self.scanner.cmd_advanced_status(args)
         except Exception as e:
-            print(f"❌ Error: {e}")
+            print(f"âŒ Error: {e}")
 
 
     def cmd_sqllab(self, args=None):
         """Start SQL Injection Learning Lab"""
         if not self.scanner:
-            print("❌ Scanner not initialized")
+            print("âŒ Scanner not initialized")
             return
         
         port = 8080
@@ -11283,40 +11283,40 @@ class SecurityTerminal:
         try:
             self.scanner.start_lab(port=port, open_browser=True)
         except Exception as e:
-            print(f"❌ Error: {e}")
+            print(f"âŒ Error: {e}")
 
 
     def cmd_sqllab_stop(self, args=None):
         """Stop SQL Injection Learning Lab"""
         if not self.scanner:
-            print("❌ Scanner not initialized")
+            print("âŒ Scanner not initialized")
             return
         
         try:
             self.scanner.stop_lab()
-            print("🛑 SQL Injection Learning Lab stopped")
+            print("ðŸ›‘ SQL Injection Learning Lab stopped")
             print("The server is no longer running")
         except Exception as e:
-            print(f"❌ Error: {e}")
+            print(f"âŒ Error: {e}")
 
 
     def cmd_sqlmap_scan(self, args=None):
         """Run SQLMap scan on a URL"""
         if not self.scanner:
-            print("❌ Scanner not initialized")
+            print("âŒ Scanner not initialized")
             return
         
         if not args:
-            print("❌ Usage: sqlmap <url>")
-            print("💡 Example: sqlmap http://testphp.vulnweb.com/artists.php?artist=1")
+            print("âŒ Usage: sqlmap <url>")
+            print("ðŸ’¡ Example: sqlmap http://testphp.vulnweb.com/artists.php?artist=1")
             return
         
         url = args[0]
-        print(f"🔍 Running SQLMap scan on: {url}")
+        print(f"ðŸ” Running SQLMap scan on: {url}")
         try:
             self.scanner.scan(url)
         except Exception as e:
-            print(f"❌ Error: {e}")
+            print(f"âŒ Error: {e}")
             
     def cmd_sqlmap_scan_file(self, args):
         """Scan a URL from a file containing URLs"""
@@ -11327,14 +11327,14 @@ class SecurityTerminal:
         
         file_path = args[0]
         if not os.path.exists(file_path):
-            print(f"❌ File not found: {file_path}")
+            print(f"âŒ File not found: {file_path}")
             return
         
         try:
             with open(file_path, 'r') as f:
                 urls = [line.strip() for line in f if line.strip()]
             
-            print(f"📄 Found {len(urls)} URLs in {file_path}")
+            print(f"ðŸ“„ Found {len(urls)} URLs in {file_path}")
             print("-" * 40)
             
             for i, url in enumerate(urls, 1):
@@ -11342,12 +11342,12 @@ class SecurityTerminal:
                 try:
                     self.scanner.scan(url)
                 except Exception as e:
-                    print(f"❌ Error scanning {url}: {e}")
+                    print(f"âŒ Error scanning {url}: {e}")
                 
-            print("\n✅ All scans completed!")
+            print("\nâœ… All scans completed!")
             
         except Exception as e:
-            print(f"❌ Error reading file: {e}")
+            print(f"âŒ Error reading file: {e}")
 
     def cmd_sqlmap_export_report(self, args):
         """Export the last scan report to a specified location"""
@@ -11362,7 +11362,7 @@ class SecurityTerminal:
         try:
             scan_files = list(self.scanner.scans_dir.glob("SQLMap_Report_*.pdf"))
             if not scan_files:
-                print("❌ No reports found")
+                print("âŒ No reports found")
                 return
             
             # Get the most recent report
@@ -11371,10 +11371,10 @@ class SecurityTerminal:
             # Copy to destination
             import shutil
             shutil.copy2(latest_report, dest_path)
-            print(f"✅ Report exported to: {dest_path}")
+            print(f"âœ… Report exported to: {dest_path}")
             
         except Exception as e:
-            print(f"❌ Error exporting report: {e}")
+            print(f"âŒ Error exporting report: {e}")
 
 #    ==sqlmsap functions end here going
 #   ======for hardening section below    =====
@@ -11398,7 +11398,7 @@ class SecurityTerminal:
                     terminal_width = 120
                 
                 self.hardening_dashboard = HardeningDashboard(terminal_width=terminal_width)
-                print(f"{Fore.GREEN}[✓] Hardening system initialized (Cinematic Mode){Style.RESET_ALL}")
+                print(f"{Fore.GREEN}[âœ“] Hardening system initialized (Cinematic Mode){Style.RESET_ALL}")
             except ImportError as e:
                 print(f"{Fore.RED}[!] Failed to import hardening_dashboard: {e}{Style.RESET_ALL}")
                 print(f"{Fore.YELLOW}[*] Make sure hardening_dashboard.py exists in the same directory{Style.RESET_ALL}")
@@ -11499,18 +11499,18 @@ class SecurityTerminal:
             categories[cat].append(module)
         
         for category, modules in categories.items():
-            print(f"{Fore.YELLOW}▸ {category}{Style.RESET_ALL}")
-            print(f"{Fore.WHITE}{'─'*50}{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}â–¸ {category}{Style.RESET_ALL}")
+            print(f"{Fore.WHITE}{'â”€'*50}{Style.RESET_ALL}")
             for module in modules:
                 if module.platforms and dashboard.system not in module.platforms:
                     continue
                 admin_req = f"{Fore.RED} [ADMIN REQUIRED]{Style.RESET_ALL}" if module.requires_admin and not dashboard.is_admin_user else ""
                 severity_color = Fore.RED if module.severity.value == 'CRITICAL' else Fore.YELLOW
-                print(f"  {Fore.GREEN}○{Style.RESET_ALL} {module.name}")
+                print(f"  {Fore.GREEN}â—‹{Style.RESET_ALL} {module.name}")
                 print(f"      [{severity_color}{module.severity.value}{Style.RESET_ALL}] {module.description[:55]}...{admin_req}")
             print()
         
-        print(f"{Fore.GREEN}[✓] Dry run complete. {len(dashboard.modules)} modules available.{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}[âœ“] Dry run complete. {len(dashboard.modules)} modules available.{Style.RESET_ALL}")
         print(f"{Fore.YELLOW}[!] No changes were made to your system.{Style.RESET_ALL}")
 
     def launch_hardening_dashboard(self):
@@ -11554,21 +11554,21 @@ class SecurityTerminal:
         print(f"{Fore.GREEN}{'='*60}{Style.RESET_ALL}")
         
         # System Info Box
-        print(f"\n{Fore.CYAN}┌{'─'*56}┐{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}│{self._center_text('SYSTEM INFORMATION', 56)}│{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}├{'─'*56}┤{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}│{f' Platform: {dashboard.system}'.ljust(56)}│{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}│{f' Admin: {dashboard.is_admin_user}'.ljust(56)}│{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}│{f' Session: {dashboard.session_id}'.ljust(56)}│{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}└{'─'*56}┘{Style.RESET_ALL}")
+        print(f"\n{Fore.CYAN}â”Œ{'â”€'*56}â”{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â”‚{self._center_text('SYSTEM INFORMATION', 56)}â”‚{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â”œ{'â”€'*56}â”¤{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â”‚{f' Platform: {dashboard.system}'.ljust(56)}â”‚{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â”‚{f' Admin: {dashboard.is_admin_user}'.ljust(56)}â”‚{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â”‚{f' Session: {dashboard.session_id}'.ljust(56)}â”‚{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â””{'â”€'*56}â”˜{Style.RESET_ALL}")
         
         # Module Stats Box
-        print(f"\n{Fore.GREEN}┌{'─'*56}┐{Style.RESET_ALL}")
-        print(f"{Fore.GREEN}│{self._center_text('MODULE STATISTICS', 56)}│{Style.RESET_ALL}")
-        print(f"{Fore.GREEN}├{'─'*56}┤{Style.RESET_ALL}")
-        print(f"{Fore.GREEN}│{f' Available: {len(dashboard.modules)}'.ljust(56)}│{Style.RESET_ALL}")
-        print(f"{Fore.GREEN}│{f' Selected: {len(dashboard.selected_modules)}'.ljust(56)}│{Style.RESET_ALL}")
-        print(f"{Fore.GREEN}└{'─'*56}┘{Style.RESET_ALL}")
+        print(f"\n{Fore.GREEN}â”Œ{'â”€'*56}â”{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}â”‚{self._center_text('MODULE STATISTICS', 56)}â”‚{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}â”œ{'â”€'*56}â”¤{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}â”‚{f' Available: {len(dashboard.modules)}'.ljust(56)}â”‚{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}â”‚{f' Selected: {len(dashboard.selected_modules)}'.ljust(56)}â”‚{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}â””{'â”€'*56}â”˜{Style.RESET_ALL}")
         
         # Results Box
         if dashboard.results:
@@ -11576,18 +11576,18 @@ class SecurityTerminal:
             failed = len(dashboard.results) - completed
             success_rate = (completed / len(dashboard.results) * 100) if dashboard.results else 0
             
-            print(f"\n{Fore.YELLOW if failed > 0 else Fore.GREEN}┌{'─'*56}┐{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW if failed > 0 else Fore.GREEN}│{self._center_text('EXECUTION RESULTS', 56)}│{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW if failed > 0 else Fore.GREEN}├{'─'*56}┤{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW if failed > 0 else Fore.GREEN}│{f' Completed: {completed}'.ljust(56)}│{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW if failed > 0 else Fore.GREEN}│{f' Failed: {failed}'.ljust(56)}│{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW if failed > 0 else Fore.GREEN}│{f' Success Rate: {success_rate:.1f}%'.ljust(56)}│{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW if failed > 0 else Fore.GREEN}└{'─'*56}┘{Style.RESET_ALL}")
+            print(f"\n{Fore.YELLOW if failed > 0 else Fore.GREEN}â”Œ{'â”€'*56}â”{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW if failed > 0 else Fore.GREEN}â”‚{self._center_text('EXECUTION RESULTS', 56)}â”‚{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW if failed > 0 else Fore.GREEN}â”œ{'â”€'*56}â”¤{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW if failed > 0 else Fore.GREEN}â”‚{f' Completed: {completed}'.ljust(56)}â”‚{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW if failed > 0 else Fore.GREEN}â”‚{f' Failed: {failed}'.ljust(56)}â”‚{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW if failed > 0 else Fore.GREEN}â”‚{f' Success Rate: {success_rate:.1f}%'.ljust(56)}â”‚{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW if failed > 0 else Fore.GREEN}â””{'â”€'*56}â”˜{Style.RESET_ALL}")
             
             if dashboard.results:
                 print(f"\n{Fore.CYAN}Recent Results:{Style.RESET_ALL}")
                 for r in dashboard.results[-5:]:
-                    status = f"{Fore.GREEN}✓{Style.RESET_ALL}" if r.success else f"{Fore.RED}✗{Style.RESET_ALL}"
+                    status = f"{Fore.GREEN}âœ“{Style.RESET_ALL}" if r.success else f"{Fore.RED}âœ—{Style.RESET_ALL}"
                     print(f"  {status} {r.module.name}")
         else:
             print(f"\n{Fore.YELLOW}[!] No results yet. Run hardening first.{Style.RESET_ALL}")
@@ -11616,11 +11616,11 @@ class SecurityTerminal:
             categories[cat].append(module)
         
         for category, modules in categories.items():
-            print(f"{Fore.YELLOW}▸ {category}{Style.RESET_ALL}")
-            print(f"{Fore.WHITE}{'─'*55}{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}â–¸ {category}{Style.RESET_ALL}")
+            print(f"{Fore.WHITE}{'â”€'*55}{Style.RESET_ALL}")
             for module in modules:
                 compatible = dashboard.system in module.platforms if module.platforms else True
-                status = f"{Fore.GREEN}✓{Style.RESET_ALL}" if compatible else f"{Fore.RED}✗{Style.RESET_ALL}"
+                status = f"{Fore.GREEN}âœ“{Style.RESET_ALL}" if compatible else f"{Fore.RED}âœ—{Style.RESET_ALL}"
                 severity_color = Fore.RED if module.severity.value == 'CRITICAL' else Fore.YELLOW
                 print(f"  [{status}] {Fore.CYAN}{module.name}{Style.RESET_ALL}")
                 print(f"       [{severity_color}{module.severity.value}{Style.RESET_ALL}] {module.description[:50]}...")
@@ -11629,7 +11629,7 @@ class SecurityTerminal:
         # Summary footer
         total = len(dashboard.modules)
         compatible = sum(1 for m in dashboard.modules if not m.platforms or dashboard.system in m.platforms)
-        print(f"{Fore.GREEN}{'─'*55}{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}{'â”€'*55}{Style.RESET_ALL}")
         print(f"{Fore.CYAN}Total: {total} | Compatible: {compatible} | Platform: {dashboard.system}{Style.RESET_ALL}")
 
     def generate_hardening_report(self):
@@ -11649,9 +11649,9 @@ class SecurityTerminal:
         successful = sum(1 for r in dashboard.results if r.success)
         total = len(dashboard.results)
         print(f"\n{Fore.CYAN}Report Summary:{Style.RESET_ALL}")
-        print(f"  {Fore.GREEN}✓ Successful: {successful}{Style.RESET_ALL}")
-        print(f"  {Fore.RED}✗ Failed: {total - successful}{Style.RESET_ALL}")
-        print(f"  {Fore.YELLOW}📊 Success Rate: {(successful/total*100):.1f}%{Style.RESET_ALL}")
+        print(f"  {Fore.GREEN}âœ“ Successful: {successful}{Style.RESET_ALL}")
+        print(f"  {Fore.RED}âœ— Failed: {total - successful}{Style.RESET_ALL}")
+        print(f"  {Fore.YELLOW}ðŸ“Š Success Rate: {(successful/total*100):.1f}%{Style.RESET_ALL}")
 
     def rollback_hardening(self):
         """Rollback hardening changes with confirmation"""
@@ -11660,7 +11660,7 @@ class SecurityTerminal:
             return
         
         print(f"\n{Fore.RED}{'='*60}{Style.RESET_ALL}")
-        print(f"{Fore.YELLOW}{self._center_text('⚠ ROLLBACK WARNING ⚠')}{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}{self._center_text('âš  ROLLBACK WARNING âš ')}{Style.RESET_ALL}")
         print(f"{Fore.RED}{'='*60}{Style.RESET_ALL}")
         print(f"{Fore.YELLOW}This will revert all applied hardening changes.{Style.RESET_ALL}")
         print(f"{Fore.RED}This action cannot be undone!{Style.RESET_ALL}")
@@ -11819,8 +11819,8 @@ class SecurityTerminal:
                             suburb = "Unknown Area"
                             neighbourhood = "Unknown Neighborhood"
                         
-                        console.print(f"[green]✓ Precise location detected: {precise_location}[/green]")
-                        console.print(f"[dim]📍 Coordinates: {lat:.6f}, {lon:.6f} (high precision)[/dim]")
+                        console.print(f"[green]âœ“ Precise location detected: {precise_location}[/green]")
+                        console.print(f"[dim]ðŸ“ Coordinates: {lat:.6f}, {lon:.6f} (high precision)[/dim]")
                         
                         return {
                             'ip': public_ip,
@@ -11840,7 +11840,7 @@ class SecurityTerminal:
                             'loc': f"{lat},{lon}"
                         }
             except Exception as e:
-                console.print(f"[yellow]⚠ High-precision geolocation failed: {e}[/yellow]")
+                console.print(f"[yellow]âš  High-precision geolocation failed: {e}[/yellow]")
             
             #       ==
             # METHOD 2: WiFi Access Point Triangulation (Windows)
@@ -11861,7 +11861,7 @@ class SecurityTerminal:
                     signals = re.findall(r'Signal\s+:\s+(\d+)%', output)
                     
                     if bssids and signals:
-                        console.print(f"[cyan]📡 Detected {len(bssids)} nearby WiFi networks for triangulation[/cyan]")
+                        console.print(f"[cyan]ðŸ“¡ Detected {len(bssids)} nearby WiFi networks for triangulation[/cyan]")
                         # Note: This would require a WiFi geolocation database API
                         # For now, we store that WiFi positioning is available
                         wifi_available = True
@@ -11880,7 +11880,7 @@ class SecurityTerminal:
                     for port in serial.tools.list_ports.comports():
                         if 'GPS' in port.description or 'GNSS' in port.description:
                             gps_ports.append(port.device)
-                            console.print(f"[cyan]🛰️ GPS device detected on {port.device}[/cyan]")
+                            console.print(f"[cyan]ðŸ›°ï¸ GPS device detected on {port.device}[/cyan]")
                     
                     if gps_ports:
                         # Attempt to read NMEA data from GPS
@@ -11901,7 +11901,7 @@ class SecurityTerminal:
                                             if parts[5] == 'W':
                                                 lon_deg = -lon_deg
                                             
-                                            console.print(f"[green]✓ GPS location acquired: {lat_deg:.6f}, {lon_deg:.6f}[/green]")
+                                            console.print(f"[green]âœ“ GPS location acquired: {lat_deg:.6f}, {lon_deg:.6f}[/green]")
                                             return {
                                                 'ip': 'GPS',
                                                 'lat': lat_deg,
@@ -11921,7 +11921,7 @@ class SecurityTerminal:
                 return
              
  
-                console.print(f"[yellow]⚠ GPS detection: {e}[/yellow]")
+                console.print(f"[yellow]âš  GPS detection: {e}[/yellow]")
             
             #       ==
             # METHOD 4: Google Geolocation API (requires API key)
@@ -11941,7 +11941,7 @@ class SecurityTerminal:
                     lat = data['location']['lat']
                     lon = data['location']['lng']
                     accuracy = data.get('accuracy', 'unknown')
-                    console.print(f"[green]✓ Google Geolocation: {lat:.6f}, {lon:.6f} (accuracy: {accuracy}m)[/green]")
+                    console.print(f"[green]âœ“ Google Geolocation: {lat:.6f}, {lon:.6f} (accuracy: {accuracy}m)[/green]")
                     # ... return precise location
             except:
                 pass
@@ -11985,8 +11985,8 @@ class SecurityTerminal:
                             
                             precise_location = ', '.join(precise_parts) if precise_parts else geo_data.get('city', 'Lilongwe')
                             
-                            console.print(f"[cyan]📍 Precise location: {precise_location}[/cyan]")
-                            console.print(f"[dim]📌 Coordinates: {lat:.6f}, {lon:.6f}[/dim]")
+                            console.print(f"[cyan]ðŸ“ Precise location: {precise_location}[/cyan]")
+                            console.print(f"[dim]ðŸ“Œ Coordinates: {lat:.6f}, {lon:.6f}[/dim]")
                             
                             return {
                                 'ip': geo_data.get('ip', 'Unknown'),
@@ -12006,13 +12006,13 @@ class SecurityTerminal:
                                 'loc': f"{lat},{lon}"
                             }
             except Exception as e:
-                console.print(f"[yellow]⚠ OpenStreetMap reverse geocoding: {e}[/yellow]")
+                console.print(f"[yellow]âš  OpenStreetMap reverse geocoding: {e}[/yellow]")
             
             #       ==
             # FALLBACK: Standard city-level location
             #       ==
             
-            console.print("[yellow]⚠ Using standard city-level location[/yellow]")
+            console.print("[yellow]âš  Using standard city-level location[/yellow]")
             return {
                 'ip': '192.168.1.1',
                 'lat': -13.9833,
@@ -12031,7 +12031,7 @@ class SecurityTerminal:
             
             rich_table.add_column("TYPE", style="cyan", width=8)
             rich_table.add_column("LOCAL", style="cyan")
-            rich_table.add_column("→", justify="center")
+            rich_table.add_column("â†’", justify="center")
             rich_table.add_column("REMOTE", style="magenta")
             rich_table.add_column("DESTINATION", style="yellow")
             rich_table.add_column("STATUS", justify="right")
@@ -12044,13 +12044,13 @@ class SecurityTerminal:
                     geo = bc['geo']
                     domain = bc.get('url_domain', conn.raddr.ip)
                     rich_table.add_row(
-                        "🌐 WEB",
+                        "ðŸŒ WEB",
                         f"{conn.laddr.ip}:{conn.laddr.port}",
-                        "⋙",
+                        "â‹™",
                         f"{conn.raddr.ip}:{conn.raddr.port}",
                         f"[cyan]{domain}[/cyan]",
                         "[green]ACTIVE",
-                        "✓"
+                        "âœ“"
                     )
             
             # Add other connections
@@ -12063,8 +12063,8 @@ class SecurityTerminal:
                     remote = f"{conn.raddr.ip}:{conn.raddr.port}"
                     
                     rich_table.add_row(
-                        "⚙️ SYS",
-                        local, "⋙", remote,
+                        "âš™ï¸ SYS",
+                        local, "â‹™", remote,
                         f"{country}",
                         "[green]ACTIVE",
                         icon
@@ -12105,7 +12105,7 @@ class SecurityTerminal:
                         except (psutil.NoSuchProcess, psutil.AccessDenied):
                             continue
             except Exception as e:
-                console.print(f"[yellow]⚠ Browser connection detection: {e}[/yellow]")
+                console.print(f"[yellow]âš  Browser connection detection: {e}[/yellow]")
             
             return web_connections
 
@@ -12201,7 +12201,7 @@ class SecurityTerminal:
                 # Calculate a point at 45 degrees on the circle edge for label placement
                 import math
                 angle_rad = math.radians(45)
-                lat_offset = (radius / 111) * math.cos(angle_rad)  # 1 degree ≈ 111 km
+                lat_offset = (radius / 111) * math.cos(angle_rad)  # 1 degree â‰ˆ 111 km
                 lon_offset = (radius / 111) * math.sin(angle_rad) / math.cos(math.radians(local_machine['lat']))
                 
                 label_lat = local_machine['lat'] + lat_offset
@@ -12229,7 +12229,7 @@ class SecurityTerminal:
                 fill=True,
                 fill_opacity=0.3,
                 weight=3,
-                popup=f"📍 DSTerminal Host - {local_machine['country']}"
+                popup=f"ðŸ“ DSTerminal Host - {local_machine['country']}"
             ).add_to(threat_map)
             
             # Middle red circle
@@ -12259,11 +12259,11 @@ class SecurityTerminal:
                 location=[local_machine['lat'], local_machine['lon']],
                 popup=folium.Popup(f"""
                 <div style="font-family: monospace; text-align: center;">
-                    <b><span style="color: #ff0000;">🔴 DSTERMINAL HOST</span></b><br>
-                    📍 {local_machine['country']}<br>
-                    🏙️ {local_machine['city']}<br>
-                    📡 IP: {local_machine['ip']}<br>
-                    <span style="color: #00ff00;">● ACTIVE MONITORING ●</span>
+                    <b><span style="color: #ff0000;">ðŸ”´ DSTERMINAL HOST</span></b><br>
+                    ðŸ“ {local_machine['country']}<br>
+                    ðŸ™ï¸ {local_machine['city']}<br>
+                    ðŸ“¡ IP: {local_machine['ip']}<br>
+                    <span style="color: #00ff00;">â— ACTIVE MONITORING â—</span>
                 </div>
                 """, max_width=280),
                 icon=folium.Icon(color='red', icon='flag', prefix='fa', icon_color='white')
@@ -12317,27 +12317,27 @@ class SecurityTerminal:
  
                 # popup_text = f"""
                 # <div style="font-family: monospace; min-width: 220px;">
-                #     <b><span style="color: #FF6B6B;">🌐 BROWSER CONNECTION</span></b><br>
+                #     <b><span style="color: #FF6B6B;">ðŸŒ BROWSER CONNECTION</span></b><br>
                 #     <hr style="margin: 3px 0;">
-                #     📍 Country: <b>{geo.get('country', 'Unknown')}</b><br>
-                #     📍 City: {geo.get('city', 'N/A')}<br>
-                #     📡 IP: {conn.raddr.ip}:{conn.raddr.port}<br>
-                #     🌐 Browser: {process_name.upper()}<br>
-                #     📏 Distance: {distance:.0f} km<br>
-                #     ⚠ Risk: LOW
+                #     ðŸ“ Country: <b>{geo.get('country', 'Unknown')}</b><br>
+                #     ðŸ“ City: {geo.get('city', 'N/A')}<br>
+                #     ðŸ“¡ IP: {conn.raddr.ip}:{conn.raddr.port}<br>
+                #     ðŸŒ Browser: {process_name.upper()}<br>
+                #     ðŸ“ Distance: {distance:.0f} km<br>
+                #     âš  Risk: LOW
                 # </div>
                 # """
                 # In the map's local marker popup, show precise location:
 
                 popup_text = f"""
                 <div style="font-family: monospace; text-align: center; min-width: 250px;">
-                    <b><span style="color: #ff0000;">🔴 DSTERMINAL HOST</span></b><br>
+                    <b><span style="color: #ff0000;">ðŸ”´ DSTERMINAL HOST</span></b><br>
                     <hr>
-                    📍 <b>Precise Location:</b> {local_machine.get('precise_location', local_machine['city'])}<br>
-                    🏙️ <b>City:</b> {local_machine['city']}<br>
-                    🏘️ <b>Area:</b> {local_machine.get('suburb', 'City Center')}<br>
-                    📡 <b>IP:</b> {local_machine['ip']}<br>
-                    <span style="color: #00ff00;">● ACTIVE MONITORING ●</span>
+                    ðŸ“ <b>Precise Location:</b> {local_machine.get('precise_location', local_machine['city'])}<br>
+                    ðŸ™ï¸ <b>City:</b> {local_machine['city']}<br>
+                    ðŸ˜ï¸ <b>Area:</b> {local_machine.get('suburb', 'City Center')}<br>
+                    ðŸ“¡ <b>IP:</b> {local_machine['ip']}<br>
+                    <span style="color: #00ff00;">â— ACTIVE MONITORING â—</span>
                 </div>
                 """
                 
@@ -12359,7 +12359,7 @@ class SecurityTerminal:
                     color=color,
                     weight=2.5,
                     opacity=0.6,
-                    tooltip=f"🌐 {domain} → {geo.get('country', 'Unknown')} ({distance:.0f}km)"
+                    tooltip=f"ðŸŒ {domain} â†’ {geo.get('country', 'Unknown')} ({distance:.0f}km)"
                 ).add_to(threat_map)
                 
                 # Add distance label at midpoint
@@ -12425,15 +12425,15 @@ class SecurityTerminal:
                         
                         popup_text = f"""
                         <div style="font-family: monospace; min-width: 220px;">
-                            <b><span style="color: {color};">⚙️ SYSTEM CONNECTION</span></b><br>
+                            <b><span style="color: {color};">âš™ï¸ SYSTEM CONNECTION</span></b><br>
                             <hr style="margin: 3px 0;">
-                            📍 Country: <b>{geo.get('country', 'Unknown')}</b><br>
-                            📍 City: {geo.get('city', 'N/A')}<br>
-                            📡 IP: {conn.raddr.ip}:{conn.raddr.port}<br>
-                            🖥️ Local Port: {conn.laddr.port}<br>
-                            📏 Distance: {distance:.0f} km<br>
-                            ⚠ Threat Score: {score}/5<br>
-                            ⚠ Risk: <span style="color: {risk_color}; font-weight: bold;">{risk_level}</span>
+                            ðŸ“ Country: <b>{geo.get('country', 'Unknown')}</b><br>
+                            ðŸ“ City: {geo.get('city', 'N/A')}<br>
+                            ðŸ“¡ IP: {conn.raddr.ip}:{conn.raddr.port}<br>
+                            ðŸ–¥ï¸ Local Port: {conn.laddr.port}<br>
+                            ðŸ“ Distance: {distance:.0f} km<br>
+                            âš  Threat Score: {score}/5<br>
+                            âš  Risk: <span style="color: {risk_color}; font-weight: bold;">{risk_level}</span>
                         </div>
                         """
                         
@@ -12456,7 +12456,7 @@ class SecurityTerminal:
                             color=line_color,
                             weight=2,
                             opacity=0.5,
-                            tooltip=f"⚙️ → {geo.get('country', 'Unknown')} | Score: {score}/5 | {distance:.0f}km"
+                            tooltip=f"âš™ï¸ â†’ {geo.get('country', 'Unknown')} | Score: {score}/5 | {distance:.0f}km"
                         ).add_to(threat_map)
                         
                         # Add distance label at midpoint
@@ -12494,59 +12494,59 @@ class SecurityTerminal:
             <div style="position: fixed; top: 20px; left: 20px; z-index: 1000; background-color: rgba(0,0,0,0.92); padding: 18px; border-radius: 10px; border: 2px solid #00ff00; font-family: 'Courier New', monospace; min-width: 280px; backdrop-filter: blur(8px); box-shadow: 0 0 20px rgba(0,255,0,0.2);">
                 
                 <div style="text-align: center; margin-bottom: 12px;">
-                    <span style="color: #00ff00; font-size: 14px; font-weight: bold;">┌─────────────────────────────┐</span><br>
-                    <span style="color: #00ff00; font-size: 13px; font-weight: bold;">│    DSTERMINAL NETWORK MAP    │</span><br>
-                    <span style="color: #00ff00; font-size: 14px; font-weight: bold;">└─────────────────────────────┘</span>
+                    <span style="color: #00ff00; font-size: 14px; font-weight: bold;">â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”</span><br>
+                    <span style="color: #00ff00; font-size: 13px; font-weight: bold;">â”‚    DSTERMINAL NETWORK MAP    â”‚</span><br>
+                    <span style="color: #00ff00; font-size: 14px; font-weight: bold;">â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜</span>
                 </div>
                 
                 <div style="margin-bottom: 12px;">
-                    <div><span style="color: #ff0000;">●</span> <span style="color: #ffffff;">Host Location:</span> <span style="color: #00ff00; font-weight: bold;">{local_machine['country']}</span></div>
-                    <div><span style="color: #ff0000;">●</span> <span style="color: #ffffff;">Coordinates:</span> <span style="color: #ffff00;">{local_machine['lat']:.2f}, {local_machine['lon']:.2f}</span></div>
-                    <div><span style="color: #ff0000;">●</span> <span style="color: #ffffff;">Local IP:</span> <span style="color: #00ffff;">{local_machine['ip']}</span></div>
+                    <div><span style="color: #ff0000;">â—</span> <span style="color: #ffffff;">Host Location:</span> <span style="color: #00ff00; font-weight: bold;">{local_machine['country']}</span></div>
+                    <div><span style="color: #ff0000;">â—</span> <span style="color: #ffffff;">Coordinates:</span> <span style="color: #ffff00;">{local_machine['lat']:.2f}, {local_machine['lon']:.2f}</span></div>
+                    <div><span style="color: #ff0000;">â—</span> <span style="color: #ffffff;">Local IP:</span> <span style="color: #00ffff;">{local_machine['ip']}</span></div>
                 </div>
                 
                 <div style="margin-bottom: 12px;">
-                    <span style="color: #00ff00;">─────────────────────────────</span>
+                    <span style="color: #00ff00;">â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€</span>
                 </div>
                 
                 <div style="margin-bottom: 12px;">
-                    <div><span style="color: #ff4444;">⚠</span> <span style="color: #ffffff;">High Risk (3-5):</span> <span style="color: #ff4444; font-weight: bold;">{high_risk}</span></div>
-                    <div><span style="color: #ffaa00;">⚠</span> <span style="color: #ffffff;">Medium Risk (2):</span> <span style="color: #ffaa00; font-weight: bold;">{medium_risk}</span></div>
-                    <div><span style="color: #00ff00;">✓</span> <span style="color: #ffffff;">Low Risk (0-1):</span> <span style="color: #00ff00; font-weight: bold;">{low_risk}</span></div>
-                    <div><span style="color: #00ffff;">🌐</span> <span style="color: #ffffff;">Browser Connections:</span> <span style="color: #00ffff; font-weight: bold;">{len(browser_connections)}</span></div>
+                    <div><span style="color: #ff4444;">âš </span> <span style="color: #ffffff;">High Risk (3-5):</span> <span style="color: #ff4444; font-weight: bold;">{high_risk}</span></div>
+                    <div><span style="color: #ffaa00;">âš </span> <span style="color: #ffffff;">Medium Risk (2):</span> <span style="color: #ffaa00; font-weight: bold;">{medium_risk}</span></div>
+                    <div><span style="color: #00ff00;">âœ“</span> <span style="color: #ffffff;">Low Risk (0-1):</span> <span style="color: #00ff00; font-weight: bold;">{low_risk}</span></div>
+                    <div><span style="color: #00ffff;">ðŸŒ</span> <span style="color: #ffffff;">Browser Connections:</span> <span style="color: #00ffff; font-weight: bold;">{len(browser_connections)}</span></div>
                 </div>
                 
                 <div style="margin-bottom: 12px;">
-                    <span style="color: #00ff00;">─────────────────────────────</span>
+                    <span style="color: #00ff00;">â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€</span>
                 </div>
                 
                 <div style="margin-bottom: 12px;">
-                    <div><span style="color: #00ff00;">🌍</span> <span style="color: #ffffff;">Active Countries:</span> <span style="color: #00ff00; font-weight: bold;">{len(active_countries)}</span></div>
-                    <div><span style="color: #00ff00;">🔗</span> <span style="color: #ffffff;">Total Connections:</span> <span style="color: #00ff00; font-weight: bold;">{total_connections}</span></div>
-                    <div><span style="color: #00ff00;">📏</span> <span style="color: #ffffff;">Distance Rings:</span> <span style="color: #00ffff;">500-10000km</span></div>
-                    <div><span style="color: #00ff00;">✨</span> <span style="color: #ffffff;">Status:</span> <span style="color: #00ff00; font-weight: bold;">ACTIVE</span></div>
+                    <div><span style="color: #00ff00;">ðŸŒ</span> <span style="color: #ffffff;">Active Countries:</span> <span style="color: #00ff00; font-weight: bold;">{len(active_countries)}</span></div>
+                    <div><span style="color: #00ff00;">ðŸ”—</span> <span style="color: #ffffff;">Total Connections:</span> <span style="color: #00ff00; font-weight: bold;">{total_connections}</span></div>
+                    <div><span style="color: #00ff00;">ðŸ“</span> <span style="color: #ffffff;">Distance Rings:</span> <span style="color: #00ffff;">500-10000km</span></div>
+                    <div><span style="color: #00ff00;">âœ¨</span> <span style="color: #ffffff;">Status:</span> <span style="color: #00ff00; font-weight: bold;">ACTIVE</span></div>
                 </div>
                 
                 <div style="margin-bottom: 12px;">
-                    <span style="color: #00ff00;">─────────────────────────────</span>
+                    <span style="color: #00ff00;">â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€</span>
                 </div>
                 
                 <div>
-                    <div style="color: #ffff00; margin-bottom: 8px;">⬤ LEGEND</div>
-                    <div><span style="color: #ff0000;">⬤</span> <span style="color: #ffffff;">High Risk (3-5)</span></div>
-                    <div><span style="color: #ffaa00;">⬤</span> <span style="color: #ffffff;">Medium Risk (2)</span></div>
-                    <div><span style="color: #00ff00;">⬤</span> <span style="color: #ffffff;">Low Risk (0-1)</span></div>
-                    <div><span style="color: #FF6B6B;">⬤</span> <span style="color: #ffffff;">Browser Traffic</span></div>
-                    <div><span style="color: #ff0000;">🔴</span> <span style="color: #ffffff;">DSTerminal Host</span></div>
-                    <div><span style="color: #00ffff;">◯</span> <span style="color: #ffffff;">Distance Rings (km)</span></div>
+                    <div style="color: #ffff00; margin-bottom: 8px;">â¬¤ LEGEND</div>
+                    <div><span style="color: #ff0000;">â¬¤</span> <span style="color: #ffffff;">High Risk (3-5)</span></div>
+                    <div><span style="color: #ffaa00;">â¬¤</span> <span style="color: #ffffff;">Medium Risk (2)</span></div>
+                    <div><span style="color: #00ff00;">â¬¤</span> <span style="color: #ffffff;">Low Risk (0-1)</span></div>
+                    <div><span style="color: #FF6B6B;">â¬¤</span> <span style="color: #ffffff;">Browser Traffic</span></div>
+                    <div><span style="color: #ff0000;">ðŸ”´</span> <span style="color: #ffffff;">DSTerminal Host</span></div>
+                    <div><span style="color: #00ffff;">â—¯</span> <span style="color: #ffffff;">Distance Rings (km)</span></div>
                 </div>
                 
                 <div style="margin-top: 12px;">
-                    <span style="color: #00ff00;">─────────────────────────────</span>
+                    <span style="color: #00ff00;">â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€</span>
                 </div>
                 
                 <div style="margin-top: 8px; text-align: center;">
-                    <span style="color: #ff6600; font-size: 9px;">● LIVE MONITORING ●</span>
+                    <span style="color: #ff6600; font-size: 9px;">â— LIVE MONITORING â—</span>
                 </div>
             </div>
             '''
@@ -12600,10 +12600,10 @@ class SecurityTerminal:
             map_file = os.path.join(map_dir, f'realtime_map_{datetime.now().strftime("%Y%m%d_%H%M%S")}.html')
             threat_map.save(map_file)
             
-            console.print(f"[green]✓ Threat map saved to: {map_file}[/green]")
-            console.print(f"[red]🔴 Host location: {local_machine['country']} ({local_machine['lat']:.2f}, {local_machine['lon']:.2f})[/red]")
-            console.print(f"[cyan]🌐 Active Connections: {total_connections} | Countries: {len(active_countries)}[/cyan]")
-            console.print(f"[yellow]📏 Distance rings: 500km, 1000km, 2000km, 5000km, 10000km[/yellow]")
+            console.print(f"[green]âœ“ Threat map saved to: {map_file}[/green]")
+            console.print(f"[red]ðŸ”´ Host location: {local_machine['country']} ({local_machine['lat']:.2f}, {local_machine['lon']:.2f})[/red]")
+            console.print(f"[cyan]ðŸŒ Active Connections: {total_connections} | Countries: {len(active_countries)}[/cyan]")
+            console.print(f"[yellow]ðŸ“ Distance rings: 500km, 1000km, 2000km, 5000km, 10000km[/yellow]")
             
             return map_file
         # Comprehensive PDF Report Generation
@@ -12744,10 +12744,10 @@ class SecurityTerminal:
             elements.append(Paragraph("Threat Distribution Analysis", heading_style))
             threat_data = [
                 ["Risk Level", "Score", "Count", "Status"],
-                ["Low", "0-1", str(threat_distribution[0] + threat_distribution[1]), "🟢 Safe"],
-                ["Medium", "2", str(threat_distribution[2]), "🟡 Monitor"],
-                ["High", "3-4", str(threat_distribution[3] + threat_distribution[4]), "🟠 Alert"],
-                ["Critical", "5", str(threat_distribution[5]), "🔴 Immediate Action"]
+                ["Low", "0-1", str(threat_distribution[0] + threat_distribution[1]), "ðŸŸ¢ Safe"],
+                ["Medium", "2", str(threat_distribution[2]), "ðŸŸ¡ Monitor"],
+                ["High", "3-4", str(threat_distribution[3] + threat_distribution[4]), "ðŸŸ  Alert"],
+                ["Critical", "5", str(threat_distribution[5]), "ðŸ”´ Immediate Action"]
             ]
             
             threat_table = PDFTable(threat_data, colWidths=[1.5*inch, 1.5*inch, 1.5*inch, 2*inch])
@@ -12801,7 +12801,7 @@ class SecurityTerminal:
             # Footer
             elements.append(Spacer(1, 0.5 * inch))
             elements.append(Paragraph(
-                f"Report autogenerated by DSTerminal v3.1.113 | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | Audit Trail Verified",
+                f"Report autogenerated by DSTerminal v4.0.0.113 | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | Audit Trail Verified",
  
                 f"Report autogenerated by DSTerminal v2.1.327 | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | Audit Trail Verified",
                 ParagraphStyle('Footer', parent=styles['Normal'], fontSize=8, textColor=colors.grey, alignment=1)
@@ -12838,8 +12838,8 @@ class SecurityTerminal:
             with open(json_report, 'w') as f:
                 json.dump(audit_data, f, indent=2)
             
-            console.print(f"[green]✓ PDF report saved to workspace: {report_file}[/green]")
-            console.print(f"[green]✓ JSON data saved to: {json_report}[/green]")
+            console.print(f"[green]âœ“ PDF report saved to workspace: {report_file}[/green]")
+            console.print(f"[green]âœ“ JSON data saved to: {json_report}[/green]")
             
             return report_file
         
@@ -12877,7 +12877,7 @@ class SecurityTerminal:
             with open(session_file, 'w') as f:
                 json.dump(session_data, f, indent=2)
             
-            console.print(f"[dim]💾 Session data saved to: {session_file}[/dim]")
+            console.print(f"[dim]ðŸ’¾ Session data saved to: {session_file}[/dim]")
         
         # Pre-scan animation
         def threat_scan_animation():
@@ -12931,10 +12931,10 @@ class SecurityTerminal:
             upload_kb = sent / 1024
             download_kb = recv / 1024
             
-            bandwidth_bar = "█" * min(int(download_kb / 5), 50)
+            bandwidth_bar = "â–ˆ" * min(int(download_kb / 5), 50)
             
             bandwidth_panel = Panel(
-                f"⬇ Download: {download_kb:.2f} KB/s\n⬆ Upload: {upload_kb:.2f} KB/s\n\n{bandwidth_bar}",
+                f"â¬‡ Download: {download_kb:.2f} KB/s\nâ¬† Upload: {upload_kb:.2f} KB/s\n\n{bandwidth_bar}",
                 title="[bold cyan]Bandwidth Activity[/bold cyan]",
                 border_style="green"
             )
@@ -12944,7 +12944,7 @@ class SecurityTerminal:
             local_machine = get_local_machine_location()
             workspace = get_workspace_dir()
             
-            console.print(f"[dim]📁 Workspace: {workspace}[/dim]")
+            console.print(f"[dim]ðŸ“ Workspace: {workspace}[/dim]")
 
             # Get operator ID from session
             operator_id = getattr(self, 'current_operator', None)
@@ -12955,12 +12955,12 @@ class SecurityTerminal:
                     existing_ops = [d for d in os.listdir(workspace_operators) if d.startswith('OP-')]
                     if existing_ops:
                         operator_id = existing_ops[-1]
-                        console.print(f"[dim]📋 Operator session: {operator_id}[/dim]")
+                        console.print(f"[dim]ðŸ“‹ Operator session: {operator_id}[/dim]")
             
             if local_machine:
-                console.print(f"[green]✓ Local machine detected: {local_machine['ip']} ({local_machine['country']})[/green]")
+                console.print(f"[green]âœ“ Local machine detected: {local_machine['ip']} ({local_machine['country']})[/green]")
             else:
-                console.print("[yellow]⚠ Could not determine local machine location[/yellow]")
+                console.print("[yellow]âš  Could not determine local machine location[/yellow]")
             
             with Live(console=console, refresh_per_second=2, screen=False) as live:
                 last_connections = []
@@ -12986,11 +12986,11 @@ class SecurityTerminal:
                     
                     # Generate and open enhanced threat map (only once)
                     if not map_opened:
-                        console.print("[yellow]🌍 Generating enhanced threat map with local machine location...[/yellow]")
+                        console.print("[yellow]ðŸŒ Generating enhanced threat map with local machine location...[/yellow]")
                         map_file = generate_enhanced_threat_map(connections, local_machine, browser_connections)
                         webbrowser.open(f'file://{map_file}')
-                        console.print(f"[green]✓ Enhanced threat map saved to: {map_file}[/green]")
-                        console.print("[cyan]📍 Map shows: Local machine marker, connection lines, threat levels, and heatmap[/cyan]")
+                        console.print(f"[green]âœ“ Enhanced threat map saved to: {map_file}[/green]")
+                        console.print("[cyan]ðŸ“ Map shows: Local machine marker, connection lines, threat levels, and heatmap[/cyan]")
                         map_opened = True
                     
                     # Generate statistics
@@ -13015,7 +13015,7 @@ class SecurityTerminal:
                                     high_risk_connections += 1
                     
                     stats.add_row("Total Connections", str(len(connections)))
-                    stats.add_row("🌐 Browser Connections", f"[cyan]{browser_count}[/cyan]")
+                    stats.add_row("ðŸŒ Browser Connections", f"[cyan]{browser_count}[/cyan]")
                     stats.add_row("ESTABLISHED", f"[green]{established}[/green]")
                     stats.add_row("LISTEN", f"[blue]{listening}[/blue]")
                     stats.add_row("Active Countries", str(len(unique_countries)))
@@ -13025,7 +13025,7 @@ class SecurityTerminal:
                     
                     # Detect and display alerts
                     alerts = detect_intrusion(connections)
-                    alert_text = "\n".join([f"[bold red]⚠ {alert}[/bold red]" for alert in alerts]) if alerts else "[green]✓ No intrusion detected[/green]"
+                    alert_text = "\n".join([f"[bold red]âš  {alert}[/bold red]" for alert in alerts]) if alerts else "[green]âœ“ No intrusion detected[/green]"
                     
                     # Create combined dashboard
                     dashboard = Layout()
@@ -13037,7 +13037,7 @@ class SecurityTerminal:
                     
                     dashboard["header"].split_row(
                         Layout(bandwidth_panel, ratio=1),
-                        Layout(Panel(f"[cyan]🌐 Active Browser Connections: {browser_count}[/cyan]", title="LIVE WEB TRAFFIC", border_style="green"), ratio=1)
+                        Layout(Panel(f"[cyan]ðŸŒ Active Browser Connections: {browser_count}[/cyan]", title="LIVE WEB TRAFFIC", border_style="green"), ratio=1)
                     )
                     dashboard["body"].split_row(
                         Layout(table_panel, ratio=2),
@@ -13046,11 +13046,11 @@ class SecurityTerminal:
                     
                     dashboard["footer"].split(
                         Layout(Panel(
-                            f"[cyan]🌍 Threat Map: {os.path.basename(map_file) if map_opened else 'Generating...'}[/cyan]\n"
-                            f"[dim]📍 Local Machine: {local_machine['country'] if local_machine else 'Unknown'} | Browser Connections: {browser_count}[/dim]\n"
-                            f"[dim]📁 Workspace: {workspace}[/dim]\n"
-                            f"[dim]📄 Audit reports saved to: {os.path.join(workspace, 'network_reports')}[/dim]\n"
-                            f"[dim]🔗 Lines show connections from your machine to remote servers[/dim]",
+                            f"[cyan]ðŸŒ Threat Map: {os.path.basename(map_file) if map_opened else 'Generating...'}[/cyan]\n"
+                            f"[dim]ðŸ“ Local Machine: {local_machine['country'] if local_machine else 'Unknown'} | Browser Connections: {browser_count}[/dim]\n"
+                            f"[dim]ðŸ“ Workspace: {workspace}[/dim]\n"
+                            f"[dim]ðŸ“„ Audit reports saved to: {os.path.join(workspace, 'network_reports')}[/dim]\n"
+                            f"[dim]ðŸ”— Lines show connections from your machine to remote servers[/dim]",
                             title="[bold red]GLOBAL THREAT MAP & AUDIT STATUS[/bold red]",
                             border_style="red"
                         ))
@@ -13064,11 +13064,11 @@ class SecurityTerminal:
             
             # Generate comprehensive audit report after monitoring
             if last_connections:
-                console.print("[yellow]📄 Generating network report...[/yellow]")
+                console.print("[yellow]ðŸ“„ Generating network report...[/yellow]")
                 export_comprehensive_audit_report(last_connections, local_machine, workspace, operator_id)
                 save_operator_session_data(last_connections, local_machine, workspace, operator_id)
             if last_browser_connections:
-                console.print(f"[cyan]✓ Captured {len(last_browser_connections)} browser connections during monitoring[/cyan]")
+                console.print(f"[cyan]âœ“ Captured {len(last_browser_connections)} browser connections during monitoring[/cyan]")
 
         # Run Monitor
         console.print(
@@ -13237,13 +13237,13 @@ class SecurityTerminal:
     #             elements.append(Paragraph("<b>Security Recommendations</b>", styles["Heading2"]))
     #             recs = results.get('recommendations', [])
     #             for rec in recs:
-    #                 elements.append(Paragraph(f"• {rec}", normal))
+    #                 elements.append(Paragraph(f"â€¢ {rec}", normal))
     #                 elements.append(Spacer(1, 5))
                 
     #             # Footer
     #             elements.append(Spacer(1, 40))
-    #             elements.append(Paragraph("Generated by DSTerminal Exploit Scanner v3.1.113", normal))
-    #             elements.append(Paragraph("© Stark Expo Tech Exchange LTD", normal))
+    #             elements.append(Paragraph("Generated by DSTerminal Exploit Scanner v4.0.0.113", normal))
+    #             elements.append(Paragraph("Â© Stark Expo Tech Exchange LTD", normal))
                 
     #             doc.build(elements)
     #             return True
@@ -13342,7 +13342,7 @@ class SecurityTerminal:
 
     #     def _ultra_type_header(text, color=Fore.CYAN):
     #         _ultra_type(f"\n{text}", 0.03, color)
-    #         _ultra_type("━" * min(len(text), 70), 0.01, Fore.CYAN)
+    #         _ultra_type("â”" * min(len(text), 70), 0.01, Fore.CYAN)
 
     #     def _ultra_type_status(text, color=Fore.CYAN):
     #         _ultra_type(f"[*] {text}", 0.025, color)
@@ -13359,7 +13359,7 @@ class SecurityTerminal:
     #     def _ultra_type_finding(text, severity="INFO"):
     #         colors = {"CRITICAL": Fore.LIGHTRED_EX, "HIGH": Fore.RED, "MEDIUM": Fore.LIGHTYELLOW_EX,
     #                 "LOW": Fore.YELLOW, "INFO": Fore.CYAN, "PASS": Fore.LIGHTGREEN_EX}
-    #         prefix = {"CRITICAL": "🚨", "HIGH": "⚠️", "MEDIUM": "⚡", "LOW": "ℹ️", "INFO": "📌", "PASS": "✅"}
+    #         prefix = {"CRITICAL": "ðŸš¨", "HIGH": "âš ï¸", "MEDIUM": "âš¡", "LOW": "â„¹ï¸", "INFO": "ðŸ“Œ", "PASS": "âœ…"}
     #         color = colors.get(severity, Fore.WHITE)
     #         # Don't use _ultra_type here to avoid double color codes
     #         print(f"{color}{prefix.get(severity, '')} {text}{Style.RESET_ALL}")
@@ -13380,18 +13380,18 @@ class SecurityTerminal:
     #     # ASCII Art Banner
     #     #           ==
     #     print(f"""
-    # {Fore.CYAN}╔{'═' * 70}╗{Style.RESET_ALL}
-    # {Fore.CYAN}║{Style.RESET_ALL}{' ' * 69}{Fore.CYAN}║{Style.RESET_ALL}
-    # {Fore.CYAN}║{Style.RESET_ALL}    {Fore.MAGENTA}███████╗██╗  ██╗██████╗ ██╗      █████╗ ██╗████████╗{Fore.CYAN}             ║{Style.RESET_ALL}
-    # {Fore.CYAN}║{Style.RESET_ALL}    {Fore.MAGENTA}██╔════╝╚██╗██╔╝██╔══██╗██║     ██╔══██╗██║╚══██╔══╝{Fore.CYAN}             ║{Style.RESET_ALL}
-    # {Fore.CYAN}║{Style.RESET_ALL}    {Fore.MAGENTA}█████╗   ╚███╔╝ ██████╔╝██║     ██   ██║██║   ██║   {Fore.CYAN}             ║{Style.RESET_ALL}
-    # {Fore.CYAN}║{Style.RESET_ALL}    {Fore.MAGENTA}██╔══╝   ██╔██╗ ██╔═══╝ ██║     ██╔══██║██║   ██║   {Fore.CYAN}             ║{Style.RESET_ALL}
-    # {Fore.CYAN}║{Style.RESET_ALL}    {Fore.MAGENTA}███████╗██╔╝ ██╗██║     ███████╗██║████║██║   ██║   {Fore.CYAN}             ║{Style.RESET_ALL}
-    # {Fore.CYAN}║{Style.RESET_ALL}    {Fore.MAGENTA}╚══════╝╚═╝  ╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝╚═╝   ╚═╝   {Fore.CYAN}             ║{Style.RESET_ALL}
-    # {Fore.CYAN}║{Style.RESET_ALL}{' ' * 69}{Fore.CYAN}║{Style.RESET_ALL}
-    # {Fore.CYAN}║{Style.RESET_ALL}        {Fore.CYAN}🔍 REAL-TIME EXPLOIT VULNERABILITY ASSESSMENT ENGINE{Fore.CYAN}         ║{Style.RESET_ALL}
-    # {Fore.CYAN}║{Style.RESET_ALL}{' ' * 69}{Fore.CYAN}║{Style.RESET_ALL}
-    # {Fore.CYAN}╚{'═' * 70}╝{Style.RESET_ALL}
+    # {Fore.CYAN}â•”{'â•' * 70}â•—{Style.RESET_ALL}
+    # {Fore.CYAN}â•‘{Style.RESET_ALL}{' ' * 69}{Fore.CYAN}â•‘{Style.RESET_ALL}
+    # {Fore.CYAN}â•‘{Style.RESET_ALL}    {Fore.MAGENTA}â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•—  â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ•—      â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—{Fore.CYAN}             â•‘{Style.RESET_ALL}
+    # {Fore.CYAN}â•‘{Style.RESET_ALL}    {Fore.MAGENTA}â–ˆâ–ˆâ•”â•â•â•â•â•â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â•šâ•â•â–ˆâ–ˆâ•”â•â•â•{Fore.CYAN}             â•‘{Style.RESET_ALL}
+    # {Fore.CYAN}â•‘{Style.RESET_ALL}    {Fore.MAGENTA}â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â•šâ–ˆâ–ˆâ–ˆâ•”â• â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘     â–ˆâ–ˆ   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   {Fore.CYAN}             â•‘{Style.RESET_ALL}
+    # {Fore.CYAN}â•‘{Style.RESET_ALL}    {Fore.MAGENTA}â–ˆâ–ˆâ•”â•â•â•   â–ˆâ–ˆâ•”â–ˆâ–ˆâ•— â–ˆâ–ˆâ•”â•â•â•â• â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   {Fore.CYAN}             â•‘{Style.RESET_ALL}
+    # {Fore.CYAN}â•‘{Style.RESET_ALL}    {Fore.MAGENTA}â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â• â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   {Fore.CYAN}             â•‘{Style.RESET_ALL}
+    # {Fore.CYAN}â•‘{Style.RESET_ALL}    {Fore.MAGENTA}â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•â•šâ•â•     â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•â•šâ•â•   â•šâ•â•   {Fore.CYAN}             â•‘{Style.RESET_ALL}
+    # {Fore.CYAN}â•‘{Style.RESET_ALL}{' ' * 69}{Fore.CYAN}â•‘{Style.RESET_ALL}
+    # {Fore.CYAN}â•‘{Style.RESET_ALL}        {Fore.CYAN}ðŸ” REAL-TIME EXPLOIT VULNERABILITY ASSESSMENT ENGINE{Fore.CYAN}         â•‘{Style.RESET_ALL}
+    # {Fore.CYAN}â•‘{Style.RESET_ALL}{' ' * 69}{Fore.CYAN}â•‘{Style.RESET_ALL}
+    # {Fore.CYAN}â•š{'â•' * 70}â•{Style.RESET_ALL}
     # """)
 
     #     time.sleep(0.3)
@@ -13399,7 +13399,7 @@ class SecurityTerminal:
     #     #           ==
     #     # Target Selection
     #     #           ==
-    #     _ultra_type_header("🎯 Target Selection", Fore.MAGENTA)
+    #     _ultra_type_header("ðŸŽ¯ Target Selection", Fore.MAGENTA)
     #     time.sleep(0.2)
 
     #     if not target:
@@ -13437,7 +13437,7 @@ class SecurityTerminal:
     #     #           ==
     #     # System Information Collection with OS Guessing for Remote
     #     #           ==
-    #     _ultra_type_header("\n🔍 System Reconnaissance", Fore.MAGENTA)
+    #     _ultra_type_header("\nðŸ” System Reconnaissance", Fore.MAGENTA)
     #     time.sleep(0.2)
 
     #     system_info = {
@@ -13526,7 +13526,7 @@ class SecurityTerminal:
     #     #           ==
     #     # Exploit Scanning
     #     #           ==
-    #     _ultra_type_header("\n🚨 Scanning for Vulnerabilities", Fore.RED)
+    #     _ultra_type_header("\nðŸš¨ Scanning for Vulnerabilities", Fore.RED)
     #     time.sleep(0.2)
 
     #     results = {
@@ -13619,27 +13619,27 @@ class SecurityTerminal:
     #     high_count = results['severity_count'].get('HIGH', 0)
         
     #     if critical_count > 0:
-    #         recommendations.append(f"🚨 IMMEDIATE: Patch {critical_count} CRITICAL vulnerabilities")
+    #         recommendations.append(f"ðŸš¨ IMMEDIATE: Patch {critical_count} CRITICAL vulnerabilities")
     #     if high_count > 0:
-    #         recommendations.append(f"⚠️ URGENT: Address {high_count} HIGH severity vulnerabilities within 24 hours")
+    #         recommendations.append(f"âš ï¸ URGENT: Address {high_count} HIGH severity vulnerabilities within 24 hours")
     #     if total_vulnerable > 0:
-    #         recommendations.append("🔒 Run full vulnerability scan with Nessus/OpenVAS")
-    #         recommendations.append("📊 Review firewall rules and access controls")
-    #         recommendations.append("🔐 Enable additional logging and monitoring")
-    #         recommendations.append("🔄 Implement regular patch management schedule")
+    #         recommendations.append("ðŸ”’ Run full vulnerability scan with Nessus/OpenVAS")
+    #         recommendations.append("ðŸ“Š Review firewall rules and access controls")
+    #         recommendations.append("ðŸ” Enable additional logging and monitoring")
+    #         recommendations.append("ðŸ”„ Implement regular patch management schedule")
     #         if target != "localhost":
-    #             recommendations.append(f"🌐 Review security posture of {target}")
+    #             recommendations.append(f"ðŸŒ Review security posture of {target}")
     #     else:
-    #         recommendations.append("✅ No vulnerabilities found - System appears secure")
-    #         recommendations.append("📋 Continue regular security audits")
-    #         recommendations.append("🔄 Keep all software updated")
+    #         recommendations.append("âœ… No vulnerabilities found - System appears secure")
+    #         recommendations.append("ðŸ“‹ Continue regular security audits")
+    #         recommendations.append("ðŸ”„ Keep all software updated")
 
     #     results['recommendations'] = recommendations
 
     #     #           ==
     #     # Display Results Summary
     #     #           ==
-    #     _ultra_type_header("\n📊 Vulnerability Assessment Summary", Fore.LIGHTCYAN_EX)
+    #     _ultra_type_header("\nðŸ“Š Vulnerability Assessment Summary", Fore.LIGHTCYAN_EX)
     #     time.sleep(0.2)
 
     #     print(f"  Target: {target}")
@@ -13659,14 +13659,14 @@ class SecurityTerminal:
     #     # Score bar
     #     bar_length = 30
     #     filled = int((results['security_score'] / 100) * bar_length)
-    #     bar = "█" * filled + "░" * (bar_length - filled)
+    #     bar = "â–ˆ" * filled + "â–‘" * (bar_length - filled)
     #     bar_color = Fore.GREEN if results['security_score'] >= 70 else Fore.YELLOW if results['security_score'] >= 40 else Fore.RED
     #     print(f"  {bar_color}[{bar}]{Style.RESET_ALL}")
 
     #     #           ==
     #     # Export Options
     #     #           ==
-    #     _ultra_type_header("\n💾 Export Options", Fore.BLUE)
+    #     _ultra_type_header("\nðŸ’¾ Export Options", Fore.BLUE)
     #     time.sleep(0.2)
 
     #     print(f"  {Fore.WHITE}[1] Export HTML Report{Style.RESET_ALL}")
@@ -13707,10 +13707,10 @@ class SecurityTerminal:
     #     #           ==
     #     # Footer
     #     #           ==
-    #     print(f"\n{Fore.CYAN}{'═' * 70}{Style.RESET_ALL}")
-    #     print(f"{Fore.CYAN}🔍 Exploit Vulnerability Scan Complete - Report ID: {results['report_id']}{Style.RESET_ALL}")
-    #     print(f"{Fore.CYAN}📅 Scan Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{Style.RESET_ALL}")
-    #     print(f"{Fore.CYAN}{'═' * 70}{Style.RESET_ALL}")
+    #     print(f"\n{Fore.CYAN}{'â•' * 70}{Style.RESET_ALL}")
+    #     print(f"{Fore.CYAN}ðŸ” Exploit Vulnerability Scan Complete - Report ID: {results['report_id']}{Style.RESET_ALL}")
+    #     print(f"{Fore.CYAN}ðŸ“… Scan Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{Style.RESET_ALL}")
+    #     print(f"{Fore.CYAN}{'â•' * 70}{Style.RESET_ALL}")
 
     #     return results
 
@@ -13842,7 +13842,7 @@ class SecurityTerminal:
     # <body>
     #     <div class="watermark">DSTERMINAL SECURITY</div>
     #     <div class="container">
-    #         <h1>🔐 DSTerminal Exploit Vulnerability Report</h1>
+    #         <h1>ðŸ” DSTerminal Exploit Vulnerability Report</h1>
             
     #         <div class="header">
     #             <p><strong>Target:</strong> {results.get('target', 'Local Machine')}</p>
@@ -13851,7 +13851,7 @@ class SecurityTerminal:
     #             <p><strong>Report ID:</strong> {results.get('report_id', 'N/A')}</p>
     #         </div>
 
-    #         <h2>📊 Scan Summary</h2>
+    #         <h2>ðŸ“Š Scan Summary</h2>
     #         <div class="summary-grid">
     #             <div class="summary-card">
     #                 <div class="value">{results.get('total_checked', 0)}</div>
@@ -13871,14 +13871,14 @@ class SecurityTerminal:
     #             </div>
     #         </div>
 
-    #         <h2>📈 Security Score</h2>
+    #         <h2>ðŸ“ˆ Security Score</h2>
     #         <div class="score-bar">
     #             <div class="score-fill" style="width: {results.get('security_score', 0)}%;">
     #                 {results.get('security_score', 0):.1f}%
     #             </div>
     #         </div>
 
-    #         <h2>🚨 Vulnerabilities Found</h2>
+    #         <h2>ðŸš¨ Vulnerabilities Found</h2>
     #         {''.join([f'''
     #         <div class="vulnerability {vuln['severity'].lower()}">
     #             <strong>{vuln['cve']}</strong> - {vuln['name']}
@@ -13889,12 +13889,12 @@ class SecurityTerminal:
     #         </div>
     #         ''' for vuln in results.get('vulnerable', [])])}
 
-    #         <h2>💡 Recommendations</h2>
-    #         {''.join([f'<div class="recommendation">• {rec}</div>' for rec in results.get('recommendations', [])])}
+    #         <h2>ðŸ’¡ Recommendations</h2>
+    #         {''.join([f'<div class="recommendation">â€¢ {rec}</div>' for rec in results.get('recommendations', [])])}
 
     #         <div class="footer">
-    #             <p>Generated by DSTerminal Exploit Scanner v3.1.113</p>
-    #             <p>© Stark Expo Tech Exchange LTD</p>
+    #             <p>Generated by DSTerminal Exploit Scanner v4.0.0.113</p>
+    #             <p>Â© Stark Expo Tech Exchange LTD</p>
     #             <p>Report ID: {results.get('report_id', 'N/A')}</p>
     #         </div>
     #     </div>
@@ -13946,9 +13946,9 @@ class SecurityTerminal:
                 )
             )
 
-        top = "╔" + "═" * (width - 2) + "╗"
-        mid = "╠" + "═" * (width - 2) + "╣"
-        bot = "╚" + "═" * (width - 2) + "╝"
+        top = "â•”" + "â•" * (width - 2) + "â•—"
+        mid = "â• " + "â•" * (width - 2) + "â•£"
+        bot = "â•š" + "â•" * (width - 2) + "â•"
 
         print()
 
@@ -13958,10 +13958,10 @@ class SecurityTerminal:
 
         # Title - ultra speed
         title_text = f" {title} "
-        sys.stdout.write(" " * left_margin + title_color + "║")
+        sys.stdout.write(" " * left_margin + title_color + "â•‘")
         sys.stdout.flush()
         self._ultra_type(
-            title_text.center(width - 2) + "║",
+            title_text.center(width - 2) + "â•‘",
             color=title_color,
             speed="ultra"
         )
@@ -13973,7 +13973,7 @@ class SecurityTerminal:
         # Content lines
         for line in wrapped:
             # Border start - instant
-            sys.stdout.write(" " * left_margin + border_color + "║ " + Style.RESET_ALL)
+            sys.stdout.write(" " * left_margin + border_color + "â•‘ " + Style.RESET_ALL)
             sys.stdout.flush()
 
             # Content - ultra speed
@@ -13984,7 +13984,7 @@ class SecurityTerminal:
             )
 
             # Border end - instant
-            sys.stdout.write(" " * left_margin + border_color + "║" + Style.RESET_ALL + "\n")
+            sys.stdout.write(" " * left_margin + border_color + "â•‘" + Style.RESET_ALL + "\n")
             sys.stdout.flush()
 
         # Bottom border - instant
@@ -14116,12 +14116,12 @@ class SecurityTerminal:
                 elements.append(PageBreak())
                 elements.append(Paragraph("<b>Security Recommendations</b>", styles["Heading2"]))
                 for rec in results.get('recommendations', []):
-                    elements.append(Paragraph(f"• {rec}", normal))
+                    elements.append(Paragraph(f"â€¢ {rec}", normal))
                     elements.append(Spacer(1, 5))
                 
                 elements.append(Spacer(1, 40))
-                elements.append(Paragraph("Generated by DSTerminal Exploit Scanner v3.1.113", normal))
-                elements.append(Paragraph("© Stark Expo Tech Exchange LTD", normal))
+                elements.append(Paragraph("Generated by DSTerminal Exploit Scanner v4.0.0.113", normal))
+                elements.append(Paragraph("Â© Stark Expo Tech Exchange LTD", normal))
                 
                 doc.build(elements)
                 return True
@@ -14196,7 +14196,7 @@ class SecurityTerminal:
         #           ==
         def _ultra_type_status(text, color=Fore.CYAN):
             self._draw_exploit_box(
-                "📡 SYSTEM STATUS",
+                "ðŸ“¡ SYSTEM STATUS",
                 [text],
                 title_color=color,
                 border_color=Fore.CYAN,
@@ -14221,17 +14221,17 @@ class SecurityTerminal:
         # Display ASCII Art Banner in Box
         #           ==
         header_art = [
-            "███████╗██╗  ██╗██████╗ ██╗      █████╗ ██╗████████╗",
-            "██╔════╝╚██╗██╔╝██╔══██╗██║     ██╔══██╗██║╚══██╔══╝",
-            "█████╗   ╚███╔╝ ██████╔╝██║     ██   ██║██║   ██║   ",
-            "██╔══╝   ██╔██╗ ██╔═══╝ ██║     ██╔══██║██║   ██║   ",
-            "███████╗██╔╝ ██╗██║     ███████╗██║████║██║   ██║   ",
-            "╚══════╝╚═╝  ╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝╚═╝   ╚═╝   "
+            "â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•—  â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ•—      â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—",
+            "â–ˆâ–ˆâ•”â•â•â•â•â•â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â•šâ•â•â–ˆâ–ˆâ•”â•â•â•",
+            "â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â•šâ–ˆâ–ˆâ–ˆâ•”â• â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘     â–ˆâ–ˆ   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   ",
+            "â–ˆâ–ˆâ•”â•â•â•   â–ˆâ–ˆâ•”â–ˆâ–ˆâ•— â–ˆâ–ˆâ•”â•â•â•â• â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   ",
+            "â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â• â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   ",
+            "â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•â•šâ•â•     â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•â•šâ•â•   â•šâ•â•   "
         ]
         
         self._draw_exploit_box(
-            "🔍 EXPLOIT VULNERABILITY ASSESSMENT ENGINE",
-            header_art + ["", "💻 Security Assessment & Vulnerability Scanner"],
+            "ðŸ” EXPLOIT VULNERABILITY ASSESSMENT ENGINE",
+            header_art + ["", "ðŸ’» Security Assessment & Vulnerability Scanner"],
             title_color=Fore.LIGHTMAGENTA_EX,
             border_color=Fore.LIGHTCYAN_EX,
             content_color=Fore.GREEN,
@@ -14244,7 +14244,7 @@ class SecurityTerminal:
         # Target Selection
         #           ==
         self._draw_exploit_box(
-            "🎯 TARGET SELECTION",
+            "ðŸŽ¯ TARGET SELECTION",
             [
                 "Select scan target:",
                 "  1. Local Machine (this system)",
@@ -14277,7 +14277,7 @@ class SecurityTerminal:
 
         if target and target != "localhost":
             self._draw_exploit_box(
-                "📡 TARGET CONFIGURED",
+                "ðŸ“¡ TARGET CONFIGURED",
                 [f"Target: {target}", f"Port: {port}" if port else "Port: Auto-detect"],
                 title_color=Fore.LIGHTCYAN_EX,
                 border_color=Fore.CYAN,
@@ -14291,7 +14291,7 @@ class SecurityTerminal:
         # System Information Collection
         #           ==
         self._draw_exploit_box(
-            "🔍 SYSTEM RECONNAISSANCE",
+            "ðŸ” SYSTEM RECONNAISSANCE",
             ["Collecting system information..."],
             title_color=Fore.MAGENTA,
             border_color=Fore.CYAN,
@@ -14342,7 +14342,7 @@ class SecurityTerminal:
             ]
 
         self._draw_exploit_box(
-            "💻 SYSTEM INFORMATION",
+            "ðŸ’» SYSTEM INFORMATION",
             os_info_lines,
             title_color=Fore.CYAN,
             border_color=Fore.CYAN,
@@ -14378,7 +14378,7 @@ class SecurityTerminal:
         # Exploit Scanning
         #           ==
         self._draw_exploit_box(
-            "🚨 SCANNING FOR VULNERABILITIES",
+            "ðŸš¨ SCANNING FOR VULNERABILITIES",
             ["Initiating exploit vulnerability scan..."],
             title_color=Fore.RED,
             border_color=Fore.CYAN,
@@ -14433,7 +14433,7 @@ class SecurityTerminal:
             results['total_checked'] += 1
             
             severity = exploit_info['severity']
-            status_icon = "🔴 VULNERABLE" if is_vulnerable else "🟢 SECURE"
+            status_icon = "ðŸ”´ VULNERABLE" if is_vulnerable else "ðŸŸ¢ SECURE"
             status_color = Fore.RED if is_vulnerable else Fore.GREEN
             
             scan_results.append(f"{cve_id}: {exploit_info['name']} - {status_icon}")
@@ -14456,7 +14456,7 @@ class SecurityTerminal:
 
         # Display scan results in box
         self._draw_exploit_box(
-            "📊 SCAN RESULTS",
+            "ðŸ“Š SCAN RESULTS",
             scan_results,
             title_color=Fore.LIGHTCYAN_EX,
             border_color=Fore.CYAN,
@@ -14484,20 +14484,20 @@ class SecurityTerminal:
         high_count = results['severity_count'].get('HIGH', 0)
         
         if critical_count > 0:
-            recommendations.append(f"🚨 IMMEDIATE: Patch {critical_count} CRITICAL vulnerabilities")
+            recommendations.append(f"ðŸš¨ IMMEDIATE: Patch {critical_count} CRITICAL vulnerabilities")
         if high_count > 0:
-            recommendations.append(f"⚠️ URGENT: Address {high_count} HIGH severity vulnerabilities within 24 hours")
+            recommendations.append(f"âš ï¸ URGENT: Address {high_count} HIGH severity vulnerabilities within 24 hours")
         if total_vulnerable > 0:
-            recommendations.append("🔒 Run full vulnerability scan with Nessus/OpenVAS")
-            recommendations.append("📊 Review firewall rules and access controls")
-            recommendations.append("🔐 Enable additional logging and monitoring")
-            recommendations.append("🔄 Implement regular patch management schedule")
+            recommendations.append("ðŸ”’ Run full vulnerability scan with Nessus/OpenVAS")
+            recommendations.append("ðŸ“Š Review firewall rules and access controls")
+            recommendations.append("ðŸ” Enable additional logging and monitoring")
+            recommendations.append("ðŸ”„ Implement regular patch management schedule")
             if target != "localhost":
-                recommendations.append(f"🌐 Review security posture of {target}")
+                recommendations.append(f"ðŸŒ Review security posture of {target}")
         else:
-            recommendations.append("✅ No vulnerabilities found - System appears secure")
-            recommendations.append("📋 Continue regular security audits")
-            recommendations.append("🔄 Keep all software updated")
+            recommendations.append("âœ… No vulnerabilities found - System appears secure")
+            recommendations.append("ðŸ“‹ Continue regular security audits")
+            recommendations.append("ðŸ”„ Keep all software updated")
 
         results['recommendations'] = recommendations
 
@@ -14525,11 +14525,11 @@ class SecurityTerminal:
         # Score bar
         bar_length = 30
         filled = int((results['security_score'] / 100) * bar_length)
-        bar = "█" * filled + "░" * (bar_length - filled)
+        bar = "â–ˆ" * filled + "â–‘" * (bar_length - filled)
         summary_lines.append(f"Score Bar: [{bar}]")
 
         self._draw_exploit_box(
-            "📊 VULNERABILITY ASSESSMENT SUMMARY",
+            "ðŸ“Š VULNERABILITY ASSESSMENT SUMMARY",
             summary_lines,
             title_color=Fore.LIGHTCYAN_EX,
             border_color=Fore.CYAN,
@@ -14542,7 +14542,7 @@ class SecurityTerminal:
         # Recommendations Display
         #           ==
         self._draw_exploit_box(
-            "💡 SECURITY RECOMMENDATIONS",
+            "ðŸ’¡ SECURITY RECOMMENDATIONS",
             recommendations,
             title_color=Fore.LIGHTBLUE_EX,
             border_color=Fore.CYAN,
@@ -14555,7 +14555,7 @@ class SecurityTerminal:
         # Export Options
         #           ==
         self._draw_exploit_box(
-            "💾 EXPORT OPTIONS",
+            "ðŸ’¾ EXPORT OPTIONS",
             [
                 "[1] Export HTML Report",
                 "[2] Export PDF Report",
@@ -14584,7 +14584,7 @@ class SecurityTerminal:
             html_file_str = str(html_file)
             if self._generate_html_report(results, html_file_str):
                 self._draw_exploit_box(
-                    "✅ HTML REPORT",
+                    "âœ… HTML REPORT",
                     [f"Report saved: {html_file}"],
                     title_color=Fore.LIGHTGREEN_EX,
                     border_color=Fore.CYAN,
@@ -14598,7 +14598,7 @@ class SecurityTerminal:
             pdf_file_str = str(pdf_file)
             if generate_pdf_report(results, pdf_file_str):
                 self._draw_exploit_box(
-                    "✅ PDF REPORT",
+                    "âœ… PDF REPORT",
                     [f"Report saved: {pdf_file}"],
                     title_color=Fore.LIGHTGREEN_EX,
                     border_color=Fore.CYAN,
@@ -14611,7 +14611,7 @@ class SecurityTerminal:
             with open(report_file, 'w') as f:
                 json.dump(results, f, indent=2, default=str)
             self._draw_exploit_box(
-                "✅ JSON RESULTS",
+                "âœ… JSON RESULTS",
                 [f"JSON saved: {report_file}"],
                 title_color=Fore.LIGHTGREEN_EX,
                 border_color=Fore.CYAN,
@@ -14626,11 +14626,11 @@ class SecurityTerminal:
         # Footer
         #           ==
         self._draw_exploit_box(
-            "🔍 SCAN COMPLETE",
+            "ðŸ” SCAN COMPLETE",
             [
                 f"Report ID: {results['report_id']}",
                 f"Scan Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-                "© Stark Expo Tech Exchange LTD"
+                "Â© Stark Expo Tech Exchange LTD"
             ],
             title_color=Fore.CYAN,
             border_color=Fore.CYAN,
@@ -14771,7 +14771,7 @@ class SecurityTerminal:
     <body>
         <div class="watermark">DSTERMINAL SECURITY</div>
         <div class="container">
-            <h1>🔐 DSTerminal Exploit Vulnerability Report</h1>
+            <h1>ðŸ” DSTerminal Exploit Vulnerability Report</h1>
             
             <div class="header">
                 <p><strong>Target:</strong> {results.get('target', 'Local Machine')}</p>
@@ -14780,7 +14780,7 @@ class SecurityTerminal:
                 <p><strong>Report ID:</strong> {results.get('report_id', 'N/A')}</p>
             </div>
 
-            <h2>📊 Scan Summary</h2>
+            <h2>ðŸ“Š Scan Summary</h2>
             <div class="summary-grid">
                 <div class="summary-card">
                     <div class="value">{results.get('total_checked', 0)}</div>
@@ -14800,14 +14800,14 @@ class SecurityTerminal:
                 </div>
             </div>
 
-            <h2>📈 Security Score</h2>
+            <h2>ðŸ“ˆ Security Score</h2>
             <div class="score-bar">
                 <div class="score-fill" style="width: {results.get('security_score', 0)}%;">
                     {results.get('security_score', 0):.1f}%
                 </div>
             </div>
 
-            <h2>🚨 Vulnerabilities Found</h2>
+            <h2>ðŸš¨ Vulnerabilities Found</h2>
             {''.join([f'''
             <div class="vulnerability {vuln['severity'].lower()}">
                 <strong>{vuln['cve']}</strong> - {vuln['name']}
@@ -14818,12 +14818,12 @@ class SecurityTerminal:
             </div>
             ''' for vuln in results.get('vulnerable', [])])}
 
-            <h2>💡 Recommendations</h2>
-            {''.join([f'<div class="recommendation">• {rec}</div>' for rec in results.get('recommendations', [])])}
+            <h2>ðŸ’¡ Recommendations</h2>
+            {''.join([f'<div class="recommendation">â€¢ {rec}</div>' for rec in results.get('recommendations', [])])}
 
             <div class="footer">
-                <p>Generated by DSTerminal Exploit Scanner v3.1.113</p>
-                <p>© Stark Expo Tech Exchange LTD</p>
+                <p>Generated by DSTerminal Exploit Scanner v4.0.0.113</p>
+                <p>Â© Stark Expo Tech Exchange LTD</p>
                 <p>Report ID: {results.get('report_id', 'N/A')}</p>
             </div>
         </div>
@@ -15078,13 +15078,13 @@ class SecurityTerminal:
         #           ==
         banner = Panel(
             Align.center(Text.from_markup("""
-    [bold cyan]███╗   ███╗ █████╗  ██████╗     ███████╗██████╗  ██████╗  ███████╗
-    [bold cyan]████╗ ████║██╔══██╗██╔════╝     ██╔════╝██╔══██╗██╔═══██╗██╔════╝
-    [bold cyan]██╔████╔██║███████║██║  ███╗    █████╗  ██████╔╝██║   ██║███████╗
-    [bold cyan]██║╚██╔╝██║██╔══██║██║   ██║    ██╔══╝  ██╔══██╗██║   ██║╚════██║
-    [bold cyan]██║ ╚═╝ ██║██║  ██║╚██████╔╝    ███████╗██║  ██║╚██████╔╝███████║
-    [bold cyan]╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝     ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
-    [bold yellow]            🔐 MAC ADDRESS SPOOFER ENGINE v3.1.113[/bold yellow]
+    [bold cyan]â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—
+    [bold cyan]â–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•     â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•
+    [bold cyan]â–ˆâ–ˆâ•”â–ˆâ–ˆâ–ˆâ–ˆâ•”â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ–ˆâ•—    â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—
+    [bold cyan]â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘    â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â•šâ•â•â•â•â–ˆâ–ˆâ•‘
+    [bold cyan]â–ˆâ–ˆâ•‘ â•šâ•â• â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•    â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘
+    [bold cyan]â•šâ•â•     â•šâ•â•â•šâ•â•  â•šâ•â• â•šâ•â•â•â•â•â•     â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â• â•šâ•â•â•â•â•â• â•šâ•â•â•â•â•â•â•
+    [bold yellow]            ðŸ” MAC ADDRESS SPOOFER ENGINE v4.0.0.113[/bold yellow]
     """)),
             border_style="bright_blue",
             box=box.DOUBLE,
@@ -15245,7 +15245,7 @@ class SecurityTerminal:
         console = Console()
 
     # Animation frames
-        FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+        FRAMES = ["â ‹", "â ™", "â ¹", "â ¸", "â ¼", "â ´", "â ¦", "â §", "â ‡", "â "]
 
         def create_panel(content, title="", border_style="blue"):
             return Panel(
@@ -15289,11 +15289,11 @@ class SecurityTerminal:
                 live.update(generate_display(debug_messages, status_messages))
             
                 if not self.is_admin():
-                    status_messages.append("[red]✖ Requires admin privileges[/red]")
+                    status_messages.append("[red]âœ– Requires admin privileges[/red]")
                     live.update(generate_display(debug_messages, status_messages))
                     raise PermissionError("Admin rights required")
             
-                status_messages.append("[green]✔ Admin privileges confirmed[/green]")
+                status_messages.append("[green]âœ” Admin privileges confirmed[/green]")
                 live.update(generate_display(debug_messages, status_messages))
             
             # 2. Interface Detection
@@ -15331,11 +15331,11 @@ class SecurityTerminal:
                 if not interface:
                     interface = get_active_interface()
                     if not interface:
-                        status_messages.append("[red]✖ Interface detection failed[/red]")
+                        status_messages.append("[red]âœ– Interface detection failed[/red]")
                         live.update(generate_display(debug_messages, status_messages))
                         raise ValueError("No interface detected")
             
-                status_messages.append(f"[green]✔ Interface: [bold]{interface}[/bold][/green]")
+                status_messages.append(f"[green]âœ” Interface: [bold]{interface}[/bold][/green]")
                 live.update(generate_display(debug_messages, status_messages))
             
             # 3. MAC Generation
@@ -15517,9 +15517,9 @@ class SecurityTerminal:
                     verification_passed = new_mac.lower() in result.stdout.lower()
             
                 if verification_passed:
-                    status_messages.append("[bold green]✓ MAC changed successfully![/bold green]")
+                    status_messages.append("[bold green]âœ“ MAC changed successfully![/bold green]")
                 else:
-                    status_messages.append("[yellow]⚠ MAC changed but verification failed[/yellow]")
+                    status_messages.append("[yellow]âš  MAC changed but verification failed[/yellow]")
                     debug_messages.append("Note: Some systems require restart for verification")
             
             # Final output
@@ -15575,7 +15575,7 @@ class SecurityTerminal:
         
         # Get URL if not provided
         if not url:
-            url = console.input("\n[bold cyan]🎯 Enter target URL (with http:// or https://): [/]").strip()
+            url = console.input("\n[bold cyan]ðŸŽ¯ Enter target URL (with http:// or https://): [/]").strip()
         
         # Clean URL - remove any sqlmap flags if user accidentally added them
         if ' --' in url:
@@ -15587,7 +15587,7 @@ class SecurityTerminal:
         
         if not url.startswith(("http://", "https://")):
             console.print(Panel(
-                "[red]❌ Invalid URL format! Must include http:// or https://[/red]",
+                "[red]âŒ Invalid URL format! Must include http:// or https://[/red]",
                 title="[bold red]Input Error[/bold red]",
                 border_style="red"
             ))
@@ -15597,9 +15597,9 @@ class SecurityTerminal:
         # Check sqlmap installation
         if not which("sqlmap"):
             console.print(Panel(
-                "[red]❌ sqlmap not found![/red]\n\n"
+                "[red]âŒ sqlmap not found![/red]\n\n"
                 "Install with:\n"
-                "[green]▶ pip install sqlmap[/green]\n\n"
+                "[green]â–¶ pip install sqlmap[/green]\n\n"
                 "Or visit: [blue]https://sqlmap.org[/blue]",
                 title="[bold red]Dependency Missing[/bold red]",
                 border_style="red"
@@ -15637,26 +15637,26 @@ class SecurityTerminal:
             log_content = "\n".join(scan_log[-8:]) if scan_log else "[dim]Waiting for scan output...[/dim]"
             layout["log"].update(create_panel(
                 log_content,
-                title="📊 SCAN LOG",
+                title="ðŸ“Š SCAN LOG",
                 border_style="blue"
             ))
             
             stats_content = f"""
-    [green]• Target:[/green] {url[:50]}
-    [cyan]• Status:[/cyan] {status_msg}
-    [yellow]• Tests Run:[/yellow] {scan_stats['tests']}
-    [magenta]• Vulnerabilities:[/magenta] {scan_stats['vulns_found']}
-    [red]• Time Elapsed:[/red] {scan_stats['elapsed']}s
+    [green]â€¢ Target:[/green] {url[:50]}
+    [cyan]â€¢ Status:[/cyan] {status_msg}
+    [yellow]â€¢ Tests Run:[/yellow] {scan_stats['tests']}
+    [magenta]â€¢ Vulnerabilities:[/magenta] {scan_stats['vulns_found']}
+    [red]â€¢ Time Elapsed:[/red] {scan_stats['elapsed']}s
             """
             layout["status"].update(create_panel(
                 stats_content,
-                title="⚡ STATUS",
+                title="âš¡ STATUS",
                 border_style="green"
             ))
             
             layout["injection"].update(create_panel(
                 f"\n[bold red]{animation_frame}[/bold red]\n\n[dim]Testing injection techniques...[/dim]",
-                title="💉 SQL INJECTION",
+                title="ðŸ’‰ SQL INJECTION",
                 border_style="red"
             ))
             
@@ -15688,7 +15688,7 @@ class SecurityTerminal:
         ]
         
         # Ask for advanced options
-        console.print("\n[bold yellow]⚡ SQLMap Configuration[/bold yellow]")
+        console.print("\n[bold yellow]âš¡ SQLMap Configuration[/bold yellow]")
         console.print("[dim]Press Enter to use defaults[/dim]\n")
         
         db_choice = console.input("[cyan]Database type (MySQL/MSSQL/Oracle/PostgreSQL/All) [All]: [/]").strip()
@@ -15722,8 +15722,8 @@ class SecurityTerminal:
                     transient=False,
                     screen=True) as live:
                 
-                scan_log.append(f"[bold cyan]▶ Starting scan on: {url}[/bold cyan]")
-                status_msg = "[yellow]🔍 Scanning target...[/yellow]"
+                scan_log.append(f"[bold cyan]â–¶ Starting scan on: {url}[/bold cyan]")
+                status_msg = "[yellow]ðŸ” Scanning target...[/yellow]"
                 scan_stats['elapsed'] = int(time.time() - start_time)
                 live.update(generate_display(scan_log, status_msg, current_frame, scan_stats))
                 
@@ -15734,7 +15734,7 @@ class SecurityTerminal:
                     TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
                     transient=False
                 ) as progress:
-                    task = progress.add_task("[cyan]🧪 Testing parameters", total=100)
+                    task = progress.add_task("[cyan]ðŸ§ª Testing parameters", total=100)
                     
                     process = subprocess.Popen(
                         cmd,
@@ -15768,11 +15768,11 @@ class SecurityTerminal:
                             if any(keyword in last_line.lower() for keyword in ["testing", "checking", "trying"]):
                                 status_msg = f"[yellow]{last_line[:50]}[/yellow]"
                             elif "vulnerable" in last_line.lower():
-                                status_msg = f"[red]⚠️ {last_line[:50]}[/red]"
+                                status_msg = f"[red]âš ï¸ {last_line[:50]}[/red]"
                                 scan_stats['vulns_found'] += 1
                                 vulnerabilities.append(last_line)
                             elif "payload" in last_line.lower():
-                                scan_log.append(f"[red]💉 {last_line}[/red]")
+                                scan_log.append(f"[red]ðŸ’‰ {last_line}[/red]")
                             else:
                                 scan_log.append(f"[dim]{last_line}[/dim]")
                             
@@ -15786,7 +15786,7 @@ class SecurityTerminal:
                     progress.update(task, completed=100)
                 
                 scan_stats['elapsed'] = int(time.time() - start_time)
-                status_msg = "[green]✅ Scan completed![/green]"
+                status_msg = "[green]âœ… Scan completed![/green]"
                 live.update(generate_display(scan_log, status_msg, current_frame, scan_stats))
                 
                 report_file = os.path.join(report_dir, "log")
@@ -15799,13 +15799,13 @@ class SecurityTerminal:
                                     vulnerabilities.append(line.strip())
         
         except KeyboardInterrupt:
-            console.print("\n[bold yellow]⚠️ Scan interrupted by user[/bold yellow]")
+            console.print("\n[bold yellow]âš ï¸ Scan interrupted by user[/bold yellow]")
             if process:
                 process.terminate()
                 process.wait()
         except Exception as e:
             console.print(Panel(
-                f"[red]❌ Error: {str(e)}[/red]\n\n"
+                f"[red]âŒ Error: {str(e)}[/red]\n\n"
                 f"[dim]Command: {' '.join(cmd)}[/dim]",
                 title="[bold red]Scan Failed[/bold red]",
                 border_style="red"
@@ -15997,25 +15997,25 @@ class SecurityTerminal:
                 
                 if scan_stats['vulns_found'] > 0:
                     summary_text = f"""
-                    <b><font color="#ff0000">⚠️ RISK ASSESSMENT: CRITICAL</font></b><br/>
+                    <b><font color="#ff0000">âš ï¸ RISK ASSESSMENT: CRITICAL</font></b><br/>
                     <br/>
                     The security assessment of <b>{url[:60]}</b> has identified <b>{scan_stats['vulns_found']} potential SQL injection vulnerabilities</b>.
                     SQL injection is a critical vulnerability that allows attackers to manipulate database queries,
                     potentially leading to unauthorized data access, data manipulation, or complete system compromise.
                     <br/>
                     <br/>
-                    <b><font color="#ff0000">⚠️ IMMEDIATE REMEDIATION REQUIRED</font></b>
+                    <b><font color="#ff0000">âš ï¸ IMMEDIATE REMEDIATION REQUIRED</font></b>
                     """
                     story.append(Paragraph(summary_text, body_style))
                 else:
                     summary_text = f"""
-                    <b><font color="#33ff33">✅ RISK ASSESSMENT: LOW</font></b><br/>
+                    <b><font color="#33ff33">âœ… RISK ASSESSMENT: LOW</font></b><br/>
                     <br/>
                     <font color="#33ff33">The security assessment of <b>{url[:60]}</b> did not detect any SQL injection vulnerabilities.
                     The application appears to implement proper input validation and parameterized queries.</font>
                     <br/>
                     <br/>
-                    <b><font color="#33ff33">✓ No immediate action required. Continue regular security monitoring.</font></b>
+                    <b><font color="#33ff33">âœ“ No immediate action required. Continue regular security monitoring.</font></b>
                     """
                     story.append(Paragraph(summary_text, body_style))
                 
@@ -16093,7 +16093,7 @@ class SecurityTerminal:
                     story.append(Paragraph("No Vulnerabilities Detected", heading_style))
                     story.append(Spacer(1, 15))
                     story.append(Paragraph(
-                        '<font color="#33ff33">✓ The application passed all SQL injection tests. No exploitable vulnerabilities were found.</font>',
+                        '<font color="#33ff33">âœ“ The application passed all SQL injection tests. No exploitable vulnerabilities were found.</font>',
                         body_style
                     ))
                 
@@ -16150,15 +16150,15 @@ class SecurityTerminal:
                     except:
                         pass
                 
-                console.print(f"\n[bold green]📄 PDF Report Generated: {pdf_path}[/bold green]")
+                console.print(f"\n[bold green]ðŸ“„ PDF Report Generated: {pdf_path}[/bold green]")
                 return pdf_path
                 
             except ImportError as e:
-                console.print(f"[yellow]⚠️ Missing module: {e}. PDF report skipped.[/yellow]")
+                console.print(f"[yellow]âš ï¸ Missing module: {e}. PDF report skipped.[/yellow]")
                 console.print("[dim]Install with: pip install reportlab Pillow[/dim]")
                 return None
             except Exception as e:
-                console.print(f"[red]❌ PDF generation failed: {e}[/red]")
+                console.print(f"[red]âŒ PDF generation failed: {e}[/red]")
                 return None
         # Generate PDF
         pdf_path = generate_sqlmap_pdf_report()
@@ -16178,7 +16178,7 @@ class SecurityTerminal:
         
         # Create the results table
         results_table = Table(
-            title="[bold cyan]🔍 SQLMap Scan Results[/bold cyan]",
+            title="[bold cyan]ðŸ” SQLMap Scan Results[/bold cyan]",
             box=box.ROUNDED,
             width=70,
             show_header=True,
@@ -16203,14 +16203,14 @@ class SecurityTerminal:
         
         # Show vulnerabilities if found
         if vulnerabilities:
-            console.print("\n[bold red]⚠️ VULNERABILITIES DETECTED![/bold red]\n")
+            console.print("\n[bold red]âš ï¸ VULNERABILITIES DETECTED![/bold red]\n")
             for v in vulnerabilities[:5]:
-                console.print(f"  [red]•[/red] {v[:80]}")
+                console.print(f"  [red]â€¢[/red] {v[:80]}")
             
             if len(vulnerabilities) > 5:
                 console.print(f"\n[dim]... and {len(vulnerabilities) - 5} more (see full report)[/dim]")
         else:
-            console.print("\n[green]✅ No SQL injection vulnerabilities detected.[/green]")
+            console.print("\n[green]âœ… No SQL injection vulnerabilities detected.[/green]")
             console.print("[dim]The application appears to be secure against SQL injection attacks.[/dim]")
         
         # Separator line
@@ -16218,11 +16218,11 @@ class SecurityTerminal:
         
         # Open PDF if requested
         if pdf_path and os.path.exists(pdf_path):
-            open_pdf = console.input("\n[bold cyan]📄 Open PDF report? (y/n): [/]").strip().lower()
+            open_pdf = console.input("\n[bold cyan]ðŸ“„ Open PDF report? (y/n): [/]").strip().lower()
             if open_pdf == 'y':
                 import webbrowser
                 webbrowser.open(f"file://{pdf_path}")
-                console.print("[green]✓ PDF report opened[/green]")
+                console.print("[green]âœ“ PDF report opened[/green]")
         
         console.print("\n[bold]Press Enter to continue...[/]", end="")
         input()
@@ -16247,7 +16247,7 @@ class SecurityTerminal:
         if not self.is_admin():
             console.print(
                 create_panel(
-                    "[red]✖ Requires administrator privileges[/red]",
+                    "[red]âœ– Requires administrator privileges[/red]",
                     title="Access Denied",
                     border_style="red"
                 )
@@ -16274,7 +16274,7 @@ class SecurityTerminal:
                 
                     console.print(
                         create_panel(
-                            f"[green]✔ Cleared Windows logs: {', '.join(logs_cleared)}[/green]",
+                            f"[green]âœ” Cleared Windows logs: {', '.join(logs_cleared)}[/green]",
                             title="Success",
                             border_style="green"
                         )
@@ -16287,7 +16287,7 @@ class SecurityTerminal:
                         progress.update(task, completed=100)
                         console.print(
                             create_panel(
-                                "[green]✔ Cleared system logs successfully[/green]",
+                                "[green]âœ” Cleared system logs successfully[/green]",
                                 title="Success",
                                 border_style="green"
                             )
@@ -16296,7 +16296,7 @@ class SecurityTerminal:
                         progress.update(task, visible=False)
                         console.print(
                             create_panel(
-                                f"[red]✖ Error clearing logs: {str(e)}[/red]",
+                                f"[red]âœ– Error clearing logs: {str(e)}[/red]",
                                 title="Error",
                                 border_style="red"
                             )
@@ -16305,7 +16305,7 @@ class SecurityTerminal:
         except Exception as e:
             console.print(
                 create_panel(
-                    f"[red]✖ Critical error: {str(e)}[/red]",
+                    f"[red]âœ– Critical error: {str(e)}[/red]",
                     title="Operation Failed",
                     border_style="red"
                 )
@@ -16335,44 +16335,44 @@ class SecurityTerminal:
     def show_integrity_help(self):
         """Display integrity monitor help"""
         help_text = f"""
-{Fore.CYAN}╔══════════════════════════════════════════════════════════════╗
-║              INTEGRITY MONITOR COMMANDS                         ║
-╠════════════════════════════════════════════════════════════════╣
-║  {Fore.YELLOW}CORE COMMANDS:{Fore.CYAN}                                                 ║
-║    integrity scan              - Full system integrity check    ║
-║    integrity baseline          - Create new system baseline     ║
-║    integrity status            - Show monitor status            ║
-║                                                               ║
-║  {Fore.YELLOW}REPORT COMMANDS:{Fore.CYAN}                                               ║
-║    integrity report            - Generate TXT report            ║
-║    integrity report json       - Generate JSON report           ║
-║    integrity report pdf        - Generate PDF report            ║
-║    integrity report all        - Generate all report formats    ║
-║                                                               ║
+{Fore.CYAN}â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+â•‘              INTEGRITY MONITOR COMMANDS                         â•‘
+â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£
+â•‘  {Fore.YELLOW}CORE COMMANDS:{Fore.CYAN}                                                 â•‘
+â•‘    integrity scan              - Full system integrity check    â•‘
+â•‘    integrity baseline          - Create new system baseline     â•‘
+â•‘    integrity status            - Show monitor status            â•‘
+â•‘                                                               â•‘
+â•‘  {Fore.YELLOW}REPORT COMMANDS:{Fore.CYAN}                                               â•‘
+â•‘    integrity report            - Generate TXT report            â•‘
+â•‘    integrity report json       - Generate JSON report           â•‘
+â•‘    integrity report pdf        - Generate PDF report            â•‘
+â•‘    integrity report all        - Generate all report formats    â•‘
+â•‘                                                               â•‘
 <<<<<<< HEAD
-║  {Fore.YELLOW}MONITORING:{Fore.CYAN}                                          ║
-║    integrity monitor           - Start monitoring     ║
-║    integrity monitor stop      - Stop monitoring      ║
+â•‘  {Fore.YELLOW}MONITORING:{Fore.CYAN}                                          â•‘
+â•‘    integrity monitor           - Start monitoring     â•‘
+â•‘    integrity monitor stop      - Stop monitoring      â•‘
  
-║  {Fore.YELLOW}REAL-TIME MONITORING:{Fore.CYAN}                                          ║
-║    integrity monitor           - Start real-time monitoring     ║
-║    integrity monitor stop      - Stop real-time monitoring      ║
-║    integrity alerts            - Show recent alerts             ║
-║                                                               ║
-║  {Fore.YELLOW}FORENSIC ANALYSIS:{Fore.CYAN}                                             ║
-║    integrity forensic timeline  - Show change timeline          ║
-║    integrity forensic report    - Generate forensic report      ║
-║    integrity list                 - Show summary of all files   ║
-║    integrity list critical        - List critical system files       ║
-║    integrity list configs         - List configuration files         ║
-║    integrity list logs            - List log files                   ║
-║    integrity list databases       - List database files
-║    integrity list user            - List user files                       ║
-║    integrity forensic timeline  - Show change timeline                    ║
-║    integrity forensic report    - Generate forensic report           ║
-║    integrity quarantine <file>    - Quarantine a suspicious file     ║
-║    integrity restore <file>       - Restore from quarantine          ║
-╚════════════════════════════════════════════════════════════════╝{Style.RESET_ALL}
+â•‘  {Fore.YELLOW}REAL-TIME MONITORING:{Fore.CYAN}                                          â•‘
+â•‘    integrity monitor           - Start real-time monitoring     â•‘
+â•‘    integrity monitor stop      - Stop real-time monitoring      â•‘
+â•‘    integrity alerts            - Show recent alerts             â•‘
+â•‘                                                               â•‘
+â•‘  {Fore.YELLOW}FORENSIC ANALYSIS:{Fore.CYAN}                                             â•‘
+â•‘    integrity forensic timeline  - Show change timeline          â•‘
+â•‘    integrity forensic report    - Generate forensic report      â•‘
+â•‘    integrity list                 - Show summary of all files   â•‘
+â•‘    integrity list critical        - List critical system files       â•‘
+â•‘    integrity list configs         - List configuration files         â•‘
+â•‘    integrity list logs            - List log files                   â•‘
+â•‘    integrity list databases       - List database files
+â•‘    integrity list user            - List user files                       â•‘
+â•‘    integrity forensic timeline  - Show change timeline                    â•‘
+â•‘    integrity forensic report    - Generate forensic report           â•‘
+â•‘    integrity quarantine <file>    - Quarantine a suspicious file     â•‘
+â•‘    integrity restore <file>       - Restore from quarantine          â•‘
+â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•{Style.RESET_ALL}
 """
         print(help_text)
 #   ==ends here integ 
@@ -16421,9 +16421,9 @@ class SecurityTerminal:
                 use_rich=False,
                 backup_enabled=True
             )
-            self._log_message("✅ Ransomware monitor initialized", "SUCCESS")
+            self._log_message("âœ… Ransomware monitor initialized", "SUCCESS")
         except Exception as e:
-            self._log_message(f"⚠️ Failed to initialize ransomware monitor: {str(e)}", "WARNING")
+            self._log_message(f"âš ï¸ Failed to initialize ransomware monitor: {str(e)}", "WARNING")
             self.ransomware_available = False
 
     def log_message(self, message, level="INFO"):
@@ -16497,7 +16497,7 @@ class SecurityTerminal:
             return
         
         self.ransomware_monitor.start_monitoring()
-        print(f"{Fore.GREEN}[✓] Ransomware monitoring started{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}[âœ“] Ransomware monitoring started{Style.RESET_ALL}")
 
     def _ransomware_stop(self):
         """Stop ransomware monitoring"""
@@ -16510,7 +16510,7 @@ class SecurityTerminal:
             return
         
         self.ransomware_monitor.stop_monitoring()
-        print(f"{Fore.GREEN}[✓] Ransomware monitoring stopped{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}[âœ“] Ransomware monitoring stopped{Style.RESET_ALL}")
 
     def _ransomware_scan(self, path=None):
         """Scan for ransomware indicators"""
@@ -16524,11 +16524,11 @@ class SecurityTerminal:
         if found:
             print(f"{Fore.RED}[!] Found {len(found)} ransomware indicators!{Style.RESET_ALL}")
             for item in found[:10]:
-                print(f"  {Fore.RED}• {item['type']}: {Path(item['path']).name}{Style.RESET_ALL}")
+                print(f"  {Fore.RED}â€¢ {item['type']}: {Path(item['path']).name}{Style.RESET_ALL}")
             if len(found) > 10:
                 print(f"  {Fore.YELLOW}... and {len(found) - 10} more{Style.RESET_ALL}")
         else:
-            print(f"{Fore.GREEN}[✓] No ransomware indicators found{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}[âœ“] No ransomware indicators found{Style.RESET_ALL}")
 
     def _ransomware_status(self):
         """Show ransomware monitor status"""
@@ -16538,20 +16538,20 @@ class SecurityTerminal:
         
         status = self.ransomware_monitor.get_status()
         
-        print(f"\n{Fore.CYAN}╔══════════════════════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.WHITE}RANSOMWARE MONITOR STATUS{Style.RESET_ALL}                              {Fore.CYAN}║{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}╚══════════════════════════════════════════════════════════════╝{Style.RESET_ALL}")
+        print(f"\n{Fore.CYAN}â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â•‘{Style.RESET_ALL}  {Fore.WHITE}RANSOMWARE MONITOR STATUS{Style.RESET_ALL}                              {Fore.CYAN}â•‘{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•{Style.RESET_ALL}")
         
         status_color = Fore.RED if status['ransomware_detected'] else Fore.GREEN
-        status_text = "🚨 ACTIVE" if status['ransomware_detected'] else "✅ CLEAN"
+        status_text = "ðŸš¨ ACTIVE" if status['ransomware_detected'] else "âœ… CLEAN"
         
         print(f"{Fore.YELLOW}Status:{Style.RESET_ALL} {status_color}{status_text}{Style.RESET_ALL}")
         print(f"{Fore.YELLOW}Threat Level:{Style.RESET_ALL} {status['threat_color']}{status['threat_level']}{Style.RESET_ALL}")
-        print(f"{Fore.YELLOW}Running:{Style.RESET_ALL} {'✅' if status['running'] else '❌'}")
+        print(f"{Fore.YELLOW}Running:{Style.RESET_ALL} {'âœ…' if status['running'] else 'âŒ'}")
         print(f"{Fore.YELLOW}Uptime:{Style.RESET_ALL} {status['uptime']}")
         print(f"{Fore.YELLOW}Monitored Dirs:{Style.RESET_ALL} {status['monitored_dirs']}")
         
-        print(f"\n{Fore.CYAN}📊 Activity Statistics:{Style.RESET_ALL}")
+        print(f"\n{Fore.CYAN}ðŸ“Š Activity Statistics:{Style.RESET_ALL}")
         stats = status['stats']
         print(f"  Files Created: {stats['files_created']}")
         print(f"  Files Modified: {stats['files_modified']}")
@@ -16561,9 +16561,9 @@ class SecurityTerminal:
         print(f"  Suspicious Events: {status['suspicious_events']}")
         print(f"  Alerts Triggered: {stats['alerts_triggered']}")
         
-        print(f"\n{Fore.CYAN}💾 Backup Statistics:{Style.RESET_ALL}")
+        print(f"\n{Fore.CYAN}ðŸ’¾ Backup Statistics:{Style.RESET_ALL}")
         backup = status['backup']
-        print(f"  Enabled: {'✅' if backup['enabled'] else '❌'}")
+        print(f"  Enabled: {'âœ…' if backup['enabled'] else 'âŒ'}")
         print(f"  Files Backed Up: {backup['files_backed_up']}")
         print(f"  Files Restored: {backup['files_restored']}")
         print(f"  Files Quarantined: {backup['files_quarantined']}")
@@ -16607,18 +16607,18 @@ class SecurityTerminal:
         # Header
         #         =====
         print()
-        print(f"{Fore.CYAN}╔{'═' * (term_width - 2)}╗{Style.RESET_ALL}")
-        header_text = f"📋 RECENT FILE EVENTS  (Last {len(events)})"
-        print(f"{Fore.CYAN}║{Style.RESET_ALL}{' ' * ((term_width - 2 - len(header_text)) // 2)}{Fore.WHITE}{header_text}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(header_text)) // 2)}{Fore.CYAN}║{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}╚{'═' * (term_width - 2)}╝{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â•”{'â•' * (term_width - 2)}â•—{Style.RESET_ALL}")
+        header_text = f"ðŸ“‹ RECENT FILE EVENTS  (Last {len(events)})"
+        print(f"{Fore.CYAN}â•‘{Style.RESET_ALL}{' ' * ((term_width - 2 - len(header_text)) // 2)}{Fore.WHITE}{header_text}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(header_text)) // 2)}{Fore.CYAN}â•‘{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â•š{'â•' * (term_width - 2)}â•{Style.RESET_ALL}")
         
         if not events:
             # No events found
             print()
-            print(f"{Fore.YELLOW}╔{'═' * (term_width - 2)}╗{Style.RESET_ALL}")
-            no_events = "📭 No events recorded yet"
-            print(f"{Fore.YELLOW}║{Style.RESET_ALL}{' ' * ((term_width - 2 - len(no_events)) // 2)}{Fore.WHITE}{no_events}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(no_events)) // 2)}{Fore.YELLOW}║{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW}╚{'═' * (term_width - 2)}╝{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}â•”{'â•' * (term_width - 2)}â•—{Style.RESET_ALL}")
+            no_events = "ðŸ“­ No events recorded yet"
+            print(f"{Fore.YELLOW}â•‘{Style.RESET_ALL}{' ' * ((term_width - 2 - len(no_events)) // 2)}{Fore.WHITE}{no_events}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(no_events)) // 2)}{Fore.YELLOW}â•‘{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}â•š{'â•' * (term_width - 2)}â•{Style.RESET_ALL}")
             print()
             return
         
@@ -16631,19 +16631,19 @@ class SecurityTerminal:
         moved = len([e for e in events if e.event_type == 'moved'])
         
         print()
-        stats_line = f"{Fore.GREEN}📁 Created: {created}{Style.RESET_ALL}  |  {Fore.YELLOW}📝 Modified: {modified}{Style.RESET_ALL}  |  {Fore.RED}🗑️ Deleted: {deleted}{Style.RESET_ALL}  |  {Fore.BLUE}🔄 Moved: {moved}{Style.RESET_ALL}"
+        stats_line = f"{Fore.GREEN}ðŸ“ Created: {created}{Style.RESET_ALL}  |  {Fore.YELLOW}ðŸ“ Modified: {modified}{Style.RESET_ALL}  |  {Fore.RED}ðŸ—‘ï¸ Deleted: {deleted}{Style.RESET_ALL}  |  {Fore.BLUE}ðŸ”„ Moved: {moved}{Style.RESET_ALL}"
         print(f"{' ' * ((term_width - 2 - len(stats_line)) // 2)}{stats_line}")
         
         #         =====
         # Event Table
         #         =====
         print()
-        print(f"{Fore.CYAN}┌{'─' * (term_width - 2)}┐{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â”Œ{'â”€' * (term_width - 2)}â”{Style.RESET_ALL}")
         
         # Table Header
-        header_cols = f"{Fore.CYAN}│{Style.RESET_ALL} {Fore.WHITE}{'#':<4}{Style.RESET_ALL} {Fore.CYAN}│{Style.RESET_ALL} {Fore.WHITE}{'Time':<12}{Style.RESET_ALL} {Fore.CYAN}│{Style.RESET_ALL} {Fore.WHITE}{'Type':<12}{Style.RESET_ALL} {Fore.CYAN}│{Style.RESET_ALL} {Fore.WHITE}{'File':<{term_width - 45}}{Style.RESET_ALL} {Fore.CYAN}│{Style.RESET_ALL}"
+        header_cols = f"{Fore.CYAN}â”‚{Style.RESET_ALL} {Fore.WHITE}{'#':<4}{Style.RESET_ALL} {Fore.CYAN}â”‚{Style.RESET_ALL} {Fore.WHITE}{'Time':<12}{Style.RESET_ALL} {Fore.CYAN}â”‚{Style.RESET_ALL} {Fore.WHITE}{'Type':<12}{Style.RESET_ALL} {Fore.CYAN}â”‚{Style.RESET_ALL} {Fore.WHITE}{'File':<{term_width - 45}}{Style.RESET_ALL} {Fore.CYAN}â”‚{Style.RESET_ALL}"
         print(header_cols)
-        print(f"{Fore.CYAN}├{'─' * (term_width - 2)}┤{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â”œ{'â”€' * (term_width - 2)}â”¤{Style.RESET_ALL}")
         
         # Display last 10 events (or all if less)
         display_events = events[-10:] if len(events) > 10 else events
@@ -16652,16 +16652,16 @@ class SecurityTerminal:
             # Determine color based on event type
             if event.event_type == 'created':
                 event_color = Fore.GREEN
-                type_display = "📁 CREATE"
+                type_display = "ðŸ“ CREATE"
             elif event.event_type == 'deleted':
                 event_color = Fore.RED
-                type_display = "🗑️ DELETE"
+                type_display = "ðŸ—‘ï¸ DELETE"
             elif event.event_type == 'modified':
                 event_color = Fore.YELLOW
-                type_display = "📝 MODIFY"
+                type_display = "ðŸ“ MODIFY"
             elif event.event_type == 'moved':
                 event_color = Fore.BLUE
-                type_display = "🔄 MOVE"
+                type_display = "ðŸ”„ MOVE"
             else:
                 event_color = Fore.WHITE
                 type_display = event.event_type.upper()
@@ -16688,10 +16688,10 @@ class SecurityTerminal:
                 file_name = file_name[:max_file_width - 3] + "..."
             
             # Build row
-            row = f"{Fore.CYAN}│{Style.RESET_ALL} {Fore.WHITE}{idx:<4}{Style.RESET_ALL} {Fore.CYAN}│{Style.RESET_ALL} {Fore.WHITE}{time_str:<12}{Style.RESET_ALL} {Fore.CYAN}│{Style.RESET_ALL} {event_color}{type_display:<12}{Style.RESET_ALL} {Fore.CYAN}│{Style.RESET_ALL} {event_color}{file_name:<{max_file_width}}{Style.RESET_ALL} {Fore.CYAN}│{Style.RESET_ALL}"
+            row = f"{Fore.CYAN}â”‚{Style.RESET_ALL} {Fore.WHITE}{idx:<4}{Style.RESET_ALL} {Fore.CYAN}â”‚{Style.RESET_ALL} {Fore.WHITE}{time_str:<12}{Style.RESET_ALL} {Fore.CYAN}â”‚{Style.RESET_ALL} {event_color}{type_display:<12}{Style.RESET_ALL} {Fore.CYAN}â”‚{Style.RESET_ALL} {event_color}{file_name:<{max_file_width}}{Style.RESET_ALL} {Fore.CYAN}â”‚{Style.RESET_ALL}"
             print(row)
         
-        print(f"{Fore.CYAN}└{'─' * (term_width - 2)}┘{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â””{'â”€' * (term_width - 2)}â”˜{Style.RESET_ALL}")
         
         #         =====
         # Footer with pagination info
@@ -16702,10 +16702,10 @@ class SecurityTerminal:
             print(f"{' ' * ((term_width - 2 - len(footer_text)) // 2)}{Fore.CYAN}{footer_text}{Style.RESET_ALL}")
         
         print()
-        print(f"{Fore.CYAN}╔{'═' * (term_width - 2)}╗{Style.RESET_ALL}")
-        footer_text2 = "🔍 Tip: Use 'rmon events 50' to view more events"
-        print(f"{Fore.CYAN}║{Style.RESET_ALL}{' ' * ((term_width - 2 - len(footer_text2)) // 2)}{Fore.WHITE}{footer_text2}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(footer_text2)) // 2)}{Fore.CYAN}║{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}╚{'═' * (term_width - 2)}╝{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â•”{'â•' * (term_width - 2)}â•—{Style.RESET_ALL}")
+        footer_text2 = "ðŸ” Tip: Use 'rmon events 50' to view more events"
+        print(f"{Fore.CYAN}â•‘{Style.RESET_ALL}{' ' * ((term_width - 2 - len(footer_text2)) // 2)}{Fore.WHITE}{footer_text2}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(footer_text2)) // 2)}{Fore.CYAN}â•‘{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â•š{'â•' * (term_width - 2)}â•{Style.RESET_ALL}")
         print()
         # NO input() here - the caller will handle it
         
@@ -16740,13 +16740,13 @@ class SecurityTerminal:
         
         if filename:
             if self.ransomware_monitor.restore_file(filename):
-                print(f"{Fore.GREEN}✅ File restored successfully!{Style.RESET_ALL}")
+                print(f"{Fore.GREEN}âœ… File restored successfully!{Style.RESET_ALL}")
             else:
-                print(f"{Fore.RED}❌ File not found or restore failed.{Style.RESET_ALL}")
+                print(f"{Fore.RED}âŒ File not found or restore failed.{Style.RESET_ALL}")
         else:
             restored = self.ransomware_monitor.restore_file()
             if restored:
-                print(f"{Fore.GREEN}✅ Files restored successfully!{Style.RESET_ALL}")
+                print(f"{Fore.GREEN}âœ… Files restored successfully!{Style.RESET_ALL}")
             else:
                 print(f"{Fore.YELLOW}No files to restore.{Style.RESET_ALL}")
 
@@ -16784,12 +16784,12 @@ class SecurityTerminal:
         # Header
         #         =====
         print()
-        print(f"{Fore.CYAN}╔{'═' * (term_width - 2)}╗{Style.RESET_ALL}")
-        header_text = "🛡️  RANSOMWARE MONITOR  v3.1.113"
-        print(f"{Fore.CYAN}║{Style.RESET_ALL}{' ' * ((term_width - 2 - len(header_text)) // 2)}{Fore.WHITE}{header_text}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(header_text)) // 2)}{Fore.CYAN}║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â•”{'â•' * (term_width - 2)}â•—{Style.RESET_ALL}")
+        header_text = "ðŸ›¡ï¸  RANSOMWARE MONITOR  v4.0.0.113"
+        print(f"{Fore.CYAN}â•‘{Style.RESET_ALL}{' ' * ((term_width - 2 - len(header_text)) // 2)}{Fore.WHITE}{header_text}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(header_text)) // 2)}{Fore.CYAN}â•‘{Style.RESET_ALL}")
         sub_header = "DSTerminal CyberOps Platform"
-        print(f"{Fore.CYAN}║{Style.RESET_ALL}{' ' * ((term_width - 2 - len(sub_header)) // 2)}{Fore.CYAN}{sub_header}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(sub_header)) // 2)}{Fore.CYAN}║{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}╚{'═' * (term_width - 2)}╝{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â•‘{Style.RESET_ALL}{' ' * ((term_width - 2 - len(sub_header)) // 2)}{Fore.CYAN}{sub_header}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(sub_header)) // 2)}{Fore.CYAN}â•‘{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â•š{'â•' * (term_width - 2)}â•{Style.RESET_ALL}")
         
         #         =====
         # Status Bar
@@ -16798,7 +16798,7 @@ class SecurityTerminal:
         backup = status.get('backup', {})
         
         status_color = Fore.RED if status.get('ransomware_detected', False) else Fore.GREEN
-        status_text = "🚨 ACTIVE" if status.get('ransomware_detected', False) else "✅ CLEAN"
+        status_text = "ðŸš¨ ACTIVE" if status.get('ransomware_detected', False) else "âœ… CLEAN"
         threat_color = status.get('threat_color', Fore.WHITE)
         threat_level = status.get('threat_level', 'NORMAL')
         
@@ -16815,48 +16815,48 @@ class SecurityTerminal:
         col_width = (term_width - 8) // 3
         
         # Row 1: Monitoring (Left) | View (Center) | Export (Right)
-        left_menu = f"{Fore.GREEN}┌{'─' * (col_width)}┐{Style.RESET_ALL}"
-        left_menu += f"\n{Fore.GREEN}│{Style.RESET_ALL} {Fore.GREEN}🟢 MONITORING{Style.RESET_ALL}{' ' * (col_width - 14)}{Fore.GREEN}│{Style.RESET_ALL}"
-        left_menu += f"\n{Fore.GREEN}├{'─' * (col_width)}┤{Style.RESET_ALL}"
-        left_menu += f"\n{Fore.GREEN}│{Style.RESET_ALL} {Fore.CYAN}1.{Style.RESET_ALL} {Fore.YELLOW}Start{Style.RESET_ALL}{' ' * 9}{Fore.WHITE}Start monitoring{Style.RESET_ALL}{' ' * (col_width - 24)}{Fore.GREEN}│{Style.RESET_ALL}"
-        left_menu += f"\n{Fore.GREEN}│{Style.RESET_ALL} {Fore.CYAN}2.{Style.RESET_ALL} {Fore.YELLOW}Stop{Style.RESET_ALL}{' ' * 10}{Fore.WHITE}Stop monitoring{Style.RESET_ALL}{' ' * (col_width - 24)}{Fore.GREEN}│{Style.RESET_ALL}"
-        left_menu += f"\n{Fore.GREEN}│{Style.RESET_ALL} {Fore.CYAN}3.{Style.RESET_ALL} {Fore.YELLOW}Scan{Style.RESET_ALL}{' ' * 10}{Fore.WHITE}Scan for threats{Style.RESET_ALL}{' ' * (col_width - 24)}{Fore.GREEN}│{Style.RESET_ALL}"
-        left_menu += f"\n{Fore.GREEN}└{'─' * (col_width)}┘{Style.RESET_ALL}"
+        left_menu = f"{Fore.GREEN}â”Œ{'â”€' * (col_width)}â”{Style.RESET_ALL}"
+        left_menu += f"\n{Fore.GREEN}â”‚{Style.RESET_ALL} {Fore.GREEN}ðŸŸ¢ MONITORING{Style.RESET_ALL}{' ' * (col_width - 14)}{Fore.GREEN}â”‚{Style.RESET_ALL}"
+        left_menu += f"\n{Fore.GREEN}â”œ{'â”€' * (col_width)}â”¤{Style.RESET_ALL}"
+        left_menu += f"\n{Fore.GREEN}â”‚{Style.RESET_ALL} {Fore.CYAN}1.{Style.RESET_ALL} {Fore.YELLOW}Start{Style.RESET_ALL}{' ' * 9}{Fore.WHITE}Start monitoring{Style.RESET_ALL}{' ' * (col_width - 24)}{Fore.GREEN}â”‚{Style.RESET_ALL}"
+        left_menu += f"\n{Fore.GREEN}â”‚{Style.RESET_ALL} {Fore.CYAN}2.{Style.RESET_ALL} {Fore.YELLOW}Stop{Style.RESET_ALL}{' ' * 10}{Fore.WHITE}Stop monitoring{Style.RESET_ALL}{' ' * (col_width - 24)}{Fore.GREEN}â”‚{Style.RESET_ALL}"
+        left_menu += f"\n{Fore.GREEN}â”‚{Style.RESET_ALL} {Fore.CYAN}3.{Style.RESET_ALL} {Fore.YELLOW}Scan{Style.RESET_ALL}{' ' * 10}{Fore.WHITE}Scan for threats{Style.RESET_ALL}{' ' * (col_width - 24)}{Fore.GREEN}â”‚{Style.RESET_ALL}"
+        left_menu += f"\n{Fore.GREEN}â””{'â”€' * (col_width)}â”˜{Style.RESET_ALL}"
         
-        center_menu = f"{Fore.CYAN}┌{'─' * (col_width)}┐{Style.RESET_ALL}"
-        center_menu += f"\n{Fore.CYAN}│{Style.RESET_ALL} {Fore.CYAN}🔵 VIEW{Style.RESET_ALL}{' ' * (col_width - 8)}{Fore.CYAN}│{Style.RESET_ALL}"
-        center_menu += f"\n{Fore.CYAN}├{'─' * (col_width)}┤{Style.RESET_ALL}"
-        center_menu += f"\n{Fore.CYAN}│{Style.RESET_ALL} {Fore.CYAN}4.{Style.RESET_ALL} {Fore.YELLOW}Events{Style.RESET_ALL}{' ' * 7}{Fore.WHITE}View events{Style.RESET_ALL}{' ' * (col_width - 22)}{Fore.CYAN}│{Style.RESET_ALL}"
-        center_menu += f"\n{Fore.CYAN}│{Style.RESET_ALL} {Fore.CYAN}5.{Style.RESET_ALL} {Fore.YELLOW}Suspicious{Style.RESET_ALL}{' ' * 3}{Fore.WHITE}View suspicious{Style.RESET_ALL}{' ' * (col_width - 24)}{Fore.CYAN}│{Style.RESET_ALL}"
-        center_menu += f"\n{Fore.CYAN}│{Style.RESET_ALL} {Fore.CYAN}6.{Style.RESET_ALL} {Fore.YELLOW}Dashboard{Style.RESET_ALL}{' ' * 3}{Fore.WHITE}Show dashboard{Style.RESET_ALL}{' ' * (col_width - 24)}{Fore.CYAN}│{Style.RESET_ALL}"
-        center_menu += f"\n{Fore.CYAN}└{'─' * (col_width)}┘{Style.RESET_ALL}"
+        center_menu = f"{Fore.CYAN}â”Œ{'â”€' * (col_width)}â”{Style.RESET_ALL}"
+        center_menu += f"\n{Fore.CYAN}â”‚{Style.RESET_ALL} {Fore.CYAN}ðŸ”µ VIEW{Style.RESET_ALL}{' ' * (col_width - 8)}{Fore.CYAN}â”‚{Style.RESET_ALL}"
+        center_menu += f"\n{Fore.CYAN}â”œ{'â”€' * (col_width)}â”¤{Style.RESET_ALL}"
+        center_menu += f"\n{Fore.CYAN}â”‚{Style.RESET_ALL} {Fore.CYAN}4.{Style.RESET_ALL} {Fore.YELLOW}Events{Style.RESET_ALL}{' ' * 7}{Fore.WHITE}View events{Style.RESET_ALL}{' ' * (col_width - 22)}{Fore.CYAN}â”‚{Style.RESET_ALL}"
+        center_menu += f"\n{Fore.CYAN}â”‚{Style.RESET_ALL} {Fore.CYAN}5.{Style.RESET_ALL} {Fore.YELLOW}Suspicious{Style.RESET_ALL}{' ' * 3}{Fore.WHITE}View suspicious{Style.RESET_ALL}{' ' * (col_width - 24)}{Fore.CYAN}â”‚{Style.RESET_ALL}"
+        center_menu += f"\n{Fore.CYAN}â”‚{Style.RESET_ALL} {Fore.CYAN}6.{Style.RESET_ALL} {Fore.YELLOW}Dashboard{Style.RESET_ALL}{' ' * 3}{Fore.WHITE}Show dashboard{Style.RESET_ALL}{' ' * (col_width - 24)}{Fore.CYAN}â”‚{Style.RESET_ALL}"
+        center_menu += f"\n{Fore.CYAN}â””{'â”€' * (col_width)}â”˜{Style.RESET_ALL}"
         
-        right_menu = f"{Fore.MAGENTA}┌{'─' * (col_width)}┐{Style.RESET_ALL}"
-        right_menu += f"\n{Fore.MAGENTA}│{Style.RESET_ALL} {Fore.MAGENTA}🟣 EXPORT{Style.RESET_ALL}{' ' * (col_width - 10)}{Fore.MAGENTA}│{Style.RESET_ALL}"
-        right_menu += f"\n{Fore.MAGENTA}├{'─' * (col_width)}┤{Style.RESET_ALL}"
-        right_menu += f"\n{Fore.MAGENTA}│{Style.RESET_ALL} {Fore.CYAN}7.{Style.RESET_ALL} {Fore.YELLOW}JSON{Style.RESET_ALL}{' ' * 10}{Fore.WHITE}Export JSON{Style.RESET_ALL}{' ' * (col_width - 21)}{Fore.MAGENTA}│{Style.RESET_ALL}"
-        right_menu += f"\n{Fore.MAGENTA}│{Style.RESET_ALL} {Fore.CYAN}8.{Style.RESET_ALL} {Fore.YELLOW}PDF{Style.RESET_ALL}{' ' * 11}{Fore.WHITE}Export PDF{Style.RESET_ALL}{' ' * (col_width - 21)}{Fore.MAGENTA}│{Style.RESET_ALL}"
-        right_menu += f"\n{Fore.MAGENTA}│{Style.RESET_ALL} {Fore.CYAN}9.{Style.RESET_ALL} {Fore.YELLOW}HTML{Style.RESET_ALL}{' ' * 10}{Fore.WHITE}Export HTML{Style.RESET_ALL}{' ' * (col_width - 21)}{Fore.MAGENTA}│{Style.RESET_ALL}"
-        right_menu += f"\n{Fore.MAGENTA}└{'─' * (col_width)}┘{Style.RESET_ALL}"
+        right_menu = f"{Fore.MAGENTA}â”Œ{'â”€' * (col_width)}â”{Style.RESET_ALL}"
+        right_menu += f"\n{Fore.MAGENTA}â”‚{Style.RESET_ALL} {Fore.MAGENTA}ðŸŸ£ EXPORT{Style.RESET_ALL}{' ' * (col_width - 10)}{Fore.MAGENTA}â”‚{Style.RESET_ALL}"
+        right_menu += f"\n{Fore.MAGENTA}â”œ{'â”€' * (col_width)}â”¤{Style.RESET_ALL}"
+        right_menu += f"\n{Fore.MAGENTA}â”‚{Style.RESET_ALL} {Fore.CYAN}7.{Style.RESET_ALL} {Fore.YELLOW}JSON{Style.RESET_ALL}{' ' * 10}{Fore.WHITE}Export JSON{Style.RESET_ALL}{' ' * (col_width - 21)}{Fore.MAGENTA}â”‚{Style.RESET_ALL}"
+        right_menu += f"\n{Fore.MAGENTA}â”‚{Style.RESET_ALL} {Fore.CYAN}8.{Style.RESET_ALL} {Fore.YELLOW}PDF{Style.RESET_ALL}{' ' * 11}{Fore.WHITE}Export PDF{Style.RESET_ALL}{' ' * (col_width - 21)}{Fore.MAGENTA}â”‚{Style.RESET_ALL}"
+        right_menu += f"\n{Fore.MAGENTA}â”‚{Style.RESET_ALL} {Fore.CYAN}9.{Style.RESET_ALL} {Fore.YELLOW}HTML{Style.RESET_ALL}{' ' * 10}{Fore.WHITE}Export HTML{Style.RESET_ALL}{' ' * (col_width - 21)}{Fore.MAGENTA}â”‚{Style.RESET_ALL}"
+        right_menu += f"\n{Fore.MAGENTA}â””{'â”€' * (col_width)}â”˜{Style.RESET_ALL}"
         
         print(f"{left_menu}{' ' * 2}{center_menu}{' ' * 2}{right_menu}")
         
         # Row 2: Backup (Left) | Utility (Center) | Test (Right)
         print()
         
-        left_menu2 = f"{Fore.YELLOW}┌{'─' * (col_width)}┐{Style.RESET_ALL}"
-        left_menu2 += f"\n{Fore.YELLOW}│{Style.RESET_ALL} {Fore.YELLOW}🟡 BACKUP{Style.RESET_ALL}{' ' * (col_width - 10)}{Fore.YELLOW}│{Style.RESET_ALL}"
-        left_menu2 += f"\n{Fore.YELLOW}├{'─' * (col_width)}┤{Style.RESET_ALL}"
-        left_menu2 += f"\n{Fore.YELLOW}│{Style.RESET_ALL} {Fore.CYAN}10.{Style.RESET_ALL} {Fore.YELLOW}Restore{Style.RESET_ALL}{' ' * 6}{Fore.WHITE}Restore files{Style.RESET_ALL}{' ' * (col_width - 23)}{Fore.YELLOW}│{Style.RESET_ALL}"
-        left_menu2 += f"\n{Fore.YELLOW}│{Style.RESET_ALL} {Fore.CYAN}11.{Style.RESET_ALL} {Fore.YELLOW}Clear{Style.RESET_ALL}{' ' * 8}{Fore.WHITE}Clear backups{Style.RESET_ALL}{' ' * (col_width - 23)}{Fore.YELLOW}│{Style.RESET_ALL}"
-        left_menu2 += f"\n{Fore.YELLOW}└{'─' * (col_width)}┘{Style.RESET_ALL}"
+        left_menu2 = f"{Fore.YELLOW}â”Œ{'â”€' * (col_width)}â”{Style.RESET_ALL}"
+        left_menu2 += f"\n{Fore.YELLOW}â”‚{Style.RESET_ALL} {Fore.YELLOW}ðŸŸ¡ BACKUP{Style.RESET_ALL}{' ' * (col_width - 10)}{Fore.YELLOW}â”‚{Style.RESET_ALL}"
+        left_menu2 += f"\n{Fore.YELLOW}â”œ{'â”€' * (col_width)}â”¤{Style.RESET_ALL}"
+        left_menu2 += f"\n{Fore.YELLOW}â”‚{Style.RESET_ALL} {Fore.CYAN}10.{Style.RESET_ALL} {Fore.YELLOW}Restore{Style.RESET_ALL}{' ' * 6}{Fore.WHITE}Restore files{Style.RESET_ALL}{' ' * (col_width - 23)}{Fore.YELLOW}â”‚{Style.RESET_ALL}"
+        left_menu2 += f"\n{Fore.YELLOW}â”‚{Style.RESET_ALL} {Fore.CYAN}11.{Style.RESET_ALL} {Fore.YELLOW}Clear{Style.RESET_ALL}{' ' * 8}{Fore.WHITE}Clear backups{Style.RESET_ALL}{' ' * (col_width - 23)}{Fore.YELLOW}â”‚{Style.RESET_ALL}"
+        left_menu2 += f"\n{Fore.YELLOW}â””{'â”€' * (col_width)}â”˜{Style.RESET_ALL}"
         
-        center_menu2 = f"{Fore.BLUE}┌{'─' * (col_width)}┐{Style.RESET_ALL}"
-        center_menu2 += f"\n{Fore.BLUE}│{Style.RESET_ALL} {Fore.BLUE}🔵 UTILITY{Style.RESET_ALL}{' ' * (col_width - 11)}{Fore.BLUE}│{Style.RESET_ALL}"
-        center_menu2 += f"\n{Fore.BLUE}├{'─' * (col_width)}┤{Style.RESET_ALL}"
-        center_menu2 += f"\n{Fore.BLUE}│{Style.RESET_ALL} {Fore.CYAN}12.{Style.RESET_ALL} {Fore.YELLOW}Test{Style.RESET_ALL}{' ' * 10}{Fore.WHITE}Create test file{Style.RESET_ALL}{' ' * (col_width - 24)}{Fore.BLUE}│{Style.RESET_ALL}"
-        center_menu2 += f"\n{Fore.BLUE}│{Style.RESET_ALL} {Fore.CYAN}13.{Style.RESET_ALL} {Fore.YELLOW}Exit{Style.RESET_ALL}{' ' * 10}{Fore.WHITE}Exit monitor{Style.RESET_ALL}{' ' * (col_width - 24)}{Fore.BLUE}│{Style.RESET_ALL}"
-        center_menu2 += f"\n{Fore.BLUE}└{'─' * (col_width)}┘{Style.RESET_ALL}"
+        center_menu2 = f"{Fore.BLUE}â”Œ{'â”€' * (col_width)}â”{Style.RESET_ALL}"
+        center_menu2 += f"\n{Fore.BLUE}â”‚{Style.RESET_ALL} {Fore.BLUE}ðŸ”µ UTILITY{Style.RESET_ALL}{' ' * (col_width - 11)}{Fore.BLUE}â”‚{Style.RESET_ALL}"
+        center_menu2 += f"\n{Fore.BLUE}â”œ{'â”€' * (col_width)}â”¤{Style.RESET_ALL}"
+        center_menu2 += f"\n{Fore.BLUE}â”‚{Style.RESET_ALL} {Fore.CYAN}12.{Style.RESET_ALL} {Fore.YELLOW}Test{Style.RESET_ALL}{' ' * 10}{Fore.WHITE}Create test file{Style.RESET_ALL}{' ' * (col_width - 24)}{Fore.BLUE}â”‚{Style.RESET_ALL}"
+        center_menu2 += f"\n{Fore.BLUE}â”‚{Style.RESET_ALL} {Fore.CYAN}13.{Style.RESET_ALL} {Fore.YELLOW}Exit{Style.RESET_ALL}{' ' * 10}{Fore.WHITE}Exit monitor{Style.RESET_ALL}{' ' * (col_width - 24)}{Fore.BLUE}â”‚{Style.RESET_ALL}"
+        center_menu2 += f"\n{Fore.BLUE}â””{'â”€' * (col_width)}â”˜{Style.RESET_ALL}"
         
         right_menu2 = ""
         
@@ -16866,7 +16866,7 @@ class SecurityTerminal:
         # Quick Stats
         #         =====
         print()
-        stats_line = f"{Fore.CYAN}📊 Quick Stats:{Style.RESET_ALL}  {Fore.YELLOW}Monitored Dirs:{Style.RESET_ALL} {status.get('monitored_dirs', 0)}  |  {Fore.YELLOW}Files Changed:{Style.RESET_ALL} {status['stats']['files_created'] + status['stats']['files_modified']}  |  {Fore.YELLOW}Deleted:{Style.RESET_ALL} {status['stats']['files_deleted']}  |  {Fore.YELLOW}Backups:{Style.RESET_ALL} {backup.get('files_backed_up', 0)}"
+        stats_line = f"{Fore.CYAN}ðŸ“Š Quick Stats:{Style.RESET_ALL}  {Fore.YELLOW}Monitored Dirs:{Style.RESET_ALL} {status.get('monitored_dirs', 0)}  |  {Fore.YELLOW}Files Changed:{Style.RESET_ALL} {status['stats']['files_created'] + status['stats']['files_modified']}  |  {Fore.YELLOW}Deleted:{Style.RESET_ALL} {status['stats']['files_deleted']}  |  {Fore.YELLOW}Backups:{Style.RESET_ALL} {backup.get('files_backed_up', 0)}"
         print(f"{' ' * ((term_width - 2 - len(stats_line)) // 2)}{stats_line}")
         
         #         =====
@@ -16920,10 +16920,10 @@ class SecurityTerminal:
         elif choice == '13':
             if self.ransomware_monitor.is_running:
                 self._ransomware_stop()
-            print(f"{Fore.GREEN}👋 Exiting Ransomware Monitor{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}ðŸ‘‹ Exiting Ransomware Monitor{Style.RESET_ALL}")
             return
         else:
-            print(f"{Fore.RED}❌ Invalid option{Style.RESET_ALL}")
+            print(f"{Fore.RED}âŒ Invalid option{Style.RESET_ALL}")
             time.sleep(1)
         
         # Recursive call to show menu again
@@ -16953,12 +16953,12 @@ class SecurityTerminal:
         # Header - Centered
         #         =====
         print()
-        print(f"{Fore.CYAN}╔{'═' * (term_width - 2)}╗{Style.RESET_ALL}")
-        header_text = "🛡️  RANSOMWARE MONITOR  v3.1.113"
-        print(f"{Fore.CYAN}║{Style.RESET_ALL}{' ' * ((term_width - 2 - len(header_text)) // 2)}{Fore.WHITE}{header_text}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(header_text)) // 2)}{Fore.CYAN}║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â•”{'â•' * (term_width - 2)}â•—{Style.RESET_ALL}")
+        header_text = "ðŸ›¡ï¸  RANSOMWARE MONITOR  v4.0.0.113"
+        print(f"{Fore.CYAN}â•‘{Style.RESET_ALL}{' ' * ((term_width - 2 - len(header_text)) // 2)}{Fore.WHITE}{header_text}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(header_text)) // 2)}{Fore.CYAN}â•‘{Style.RESET_ALL}")
         sub_header = "DSTerminal CyberOps Platform"
-        print(f"{Fore.CYAN}║{Style.RESET_ALL}{' ' * ((term_width - 2 - len(sub_header)) // 2)}{Fore.CYAN}{sub_header}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(sub_header)) // 2)}{Fore.CYAN}║{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}╚{'═' * (term_width - 2)}╝{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â•‘{Style.RESET_ALL}{' ' * ((term_width - 2 - len(sub_header)) // 2)}{Fore.CYAN}{sub_header}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(sub_header)) // 2)}{Fore.CYAN}â•‘{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â•š{'â•' * (term_width - 2)}â•{Style.RESET_ALL}")
         
         #         =====
         # Row 1: Monitoring (Left) | View (Center) | Export (Right)
@@ -16966,33 +16966,33 @@ class SecurityTerminal:
         print()
         
         # Left: Monitoring Commands
-        left_box = f"{Fore.GREEN}┌{'─' * (col_width)}┐{Style.RESET_ALL}"
-        left_box += f"\n{Fore.GREEN}│{Style.RESET_ALL} {Fore.GREEN}🟢 MONITORING{Style.RESET_ALL}{' ' * (col_width - 14)}{Fore.GREEN}│{Style.RESET_ALL}"
-        left_box += f"\n{Fore.GREEN}├{'─' * (col_width)}┤{Style.RESET_ALL}"
-        left_box += f"\n{Fore.GREEN}│{Style.RESET_ALL} {Fore.YELLOW}start{Style.RESET_ALL}{' ' * 8}{Fore.WHITE}Start monitoring{Style.RESET_ALL}{' ' * (col_width - 25)}{Fore.GREEN}│{Style.RESET_ALL}"
-        left_box += f"\n{Fore.GREEN}│{Style.RESET_ALL} {Fore.YELLOW}stop{Style.RESET_ALL}{' ' * 9}{Fore.WHITE}Stop monitoring{Style.RESET_ALL}{' ' * (col_width - 24)}{Fore.GREEN}│{Style.RESET_ALL}"
-        left_box += f"\n{Fore.GREEN}│{Style.RESET_ALL} {Fore.YELLOW}scan{Style.RESET_ALL}{' ' * 9}{Fore.WHITE}Scan for ransomware{Style.RESET_ALL}{' ' * (col_width - 26)}{Fore.GREEN}│{Style.RESET_ALL}"
-        left_box += f"\n{Fore.GREEN}│{Style.RESET_ALL} {Fore.YELLOW}status{Style.RESET_ALL}{' ' * 7}{Fore.WHITE}Show status{Style.RESET_ALL}{' ' * (col_width - 21)}{Fore.GREEN}│{Style.RESET_ALL}"
-        left_box += f"\n{Fore.GREEN}│{Style.RESET_ALL} {Fore.YELLOW}dashboard{Style.RESET_ALL}{' ' * 4}{Fore.WHITE}Show dashboard{Style.RESET_ALL}{' ' * (col_width - 23)}{Fore.GREEN}│{Style.RESET_ALL}"
-        left_box += f"\n{Fore.GREEN}└{'─' * (col_width)}┘{Style.RESET_ALL}"
+        left_box = f"{Fore.GREEN}â”Œ{'â”€' * (col_width)}â”{Style.RESET_ALL}"
+        left_box += f"\n{Fore.GREEN}â”‚{Style.RESET_ALL} {Fore.GREEN}ðŸŸ¢ MONITORING{Style.RESET_ALL}{' ' * (col_width - 14)}{Fore.GREEN}â”‚{Style.RESET_ALL}"
+        left_box += f"\n{Fore.GREEN}â”œ{'â”€' * (col_width)}â”¤{Style.RESET_ALL}"
+        left_box += f"\n{Fore.GREEN}â”‚{Style.RESET_ALL} {Fore.YELLOW}start{Style.RESET_ALL}{' ' * 8}{Fore.WHITE}Start monitoring{Style.RESET_ALL}{' ' * (col_width - 25)}{Fore.GREEN}â”‚{Style.RESET_ALL}"
+        left_box += f"\n{Fore.GREEN}â”‚{Style.RESET_ALL} {Fore.YELLOW}stop{Style.RESET_ALL}{' ' * 9}{Fore.WHITE}Stop monitoring{Style.RESET_ALL}{' ' * (col_width - 24)}{Fore.GREEN}â”‚{Style.RESET_ALL}"
+        left_box += f"\n{Fore.GREEN}â”‚{Style.RESET_ALL} {Fore.YELLOW}scan{Style.RESET_ALL}{' ' * 9}{Fore.WHITE}Scan for ransomware{Style.RESET_ALL}{' ' * (col_width - 26)}{Fore.GREEN}â”‚{Style.RESET_ALL}"
+        left_box += f"\n{Fore.GREEN}â”‚{Style.RESET_ALL} {Fore.YELLOW}status{Style.RESET_ALL}{' ' * 7}{Fore.WHITE}Show status{Style.RESET_ALL}{' ' * (col_width - 21)}{Fore.GREEN}â”‚{Style.RESET_ALL}"
+        left_box += f"\n{Fore.GREEN}â”‚{Style.RESET_ALL} {Fore.YELLOW}dashboard{Style.RESET_ALL}{' ' * 4}{Fore.WHITE}Show dashboard{Style.RESET_ALL}{' ' * (col_width - 23)}{Fore.GREEN}â”‚{Style.RESET_ALL}"
+        left_box += f"\n{Fore.GREEN}â””{'â”€' * (col_width)}â”˜{Style.RESET_ALL}"
         
         # Center: View Commands
-        center_box = f"{Fore.CYAN}┌{'─' * (col_width)}┐{Style.RESET_ALL}"
-        center_box += f"\n{Fore.CYAN}│{Style.RESET_ALL} {Fore.CYAN}🔵 VIEW{Style.RESET_ALL}{' ' * (col_width - 8)}{Fore.CYAN}│{Style.RESET_ALL}"
-        center_box += f"\n{Fore.CYAN}├{'─' * (col_width)}┤{Style.RESET_ALL}"
-        center_box += f"\n{Fore.CYAN}│{Style.RESET_ALL} {Fore.YELLOW}events [n]{Style.RESET_ALL}{' ' * 3}{Fore.WHITE}Show events{Style.RESET_ALL}{' ' * (col_width - 22)}{Fore.CYAN}│{Style.RESET_ALL}"
-        center_box += f"\n{Fore.CYAN}│{Style.RESET_ALL} {Fore.YELLOW}suspicious{Style.RESET_ALL}{' ' * 3}{Fore.WHITE}Show suspicious{Style.RESET_ALL}{' ' * (col_width - 24)}{Fore.CYAN}│{Style.RESET_ALL}"
-        center_box += f"\n{Fore.CYAN}└{'─' * (col_width)}┘{Style.RESET_ALL}"
+        center_box = f"{Fore.CYAN}â”Œ{'â”€' * (col_width)}â”{Style.RESET_ALL}"
+        center_box += f"\n{Fore.CYAN}â”‚{Style.RESET_ALL} {Fore.CYAN}ðŸ”µ VIEW{Style.RESET_ALL}{' ' * (col_width - 8)}{Fore.CYAN}â”‚{Style.RESET_ALL}"
+        center_box += f"\n{Fore.CYAN}â”œ{'â”€' * (col_width)}â”¤{Style.RESET_ALL}"
+        center_box += f"\n{Fore.CYAN}â”‚{Style.RESET_ALL} {Fore.YELLOW}events [n]{Style.RESET_ALL}{' ' * 3}{Fore.WHITE}Show events{Style.RESET_ALL}{' ' * (col_width - 22)}{Fore.CYAN}â”‚{Style.RESET_ALL}"
+        center_box += f"\n{Fore.CYAN}â”‚{Style.RESET_ALL} {Fore.YELLOW}suspicious{Style.RESET_ALL}{' ' * 3}{Fore.WHITE}Show suspicious{Style.RESET_ALL}{' ' * (col_width - 24)}{Fore.CYAN}â”‚{Style.RESET_ALL}"
+        center_box += f"\n{Fore.CYAN}â””{'â”€' * (col_width)}â”˜{Style.RESET_ALL}"
         
         # Right: Export Commands
-        right_box = f"{Fore.MAGENTA}┌{'─' * (col_width)}┐{Style.RESET_ALL}"
-        right_box += f"\n{Fore.MAGENTA}│{Style.RESET_ALL} {Fore.MAGENTA}🟣 EXPORT{Style.RESET_ALL}{' ' * (col_width - 10)}{Fore.MAGENTA}│{Style.RESET_ALL}"
-        right_box += f"\n{Fore.MAGENTA}├{'─' * (col_width)}┤{Style.RESET_ALL}"
-        right_box += f"\n{Fore.MAGENTA}│{Style.RESET_ALL} {Fore.YELLOW}export{Style.RESET_ALL}{' ' * 7}{Fore.WHITE}Export report{Style.RESET_ALL}{' ' * (col_width - 21)}{Fore.MAGENTA}│{Style.RESET_ALL}"
-        right_box += f"\n{Fore.MAGENTA}│{Style.RESET_ALL} {Fore.YELLOW}  json{Style.RESET_ALL}{' ' * 8}{Fore.WHITE}JSON format{Style.RESET_ALL}{' ' * (col_width - 20)}{Fore.MAGENTA}│{Style.RESET_ALL}"
-        right_box += f"\n{Fore.MAGENTA}│{Style.RESET_ALL} {Fore.YELLOW}  pdf{Style.RESET_ALL}{' ' * 9}{Fore.WHITE}PDF format{Style.RESET_ALL}{' ' * (col_width - 20)}{Fore.MAGENTA}│{Style.RESET_ALL}"
-        right_box += f"\n{Fore.MAGENTA}│{Style.RESET_ALL} {Fore.YELLOW}  html{Style.RESET_ALL}{' ' * 8}{Fore.WHITE}HTML format{Style.RESET_ALL}{' ' * (col_width - 20)}{Fore.MAGENTA}│{Style.RESET_ALL}"
-        right_box += f"\n{Fore.MAGENTA}└{'─' * (col_width)}┘{Style.RESET_ALL}"
+        right_box = f"{Fore.MAGENTA}â”Œ{'â”€' * (col_width)}â”{Style.RESET_ALL}"
+        right_box += f"\n{Fore.MAGENTA}â”‚{Style.RESET_ALL} {Fore.MAGENTA}ðŸŸ£ EXPORT{Style.RESET_ALL}{' ' * (col_width - 10)}{Fore.MAGENTA}â”‚{Style.RESET_ALL}"
+        right_box += f"\n{Fore.MAGENTA}â”œ{'â”€' * (col_width)}â”¤{Style.RESET_ALL}"
+        right_box += f"\n{Fore.MAGENTA}â”‚{Style.RESET_ALL} {Fore.YELLOW}export{Style.RESET_ALL}{' ' * 7}{Fore.WHITE}Export report{Style.RESET_ALL}{' ' * (col_width - 21)}{Fore.MAGENTA}â”‚{Style.RESET_ALL}"
+        right_box += f"\n{Fore.MAGENTA}â”‚{Style.RESET_ALL} {Fore.YELLOW}  json{Style.RESET_ALL}{' ' * 8}{Fore.WHITE}JSON format{Style.RESET_ALL}{' ' * (col_width - 20)}{Fore.MAGENTA}â”‚{Style.RESET_ALL}"
+        right_box += f"\n{Fore.MAGENTA}â”‚{Style.RESET_ALL} {Fore.YELLOW}  pdf{Style.RESET_ALL}{' ' * 9}{Fore.WHITE}PDF format{Style.RESET_ALL}{' ' * (col_width - 20)}{Fore.MAGENTA}â”‚{Style.RESET_ALL}"
+        right_box += f"\n{Fore.MAGENTA}â”‚{Style.RESET_ALL} {Fore.YELLOW}  html{Style.RESET_ALL}{' ' * 8}{Fore.WHITE}HTML format{Style.RESET_ALL}{' ' * (col_width - 20)}{Fore.MAGENTA}â”‚{Style.RESET_ALL}"
+        right_box += f"\n{Fore.MAGENTA}â””{'â”€' * (col_width)}â”˜{Style.RESET_ALL}"
         
         # Print row 1 - Left, Center, Right aligned
         print(f"{left_box}{' ' * 2}{center_box}{' ' * 2}{right_box}")
@@ -17003,20 +17003,20 @@ class SecurityTerminal:
         print()
         
         # Left: Backup Commands
-        left_box2 = f"{Fore.YELLOW}┌{'─' * (col_width)}┐{Style.RESET_ALL}"
-        left_box2 += f"\n{Fore.YELLOW}│{Style.RESET_ALL} {Fore.YELLOW}🟡 BACKUP{Style.RESET_ALL}{' ' * (col_width - 10)}{Fore.YELLOW}│{Style.RESET_ALL}"
-        left_box2 += f"\n{Fore.YELLOW}├{'─' * (col_width)}┤{Style.RESET_ALL}"
-        left_box2 += f"\n{Fore.YELLOW}│{Style.RESET_ALL} {Fore.YELLOW}restore [file]{Style.RESET_ALL}{' ' * 1}{Fore.WHITE}Restore files{Style.RESET_ALL}{' ' * (col_width - 24)}{Fore.YELLOW}│{Style.RESET_ALL}"
-        left_box2 += f"\n{Fore.YELLOW}│{Style.RESET_ALL} {Fore.YELLOW}clear-backups{Style.RESET_ALL}{' ' * 1}{Fore.WHITE}Clear backups{Style.RESET_ALL}{' ' * (col_width - 24)}{Fore.YELLOW}│{Style.RESET_ALL}"
-        left_box2 += f"\n{Fore.YELLOW}└{'─' * (col_width)}┘{Style.RESET_ALL}"
+        left_box2 = f"{Fore.YELLOW}â”Œ{'â”€' * (col_width)}â”{Style.RESET_ALL}"
+        left_box2 += f"\n{Fore.YELLOW}â”‚{Style.RESET_ALL} {Fore.YELLOW}ðŸŸ¡ BACKUP{Style.RESET_ALL}{' ' * (col_width - 10)}{Fore.YELLOW}â”‚{Style.RESET_ALL}"
+        left_box2 += f"\n{Fore.YELLOW}â”œ{'â”€' * (col_width)}â”¤{Style.RESET_ALL}"
+        left_box2 += f"\n{Fore.YELLOW}â”‚{Style.RESET_ALL} {Fore.YELLOW}restore [file]{Style.RESET_ALL}{' ' * 1}{Fore.WHITE}Restore files{Style.RESET_ALL}{' ' * (col_width - 24)}{Fore.YELLOW}â”‚{Style.RESET_ALL}"
+        left_box2 += f"\n{Fore.YELLOW}â”‚{Style.RESET_ALL} {Fore.YELLOW}clear-backups{Style.RESET_ALL}{' ' * 1}{Fore.WHITE}Clear backups{Style.RESET_ALL}{' ' * (col_width - 24)}{Fore.YELLOW}â”‚{Style.RESET_ALL}"
+        left_box2 += f"\n{Fore.YELLOW}â””{'â”€' * (col_width)}â”˜{Style.RESET_ALL}"
         
         # Center: Utility Commands
-        center_box2 = f"{Fore.BLUE}┌{'─' * (col_width)}┐{Style.RESET_ALL}"
-        center_box2 += f"\n{Fore.BLUE}│{Style.RESET_ALL} {Fore.BLUE}🔵 UTILITY{Style.RESET_ALL}{' ' * (col_width - 11)}{Fore.BLUE}│{Style.RESET_ALL}"
-        center_box2 += f"\n{Fore.BLUE}├{'─' * (col_width)}┤{Style.RESET_ALL}"
-        center_box2 += f"\n{Fore.BLUE}│{Style.RESET_ALL} {Fore.YELLOW}interactive{Style.RESET_ALL}{' ' * 3}{Fore.WHITE}Launch interactive menu{Style.RESET_ALL}{' ' * (col_width - 28)}{Fore.BLUE}│{Style.RESET_ALL}"
-        center_box2 += f"\n{Fore.BLUE}│{Style.RESET_ALL} {Fore.YELLOW}help{Style.RESET_ALL}{' ' * 9}{Fore.WHITE}Show this help{Style.RESET_ALL}{' ' * (col_width - 22)}{Fore.BLUE}│{Style.RESET_ALL}"
-        center_box2 += f"\n{Fore.BLUE}└{'─' * (col_width)}┘{Style.RESET_ALL}"
+        center_box2 = f"{Fore.BLUE}â”Œ{'â”€' * (col_width)}â”{Style.RESET_ALL}"
+        center_box2 += f"\n{Fore.BLUE}â”‚{Style.RESET_ALL} {Fore.BLUE}ðŸ”µ UTILITY{Style.RESET_ALL}{' ' * (col_width - 11)}{Fore.BLUE}â”‚{Style.RESET_ALL}"
+        center_box2 += f"\n{Fore.BLUE}â”œ{'â”€' * (col_width)}â”¤{Style.RESET_ALL}"
+        center_box2 += f"\n{Fore.BLUE}â”‚{Style.RESET_ALL} {Fore.YELLOW}interactive{Style.RESET_ALL}{' ' * 3}{Fore.WHITE}Launch interactive menu{Style.RESET_ALL}{' ' * (col_width - 28)}{Fore.BLUE}â”‚{Style.RESET_ALL}"
+        center_box2 += f"\n{Fore.BLUE}â”‚{Style.RESET_ALL} {Fore.YELLOW}help{Style.RESET_ALL}{' ' * 9}{Fore.WHITE}Show this help{Style.RESET_ALL}{' ' * (col_width - 22)}{Fore.BLUE}â”‚{Style.RESET_ALL}"
+        center_box2 += f"\n{Fore.BLUE}â””{'â”€' * (col_width)}â”˜{Style.RESET_ALL}"
         
         # Right: Empty (for now)
         right_box2 = ""
@@ -17028,28 +17028,28 @@ class SecurityTerminal:
         # Shortcuts Section - Centered Full Width
         #         =====
         print()
-        print(f"{Fore.CYAN}╔{'═' * (term_width - 2)}╗{Style.RESET_ALL}")
-        shortcuts_title = "⚡ SHORTCUTS"
-        print(f"{Fore.CYAN}║{Style.RESET_ALL}{' ' * ((term_width - 2 - len(shortcuts_title)) // 2)}{Fore.CYAN}{shortcuts_title}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(shortcuts_title)) // 2)}{Fore.CYAN}║{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}╠{'═' * (term_width - 2)}╣{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â•”{'â•' * (term_width - 2)}â•—{Style.RESET_ALL}")
+        shortcuts_title = "âš¡ SHORTCUTS"
+        print(f"{Fore.CYAN}â•‘{Style.RESET_ALL}{' ' * ((term_width - 2 - len(shortcuts_title)) // 2)}{Fore.CYAN}{shortcuts_title}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(shortcuts_title)) // 2)}{Fore.CYAN}â•‘{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â• {'â•' * (term_width - 2)}â•£{Style.RESET_ALL}")
         
         # Shortcuts in 3 columns
         shortcuts = [
-            ("rmon start", "→ start", "Start monitoring"),
-            ("rmon stop", "→ stop", "Stop monitoring"),
-            ("rmon scan", "→ scan", "Scan for ransomware"),
-            ("rmon status", "→ status", "Show status"),
-            ("rmon dashboard", "→ dashboard", "Show dashboard"),
-            ("rmon events", "→ events", "Show events"),
-            ("rmon export", "→ export", "Export report"),
-            ("rmon restore", "→ restore", "Restore files"),
-            ("rmon help", "→ help", "Show help"),
+            ("rmon start", "â†’ start", "Start monitoring"),
+            ("rmon stop", "â†’ stop", "Stop monitoring"),
+            ("rmon scan", "â†’ scan", "Scan for ransomware"),
+            ("rmon status", "â†’ status", "Show status"),
+            ("rmon dashboard", "â†’ dashboard", "Show dashboard"),
+            ("rmon events", "â†’ events", "Show events"),
+            ("rmon export", "â†’ export", "Export report"),
+            ("rmon restore", "â†’ restore", "Restore files"),
+            ("rmon help", "â†’ help", "Show help"),
         ]
         
         # Print shortcuts in 3 columns
         for i in range(0, len(shortcuts), 3):
             row = shortcuts[i:i+3]
-            line = f"{Fore.CYAN}║{Style.RESET_ALL}"
+            line = f"{Fore.CYAN}â•‘{Style.RESET_ALL}"
             
             for idx, (shortcut, arrow, desc) in enumerate(row):
                 # Calculate column width
@@ -17061,34 +17061,34 @@ class SecurityTerminal:
                 padding = col_w - len(entry) + 2
                 if padding < 1:
                     padding = 1
-                line += f"{entry}{' ' * padding}{Fore.CYAN}║{Style.RESET_ALL}"
+                line += f"{entry}{' ' * padding}{Fore.CYAN}â•‘{Style.RESET_ALL}"
             
             print(line)
         
-        print(f"{Fore.CYAN}╚{'═' * (term_width - 2)}╝{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â•š{'â•' * (term_width - 2)}â•{Style.RESET_ALL}")
         
         #         =====
         # Quick Start - Centered Full Width
         #         =====
         print()
-        print(f"{Fore.GREEN}┌{'─' * (term_width - 2)}┐{Style.RESET_ALL}")
-        quick_title = "💡 QUICK START"
-        print(f"{Fore.GREEN}│{Style.RESET_ALL}{' ' * ((term_width - 2 - len(quick_title)) // 2)}{Fore.GREEN}{quick_title}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(quick_title)) // 2)}{Fore.GREEN}│{Style.RESET_ALL}")
-        print(f"{Fore.GREEN}├{'─' * (term_width - 2)}┤{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}â”Œ{'â”€' * (term_width - 2)}â”{Style.RESET_ALL}")
+        quick_title = "ðŸ’¡ QUICK START"
+        print(f"{Fore.GREEN}â”‚{Style.RESET_ALL}{' ' * ((term_width - 2 - len(quick_title)) // 2)}{Fore.GREEN}{quick_title}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(quick_title)) // 2)}{Fore.GREEN}â”‚{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}â”œ{'â”€' * (term_width - 2)}â”¤{Style.RESET_ALL}")
         
         # Quick start steps in 2 columns
         steps = [
-            ("rmon start", "→  Start monitoring"),
-            ("rmon events", "→  Watch file activity"),
-            ("rmon scan", "→  Scan for threats"),
-            ("rmon dashboard", "→  View live dashboard"),
-            ("rmon export pdf", "→  Generate report"),
-            ("rmon stop", "→  Stop monitoring"),
+            ("rmon start", "â†’  Start monitoring"),
+            ("rmon events", "â†’  Watch file activity"),
+            ("rmon scan", "â†’  Scan for threats"),
+            ("rmon dashboard", "â†’  View live dashboard"),
+            ("rmon export pdf", "â†’  Generate report"),
+            ("rmon stop", "â†’  Stop monitoring"),
         ]
         
         for i in range(0, len(steps), 2):
             row = steps[i:i+2]
-            line = f"{Fore.GREEN}│{Style.RESET_ALL}"
+            line = f"{Fore.GREEN}â”‚{Style.RESET_ALL}"
             
             for idx, (cmd, desc) in enumerate(row):
                 col_w = (term_width - 4) // 2
@@ -17099,22 +17099,22 @@ class SecurityTerminal:
                 padding = col_w - len(entry) + 2
                 if padding < 1:
                     padding = 1
-                line += f"{entry}{' ' * padding}{Fore.GREEN}│{Style.RESET_ALL}"
+                line += f"{entry}{' ' * padding}{Fore.GREEN}â”‚{Style.RESET_ALL}"
             
             print(line)
         
-        print(f"{Fore.GREEN}└{'─' * (term_width - 2)}┘{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}â””{'â”€' * (term_width - 2)}â”˜{Style.RESET_ALL}")
         
         #         =====
         # Footer - Centered
         #         =====
         print()
-        print(f"{Fore.CYAN}╔{'═' * (term_width - 2)}╗{Style.RESET_ALL}")
-        footer_text1 = "Developed: Spark Wilson Spink  |  © 2024"
-        print(f"{Fore.CYAN}║{Style.RESET_ALL}{' ' * ((term_width - 2 - len(footer_text1)) // 2)}{Fore.WHITE}{footer_text1}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(footer_text1)) // 2)}{Fore.CYAN}║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â•”{'â•' * (term_width - 2)}â•—{Style.RESET_ALL}")
+        footer_text1 = "Developed: Spark Wilson Spink  |  Â© 2024"
+        print(f"{Fore.CYAN}â•‘{Style.RESET_ALL}{' ' * ((term_width - 2 - len(footer_text1)) // 2)}{Fore.WHITE}{footer_text1}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(footer_text1)) // 2)}{Fore.CYAN}â•‘{Style.RESET_ALL}")
         footer_text2 = "DSTerminal CyberOps Platform"
-        print(f"{Fore.CYAN}║{Style.RESET_ALL}{' ' * ((term_width - 2 - len(footer_text2)) // 2)}{Fore.CYAN}{footer_text2}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(footer_text2)) // 2)}{Fore.CYAN}║{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}╚{'═' * (term_width - 2)}╝{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â•‘{Style.RESET_ALL}{' ' * ((term_width - 2 - len(footer_text2)) // 2)}{Fore.CYAN}{footer_text2}{Style.RESET_ALL}{' ' * ((term_width - 2 - len(footer_text2)) // 2)}{Fore.CYAN}â•‘{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â•š{'â•' * (term_width - 2)}â•{Style.RESET_ALL}")
         print()
     
     #          ======
@@ -17205,7 +17205,7 @@ class SecurityTerminal:
                         time.sleep(delay * 2)
                     elif text[i] == " ":
                         time.sleep(delay * 0.3)
-                    elif text[i] in "═╔╗║╠╣╚╝":
+                    elif text[i] in "â•â•”â•—â•‘â• â•£â•šâ•":
                         time.sleep(delay * 0.1)
                     else:
                         time.sleep(delay + (random.random() * variance * 0.5))
@@ -17245,11 +17245,11 @@ class SecurityTerminal:
                 "INFO": Fore.WHITE
             }
             prefix = {
-                "CRITICAL": "🚨",
-                "HIGH": "⚠️",
-                "MEDIUM": "🔍",
-                "LOW": "ℹ️",
-                "INFO": "📌"
+                "CRITICAL": "ðŸš¨",
+                "HIGH": "âš ï¸",
+                "MEDIUM": "ðŸ”",
+                "LOW": "â„¹ï¸",
+                "INFO": "ðŸ“Œ"
             }
             color = colors.get(severity, Fore.WHITE)
             _ultra_type(f"{prefix.get(severity, '')} {text}", delay, variance, color)
@@ -17257,7 +17257,7 @@ class SecurityTerminal:
         def _ultra_type_header(text, color=Fore.CYAN):
             """Print a header with ultra-fast typing effect."""
             _ultra_type(f"\n{text}", 0.001, 0.0003, color)
-            _ultra_type("━" * min(len(text), 70), 0.0005, 0.0001, Fore.CYAN)
+            _ultra_type("â”" * min(len(text), 70), 0.0005, 0.0001, Fore.CYAN)
         
         #           ==
         # Box Drawing Functions
@@ -17285,20 +17285,20 @@ class SecurityTerminal:
                     continue
                 wrapped.extend(textwrap.wrap(line, inner, break_long_words=False, replace_whitespace=False))
             
-            top = "╔" + "═" * (width - 2) + "╗"
-            mid = "╠" + "═" * (width - 2) + "╣"
-            bot = "╚" + "═" * (width - 2) + "╝"
+            top = "â•”" + "â•" * (width - 2) + "â•—"
+            mid = "â• " + "â•" * (width - 2) + "â•£"
+            bot = "â•š" + "â•" * (width - 2) + "â•"
             title_text = f" {title} ".center(width - 2)
             
             print()
             sys.stdout.write(" " * left_margin + border_color + top + Style.RESET_ALL + "\n")
-            sys.stdout.write(" " * left_margin + title_color + "║" + title_text + "║" + Style.RESET_ALL + "\n")
+            sys.stdout.write(" " * left_margin + title_color + "â•‘" + title_text + "â•‘" + Style.RESET_ALL + "\n")
             sys.stdout.write(" " * left_margin + border_color + mid + Style.RESET_ALL + "\n")
             
             for line in wrapped:
-                sys.stdout.write(" " * left_margin + border_color + "║ " + Style.RESET_ALL)
+                sys.stdout.write(" " * left_margin + border_color + "â•‘ " + Style.RESET_ALL)
                 self._ultra_type(line.ljust(inner), color=content_color, speed="ultra")
-                sys.stdout.write(" " * left_margin + border_color + "║" + Style.RESET_ALL + "\n")
+                sys.stdout.write(" " * left_margin + border_color + "â•‘" + Style.RESET_ALL + "\n")
             
             sys.stdout.write(" " * left_margin + border_color + bot + Style.RESET_ALL + "\n")
             sys.stdout.flush()
@@ -17313,38 +17313,38 @@ class SecurityTerminal:
             left_margin = max(0, (term.columns - width) // 2)
             
             print()
-            print(" " * left_margin + Fore.CYAN + "╔" + "═" * (width - 2) + "╗" + Style.RESET_ALL)
-            print(" " * left_margin + Fore.CYAN + "║" + Style.RESET_ALL + " " * (width - 2) + Fore.CYAN + "║" + Style.RESET_ALL)
+            print(" " * left_margin + Fore.CYAN + "â•”" + "â•" * (width - 2) + "â•—" + Style.RESET_ALL)
+            print(" " * left_margin + Fore.CYAN + "â•‘" + Style.RESET_ALL + " " * (width - 2) + Fore.CYAN + "â•‘" + Style.RESET_ALL)
             
             # ASCII Art
             ascii_art = [
-                "    ██╗    ██╗██╗███████╗██╗    █████╗ ██╗   ██╗██████╗ ██╗████████╗",
-                "    ██║    ██║██║██╔════╝██║   ██╔══██╗██║   ██║██╔══██╗██║╚══██╔══╝",
-                "    ██║ █╗ ██║██║█████╗  ██║   ███████║██║   ██║██   ██╔██║   ██║   ",
-                "    ██║███╗██║██║██╔══╝  ██║   ██╔══██║██║   ██║██   ██╗██║   ██║   ",
-                "    ╚███╔███╔╝██║██║     ██║   ██║  ██║╚██████╔╝██║█║██║██║   ██║   ",
-                "     ╚══╝╚══╝ ╚═╝╚═╝     ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝   ╚═╝   "
+                "    â–ˆâ–ˆâ•—    â–ˆâ–ˆâ•—â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•—    â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ•—   â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—",
+                "    â–ˆâ–ˆâ•‘    â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â•šâ•â•â–ˆâ–ˆâ•”â•â•â•",
+                "    â–ˆâ–ˆâ•‘ â–ˆâ•— â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆ   â–ˆâ–ˆâ•”â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   ",
+                "    â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆ   â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   ",
+                "    â•šâ–ˆâ–ˆâ–ˆâ•”â–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘â–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   ",
+                "     â•šâ•â•â•â•šâ•â•â• â•šâ•â•â•šâ•â•     â•šâ•â•   â•šâ•â•  â•šâ•â• â•šâ•â•â•â•â•â• â•šâ•â•  â•šâ•â•â•šâ•â•   â•šâ•â•   "
             ]
             
             for line in ascii_art:
-                print(" " * left_margin + Fore.CYAN + "║" + Style.RESET_ALL + " " * 4 + 
+                print(" " * left_margin + Fore.CYAN + "â•‘" + Style.RESET_ALL + " " * 4 + 
                     Fore.LIGHTGREEN_EX + line + Style.RESET_ALL + 
-                    " " * (width - len(line) - 10) + Fore.CYAN + "║" + Style.RESET_ALL)
+                    " " * (width - len(line) - 10) + Fore.CYAN + "â•‘" + Style.RESET_ALL)
             
             # Title
-            print(" " * left_margin + Fore.CYAN + "║" + Style.RESET_ALL + 
+            print(" " * left_margin + Fore.CYAN + "â•‘" + Style.RESET_ALL + 
                 " " * ((width - 2 - len(title)) // 2) + 
                 Fore.LIGHTCYAN_EX + title + Style.RESET_ALL + 
-                " " * ((width - 2 - len(title)) // 2) + Fore.CYAN + "║" + Style.RESET_ALL)
+                " " * ((width - 2 - len(title)) // 2) + Fore.CYAN + "â•‘" + Style.RESET_ALL)
             
             if subtitle:
-                print(" " * left_margin + Fore.CYAN + "║" + Style.RESET_ALL + 
+                print(" " * left_margin + Fore.CYAN + "â•‘" + Style.RESET_ALL + 
                     " " * ((width - 2 - len(subtitle)) // 2) + 
                     Fore.CYAN + subtitle + Style.RESET_ALL + 
-                    " " * ((width - 2 - len(subtitle)) // 2) + Fore.CYAN + "║" + Style.RESET_ALL)
+                    " " * ((width - 2 - len(subtitle)) // 2) + Fore.CYAN + "â•‘" + Style.RESET_ALL)
             
-            print(" " * left_margin + Fore.CYAN + "║" + Style.RESET_ALL + " " * (width - 2) + Fore.CYAN + "║" + Style.RESET_ALL)
-            print(" " * left_margin + Fore.CYAN + "╚" + "═" * (width - 2) + "╝" + Style.RESET_ALL)
+            print(" " * left_margin + Fore.CYAN + "â•‘" + Style.RESET_ALL + " " * (width - 2) + Fore.CYAN + "â•‘" + Style.RESET_ALL)
+            print(" " * left_margin + Fore.CYAN + "â•š" + "â•" * (width - 2) + "â•" + Style.RESET_ALL)
             print()
 
         #           ==
@@ -17378,14 +17378,14 @@ class SecurityTerminal:
         # Clear Screen and Display Header
         #           ==
         os.system('cls' if platform.system() == 'Windows' else 'clear')
-        draw_wifi_header("🔐 WiFi Security Audit Engine", "DSTerminal CyberOps Platform v3.1.113")
+        draw_wifi_header("ðŸ” WiFi Security Audit Engine", "DSTerminal CyberOps Platform v4.0.0.113")
         time.sleep(0.3)
 
         #           ==
         # Security Impact Assessment Box
         #           ==
         _ultra_type_box(
-            "🔐 Security Impact Assessment",
+            "ðŸ” Security Impact Assessment",
             [
                 "Rogue Access Point Detection: Identifying unauthorized APs for MITM protection",
                 "Security Protocol Analysis: WEP, WPA, WPA2, WPA3 evaluation",
@@ -17410,7 +17410,7 @@ class SecurityTerminal:
         ]
         
         _ultra_type_box(
-            "🔧 Initializing Audit Engine",
+            "ðŸ”§ Initializing Audit Engine",
             init_lines,
             title_color=Fore.YELLOW,
             border_color=Fore.CYAN,
@@ -17426,7 +17426,7 @@ class SecurityTerminal:
         try:
             if system == "windows":
                 _ultra_type_box(
-                    "📡 Platform Detection",
+                    "ðŸ“¡ Platform Detection",
                     ["Using Windows native WiFi API"],
                     title_color=Fore.CYAN,
                     border_color=Fore.CYAN,
@@ -17437,7 +17437,7 @@ class SecurityTerminal:
                 audit_results = self._wifi_audit_windows(interface, audit_results, _ultra_type_status, _ultra_type_finding, _ultra_type_success, _ultra_type_error, _ultra_type_warning)
             elif system == "linux":
                 _ultra_type_box(
-                    "📡 Platform Detection",
+                    "ðŸ“¡ Platform Detection",
                     ["Using Linux iwconfig/iwlist"],
                     title_color=Fore.CYAN,
                     border_color=Fore.CYAN,
@@ -17448,7 +17448,7 @@ class SecurityTerminal:
                 audit_results = self._wifi_audit_linux(interface, audit_results, _ultra_type_status, _ultra_type_finding, _ultra_type_success, _ultra_type_error, _ultra_type_warning)
             elif system == "darwin":
                 _ultra_type_box(
-                    "📡 Platform Detection",
+                    "ðŸ“¡ Platform Detection",
                     ["Using macOS airport utility"],
                     title_color=Fore.CYAN,
                     border_color=Fore.CYAN,
@@ -17459,7 +17459,7 @@ class SecurityTerminal:
                 audit_results = self._wifi_audit_macos(interface, audit_results, _ultra_type_status, _ultra_type_finding, _ultra_type_success, _ultra_type_error, _ultra_type_warning)
             else:
                 _ultra_type_box(
-                    "❌ Unsupported Platform",
+                    "âŒ Unsupported Platform",
                     [f"Platform: {system} is not supported"],
                     title_color=Fore.RED,
                     border_color=Fore.CYAN,
@@ -17471,7 +17471,7 @@ class SecurityTerminal:
                 return audit_results
         except Exception as e:
             _ultra_type_box(
-                "❌ Error",
+                "âŒ Error",
                 [f"Error during WiFi audit: {str(e)}"],
                 title_color=Fore.RED,
                 border_color=Fore.CYAN,
@@ -17486,7 +17486,7 @@ class SecurityTerminal:
         # Analyze Findings
         #           ==
         _ultra_type_box(
-            "🔬 Analyzing Findings",
+            "ðŸ”¬ Analyzing Findings",
             [
                 "Processing access point data...",
                 "Evaluating security configurations...",
@@ -17521,7 +17521,7 @@ class SecurityTerminal:
         ]
         
         _ultra_type_box(
-            "📊 WiFi Audit Summary",
+            "ðŸ“Š WiFi Audit Summary",
             summary_lines,
             title_color=Fore.LIGHTCYAN_EX,
             border_color=Fore.CYAN,
@@ -17533,15 +17533,15 @@ class SecurityTerminal:
 
         # Security Distribution Box
         security_lines = [
-            f"WPA3: {summary.get('wpa3_aps', 0)}  {'█' * min(summary.get('wpa3_aps', 0), 20)}",
-            f"WPA2: {summary.get('wpa2_aps', 0)}  {'█' * min(summary.get('wpa2_aps', 0), 20)}",
-            f"WPA:  {summary.get('wpa_aps', 0)}   {'█' * min(summary.get('wpa_aps', 0), 20)}",
-            f"WEP:  {summary.get('wep_aps', 0)}   {'█' * min(summary.get('wep_aps', 0), 20)}",
-            f"Open: {summary.get('open_aps', 0)}  {'█' * min(summary.get('open_aps', 0), 20)}"
+            f"WPA3: {summary.get('wpa3_aps', 0)}  {'â–ˆ' * min(summary.get('wpa3_aps', 0), 20)}",
+            f"WPA2: {summary.get('wpa2_aps', 0)}  {'â–ˆ' * min(summary.get('wpa2_aps', 0), 20)}",
+            f"WPA:  {summary.get('wpa_aps', 0)}   {'â–ˆ' * min(summary.get('wpa_aps', 0), 20)}",
+            f"WEP:  {summary.get('wep_aps', 0)}   {'â–ˆ' * min(summary.get('wep_aps', 0), 20)}",
+            f"Open: {summary.get('open_aps', 0)}  {'â–ˆ' * min(summary.get('open_aps', 0), 20)}"
         ]
         
         _ultra_type_box(
-            "🔐 Security Distribution",
+            "ðŸ” Security Distribution",
             security_lines,
             title_color=Fore.LIGHTMAGENTA_EX,
             border_color=Fore.CYAN,
@@ -17572,7 +17572,7 @@ class SecurityTerminal:
             
             bar_length = 30
             filled = int((security_score / 100) * bar_length)
-            bar = "█" * filled + "░" * (bar_length - filled)
+            bar = "â–ˆ" * filled + "â–‘" * (bar_length - filled)
             
             score_lines = [
                 f"Score: {security_score}/100",
@@ -17581,7 +17581,7 @@ class SecurityTerminal:
             ]
             
             _ultra_type_box(
-                "📊 Security Score",
+                "ðŸ“Š Security Score",
                 score_lines,
                 title_color=Fore.LIGHTYELLOW_EX,
                 border_color=Fore.CYAN,
@@ -17597,14 +17597,14 @@ class SecurityTerminal:
             finding_lines = []
             for finding in findings[:10]:
                 severity = finding.get('severity', 'INFO')
-                emoji = {"CRITICAL": "🚨", "HIGH": "⚠️", "MEDIUM": "🔍", "LOW": "ℹ️"}.get(severity, "📌")
+                emoji = {"CRITICAL": "ðŸš¨", "HIGH": "âš ï¸", "MEDIUM": "ðŸ”", "LOW": "â„¹ï¸"}.get(severity, "ðŸ“Œ")
                 finding_lines.append(f"{emoji} [{severity}] {finding.get('finding', '')} ({finding.get('ap', 'Unknown')})")
             
             if len(findings) > 10:
                 finding_lines.append(f"... and {len(findings) - 10} more findings")
             
             _ultra_type_box(
-                "🚨 Security Findings",
+                "ðŸš¨ Security Findings",
                 finding_lines,
                 title_color=Fore.RED,
                 border_color=Fore.CYAN,
@@ -17624,7 +17624,7 @@ class SecurityTerminal:
                 rec_lines.append(f"... and {len(recommendations) - 5} more recommendations")
             
             _ultra_type_box(
-                "💡 Recommendations",
+                "ðŸ’¡ Recommendations",
                 rec_lines,
                 title_color=Fore.LIGHTBLUE_EX,
                 border_color=Fore.CYAN,
@@ -17645,8 +17645,8 @@ class SecurityTerminal:
                 security = ap.get('security_type', ap.get('security', 'Unknown'))[:10]
                 
                 sig = ap.get('signal', 0)
-                sig_indicator = "📶" if sig > 70 else "📡" if sig > 40 else "📻"
-                connected = "🔗 " if ap.get('connected', False) else ""
+                sig_indicator = "ðŸ“¶" if sig > 70 else "ðŸ“¡" if sig > 40 else "ðŸ“»"
+                connected = "ðŸ”— " if ap.get('connected', False) else ""
                 
                 ap_lines.append(f"{sig_indicator} {connected}{ssid:<18} {bssid:<17} {signal:>4} {security}")
             
@@ -17654,7 +17654,7 @@ class SecurityTerminal:
                 ap_lines.append(f"... and {len(access_points) - 15} more")
             
             _ultra_type_box(
-                f"📡 Access Points ({len(access_points)})",
+                f"ðŸ“¡ Access Points ({len(access_points)})",
                 ap_lines,
                 title_color=Fore.LIGHTBLUE_EX,
                 border_color=Fore.CYAN,
@@ -17668,7 +17668,7 @@ class SecurityTerminal:
         # Export Results
         #           ==
         _ultra_type_box(
-            "💾 Exporting Results",
+            "ðŸ’¾ Exporting Results",
             ["Generating export files..."],
             title_color=Fore.BLUE,
             border_color=Fore.CYAN,
@@ -17682,7 +17682,7 @@ class SecurityTerminal:
         
         if export_path:
             _ultra_type_box(
-                "✅ Export Complete",
+                "âœ… Export Complete",
                 [f"Results exported to: {export_path}"],
                 title_color=Fore.LIGHTGREEN_EX,
                 border_color=Fore.CYAN,
@@ -17692,7 +17692,7 @@ class SecurityTerminal:
             )
         else:
             _ultra_type_box(
-                "⚠️ Export Failed",
+                "âš ï¸ Export Failed",
                 ["Failed to export results"],
                 title_color=Fore.YELLOW,
                 border_color=Fore.CYAN,
@@ -17705,11 +17705,11 @@ class SecurityTerminal:
         # Footer
         #           ==
         _ultra_type_box(
-            "🔐 WiFi Security Audit Complete",
+            "ðŸ” WiFi Security Audit Complete",
             [
                 f"Report ID: {datetime.now().strftime('%Y%m%d_%H%M%S')}",
                 f"Scan Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-                "© Stark Expo Tech Exchange LTD  |  DSTerminal CyberOps Platform"
+                "Â© Stark Expo Tech Exchange LTD  |  DSTerminal CyberOps Platform"
             ],
             title_color=Fore.CYAN,
             border_color=Fore.CYAN,
@@ -17908,7 +17908,7 @@ class SecurityTerminal:
                         
                         if _ultra_type_finding:
                             sig = ap.get('signal', 0)
-                            sig_indicator = "📶" if sig > 70 else "📡" if sig > 40 else "📻"
+                            sig_indicator = "ðŸ“¶" if sig > 70 else "ðŸ“¡" if sig > 40 else "ðŸ“»"
                             is_connected = " [CONNECTED]" if ap.get('connected', False) else ""
                             bssid_display = f" ({ap['bssid']})" if ap.get('bssid') else ""
                             _ultra_type_finding(
@@ -17936,7 +17936,7 @@ class SecurityTerminal:
                     if _ultra_type_finding:
                         is_connected = " [CONNECTED]" if ap.get('connected', False) else ""
                         _ultra_type_finding(
-                            f"📡 {ap['ssid']}{is_connected} - {ap['security']}",
+                            f"ðŸ“¡ {ap['ssid']}{is_connected} - {ap['security']}",
                             "INFO"
                         )
             
@@ -17954,7 +17954,7 @@ class SecurityTerminal:
                 ap_count += 1
                 if _ultra_type_finding:
                     bssid_display = f" ({ap['bssid']})" if ap['bssid'] != 'Unknown' else ''
-                    _ultra_type_finding(f"📶 {ap['ssid']}{bssid_display} [CONNECTED] - Signal: {ap['signal']}% - {ap['security']}", "INFO")
+                    _ultra_type_finding(f"ðŸ“¶ {ap['ssid']}{bssid_display} [CONNECTED] - Signal: {ap['signal']}% - {ap['security']}", "INFO")
             
             if _ultra_type_success:
                 _ultra_type_success(f"Found {ap_count} access points")
@@ -18080,7 +18080,7 @@ class SecurityTerminal:
                     results['access_points'].append(ap)
                     if _ultra_type_finding:
                         sig = ap.get('signal', 0)
-                        sig_indicator = "📶" if sig > 50 else "📡" if sig > 30 else "📻"
+                        sig_indicator = "ðŸ“¶" if sig > 50 else "ðŸ“¡" if sig > 30 else "ðŸ“»"
                         _ultra_type_finding(f"{sig_indicator} {ap.get('ssid', 'Unknown')} ({ap.get('bssid', '')}) - Signal: {sig}% - {ap.get('security', 'Unknown')}", "INFO")
             
             if _ultra_type_success:
@@ -18214,7 +18214,7 @@ class SecurityTerminal:
                         results['access_points'].append(ap)
                         if _ultra_type_finding:
                             sig = ap.get('signal', 0)
-                            sig_indicator = "📶" if sig > -50 else "📡" if sig > -70 else "📻"
+                            sig_indicator = "ðŸ“¶" if sig > -50 else "ðŸ“¡" if sig > -70 else "ðŸ“»"
                             _ultra_type_finding(f"{sig_indicator} {ap.get('ssid', 'Unknown')} ({ap.get('bssid', '')}) - Signal: {sig} dBm - {ap.get('security_type', ap.get('security', 'Unknown'))}", "INFO")
             
             if _ultra_type_success:
@@ -18326,29 +18326,29 @@ class SecurityTerminal:
         recommendations = []
         
         if security_counts.get('Open', 0) > 0:
-            recommendations.append("🔴 Open networks detected - Disable open networks or implement WPA3 encryption")
+            recommendations.append("ðŸ”´ Open networks detected - Disable open networks or implement WPA3 encryption")
         
         if security_counts.get('WEP', 0) > 0:
-            recommendations.append("🔴 WEP encryption detected - Upgrade to WPA3 immediately (WEP can be cracked in minutes)")
+            recommendations.append("ðŸ”´ WEP encryption detected - Upgrade to WPA3 immediately (WEP can be cracked in minutes)")
         
         if security_counts.get('WPA', 0) > 0:
-            recommendations.append("🟡 WPA encryption detected - Upgrade to WPA2/WPA3 (WPA is deprecated and vulnerable)")
+            recommendations.append("ðŸŸ¡ WPA encryption detected - Upgrade to WPA2/WPA3 (WPA is deprecated and vulnerable)")
         
         if results['summary'].get('rogue_aps', 0) > 0:
-            recommendations.append("🔴 Rogue Access Points detected - Investigate and remove unauthorized APs immediately")
+            recommendations.append("ðŸ”´ Rogue Access Points detected - Investigate and remove unauthorized APs immediately")
         
         if security_counts.get('WPA3', 0) == 0 and security_counts.get('WPA2', 0) > 0:
-            recommendations.append("🟢 WPA2 detected - Consider upgrading to WPA3 for enhanced security")
+            recommendations.append("ðŸŸ¢ WPA2 detected - Consider upgrading to WPA3 for enhanced security")
         
         if not recommendations:
-            recommendations.append("✅ No critical security issues found - Continue monitoring")
+            recommendations.append("âœ… No critical security issues found - Continue monitoring")
         
         results['recommendations'] = recommendations
         
         return results
 
     def _export_wifi_audit_results(self, results):
-        """Export WiFi audit results to JSON and PDF with DSTerminal v3.1.113 watermark - SINGLE EXPORT"""
+        """Export WiFi audit results to JSON and PDF with DSTerminal v4.0.0.113 watermark - SINGLE EXPORT"""
         try:
             from datetime import datetime
             from pathlib import Path
@@ -18375,10 +18375,10 @@ class SecurityTerminal:
             with open(json_filename, 'w') as f:
                 json.dump(results, f, indent=2, default=str)
             
-            print(f"\n{Fore.GREEN}✅ JSON Report exported to: {json_filename}{Style.RESET_ALL}")
+            print(f"\n{Fore.GREEN}âœ… JSON Report exported to: {json_filename}{Style.RESET_ALL}")
             
             #          =====
-            # 2. PDF Export with DSTerminal v3.1.113 Watermark
+            # 2. PDF Export with DSTerminal v4.0.0.113 Watermark
             #          =====
             try:
                 from reportlab.lib.pagesizes import letter
@@ -18441,15 +18441,15 @@ class SecurityTerminal:
                     canvas_obj.setFillColor(colors.HexColor('#cccccc'))
                     canvas_obj.setFont('Helvetica-Bold', 60)
                     canvas_obj.rotate(45)
-                    canvas_obj.drawString(200, 150, "DSTerminal v3.1.113")
+                    canvas_obj.drawString(200, 150, "DSTerminal v4.0.0.113")
                     canvas_obj.setFillColor(colors.HexColor('#dddddd'))
                     canvas_obj.setFont('Helvetica', 30)
                     canvas_obj.rotate(-30)
-                    canvas_obj.drawString(450, -100, "DSTerminal v3.1.113")
+                    canvas_obj.drawString(450, -100, "DSTerminal v4.0.0.113")
                     canvas_obj.setFillColor(colors.HexColor('#eeeeee'))
                     canvas_obj.setFont('Helvetica', 10)
                     canvas_obj.rotate(0)
-                    canvas_obj.drawString(300, 30, "Generated by DSTerminal v3.1.113 WiFi Audit Engine")
+                    canvas_obj.drawString(300, 30, "Generated by DSTerminal v4.0.0.113 WiFi Audit Engine")
                     canvas_obj.restoreState()
                 
                 # Title
@@ -18544,8 +18544,8 @@ class SecurityTerminal:
                     story.append(Spacer(1, 6))
                     
                     for rec in recommendations:
-                        clean_rec = rec.replace('🔴', '[CRITICAL]').replace('🟡', '[MEDIUM]').replace('🟢', '[LOW]').replace('✅', '[OK]')
-                        story.append(Paragraph(f"• {clean_rec}", styles['Normal']))
+                        clean_rec = rec.replace('ðŸ”´', '[CRITICAL]').replace('ðŸŸ¡', '[MEDIUM]').replace('ðŸŸ¢', '[LOW]').replace('âœ…', '[OK]')
+                        story.append(Paragraph(f"â€¢ {clean_rec}", styles['Normal']))
                         story.append(Spacer(1, 4))
                     story.append(Spacer(1, 10))
                 
@@ -18564,7 +18564,7 @@ class SecurityTerminal:
                         channel = str(ap.get('channel', 'N/A'))
                         
                         if ap.get('connected', False):
-                            ssid = f"🔗 {ssid}"
+                            ssid = f"ðŸ”— {ssid}"
                         
                         ap_data.append([ssid, bssid, signal, security[:10], channel])
                     
@@ -18627,19 +18627,19 @@ class SecurityTerminal:
                     textColor=colors.grey,
                     alignment=TA_CENTER
                 )
-                story.append(Paragraph("─" * 80, footer_style))
-                story.append(Paragraph("Generated by DSTerminal v3.1.113 WiFi Security Audit Engine", footer_style))
+                story.append(Paragraph("â”€" * 80, footer_style))
+                story.append(Paragraph("Generated by DSTerminal v4.0.0.113 WiFi Security Audit Engine", footer_style))
                 story.append(Paragraph(f"Report ID: {timestamp}", footer_style))
                 
                 doc.build(story, onFirstPage=add_watermark, onLaterPages=add_watermark)
                 
-                print(f"{Fore.GREEN}✅ PDF Report exported to: {pdf_filename}{Style.RESET_ALL}")
+                print(f"{Fore.GREEN}âœ… PDF Report exported to: {pdf_filename}{Style.RESET_ALL}")
                 
             except ImportError:
-                print(f"{Fore.YELLOW}⚠️ ReportLab not installed - PDF generation skipped{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}âš ï¸ ReportLab not installed - PDF generation skipped{Style.RESET_ALL}")
                 print(f"{Fore.YELLOW}   Install with: pip install reportlab{Style.RESET_ALL}")
             except Exception as e:
-                print(f"{Fore.YELLOW}⚠️ PDF generation failed: {str(e)}{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}âš ï¸ PDF generation failed: {str(e)}{Style.RESET_ALL}")
             
             # Store export key to prevent duplicates
             self._last_export_key = export_key
@@ -18648,7 +18648,7 @@ class SecurityTerminal:
             return str(json_filename)
             
         except Exception as e:
-            print(f"{Fore.YELLOW}⚠️ Failed to export results: {str(e)}{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}âš ï¸ Failed to export results: {str(e)}{Style.RESET_ALL}")
             return None
     
     def _display_wifi_audit_results_generative(self, results, _ultra_type=None, _ultra_type_finding=None, _ultra_type_status=None, _ultra_type_success=None, _ultra_type_error=None):
@@ -18684,7 +18684,7 @@ class SecurityTerminal:
         def glitch_text(text, glitch_chance=0.05):
             """Add random glitch effects to text"""
             if random.random() < glitch_chance:
-                glitch_chars = ['█', '▓', '▒', '░', '▄', '▀', '■', '□', '▪', '▫']
+                glitch_chars = ['â–ˆ', 'â–“', 'â–’', 'â–‘', 'â–„', 'â–€', 'â– ', 'â–¡', 'â–ª', 'â–«']
                 text_list = list(text)
                 for i in range(random.randint(1, 3)):
                     if i < len(text_list):
@@ -18698,15 +18698,15 @@ class SecurityTerminal:
         _ultra_type("\n", delay=0.01)
         
         # Top border
-        top_border = "╔" + "═" * 38 + "╗"
+        top_border = "â•”" + "â•" * 38 + "â•—"
         _ultra_type(" " * ((term_width - 40) // 2) + top_border, delay=0.01, color=Fore.LIGHTGREEN_EX)
         
         # Header with blink effect
-        header = "  ⚡ WIFI AUDIT SUMMARY ⚡  "
-        _ultra_type(" " * ((term_width - 40) // 2) + "║" + header + " " * (40 - len(header) - 2) + "║", delay=0.02, color=Fore.LIGHTGREEN_EX)
+        header = "  âš¡ WIFI AUDIT SUMMARY âš¡  "
+        _ultra_type(" " * ((term_width - 40) // 2) + "â•‘" + header + " " * (40 - len(header) - 2) + "â•‘", delay=0.02, color=Fore.LIGHTGREEN_EX)
         
         # Bottom border
-        bottom_border = "╚" + "═" * 38 + "╝"
+        bottom_border = "â•š" + "â•" * 38 + "â•"
         _ultra_type(" " * ((term_width - 40) // 2) + bottom_border, delay=0.01, color=Fore.LIGHTGREEN_EX)
         time.sleep(0.2)
         
@@ -18728,13 +18728,13 @@ class SecurityTerminal:
         #           ==
         _ultra_type("\n", delay=0.01)
         
-        top_border = "┌" + "─" * 40 + "┐"
+        top_border = "â”Œ" + "â”€" * 40 + "â”"
         _ultra_type(" " * ((term_width - 42) // 2) + top_border, delay=0.01, color=Fore.LIGHTMAGENTA_EX)
         
-        header = "  🔐 SECURITY DISTRIBUTION  "
-        _ultra_type(" " * ((term_width - 42) // 2) + "│" + header + " " * (42 - len(header) - 2) + "│", delay=0.02, color=Fore.LIGHTMAGENTA_EX)
+        header = "  ðŸ” SECURITY DISTRIBUTION  "
+        _ultra_type(" " * ((term_width - 42) // 2) + "â”‚" + header + " " * (42 - len(header) - 2) + "â”‚", delay=0.02, color=Fore.LIGHTMAGENTA_EX)
         
-        separator = "├" + "─" * 40 + "┤"
+        separator = "â”œ" + "â”€" * 40 + "â”¤"
         _ultra_type(" " * ((term_width - 42) // 2) + separator, delay=0.01, color=Fore.LIGHTMAGENTA_EX)
         
         security_types = {
@@ -18747,10 +18747,10 @@ class SecurityTerminal:
         
         for sec_type, (count, color) in security_types.items():
             line = f"  {sec_type:<6}: {count}"
-            _ultra_type(" " * ((term_width - 42) // 2) + "│" + line + " " * (42 - len(line) - 2) + "│", delay=0.025, color=color)
+            _ultra_type(" " * ((term_width - 42) // 2) + "â”‚" + line + " " * (42 - len(line) - 2) + "â”‚", delay=0.025, color=color)
             time.sleep(0.03)
         
-        bottom_border = "└" + "─" * 40 + "┘"
+        bottom_border = "â””" + "â”€" * 40 + "â”˜"
         _ultra_type(" " * ((term_width - 42) // 2) + bottom_border, delay=0.01, color=Fore.LIGHTMAGENTA_EX)
         time.sleep(0.3)
         
@@ -18761,30 +18761,30 @@ class SecurityTerminal:
         if recommendations:
             _ultra_type("\n", delay=0.01)
             
-            top_border = "╔" + "═" * 47 + "╗"
+            top_border = "â•”" + "â•" * 47 + "â•—"
             _ultra_type(" " * ((term_width - 49) // 2) + top_border, delay=0.01, color=Fore.LIGHTCYAN_EX)
             
-            header = "  💡 RECOMMENDATIONS  "
-            _ultra_type(" " * ((term_width - 49) // 2) + "║" + header + " " * (49 - len(header) - 2) + "║", delay=0.02, color=Fore.LIGHTCYAN_EX)
+            header = "  ðŸ’¡ RECOMMENDATIONS  "
+            _ultra_type(" " * ((term_width - 49) // 2) + "â•‘" + header + " " * (49 - len(header) - 2) + "â•‘", delay=0.02, color=Fore.LIGHTCYAN_EX)
             
-            separator = "╠" + "═" * 47 + "╣"
+            separator = "â• " + "â•" * 47 + "â•£"
             _ultra_type(" " * ((term_width - 49) // 2) + separator, delay=0.01, color=Fore.LIGHTCYAN_EX)
             
             for rec in recommendations[:3]:
-                if '🔴' in rec:
+                if 'ðŸ”´' in rec:
                     color = Fore.LIGHTRED_EX
-                elif '🟡' in rec:
+                elif 'ðŸŸ¡' in rec:
                     color = Fore.LIGHTYELLOW_EX
-                elif '🟢' in rec:
+                elif 'ðŸŸ¢' in rec:
                     color = Fore.LIGHTGREEN_EX
                 else:
                     color = Fore.WHITE
                 
                 line = "  " + rec[:45]
-                _ultra_type(" " * ((term_width - 49) // 2) + "║" + line + " " * (49 - len(line) - 2) + "║", delay=0.02, color=color)
+                _ultra_type(" " * ((term_width - 49) // 2) + "â•‘" + line + " " * (49 - len(line) - 2) + "â•‘", delay=0.02, color=color)
                 time.sleep(0.05)
             
-            bottom_border = "╚" + "═" * 47 + "╝"
+            bottom_border = "â•š" + "â•" * 47 + "â•"
             _ultra_type(" " * ((term_width - 49) // 2) + bottom_border, delay=0.01, color=Fore.LIGHTCYAN_EX)
         
         time.sleep(0.3)
@@ -18799,13 +18799,13 @@ class SecurityTerminal:
             
             _ultra_type("\n", delay=0.01)
             
-            top_border = "┌" + "─" * 35 + "┐"
+            top_border = "â”Œ" + "â”€" * 35 + "â”"
             _ultra_type(" " * ((term_width - 37) // 2) + top_border, delay=0.01, color=Fore.LIGHTYELLOW_EX)
             
-            header = "  📊 SECURITY SCORE  "
-            _ultra_type(" " * ((term_width - 37) // 2) + "│" + header + " " * (37 - len(header) - 2) + "│", delay=0.02, color=Fore.LIGHTYELLOW_EX)
+            header = "  ðŸ“Š SECURITY SCORE  "
+            _ultra_type(" " * ((term_width - 37) // 2) + "â”‚" + header + " " * (37 - len(header) - 2) + "â”‚", delay=0.02, color=Fore.LIGHTYELLOW_EX)
             
-            separator = "├" + "─" * 35 + "┤"
+            separator = "â”œ" + "â”€" * 35 + "â”¤"
             _ultra_type(" " * ((term_width - 37) // 2) + separator, delay=0.01, color=Fore.LIGHTYELLOW_EX)
             
             if security_score >= 90:
@@ -18822,12 +18822,12 @@ class SecurityTerminal:
                 status_text = "POOR"
             
             line = f"  {security_score}/100 - {status_text}"
-            _ultra_type(" " * ((term_width - 37) // 2) + "│" + line + " " * (37 - len(line) - 2) + "│", delay=0.02, color=score_color)
+            _ultra_type(" " * ((term_width - 37) // 2) + "â”‚" + line + " " * (37 - len(line) - 2) + "â”‚", delay=0.02, color=score_color)
             
             # Security bar
             bar_length = 25
             filled = int((security_score / 100) * bar_length)
-            bar = "█" * filled + "░" * (bar_length - filled)
+            bar = "â–ˆ" * filled + "â–‘" * (bar_length - filled)
             
             if security_score >= 70:
                 bar_color = Fore.LIGHTGREEN_EX
@@ -18837,9 +18837,9 @@ class SecurityTerminal:
                 bar_color = Fore.LIGHTRED_EX
             
             line = f"  [{bar}]"
-            _ultra_type(" " * ((term_width - 37) // 2) + "│" + line + " " * (37 - len(line) - 2) + "│", delay=0.01, color=bar_color)
+            _ultra_type(" " * ((term_width - 37) // 2) + "â”‚" + line + " " * (37 - len(line) - 2) + "â”‚", delay=0.01, color=bar_color)
             
-            bottom_border = "└" + "─" * 35 + "┘"
+            bottom_border = "â””" + "â”€" * 35 + "â”˜"
             _ultra_type(" " * ((term_width - 37) // 2) + bottom_border, delay=0.01, color=Fore.LIGHTYELLOW_EX)
         
         time.sleep(0.3)
@@ -18851,13 +18851,13 @@ class SecurityTerminal:
         if access_points:
             _ultra_type("\n", delay=0.01)
             
-            top_border = "╔" + "═" * 52 + "╗"
+            top_border = "â•”" + "â•" * 52 + "â•—"
             _ultra_type(" " * ((term_width - 54) // 2) + top_border, delay=0.01, color=Fore.LIGHTBLUE_EX)
             
-            header = "  📡 ACCESS POINTS  "
-            _ultra_type(" " * ((term_width - 54) // 2) + "║" + header + " " * (54 - len(header) - 2) + "║", delay=0.02, color=Fore.LIGHTBLUE_EX)
+            header = "  ðŸ“¡ ACCESS POINTS  "
+            _ultra_type(" " * ((term_width - 54) // 2) + "â•‘" + header + " " * (54 - len(header) - 2) + "â•‘", delay=0.02, color=Fore.LIGHTBLUE_EX)
             
-            separator = "╠" + "═" * 52 + "╣"
+            separator = "â• " + "â•" * 52 + "â•£"
             _ultra_type(" " * ((term_width - 54) // 2) + separator, delay=0.01, color=Fore.LIGHTBLUE_EX)
             
             for ap in access_points[:10]:
@@ -18887,14 +18887,14 @@ class SecurityTerminal:
                 
                 # Split the line into parts for different colors
                 # This is simpler: just use the color parameter
-                _ultra_type(" " * ((term_width - 54) // 2) + "║" + line + " " * (54 - len(line) - 2) + "║", delay=0.025, color=Fore.WHITE)
+                _ultra_type(" " * ((term_width - 54) // 2) + "â•‘" + line + " " * (54 - len(line) - 2) + "â•‘", delay=0.025, color=Fore.WHITE)
                 time.sleep(0.05)
             
             if len(access_points) > 10:
                 line = f"  ... and {len(access_points) - 10} more"
-                _ultra_type(" " * ((term_width - 54) // 2) + "║" + line + " " * (54 - len(line) - 2) + "║", delay=0.02, color=Fore.LIGHTYELLOW_EX)
+                _ultra_type(" " * ((term_width - 54) // 2) + "â•‘" + line + " " * (54 - len(line) - 2) + "â•‘", delay=0.02, color=Fore.LIGHTYELLOW_EX)
             
-            bottom_border = "╚" + "═" * 52 + "╝"
+            bottom_border = "â•š" + "â•" * 52 + "â•"
             _ultra_type(" " * ((term_width - 54) // 2) + bottom_border, delay=0.01, color=Fore.LIGHTBLUE_EX)
         
         time.sleep(0.3)
@@ -18905,10 +18905,10 @@ class SecurityTerminal:
         _ultra_type("\n", delay=0.01)
         
         # Matrix-style footer
-        matrix_chars = ['0', '1', ' ', '░', '▒', '▓']
+        matrix_chars = ['0', '1', ' ', 'â–‘', 'â–’', 'â–“']
         matrix_line = ''.join(random.choice(matrix_chars) for _ in range(40))
         
-        footer = "▸ ⚡ WiFi Audit Complete ◂"
+        footer = "â–¸ âš¡ WiFi Audit Complete â—‚"
         _ultra_type(" " * ((term_width - len(footer)) // 2) + footer, delay=0.02, color=Fore.LIGHTGREEN_EX)
         
         # Random matrix rain effect
@@ -18923,14 +18923,14 @@ class SecurityTerminal:
         #           ==
         # Export Results
         #           ==
-        _ultra_type("\n💾 Exporting Results...", delay=0.02, color=Fore.LIGHTCYAN_EX)
+        _ultra_type("\nðŸ’¾ Exporting Results...", delay=0.02, color=Fore.LIGHTCYAN_EX)
         time.sleep(0.3)
         
         export_path = self._export_wifi_audit_results(results)
         if export_path:
-            _ultra_type(f"✅ Results exported to: {export_path}", delay=0.02, color=Fore.LIGHTGREEN_EX)
+            _ultra_type(f"âœ… Results exported to: {export_path}", delay=0.02, color=Fore.LIGHTGREEN_EX)
         else:
-            _ultra_type("⚠️ Failed to export results", delay=0.02, color=Fore.LIGHTYELLOW_EX)
+            _ultra_type("âš ï¸ Failed to export results", delay=0.02, color=Fore.LIGHTYELLOW_EX)
                     
     def _display_wifi_audit_results_fallback(self, results):
         """Fallback display without generative writing"""
@@ -18938,9 +18938,9 @@ class SecurityTerminal:
         import json
         from datetime import datetime
         
-        print(f"\n{Fore.CYAN}╔{'═' * 70}╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.WHITE}📊 WIFI AUDIT RESULTS{Style.RESET_ALL}                          {Fore.CYAN}║{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}╚{'═' * 70}╝{Style.RESET_ALL}")
+        print(f"\n{Fore.CYAN}â•”{'â•' * 70}â•—{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â•‘{Style.RESET_ALL}  {Fore.WHITE}ðŸ“Š WIFI AUDIT RESULTS{Style.RESET_ALL}                          {Fore.CYAN}â•‘{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}â•š{'â•' * 70}â•{Style.RESET_ALL}")
         print(f"{Fore.CYAN}Audit Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{Style.RESET_ALL}")
         print(f"{Fore.CYAN}System: {results.get('system', 'Unknown').upper()}{Style.RESET_ALL}")
         print(f"{Fore.CYAN}Host: {results.get('hostname', 'Unknown')}{Style.RESET_ALL}")
@@ -18952,7 +18952,7 @@ class SecurityTerminal:
         #           ==
         # Summary Statistics
         #           ==
-        print(f"\n{Fore.CYAN}📈 Summary Statistics:{Style.RESET_ALL}")
+        print(f"\n{Fore.CYAN}ðŸ“ˆ Summary Statistics:{Style.RESET_ALL}")
         print(f"  {Fore.YELLOW}Total Access Points:{Style.RESET_ALL} {summary.get('total_aps', 0)}")
         print(f"  {Fore.GREEN}Secured Networks:{Style.RESET_ALL} {summary.get('secured_aps', 0)}")
         print(f"  {Fore.RED}Open Networks:{Style.RESET_ALL} {summary.get('open_aps', 0)}")
@@ -18967,7 +18967,7 @@ class SecurityTerminal:
         #           ==
         security_findings = results.get('security_findings', [])
         if security_findings:
-            print(f"\n{Fore.RED}🚨 Security Findings:{Style.RESET_ALL}")
+            print(f"\n{Fore.RED}ðŸš¨ Security Findings:{Style.RESET_ALL}")
             for finding in security_findings:
                 severity = finding.get('severity', 'UNKNOWN')
                 if severity == 'CRITICAL':
@@ -18986,13 +18986,13 @@ class SecurityTerminal:
         #           ==
         recommendations = results.get('recommendations', [])
         if recommendations:
-            print(f"\n{Fore.CYAN}💡 Recommendations:{Style.RESET_ALL}")
+            print(f"\n{Fore.CYAN}ðŸ’¡ Recommendations:{Style.RESET_ALL}")
             for rec in recommendations:
-                if '🔴' in rec:
+                if 'ðŸ”´' in rec:
                     rec_color = Fore.RED
-                elif '🟡' in rec:
+                elif 'ðŸŸ¡' in rec:
                     rec_color = Fore.YELLOW
-                elif '🟢' in rec:
+                elif 'ðŸŸ¢' in rec:
                     rec_color = Fore.GREEN
                 else:
                     rec_color = Fore.WHITE
@@ -19003,10 +19003,10 @@ class SecurityTerminal:
         #           ==
         access_points = results.get('access_points', [])
         if access_points:
-            print(f"\n{Fore.CYAN}📡 Access Points:{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}{'─' * 70}{Style.RESET_ALL}")
+            print(f"\n{Fore.CYAN}ðŸ“¡ Access Points:{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}{'â”€' * 70}{Style.RESET_ALL}")
             print(f"{'SSID':<25} {'BSSID':<18} {'Signal':<8} {'Sec':<10} {'Channel':<8}")
-            print(f"{Fore.CYAN}{'─' * 70}{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}{'â”€' * 70}{Style.RESET_ALL}")
             
             for ap in access_points[:20]:
                 ssid = ap.get('ssid', '<Hidden>')[:24]
@@ -19046,7 +19046,7 @@ class SecurityTerminal:
         #           ==
         # Detailed Security Analysis
         #           ==
-        print(f"\n{Fore.CYAN}🔍 Detailed Security Analysis:{Style.RESET_ALL}")
+        print(f"\n{Fore.CYAN}ðŸ” Detailed Security Analysis:{Style.RESET_ALL}")
         
         # Analyze security types
         security_types = {}
@@ -19088,11 +19088,11 @@ class SecurityTerminal:
                 
                 # Signal strength assessment
                 if avg_signal > 70:
-                    print(f"    {Fore.GREEN}✓ Excellent signal strength{Style.RESET_ALL}")
+                    print(f"    {Fore.GREEN}âœ“ Excellent signal strength{Style.RESET_ALL}")
                 elif avg_signal > 50:
-                    print(f"    {Fore.YELLOW}⚠️ Good signal strength{Style.RESET_ALL}")
+                    print(f"    {Fore.YELLOW}âš ï¸ Good signal strength{Style.RESET_ALL}")
                 else:
-                    print(f"    {Fore.RED}✗ Weak signal strength - Possible interference or distance{Style.RESET_ALL}")
+                    print(f"    {Fore.RED}âœ— Weak signal strength - Possible interference or distance{Style.RESET_ALL}")
         
         #           ==
         # Channel Analysis
@@ -19149,7 +19149,7 @@ class SecurityTerminal:
             # Security bar
             bar_length = 40
             filled = int((security_score / 100) * bar_length)
-            bar = "█" * filled + "░" * (bar_length - filled)
+            bar = "â–ˆ" * filled + "â–‘" * (bar_length - filled)
             
             if security_score >= 70:
                 bar_color = Fore.GREEN
@@ -19165,21 +19165,21 @@ class SecurityTerminal:
         # ==
         rogue_aps = summary.get('rogue_aps', 0)
         if rogue_aps > 0:
-            print(f"\n  {Fore.RED}⚠️ Rogue Access Point Details:{Style.RESET_ALL}")
+            print(f"\n  {Fore.RED}âš ï¸ Rogue Access Point Details:{Style.RESET_ALL}")
             print(f"    {Fore.RED}Found {rogue_aps} potential rogue APs{Style.RESET_ALL}")
             
             # List rogue APs
             for ap in access_points:
                 if ap.get('security_type') == 'Open' and ap.get('ssid') != '<Hidden>':
-                    print(f"    {Fore.RED}  • {ap.get('ssid')} ({ap.get('bssid')}) - Open network{Style.RESET_ALL}")
+                    print(f"    {Fore.RED}  â€¢ {ap.get('ssid')} ({ap.get('bssid')}) - Open network{Style.RESET_ALL}")
         
         # ==
         # Footer
         # ==
-        print(f"\n{Fore.CYAN}{'═' * 70}{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}🔐 WiFi Audit Complete{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}📁 Results exported to: {results.get('export_path', 'Not exported')}{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}{'═' * 70}{Style.RESET_ALL}\n")
+        print(f"\n{Fore.CYAN}{'â•' * 70}{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}ðŸ” WiFi Audit Complete{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}ðŸ“ Results exported to: {results.get('export_path', 'Not exported')}{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}{'â•' * 70}{Style.RESET_ALL}\n")
         
         # ==
         # Export results to file
@@ -19195,10 +19195,10 @@ class SecurityTerminal:
                 json.dump(results, f, indent=2, default=str)
             
             results['export_path'] = str(filename)
-            print(f"{Fore.GREEN}✅ Results exported to: {filename}{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}âœ… Results exported to: {filename}{Style.RESET_ALL}")
             
         except Exception as e:
-            print(f"{Fore.YELLOW}⚠️ Failed to export results: {str(e)}{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}âš ï¸ Failed to export results: {str(e)}{Style.RESET_ALL}")
         
         return results
  
@@ -19244,20 +19244,20 @@ class SecurityTerminal:
 
     def _scan_bar(self, label, duration=10, width=30):
         """Animated progress bar for cinematic scanning"""
-        sys.stdout.write(f"    ├─ {label}: ")
+        sys.stdout.write(f"    â”œâ”€ {label}: ")
         sys.stdout.flush()
         steps = 20
         for i in range(steps):
-            sys.stdout.write("█")
+            sys.stdout.write("â–ˆ")
             sys.stdout.flush()
             time.sleep(duration / steps)
-        print(" ✓")
+        print(" âœ“")
 
 
     def check_steganography(self, image_path):
         """
         Perform non-invasive steganalysis checks on an image.
-        Detection only – no extraction or execution.
+        Detection only â€“ no extraction or execution.
         """
 
         if not os.path.exists(image_path):
@@ -19317,18 +19317,18 @@ class SecurityTerminal:
                 print("\n[!] WARNING: Potential anomalies detected")
                 for a in anomalies:
                     time.sleep(1.5)
-                    print(f"    ├─ {a}")
+                    print(f"    â”œâ”€ {a}")
 
                 confidence = "MEDIUM" if len(anomalies) > 1 else "LOW"
                 print(f"\n[+] Confidence level: {confidence}")
                 print("[+] Recommendation: Manual forensic review advised")
             else:
-                print("\n[✓] No obvious steganographic indicators detected")
+                print("\n[âœ“] No obvious steganographic indicators detected")
                 print("[+] Confidence level: LOW")
                 print("[+] Image appears normal")
 
             time.sleep(2)
-            print("\n[✓] Steganalysis completed successfully")
+            print("\n[âœ“] Steganalysis completed successfully")
 
         except Exception as e:
             print(f"[!] Analysis error: {e}")
@@ -19375,18 +19375,18 @@ class SecurityTerminal:
 
             # Cinematic header with typing effect
             self._type_text("""
-        ╔══════════════════════════════════════════════════════════════════════╗
-        ║                                                                      ║
-        ║     ██████╗███████╗██████╗ ████████╗██╗███████╗██╗ ██████╗ █████╗   ║
-        ║    ██╔════╝██╔════╝██╔══██╗╚══██╔══╝██║██╔════╝██║██╔════╝██╔══██╗  ║
-        ║    ██║     █████╗  ██████╔╝   ██║   ██║█████╗  ██║██║     ███████║  ║
-        ║    ██║     ██╔══╝  ██╔══██╗   ██║   ██║██╔══╝  ██║██║     ██╔══██║  ║
-        ║    ╚██████╗███████╗██║  ██║   ██║   ██║██║     ██║╚██████╗██║  ██║  ║
-        ║     ╚═════╝╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═╝╚═╝     ╚═╝ ╚═════╝╚═╝  ╚═╝  ║
-        ║                                                                      ║
-        ║              🔐 SSL/TLS CERTIFICATE SECURITY ENGINE                 ║
-        ║                                                                      ║
-        ╚══════════════════════════════════════════════════════════════════════╝
+        â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+        â•‘                                                                      â•‘
+        â•‘     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â•‘
+        â•‘    â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â•šâ•â•â–ˆâ–ˆâ•”â•â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—  â•‘
+        â•‘    â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘  â•‘
+        â•‘    â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘  â•‘
+        â•‘    â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘  â•‘
+        â•‘     â•šâ•â•â•â•â•â•â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•   â•šâ•â•   â•šâ•â•â•šâ•â•     â•šâ•â• â•šâ•â•â•â•â•â•â•šâ•â•  â•šâ•â•  â•‘
+        â•‘                                                                      â•‘
+        â•‘              ðŸ” SSL/TLS CERTIFICATE SECURITY ENGINE                 â•‘
+        â•‘                                                                      â•‘
+        â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
             """, delay=0.025)
 
             time.sleep(0.5)
@@ -19395,10 +19395,10 @@ class SecurityTerminal:
 
         # Cinematic header
             banner = """
-            ████╗  █████╗  ██╔██╗ ██║█████╗   ╚███╔╝
-            ██║  ██║██╔══╝  ██╔══╝  ██╔══╝  ██║╚██╗██║
-            ██████╔╝██║     ██║     ███████╗██║ ╚████║
-            ╚═════╝ ╚═╝     ╚═╝     ╚══════╝╚═╝  ╚═══╝
+            â–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•”â–ˆâ–ˆâ•— â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â•šâ–ˆâ–ˆâ–ˆâ•”â•
+            â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘
+            â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘ â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•‘
+            â•šâ•â•â•â•â•â• â•šâ•â•     â•šâ•â•     â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•â•â•
             """
             print(banner)
             print(f"\n[-- DFFENEX@DSTerminal ]-[] certcheck")
@@ -19441,7 +19441,7 @@ class SecurityTerminal:
     def _type_header(self, text, color=Fore.CYAN):
         """Print a header with typing effect."""
         self._type_text(f"\n{text}", 0.03, color)
-        self._type_text("━" * min(len(text), 70), 0.01, Fore.CYAN)
+        self._type_text("â”" * min(len(text), 70), 0.01, Fore.CYAN)
 
     def _type_status(self, text, delay=0.025, color=Fore.CYAN):
         """Print a status message with typing effect."""
@@ -19470,12 +19470,12 @@ class SecurityTerminal:
             "PASS": Fore.LIGHTGREEN_EX
         }
         prefix = {
-            "CRITICAL": "🚨",
-            "HIGH": "⚠️",
-            "MEDIUM": "⚡",
-            "LOW": "ℹ️",
-            "INFO": "📌",
-            "PASS": "✅"
+            "CRITICAL": "ðŸš¨",
+            "HIGH": "âš ï¸",
+            "MEDIUM": "âš¡",
+            "LOW": "â„¹ï¸",
+            "INFO": "ðŸ“Œ",
+            "PASS": "âœ…"
         }
         color = colors.get(severity, Fore.WHITE)
         self._type_text(f"{prefix.get(severity, '')} {text}", delay, color)
@@ -19493,7 +19493,7 @@ class SecurityTerminal:
                     return
             
             # Security Impact Header
-            self._type_header("🔐 SSL/TLS Security Assessment", Fore.CYAN)
+            self._type_header("ðŸ” SSL/TLS Security Assessment", Fore.CYAN)
             time.sleep(0.2)
             
             self._type_finding("Certificate Chain Validation: Verifying trust chain integrity", "INFO")
@@ -19688,24 +19688,24 @@ class SecurityTerminal:
         if risk == 0:
             level = "LOW"
             risk_color = Fore.LIGHTGREEN_EX
-            risk_emoji = "🟢"
+            risk_emoji = "ðŸŸ¢"
         elif risk <= 3:
             level = "MEDIUM"
             risk_color = Fore.LIGHTYELLOW_EX
-            risk_emoji = "🟡"
+            risk_emoji = "ðŸŸ¡"
         elif risk <= 6:
             level = "HIGH"
             risk_color = Fore.RED
-            risk_emoji = "🔴"
+            risk_emoji = "ðŸ”´"
         else:
             level = "CRITICAL"
             risk_color = Fore.LIGHTRED_EX
-            risk_emoji = "🚨"
+            risk_emoji = "ðŸš¨"
         
         # ==
         # Display Certificate Information with Typing
         # ==
-        self._type_header("\n📊 Certificate Analysis", Fore.LIGHTCYAN_EX)
+        self._type_header("\nðŸ“Š Certificate Analysis", Fore.LIGHTCYAN_EX)
         time.sleep(0.2)
         
         # Basic Info
@@ -19729,7 +19729,7 @@ class SecurityTerminal:
         # ==
         # Expiration Analysis
         # ==
-        self._type_header("\n⏰ Expiration Analysis", Fore.LIGHTYELLOW_EX)
+        self._type_header("\nâ° Expiration Analysis", Fore.LIGHTYELLOW_EX)
         time.sleep(0.2)
         
         not_before = cert_obj.get_notBefore().decode()
@@ -19742,13 +19742,13 @@ class SecurityTerminal:
             self._type_text(f"  Issued: {not_before_dt.strftime('%Y-%m-%d %H:%M:%S')}", 0.02, Fore.CYAN)
             
             if valid_days < 0:
-                self._type_text(f"  ⚠️ EXPIRED: {not_after_dt.strftime('%Y-%m-%d %H:%M:%S')} ({abs(valid_days)} days overdue)", 0.02, Fore.LIGHTRED_EX)
+                self._type_text(f"  âš ï¸ EXPIRED: {not_after_dt.strftime('%Y-%m-%d %H:%M:%S')} ({abs(valid_days)} days overdue)", 0.02, Fore.LIGHTRED_EX)
             elif valid_days < 30:
-                self._type_text(f"  ⚠️ Expires Soon: {not_after_dt.strftime('%Y-%m-%d %H:%M:%S')} ({valid_days} days)", 0.02, Fore.LIGHTYELLOW_EX)
+                self._type_text(f"  âš ï¸ Expires Soon: {not_after_dt.strftime('%Y-%m-%d %H:%M:%S')} ({valid_days} days)", 0.02, Fore.LIGHTYELLOW_EX)
             elif valid_days < 90:
-                self._type_text(f"  📅 Expires: {not_after_dt.strftime('%Y-%m-%d %H:%M:%S')} ({valid_days} days)", 0.02, Fore.YELLOW)
+                self._type_text(f"  ðŸ“… Expires: {not_after_dt.strftime('%Y-%m-%d %H:%M:%S')} ({valid_days} days)", 0.02, Fore.YELLOW)
             else:
-                self._type_text(f"  ✅ Expires: {not_after_dt.strftime('%Y-%m-%d %H:%M:%S')} ({valid_days} days)", 0.02, Fore.LIGHTGREEN_EX)
+                self._type_text(f"  âœ… Expires: {not_after_dt.strftime('%Y-%m-%d %H:%M:%S')} ({valid_days} days)", 0.02, Fore.LIGHTGREEN_EX)
             
             # Validity period
             validity_days = (not_after_dt - not_before_dt).days
@@ -19763,7 +19763,7 @@ class SecurityTerminal:
         # ==
         # SAN Analysis
         # ==
-        self._type_header("\n🌐 Subject Alternative Names", Fore.LIGHTBLUE_EX)
+        self._type_header("\nðŸŒ Subject Alternative Names", Fore.LIGHTBLUE_EX)
         time.sleep(0.2)
         
         try:
@@ -19784,9 +19784,9 @@ class SecurityTerminal:
                 pass
             
             if san_list:
-                self._type_text(f"  📡 SANs ({len(san_list)}):", 0.02, Fore.CYAN)
+                self._type_text(f"  ðŸ“¡ SANs ({len(san_list)}):", 0.02, Fore.CYAN)
                 for san in san_list[:10]:
-                    self._type_text(f"    • {san}", 0.02, Fore.WHITE)
+                    self._type_text(f"    â€¢ {san}", 0.02, Fore.WHITE)
                 if len(san_list) > 10:
                     self._type_text(f"    ... and {len(san_list) - 10} more", 0.02, Fore.CYAN)
             else:
@@ -19799,7 +19799,7 @@ class SecurityTerminal:
         # ==
         # Key Strength Analysis
         # ==
-        self._type_header("\n🔑 Key Strength Analysis", Fore.LIGHTMAGENTA_EX)
+        self._type_header("\nðŸ”‘ Key Strength Analysis", Fore.LIGHTMAGENTA_EX)
         time.sleep(0.2)
         
         try:
@@ -19855,7 +19855,7 @@ class SecurityTerminal:
         # ==
         # Security Findings
         # ==
-        self._type_header("\n🚨 Security Findings", Fore.RED)
+        self._type_header("\nðŸš¨ Security Findings", Fore.RED)
         time.sleep(0.2)
         
         findings = []
@@ -19898,7 +19898,7 @@ class SecurityTerminal:
         # ==
         # Risk Score
         # ==
-        self._type_header("\n📊 Security Score", Fore.CYAN)
+        self._type_header("\nðŸ“Š Security Score", Fore.CYAN)
         time.sleep(0.2)
         
         # Calculate score (100 - risk)
@@ -19909,7 +19909,7 @@ class SecurityTerminal:
         # Score bar
         bar_length = 30
         filled = int((score / 100) * bar_length)
-        bar = "█" * filled + "░" * (bar_length - filled)
+        bar = "â–ˆ" * filled + "â–‘" * (bar_length - filled)
         
         if score >= 80:
             bar_color = Fore.LIGHTGREEN_EX
@@ -19928,7 +19928,7 @@ class SecurityTerminal:
         # ==
         # Recommendations
         # ==
-        self._type_header("\n💡 Recommendations", Fore.LIGHTBLUE_EX)
+        self._type_header("\nðŸ’¡ Recommendations", Fore.LIGHTBLUE_EX)
         time.sleep(0.2)
         
         recommendations = []
@@ -19958,7 +19958,7 @@ class SecurityTerminal:
             self._type_finding("No recommendations - Certificate is secure", "PASS")
         else:
             for rec in recommendations[:5]:
-                self._type_text(f"  • {rec}", 0.02, Fore.WHITE)
+                self._type_text(f"  â€¢ {rec}", 0.02, Fore.WHITE)
                 time.sleep(0.05)
         
         time.sleep(0.3)
@@ -19966,7 +19966,7 @@ class SecurityTerminal:
         # ==
         # Certificate Chain
         # ==
-        self._type_header("\n🔗 Certificate Chain", Fore.MAGENTA)
+        self._type_header("\nðŸ”— Certificate Chain", Fore.MAGENTA)
         time.sleep(0.2)
         
         for i, cert in enumerate(chain):
@@ -19989,7 +19989,7 @@ class SecurityTerminal:
                 color = Fore.LIGHTCYAN_EX
                 role = "Intermediate"
             
-            self._type_text(f"{indent} {color}├─ [{role}] {subject_name}{Style.RESET_ALL}", 0.02, color)
+            self._type_text(f"{indent} {color}â”œâ”€ [{role}] {subject_name}{Style.RESET_ALL}", 0.02, color)
             self._type_text(f"{indent}    Issuer: {issuer_name}", 0.02, Fore.CYAN)
             if hasattr(cert, 'get'):
                 self._type_text(f"{indent}    Serial: {cert.get('serial', 'N/A')}", 0.02, Fore.CYAN)
@@ -20000,7 +20000,7 @@ class SecurityTerminal:
         # ==
         # Export Options
         # ==
-        self._type_header("\n💾 Export Options", Fore.BLUE)
+        self._type_header("\nðŸ’¾ Export Options", Fore.BLUE)
         time.sleep(0.2)
         
         self._type_text("  [1] Export JSON Report", 0.02, Fore.WHITE)
@@ -20044,10 +20044,10 @@ class SecurityTerminal:
         # ==
         # Footer
         # ==
-        self._type_text("\n" + "═" * 70, 0.01, Fore.CYAN)
-        self._type_text(f"🔐 SSL/TLS Certificate Audit Complete: {domain}", 0.02, Fore.LIGHTGREEN_EX)
-        self._type_text(f"📅 Scan Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", 0.02, Fore.CYAN)
-        self._type_text("═" * 70, 0.01, Fore.CYAN)
+        self._type_text("\n" + "â•" * 70, 0.01, Fore.CYAN)
+        self._type_text(f"ðŸ” SSL/TLS Certificate Audit Complete: {domain}", 0.02, Fore.LIGHTGREEN_EX)
+        self._type_text(f"ðŸ“… Scan Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", 0.02, Fore.CYAN)
+        self._type_text("â•" * 70, 0.01, Fore.CYAN)
     
     def _get_certificate_chain(self, cert_obj):
         """Get certificate chain using cryptography to avoid deprecation warnings"""
@@ -20115,12 +20115,12 @@ class SecurityTerminal:
         sys.stdout.write("\033[K")  # Clear current line
         
         # Top border (centered)
-        print(" " * left_padding + color + "┌" + "─" * box_width + "┐" + Style.RESET_ALL)
+        print(" " * left_padding + color + "â”Œ" + "â”€" * box_width + "â”" + Style.RESET_ALL)
         
         # Title with blinking effect
         title_text = f"{blink}{title}{Style.RESET_ALL}" if not error else title
-        print(" " * left_padding + color + "│" + Style.RESET_ALL + f" {title_text}".ljust(box_width + 1) + color + "│" + Style.RESET_ALL)
-        print(" " * left_padding + color + "├" + "─" * box_width + "┤" + Style.RESET_ALL)
+        print(" " * left_padding + color + "â”‚" + Style.RESET_ALL + f" {title_text}".ljust(box_width + 1) + color + "â”‚" + Style.RESET_ALL)
+        print(" " * left_padding + color + "â”œ" + "â”€" * box_width + "â”¤" + Style.RESET_ALL)
         
         # Animation inside box
 
@@ -20140,15 +20140,15 @@ class SecurityTerminal:
         sys.stdout.write("\033[K")  # Clear current line
     
     # Top border (centered)
-        print(" " * left_padding + color + "┌" + "─" * box_width + "┐" + Style.RESET_ALL)
+        print(" " * left_padding + color + "â”Œ" + "â”€" * box_width + "â”" + Style.RESET_ALL)
     
     # Title with blinking effect
         title_text = f"{blink}{title}{Style.RESET_ALL}" if not error else title
-        print(" " * left_padding + color + "│" + Style.RESET_ALL + f" {title_text}".ljust(box_width + 1) + color + "│" + Style.RESET_ALL)
-        print(" " * left_padding + color + "├" + "─" * box_width + "┤" + Style.RESET_ALL)
+        print(" " * left_padding + color + "â”‚" + Style.RESET_ALL + f" {title_text}".ljust(box_width + 1) + color + "â”‚" + Style.RESET_ALL)
+        print(" " * left_padding + color + "â”œ" + "â”€" * box_width + "â”¤" + Style.RESET_ALL)
     
     # Animation inside box
-        spinner = ["⠋","⠙","⠹","⠸","⠼","⠴","⠦","⠧","⠇","⠏"]
+        spinner = ["â ‹","â ™","â ¹","â ¸","â ¼","â ´","â ¦","â §","â ‡","â "]
         flickers = [
             "[SCANNING...]", "[TLS CHECK]", "[OCSP QUERY]", 
             "[CERT VERIFY]", "[RISK ASSESS]", "[CHAIN ANALYZE]",
@@ -20161,7 +20161,7 @@ class SecurityTerminal:
     
         while time.time() < end_time:
             progress = int(((time.time() % seconds) / seconds) * (box_width - 10))
-            bar = "█" * progress + "░" * (box_width - 10 - progress)
+            bar = "â–ˆ" * progress + "â–‘" * (box_width - 10 - progress)
             flicker_text = random.choice(flickers)
             
             # Create the content line
@@ -20178,7 +20178,7 @@ class SecurityTerminal:
         # Position cursor and update
             sys.stdout.write(f"\033[s")  # Save position
             sys.stdout.write(f"\033[{left_padding+1}G")  # Move to start of box content
-            sys.stdout.write(color + "│" + Style.RESET_ALL + f" {content} " + color + "│" + Style.RESET_ALL)
+            sys.stdout.write(color + "â”‚" + Style.RESET_ALL + f" {content} " + color + "â”‚" + Style.RESET_ALL)
             sys.stdout.write(f"\033[u")  # Restore position
             sys.stdout.flush()
             time.sleep(0.1)
@@ -20188,7 +20188,7 @@ class SecurityTerminal:
 
     
     # Bottom border (centered)
-        print("\n" + " " * left_padding + color + "└" + "─" * box_width + "┘" + Style.RESET_ALL)
+        print("\n" + " " * left_padding + color + "â””" + "â”€" * box_width + "â”˜" + Style.RESET_ALL)
         sys.stdout.flush()
 
     def _animated_ssl_scan(self):
@@ -20254,10 +20254,10 @@ class SecurityTerminal:
         print("\n" * 2)
     
     # Top border with title
-        print(" " * left_padding + Fore.CYAN + "╔" + "═" * table_width + "╗" + Style.RESET_ALL)
-        title = "🔐 DSTERMINAL SSL/TLS SECURITY AUDIT 🔐"
-        print(" " * left_padding + Fore.CYAN + "║" + Style.RESET_ALL + f"{blink}{Fore.LIGHTYELLOW_EX}{title:^{table_width}}{Style.RESET_ALL}" + Fore.CYAN + "║" + Style.RESET_ALL)
-        print(" " * left_padding + Fore.CYAN + "╠" + "═" * table_width + "╣" + Style.RESET_ALL)
+        print(" " * left_padding + Fore.CYAN + "â•”" + "â•" * table_width + "â•—" + Style.RESET_ALL)
+        title = "ðŸ” DSTERMINAL SSL/TLS SECURITY AUDIT ðŸ”"
+        print(" " * left_padding + Fore.CYAN + "â•‘" + Style.RESET_ALL + f"{blink}{Fore.LIGHTYELLOW_EX}{title:^{table_width}}{Style.RESET_ALL}" + Fore.CYAN + "â•‘" + Style.RESET_ALL)
+        print(" " * left_padding + Fore.CYAN + "â• " + "â•" * table_width + "â•£" + Style.RESET_ALL)
         
         # Table content with blinking effect
         for key, value in cert_data.items():
@@ -20295,14 +20295,14 @@ class SecurityTerminal:
             row = f" {key_str:<20} {value_str:<{table_width-23}}"
             
             # Print row with animation
-            print(" " * left_padding + Fore.CYAN + "║" + Style.RESET_ALL + row + " " * (table_width - len(row) + 1) + Fore.CYAN + "║" + Style.RESET_ALL)
+            print(" " * left_padding + Fore.CYAN + "â•‘" + Style.RESET_ALL + row + " " * (table_width - len(row) + 1) + Fore.CYAN + "â•‘" + Style.RESET_ALL)
             time.sleep(0.1)  # Typing effect
         
         # Bottom border
-        print(" " * left_padding + Fore.CYAN + "╚" + "═" * table_width + "╝" + Style.RESET_ALL)
+        print(" " * left_padding + Fore.CYAN + "â•š" + "â•" * table_width + "â•" + Style.RESET_ALL)
         
         # Add status line
-        status = f"{Fore.GREEN}[✓] SCAN COMPLETE • {datetime.now().strftime('%H:%M:%S')}{Style.RESET_ALL}"
+        status = f"{Fore.GREEN}[âœ“] SCAN COMPLETE â€¢ {datetime.now().strftime('%H:%M:%S')}{Style.RESET_ALL}"
         print(" " * ((terminal_width - len(status)) // 2) + status)
 
     def _get_cert_cn(self, cert_obj, field="subject"):
@@ -20347,14 +20347,14 @@ class SecurityTerminal:
             row = f" {key_str:<20} {value_str:<{table_width-23}}"
         
         # Print row with animation
-            print(" " * left_padding + Fore.CYAN + "║" + Style.RESET_ALL + row + " " * (table_width - len(row) + 1) + Fore.CYAN + "║" + Style.RESET_ALL)
+            print(" " * left_padding + Fore.CYAN + "â•‘" + Style.RESET_ALL + row + " " * (table_width - len(row) + 1) + Fore.CYAN + "â•‘" + Style.RESET_ALL)
             time.sleep(0.1)  # Typing effect
     
     # Bottom border
-        print(" " * left_padding + Fore.CYAN + "╚" + "═" * table_width + "╝" + Style.RESET_ALL)
+        print(" " * left_padding + Fore.CYAN + "â•š" + "â•" * table_width + "â•" + Style.RESET_ALL)
     
     # Add status line
-        status = f"{Fore.GREEN}[✓] SCAN COMPLETE • {datetime.now().strftime('%H:%M:%S')}{Style.RESET_ALL}"
+        status = f"{Fore.GREEN}[âœ“] SCAN COMPLETE â€¢ {datetime.now().strftime('%H:%M:%S')}{Style.RESET_ALL}"
         print(" " * ((terminal_width - len(status)) // 2) + status)
 
     def _print_ssl_report(self, domain, ssock, cert_obj, chain, ocsp_status, valid_days):
@@ -20430,10 +20430,10 @@ class SecurityTerminal:
         self._animated_ssl_table(cert_data)
     
     # Certificate chain display
-        print("\n" + "═" * shutil.get_terminal_size().columns)
-        chain_title = f"{Fore.CYAN}🔗 CERTIFICATE CHAIN ANALYSIS{Style.RESET_ALL}"
+        print("\n" + "â•" * shutil.get_terminal_size().columns)
+        chain_title = f"{Fore.CYAN}ðŸ”— CERTIFICATE CHAIN ANALYSIS{Style.RESET_ALL}"
         print(chain_title.center(shutil.get_terminal_size().columns))
-        print("═" * shutil.get_terminal_size().columns)
+        print("â•" * shutil.get_terminal_size().columns)
         
         for i, cert in enumerate(chain):
             indent = "  " * i
@@ -20463,7 +20463,7 @@ class SecurityTerminal:
             else:
                 color = Fore.CYAN  # Intermediate
             
-            print(f"{indent} {color}├─ {subject_name}{Style.RESET_ALL}")
+            print(f"{indent} {color}â”œâ”€ {subject_name}{Style.RESET_ALL}")
             if i == 0:
                 print(f"{indent}    Issuer: {issuer_name}")
                 print(f"{indent}    Valid: {cert['expires'][:8]}")
@@ -20471,30 +20471,30 @@ class SecurityTerminal:
         # Security assessment
 
         
-            print(f"{indent} {color}├─ {subject}{Style.RESET_ALL}")
+            print(f"{indent} {color}â”œâ”€ {subject}{Style.RESET_ALL}")
             if i == 0:
                 print(f"{indent}    Issuer: {issuer}")
                 print(f"{indent}    Valid: {cert['expires'][:8]}")
     
     # Security assessment
-        print("\n" + "═" * shutil.get_terminal_size().columns)
-        assess_title = f"{Fore.MAGENTA}🛡️ SECURITY ASSESSMENT{Style.RESET_ALL}"
+        print("\n" + "â•" * shutil.get_terminal_size().columns)
+        assess_title = f"{Fore.MAGENTA}ðŸ›¡ï¸ SECURITY ASSESSMENT{Style.RESET_ALL}"
         print(assess_title.center(shutil.get_terminal_size().columns))
-        print("═" * shutil.get_terminal_size().columns)
+        print("â•" * shutil.get_terminal_size().columns)
         
 
     
         warnings = []
         if valid_days < 60:
-            warnings.append(f"{Fore.YELLOW}⚠ Certificate expires soon ({valid_days} days){Style.RESET_ALL}")
+            warnings.append(f"{Fore.YELLOW}âš  Certificate expires soon ({valid_days} days){Style.RESET_ALL}")
         if "SHA1" in sig_algo:
-            warnings.append(f"{Fore.RED}✗ Weak signature algorithm (SHA-1){Style.RESET_ALL}")
+            warnings.append(f"{Fore.RED}âœ— Weak signature algorithm (SHA-1){Style.RESET_ALL}")
         if protocol in ["TLSv1", "TLSv1.1"]:
-            warnings.append(f"{Fore.RED}✗ Deprecated TLS protocol{Style.RESET_ALL}")
+            warnings.append(f"{Fore.RED}âœ— Deprecated TLS protocol{Style.RESET_ALL}")
         if protocol != "TLSv1.3":
-            warnings.append(f"{Fore.YELLOW}⚠ TLS 1.3 not enabled{Style.RESET_ALL}")
+            warnings.append(f"{Fore.YELLOW}âš  TLS 1.3 not enabled{Style.RESET_ALL}")
         if ocsp_status != "VALID":
-            warnings.append(f"{Fore.YELLOW}⚠ OCSP revocation not verified{Style.RESET_ALL}")
+            warnings.append(f"{Fore.YELLOW}âš  OCSP revocation not verified{Style.RESET_ALL}")
         
 
     
@@ -20502,29 +20502,29 @@ class SecurityTerminal:
             for warning in warnings:
                 print(f"  {warning}")
         else:
-            print(f"  {Fore.GREEN}✓ No security issues detected{Style.RESET_ALL}")
+            print(f"  {Fore.GREEN}âœ“ No security issues detected{Style.RESET_ALL}")
         
         # Recommendations
 
     
     # Recommendations
-        print("\n" + "═" * shutil.get_terminal_size().columns)
-        rec_title = f"{Fore.BLUE}💡 RECOMMENDATIONS{Style.RESET_ALL}"
+        print("\n" + "â•" * shutil.get_terminal_size().columns)
+        rec_title = f"{Fore.BLUE}ðŸ’¡ RECOMMENDATIONS{Style.RESET_ALL}"
         print(rec_title.center(shutil.get_terminal_size().columns))
-        print("═" * shutil.get_terminal_size().columns)
+        print("â•" * shutil.get_terminal_size().columns)
         
 
     
         if valid_days < 60:
-            print(f"  {Fore.YELLOW}→ Renew SSL certificate immediately{Style.RESET_ALL}")
+            print(f"  {Fore.YELLOW}â†’ Renew SSL certificate immediately{Style.RESET_ALL}")
         if protocol != "TLSv1.3":
-            print(f"  {Fore.CYAN}→ Upgrade server to support TLS 1.3{Style.RESET_ALL}")
+            print(f"  {Fore.CYAN}â†’ Upgrade server to support TLS 1.3{Style.RESET_ALL}")
         if ocsp_status != "VALID":
-            print(f"  {Fore.CYAN}→ Enable OCSP stapling{Style.RESET_ALL}")
+            print(f"  {Fore.CYAN}â†’ Enable OCSP stapling{Style.RESET_ALL}")
         if not warnings:
-            print(f"  {Fore.GREEN}→ No action required. System secure.{Style.RESET_ALL}")
+            print(f"  {Fore.GREEN}â†’ No action required. System secure.{Style.RESET_ALL}")
         
-        print("\n" + "═" * shutil.get_terminal_size().columns)
+        print("\n" + "â•" * shutil.get_terminal_size().columns)
         
         # Build report data
         data = {
@@ -20532,7 +20532,7 @@ class SecurityTerminal:
             "subject": subject,
 
     
-        print("\n" + "═" * shutil.get_terminal_size().columns)
+        print("\n" + "â•" * shutil.get_terminal_size().columns)
     
     # Build report data
         data = {
@@ -20651,7 +20651,7 @@ class SecurityTerminal:
             with open(report_file, "w") as f:
                 json.dump(data, f, indent=2)
 
-            print(f"\n[✓] Encrypted audit report saved: {report_file}")
+            print(f"\n[âœ“] Encrypted audit report saved: {report_file}")
             
         except Exception as e:
             print(f"[!] Failed to export results: {e}")
@@ -20746,7 +20746,7 @@ class SecurityTerminal:
                     self.canv.rotate(45)
                     
                     # Draw watermark text
-                    text = "DSTerminal v3.1.113"
+                    text = "DSTerminal v4.0.0.113"
                     text_width = self.canv.stringWidth(text, 'Helvetica-Bold', 55)
                     self.canv.drawString(-text_width/2, 0, text)
                     
@@ -20824,7 +20824,7 @@ class SecurityTerminal:
             elements.append(Paragraph("Recommendations", section_style))
             recs = self._build_recommendations(data)
             for rec in recs:
-                elements.append(Paragraph(f"• {rec}", normal))
+                elements.append(Paragraph(f"â€¢ {rec}", normal))
                 elements.append(Spacer(1, 5))
 
             # Footer
@@ -20839,18 +20839,18 @@ class SecurityTerminal:
                     scale_ratio = max_footer_width / footer_logo.imageWidth
                     footer_logo.drawWidth = footer_logo.imageWidth * scale_ratio
                     footer_logo.drawHeight = footer_logo.imageHeight * scale_ratio
-                footer_data.append([footer_logo, Paragraph("AUTOGENERATED CERTIFICATE REPORT | DSTerminal Platform\n© Stark Expo Tech Exchange", normal)])
+                footer_data.append([footer_logo, Paragraph("AUTOGENERATED CERTIFICATE REPORT | DSTerminal Platform\nÂ© Stark Expo Tech Exchange", normal)])
                 footer_table = Table(footer_data, colWidths=[60, page_width - 60 - doc.leftMargin - doc.rightMargin])
                 footer_table.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'MIDDLE')]))
                 elements.append(footer_table)
             else:
                 # fallback if logo missing
                 elements.append(Paragraph("AUTOGENERATED REPORT | DSTerminal Unified Platform", normal))
-                elements.append(Paragraph("© Stark Expo Tech Exchange LTD", normal))
+                elements.append(Paragraph("Â© Stark Expo Tech Exchange LTD", normal))
 
             # Build the document with watermark
             doc.build(elements)
-            print(f"\n[✓] PDF Compliance Report Created: {report_file}")
+            print(f"\n[âœ“] PDF Compliance Report Created: {report_file}")
             
         except Exception as e:
             print(f"[!] Failed to generate PDF: {e}")
@@ -20946,7 +20946,7 @@ class SecurityTerminal:
         with open(report_file, "w") as f:
             json.dump(data, f, indent=2)
 
-        print(f"\n[✓] Encrypted audit report saved: {report_file}")
+        print(f"\n[âœ“] Encrypted audit report saved: {report_file}")
 
     def _bytes_to_str_dict(self, data):
         """Convert bytes dictionary to string dictionary"""
@@ -21120,7 +21120,7 @@ class SecurityTerminal:
         elements.append(Paragraph("Recommendations", section_style))
         recs = self._build_recommendations(data)
         for rec in recs:
-            elements.append(Paragraph(f"• {rec}", normal))
+            elements.append(Paragraph(f"â€¢ {rec}", normal))
             elements.append(Spacer(1, 5))
 
     # Footer
@@ -21135,21 +21135,21 @@ class SecurityTerminal:
                 scale_ratio = max_footer_width / footer_logo.imageWidth
                 footer_logo.drawWidth = footer_logo.imageWidth * scale_ratio
                 footer_logo.drawHeight = footer_logo.imageHeight * scale_ratio
-            footer_data.append([footer_logo, Paragraph("AUTOGENERATED CERTIFICATE REPORT | DSTerminal Platform\n© Stark Expo Tech Exchange", normal)])
+            footer_data.append([footer_logo, Paragraph("AUTOGENERATED CERTIFICATE REPORT | DSTerminal Platform\nÂ© Stark Expo Tech Exchange", normal)])
             footer_table = Table(footer_data, colWidths=[60, page_width - 60 - doc.leftMargin - doc.rightMargin])
             footer_table.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'MIDDLE')]))
             elements.append(footer_table)
         else:
         # fallback if logo missing
             elements.append(Paragraph("AUTOGENERATED REPORT | DSTerminal Unified Platform", normal))
-            elements.append(Paragraph("© Stark Expo Tech Exchange LTD", normal))
+            elements.append(Paragraph("Â© Stark Expo Tech Exchange LTD", normal))
 
         doc.build(elements)
-        print(f"\n[✓] PDF Compliance Report Created: {report_file}")
+        print(f"\n[âœ“] PDF Compliance Report Created: {report_file}")
 # ===lists of reports===
     def list_reports(self):
         """List all reports in workspace reports directory"""
-        print("\n📊 DSTerminal Reports")
+        print("\nðŸ“Š DSTerminal Reports")
         print("="*50)
 
         # Get workspace directory
@@ -21184,7 +21184,7 @@ class SecurityTerminal:
             report_path = os.path.join(reports_dir, f)
             if os.path.isfile(report_path):
                 size = os.path.getsize(report_path)
-                print(f"📄 {f:50} ({self.human_readable_size(size)})")
+                print(f"ðŸ“„ {f:50} ({self.human_readable_size(size)})")
 
     def human_readable_size(self, size_bytes):
         """Convert bytes to human readable format"""
@@ -21309,7 +21309,7 @@ class SecurityTerminal:
         terminal_width = 80
         print("\n" + text.center(terminal_width))
     
-        spinner = ["⠋","⠙","⠹","⠸","⠼","⠴","⠦","⠧","⠇","⠏"]
+        spinner = ["â ‹","â ™","â ¹","â ¸","â ¼","â ´","â ¦","â §","â ‡","â "]
         end_time = time.time() + seconds
         i = 0
 
@@ -21334,7 +21334,7 @@ class SecurityTerminal:
         # Animated spinner + sliding progress
             bar_length = 30
             progress = int(((time.time() % seconds) / seconds) * bar_length)
-            bar = "█" * progress + "-" * (bar_length - progress)
+            bar = "â–ˆ" * progress + "-" * (bar_length - progress)
 
             # Random colors
 
@@ -21346,12 +21346,12 @@ class SecurityTerminal:
             i += 1
 
         # Finish with a completed checkmark
-        sys.stdout.write(f"\r{Fore.GREEN}[✓] {text} Completed{' ' * 40}{Style.RESET_ALL}\n")
+        sys.stdout.write(f"\r{Fore.GREEN}[âœ“] {text} Completed{' ' * 40}{Style.RESET_ALL}\n")
         sys.stdout.flush()
 
 
     # Finish with a completed checkmark
-        sys.stdout.write(f"\r{Fore.GREEN}[✓] {text} Completed{' ' * 40}{Style.RESET_ALL}\n")
+        sys.stdout.write(f"\r{Fore.GREEN}[âœ“] {text} Completed{' ' * 40}{Style.RESET_ALL}\n")
         sys.stdout.flush()
 # ======
 # ==
@@ -21448,7 +21448,7 @@ class SecurityTerminal:
         def _ultra_type_header(text, color=Fore.CYAN):
             """Print a header with typing effect."""
             _ultra_type(f"\n{text}", 0.04, 0.02, color)
-            _ultra_type("━" * min(len(text), 70), 0.01, 0.005, Fore.CYAN)
+            _ultra_type("â”" * min(len(text), 70), 0.01, 0.005, Fore.CYAN)
         
         # Get terminal width for centering
         try:
@@ -21464,18 +21464,18 @@ class SecurityTerminal:
         # ASCII Art Banner - System Info
         # ==
         _ultra_type("""
-        ╔══════════════════════════════════════════════════════════════════════╗
-        ║                                                                      ║
-        ║    ███████╗██╗   ██╗███████╗████████╗███████╗███╗   ███╗            ║
-        ║    ██╔════╝╚██╗ ██╔╝██╔════╝╚══██╔══╝██╔════╝████╗ ████║            ║
-        ║    ███████╗ ╚████╔╝ █████╗     ██║   █████╗  ██╔████╔██║            ║
-        ║    ╚════██║  ╚██╔╝  ██╔══╝     ██║   ██╔══╝  ██║╚██╔╝██║            ║
-        ║    ███████║   ██║   ███████╗   ██║   ███████╗██║ ╚═╝ ██║            ║
-        ║    ╚══════╝   ╚═╝   ╚══════╝   ╚═╝   ╚══════╝╚═╝     ╚═╝            ║
-        ║                                                                      ║
-        ║              🔍 SYSTEM INFORMATION & ANALYSIS ENGINE                ║
-        ║                                                                      ║
-        ╚══════════════════════════════════════════════════════════════════════╝
+        â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+        â•‘                                                                      â•‘
+        â•‘    â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•—   â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ–ˆâ•—            â•‘
+        â•‘    â–ˆâ–ˆâ•”â•â•â•â•â•â•šâ–ˆâ–ˆâ•— â–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•”â•â•â•â•â•â•šâ•â•â–ˆâ–ˆâ•”â•â•â•â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ•‘            â•‘
+        â•‘    â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•”â• â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—     â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•”â–ˆâ–ˆâ–ˆâ–ˆâ•”â–ˆâ–ˆâ•‘            â•‘
+        â•‘    â•šâ•â•â•â•â–ˆâ–ˆâ•‘  â•šâ–ˆâ–ˆâ•”â•  â–ˆâ–ˆâ•”â•â•â•     â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘            â•‘
+        â•‘    â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘ â•šâ•â• â–ˆâ–ˆâ•‘            â•‘
+        â•‘    â•šâ•â•â•â•â•â•â•   â•šâ•â•   â•šâ•â•â•â•â•â•â•   â•šâ•â•   â•šâ•â•â•â•â•â•â•â•šâ•â•     â•šâ•â•            â•‘
+        â•‘                                                                      â•‘
+        â•‘              ðŸ” SYSTEM INFORMATION & ANALYSIS ENGINE                â•‘
+        â•‘                                                                      â•‘
+        â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
         """, delay=0.025, variance=0.01, color=Fore.CYAN)
         
         time.sleep(0.05)
@@ -21604,9 +21604,9 @@ class SecurityTerminal:
         # ==
         
         # Box 1: System Overview
-        _ultra_type("\n" + " " * ((term_width - 45) // 2) + "╔═════════════════════════════════════════════════════╗", delay=0.01, color=Fore.LIGHTCYAN_EX)
-        _ultra_type(" " * ((term_width - 45) // 2) + "║  ⚡ SYSTEM OVERVIEW  ║", delay=0.02, color=Fore.LIGHTCYAN_EX)
-        _ultra_type(" " * ((term_width - 45) // 2) + "╚═════════════════════════════════════════════════════╝", delay=0.01, color=Fore.LIGHTCYAN_EX)
+        _ultra_type("\n" + " " * ((term_width - 45) // 2) + "â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—", delay=0.01, color=Fore.LIGHTCYAN_EX)
+        _ultra_type(" " * ((term_width - 45) // 2) + "â•‘  âš¡ SYSTEM OVERVIEW  â•‘", delay=0.02, color=Fore.LIGHTCYAN_EX)
+        _ultra_type(" " * ((term_width - 45) // 2) + "â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•", delay=0.01, color=Fore.LIGHTCYAN_EX)
         time.sleep(0.02)
         
         sys_info = [
@@ -21624,9 +21624,9 @@ class SecurityTerminal:
         time.sleep(0.03)
         
         # Box 2: Boot & Uptime
-        _ultra_type("\n" + " " * ((term_width - 45) // 2) + "┌─────────────────────────────────────────────────────┐", delay=0.01, color=Fore.LIGHTYELLOW_EX)
-        _ultra_type(" " * ((term_width - 45) // 2) + "│  ⏰ BOOT & UPTIME  │", delay=0.02, color=Fore.LIGHTYELLOW_EX)
-        _ultra_type(" " * ((term_width - 45) // 2) + "├─────────────────────────────────────────────────────┤", delay=0.01, color=Fore.LIGHTYELLOW_EX)
+        _ultra_type("\n" + " " * ((term_width - 45) // 2) + "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”", delay=0.01, color=Fore.LIGHTYELLOW_EX)
+        _ultra_type(" " * ((term_width - 45) // 2) + "â”‚  â° BOOT & UPTIME  â”‚", delay=0.02, color=Fore.LIGHTYELLOW_EX)
+        _ultra_type(" " * ((term_width - 45) // 2) + "â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤", delay=0.01, color=Fore.LIGHTYELLOW_EX)
         
         boot_info = [
             (f"  Boot Time: {boot_time_str}", Fore.LIGHTYELLOW_EX),
@@ -21635,16 +21635,16 @@ class SecurityTerminal:
         
         for info, color in boot_info:
             line = info
-            _ultra_type(" " * ((term_width - 45) // 2) + "│" + line + " " * (45 - len(line) - 2) + "│", delay=0.02, color=color)
+            _ultra_type(" " * ((term_width - 45) // 2) + "â”‚" + line + " " * (45 - len(line) - 2) + "â”‚", delay=0.02, color=color)
             time.sleep(0.05)
         
-        _ultra_type(" " * ((term_width - 45) // 2) + "└─────────────────────────────────────────────────────┘", delay=0.01, color=Fore.LIGHTYELLOW_EX)
+        _ultra_type(" " * ((term_width - 45) // 2) + "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜", delay=0.01, color=Fore.LIGHTYELLOW_EX)
         time.sleep(0.03)
         
         # Box 3: CPU Information
-        _ultra_type("\n" + " " * ((term_width - 45) // 2) + "╔═════════════════════════════════════════════════════╗", delay=0.01, color=Fore.LIGHTMAGENTA_EX)
-        _ultra_type(" " * ((term_width - 45) // 2) + "║  🔥 CPU INFORMATION  ║", delay=0.02, color=Fore.LIGHTMAGENTA_EX)
-        _ultra_type(" " * ((term_width - 45) // 2) + "╚═════════════════════════════════════════════════════╝", delay=0.01, color=Fore.LIGHTMAGENTA_EX)
+        _ultra_type("\n" + " " * ((term_width - 45) // 2) + "â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—", delay=0.01, color=Fore.LIGHTMAGENTA_EX)
+        _ultra_type(" " * ((term_width - 45) // 2) + "â•‘  ðŸ”¥ CPU INFORMATION  â•‘", delay=0.02, color=Fore.LIGHTMAGENTA_EX)
+        _ultra_type(" " * ((term_width - 45) // 2) + "â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•", delay=0.01, color=Fore.LIGHTMAGENTA_EX)
         time.sleep(0.02)
         
         cpu_info = [
@@ -21661,7 +21661,7 @@ class SecurityTerminal:
         # CPU Usage Bar
         bar_length = 30
         filled = int((cpu_percent / 100) * bar_length)
-        bar = "█" * filled + "░" * (bar_length - filled)
+        bar = "â–ˆ" * filled + "â–‘" * (bar_length - filled)
         if cpu_percent < 70:
             bar_color = Fore.LIGHTGREEN_EX
         elif cpu_percent < 90:
@@ -21674,9 +21674,9 @@ class SecurityTerminal:
         time.sleep(0.03)
         
         # Box 4: Memory Information
-        _ultra_type("\n" + " " * ((term_width - 45) // 2) + "┌─────────────────────────────────────────────────────┐", delay=0.01, color=Fore.LIGHTCYAN_EX)
-        _ultra_type(" " * ((term_width - 45) // 2) + "│  💾 MEMORY INFORMATION  │", delay=0.02, color=Fore.LIGHTCYAN_EX)
-        _ultra_type(" " * ((term_width - 45) // 2) + "├─────────────────────────────────────────────────────┤", delay=0.01, color=Fore.LIGHTCYAN_EX)
+        _ultra_type("\n" + " " * ((term_width - 45) // 2) + "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”", delay=0.01, color=Fore.LIGHTCYAN_EX)
+        _ultra_type(" " * ((term_width - 45) // 2) + "â”‚  ðŸ’¾ MEMORY INFORMATION  â”‚", delay=0.02, color=Fore.LIGHTCYAN_EX)
+        _ultra_type(" " * ((term_width - 45) // 2) + "â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤", delay=0.01, color=Fore.LIGHTCYAN_EX)
         
         mem_info = [
             (f"  Total RAM: {mem_total:.1f} GB", Fore.LIGHTCYAN_EX),
@@ -21687,13 +21687,13 @@ class SecurityTerminal:
         
         for info, color in mem_info:
             line = info
-            _ultra_type(" " * ((term_width - 45) // 2) + "│" + line + " " * (45 - len(line) - 2) + "│", delay=0.02, color=color)
+            _ultra_type(" " * ((term_width - 45) // 2) + "â”‚" + line + " " * (45 - len(line) - 2) + "â”‚", delay=0.02, color=color)
             time.sleep(0.05)
         
         # Memory Usage Bar
         bar_length = 30
         filled = int((mem_percent / 100) * bar_length)
-        bar = "█" * filled + "░" * (bar_length - filled)
+        bar = "â–ˆ" * filled + "â–‘" * (bar_length - filled)
         if mem_percent < 70:
             bar_color = Fore.LIGHTGREEN_EX
         elif mem_percent < 90:
@@ -21702,15 +21702,15 @@ class SecurityTerminal:
             bar_color = Fore.LIGHTRED_EX
         
         line = f"  [{bar}]"
-        _ultra_type(" " * ((term_width - 45) // 2) + "│" + line + " " * (45 - len(line) - 2) + "│", delay=0.01, color=bar_color)
-        _ultra_type(" " * ((term_width - 45) // 2) + "└─────────────────────────────────────────────────────┘", delay=0.01, color=Fore.LIGHTCYAN_EX)
+        _ultra_type(" " * ((term_width - 45) // 2) + "â”‚" + line + " " * (45 - len(line) - 2) + "â”‚", delay=0.01, color=bar_color)
+        _ultra_type(" " * ((term_width - 45) // 2) + "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜", delay=0.01, color=Fore.LIGHTCYAN_EX)
         time.sleep(0.03)
         
         # Box 5: Disk Information
         if disk_info:
-            _ultra_type("\n" + " " * ((term_width - 45) // 2) + "╔═════════════════════════════════════════════════════╗", delay=0.01, color=Fore.LIGHTGREEN_EX)
-            _ultra_type(" " * ((term_width - 45) // 2) + "║  💿 DISK INFORMATION  ║", delay=0.02, color=Fore.LIGHTGREEN_EX)
-            _ultra_type(" " * ((term_width - 45) // 2) + "╚═════════════════════════════════════════════════════╝", delay=0.01, color=Fore.LIGHTGREEN_EX)
+            _ultra_type("\n" + " " * ((term_width - 45) // 2) + "â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—", delay=0.01, color=Fore.LIGHTGREEN_EX)
+            _ultra_type(" " * ((term_width - 45) // 2) + "â•‘  ðŸ’¿ DISK INFORMATION  â•‘", delay=0.02, color=Fore.LIGHTGREEN_EX)
+            _ultra_type(" " * ((term_width - 45) // 2) + "â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•", delay=0.01, color=Fore.LIGHTGREEN_EX)
             time.sleep(0.2)
             
             for disk in disk_info[:3]:  # Show first 3 disks
@@ -21734,9 +21734,9 @@ class SecurityTerminal:
         time.sleep(0.03)
         
         # Box 6: Network & Process Information
-        _ultra_type("\n" + " " * ((term_width - 45) // 2) + "┌─────────────────────────────────────────────────────┐", delay=0.01, color=Fore.LIGHTBLUE_EX)
-        _ultra_type(" " * ((term_width - 45) // 2) + "│  🌐 NETWORK & PROCESSES  │", delay=0.02, color=Fore.LIGHTBLUE_EX)
-        _ultra_type(" " * ((term_width - 45) // 2) + "├─────────────────────────────────────────────────────┤", delay=0.01, color=Fore.LIGHTBLUE_EX)
+        _ultra_type("\n" + " " * ((term_width - 45) // 2) + "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”", delay=0.01, color=Fore.LIGHTBLUE_EX)
+        _ultra_type(" " * ((term_width - 45) // 2) + "â”‚  ðŸŒ NETWORK & PROCESSES  â”‚", delay=0.02, color=Fore.LIGHTBLUE_EX)
+        _ultra_type(" " * ((term_width - 45) // 2) + "â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤", delay=0.01, color=Fore.LIGHTBLUE_EX)
         
         net_info = [
             (f"  IP Addresses: {', '.join(ip_addresses[:3])}", Fore.LIGHTBLUE_EX),
@@ -21746,10 +21746,10 @@ class SecurityTerminal:
         
         for info, color in net_info:
             line = info
-            _ultra_type(" " * ((term_width - 45) // 2) + "│" + line + " " * (45 - len(line) - 2) + "│", delay=0.02, color=color)
+            _ultra_type(" " * ((term_width - 45) // 2) + "â”‚" + line + " " * (45 - len(line) - 2) + "â”‚", delay=0.02, color=color)
             time.sleep(0.05)
         
-        _ultra_type(" " * ((term_width - 45) // 2) + "└─────────────────────────────────────────────────────┘", delay=0.01, color=Fore.LIGHTBLUE_EX)
+        _ultra_type(" " * ((term_width - 45) // 2) + "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜", delay=0.01, color=Fore.LIGHTBLUE_EX)
         time.sleep(0.03)
         
         # ==
@@ -21757,9 +21757,9 @@ class SecurityTerminal:
         # ==
         _ultra_type("\n", delay=0.01)
         
-        matrix_chars = ['0', '1', ' ', '░', '▒', '▓']
+        matrix_chars = ['0', '1', ' ', 'â–‘', 'â–’', 'â–“']
         
-        footer = "▸ " + Fore.LIGHTGREEN_EX + "⚡ System Analysis Complete" + Fore.RESET + " ◂"
+        footer = "â–¸ " + Fore.LIGHTGREEN_EX + "âš¡ System Analysis Complete" + Fore.RESET + " â—‚"
         _ultra_type(" " * ((term_width - len(footer)) // 2) + footer, delay=0.02)
         
         # Random matrix rain effect
@@ -21774,7 +21774,7 @@ class SecurityTerminal:
         # ==
         # Export System Info
         # ==
-        _ultra_type("\n💾 Exporting System Information...", delay=0.02, color=Fore.LIGHTCYAN_EX)
+        _ultra_type("\nðŸ’¾ Exporting System Information...", delay=0.02, color=Fore.LIGHTCYAN_EX)
         time.sleep(0.3)
         
         export_path = self._export_system_info({
@@ -21804,9 +21804,9 @@ class SecurityTerminal:
         })
         
         if export_path:
-            _ultra_type(f"✅ Results exported to: {export_path}", delay=0.02, color=Fore.LIGHTGREEN_EX)
+            _ultra_type(f"âœ… Results exported to: {export_path}", delay=0.02, color=Fore.LIGHTGREEN_EX)
         else:
-            _ultra_type("⚠️ Failed to export results", delay=0.02, color=Fore.LIGHTYELLOW_EX)
+            _ultra_type("âš ï¸ Failed to export results", delay=0.02, color=Fore.LIGHTYELLOW_EX)
 
     def _export_system_info(self, data):
         """Export system information to JSON file"""
@@ -21877,9 +21877,9 @@ class SecurityTerminal:
 
         #  ANIMATIONS 
         def hacker_animation():
-            symbols = "█▓▒░▄▀■►▼▲◄▶◀◢◣◥◤▬▭▮▯┌┐└┘├┤┬┴┼╔╗╚╝╠╣╦╩╬═║"
+            symbols = "â–ˆâ–“â–’â–‘â–„â–€â– â–ºâ–¼â–²â—„â–¶â—€â—¢â—£â—¥â—¤â–¬â–­â–®â–¯â”Œâ”â””â”˜â”œâ”¤â”¬â”´â”¼â•”â•—â•šâ•â• â•£â•¦â•©â•¬â•â•‘"
             width = console.size.width
-            with console.status("[bold red]🔐 ACCESSING UPDATE SERVERS...[/]", spinner="dots"):
+            with console.status("[bold red]ðŸ” ACCESSING UPDATE SERVERS...[/]", spinner="dots"):
                 for _ in range(3):
                     console.print(
                         "".join(random.choice(symbols) for _ in range(width)),
@@ -21888,7 +21888,7 @@ class SecurityTerminal:
                     time.sleep(1.5)
 
         def satellite_scan():
-            frames = ["🛰", "📡", "📶", "🔍", "🎯", "⚡"]
+            frames = ["ðŸ›°", "ðŸ“¡", "ðŸ“¶", "ðŸ”", "ðŸŽ¯", "âš¡"]
             with Progress(
                 SpinnerColumn(style="cyan"),
                 TextColumn("[bold blue]{task.description}"),
@@ -21904,7 +21904,7 @@ class SecurityTerminal:
         def version_comparison_animation(current_ver, latest_ver):
             with Live(refresh_per_second=10, console=console, transient=True) as live:
                 for i in range(1, 4):
-                    bar = "█" * (i * 8)
+                    bar = "â–ˆ" * (i * 8)
                     live.update(
                         Panel(
                             f"[bold cyan]Comparing Versions[/]\n\n"
@@ -21985,13 +21985,13 @@ class SecurityTerminal:
                         download_url = asset["browser_download_url"]
                         asset_name = name
                         asset_size = asset.get("size", 0)
-                        console.print(f"[green]✓ Selected: {name}[/green]")
+                        console.print(f"[green]âœ“ Selected: {name}[/green]")
                         break
                     elif "dsterminal_win" in name and name.endswith(".exe"):
                         download_url = asset["browser_download_url"]
                         asset_name = name
                         asset_size = asset.get("size", 0)
-                        console.print(f"[green]✓ Selected: {name}[/green]")
+                        console.print(f"[green]âœ“ Selected: {name}[/green]")
                         break
                 
                 if not download_url:
@@ -22030,7 +22030,7 @@ class SecurityTerminal:
         def download_update(url, filename):
             """Download update with progress bar"""
             try:
-                console.print(f"\n[cyan]📥 Downloading update from Update Modules...[/cyan]")
+                console.print(f"\n[cyan]ðŸ“¥ Downloading update from Update Modules...[/cyan]")
                 console.print(f"[dim]File: {filename}[/dim]")
                 
                 response = requests.get(url, stream=True, timeout=30)
@@ -22058,11 +22058,11 @@ class SecurityTerminal:
                     console.print(f"[red]Size mismatch! Expected {total_size}, got {actual_size}[/red]")
                     return False
                 
-                console.print(f"[green]✓ Download complete: {filename}[/green]")
+                console.print(f"[green]âœ“ Download complete: {filename}[/green]")
                 return True
                 
             except Exception as e:
-                console.print(f"[red]✗ Download failed: {e}[/red]")
+                console.print(f"[red]âœ— Download failed: {e}[/red]")
                 return False
 
         def perform_update(latest):
@@ -22079,13 +22079,13 @@ class SecurityTerminal:
                 details_table.add_row("Size", f"{size_mb:.1f} MB")
             details_table.add_row("Release", latest.get('published_at', 'Unknown')[:10])
             
-            console.print(Panel(details_table, title="[bold yellow]📦 UPDATE DETAILS[/bold yellow]", border_style="yellow"))
+            console.print(Panel(details_table, title="[bold yellow]ðŸ“¦ UPDATE DETAILS[/bold yellow]", border_style="yellow"))
             
             # Security confirmation
-            console.print("\n[bold red]⚠️ SECURITY NOTICE[/bold red]")
-            console.print("[dim]• The installer will be downloaded from GitHub\n"
-                        "• Verify the digital signature before running\n"
-                        "• Administrator privileges may be required[/dim]\n")
+            console.print("\n[bold red]âš ï¸ SECURITY NOTICE[/bold red]")
+            console.print("[dim]â€¢ The installer will be downloaded from GitHub\n"
+                        "â€¢ Verify the digital signature before running\n"
+                        "â€¢ Administrator privileges may be required[/dim]\n")
             
             confirm = console.input("[bold red]Type 'INSTALL' to download and run the installer: [/]").strip()
             
@@ -22117,10 +22117,10 @@ class SecurityTerminal:
                 console.print("[red]Download verification failed[/red]")
                 return False
             
-            console.print("\n[green]✓ Download verified successfully[/green]")
+            console.print("\n[green]âœ“ Download verified successfully[/green]")
             
             # Ask to run installer
-            console.print("\n[cyan]🔧 Ready to install update...[/cyan]")
+            console.print("\n[cyan]ðŸ”§ Ready to install update...[/cyan]")
             run_installer = console.input("[bold yellow]Run the installer now? (Y/n): [/]").strip().lower()
             
             if run_installer != 'n':
@@ -22135,7 +22135,7 @@ class SecurityTerminal:
                         subprocess.Popen([installer_path], shell=True)
                     
                     console.print(Panel(
-                        f"[bold green]✅ INSTALLER LAUNCHED![/bold green]\n\n"
+                        f"[bold green]âœ… INSTALLER LAUNCHED![/bold green]\n\n"
                         f"[yellow]Please complete the installation wizard[/yellow]\n"
                         f"[dim]Installer location: {installer_path}[/dim]\n\n"
                         f"[cyan]After installation, restart DSTerminal[/cyan]",
@@ -22155,7 +22155,7 @@ class SecurityTerminal:
         try:
             # Display header
             console.print(Panel(
-                Align.center("[bold cyan]🔄 DSTERMINAL UPDATE PROTOCOL 🔄[/bold cyan]"),
+                Align.center("[bold cyan]ðŸ”„ DSTERMINAL UPDATE PROTOCOL ðŸ”„[/bold cyan]"),
                 border_style="cyan"
             ))
             
@@ -22164,7 +22164,7 @@ class SecurityTerminal:
             satellite_scan()
             
             # Get current version
-            current_version = CONFIG.get("CURRENT_VERSION", "3.1.113").lstrip("v")
+            current_version = CONFIG.get("CURRENT_VERSION", "4.0.0.113").lstrip("v")
 
             current_version = CONFIG.get("CURRENT_VERSION", "2.1.327").lstrip("v")
             
@@ -22176,23 +22176,23 @@ class SecurityTerminal:
             version_table.add_row("System", platform.system())
             version_table.add_row("Architecture", platform.machine())
             
-            console.print(Panel(version_table, title="[bold]📊 SYSTEM STATUS[/bold]", border_style="blue"))
+            console.print(Panel(version_table, title="[bold]ðŸ“Š SYSTEM STATUS[/bold]", border_style="blue"))
             
             # Check for updates
-            console.print("\n[cyan]🔍 Checking Modules for updates...[/cyan]")
+            console.print("\n[cyan]ðŸ” Checking Modules for updates...[/cyan]")
             latest = check_github_release()
             
             if not latest:
                 console.print(Panel(
-                    "[yellow]⚠️ UPDATE SERVER UNREACHABLE - [/yellow]\n\n"
-                    "[dim]• Check your internet connection & make sure you're connected to internet to update the software\n"
-                    "• API may be rate-limited\n"
-                    "• Visit: https://starkexpotechexchange.mw/community_support[/dim]",
+                    "[yellow]âš ï¸ UPDATE SERVER UNREACHABLE - [/yellow]\n\n"
+                    "[dim]â€¢ Check your internet connection & make sure you're connected to internet to update the software\n"
+                    "â€¢ API may be rate-limited\n"
+                    "â€¢ Visit: https://starkexpotechexchange.mw/community_support[/dim]",
 
-                    "[yellow]⚠️ UPDATE SERVER UNREACHABLE[/yellow]\n\n"
-                    "[dim]• Check your internet connection\n"
-                    "• GitHub API may be rate-limited\n"
-                    "• Visit: https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/releases[/dim]",
+                    "[yellow]âš ï¸ UPDATE SERVER UNREACHABLE[/yellow]\n\n"
+                    "[dim]â€¢ Check your internet connection\n"
+                    "â€¢ GitHub API may be rate-limited\n"
+                    "â€¢ Visit: https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/releases[/dim]",
                     border_style="yellow"
                 ))
                 return True
@@ -22207,7 +22207,7 @@ class SecurityTerminal:
             if latest_tuple > current_tuple:
                 # Show update available
                 update_info = (
-                    f"[bold red]🚨 UPDATE AVAILABLE! 🚨[/bold red]\n\n"
+                    f"[bold red]ðŸš¨ UPDATE AVAILABLE! ðŸš¨[/bold red]\n\n"
                     f"[yellow]Current:[/yellow] v{current_version}\n"
                     f"[green]Latest:[/green] v{latest['version']}\n"
                     f"[cyan]Released:[/cyan] {latest.get('published_at', 'Unknown')[:10]}\n\n"
@@ -22216,7 +22216,7 @@ class SecurityTerminal:
                 )
                 
                 if latest.get('prerelease'):
-                    update_info += f"\n[red]⚠️ PRE-RELEASE VERSION - Use with caution[/red]\n"
+                    update_info += f"\n[red]âš ï¸ PRE-RELEASE VERSION - Use with caution[/red]\n"
                 
                 console.print(Panel(
                     update_info,
@@ -22236,7 +22236,7 @@ class SecurityTerminal:
             else:
                 console.print(Panel(
                     Align.center(
-                        f"[bold green]✅ DSTERMINAL IS UP TO DATE![/bold green]\n\n"
+                        f"[bold green]âœ… DSTERMINAL IS UP TO DATE![/bold green]\n\n"
                         f"[dim]Version: v{current_version}\n"
                         f"Checked: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}[/dim]"
                     ),
@@ -22284,10 +22284,10 @@ class SecurityTerminal:
         
         # Multiple spinner types for variety
         spinners = {
-            'dots': ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"],
-            'arrows': ["←", "↖", "↑", "↗", "→", "↘", "↓", "↙"],
-            'pipes': ["┤", "┘", "┴", "└", "├", "┌", "┬", "┐"],
-            'circles': ["◴", "◷", "◶", "◵"]
+            'dots': ["â ‹", "â ™", "â ¹", "â ¸", "â ¼", "â ´", "â ¦", "â §", "â ‡", "â "],
+            'arrows': ["â†", "â†–", "â†‘", "â†—", "â†’", "â†˜", "â†“", "â†™"],
+            'pipes': ["â”¤", "â”˜", "â”´", "â””", "â”œ", "â”Œ", "â”¬", "â”"],
+            'circles': ["â—´", "â—·", "â—¶", "â—µ"]
         }
         
         # Glitch text fragments
@@ -22342,7 +22342,7 @@ class SecurityTerminal:
                     # === LEFT COLUMN: System Stats ===
                     left_content = Panel(
                         Align.center(
-                            f"[bold cyan]📊 SYSTEM STATS[/bold cyan]\n\n"
+                            f"[bold cyan]ðŸ“Š SYSTEM STATS[/bold cyan]\n\n"
                             f"[white]CPU:[/white] [green]{stats['cpu']}%[/green]\n"
                             f"[white]MEM:[/white] [yellow]{stats['mem']} MB[/yellow]\n"
                             f"[white]DISK:[/white] [blue]{stats['disk']}%[/blue]\n"
@@ -22350,13 +22350,13 @@ class SecurityTerminal:
                             f"[white]NET:[/white] [cyan]{stats['network']} Mbps[/cyan]",
                             vertical="middle"
                         ),
-                        title=f"[bold {color}]⚙️ SYSTEM STATS[/bold {color}]",
+                        title=f"[bold {color}]âš™ï¸ SYSTEM STATS[/bold {color}]",
                         border_style=color,
                         width=column_width,
                         padding=(0, 1),
                         height=15
 
-                        title=f"[bold {color}]⚙️ LEFT PANEL[/bold {color}]",
+                        title=f"[bold {color}]âš™ï¸ LEFT PANEL[/bold {color}]",
                         border_style=color,
                         width=column_width,
                         padding=(0, 1),
@@ -22367,7 +22367,7 @@ class SecurityTerminal:
                     # Progress bar
                     bar_width = column_width - 10
                     filled = int(progress_percent / 100 * bar_width)
-                    progress_bar = "█" * filled + "░" * (bar_width - filled)
+                    progress_bar = "â–ˆ" * filled + "â–‘" * (bar_width - filled)
                     
                     center_content = Panel(
                         Align.center(
@@ -22377,13 +22377,13 @@ class SecurityTerminal:
                             f"[dim]{glitch}[/dim]",
                             vertical="middle"
                         ),
-                        title=f"[bold {color}]🌀 SYNCING PHASES[/bold {color}]",
+                        title=f"[bold {color}]ðŸŒ€ SYNCING PHASES[/bold {color}]",
                         border_style=color,
                         width=column_width,
                         padding=(0, 1),
                         height=15
 
-                        title=f"[bold {color}]🌀 CENTER PANEL[/bold {color}]",
+                        title=f"[bold {color}]ðŸŒ€ CENTER PANEL[/bold {color}]",
                         border_style=color,
                         width=column_width,
                         padding=(0, 1),
@@ -22401,19 +22401,19 @@ class SecurityTerminal:
                     
                     right_content = Panel(
                         Align.center(
-                            f"[bold yellow]⚠️ SECURITY[/bold yellow]\n\n"
+                            f"[bold yellow]âš ï¸ SECURITY[/bold yellow]\n\n"
                             f"[white]Event:[/white]\n[cyan]{current_event}[/cyan]\n\n"
                             f"[white]Status:[/white] [green]ACTIVE[/green]\n"
                             f"[white]Level:[/white] [red]HIGH[/red]",
                             vertical="middle"
                         ),
-                        title=f"[bold {color}]🔒 SECURITY EVENTS STATUS[/bold {color}]",
+                        title=f"[bold {color}]ðŸ”’ SECURITY EVENTS STATUS[/bold {color}]",
                         border_style=color,
                         width=column_width,
                         padding=(1, 1),
                         height=15
 
-                        title=f"[bold {color}]🔒 RIGHT PANEL[/bold {color}]",
+                        title=f"[bold {color}]ðŸ”’ RIGHT PANEL[/bold {color}]",
                         border_style=color,
                         width=column_width,
                         padding=(1, 1),
@@ -22442,16 +22442,16 @@ class SecurityTerminal:
         
         # ASCII Art Logo (centered across all columns)
         logo_art = [
-            "╔═══════════════════════════════════════════════════════════════════╗",
-            "║                                                                    ║",
-            "║    ██████╗ ███████╗███████╗███████╗███╗   ██╗███████╗██╗  ██╗    ║",
-            "║    ██╔══██╗██╔════╝██╔════╝██╔════╝████╗  ██║██╔════╝╚██╗██╔╝    ║",
-            "║    ██║  ██║█████╗  █████╗  █████╗  ██╔██╗ ██║█████╗   ╚███╔╝     ║",
-            "║    ██║  ██║██╔══╝  ██╔══╝  ██╔══╝  ██║╚██╗██║██╔══╝   ██╔██╗     ║",
-            "║    ██████╔╝██║     ██║     ███████╗██║ ╚████║███████╗██╔╝ ██╗    ║",
-            "║    ╚═════╝ ╚═╝     ╚═╝     ╚══════╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝    ║",
-            "║                                                                    ║",
-            "╚═══════════════════════════════════════════════════════════════════╝",
+            "â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—",
+            "â•‘                                                                    â•‘",
+            "â•‘    â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•—  â–ˆâ–ˆâ•—    â•‘",
+            "â•‘    â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•â•â•â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•    â•‘",
+            "â•‘    â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•”â–ˆâ–ˆâ•— â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â•šâ–ˆâ–ˆâ–ˆâ•”â•     â•‘",
+            "â•‘    â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•   â–ˆâ–ˆâ•”â–ˆâ–ˆâ•—     â•‘",
+            "â•‘    â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘ â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â• â–ˆâ–ˆâ•—    â•‘",
+            "â•‘    â•šâ•â•â•â•â•â• â•šâ•â•     â•šâ•â•     â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•â•â•â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•    â•‘",
+            "â•‘                                                                    â•‘",
+            "â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•",
         ]
         
         # Calculate padding to center the logo
@@ -22488,7 +22488,7 @@ class SecurityTerminal:
         # Left column: System Info
         left_status = Panel(
             Align.center(
-                f"[bold cyan]🖥️ SYSTEM INFO[/bold cyan]\n\n"
+                f"[bold cyan]ðŸ–¥ï¸ SYSTEM INFO[/bold cyan]\n\n"
                 f"[white]OS:[/white] [green]{platform.system()} {platform.release()}[/green]\n"
                 f"[white]Arch:[/white] [yellow]{platform.machine()}[/yellow]\n"
                 f"[white]Terminal:[/white] [dim]{terminal_width} cols[/dim]\n",
@@ -22505,7 +22505,7 @@ class SecurityTerminal:
         # Center column: Status Message
         center_status = Panel(
             Align.center(
-                f"[blink][bright_green]✦ SYSTEM INITIALIZED ✦[/bright_green][/blink]\n\n"
+                f"[blink][bright_green]âœ¦ SYSTEM INITIALIZED âœ¦[/bright_green][/blink]\n\n"
                 f"[white]Session ID:[/white]\n[cyan]{datetime.now().strftime('%Y%m%d%H%M%S')}[/cyan]\n\n"
                 f"[white]Ready for:[/white]\n[yellow]SSL/TLS Security Audit[/yellow]",
                 vertical="middle"
@@ -22521,7 +22521,7 @@ class SecurityTerminal:
         # Right column: Quick Commands
         right_status = Panel(
             Align.center(
-                f"[bold yellow]⚡ QUICK CMDS[/bold yellow]\n\n"
+                f"[bold yellow]âš¡ QUICK CMDS[/bold yellow]\n\n"
                 f"[cyan]help[/cyan] - Show commands\n"
                 f"[cyan]scan[/cyan] - Run security scan\n"
                 f"[cyan]update[/cyan] - Check updates\n"
@@ -22635,13 +22635,13 @@ class SecurityTerminal:
             ascii_art = figlet_format(text, font='slant')
             if os.environ.get('TERM') and 'color' in os.environ.get('TERM', ''):
                 colors = [Fore.RED, Fore.GREEN, Fore.YELLOW, Fore.BLUE, Fore.MAGENTA, Fore.CYAN]
-                flicker = random.choice(colors) + ascii_art.replace(random.choice(text), '▒') + Style.RESET_ALL
+                flicker = random.choice(colors) + ascii_art.replace(random.choice(text), 'â–’') + Style.RESET_ALL
                 print(f"\n{flicker}")
             else:
                 # print(f"\n{ascii_art}")
                 print(f"\n")
         except ImportError:
-            border = "═" * (len(text) + 4)
+            border = "â•" * (len(text) + 4)
             print(f"\n")
             # print(f"\n{border}\n  {text.upper()}  \n{border}\n")
 
@@ -22650,7 +22650,7 @@ class SecurityTerminal:
  
     def _hacking_animation(duration, graphics):
         console = Console()
-        symbols = list("▣⚙⧫◎◉⛏⊠⊞⌁⍟☍█▓▒░▌▎#@$=%/\\*~^↯⎈⛶∞∴∵")
+        symbols = list("â–£âš™â§«â—Žâ—‰â›âŠ âŠžâŒâŸâ˜â–ˆâ–“â–’â–‘â–Œâ–Ž#@$=%/\\*~^â†¯âŽˆâ›¶âˆžâˆ´âˆµ")
 
         class RotatingSymbol:
             def __init__(self):
@@ -22710,26 +22710,26 @@ class SecurityTerminal:
             except KeyboardInterrupt:
                 console.print("\n[bold red]Animation interrupted.[/bold red]")
 
-        console.print("[bold green]✓ Access Granted.[/bold green]")
+        console.print("[bold green]âœ“ Access Granted.[/bold green]")
 
     def _cyber_attack_simulation(self):
         """Simulate incoming attacks being blocked (randomized)"""
         attack_types = ["Brute Force", "SQL Injection", "XSS", "RCE", "Zero-Day"]
         protocols = ["SSH", "HTTP", "HTTPS", "FTP", "SMTP"]
 
-        print(f"\n{Fore.RED}▄︻デ══━ INTRUSION DETECTED ══━︻▄{Style.RESET_ALL}")
+        print(f"\n{Fore.RED}â–„ï¸»ãƒ‡â•â•â” INTRUSION DETECTED â•â•â”ï¸»â–„{Style.RESET_ALL}")
         for _ in range(random.randint(3, 5)):
             attack = random.choice(attack_types)
             protocol = random.choice(protocols)
             ip = ".".join(str(random.randint(1, 255)) for _ in range(4))
             time.sleep(random.uniform(0.3, 0.7))
-            print(f"{Fore.YELLOW}▶ {ip} | {protocol} | {attack}{Style.RESET_ALL}", end='')
+            print(f"{Fore.YELLOW}â–¶ {ip} | {protocol} | {attack}{Style.RESET_ALL}", end='')
             time.sleep(random.uniform(0.5, 1.2))
-            print(f"\r{Fore.GREEN}✓ {ip} | {protocol} | {attack} {Fore.BLACK}▶ BLOCKED{Style.RESET_ALL}")
+            print(f"\r{Fore.GREEN}âœ“ {ip} | {protocol} | {attack} {Fore.BLACK}â–¶ BLOCKED{Style.RESET_ALL}")
 
     def _network_scan_animation(self):
         """Simulate network scanning visualization"""
-        print(f"\n{Fore.CYAN}═════════⋘ NETWORK TOPOLOGY ⋙═════════{Style.RESET_ALL}")
+        print(f"\n{Fore.CYAN}â•â•â•â•â•â•â•â•â•â‹˜ NETWORK TOPOLOGY â‹™â•â•â•â•â•â•â•â•â•{Style.RESET_ALL}")
         devices = [
             ("Router", "192.168.1.1", "Cisco IOS"),
             ("Workstation", "192.168.1.15", "Windows 11"),
@@ -22737,7 +22737,7 @@ class SecurityTerminal:
         ]
 
         for device, ip, osys in devices:
-            print(f"{Fore.MAGENTA}⌖ {device}: {ip}", end='')
+            print(f"{Fore.MAGENTA}âŒ– {device}: {ip}", end='')
             for _ in range(3):
                 print(".", end='', flush=True)
                 time.sleep(0.3)
@@ -22798,12 +22798,12 @@ class SecurityTerminal:
             for color in colors:
                 os.system('cls' if os.name == 'nt' else 'clear')
                 print(f"\n{color}{centered_banner}{Style.RESET_ALL}")
-                print(f"\n{Fore.CYAN}{self._center_text('═' * 60)}{Style.RESET_ALL}")
-                print(f"{Fore.YELLOW}{self._center_text('DEFENSIVE SECURITY TERMINAL v3.1.113')}{Style.RESET_ALL}")
+                print(f"\n{Fore.CYAN}{self._center_text('â•' * 60)}{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}{self._center_text('DEFENSIVE SECURITY TERMINAL v4.0.0.113')}{Style.RESET_ALL}")
 
                 print(f"{Fore.YELLOW}{self._center_text('DEFENSIVE SECURITY TERMINAL v2.1.327')}{Style.RESET_ALL}")
-                print(f"{Fore.CYAN}{self._center_text('═' * 60)}{Style.RESET_ALL}")
-                print(f"{Fore.GREEN}{self._center_text('⚡ System Ready | Mode: HARDENING MODE ⚡')}{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}{self._center_text('â•' * 60)}{Style.RESET_ALL}")
+                print(f"{Fore.GREEN}{self._center_text('âš¡ System Ready | Mode: HARDENING MODE âš¡')}{Style.RESET_ALL}")
                 time.sleep(0.2)
         
         time.sleep(1)
@@ -22817,7 +22817,7 @@ class SecurityTerminal:
     def _matrix_rain_effect(self, duration=2):
         """Create Matrix-style digital rain effect"""
         end_time = time.time() + duration
-        chars = "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン"
+        chars = "01ã‚¢ã‚¤ã‚¦ã‚¨ã‚ªã‚«ã‚­ã‚¯ã‚±ã‚³ã‚µã‚·ã‚¹ã‚»ã‚½ã‚¿ãƒãƒ„ãƒ†ãƒˆãƒŠãƒ‹ãƒŒãƒãƒŽãƒãƒ’ãƒ•ãƒ˜ãƒ›ãƒžãƒŸãƒ ãƒ¡ãƒ¢ãƒ¤ãƒ¦ãƒ¨ãƒ©ãƒªãƒ«ãƒ¬ãƒ­ãƒ¯ãƒ²ãƒ³"
         
         while time.time() < end_time:
             line = ''.join(random.choice(chars) for _ in range(self.terminal_width // 2))
@@ -22852,7 +22852,7 @@ class SecurityTerminal:
         """Show a simple text-based progress bar for cinematic effect"""
         print(f"{task_name}: ", end="", flush=True)
         for i in range(length + 1):
-            bar = "█" * i + "▒" * (length - i)
+            bar = "â–ˆ" * i + "â–’" * (length - i)
             percent = int((i / length) * 100)
             color = Fore.GREEN if percent < 50 else Fore.YELLOW if percent < 80 else Fore.RED
             print(f"\r{task_name}: {color}|{bar}| {percent}%{Style.RESET_ALL}", end="", flush=True)
@@ -22861,13 +22861,13 @@ class SecurityTerminal:
     
     def _network_scan_animation(self):
         """Simulate network scanning with visual effects"""
-        print(f"\n{Fore.CYAN}{self._center_text('═════════⋘ NETWORK TOPOLOGY ⋙═════════')}{Style.RESET_ALL}")
+        print(f"\n{Fore.CYAN}{self._center_text('â•â•â•â•â•â•â•â•â•â‹˜ NETWORK TOPOLOGY â‹™â•â•â•â•â•â•â•â•â•')}{Style.RESET_ALL}")
         ips = [
-            (f"⌖ Router: 192.168.1.1... [Cisco IOS]", Fore.YELLOW),
-            (f"⌖ Workstation: 192.168.1.15... [Windows 11]", Fore.GREEN),
-            (f"⌖ Server: 192.168.1.100... [Ubuntu 22.04]", Fore.BLUE),
-            (f"⌖ IoT Device: 192.168.1.50... [Smart Hub]", Fore.MAGENTA),
-            (f"⌖ Printer: 192.168.1.30... [HP LaserJet]", Fore.CYAN)
+            (f"âŒ– Router: 192.168.1.1... [Cisco IOS]", Fore.YELLOW),
+            (f"âŒ– Workstation: 192.168.1.15... [Windows 11]", Fore.GREEN),
+            (f"âŒ– Server: 192.168.1.100... [Ubuntu 22.04]", Fore.BLUE),
+            (f"âŒ– IoT Device: 192.168.1.50... [Smart Hub]", Fore.MAGENTA),
+            (f"âŒ– Printer: 192.168.1.30... [HP LaserJet]", Fore.CYAN)
         ]
         
         for ip, color in ips:
@@ -22885,23 +22885,23 @@ class SecurityTerminal:
         ]
         vulns = random.sample(sample_vulns, k=random.randint(2, 4))
         
-        print(f"\n{Fore.RED}{self._center_text('▄︻デ══━ VULNERABILITY SCAN ══━︻▄')}{Style.RESET_ALL}")
+        print(f"\n{Fore.RED}{self._center_text('â–„ï¸»ãƒ‡â•â•â” VULNERABILITY SCAN â•â•â”ï¸»â–„')}{Style.RESET_ALL}")
         for cve, severity, component in vulns:
             time.sleep(0.5)
             severity_color = Fore.RED if severity == "Critical" else Fore.YELLOW if severity == "High" else Fore.GREEN
-            print(f"{severity_color}{severity.upper().ljust(8)} {cve} → {component}{Style.RESET_ALL}")
+            print(f"{severity_color}{severity.upper().ljust(8)} {cve} â†’ {component}{Style.RESET_ALL}")
             time.sleep(0.3)
-        print(f"{Fore.GREEN}✓ {len(vulns)} vulnerabilities patched{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}âœ“ {len(vulns)} vulnerabilities patched{Style.RESET_ALL}")
     
     def _cyber_attack_simulation(self):
         """Simulate cyber attack detection with blinking effects"""
-        print(f"\n{Fore.RED}{self._center_text('▄︻デ══━ INTRUSION DETECTED ══━︻▄')}{Style.RESET_ALL}")
+        print(f"\n{Fore.RED}{self._center_text('â–„ï¸»ãƒ‡â•â•â” INTRUSION DETECTED â•â•â”ï¸»â–„')}{Style.RESET_ALL}")
         attacks = [
-            (f"✓ 225.242.61.205 | HTTPS | RCE ▶ BLOCKED", Fore.GREEN),
-            (f"✓ 188.101.45.207 | HTTPS | XSS ▶ BLOCKED", Fore.GREEN),
-            (f"✓ 43.77.112.198 | HTTP | Brute Force ▶ BLOCKED", Fore.YELLOW),
-            (f"✓ 250.124.212.130 | HTTPS | Brute Force ▶ BLOCKED", Fore.YELLOW),
-            (f"⚠ 78.95.143.67 | SSH | Dictionary Attack ▶ MITIGATED", Fore.RED)
+            (f"âœ“ 225.242.61.205 | HTTPS | RCE â–¶ BLOCKED", Fore.GREEN),
+            (f"âœ“ 188.101.45.207 | HTTPS | XSS â–¶ BLOCKED", Fore.GREEN),
+            (f"âœ“ 43.77.112.198 | HTTP | Brute Force â–¶ BLOCKED", Fore.YELLOW),
+            (f"âœ“ 250.124.212.130 | HTTPS | Brute Force â–¶ BLOCKED", Fore.YELLOW),
+            (f"âš  78.95.143.67 | SSH | Dictionary Attack â–¶ MITIGATED", Fore.RED)
         ]
         
         for attack, color in attacks:
@@ -22909,7 +22909,7 @@ class SecurityTerminal:
             time.sleep(0.3)
         
         # Blinking threat neutralized
-        self._blinking_text(self._center_text("⚠ THREAT NEUTRALIZED ⚠"), Fore.RED, 2)
+        self._blinking_text(self._center_text("âš  THREAT NEUTRALIZED âš "), Fore.RED, 2)
     
     # go down here, don't remove these lines below
  
@@ -22922,7 +22922,7 @@ class SecurityTerminal:
         import shutil
         
         if not args:
-            print(f"{Fore.RED}❌ Usage: nikto --url <TARGET>{Style.RESET_ALL}")
+            print(f"{Fore.RED}âŒ Usage: nikto --url <TARGET>{Style.RESET_ALL}")
             print(f"{Fore.YELLOW}   Example: nikto --url https://example.com{Style.RESET_ALL}")
             print(f"{Fore.YELLOW}   Example: nikto unima.ac.mw --port 443{Style.RESET_ALL}")
             return
@@ -22957,14 +22957,14 @@ class SecurityTerminal:
                 # Parse with shlex to handle quoted strings
                 cmd_args = shlex.split(arg_str)
             
-            print(f"{Fore.CYAN}🔍 Running Nikto scan: {cmd_args}{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}ðŸ” Running Nikto scan: {cmd_args}{Style.RESET_ALL}")
             
             # Check if nikto is installed
             nikto_path = shutil.which('nikto')
             if not nikto_path:
-                print(f"{Fore.RED}❌ Nikto not found. Please install nikto.{Style.RESET_ALL}")
-                print(f"{Fore.YELLOW}💡 On Kali: sudo apt install nikto{Style.RESET_ALL}")
-                print(f"{Fore.YELLOW}💡 On other systems: https://github.com/sullo/nikto{Style.RESET_ALL}")
+                print(f"{Fore.RED}âŒ Nikto not found. Please install nikto.{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}ðŸ’¡ On Kali: sudo apt install nikto{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}ðŸ’¡ On other systems: https://github.com/sullo/nikto{Style.RESET_ALL}")
                 return
             
             # Build the command
@@ -22974,8 +22974,8 @@ class SecurityTerminal:
             if '-Format' not in arg_str and '-f' not in arg_str:
                 cmd.extend(['-Format', 'html'])
             
-            print(f"{Fore.GREEN}▶ Executing: {' '.join(cmd)}{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW}⏳ Scanning... This may take a few minutes.{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}â–¶ Executing: {' '.join(cmd)}{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}â³ Scanning... This may take a few minutes.{Style.RESET_ALL}")
             
             # Run nikto
             try:
@@ -22988,25 +22988,25 @@ class SecurityTerminal:
                 
                 # Print output
                 if result.stdout:
-                    print(f"\n{Fore.GREEN}📊 Scan Results:{Style.RESET_ALL}")
+                    print(f"\n{Fore.GREEN}ðŸ“Š Scan Results:{Style.RESET_ALL}")
                     print(result.stdout)
                 
                 if result.stderr:
-                    print(f"\n{Fore.YELLOW}⚠️ Warnings/Errors:{Style.RESET_ALL}")
+                    print(f"\n{Fore.YELLOW}âš ï¸ Warnings/Errors:{Style.RESET_ALL}")
                     print(result.stderr)
                 
                 if result.returncode == 0:
-                    print(f"\n{Fore.GREEN}✅ Nikto scan completed successfully.{Style.RESET_ALL}")
+                    print(f"\n{Fore.GREEN}âœ… Nikto scan completed successfully.{Style.RESET_ALL}")
                 else:
-                    print(f"\n{Fore.RED}❌ Nikto scan failed with code: {result.returncode}{Style.RESET_ALL}")
+                    print(f"\n{Fore.RED}âŒ Nikto scan failed with code: {result.returncode}{Style.RESET_ALL}")
                     
             except subprocess.TimeoutExpired:
-                print(f"{Fore.RED}❌ Nikto scan timed out after 5 minutes.{Style.RESET_ALL}")
+                print(f"{Fore.RED}âŒ Nikto scan timed out after 5 minutes.{Style.RESET_ALL}")
             except Exception as e:
-                print(f"{Fore.RED}❌ Error running nikto: {str(e)}{Style.RESET_ALL}")
+                print(f"{Fore.RED}âŒ Error running nikto: {str(e)}{Style.RESET_ALL}")
                 
         except Exception as e:
-            print(f"{Fore.RED}❌ Error parsing arguments: {str(e)}{Style.RESET_ALL}")
+            print(f"{Fore.RED}âŒ Error parsing arguments: {str(e)}{Style.RESET_ALL}")
             print(f"{Fore.YELLOW}Usage: nikto --url <TARGET>{Style.RESET_ALL}")
             print(f"{Fore.YELLOW}  Example: nikto --url https://example.com{Style.RESET_ALL}")
             print(f"{Fore.YELLOW}  Example: nikto unima.ac.mw{Style.RESET_ALL}")
@@ -23100,7 +23100,7 @@ class SecurityTerminal:
     #                             self._cinematic_typing(f"[!] Failed to enable UFW: {str(e)}", 0.04)
     #                             logging.error(f"Failed to enable UFW: {str(e)}")
     #                     else:
-    #                         self._cinematic_typing("[!] UFW firewall not found — skipping Linux hardening", 0.04)
+    #                         self._cinematic_typing("[!] UFW firewall not found â€” skipping Linux hardening", 0.04)
                 
     #             except Exception as e:
     #                 logging.error(f"Hardening failed: {str(e)}")
@@ -23113,12 +23113,12 @@ class SecurityTerminal:
             
     #         # Blinking completion banner
     #         for _ in range(3):
-    #             print(f"\r{Fore.GREEN}{self._center_text('▄︻デ══━ SYSTEM FORTIFICATION COMPLETE ══━︻▄')}{Style.RESET_ALL}", end="")
+    #             print(f"\r{Fore.GREEN}{self._center_text('â–„ï¸»ãƒ‡â•â•â” SYSTEM FORTIFICATION COMPLETE â•â•â”ï¸»â–„')}{Style.RESET_ALL}", end="")
     #             time.sleep(0.3)
     #             print(f"\r{' ' * self.terminal_width}", end="")
     #             time.sleep(0.3)
             
-    #         print(f"\n{Fore.GREEN}{self._center_text('▄︻デ══━ SYSTEM FORTIFICATION COMPLETE ══━︻▄')}{Style.RESET_ALL}")
+    #         print(f"\n{Fore.GREEN}{self._center_text('â–„ï¸»ãƒ‡â•â•â” SYSTEM FORTIFICATION COMPLETE â•â•â”ï¸»â–„')}{Style.RESET_ALL}")
     #         threat_level = random.randint(1, 10)
             
     #         # Blinking threat level
@@ -23129,7 +23129,7 @@ class SecurityTerminal:
     #         # Catch-all to preserve cinematic end even on errors
     #         print(f"{Fore.RED}[!] Critical error: {str(e)}{Style.RESET_ALL}")
     #         self._cinematic_typing("System fortification complete with errors.", 0.05)
-    #         print(f"\n{Fore.GREEN}{self._center_text('▄︻デ══━ SYSTEM FORTIFICATION COMPLETE ══━︻▄')}{Style.RESET_ALL}")
+    #         print(f"\n{Fore.GREEN}{self._center_text('â–„ï¸»ãƒ‡â•â•â” SYSTEM FORTIFICATION COMPLETE â•â•â”ï¸»â–„')}{Style.RESET_ALL}")
     #         threat_level = random.randint(1, 10)
     #         print(f"{Fore.YELLOW}{self._center_text(f' Firewall Active | Intrusion Prevention Engaged | Threat Level: {threat_level}/10')}{Style.RESET_ALL}")
 
@@ -23409,7 +23409,7 @@ class SecurityTerminal:
                 self._soc_help()
                 return
             else:
-                print(f"❌ Unknown SOC command: {args[0]}")
+                print(f"âŒ Unknown SOC command: {args[0]}")
                 print("   Available: start, stop, status, dashboard, enhanced, ioc, scan, report, help")
                 return
         
@@ -23421,16 +23421,16 @@ class SecurityTerminal:
             # Run SQLMap scan on a URL
             # Usage: sqlmap http://example.com/page?id=1
             if not args:
-                self.console.print("[red]❌ Usage: sqlmap <url>[/red]")
-                self.console.print("[yellow]💡 Example: sqlmap https://starkexpotechexchange.netlify.app[/yellow]")
+                self.console.print("[red]âŒ Usage: sqlmap <url>[/red]")
+                self.console.print("[yellow]ðŸ’¡ Example: sqlmap https://starkexpotechexchange.netlify.app[/yellow]")
                 return
             
             url = args[0]
-            self.console.print(f"[cyan]🔍 Running SQLMap scan on: {url}[/cyan]")
+            self.console.print(f"[cyan]ðŸ” Running SQLMap scan on: {url}[/cyan]")
             try:
                 self.scanner.scan(url)
             except Exception as e:
-                self.console.print(f"[red]❌ Error: {e}[/red]")
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
             return
 
         elif cmd in ["sqllab", "sqlmap-lab"]:
@@ -23440,36 +23440,36 @@ class SecurityTerminal:
                 try:
                     port = int(args[0])
                 except ValueError:
-                    self.console.print(f"[red]❌ Invalid port: {args[0]}, using default 8080[/red]")
+                    self.console.print(f"[red]âŒ Invalid port: {args[0]}, using default 8080[/red]")
             
             try:
                 # Start the lab (non-blocking)
                 self.scanner.start_lab(port=port, open_browser=True)
                 # Don't block - return immediately
             except Exception as e:
-                self.console.print(f"[red]❌ Error: {e}[/red]")
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
             return
 
         elif cmd in ["sqlmap-install", "sqlmap-install"]:
             # Install SQLMap
-            self.console.print("[cyan]📦 Installing SQLMap...[/cyan]")
+            self.console.print("[cyan]ðŸ“¦ Installing SQLMap...[/cyan]")
             try:
                 if self.scanner.install_sqlmap():
-                    self.console.print("[green]✅ SQLMap installed successfully![/green]")
+                    self.console.print("[green]âœ… SQLMap installed successfully![/green]")
                 else:
-                    self.console.print("[red]❌ SQLMap installation failed[/red]")
+                    self.console.print("[red]âŒ SQLMap installation failed[/red]")
             except Exception as e:
-                self.console.print(f"[red]❌ Error: {e}[/red]")
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
             return
 
         elif cmd in ["sqlmap-reset", "sqlmap-db-reset"]:
             # Reset SQL Injection Lab database
-            self.console.print("[yellow]🔄 Resetting SQL Injection Lab database...[/yellow]")
+            self.console.print("[yellow]ðŸ”„ Resetting SQL Injection Lab database...[/yellow]")
             try:
                 self.scanner.lab.reset_database()
-                self.console.print("[green]✅ Database reset successfully![/green]")
+                self.console.print("[green]âœ… Database reset successfully![/green]")
             except Exception as e:
-                self.console.print(f"[red]❌ Error: {e}[/red]")
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
             return
 
         elif cmd in ["sqlmap-secure", "sqlmap-toggle-secure"]:
@@ -23478,13 +23478,13 @@ class SecurityTerminal:
                 self.scanner.lab.set_secure_mode(not self.scanner.lab.secure_mode)
                 status = "ENABLED" if self.scanner.lab.secure_mode else "DISABLED"
                 color = "green" if self.scanner.lab.secure_mode else "red"
-                self.console.print(f"[{color}]🔒 Secure mode: {status}[/{color}]")
+                self.console.print(f"[{color}]ðŸ”’ Secure mode: {status}[/{color}]")
                 if self.scanner.lab.secure_mode:
-                    self.console.print("[green]✅ SQL injection is now PREVENTED[/green]")
+                    self.console.print("[green]âœ… SQL injection is now PREVENTED[/green]")
                 else:
-                    self.console.print("[red]⚠️ SQL injection is now POSSIBLE (vulnerable)[/red]")
+                    self.console.print("[red]âš ï¸ SQL injection is now POSSIBLE (vulnerable)[/red]")
             except Exception as e:
-                self.console.print(f"[red]❌ Error: {e}[/red]")
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
             return
 
         elif cmd in ["sqllab-stop", "sqlmap-stop"]:
@@ -23492,7 +23492,7 @@ class SecurityTerminal:
             try:
                 self.scanner.stop_lab()
             except Exception as e:
-                self.console.print(f"[red]❌ Error: {e}[/red]")
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
             return
 
         elif cmd in ["sqlmap-waf", "sqlmap-toggle-waf"]:
@@ -23501,13 +23501,13 @@ class SecurityTerminal:
                 self.scanner.lab.set_waf_mode(not self.scanner.lab.waf_mode)
                 status = "ENABLED" if self.scanner.lab.waf_mode else "DISABLED"
                 color = "green" if self.scanner.lab.waf_mode else "red"
-                self.console.print(f"[{color}]🛡️ WAF mode: {status}[/{color}]")
+                self.console.print(f"[{color}]ðŸ›¡ï¸ WAF mode: {status}[/{color}]")
                 if self.scanner.lab.waf_mode:
-                    self.console.print("[green]✅ WAF is now actively blocking injection attempts[/green]")
+                    self.console.print("[green]âœ… WAF is now actively blocking injection attempts[/green]")
                 else:
-                    self.console.print("[red]⚠️ WAF is now disabled - injections may pass through[/red]")
+                    self.console.print("[red]âš ï¸ WAF is now disabled - injections may pass through[/red]")
             except Exception as e:
-                self.console.print(f"[red]❌ Error: {e}[/red]")
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
             return
 
         elif cmd in ["sqlmap-status", "sqlmap-lab-status"]:
@@ -23515,26 +23515,26 @@ class SecurityTerminal:
             try:
                 self.scanner.cmd_advanced_status(args)
             except Exception as e:
-                self.console.print(f"[red]❌ Error: {e}[/red]")
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
             return
 
         elif cmd in ["sqlmap-pdf", "sqlmap-notes"]:
             # Generate PDF notes for SQL Injection
-            self.console.print("[cyan]📄 Generating SQL Injection PDF Notes...[/cyan]")
+            self.console.print("[cyan]ðŸ“„ Generating SQL Injection PDF Notes...[/cyan]")
             try:
                 pdf_path = self.scanner.lab.generate_pdf_notes()
                 if pdf_path:
-                    self.console.print(f"[green]✅ PDF Notes generated: {pdf_path}[/green]")
+                    self.console.print(f"[green]âœ… PDF Notes generated: {pdf_path}[/green]")
                     try:
                         import webbrowser
                         webbrowser.open(f"file://{pdf_path}")
-                        self.console.print("[green]✅ PDF opened in default viewer[/green]")
+                        self.console.print("[green]âœ… PDF opened in default viewer[/green]")
                     except:
                         pass
                 else:
-                    self.console.print("[red]❌ PDF generation failed[/red]")
+                    self.console.print("[red]âŒ PDF generation failed[/red]")
             except Exception as e:
-                self.console.print(f"[red]❌ Error: {e}[/red]")
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
             return
 
         elif cmd in ["sqlmap-techniques", "sqlmap-list"]:
@@ -23542,7 +23542,7 @@ class SecurityTerminal:
             try:
                 self.scanner.cmd_advanced_techniques(args)
             except Exception as e:
-                self.console.print(f"[red]❌ Error: {e}[/red]")
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
             return
 
         elif cmd in ["sqlmap-info", "sqlmap-version"]:
@@ -23550,7 +23550,7 @@ class SecurityTerminal:
             try:
                 self.cmd_sqlmap_info(args)
             except Exception as e:
-                self.console.print(f"[red]❌ Error: {e}[/red]")
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
             return
 
         elif cmd in ["sqlmap-help", "sqlmap-?"]:
@@ -23562,9 +23562,9 @@ class SecurityTerminal:
             # Stop SQL Injection Learning Lab
             try:
                 self.scanner.stop_lab()
-                self.console.print("[green]✅ SQL Injection Learning Lab stopped[/green]")
+                self.console.print("[green]âœ… SQL Injection Learning Lab stopped[/green]")
             except Exception as e:
-                self.console.print(f"[red]❌ Error: {e}[/red]")
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
             return
 
         # ====
@@ -23583,20 +23583,20 @@ class SecurityTerminal:
         elif cmd in ["sqlmap-scan-file", "sqlmap-file"]:
             # Scan URLs from a file
             if not args:
-                self.console.print("[red]❌ Usage: sqlmap-scan-file <file_path>[/red]")
-                self.console.print("[yellow]💡 Example: sqlmap-scan-file urls.txt[/yellow]")
+                self.console.print("[red]âŒ Usage: sqlmap-scan-file <file_path>[/red]")
+                self.console.print("[yellow]ðŸ’¡ Example: sqlmap-scan-file urls.txt[/yellow]")
                 return
             
             file_path = args[0]
             if not os.path.exists(file_path):
-                self.console.print(f"[red]❌ File not found: {file_path}[/red]")
+                self.console.print(f"[red]âŒ File not found: {file_path}[/red]")
                 return
             
             try:
                 with open(file_path, 'r') as f:
                     urls = [line.strip() for line in f if line.strip()]
                 
-                self.console.print(f"[cyan]📄 Found {len(urls)} URLs in {file_path}[/cyan]")
+                self.console.print(f"[cyan]ðŸ“„ Found {len(urls)} URLs in {file_path}[/cyan]")
                 self.console.print("[yellow]Starting batch scan...[/yellow]")
                 
                 for i, url in enumerate(urls, 1):
@@ -23604,18 +23604,18 @@ class SecurityTerminal:
                     try:
                         self.scanner.scan(url)
                     except Exception as e:
-                        self.console.print(f"[red]❌ Error scanning {url}: {e}[/red]")
+                        self.console.print(f"[red]âŒ Error scanning {url}: {e}[/red]")
                 
-                self.console.print("[green]✅ All scans completed![/green]")
+                self.console.print("[green]âœ… All scans completed![/green]")
             except Exception as e:
-                self.console.print(f"[red]❌ Error: {e}[/red]")
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
             return
 
         elif cmd in ["sqlmap-export", "sqlmap-report-export"]:
             # Export the latest scan report
             if not args:
-                self.console.print("[red]❌ Usage: sqlmap-export <destination_path>[/red]")
-                self.console.print("[yellow]💡 Example: sqlmap-export C:\\Users\\User\\Desktop\\report.pdf[/yellow]")
+                self.console.print("[red]âŒ Usage: sqlmap-export <destination_path>[/red]")
+                self.console.print("[yellow]ðŸ’¡ Example: sqlmap-export C:\\Users\\User\\Desktop\\report.pdf[/yellow]")
                 return
             
             dest_path = args[0]
@@ -23624,21 +23624,21 @@ class SecurityTerminal:
                 scans_dir = os.path.join(workspace, "scans")
                 
                 if not os.path.exists(scans_dir):
-                    self.console.print("[red]❌ No scan reports found[/red]")
+                    self.console.print("[red]âŒ No scan reports found[/red]")
                     return
                 
                 import glob
                 scan_files = glob.glob(os.path.join(scans_dir, "SQLMap_Report_*.pdf"))
                 if not scan_files:
-                    self.console.print("[red]❌ No reports found[/red]")
+                    self.console.print("[red]âŒ No reports found[/red]")
                     return
                 
                 latest_report = max(scan_files, key=os.path.getctime)
                 import shutil
                 shutil.copy2(latest_report, dest_path)
-                self.console.print(f"[green]✅ Report exported to: {dest_path}[/green]")
+                self.console.print(f"[green]âœ… Report exported to: {dest_path}[/green]")
             except Exception as e:
-                self.console.print(f"[red]❌ Error: {e}[/red]")
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
             return
 
         # Direct shortcuts for SOC commands (no space version)
@@ -23886,11 +23886,11 @@ class SecurityTerminal:
                                     count += 1
                                 except:
                                     pass
-                        self.crypto.typer._ultra_type(f"✅ Deleted {count} QR codes", color=Colors.GREEN)
+                        self.crypto.typer._ultra_type(f"âœ… Deleted {count} QR codes", color=Colors.GREEN)
                         self.crypto.add_activity(f"Cleaned {count} QR codes")
                         input(f"\n{Fore.YELLOW}Press ENTER to continue...{Style.RESET_ALL}")
                 else:
-                    self.crypto.typer._ultra_type("❌ QR directory not found", color=Colors.RED)
+                    self.crypto.typer._ultra_type("âŒ QR directory not found", color=Colors.RED)
                     input(f"\n{Fore.YELLOW}Press ENTER to continue...{Style.RESET_ALL}")
             else:
                 print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
@@ -24112,13 +24112,13 @@ class SecurityTerminal:
                     for fmt in formats:
                         result = self.security_terminal.export_results(fmt, filename)
                         if result:
-                            print(f"{Fore.GREEN}[✓] Exported {fmt.upper()}: {result}{Style.RESET_ALL}")
+                            print(f"{Fore.GREEN}[âœ“] Exported {fmt.upper()}: {result}{Style.RESET_ALL}")
                         else:
                             print(f"{Fore.RED}[!] Failed to export {fmt.upper()}{Style.RESET_ALL}")
                 else:
                     result = self.security_terminal.export_results(format_type, filename)
                     if result:
-                        print(f"{Fore.GREEN}[✓] Exported to: {result}{Style.RESET_ALL}")
+                        print(f"{Fore.GREEN}[âœ“] Exported to: {result}{Style.RESET_ALL}")
                     else:
                         print(f"{Fore.RED}[!] Export failed{Style.RESET_ALL}")
             
@@ -24133,7 +24133,7 @@ class SecurityTerminal:
                     return True
                 result = self.security_terminal.load_scan_results(args[1])
                 if result:
-                    print(f"{Fore.GREEN}[✓] Scan data loaded successfully{Style.RESET_ALL}")
+                    print(f"{Fore.GREEN}[âœ“] Scan data loaded successfully{Style.RESET_ALL}")
                 else:
                     print(f"{Fore.RED}[!] Load failed{Style.RESET_ALL}")
             
@@ -24180,7 +24180,7 @@ class SecurityTerminal:
                 )
             print(f"{Fore.CYAN}[*] Starting deep system scan...{Style.RESET_ALL}")
             self.security_terminal.scan_system()
-            print(f"{Fore.GREEN}[✓] Scan initiated in background{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}[âœ“] Scan initiated in background{Style.RESET_ALL}")
             return
         
         elif command in ['scan-quick', 'quick-scan', 'qs']:
@@ -24283,7 +24283,7 @@ class SecurityTerminal:
                         print(f"{Fore.RED}[!] Integrity violations detected!{Style.RESET_ALL}")
                         self.integrity.generate_report(changes, scan_results)
                     else:
-                        print(f"{Fore.GREEN}[✓] No integrity violations found{Style.RESET_ALL}")
+                        print(f"{Fore.GREEN}[âœ“] No integrity violations found{Style.RESET_ALL}")
                 except Exception as e:
                     print(f"{Fore.RED}[!] Scan failed: {e}{Style.RESET_ALL}")
             
@@ -24325,13 +24325,13 @@ class SecurityTerminal:
                 if len(args) > 1 and args[1] == 'stop':
                     if self.alert_manager:
                         self.alert_manager.stop_monitoring()
-                        print(f"{Fore.GREEN}[✓] Monitoring stopped{Style.RESET_ALL}")
+                        print(f"{Fore.GREEN}[âœ“] Monitoring stopped{Style.RESET_ALL}")
                 else:
                     if self.alert_manager:
                         self.alert_manager.start_monitoring()
-                        print(f"{Fore.GREEN}[✓] monitoring started{Style.RESET_ALL}")
+                        print(f"{Fore.GREEN}[âœ“] monitoring started{Style.RESET_ALL}")
 
-                        print(f"{Fore.GREEN}[✓] Real-time monitoring started{Style.RESET_ALL}")
+                        print(f"{Fore.GREEN}[âœ“] Real-time monitoring started{Style.RESET_ALL}")
             
             # integrity alerts
             elif subcmd == 'alerts':
@@ -24429,7 +24429,7 @@ class SecurityTerminal:
                             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
                             dest = os.path.join(quarantine_dir, f"{timestamp}_{filename}")
                             shutil.move(file_path, dest)
-                            print(f"{Fore.GREEN}[✓] File quarantined to: {dest}{Style.RESET_ALL}")
+                            print(f"{Fore.GREEN}[âœ“] File quarantined to: {dest}{Style.RESET_ALL}")
                     except Exception as e:
                         print(f"{Fore.RED}[!] Failed to quarantine: {e}{Style.RESET_ALL}")
                 else:
@@ -24623,9 +24623,9 @@ class SecurityTerminal:
                 return
 
         elif parts[0] == "show-paths":
-            print("\n📁 Monitored Paths:")
+            print("\nðŸ“ Monitored Paths:")
             for p in self.config['monitor_paths']:
-                status = "✓" if os.path.exists(p) else "✗"
+                status = "âœ“" if os.path.exists(p) else "âœ—"
                 print(f"  {status} {p}")
             return
         
@@ -24960,7 +24960,7 @@ class SecurityTerminal:
 
         # Define categories dictionary FIRST before any validation or use
         categories = {
-            "🔥 CORE SECURITY": [
+            "ðŸ”¥ CORE SECURITY": [
                 ("system scan -All", "System threat scan (sys, apps, net)"),
                 ("system", "System security management"),
                 ("system help", "Show system command help"),
@@ -24986,7 +24986,7 @@ class SecurityTerminal:
     
     # Help menu categories with commands
         categories = {
-            "🔥 CORE SECURITY": [
+            "ðŸ”¥ CORE SECURITY": [
                 ("system scan -All", "System threat scan (sys, apps, net)"),
                 ("net -n mon", "Live network monitoring"),
                 ("exploitcheck", "Check for critical CVEs"),
@@ -25006,7 +25006,7 @@ class SecurityTerminal:
                 ("trace", "Trace suspicious transactions")
             ],
         
-            "🌐 NETWORK TOOLS": [
+            "ðŸŒ NETWORK TOOLS": [
                 ("portsweep [IP]", "Scan target for open ports"),
                 ("traceroute [IP]", "Network path analysis"),
                 ("torify", "Route traffic through Tor"),
@@ -25020,7 +25020,7 @@ class SecurityTerminal:
                 ("msfconsole", "Launch Metasploit Framework console")
             ],
         
-            "🔍 FORENSICS & FINANCIAL": [
+            "ðŸ” FORENSICS & FINANCIAL": [
                 ("memdump", "Capture volatile memory"),
                 ("hashfile [PATH]", "Generate file integrity hashes"),
                 ("stegcheck [IMG]", "Detect hidden image data"),
@@ -25050,7 +25050,7 @@ class SecurityTerminal:
                 ("sessiondump", "Dump active user sessions")
             ],
 
-            "🔐 SQL INJECTION TOOLS": [
+            "ðŸ” SQL INJECTION TOOLS": [
                 ("sqlmap <URL>", "Run SQLMap scan on a target URL"),
                 ("sqlmap --url <URL>", "SQLMap scan with URL parameter"),
                 ("sqlmap --fs <PATH>", "SQLMap filesystem scan"),
@@ -25079,7 +25079,7 @@ class SecurityTerminal:
                 ("sqlmap-export <DEST>", "Export the last scan report")
             ],
             
-            "🛡️ HARDENING TOOLS": [
+            "ðŸ›¡ï¸ HARDENING TOOLS": [
                 ("harden", "System hardening menu"),
                 ("harden -t sys", "Target system hardening"),
                 ("harden-quick", "Quick system hardening"),
@@ -25105,14 +25105,14 @@ class SecurityTerminal:
                 ("harden-info", "Show hardening information")
             ],
             
-            "📂 BACKUP & RESTORE": [
+            "ðŸ“‚ BACKUP & RESTORE": [
                 ("list-backups", "List available backups"),
                 ("search", "Search through backups"),
                 ("restore-id", "Restore backup by ID"),
                 ("restore-last", "Restore the last backup")
             ],
             
-            "🔧 SYSTEM MANAGEMENT": [
+            "ðŸ”§ SYSTEM MANAGEMENT": [
                 ("add-path", "Add directory to system PATH"),
                 ("dst-workspace", "DSTerminal workspace management"),
                 ("dst-cleanup", "Clean up temporary files"),
@@ -25144,7 +25144,7 @@ class SecurityTerminal:
                 ("ss", "Alias for scan-status"),
 
         
-            "⚙️ SYSTEM MANAGEMENT": [
+            "âš™ï¸ SYSTEM MANAGEMENT": [
                 ("sysinfo", "Detailed system report"),
                 ("killproc PID", "Terminate process"),
                 ("macspoof [IFACE]", "Randomize MAC address"),
@@ -25154,7 +25154,7 @@ class SecurityTerminal:
                 ("shutdown now", "Immediate machine shutdown")
             ],
             
-            "🕵️ RECONNAISSANCE TOOLS": [
+            "ðŸ•µï¸ RECONNAISSANCE TOOLS": [
                 ("dst-recon", "Basic reconnaissance"),
                 ("dst-recon-full", "Full reconnaissance scan"),
                 ("dst-recon-quick", "Quick reconnaissance"),
@@ -25166,7 +25166,7 @@ class SecurityTerminal:
                 ("recf", "Full reconnaissance")
             ],
             
-            "🔍 INTEGRITY CHECKING": [
+            "ðŸ” INTEGRITY CHECKING": [
                 ("integrity", "Integrity checking menu"),
                 ("integrity-scan", "Scan file integrity"),
                 ("integrity-restore", "Restore integrity"),
@@ -25187,7 +25187,7 @@ class SecurityTerminal:
                 ("integrity-info", "Show integrity information")
             ],
             
-            "📊 CERTIFICATE & ENCRYPTION": [
+            "ðŸ“Š CERTIFICATE & ENCRYPTION": [
                 ("certcheck", "Check SSL/TLS certificates"),
                 ("crypto-export", "Export cryptographic keys"),
                 ("crypto-import", "Import cryptographic keys"),
@@ -25217,7 +25217,7 @@ class SecurityTerminal:
 
             ],
             
-            "🔬 FORENSICS & INVESTIGATION": [
+            "ðŸ”¬ FORENSICS & INVESTIGATION": [
                 ("forensics", "Forensics menu"),
                 ("forensic", "Forensic analysis tools"),
                 ("fraud-investigate", "Fraud investigation"),
@@ -25229,7 +25229,7 @@ class SecurityTerminal:
                 ("trace-route", "Trace route analysis")
             ],
             
-            "⚙️ SERVICES & MONITORING": [
+            "âš™ï¸ SERVICES & MONITORING": [
                 ("service", "Service management menu"),
                 ("service start", "Start a service"),
                 ("service stop", "Stop a service"),
@@ -25254,7 +25254,7 @@ class SecurityTerminal:
                 ("monitor info", "Show monitoring information")
             ],
             
-            "🐍 SECURITY SCANNERS": [
+            "ðŸ SECURITY SCANNERS": [
                 ("nikto scan", "Run Nikto web scanner"),
                 ("nikto report", "Generate Nikto report"),
                 ("nikto help", "Show Nikto help"),
@@ -25281,7 +25281,7 @@ class SecurityTerminal:
                 ("trufflehog info", "Show TruffleHog information")
             ],
             
-            "🔐 SOC ( Detailed Information Reconnaissance)": [
+            "ðŸ” SOC ( Detailed Information Reconnaissance)": [
                 ("soc", "SOC command menu"),
                 ("soc terminal", "Open SOC terminal"),
                 ("soc monitor", "Open SOC monitor"),
@@ -25300,7 +25300,7 @@ class SecurityTerminal:
                 ("soc-orgs", "Manage SOC organizations")
             ],
             
-            "🖥️ DEBUG & SYSTEM TOOLS": [
+            "ðŸ–¥ï¸ DEBUG & SYSTEM TOOLS": [
                 ("debug", "Debug menu"),
                 ("debug start", "Start debugging"),
                 ("debug stop", "Stop debugging"),
@@ -25329,7 +25329,7 @@ class SecurityTerminal:
                 ("system xml", "Export system data to XML")
             ],
             
-            "📊 NETWORK MONITORING": [
+            "ðŸ“Š NETWORK MONITORING": [
                 ("net mon", "Network monitoring"),
                 ("net scan", "Network scanning"),
                 ("net report", "Network report generation"),
@@ -25356,7 +25356,7 @@ class SecurityTerminal:
                 ("wlan", "Wireless LAN management and auditing")
             ],
             
-            "🔨 UTILITY TOOLS": [
+            "ðŸ”¨ UTILITY TOOLS": [
                 ("registry mon", "Registry monitoring"),
                 ("shutdown", "Shutdown DSTerminal"),
                 ("clear", "Clear terminal screen"),
@@ -25365,7 +25365,7 @@ class SecurityTerminal:
             ],
 
         
-            "🔐 CRYPTO TOOLS": [
+            "ðŸ” CRYPTO TOOLS": [
                 ("encrypt FILE", "AES-256 file encryption"),
                 ("decrypt FILE KEY", "File decryption"),
                 ("crypto-list", "List encrypted files"),
@@ -25376,7 +25376,7 @@ class SecurityTerminal:
                 ("encrypt-setup", "Setup encryption system")
             ],
         
-            "🌍 WEB SECURITY": [
+            "ðŸŒ WEB SECURITY": [
                 ("web-security", "Launch Web Security Analyzer Dashboard"),
                 ("websec", "Launch Web Security Analyzer (shortcut)"),
                 ("ws", "Launch Web Security Analyzer (shortcut)"),
@@ -25405,12 +25405,12 @@ class SecurityTerminal:
 
             ],
         
-            "📊 MONITORING": [
+            "ðŸ“Š MONITORING": [
                 ("watchfolder [PATH]", "Directory change detection"),
                 ("regmon", "Windows registry monitor")
             ],
         
-            "📁 FILE COMMANDS": [
+            "ðŸ“ FILE COMMANDS": [
                 ("ls", "List files"),
                 ("cat <file>", "Show file contents"),
                 ("touch <file>", "Create file"),
@@ -25418,7 +25418,7 @@ class SecurityTerminal:
                 ("pwd", "Show current directory")
             ],
         
-            "🛠️ UTILITIES": [
+            "ðŸ› ï¸ UTILITIES": [
                 ("help", "Show this menu"),
                 ("exit", "Quit terminal"),
                 ("clear", "Clear terminal display"),
@@ -25428,10 +25428,10 @@ class SecurityTerminal:
         
         # Now categories is defined, proceed with display
         # Create header
-        print(f"\n{Fore.RED}╔{'═' * (terminal_width-2)}╗{Style.RESET_ALL}")
-        print(f"{Fore.RED}║{Fore.CYAN}{'DSTerminal v3.1.113 - Command Reference Manual'.center(terminal_width-2)}{Fore.RED}║{Style.RESET_ALL}")
-        print(f"{Fore.RED}║{Fore.YELLOW}{'INTERACTIVE COMMAND MENU'.center(terminal_width-2)}{Fore.RED}║{Style.RESET_ALL}")
-        print(f"{Fore.RED}╠{'═' * (terminal_width-2)}╣{Style.RESET_ALL}")
+        print(f"\n{Fore.RED}â•”{'â•' * (terminal_width-2)}â•—{Style.RESET_ALL}")
+        print(f"{Fore.RED}â•‘{Fore.CYAN}{'DSTerminal v4.0.0.113 - Command Reference Manual'.center(terminal_width-2)}{Fore.RED}â•‘{Style.RESET_ALL}")
+        print(f"{Fore.RED}â•‘{Fore.YELLOW}{'INTERACTIVE COMMAND MENU'.center(terminal_width-2)}{Fore.RED}â•‘{Style.RESET_ALL}")
+        print(f"{Fore.RED}â• {'â•' * (terminal_width-2)}â•£{Style.RESET_ALL}")
         
         # Display each category
         for category, commands in categories.items():
@@ -25443,10 +25443,10 @@ class SecurityTerminal:
 
     
     # Create header
-        print(f"\n{Fore.RED}╔{'═' * (terminal_width-2)}╗{Style.RESET_ALL}")
-        print(f"{Fore.RED}║{Fore.CYAN}{'DSTerminal v2.1.327 - Command Reference Manual'.center(terminal_width-2)}{Fore.RED}║{Style.RESET_ALL}")
-        print(f"{Fore.RED}║{Fore.YELLOW}{'INTERACTIVE COMMAND MENU'.center(terminal_width-2)}{Fore.RED}║{Style.RESET_ALL}")
-        print(f"{Fore.RED}╠{'═' * (terminal_width-2)}╣{Style.RESET_ALL}")
+        print(f"\n{Fore.RED}â•”{'â•' * (terminal_width-2)}â•—{Style.RESET_ALL}")
+        print(f"{Fore.RED}â•‘{Fore.CYAN}{'DSTerminal v2.1.327 - Command Reference Manual'.center(terminal_width-2)}{Fore.RED}â•‘{Style.RESET_ALL}")
+        print(f"{Fore.RED}â•‘{Fore.YELLOW}{'INTERACTIVE COMMAND MENU'.center(terminal_width-2)}{Fore.RED}â•‘{Style.RESET_ALL}")
+        print(f"{Fore.RED}â• {'â•' * (terminal_width-2)}â•£{Style.RESET_ALL}")
     
     # Display each category
         for category, commands in categories.items():
@@ -25456,9 +25456,9 @@ class SecurityTerminal:
         
         # Category header with blinking for important ones
             if "CORE" in category or "SECURITY" in category:
-                print(f"\n{cat_color}┌─{blink_on}{category}{blink_off}{'─' * (terminal_width - len(category) - 6)}{cat_color}┐{Style.RESET_ALL}")
+                print(f"\n{cat_color}â”Œâ”€{blink_on}{category}{blink_off}{'â”€' * (terminal_width - len(category) - 6)}{cat_color}â”{Style.RESET_ALL}")
             else:
-                print(f"\n{cat_color}┌─{category}{'─' * (terminal_width - len(category) - 5)}{cat_color}┐{Style.RESET_ALL}")
+                print(f"\n{cat_color}â”Œâ”€{category}{'â”€' * (terminal_width - len(category) - 5)}{cat_color}â”{Style.RESET_ALL}")
             
             # Display commands
             for cmd, desc in commands:
@@ -25507,12 +25507,12 @@ class SecurityTerminal:
                 
                 # Build the line parts
                 line_parts = [
-                    f"{cat_color}│{Style.RESET_ALL} ",
+                    f"{cat_color}â”‚{Style.RESET_ALL} ",
                     cmd_text,
                     " " * padding_needed,
                     " ",
                     desc_text,
-                    f"{cat_color}│{Style.RESET_ALL}"
+                    f"{cat_color}â”‚{Style.RESET_ALL}"
                 ]
                 
                 # Join and truncate
@@ -25531,11 +25531,11 @@ class SecurityTerminal:
                 time.sleep(0.025)  # Slight typing effect
             
             # Category footer
-            print(f"{cat_color}└{'─' * (terminal_width-2)}┘{Style.RESET_ALL}")
+            print(f"{cat_color}â””{'â”€' * (terminal_width-2)}â”˜{Style.RESET_ALL}")
             time.sleep(0.2)
         
         # Footer with tips
-        print(f"\n{Fore.RED}╠{'═' * (terminal_width-2)}╣{Style.RESET_ALL}")
+        print(f"\n{Fore.RED}â• {'â•' * (terminal_width-2)}â•£{Style.RESET_ALL}")
         
 
             
@@ -25554,34 +25554,34 @@ class SecurityTerminal:
                 desc_padded = desc_part.ljust(desc_width)[:desc_width]
             
             # Build the line without using width specifiers in f-string that might contain %
-                line = f"{cat_color}│{Style.RESET_ALL} {cmd_padded} {desc_padded}{cat_color}│{Style.RESET_ALL}"
+                line = f"{cat_color}â”‚{Style.RESET_ALL} {cmd_padded} {desc_padded}{cat_color}â”‚{Style.RESET_ALL}"
                 print(line[:terminal_width])
                 time.sleep(0.09)  # Slight typing effect
         
         # Category footer
-            print(f"{cat_color}└{'─' * (terminal_width-2)}┘{Style.RESET_ALL}")
+            print(f"{cat_color}â””{'â”€' * (terminal_width-2)}â”˜{Style.RESET_ALL}")
             time.sleep(0.2)
     
     # Footer with tips
-        print(f"\n{Fore.RED}╠{'═' * (terminal_width-2)}╣{Style.RESET_ALL}")
+        print(f"\n{Fore.RED}â• {'â•' * (terminal_width-2)}â•£{Style.RESET_ALL}")
     
         tips = [
-            ("💡 TIP:", "Use Tab for command completion", Fore.CYAN),
-            ("⚡ PRO:", "Combine commands with '&&'", Fore.GREEN),
-            ("🔧 DEV:", "Check /var/log/dsterminal for logs", Fore.YELLOW),
-            ("🌐 WEB:", "Access web interface at https://www.dsterminal.com", Fore.MAGENTA)
+            ("ðŸ’¡ TIP:", "Use Tab for command completion", Fore.CYAN),
+            ("âš¡ PRO:", "Combine commands with '&&'", Fore.GREEN),
+            ("ðŸ”§ DEV:", "Check /var/log/dsterminal for logs", Fore.YELLOW),
+            ("ðŸŒ WEB:", "Access web interface at https://www.dsterminal.com", Fore.MAGENTA)
         ]
         
         for icon, tip, color in tips:
-            print(f"{Fore.RED}║{Style.RESET_ALL} {color}{icon}{Style.RESET_ALL} {Fore.WHITE}{tip:<{terminal_width-20}}{Fore.RED}║{Style.RESET_ALL}")
+            print(f"{Fore.RED}â•‘{Style.RESET_ALL} {color}{icon}{Style.RESET_ALL} {Fore.WHITE}{tip:<{terminal_width-20}}{Fore.RED}â•‘{Style.RESET_ALL}")
         
-        print(f"{Fore.RED}╚{'═' * (terminal_width-2)}╝{Style.RESET_ALL}")
+        print(f"{Fore.RED}â•š{'â•' * (terminal_width-2)}â•{Style.RESET_ALL}")
         
         # Interactive command search
-        print(f"\n{Fore.CYAN}┌─[{Fore.GREEN}HELP{Fore.CYAN}]─[{Fore.YELLOW}type 'search' to find commands or 'exit' to quit{Fore.CYAN}]")
+        print(f"\n{Fore.CYAN}â”Œâ”€[{Fore.GREEN}HELP{Fore.CYAN}]â”€[{Fore.YELLOW}type 'search' to find commands or 'exit' to quit{Fore.CYAN}]")
         
         while True:
-            search = input(f"{Fore.CYAN}└─$ {Style.RESET_ALL}").strip().lower()
+            search = input(f"{Fore.CYAN}â””â”€$ {Style.RESET_ALL}").strip().lower()
             
             if search == "exit" or search == "q" or search == "":
                 break
@@ -25593,15 +25593,15 @@ class SecurityTerminal:
 
     
         for icon, tip, color in tips:
-            print(f"{Fore.RED}║{Style.RESET_ALL} {color}{icon}{Style.RESET_ALL} {Fore.WHITE}{tip:<{terminal_width-20}}{Fore.RED}║{Style.RESET_ALL}")
+            print(f"{Fore.RED}â•‘{Style.RESET_ALL} {color}{icon}{Style.RESET_ALL} {Fore.WHITE}{tip:<{terminal_width-20}}{Fore.RED}â•‘{Style.RESET_ALL}")
     
-        print(f"{Fore.RED}╚{'═' * (terminal_width-2)}╝{Style.RESET_ALL}")
+        print(f"{Fore.RED}â•š{'â•' * (terminal_width-2)}â•{Style.RESET_ALL}")
     
     # Interactive command search
-        print(f"\n{Fore.CYAN}┌─[{Fore.GREEN}HELP{Fore.CYAN}]─[{Fore.YELLOW}type 'search' to find commands or 'exit' to quit{Fore.CYAN}]")
+        print(f"\n{Fore.CYAN}â”Œâ”€[{Fore.GREEN}HELP{Fore.CYAN}]â”€[{Fore.YELLOW}type 'search' to find commands or 'exit' to quit{Fore.CYAN}]")
     
         while True:
-            search = input(f"{Fore.CYAN}└─$ {Style.RESET_ALL}").strip().lower()
+            search = input(f"{Fore.CYAN}â””â”€$ {Style.RESET_ALL}").strip().lower()
         
             if search == "exit" or search == "q" or search == "":
                 break
@@ -25612,8 +25612,8 @@ class SecurityTerminal:
             
                 if term:
                     found = False
-                    print(f"\n{Fore.GREEN}🔍 Search results for '{term}':{Style.RESET_ALL}")
-                    print(f"{Fore.CYAN}{'─' * 60}{Style.RESET_ALL}")
+                    print(f"\n{Fore.GREEN}ðŸ” Search results for '{term}':{Style.RESET_ALL}")
+                    print(f"{Fore.CYAN}{'â”€' * 60}{Style.RESET_ALL}")
                     
                     # Search through all commands
 
@@ -25629,20 +25629,20 @@ class SecurityTerminal:
                                     match_color = Fore.YELLOW
                                 else:
                                     match_color = Fore.WHITE
-                                print(f"{Fore.GREEN}✓{Style.RESET_ALL} {match_color}{cmd:<30}{Style.RESET_ALL} {Fore.WHITE}{desc}{Style.RESET_ALL}")
+                                print(f"{Fore.GREEN}âœ“{Style.RESET_ALL} {match_color}{cmd:<30}{Style.RESET_ALL} {Fore.WHITE}{desc}{Style.RESET_ALL}")
                     
                     if not found:
-                        print(f"{Fore.RED}✗ No commands found matching '{term}'{Style.RESET_ALL}")
+                        print(f"{Fore.RED}âœ— No commands found matching '{term}'{Style.RESET_ALL}")
                     
-                    print(f"{Fore.CYAN}{'─' * 60}{Style.RESET_ALL}")
+                    print(f"{Fore.CYAN}{'â”€' * 60}{Style.RESET_ALL}")
             else:
                 # Direct command search
 
                 
                     if not found:
-                        print(f"{Fore.RED}✗ No commands found matching '{term}'{Style.RESET_ALL}")
+                        print(f"{Fore.RED}âœ— No commands found matching '{term}'{Style.RESET_ALL}")
                 
-                    print(f"{Fore.CYAN}{'─' * 60}{Style.RESET_ALL}")
+                    print(f"{Fore.CYAN}{'â”€' * 60}{Style.RESET_ALL}")
             else:
             # Direct command search
                 found = False
@@ -25650,24 +25650,24 @@ class SecurityTerminal:
                     for cmd, desc in commands:
                         if search in cmd.lower():
                             found = True
-                            print(f"{Fore.GREEN}✓ {cmd}: {Fore.WHITE}{desc}{Style.RESET_ALL}")
+                            print(f"{Fore.GREEN}âœ“ {cmd}: {Fore.WHITE}{desc}{Style.RESET_ALL}")
                 
                 if not found:
-                    print(f"{Fore.RED}✗ Command '{search}' not found. Type 'search' to search descriptions.{Style.RESET_ALL}")
+                    print(f"{Fore.RED}âœ— Command '{search}' not found. Type 'search' to search descriptions.{Style.RESET_ALL}")
         
 
             
                 if not found:
-                    print(f"{Fore.RED}✗ Command '{search}' not found. Type 'search' to search descriptions.{Style.RESET_ALL}")
+                    print(f"{Fore.RED}âœ— Command '{search}' not found. Type 'search' to search descriptions.{Style.RESET_ALL}")
     
-        print(f"{Fore.GREEN}[✓] Help system closed{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}[âœ“] Help system closed{Style.RESET_ALL}")
 
 # --------------------help menu ends here from above===
 # =END
 
     def run(self):
 
-        self.initialize_operator_session()   # ← ADD THIS
+        self.initialize_operator_session()   # â† ADD THIS
         self.print_banner()
         
         # Define available commands for autocompletion
@@ -26026,7 +26026,7 @@ class SecurityTerminal:
                     f"<ansiyellow>[{env}]</ansiyellow> "
                     f"{severity} "
                     f"<ansimagenta>[{session_id}]</ansimagenta>\n"
-                    f"<ansigreen>🔹 {self.operator_username}</ansigreen> "
+                    f"<ansigreen>ðŸ”¹ {self.operator_username}</ansigreen> "
                     f"<ansiwhite>@</ansiwhite> "
                     f"<ansiblue>soc-terminal</ansiblue> "
                     f"<ansiwhite>:</ansiwhite> "
@@ -26065,11 +26065,11 @@ if __name__ == "__main__":
         workspace_path = sys.argv[ws_idx + 1] if ws_idx else os.getcwd()
         
         print("""
-╔══════════════════════════════════════════════════════╗
-║         DSTERMINAL DELETION PROTECTION               ║
-║         Background Monitoring Active                 ║
-║         Close this window to stop                    ║
-╚══════════════════════════════════════════════════════╝
+â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+â•‘         DSTERMINAL DELETION PROTECTION               â•‘
+â•‘         Background Monitoring Active                 â•‘
+â•‘         Close this window to stop                    â•‘
+â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
         """)
         
         # Load config with all paths
@@ -26080,7 +26080,7 @@ if __name__ == "__main__":
             monitor_paths = pd.get_trash_paths()
         
         config = {
-            'version': '3.1.113',
+            'version': '4.0.0.113',
             'monitor_paths': monitor_paths,
             'exclude_patterns': ['*.tmp', '*.temp', '*~', '.DS_Store', 'Thumbs.db'],
             'max_file_size': 100 * 1024 * 1024,
@@ -26097,9 +26097,9 @@ if __name__ == "__main__":
             if os.path.exists(path):
                 try:
                     observer.schedule(monitor, path=path, recursive=True)
-                    print(f"  ✓ Monitoring: {path}")
+                    print(f"  âœ“ Monitoring: {path}")
                 except Exception as e:
-                    print(f"  ✗ Skipping {path}: {e}")
+                    print(f"  âœ— Skipping {path}: {e}")
         
         observer.start()
         print(f"\n[*] Monitoring {len(monitor_paths)} folders.")
@@ -26115,7 +26115,7 @@ if __name__ == "__main__":
             observer.stop()
             observer.join()
             monitor.cleanup()
-            print("[✓] Monitoring stopped.")
+            print("[âœ“] Monitoring stopped.")
         
         sys.exit(0)
     

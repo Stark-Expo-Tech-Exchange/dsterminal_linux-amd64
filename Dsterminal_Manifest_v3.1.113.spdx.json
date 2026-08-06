@@ -1,17 +1,17 @@
-{
+﻿{
   "SPDXID": "SPDXRef-DOCUMENT",
   "spdxVersion": "SPDX-2.3",
   "creationInfo": {
     "created": "2026-07-20T20:32:53Z",
     "creators": [
       "Organization: Dsterminal Security Labs",
-      "Tool: Dsterminal-Manifest-Generator-3.1.113"
+      "Tool: Dsterminal-Manifest-Generator-4.0.0.113"
     ],
     "licenseListVersion": "3.22"
   },
-  "name": "Dsterminal Platform 3.1.113",
+  "name": "Dsterminal Platform 4.0.0.113",
   "dataLicense": "CC0-1.0",
-  "documentNamespace": "https://dsterminal.dev/spdx/Dsterminal-3.1.113",
+  "documentNamespace": "https://dsterminal.dev/spdx/Dsterminal-4.0.0.113",
   "documentDescribes": [
     "SPDXRef-Dsterminal-Platform"
   ],
@@ -19,7 +19,7 @@
     {
       "SPDXID": "SPDXRef-Dsterminal-Platform",
       "name": "Dsterminal Platform",
-      "versionInfo": "3.1.113",
+      "versionInfo": "4.0.0.113",
       "supplier": "Organization: Dsterminal Security Labs",
       "downloadLocation": "https://dsterminal.dev/download",
       "filesAnalyzed": false,
@@ -85,7 +85,7 @@
     {
       "SPDXID": "SPDXRef-Package-005",
       "name": "dsterminal-core",
-      "versionInfo": "3.1.113",
+      "versionInfo": "4.0.0.113",
       "supplier": "Organization: Dsterminal Security Labs",
       "downloadLocation": "https://dsterminal.dev/download",
       "filesAnalyzed": false,

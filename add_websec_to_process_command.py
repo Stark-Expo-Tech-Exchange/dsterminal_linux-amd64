@@ -1,4 +1,4 @@
-# add_websec_to_process_command.py
+﻿# add_websec_to_process_command.py
 """
 Add web security commands to process_command in dsterminal.py
 """
@@ -14,10 +14,10 @@ with open('dsterminal.py', 'r', encoding='utf-8') as f:
 
 # Check if web security commands already exist
 if 'web-security' in content and 'websec' in content:
-    print("✅ Web security commands already found in process_command")
+    print("âœ… Web security commands already found in process_command")
     print("No changes needed!")
 else:
-    print("⚠️ Web security commands NOT found in process_command")
+    print("âš ï¸ Web security commands NOT found in process_command")
     print("Adding them now...")
     
     # Find the hardening commands section end
@@ -54,9 +54,9 @@ else:
         with open('dsterminal.py', 'w', encoding='utf-8') as f:
             f.write(new_content)
         
-        print("✅ Added web security commands after hardening section")
+        print("âœ… Added web security commands after hardening section")
     else:
-        print("❌ Could not find hardening section end")
+        print("âŒ Could not find hardening section end")
         print("Please manually add the commands")
 
 print("="*60)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 DSTerminal Dynamic SOC Dashboard
 Multiple chart types with real-time WebSocket updates
@@ -143,17 +143,17 @@ class DynamicSOCDashboard:
 
     def _generate_events(self):
         event_types = [
-            ('🛡️', 'Firewall Block', 'critical'),
-            ('⚠️', 'Auth Failure', 'warning'),
-            ('🔥', 'Malware Detected', 'critical'),
-            ('📡', 'Lateral Movement', 'warning'),
-            ('🔍', 'Suspicious Process', 'info'),
-            ('🚨', 'IDS Alert', 'critical'),
-            ('📊', 'SIEM Correlation', 'info'),
-            ('🎯', 'Phishing Attempt', 'warning'),
-            ('💀', 'Ransomware', 'critical'),
-            ('🔐', 'Privilege Escalation', 'critical'),
-            ('🌐', 'C2 Communication', 'warning'),
+            ('ðŸ›¡ï¸', 'Firewall Block', 'critical'),
+            ('âš ï¸', 'Auth Failure', 'warning'),
+            ('ðŸ”¥', 'Malware Detected', 'critical'),
+            ('ðŸ“¡', 'Lateral Movement', 'warning'),
+            ('ðŸ”', 'Suspicious Process', 'info'),
+            ('ðŸš¨', 'IDS Alert', 'critical'),
+            ('ðŸ“Š', 'SIEM Correlation', 'info'),
+            ('ðŸŽ¯', 'Phishing Attempt', 'warning'),
+            ('ðŸ’€', 'Ransomware', 'critical'),
+            ('ðŸ”', 'Privilege Escalation', 'critical'),
+            ('ðŸŒ', 'C2 Communication', 'warning'),
         ]
         for _ in range(20):
             ts = datetime.now().strftime("%H:%M:%S")
@@ -225,13 +225,13 @@ class DynamicSOCDashboard:
         if random.random() < 0.2:
             ts = datetime.now().strftime("%H:%M:%S")
             event_types = [
-                ('🛡️', 'Firewall Block', 'critical'),
-                ('⚠️', 'Auth Failure', 'warning'),
-                ('🔥', 'Malware Detected', 'critical'),
-                ('📡', 'Lateral Movement', 'warning'),
-                ('🚨', 'IDS Alert', 'critical'),
-                ('🔍', 'Suspicious Process', 'info'),
-                ('📊', 'SIEM Correlation', 'info'),
+                ('ðŸ›¡ï¸', 'Firewall Block', 'critical'),
+                ('âš ï¸', 'Auth Failure', 'warning'),
+                ('ðŸ”¥', 'Malware Detected', 'critical'),
+                ('ðŸ“¡', 'Lateral Movement', 'warning'),
+                ('ðŸš¨', 'IDS Alert', 'critical'),
+                ('ðŸ”', 'Suspicious Process', 'info'),
+                ('ðŸ“Š', 'SIEM Correlation', 'info'),
             ]
             icon, event, severity = random.choice(event_types)
             self.events.insert(0, {'time': ts, 'icon': icon, 'event': event, 'severity': severity})
@@ -666,7 +666,7 @@ class DynamicSOCDashboard:
             <div class="dashboard">
                 <!-- Header -->
                 <div class="header">
-                    <h1>🛡️ DSTERMINAL <span>SOC</span></h1>
+                    <h1>ðŸ›¡ï¸ DSTERMINAL <span>SOC</span></h1>
                     <div class="status">
                         <span class="dot"></span>
                         <span class="status-item">LIVE</span>
@@ -676,7 +676,7 @@ class DynamicSOCDashboard:
                         <span class="status-item" id="clock">{{ now }}</span>
                         <span class="status-item">|</span>
                         <span class="threat-badge {{ metrics.threat_level.lower() }}" id="threatBadge">{{ metrics.threat_level }}</span>
-                        <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+                        <button class="fullscreen-btn" onclick="toggleFullscreen()">â›¶ Fullscreen</button>
                     </div>
                 </div>
                 
@@ -720,7 +720,7 @@ class DynamicSOCDashboard:
                 <div class="charts-grid">
                     <!-- Hourly Trend - Line Chart -->
                     <div class="chart-card">
-                        <h3>📈 Hourly Alert Trend <span class="live-badge">● LIVE</span></h3>
+                        <h3>ðŸ“ˆ Hourly Alert Trend <span class="live-badge">â— LIVE</span></h3>
                         <div class="bar-chart" id="hourlyChart">
                             {% for value in hourly_trend %}
                             <div class="bar-item {% if value > 60 %}critical{% elif value > 35 %}warning{% else %}good{% endif %}" 
@@ -731,7 +731,7 @@ class DynamicSOCDashboard:
                     
                     <!-- Threat Distribution - Pie Chart -->
                     <div class="chart-card">
-                        <h3>🎯 Threat Distribution <span class="live-badge">● LIVE</span></h3>
+                        <h3>ðŸŽ¯ Threat Distribution <span class="live-badge">â— LIVE</span></h3>
                         <div class="pie-container">
                             <div class="pie" id="pieChart">
                                 <div class="pie-center">Threats</div>
@@ -753,7 +753,7 @@ class DynamicSOCDashboard:
                 <div class="charts-grid">
                     <!-- Security Posture - Donut Chart -->
                     <div class="chart-card">
-                        <h3>🛡️ Security Posture <span class="live-badge">● LIVE</span></h3>
+                        <h3>ðŸ›¡ï¸ Security Posture <span class="live-badge">â— LIVE</span></h3>
                         <div class="pie-container">
                             <div class="donut" id="donutChart">
                                 <div class="donut-center">
@@ -775,7 +775,7 @@ class DynamicSOCDashboard:
                     
                     <!-- Security Scores - Horizontal Bars -->
                     <div class="chart-card">
-                        <h3>📊 Security Scores <span class="live-badge">● LIVE</span></h3>
+                        <h3>ðŸ“Š Security Scores <span class="live-badge">â— LIVE</span></h3>
                         {% for name, score in security_scores.items() %}
                         <div class="h-bar" id="scoreRow{{ loop.index0 }}">
                             <span class="label">{{ name }}</span>
@@ -795,7 +795,7 @@ class DynamicSOCDashboard:
                 <div class="charts-grid">
                     <!-- MITRE ATT&CK -->
                     <div class="chart-card">
-                        <h3>🎯 MITRE ATT&CK <span class="live-badge">● LIVE</span></h3>
+                        <h3>ðŸŽ¯ MITRE ATT&CK <span class="live-badge">â— LIVE</span></h3>
                         {% for tech in mitre %}
                         <div class="h-bar" id="mitreRow{{ loop.index0 }}">
                             <span class="label" style="min-width: 45px; color: #d29922;">{{ tech.id }}</span>
@@ -813,7 +813,7 @@ class DynamicSOCDashboard:
                     
                     <!-- Top Attackers - Bar Chart -->
                     <div class="chart-card">
-                        <h3>👤 Top Attackers <span class="live-badge">● LIVE</span></h3>
+                        <h3>ðŸ‘¤ Top Attackers <span class="live-badge">â— LIVE</span></h3>
                         {% for attacker in attackers %}
                         <div class="h-bar" id="attackerRow{{ loop.index0 }}">
                             <span class="label" style="min-width: 100px; font-family: monospace; color: #f85149;">{{ attacker.ip }}</span>
@@ -830,7 +830,7 @@ class DynamicSOCDashboard:
                 <div class="charts-grid">
                     <!-- Events -->
                     <div class="chart-card">
-                        <h3>⚡ Recent Events <span class="live-badge">● LIVE</span></h3>
+                        <h3>âš¡ Recent Events <span class="live-badge">â— LIVE</span></h3>
                         <div class="events-list" id="eventsList">
                             {% for event in events %}
                             <div class="event-item {{ event.severity }}">
@@ -844,7 +844,7 @@ class DynamicSOCDashboard:
                     
                     <!-- System Resources - Gauge -->
                     <div class="chart-card">
-                        <h3>💻 System Resources <span class="live-badge">● LIVE</span></h3>
+                        <h3>ðŸ’» System Resources <span class="live-badge">â— LIVE</span></h3>
                         <div class="gauge-container">
                             {% for name, value in resources.items() %}
                             <div class="gauge-item">
@@ -865,7 +865,7 @@ class DynamicSOCDashboard:
                 <!-- Alert Severity - Full Width -->
                 <div class="charts-grid">
                     <div class="chart-card full-width">
-                        <h3>📊 Alert Severity Distribution <span class="live-badge">● LIVE</span></h3>
+                        <h3>ðŸ“Š Alert Severity Distribution <span class="live-badge">â— LIVE</span></h3>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; padding: 6px 0;">
                             {% for name, value in severity.items() %}
                             <div id="severityRow{{ loop.index0 }}">
@@ -1143,25 +1143,25 @@ class DynamicSOCDashboard:
         url = f"http://localhost:{self.port}"
         
         print(f"\n{'='*60}")
-        print("🛡️ DSTERMINAL DYNAMIC SOC DASHBOARD")
+        print("ðŸ›¡ï¸ DSTERMINAL DYNAMIC SOC DASHBOARD")
         print(f"{'='*60}")
-        print(f"📍 URL: {url}")
-        print(f"⏱️  Update Interval: {self.update_interval}s")
-        print(f"📊 Multiple Chart Types (Bar, Pie, Donut, Gauge, Horizontal Bar)")
-        print(f"🔄 Real-time WebSocket Updates - NO Page Refresh")
+        print(f"ðŸ“ URL: {url}")
+        print(f"â±ï¸  Update Interval: {self.update_interval}s")
+        print(f"ðŸ“Š Multiple Chart Types (Bar, Pie, Donut, Gauge, Horizontal Bar)")
+        print(f"ðŸ”„ Real-time WebSocket Updates - NO Page Refresh")
         print(f"{'='*60}\n")
         
         try:
             chrome = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
             if os.path.exists(chrome):
                 subprocess.Popen([chrome, "--kiosk", url])
-                print("✅ Chrome opened in fullscreen mode")
+                print("âœ… Chrome opened in fullscreen mode")
             else:
                 webbrowser.open(url)
         except:
             webbrowser.open(url)
         
-        print("\n🔄 Press Ctrl+C to stop\n")
+        print("\nðŸ”„ Press Ctrl+C to stop\n")
         
         try:
             self.socketio.run(self.app, host='0.0.0.0', port=self.port, debug=False, use_reloader=False)
@@ -1170,7 +1170,7 @@ class DynamicSOCDashboard:
 
     def stop(self):
         self.running = False
-        print("\n✅ Dashboard stopped")
+        print("\nâœ… Dashboard stopped")
 
 
 if __name__ == "__main__":

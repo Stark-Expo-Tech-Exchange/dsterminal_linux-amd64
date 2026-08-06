@@ -250,7 +250,7 @@ if __name__ == "__main__":
             monitor_paths = pd.get_trash_paths()
         
         config = {
-            'version': '3.1.113',
+            'version': '4.0.0.113',
             'monitor_paths': monitor_paths,
             'exclude_patterns': ['*.tmp', '*.temp', '*~', '.DS_Store', 'Thumbs.db'],
             'max_file_size': 100 * 1024 * 1024,

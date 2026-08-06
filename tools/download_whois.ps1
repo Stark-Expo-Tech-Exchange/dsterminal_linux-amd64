@@ -1,4 +1,4 @@
-# download_whois.ps1
+﻿# download_whois.ps1
 # Download WHOIS from Microsoft Sysinternals and bundle it for offline installation
 
 param(
@@ -66,7 +66,7 @@ try {
         Write-Host ""
         Write-Host "Verifying WHOIS.exe..." -ForegroundColor Yellow
         $version = & $whoisExePath --version 2>&1 | Select-Object -First 1
-        Write-Host "✅ $version" -ForegroundColor Green
+        Write-Host "âœ… $version" -ForegroundColor Green
         
         Write-Host ""
         Write-Host "WHOIS bundled successfully!" -ForegroundColor Green

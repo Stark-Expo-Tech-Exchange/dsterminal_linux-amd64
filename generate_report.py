@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 DSTERMINAL Report Generator
 Generates a well-formatted DOC file for the NCST Technical Progress Report
@@ -54,7 +54,7 @@ def create_report():
     doc.add_paragraph()
     info2 = doc.add_paragraph()
     info2.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    info2.add_run("Report Period: June – July 2026").bold = True
+    info2.add_run("Report Period: June â€“ July 2026").bold = True
     doc.add_paragraph()
     info3 = doc.add_paragraph()
     info3.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -81,7 +81,7 @@ def create_report():
     
     doc.add_paragraph()
     p = doc.add_paragraph()
-    p.add_run("DSTerminal v3.1.113 has been successfully developed, packaged, and branded. The software is now at Pre-Release stage with 85% core development completion. The project has utilized MWK 3,135,000 of the total MWK 5,000,000 grant, leaving a balance of MWK 1,865,000.")
+    p.add_run("DSTerminal v4.0.0.113 has been successfully developed, packaged, and branded. The software is now at Pre-Release stage with 85% core development completion. The project has utilized MWK 3,135,000 of the total MWK 5,000,000 grant, leaving a balance of MWK 1,865,000.")
     
     doc.add_paragraph()
     p = doc.add_paragraph()
@@ -119,13 +119,13 @@ def create_report():
         cell.paragraphs[0].runs[0].bold = True
     
     data = [
-        ("Grant Received", "Yes – 100%", "✓"),
-        ("Software Development", "85% Complete", "↑"),
-        ("Internal Testing", "90% Complete", "↑"),
-        ("Software Packaging", "Complete", "✓"),
-        ("Equipment Procurement", "85% Complete", "↑"),
-        ("External Pilot Testing", "0%", "✗"),
-        ("Commercialization", "0%", "✗")
+        ("Grant Received", "Yes â€“ 100%", "âœ“"),
+        ("Software Development", "85% Complete", "â†‘"),
+        ("Internal Testing", "90% Complete", "â†‘"),
+        ("Software Packaging", "Complete", "âœ“"),
+        ("Equipment Procurement", "85% Complete", "â†‘"),
+        ("External Pilot Testing", "0%", "âœ—"),
+        ("Commercialization", "0%", "âœ—")
     ]
     
     for i, row_data in enumerate(data):
@@ -154,15 +154,15 @@ def create_report():
         cell.paragraphs[0].runs[0].bold = True
     
     modules = [
-        ("VirusTotal Scanner", "✓"),
-        ("Network Reconnaissance", "✓"),
-        ("Web Security Analyzer", "✓"),
-        ("Encryption Engine", "✓"),
-        ("SQLMap Integration", "✓"),
-        ("Wi-Fi Auditor", "✓"),
-        ("System Hardening", "✓"),
-        ("Digital Forensics", "✓"),
-        ("SSL/TLS Scanner", "✓")
+        ("VirusTotal Scanner", "âœ“"),
+        ("Network Reconnaissance", "âœ“"),
+        ("Web Security Analyzer", "âœ“"),
+        ("Encryption Engine", "âœ“"),
+        ("SQLMap Integration", "âœ“"),
+        ("Wi-Fi Auditor", "âœ“"),
+        ("System Hardening", "âœ“"),
+        ("Digital Forensics", "âœ“"),
+        ("SSL/TLS Scanner", "âœ“")
     ]
     
     for i, module_data in enumerate(modules):
@@ -353,7 +353,7 @@ def create_report():
         cell.paragraphs[0].runs[0].bold = True
     
     planned_activities = [
-        ("External Beta Testing (Partial)", "Aug–Sep 2026", "500,000"),
+        ("External Beta Testing (Partial)", "Augâ€“Sep 2026", "500,000"),
         ("Pilot Deployment (1 Institution)", "Sep 2026", "400,000"),
         ("Basic Training Content", "Aug 2026", "250,000"),
         ("Internal Security Reviews", "Ongoing", "200,000"),
@@ -399,7 +399,7 @@ def create_report():
     
     doc.add_paragraph()
     p = doc.add_paragraph()
-    p.add_run("The available balance of MWK 1,865,000 is insufficient to cover external testing, pilot deployment, security validation, legal protection, and commercialization—all of which are essential for the project's success and sustainability.")
+    p.add_run("The available balance of MWK 1,865,000 is insufficient to cover external testing, pilot deployment, security validation, legal protection, and commercializationâ€”all of which are essential for the project's success and sustainability.")
     
     doc.add_heading("7.2 Recommendations for NCST", level=2)
     
@@ -421,11 +421,11 @@ def create_report():
     
     doc.add_paragraph()
     p = doc.add_paragraph()
-    p.add_run("2. Facilitate connections – Introduce the project to potential institutional partners for pilot deployment.").bold = True
+    p.add_run("2. Facilitate connections â€“ Introduce the project to potential institutional partners for pilot deployment.").bold = True
     
     doc.add_paragraph()
     p = doc.add_paragraph()
-    p.add_run("3. Provide commercialization guidance – Support with market entry and business model development.").bold = True
+    p.add_run("3. Provide commercialization guidance â€“ Support with market entry and business model development.").bold = True
     
     # ============================================================
     # SECTION 8: ACKNOWLEDGEMENT
@@ -484,7 +484,7 @@ def create_report():
     # Save the document
     filename = f"DSTERMINAL_Progress_Report_{datetime.now().strftime('%Y%m%d')}.docx"
     doc.save(filename)
-    print(f"✅ Report saved as: {filename}")
+    print(f"âœ… Report saved as: {filename}")
     return filename
 
 if __name__ == "__main__":
@@ -497,5 +497,5 @@ if __name__ == "__main__":
         import docx
     
     create_report()
-    print("\n📄 Report generation complete!")
+    print("\nðŸ“„ Report generation complete!")
     print("   Open the generated .docx file to view the formatted report.")
