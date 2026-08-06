@@ -195,34 +195,13 @@ var
   InstallAborted: Boolean;
 
 // ============================================================
-// GET CURRENT DATE TIME STRING
+// GET CURRENT DATE TIME STRING (Uses Inno Setup Native Function)
 // ============================================================
-function GetDateTimeString: string;
-var
-  Year, Month, Day, Hour, Minute, Second: string;
-  Y, M, D, H, Min, S, MS: Integer;
+function MyFormatDateTime: string;
 begin
-  DecodeDateFully(Now, Y, M, D);
-  DecodeTime(Now, H, Min, S, MS);
-  
-  Year := IntToStr(Y);
-  Month := FormatInt(M, 2);
-  Day := FormatInt(D, 2);
-  Hour := FormatInt(H, 2);
-  Minute := FormatInt(Min, 2);
-  Second := FormatInt(S, 2);
-  
-  Result := Year + '-' + Month + '-' + Day + ' ' + Hour + ':' + Minute + ':' + Second;
-end;
-
-// ============================================================
-// FORMAT INTEGER WITH LEADING ZEROS
-// ============================================================
-function FormatInt(Value, Digits: Integer): string;
-begin
-  Result := IntToStr(Value);
-  while Length(Result) < Digits do
-    Result := '0' + Result;
+  // Use Inno Setup's native built-in function to format the date/time.
+  // (Custom function name changed so it doesn't conflict with Inno's internal one)
+  Result := GetDateTimeString('yyyy-mm-dd hh:nn:ss', '-', ':');
 end;
 
 // ============================================================
@@ -339,9 +318,9 @@ begin
     'DSTerminal License Validation',
     'Enter your DSTerminal license key to activate and continue installation',
     'Please enter your DSTerminal license key from the official website.' + #13#10#13#10 +
-    'The license key format is: STARK-XXXXXXXX-XXXXXXXX-XXXXXXXX' + #13#10#13#10 +
-    'Example: STARK-A1B2C3D4-E5F6G7H8-I9J0K1L2' + #13#10#13#10 +
-    'You have 3 attempts to enter a valid license key.' + #13#10#13#10 +
+    'The license key format is: XXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX' + #13#10#13#10 +
+    'Example: XXXXXX-ACX1B2C3D4-E5FXX6G7H8-I9JXXX0K1L2' + #13#10#13#10 +
+    'You have 3 attempts to enter a valid license key, otherwise the installation will terminate naturally.' + #13#10#13#10 +
     'If you don''t have a license key, please visit:' + #13#10 +
     'https://starkexpotechexchange.mw/license for licensing');
   
@@ -392,8 +371,8 @@ begin
       end;
       
       MsgBox('Invalid license key format.' + #13#10#13#10 +
-             'Please use the format: STARK-XXXXXXXX-XXXXXXXX-XXXXXXXX' + #13#10 +
-             'Example: STARK-A1B2C3D4-E5F6G7H8-I9J0K1L2' + #13#10#13#10 +
+             'Please use the format: XXXXXX-XXXXXXXCCXX-XXXXXBB87XXX-XXXXXXXX' + #13#10 +
+             'Example: XXXXXX-ACX1B2C3D4-E5FXX6G7H8-I9JXXX0K1L2' + #13#10#13#10 +
              'Attempts remaining: ' + IntToStr(3 - AttemptCount), mbError, MB_OK);
       Result := False;
       Exit;
@@ -438,8 +417,7 @@ begin
     // Save the license key to the installation directory
     if FileExists(ExpandConstant('{tmp}\license.key')) then
     begin
-      FileCopy(ExpandConstant('{tmp}\license.key'), ExpandConstant('{app}\license.key'), False);
-    end;
+        CopyFile(ExpandConstant('{tmp}\license.key'), ExpandConstant('{app}\license.key'), False);    end;
   end;
 end;
 
@@ -447,34 +425,16 @@ end;
 // HANDLE INSTALLATION ABORT WITH ROLLBACK
 // ============================================================
 procedure CancelButtonClick(CurPageID: Integer; var Cancel, Confirm: Boolean);
-var
-  RollbackLog: string;
 begin
   if InstallAborted then
   begin
+    // Prevent the "Are you sure?" popup
     Confirm := False;
+    // Tell Inno Setup to cancel the installer naturally
     Cancel := True;
     
-    // Clean up any partially installed files
-    if DirExists(ExpandConstant('{app}')) then
-    begin
-      // Build rollback log message
-      RollbackLog := 'Rolling back changes... Aborting installation.' + #13#10 +
-                     'Installation aborted at: ' + GetDateTimeString + #13#10 +
-                     'Reason: Invalid license key (3 failed attempts)' + #13#10 +
-                     'Rolling back: ' + ExpandConstant('{app}');
-      
-      // Write rollback log
-      SaveStringToFile(ExpandConstant('{tmp}\rollback.log'), RollbackLog, False);
-      
-      // Show rollback message
-      MsgBox('Rolling back changes... Aborting installation.' + #13#10#13#10 +
-             'The installation has been aborted due to invalid license key.' + #13#10#13#10 +
-             'All changes are being rolled back.', mbInformation, MB_OK);
-      
-      // Wait for user to acknowledge
-      Sleep(500);
-    end;
+    // Wait a moment so the user sees the last message
+    Sleep(500);
   end;
 end;
 

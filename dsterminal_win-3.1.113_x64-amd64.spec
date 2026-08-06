@@ -4,7 +4,7 @@ import sys
 import site
 
 # Fix the path - update to your actual path
-BASE_PATH = 'C:\\Users\\stark\\Documents\\DSTerminal_releases_latest'
+BASE_PATH = 'C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\DSTerminal_releases_latest'
 
 # ====================================================================
 # DATA FILES - Define FIRST
@@ -13,6 +13,11 @@ datas = [
     ('vt_scan.py', '.'),
     ('recon.py', '.'),
     ('recon_full.py', '.'),
+    ('dsterminal_complete.py', '.'),
+    ('dsterminal_dashboard.py', '.'),
+    ('shield_core.py', '.'),
+    ('qr_wrapper.py', '.'),
+    ('cli_ui.py', '.'),
     ('web_security_analyzer.py', '.'),
     ('edu_typing_engine.py', '.'),
     ('crypto_engine.py', '.'),
@@ -300,9 +305,11 @@ else:
     print("⚠️ Could not find cryptography directory")
 
 
-print("Looking for python_dotenv...")
+print("Looking for python-dotenv...")
 python_dotenv_path = None
 possible_python_dotenv_paths = [
+    os.path.join(BASE_PATH, 'venv', 'Lib', 'site-packages', 'dotenv'),
+    os.path.join(BASE_PATH, 'venv', 'lib', 'site-packages', 'dotenv'),
     os.path.join(BASE_PATH, 'venv', 'Lib', 'site-packages', 'python_dotenv'),
     os.path.join(BASE_PATH, 'venv', 'lib', 'site-packages', 'python_dotenv'),
 ]
@@ -310,20 +317,20 @@ possible_python_dotenv_paths = [
 for path in possible_python_dotenv_paths:
     if os.path.exists(path) and os.path.isdir(path):
         python_dotenv_path = path
-        print(f"✅ Found python_dotenv at: {python_dotenv_path}")
+        print(f"✅ Found python-dotenv at: {python_dotenv_path}")
         break
 
 if python_dotenv_path and os.path.exists(python_dotenv_path):
-    datas.append((python_dotenv_path, 'python_dotenv'))
-    print(f"✅ Added python_dotenv directory to data")
+    datas.append((python_dotenv_path, 'python-dotenv'))
+    print(f"✅ Added python-dotenv directory to data")
     
     for file in os.listdir(python_dotenv_path):
         full_path = os.path.join(python_dotenv_path, file)
         if os.path.isfile(full_path) and (file.endswith('.pyd') or file.endswith('.so') or file.endswith('.dylib')):
-            binaries.append((full_path, 'python_dotenv'))
-            print(f"  Added python_dotenv binary: {file}")
+            binaries.append((full_path, 'python-dotenv'))
+            print(f"  Added python-dotenv binary: {file}")
 else:
-    print("⚠️ Could not find python_dotenv directory")
+    print("⚠️ Could not find python-dotenv directory")
 
 
 
@@ -445,7 +452,9 @@ else:
 # ====================================================================
 print("Looking for pyOpenSSL...")
 pyOpenSSL_path = None
-possible_pyOpenSSL_paths = [  # <-- FIX THIS LINE
+possible_pyOpenSSL_paths = [
+    os.path.join(BASE_PATH, 'venv', 'Lib', 'site-packages', 'OpenSSL'),
+    os.path.join(BASE_PATH, 'venv', 'lib', 'site-packages', 'OpenSSL'),
     os.path.join(BASE_PATH, 'venv', 'Lib', 'site-packages', 'pyOpenSSL'),
     os.path.join(BASE_PATH, 'venv', 'lib', 'site-packages', 'pyOpenSSL'),
 ]
@@ -460,8 +469,8 @@ if pyOpenSSL_path and os.path.exists(pyOpenSSL_path):
     datas.append((pyOpenSSL_path, 'pyopenssl'))
     print(f"✅ Added pyopenssl directory to data")
     
-    for file in os.listdir(pyopenssl_path):
-        full_path = os.path.join(pyopenssl_path, file)
+    for file in os.listdir(pyOpenSSL_path):
+        full_path = os.path.join(pyOpenSSL_path, file)
         if os.path.isfile(full_path) and (file.endswith('.pyd') or file.endswith('.so') or file.endswith('.dylib')):
             binaries.append((full_path, 'pyopenssl'))
             print(f"  Added pyopenssl binary: {file}")
@@ -638,6 +647,11 @@ hiddenimports = [
     'edu_typing_engine',
     'crypto_engine',
     'deletion_protection',
+    'dsterminal_complete.py',
+    'dsterminal_dashboard.py',
+    'shield_core.py',
+    'qr_wrapper.py',
+    'cli_ui.py',
     'financial_forensics',
     'hardening_dashboard',
     'integrity_monitor',
@@ -770,6 +784,25 @@ hiddenimports = [
     'winreg',
     # Add these common packages that might be missing
     'six',
+        'eventlet',
+    'eventlet.hubs',
+    'eventlet.hubs.epolls',
+    'eventlet.hubs.selects',
+    'gevent',
+    'gevent.socket',
+    'gevent.select',
+    'gevent.event',
+    'gevent.pool',
+    'gevent.queue',
+    'gevent.timeout',
+    'gevent.hub',
+    'gevent.greenlet',
+    'engineio',
+    'engineio.async_drivers',
+    'engineio.async_drivers.threading',
+    'engineio.async_drivers.eventlet',
+    'engineio.async_drivers.gevent',
+    'socketio',
     'packaging',
     'setuptools',
     'pip',

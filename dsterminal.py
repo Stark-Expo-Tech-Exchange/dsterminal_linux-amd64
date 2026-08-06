@@ -317,8 +317,11 @@ import folium
 from folium.plugins import HeatMap, MarkerCluster
 import webbrowser
 import tempfile
-from geopy.geocoders import Nominatim
-from geopy.exc import GeocoderTimedOut, GeocoderServiceError
+import contextlib
+
+#from geopy.geocoders import Nominatim
+#from geopy.exc import GeocoderTimedOut, GeocoderServiceError
+
 import plotly.graph_objects as go
 import plotly.express as px
 from plotly.subplots import make_subplots
@@ -520,10 +523,10 @@ except ImportError as e:
     
 # WiFi Audit Module
 try:
-    from wifi_audit import WiFiAudit
-    WIFI_AUDIT_AVAILABLE = True
+    from wifi_audit import NetworkAudit
+    NETWORK_AUDIT_AVAILABLE = True
 except ImportError as e:
-    WIFI_AUDIT_AVAILABLE = False
+    NETWORK_AUDIT_AVAILABLE = False
     print(f"{Fore.YELLOW}⚠️ WiFi Audit module not found: {e}{Style.RESET_ALL}")
     print(f"{Fore.YELLOW}   Download wifi_audit from the repository{Style.RESET_ALL}")
 # 2. Integrity Monitor - Silent
@@ -628,6 +631,14 @@ try:
 except:
     web_security_analyzer = None
     pass
+
+# importing dsterminal_dashboard
+try:
+    from dsterminal_dashboard import register_dashboard_commands, DASHBOARD_AVAILABLE, dashboard_integration
+except ImportError:
+    DASHBOARD_AVAILABLE = False
+    def register_dashboard_commands(terminal):
+        return False
 
 # 11. advanced_sql
 # Import the enhanced SQLMap scanner and lab
@@ -1858,14 +1869,23 @@ class SecurityTerminal:
     NEON_COMMAND = "<ansigreen>"
     RESET = "</ansigreen>"
 
-    def __init__(self, workspace_root=None, interactive: bool = True, session_id=None, log_callback=None, auto_launch_websec=False):
+    def __init__(self, workspace_root=None, interactive: bool = True, session_id=None, 
+                 log_callback=None, auto_launch_websec=False, quiet=False, verbose=False):
         """Initialize DSTerminal with integrated operator session management"""
         import queue
         from pathlib import Path
         from datetime import datetime
         import uuid
-        
-            # ========== FAST ATTRIBUTE INIT ==========
+        import contextlib
+
+        # ========== QUIET/VERBOSE MODE SETUP ==========
+        self.quiet = quiet
+        self.verbose = verbose
+
+        # ========== COMMANDS - INITIALIZE FIRST ==========
+        self.commands = {}  # Start with empty dict
+
+        # ========== FAST ATTRIBUTE INIT ==========
         self.scan_results = {}
         self.log_callback = log_callback
         self.log_queue = queue.Queue()
@@ -1876,28 +1896,63 @@ class SecurityTerminal:
         self._banner_shown = False
         self.session_manager_initialized = False
         self.version = "3.1.113"
+                # ========== BLINKING CURSOR SETUP ==========
+        # ============================================================
+        # SIEM DASHBOARD PROMPT - LIVE STATS
+        # ============================================================
         
+        # SIEM Metrics
+        self.alert_count = 247
+        self.critical_alerts = 12
+        self.high_alerts = 45
+        self.incident_count = 12
+        self.mttr = "4.2h"
+        self.risk_score = 76
+        self.event_rate = 143
+        self.active_sessions = 3
+        self.uptime_seconds = 9240  # 2h 34m
+        self.start_time = datetime.now()
+        
+        # Cursor animation
+        self.cursor_visible = True
+        self.cursor_running = False
+        self.cursor_color_index = 0
+        self.cursor_colors = [
+            '#00ff00', '#ff4444', '#ffdd44', '#44ddff', 
+            '#ff44ff', '#4444ff', '#ff8800', '#88ff88'
+        ]
+        
+        # Start the cursor animation
+        self._start_cursor_blink()
+        # ========== DASHBOARD ATTRIBUTES ==========
+        self.soc_dashboard = None
+        self.soc_dashboard_active = False
+        self.dashboard_thread = None
+        self.dashboard_port = 5000
+
         """Initialize SOC Lab - Called from __init__"""
         self.soc_lab = None
         self.soc_lab_running = False
-        
+
         if SOC_LAB_AVAILABLE:
             try:
                 workspace = os.path.expanduser('~/soc_lab_workspace')
                 os.makedirs(workspace, exist_ok=True)
+                if not self.quiet:
+                    print("✅ SOC Automated Lab initialized")
                 self.soc_lab = SOCAutomatedLab(workspace)
-                print("✅ SOC Automated Lab initialized")
             except Exception as e:
-                print(f"⚠️ SOC Lab initialization failed: {e}")
+                if not self.quiet:
+                    print(f"⚠️ SOC Lab initialization failed: {e}")
                 self.soc_lab = None
-                
+    
         # ========== WORKSPACE - Fast ==========
         if workspace_root is None:
             self.workspace_root = os.path.expanduser("~/dsterminal_workspace")
         else:
             self.workspace_root = workspace_root
         os.makedirs(self.workspace_root, exist_ok=True)
-        
+
         # ========== BASIC ATTRS - Fast ==========
         self.interactive = interactive
         self.ui = None
@@ -1906,21 +1961,19 @@ class SecurityTerminal:
         self.workspace = str(self.workspace_root)
         self.current_dir = self.workspace_root
         self.terminal_width = self._get_terminal_width()
-        
+        self.commands = self._init_commands()
+
         # ========== OPERATOR SESSION - Fast ==========
         self.operator_username = None
         self.session_id = None
-        self.session_start = datetime.now()  # Default to now
+        self.session_start = datetime.now()
         self.operator_dir = None
         self.log_file = None
-        
 
         # ========== MODULES - Lazy init ==========
         self.crypto = None
         self.scanner = None
         self.soc_nmap = None
-        self.soc_dashboard = None
-        self.soc_dashboard_active = False
         self.hardening_dashboard = None
         self.hardening_enabled = False
         self.integrity = None
@@ -1938,36 +1991,34 @@ class SecurityTerminal:
         self.monitor = None
         self.observer = None
         self.vfs_root = os.path.expanduser("~/.dsterminal_vfs")
-        
+
         # ========== SHOW BANNER - Fast ==========
-        self.show_banner()
-        
+        if not self.quiet:
+            self.show_banner()
+
         # ========== INIT SESSION - Fast ==========
         try:
             self.initialize_operator_session()
             self.session_manager_initialized = True
         except Exception as e:
-            # Fallback - fast
             self.operator_username = f"OP-{uuid.uuid4().hex[:6].upper()}"
             self.session_id = f"SESSION-{uuid.uuid4().hex[:5].upper()}"
             self.session_start = datetime.now()
-        
+
         # ========== SET GLOBALS - Fast ==========
         global GLOBAL_OPERATOR, GLOBAL_SESSION
         GLOBAL_OPERATOR = self.operator_username
         GLOBAL_SESSION = self.session_id
-        
+
         # ========== SHOW READY STATUS - Fast ==========
-        self.show_ready_status()
-        
+        if not self.quiet:
+            self.show_ready_status()
+
         # ========== INIT WEB SECURITY - Fast ==========
         self._init_web_security()
         if auto_launch_websec:
             self.launch_web_security_analyzer()
-        
-        # ========== INIT SOC DASHBOARD - Fast ==========
-        self._init_soc_dashboard()
-        
+
         # ========== INIT RANSOMWARE - Fast ==========
         if RANSOMWARE_AVAILABLE and RansomwareMonitor:
             try:
@@ -1980,14 +2031,14 @@ class SecurityTerminal:
                 self.ransomware_available = True
             except:
                 pass
-        
+
         # ========== INIT CRYPTO - Fast ==========
         try:
             if CryptoEngine:
                 self.crypto = CryptoEngine(os.getcwd())
         except:
             self.crypto = None
-        
+
         # ========== INIT SCANNER - Fast ==========
         try:
             self.scanner = SQLMapScanner(verbose=True)
@@ -2000,18 +2051,18 @@ class SecurityTerminal:
             self.scanner = EnhancedSQLMapScanner(verbose=True)
         except Exception as e:
             self.scanner = None
-        
+
         self.console = type('DummyConsole', (), {
             'print': lambda self, *args, **kwargs: print(*args)
         })()
-            
+    
         # ========== INIT SOC NMAP - Fast ==========
         if SOC_NMAP_AVAILABLE and SOCNmapIntegration:
             try:
                 self.soc_nmap = SOCNmapIntegration()
             except:
                 self.soc_nmap = None
-        
+
         # ========== INIT HARDENING - Fast ==========
         if HARDENING_AVAILABLE and HardeningDashboard:
             try:
@@ -2020,7 +2071,7 @@ class SecurityTerminal:
             except:
                 self.hardening_dashboard = None
                 self.hardening_enabled = False
-        
+
         # ========== INIT INTEGRITY - Fast ==========
         if INTEGRITY_AVAILABLE:
             try:
@@ -2035,14 +2086,14 @@ class SecurityTerminal:
                 self.alert_manager = None
                 self.forensic = None
                 self.autoremediation = None
-        
+
         # ========== INIT VT - Fast ==========
         if VT_AVAILABLE and VirusTotalScanner:
             try:
                 self.vt_scanner = VirusTotalScanner()
             except:
                 self.vt_scanner = None
-        
+
         # ========== CONSOLE & SCAN - Fast ==========
         self.found_threats = False
         self.scan_stages = [
@@ -2068,11 +2119,11 @@ class SecurityTerminal:
         self.discovered_ports = []
         self.services_found = []
         self.nmap_mode = False
-        
+
         # ========== CREATE DIRS - Fast ==========
         self.scans_dir = os.path.join(self.workspace_root, "scans")
         os.makedirs(self.scans_dir, exist_ok=True)
-        
+
         default_dirs = ["exploits", "reports", "sandbox", "scans", "operators", 
                         "network_reports", "integrity_reports", "compliance_reports", 
                         "logs", "baselines", "alerts", "quarantine", "forensic", 
@@ -2080,13 +2131,13 @@ class SecurityTerminal:
         for dir_name in default_dirs:
             dir_path = os.path.join(self.workspace_root, dir_name)
             os.makedirs(dir_path, exist_ok=True)
-        
+
         threat_maps_dir = os.path.join(self.workspace_root, 'network_reports', 'threat_maps')
         os.makedirs(threat_maps_dir, exist_ok=True)
-        
+
         # ========== VFS - Fast ==========
         self.ensure_vfs()
-        
+
         # ========== SERVICE MANAGER - Fast ==========
         try:
             from deletion_protection import ServiceManager
@@ -2096,7 +2147,7 @@ class SecurityTerminal:
             )
         except:
             self.service_manager = None
-        
+
         # ========== CONFIG - Fast ==========
         try:
             from deletion_protection import PlatformDetector
@@ -2116,76 +2167,32 @@ class SecurityTerminal:
                 'max_file_size': 100 * 1024 * 1024,
                 'encrypt_backups': False,
             }
-        
-        # ========== COMMANDS - Fast ==========
-        self.commands = self._init_commands()
-        
+
+        # ========== INITIALIZE ALL COMMANDS ==========
+         
+
         # ========== LOGGING - Fast ==========
         self._setup_logging()
-        
+
         # ========== LOG INIT - Fast ==========
         self.log_to_siem(f"DSTerminal initialized by {self.operator_username}")
         self.log_event("SYSTEM", f"DSTerminal v{self.config['version']} initialized")
-        
+
         # ========== BANNER - Fast ==========
         if interactive:
             self._display_initialization_banner()
 
-    # ========== HELPER METHODS ==========
-    
+    # ========== COMMAND INITIALIZATION METHODS ==========
+
     def _get_terminal_width(self):
         try:
             return shutil.get_terminal_size().columns
         except:
             return 80
     # =========================
-
-    # =====================================================================================================
- # Add this at the top of dsterminal.py (after other imports)
-    from deletion_protection import DSTerminalMonitor, BackupDatabase, RestoreManager, ServiceManager
-
-# Then in your SecurityTerminal class, you can use:
-    def init_deletion_protection(self):
-        """Initialize the deletion protection system"""
-        config = {
-            'monitor_paths': self.monitor_paths if hasattr(self, 'monitor_paths') else [],
-            'exclude_patterns': ['*.tmp', '*.temp', '*~', '.DS_Store'],
-            'max_file_size': 100 * 1024 * 1024
-        }
-        
-        try:
-            self.monitor = DSTerminalMonitor(
-                config=config,
-                workspace=self.workspace,
-                interactive=True,
-                ui=self
-            )
-            print("✅ Deletion Protection initialized")
-        except Exception as e:
-            print(f"⚠️ Could not initialize deletion protection: {e}")
-            
-    def _init_web_security(self):
-        """Initialize web security analyzer - Fast"""
-        try:
-            import web_security_analyzer
-            self.web_security_module = web_security_analyzer
-            self.web_security_available = True
-        except:
-            self.web_security_available = False
-            self.web_security_module = None
-    
-    def _init_soc_dashboard(self):
-        """Initialize SOC dashboard - Fast"""
-        try:
-            from soc_nmap_dashboard import SOCNmapIntegration
-            self.soc_dashboard = SOCNmapIntegration()
-        except:
-            pass
-
-    #  ============================================= 
     def _init_commands(self):
         """Initialize commands dictionary - Fast"""
-        return {
+        commands = {
         
             # SQLMap Commands
             'sqlmap': {'func': self.cmd_sqlmap_scan, 'desc': 'Run SQLMap scan on a URL'},
@@ -2215,7 +2222,8 @@ class SecurityTerminal:
             'sqlmap-file': {'func': self.cmd_sqlmap_scan_file, 'desc': 'Scan URLs from a file'},
             'sqlmap-export': {'func': self.cmd_sqlmap_export_report, 'desc': 'Export latest scan report'},
             'sqlmap-report-export': {'func': self.cmd_sqlmap_export_report, 'desc': 'Export latest scan report'},
-            'sqlmap-export': {'func': self.cmd_sqlmap_export_report, 'desc': 'Export the last scan report'},
+        
+            # Deletion Protection Commands
             'monitor': {'func': self.cmd_monitor, 'desc': 'Start deletion protection monitor'},
             'monitor-all': {'func': self.cmd_monitor_all, 'desc': 'Monitor entire user profile'},
             'kill-monitor': {'func': self.cmd_kill_monitor, 'desc': 'Force kill monitoring window'},
@@ -2233,18 +2241,14 @@ class SecurityTerminal:
             'platform-info': {'func': self.cmd_platform_info, 'desc': 'Show platform info'},
             'view-log': {'func': self.view_session_log, 'desc': 'View current session log'},
             'close-session': {'func': self.close_operator_session, 'desc': 'Close current session'},
-            'service pause': {'func': self.cmd_service_pause},
-            'service resume': {'func': self.cmd_service_resume},
-            'service status': {'func': self.cmd_service_status},
-            'service-pause': {'func': self.cmd_service_pause},
-            'service-resume': {'func': self.cmd_service_resume},
-            'service-status': {'func': self.cmd_service_status},
-            'pause': {'func': self.cmd_service_pause},
-            'resume': {'func': self.cmd_service_resume},
-            
-            # ============================================================
+            'service pause': {'func': self.cmd_service_pause, 'desc': 'Pause service'},
+            'service resume': {'func': self.cmd_service_resume, 'desc': 'Resume service'},
+            'service-pause': {'func': self.cmd_service_pause, 'desc': 'Pause service'},
+            'service-resume': {'func': self.cmd_service_resume, 'desc': 'Resume service'},
+            'pause': {'func': self.cmd_service_pause, 'desc': 'Pause service'},
+            'resume': {'func': self.cmd_service_resume, 'desc': 'Resume service'},
+        
             # SOC LAB COMMANDS
-            # ============================================================
             'soc': {
                 'func': self.cmd_soc,
                 'help': 'SOC Automated Lab - Security Operations Center',
@@ -2295,6 +2299,18 @@ class SecurityTerminal:
                 'help': 'Show SOC Lab help',
                 'category': 'Security'
             },
+        
+            # IOC EDUCATION COMMANDS
+            'ioc': {
+                'func': self.cmd_ioc,
+                'help': 'Interactive IOC Education - Learn about Indicators of Compromise',
+                'category': 'Education'
+            },
+            'ioc-education': {
+                'func': self.cmd_ioc_education,
+                'help': 'Complete IOC education guide (interactive)',
+                'category': 'Education'
+            },
             'ioc-learn': {
                 'func': lambda args: show_educational_tip('ioc-guide', education_tips),
                 'help': 'Learn about Indicators of Compromise (IOCs)',
@@ -2308,19 +2324,6 @@ class SecurityTerminal:
             'iocs': {
                 'func': lambda args: show_educational_tip('iocs', education_tips),
                 'help': 'Complete IOC education guide',
-                'category': 'Education'
-            },
-            # ============================================================
-            # IOC EDUCATION COMMANDS
-            # ============================================================
-            'ioc': {
-                'func': self.cmd_ioc,
-                'help': 'Interactive IOC Education - Learn about Indicators of Compromise',
-                'category': 'Education'
-            },
-            'ioc-education': {
-                'func': self.cmd_ioc_education,
-                'help': 'Complete IOC education guide (interactive)',
                 'category': 'Education'
             },
             'ioc-random': {
@@ -2347,44 +2350,535 @@ class SecurityTerminal:
                 'func': self.cmd_ioc_help,
                 'help': 'Show IOC education help',
                 'category': 'Education'
+            },        
+            # ============================================================
+            # DASHBOARD COMMANDS - INTEGRATION FROM dsterminal_dashboard.py
+            # ============================================================
+            'dashboard': {
+                'func': self.cmd_dashboard,
+                'desc': 'Start the security dashboard',
+                'help': 'Start the security dashboard',
+                'category': 'Dashboard'
+            },
+            'dashboard stop': {
+                'func': self.cmd_dashboard_stop,
+                'desc': 'Stop the security dashboard',
+                'help': 'Stop the dashboard server',
+                'category': 'Dashboard'
+            },
+            'dashboard status': {
+                'func': self.cmd_dashboard_status,
+                'desc': 'Check dashboard status',
+                'help': 'Show dashboard running status',
+                'category': 'Dashboard'
+            },
+            'dashboard browser': {
+                'func': self.cmd_dashboard_browser,
+                'desc': 'Open dashboard in browser',
+                'help': 'Open dashboard in your default browser',
+                'category': 'Dashboard'
+            },
+            'dashboard help': {
+                'func': self.cmd_dashboard_help,
+                'desc': 'Show dashboard help',
+                'help': 'Display dashboard command help',
+                'category': 'Dashboard'
+            },
+            'dash': {
+                'func': self.cmd_dashboard,
+                'desc': 'Shortcut to start dashboard',
+                'help': 'Quick start dashboard',
+                'category': 'Dashboard'
+            },
+            'dash-stop': {
+                'func': self.cmd_dashboard_stop,
+                'desc': 'Shortcut to stop dashboard',
+                'help': 'Quick stop dashboard',
+                'category': 'Dashboard'
+            },
+            'dash-status': {
+                'func': self.cmd_dashboard_status,
+                'desc': 'Shortcut to dashboard status',
+                'help': 'Quick dashboard status check',
+                'category': 'Dashboard'
+            },
+        
+            # ============================================================
+            # BUILT-IN COMMANDS
+            # ============================================================
+            'help': {
+                'func': self.cmd_help,
+                'desc': 'Show available commands',
+                'help': 'Display all available commands',
+                'category': 'System'
+            },
+            'exit': {
+                'func': self.cmd_exit,
+                'desc': 'Exit DSTerminal',
+                'help': 'Exit the terminal',
+                'category': 'System'
+            },
+            'clear': {
+                'func': self.cmd_clear,
+                'desc': 'Clear the terminal screen',
+                'help': 'Clear screen',
+                'category': 'System'
+            },
+            'ls': {
+                'func': self.cmd_ls,
+                'desc': 'List directory contents',
+                'help': 'List files in current directory',
+                'category': 'System'
+            },
+            'pwd': {
+                'func': self.cmd_pwd,
+                'desc': 'Print working directory',
+                'help': 'Show current directory path',
+                'category': 'System'
+            },
+            'status': {
+                'func': self.cmd_status,
+                'desc': 'Show system status',
+                'help': 'Display system status information',
+                'category': 'System'
+            },
+            'debug': {
+                'func': self.cmd_debug,
+                'desc': 'Show debug information',
+                'help': 'Display debug information about commands',
+                'category': 'System'
+            },
+            'show': {
+                'func': self.cmd_show,
+                'desc': 'Show command details',
+                'category': 'System'
             },
             # ============================================================
-            # WIFI AUDIT COMMANDS
+            # NETWORK AUDIT COMMANDS
             # ============================================================
-            'wifi': {
-                'func': self.cmd_wifi,
-                'help': 'WiFi Security Audit - Scan and analyze WiFi networks',
+            'net-scan': {
+                'func': self.cmd_network_scan,
+                'desc': 'Scan for WiFi + Ethernet networks',
                 'category': 'Security'
             },
-            'wifi-scan': {
-                'func': self.cmd_wifi_scan,
-                'help': 'Scan for WiFi networks and analyze security',
+            'net-audit': {
+                'func': self.cmd_network_audit,
+                'desc': 'Comprehensive network security audit',
                 'category': 'Security'
             },
-            'wifi-live': {
-                'func': self.cmd_wifi_live,
-                'help': 'Live WiFi monitoring mode (refreshes every 2 seconds)',
+            'net-wifi': {
+                'func': self.cmd_network_wifi,
+                'desc': 'Scan WiFi networks only',
                 'category': 'Security'
             },
-            'wifi-interface': {
-                'func': self.cmd_wifi_interface,
-                'help': 'Scan using a specific WiFi interface',
+            'net-eth': {
+                'func': self.cmd_network_ethernet,
+                'desc': 'Scan Ethernet interfaces only',
                 'category': 'Security'
             },
-            'wifi-help': {
-                'func': self.cmd_wifi_help,
-                'help': 'Show WiFi audit help',
+            'net-live': {
+                'func': self.cmd_network_live,
+                'desc': 'Live network monitoring mode',
                 'category': 'Security'
             },
-            'wifi-status': {
-                'func': self.cmd_wifi_status,
-                'help': 'Show WiFi module status',
+            'net-status': {
+                'func': self.cmd_network_status,
+                'desc': 'Show network module status',
                 'category': 'Security'
             },
- 
-    
+            'net-help': {
+                'func': self.cmd_network_help,
+                'desc': 'Show network audit help',
+                'category': 'Security'
+            },
+   
         }
     
+        # register dashboard commands if available
+        #self._register_dashboard_commands()
+    
+        return commands
+
+
+    def _register_builtin_commands(self):
+        """Register built-in commands"""
+        self.commands['help'] = self.cmd_help
+        self.commands['exit'] = self.cmd_exit
+        self.commands['clear'] = self.cmd_clear
+        self.commands['ls'] = self.cmd_ls
+        self.commands['pwd'] = self.cmd_pwd
+        self.commands['status'] = self.cmd_status
+        self.commands['debug'] = self.cmd_debug
+        # ❌ REMOVE: self.commands['dashboard'] = self.cmd_dashboard
+        # Dashboard is now registered in _register_dashboard_commands()
+    
+    def _register_dashboard_commands(self):
+        """Register dashboard commands from external module"""
+        if not DASHBOARD_AVAILABLE:
+            if not self.quiet:
+                print("[!] Dashboard module not available")
+            # Fallback to built-in dashboard
+            self.commands['dashboard'] = self.cmd_dashboard_fallback
+            return False
+    
+        try:
+            from dsterminal_dashboard import register_dashboard_commands, dashboard_integration
+        
+            # Register all dashboard commands
+            result = register_dashboard_commands(self)
+        
+            if result:
+                if not self.quiet:
+                    print("[+] ✅ Dashboard commands registered!")
+                return True
+            else:
+                if not self.quiet:
+                    print("[!] ⚠️ Dashboard registration failed")
+                # Fallback
+                self.commands['dashboard'] = self.cmd_dashboard_fallback
+                return False
+            
+        except Exception as e:
+            if not self.quiet:
+                print(f"[!] ❌ Error registering dashboard: {e}")
+            # Fallback
+            self.commands['dashboard'] = self.cmd_dashboard_fallback
+            return False
+
+    # ============================================================
+    # DASHBOARD COMMAND METHODS
+    # ============================================================
+
+    def cmd_dashboard(self, args):
+        """Start the security dashboard"""
+        if DASHBOARD_AVAILABLE:
+            try:
+                from dsterminal_dashboard import dashboard_integration
+                return dashboard_integration.start_dashboard()  # ← Return instead of print
+            except ImportError:
+                return "[!] Dashboard module not available"
+        else:
+            return "[!] Dashboard not available"
+
+    def cmd_dashboard_stop(self, args):
+        """Stop the security dashboard"""
+        if DASHBOARD_AVAILABLE:
+            try:
+                from dsterminal_dashboard import dashboard_integration
+                return dashboard_integration.stop_dashboard()  # ← Return instead of print
+            except ImportError:
+                return "[!] Dashboard module not available"
+        else:
+            return "[!] Dashboard is not running"
+
+    def cmd_dashboard_status(self, args):
+        """Check dashboard status"""
+        if DASHBOARD_AVAILABLE:
+            try:
+                from dsterminal_dashboard import dashboard_integration
+                return dashboard_integration.status()  # ← Return instead of print
+            except ImportError:
+                return "[!] Dashboard module not available"
+        else:
+            return "[!] Dashboard not available"
+
+    def cmd_dashboard_browser(self, args):
+        """Open dashboard in browser"""
+        if DASHBOARD_AVAILABLE:
+            try:
+                from dsterminal_dashboard import dashboard_integration
+                return dashboard_integration.open_browser()  # ← Return instead of print
+            except ImportError:
+                return "[!] Dashboard module not available"
+        else:
+            return "[!] Dashboard not available"
+
+    def cmd_dashboard_help(self, args):
+        """Show dashboard help"""
+        if DASHBOARD_AVAILABLE:
+            try:
+                from dsterminal_dashboard import dashboard_integration
+                return dashboard_integration.help()  # ← Return instead of print
+            except ImportError:
+                return "[!] Dashboard module not available"
+        else:
+            return """
+    ╔══════════════════════════════════════════════════════════════╗
+    ║              DSTERMINAL DASHBOARD COMMANDS                   ║
+    ╠══════════════════════════════════════════════════════════════╣
+    ║  dashboard           - Start the security dashboard          ║
+    ║  dashboard stop      - Stop the dashboard                    ║
+    ║  dashboard status    - Check dashboard status                ║
+    ║  dashboard browser   - Open dashboard in browser             ║
+    ║  dashboard help      - Show this help                       ║
+    ╠══════════════════════════════════════════════════════════════╣
+    ║  Shortcuts:                                                  ║
+    ║  dash                 - Quick start dashboard                ║
+    ║  dash-stop           - Quick stop dashboard                 ║
+    ║  dash-status         - Quick dashboard status               ║
+    ╚══════════════════════════════════════════════════════════════╝
+    """
+
+    def cmd_help(self, args):
+        """Show dashboard help"""
+        if DASHBOARD_AVAILABLE:
+            try:
+                from dsterminal_dashboard import dashboard_integration
+                return dashboard_integration.help()  # ← Return instead of print
+            except ImportError:
+                return "[!] Dashboard module not available"
+        else:
+            return """
+    ╔══════════════════════════════════════════════════════════════╗
+    ║              DSTERMINAL DASHBOARD COMMANDS                   ║
+    ╠══════════════════════════════════════════════════════════════╣
+    ║  dashboard           - Start the security dashboard          ║
+    ║  dashboard stop      - Stop the dashboard                    ║
+    ║  dashboard status    - Check dashboard status                ║
+    ║  dashboard browser   - Open dashboard in browser             ║
+    ║  dashboard help      - Show this help                       ║
+    ╠══════════════════════════════════════════════════════════════╣
+    ║  Shortcuts:                                                  ║
+    ║  dash                 - Quick start dashboard                ║
+    ║  dash-stop           - Quick stop dashboard                 ║
+    ║  dash-status         - Quick dashboard status               ║
+    ╚══════════════════════════════════════════════════════════════╝
+    """
+    def cmd_show(self, args):
+        """Show dashboard help"""
+        if DASHBOARD_AVAILABLE:
+            try:
+                from dsterminal_dashboard import dashboard_integration
+                return dashboard_integration.help()  # ← Return instead of print
+            except ImportError:
+                return "[!] Dashboard module not available"
+        else:
+            return """
+    ╔══════════════════════════════════════════════════════════════╗
+    ║              DSTERMINAL DASHBOARD COMMANDS                   ║
+    ╠══════════════════════════════════════════════════════════════╣
+    ║  dashboard           - Start the security dashboard          ║
+    ║  dashboard stop      - Stop the dashboard                    ║
+    ║  dashboard status    - Check dashboard status                ║
+    ║  dashboard browser   - Open dashboard in browser             ║
+    ║  dashboard help      - Show this help                       ║
+    ╠══════════════════════════════════════════════════════════════╣
+    ║  Shortcuts:                                                  ║
+    ║  dash                 - Quick start dashboard                ║
+    ║  dash-stop           - Quick stop dashboard                 ║
+    ║  dash-status         - Quick dashboard status               ║
+    ╚══════════════════════════════════════════════════════════════╝
+    """
+    def cmd_dashboard_fallback(self, args):
+        """Fallback dashboard if module not available"""
+        print("\n" + "="*60)
+        print("🔮 DSTERMINAL SECURITY DASHBOARD (FALLBACK)")
+        print("="*60)
+        print("⚠️ Dashboard module not loaded properly")
+        print("⚡ Using simple built-in dashboard")
+        print("="*60 + "\n")
+    
+        # Try to start simple Flask dashboard
+        try:
+            from flask import Flask, jsonify, render_template_string
+            import threading
+            import webbrowser
+            import time
+        
+            HTML_TEMPLATE = """
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>DSTerminal Dashboard</title>
+                <style>
+                    body { font-family: Arial; background: #0a0e1a; color: #c8d6e5; padding: 40px; }
+                    h1 { color: #00ff88; }
+                    .card { background: #1a1a2e; padding: 20px; border-radius: 10px; margin: 10px 0; }
+                    .value { color: #00ff88; font-size: 24px; }
+                </style>
+            </head>
+            <body>
+                <h1>🛡️ DSTERMINAL SECURITY DASHBOARD</h1>
+                <div class="card"><b>Version:</b> {{ version }}</div>
+                <div class="card"><b>Operator:</b> {{ operator }}</div>
+                <div class="card"><b>Session:</b> {{ session }}</div>
+                <div class="card"><b>Commands:</b> {{ commands }}</div>
+                <div class="card"><b>Status:</b> {{ status }}</div>
+            </body>
+            </html>
+            """
+        
+            app = Flask(__name__)
+        
+            @app.route('/')
+            def index():
+                return render_template_string(
+                    HTML_TEMPLATE,
+                    version=self.version,
+                    operator=self.operator_username,
+                    session=self.session_id,
+                    commands=len(self.commands),
+                    status="✅ Running"
+                )
+        
+            @app.route('/api/status')
+            def api_status():
+                return jsonify({
+                    'status': 'running',
+                    'operator': self.operator_username,
+                    'session': self.session_id,
+                    'version': self.version,
+                    'commands': len(self.commands)
+                })
+        
+            def run_flask():
+                app.run(host='0.0.0.0', port=5000, debug=False, use_reloader=False)
+        
+            thread = threading.Thread(target=run_flask, daemon=True)
+            thread.start()
+        
+            self.soc_dashboard = app
+            self.soc_dashboard_active = True
+        
+            time.sleep(1)
+            webbrowser.open('http://localhost:5000')
+        
+            print("✅ Dashboard started at http://localhost:5000")
+            return None
+        
+        except ImportError:
+            print("❌ Flask not installed. Install with: pip install flask")
+            return None
+        except Exception as e:
+            print(f"❌ Error: {e}")
+            return None
+
+
+    def cmd_debug(self, args):
+        """Debug command - shows registered commands"""
+        print("\n" + "="*50)
+        print("🔍 DEBUG - REGISTERED COMMANDS")
+        print("="*50)
+        print(f"Total commands: {len(self.commands)}")
+        for cmd in sorted(self.commands.keys()):
+            print(f"  ✅ {cmd}")
+        print(f"\nDashboard active: {self.soc_dashboard_active}")
+        print("="*50 + "\n")
+        return None
+    
+    def cmd_status(self, args):
+        """Show system status"""
+        print("\n" + "="*50)
+        print("📊 SYSTEM STATUS")
+        print("="*50)
+        print(f"  Version: {self.version}")
+        print(f"  Operator: {self.operator_username}")
+        print(f"  Session: {self.session_id}")
+        print(f"  Workspace: {self.workspace}")
+        print(f"  Commands: {len(self.commands)} registered")
+        print(f"  Dashboard: {'✅ Active' if self.soc_dashboard_active else '❌ Inactive'}")
+        print(f"  Ransomware: {'✅ Active' if self.ransomware_available else '❌ Inactive'}")
+        print(f"  System: {platform.system()} {platform.release()}")
+        print("="*50 + "\n")
+        return None
+
+    def cmd_test(self, args):
+        """Simple test command to verify commands are working"""
+        print("✅ Test command executed successfully!")
+        print(f"   Args received: {args}")
+        print(f"   Commands registered: {len(self.commands)}")
+        return None
+
+    #==============================
+    def _init_soc_dashboard(self):
+        """Initialize SOC dashboard"""
+        try:
+            # Check if dashboard module exists
+            import dsterminal_dashboard
+            from dsterminal_dashboard import start_dashboard
+        
+            # Start dashboard
+            self.soc_dashboard = start_dashboard(
+                workspace=self.workspace,
+                terminal=self
+            )
+            if self.soc_dashboard:
+                self.soc_dashboard_active = True
+                if not self.quiet:
+                    print("[+] Dashboard started successfully")
+        except ImportError:
+            if not self.quiet:
+                print("[!] Dashboard module not available")
+            self.soc_dashboard = None
+        except Exception as e:
+            if not self.quiet:
+                print(f"⚠️ Dashboard initialization failed: {e}")
+            self.soc_dashboard = None
+
+    def cmd_exit(self, args):
+        """Exit the terminal"""
+        print("[+] Exiting DSTerminal...")
+        sys.exit(0)
+
+    def cmd_clear(self, args):
+        """Clear the terminal screen"""
+        os.system('cls' if os.name == 'nt' else 'clear')
+        return None
+
+    def cmd_ls(self, args):
+        """List directory contents"""
+        try:
+            path = args[0] if args else self.current_dir
+            items = os.listdir(path)
+            for item in sorted(items):
+                full_path = os.path.join(path, item)
+                if os.path.isdir(full_path):
+                    print(f"  📁 {item}/")
+                else:
+                    print(f"  📄 {item}")
+        except Exception as e:
+            print(f"❌ Error: {e}")
+        return None
+
+    def cmd_pwd(self, args):
+        """Print working directory"""
+        print(self.current_dir)
+        return None
+
+    # =====================================================================================================
+    from deletion_protection import DSTerminalMonitor, BackupDatabase, RestoreManager, ServiceManager
+
+    def init_deletion_protection(self):
+        """Initialize the deletion protection system"""
+        config = {
+            'monitor_paths': self.monitor_paths if hasattr(self, 'monitor_paths') else [],
+            'exclude_patterns': ['*.tmp', '*.temp', '*~', '.DS_Store'],
+            'max_file_size': 100 * 1024 * 1024
+        }
+        
+        try:
+            self.monitor = DSTerminalMonitor(
+                config=config,
+                workspace=self.workspace,
+                interactive=True,
+                ui=self
+            )
+            print("✅ Deletion Protection initialized")
+        except Exception as e:
+            print(f"⚠️ Could not initialize deletion protection: {e}")
+            
+    def _init_web_security(self):
+        """Initialize web security analyzer - Fast"""
+        try:
+            import web_security_analyzer
+            self.web_security_module = web_security_analyzer
+            self.web_security_available = True
+        except:
+            self.web_security_available = False
+            self.web_security_module = None
+    
+    #  =============================================     
+
     def _setup_logging(self):
         """Setup logging - Fast"""
         # Minimal logging setup
@@ -2575,80 +3069,107 @@ class SecurityTerminal:
         time.sleep(1.05)
     
     def _display_initialization_banner(self):
-        """Display initialization banner with 20-second hacker-style countdown and ultra-fast auto-typing effects"""
+        """Display initialization banner with responsive centering and colorful instant typing"""
         import platform
         import time
         import random
         import sys
-        
-        # Try to import colorama for better colors
+        import shutil
+        import re
+
+        # Get terminal width
         try:
-            from colorama import Fore, Style, init
+            terminal_width = shutil.get_terminal_size().columns
+        except:
+            terminal_width = 120
+
+        if terminal_width < 60:
+            terminal_width = 60
+
+        # Try to import colorama
+        try:
+            from colorama import Fore, Style, init, Back
             init(autoreset=True)
             COLORAMA_AVAILABLE = True
         except ImportError:
             COLORAMA_AVAILABLE = False
-        
-        # Clear screen for dramatic effect
-        if platform.system().lower() == "windows":
-            os.system('cls')
-        else:
-            os.system('clear')
-        
+
+        # Clear screen
+        os.system('cls' if platform.system().lower() == "windows" else 'clear')
+
         # ============================================================
-        # ULTRA-FAST AUTO-TYPING FUNCTION - GREEN
+        # COLORED TYPING FUNCTION - FIXED
         # ============================================================
-        def type_text_green(text, delay=0.005, end="\n"):
-            """Simulate ultra-fast auto-typing effect in GREEN color"""
+        def type_text_colored(text, end="\n", color=None):
+            """Type text with specific color - NO raw ANSI codes displayed"""
             if COLORAMA_AVAILABLE:
-                sys.stdout.write(Fore.GREEN)
+                if color:
+                    sys.stdout.write(color)
+                reset = Style.RESET_ALL
             else:
-                sys.stdout.write('\x1b[32m')  # Fallback ANSI
-            
+                if color:
+                    sys.stdout.write(color)
+                reset = '\x1b[0m'
+        
             for char in text:
                 sys.stdout.write(char)
                 sys.stdout.flush()
-                # Ultra-fast typing with minimal delay
-                time.sleep(delay + random.uniform(-0.002, 0.005))
-            
-            if COLORAMA_AVAILABLE:
-                sys.stdout.write(Style.RESET_ALL)
-            else:
-                sys.stdout.write('\x1b[0m')
-            
+        
+            sys.stdout.write(reset)
             if end:
                 sys.stdout.write(end)
             sys.stdout.flush()
-        
+
         # ============================================================
-        # DSTERMINAL STARTUP SEQUENCE WITH ULTRA-FAST GREEN TYPING
+        # CENTERING HELPER
         # ============================================================
-        
-        # Display ASCII art banner with green typing effect
+        def center_text(text, width=None):
+            """Center text within terminal width"""
+            if width is None:
+                width = terminal_width
+            clean_text = re.sub(r'\x1b\[[0-9;]*m', '', text)
+            clean_text = re.sub(r'\[[0-9]+m', '', clean_text)
+            padding = max(0, (width - len(clean_text)) // 2)
+            return ' ' * padding + text
+
+        # ============================================================
+        # BANNER
+        # ============================================================
+
         banner_lines = [
-            "╔══════════════════════════════════════════════════════════════╗",
-            "║                    DSTERMINAL Cyber-Ops                      ║",
-            "╠══════════════════════════════════════════════════════════════╣",
-            f"║ Version    : {self.config.get('version', '3.1.113')}",
-            f"║ Operator   : {self.operator_username}",
-            f"║ ID         : {self.session_id}",
-            f"║ Started    : {self.session_start.strftime('%Y-%m-%d %H:%M:%S') if self.session_start else 'N/A'}",
-            f"║ Host       : {platform.node()}",
-            f"║ Workspace  : {self.workspace_root}",
-            "╚══════════════════════════════════════════════════════════════╝"
+            "╔════════════════════════════════════════════════════════════════════════════╗",
+            "║                                                                            ║",
+            "║  ██████╗ ███████╗████████╗███████╗██████╗ ███╗   ███╗██╗███╗   ██╗ █████╗ ║",
+            "║  ██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║████╗  ██║██╔══██╗║",
+            "║  ██║  ██║███████╗   ██║   █████╗  ██████╔╝██╔████╔██║██║██╔██╗ ██║███████║║",
+            "║  ██║  ██║╚════██║   ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██║██║╚██╗██║██╔══██║║",
+            "║  ██████╔╝███████║   ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║██║  ██║║",
+            "║  ╚═════╝ ╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝║",
+            "║                                                                            ║",
+            "║               [ ENCRYPTION SUITE v3.1.113 - EDITION ]                     ║",
+            "║              ══════════════════════════════════════════                    ║",
+            "╠════════════════════════════════════════════════════════════════════════════╣",
+            f"║  Version       : {self.config.get('version', '3.1.113'):<46}║",
+            f"║  Operator ID   : {self.operator_username:<46}║",
+            f"║  Session ID    : {self.session_id:<46}║",
+            f"║  Started       : {self.session_start.strftime('%Y-%m-%d %H:%M:%S') if self.session_start else 'N/A':<46}║",
+            f"║  Host          : {platform.node():<46}║",
+            f"║  Workspace     : {os.path.basename(self.workspace_root) if self.workspace_root else 'N/A':<46}║",
+            "╚════════════════════════════════════════════════════════════════════════════╝"
         ]
-        
-        # Type each line in GREEN (ultra-fast)
+
+        # Use green for banner
         for line in banner_lines:
-            type_text_green(line, delay=0.003)  # Ultra-fast
-            time.sleep(0.03)  # Minimal pause between lines
-        
-        print()  # Add extra line after banner
-        
+            centered = center_text(line)
+            type_text_colored(centered, color=Fore.GREEN if COLORAMA_AVAILABLE else '\x1b[32m')
+            time.sleep(0.000005)
+
+        print()
+
         # ============================================================
-        # INITIALIZATION SEQUENCE WITH ULTRA-FAST GREEN TYPING
+        # STARTUP MESSAGES
         # ============================================================
-        
+
         startup_messages = [
             "⚡ INITIALIZING DSTERMINAL ENGINE...",
             "🔐 Loading security modules...",
@@ -2664,21 +3185,21 @@ class SecurityTerminal:
             "✅ Verification protocols engaged...",
             "🚀 Launching DSTERMINAL Core..."
         ]
-        
+
         for msg in startup_messages:
-            type_text_green(msg, delay=0.005)  # Ultra-fast
-            time.sleep(0.08)  # Minimal pause
-        
+            centered = center_text(msg)
+            type_text_colored(centered, color=Fore.GREEN if COLORAMA_AVAILABLE else '\x1b[32m')
+            time.sleep(0.0003)
+
         print("\n")
-        
+
         # ============================================================
-        # PROGRESS BAR WITH GREEN
+        # PROGRESS BAR
         # ============================================================
-        
+
         total_seconds = 20
-        bar_length = 50
-        
-        # Green hacker messages
+        bar_length = min(50, terminal_width - 40)
+
         hacker_messages = [
             "🔐 Decrypting secure channel...",
             "📡 Establishing satellite uplink...",
@@ -2695,200 +3216,105 @@ class SecurityTerminal:
             "💾 Caching update data...",
             "🔄 Establishing redundant link..."
         ]
-        
-        # Display initial progress bar
-        if COLORAMA_AVAILABLE:
-            sys.stdout.write(Fore.GREEN)
-        else:
-            sys.stdout.write('\x1b[32m')
-        sys.stdout.write("░" * bar_length + " [0/20s] 0.0%")
-        if COLORAMA_AVAILABLE:
-            sys.stdout.write(Style.RESET_ALL)
-        else:
-            sys.stdout.write('\x1b[0m')
+
+        bar_display = "░" * bar_length + f" [0/{total_seconds}s] 0.0%"
+        centered_bar = center_text(bar_display)
+        sys.stdout.write(centered_bar)
         sys.stdout.flush()
-        
-        last_msg = ""
-        
+
         for i in range(total_seconds + 1):
             progress = (i / total_seconds) * 100
             filled_length = int(bar_length * i // total_seconds)
             bar = '█' * filled_length + '░' * (bar_length - filled_length)
-            
+
             msg_index = min(i * 2 // 3, len(hacker_messages) - 1)
             hacker_msg = hacker_messages[msg_index]
-            
+
+            if COLORAMA_AVAILABLE:
+                color = Fore.GREEN if progress < 33 else Fore.YELLOW if progress < 66 else Fore.RED
+            else:
+                color = '\x1b[32m' if progress < 33 else '\x1b[33m' if progress < 66 else '\x1b[31m'
+
             sys.stdout.write('\r')
-            
-            # Progress bar - Green
+            sys.stdout.write(' ' * terminal_width)
+            sys.stdout.write('\r')
+
             if COLORAMA_AVAILABLE:
-                sys.stdout.write(Fore.GREEN)
+                bar_text = f"{color}{bar}{Style.RESET_ALL} {i:2d}/{total_seconds}s {progress:.1f}% {color}{hacker_msg}{Style.RESET_ALL}"
             else:
-                sys.stdout.write('\x1b[32m')
-            sys.stdout.write(bar)
-            if COLORAMA_AVAILABLE:
-                sys.stdout.write(Style.RESET_ALL)
-            else:
-                sys.stdout.write('\x1b[0m')
-            
-            sys.stdout.write(' ')
-            
-            # Time - Green
-            if COLORAMA_AVAILABLE:
-                sys.stdout.write(Fore.GREEN)
-            else:
-                sys.stdout.write('\x1b[32m')
-            sys.stdout.write(f"{i:2d}/{total_seconds}s")
-            if COLORAMA_AVAILABLE:
-                sys.stdout.write(Style.RESET_ALL)
-            else:
-                sys.stdout.write('\x1b[0m')
-            
-            sys.stdout.write(' ')
-            
-            # Percentage - Green
-            if COLORAMA_AVAILABLE:
-                sys.stdout.write(Fore.GREEN)
-            else:
-                sys.stdout.write('\x1b[32m')
-            sys.stdout.write(f"{progress:.1f}%")
-            if COLORAMA_AVAILABLE:
-                sys.stdout.write(Style.RESET_ALL)
-            else:
-                sys.stdout.write('\x1b[0m')
-            
-            sys.stdout.write(' ')
-            
-            # Message - Green
-            if COLORAMA_AVAILABLE:
-                sys.stdout.write(Fore.GREEN)
-            else:
-                sys.stdout.write('\x1b[32m')
-            sys.stdout.write(hacker_msg)
-            if COLORAMA_AVAILABLE:
-                sys.stdout.write(Style.RESET_ALL)
-            else:
-                sys.stdout.write('\x1b[0m')
-            
-            if len(hacker_msg) < len(last_msg):
-                sys.stdout.write(" " * (len(last_msg) - len(hacker_msg)))
-            
+                bar_text = f"{color}{bar}\x1b[0m {i:2d}/{total_seconds}s {progress:.1f}% {color}{hacker_msg}\x1b[0m"
+    
+            centered = center_text(bar_text)
+            sys.stdout.write(centered)
             sys.stdout.flush()
-            last_msg = hacker_msg
-            
-            # Random glitch effects (still fast)
-            if random.random() < 0.05 and i > 0 and i < total_seconds:
-                time.sleep(0.05)
+
+            if random.random() < 0.03 and i > 0 and i < total_seconds:
+                time.sleep(0.0003)
                 glitch_msg = random.choice([
-                    "⚠️  Packet loss detected... retransmitting",
-                    "⚠️  Firewall anomaly detected... rerouting",
-                    "⚠️  Handshake timeout... reconnecting",
-                    "⚠️  DNS resolution failed... using backup"
+                    "⚠️ Packet loss detected... retransmitting",
+                    "⚠️ Firewall anomaly detected... rerouting",
+                    "⚠️ Handshake timeout... reconnecting",
+                    "⚠️ DNS resolution failed... using backup"
                 ])
                 sys.stdout.write('\r')
-                if COLORAMA_AVAILABLE:
-                    sys.stdout.write(Fore.GREEN)
-                else:
-                    sys.stdout.write('\x1b[32m')
-                sys.stdout.write(glitch_msg)
-                if COLORAMA_AVAILABLE:
-                    sys.stdout.write(Style.RESET_ALL)
-                else:
-                    sys.stdout.write('\x1b[0m')
-                sys.stdout.write(" " * 20)
-                sys.stdout.flush()
-                time.sleep(0.15)
-                
-                # Restore the progress bar
+                sys.stdout.write(' ' * terminal_width)
                 sys.stdout.write('\r')
+                glitch_color = Fore.YELLOW if COLORAMA_AVAILABLE else '\x1b[33m'
                 if COLORAMA_AVAILABLE:
-                    sys.stdout.write(Fore.GREEN)
+                    centered_glitch = center_text(f"{glitch_color}{glitch_msg}{Style.RESET_ALL}")
                 else:
-                    sys.stdout.write('\x1b[32m')
-                sys.stdout.write(bar)
-                if COLORAMA_AVAILABLE:
-                    sys.stdout.write(Style.RESET_ALL)
-                else:
-                    sys.stdout.write('\x1b[0m')
-                sys.stdout.write(' ')
-                if COLORAMA_AVAILABLE:
-                    sys.stdout.write(Fore.GREEN)
-                else:
-                    sys.stdout.write('\x1b[32m')
-                sys.stdout.write(f"{i:2d}/{total_seconds}s")
-                if COLORAMA_AVAILABLE:
-                    sys.stdout.write(Style.RESET_ALL)
-                else:
-                    sys.stdout.write('\x1b[0m')
-                sys.stdout.write(' ')
-                if COLORAMA_AVAILABLE:
-                    sys.stdout.write(Fore.GREEN)
-                else:
-                    sys.stdout.write('\x1b[32m')
-                sys.stdout.write(f"{progress:.1f}%")
-                if COLORAMA_AVAILABLE:
-                    sys.stdout.write(Style.RESET_ALL)
-                else:
-                    sys.stdout.write('\x1b[0m')
-                sys.stdout.write(' ')
-                if COLORAMA_AVAILABLE:
-                    sys.stdout.write(Fore.GREEN)
-                else:
-                    sys.stdout.write('\x1b[32m')
-                sys.stdout.write(hacker_msg)
-                if COLORAMA_AVAILABLE:
-                    sys.stdout.write(Style.RESET_ALL)
-                else:
-                    sys.stdout.write('\x1b[0m')
-                
-                if len(hacker_msg) < len(last_msg):
-                    sys.stdout.write(" " * (len(last_msg) - len(hacker_msg)))
+                    centered_glitch = center_text(f"{glitch_color}{glitch_msg}\x1b[0m")
+                sys.stdout.write(centered_glitch)
                 sys.stdout.flush()
-            
-            time.sleep(1)  # Keep this at 1 second for the countdown
-        
-        # Clear the line
+                time.sleep(0.0005)
+
+            time.sleep(1)
+
         sys.stdout.write('\r')
-        sys.stdout.write(' ' * 80)
+        sys.stdout.write(' ' * terminal_width)
         sys.stdout.write('\r')
         sys.stdout.flush()
-        
+
         # ============================================================
-        # COMPLETION SEQUENCE WITH ULTRA-FAST GREEN TYPING
+        # COMPLETION MESSAGES - FIXED (no raw ANSI codes)
         # ============================================================
-        
+
         completion_messages = [
-            "✅ SECURE CONNECTION ESTABLISHED!",
-            "🛡️  All security protocols active",
-            "📡 Update servers synchronized",
-            "🔑 Session keys generated successfully",
-            "🚀 DSTERMINAL Core initialized"
+            ("✅ SECURE CONNECTION ESTABLISHED!", Fore.GREEN if COLORAMA_AVAILABLE else '\x1b[32m'),
+            ("🛡️ All security protocols active", Fore.CYAN if COLORAMA_AVAILABLE else '\x1b[36m'),
+            ("📡 Update servers synchronized", Fore.YELLOW if COLORAMA_AVAILABLE else '\x1b[33m'),
+            ("🔑 Session keys generated successfully", Fore.MAGENTA if COLORAMA_AVAILABLE else '\x1b[35m'),
+            ("🚀 DSTERMINAL Core initialized", Fore.GREEN if COLORAMA_AVAILABLE else '\x1b[32m')
         ]
-        
-        for msg in completion_messages:
-            type_text_green(msg, delay=0.003)  # Ultra-fast
-            time.sleep(0.1)  # Minimal pause
-        
+
+        for msg, color in completion_messages:
+            centered = center_text(msg)
+            type_text_colored(centered, color=color)
+            time.sleep(0.0003)
+
         print("\n")
-        
-        # Final system status with ultra-fast typing
+
+        # ============================================================
+        # SYSTEM STATUS - FIXED (no raw ANSI codes)
+        # ============================================================
+
         status_messages = [
-            "\nSYSTEM STATUS:",
-            f"  ✅ DSTERMINAL v{self.config.get('version', '3.1.113')} loaded",
-            f"  ✅ User authenticated: {self.operator_username}",
-            f"  ✅ Session ID: {self.session_id}",
-            f"  ✅ Workspace: {self.workspace_root}",
-            "  ✅ System ready for update operations",
-            f"\n⏱️  Initialization time: {total_seconds} seconds"
+            ("SYSTEM STATUS:", Fore.CYAN if COLORAMA_AVAILABLE else '\x1b[36m'),
+            (f"  ✅ DSTERMINAL v{self.config.get('version', '3.1.113')} loaded", Fore.GREEN if COLORAMA_AVAILABLE else '\x1b[32m'),
+            (f"  ✅ User authenticated: {self.operator_username}", Fore.GREEN if COLORAMA_AVAILABLE else '\x1b[32m'),
+            (f"  ✅ Session ID: {self.session_id}", Fore.GREEN if COLORAMA_AVAILABLE else '\x1b[32m'),
+            (f"  ✅ Workspace: {os.path.basename(self.workspace_root) if self.workspace_root else 'N/A'}", Fore.GREEN if COLORAMA_AVAILABLE else '\x1b[32m'),
+            ("  ✅ System ready for operations", Fore.GREEN if COLORAMA_AVAILABLE else '\x1b[32m'),
+            (f"\n⏱️  Initialization time: {total_seconds} seconds", Fore.YELLOW if COLORAMA_AVAILABLE else '\x1b[33m')
         ]
-        
-        for msg in status_messages:
-            type_text_green(msg, delay=0.003)  # Ultra-fast
-            time.sleep(0.05)  # Minimal pause
-        
-        print("\n")
-        time.sleep(0.3)  # Reduced final pause
-        
+
+        for msg, color in status_messages:
+            centered = center_text(msg)
+            type_text_colored(centered, color=color)
+            time.sleep(0.5)
+
+
+     
     # ========== COMMAND METHODS (Placeholders) ==========
     #   =====================soc_automated section+++++++++++++++++++++++===
     def cmd_soc(self, args):
@@ -3555,212 +3981,221 @@ class SecurityTerminal:
        # ========================================================================
     # WIFI AUDIT COMMAND HANDLERS
     # ========================================================================
+    # ============================================================
+    # NETWORK AUDIT COMMAND METHODS
+    # ============================================================
+
+    def cmd_network_scan(self, args):
+        """Scan for WiFi + Ethernet networks"""
+        if not NETWORK_AUDIT_AVAILABLE:
+            print("[!] Network Audit module not available")
+            return None
     
-    def cmd_wifi(self, args=None):
-        """Run WiFi security audit with auto-detection"""
-        if not WIFI_AUDIT_AVAILABLE:
-            self._print_error("WiFi Audit module not available.")
-            self._print_info("Make sure wifi_audit.py is in the same directory.")
-            return
-        
         try:
-            # Parse arguments for interface
+            print("\n" + "="*60)
+            print("🌐 Network Scan")
+            print("="*60)
+        
+            # Parse interface from args
             interface = None
-            speed = 0.035
-            
+            if args and not args[0].startswith('--'):
+                interface = args[0]
+        
+            # Create instance and run
+            auditor = NetworkAudit(interface=interface, scan_all=True)
+            auditor.run()
+        
+            return None
+        
+        except Exception as e:
+            print(f"[!] Error during network scan: {e}")
+            return None
+
+    def cmd_network_audit(self, args):
+        """Comprehensive network security audit"""
+        if not NETWORK_AUDIT_AVAILABLE:
+            print("[!] Network Audit module not available")
+            return None
+    
+        try:
+            print("\n" + "="*60)
+            print("🔐 Comprehensive Network Security Audit")
+            print("="*60)
+            print("📡 WiFi + Ethernet Analysis")
+            print("="*60 + "\n")
+        
+            # Parse interface from args
+            interface = None
             if args:
-                for arg in args:
-                    if not arg.startswith('--'):
-                        interface = arg
-                    elif arg.startswith('--speed='):
-                        try:
-                            speed = float(arg.split('=')[1])
-                        except:
-                            pass
-            
-            # Create WiFi audit instance
-            wifi = WiFiAudit(interface=interface)
-            wifi.pen_speed = speed
-            wifi.run()
-            
-        except KeyboardInterrupt:
-            print(f"\n{Fore.YELLOW}[!] WiFi audit interrupted by user{Style.RESET_ALL}")
-        except Exception as e:
-            self._print_error(f"WiFi audit failed: {str(e)}")
-            import traceback
-            traceback.print_exc()
-    
-    def cmd_wifi_scan(self, args=None):
-        """Quick WiFi scan"""
-        if not WIFI_AUDIT_AVAILABLE:
-            self._print_error("WiFi Audit module not available.")
-            return
+                if '--help' in args:
+                    self.cmd_network_help(args)
+                    return None
+                interface = args[0] if not args[0].startswith('--') else None
         
+            # Create and run audit
+            auditor = NetworkAudit(interface=interface, scan_all=True)
+            auditor.run()
+        
+            return None
+        
+        except Exception as e:
+            print(f"[!] Error during network audit: {e}")
+            return None
+
+    def cmd_network_wifi(self, args):
+        """Scan WiFi networks only"""
+        if not NETWORK_AUDIT_AVAILABLE:
+            print("[!] Network Audit module not available")
+            return None
+    
         try:
-            interface = args[0] if args else None
-            wifi = WiFiAudit(interface=interface)
-            
-            # Override the run method to skip some steps for quick scan
-            # Or just run the full scan
-            wifi.run()
-            
-        except KeyboardInterrupt:
-            print(f"\n{Fore.YELLOW}[!] WiFi scan interrupted{Style.RESET_ALL}")
-        except Exception as e:
-            self._print_error(f"WiFi scan failed: {str(e)}")
-    
-    def cmd_wifi_live(self, args=None):
-        """Live WiFi monitoring mode"""
-        if not WIFI_AUDIT_AVAILABLE:
-            self._print_error("WiFi Audit module not available.")
-            return
+            print("\n" + "="*60)
+            print("📡 WiFi Network Scan")
+            print("="*60)
         
+            # Parse interface
+            interface = None
+            if args and not args[0].startswith('--'):
+                interface = args[0]
+        
+            # Create instance
+            auditor = NetworkAudit(interface=interface)
+        
+            # Force WiFi only scan
+            auditor.scan_all = False
+        
+            # Run WiFi scan
+            auditor.run()
+        
+            return None
+        
+        except Exception as e:
+            print(f"[!] Error during WiFi scan: {e}")
+            return None
+
+    def cmd_network_ethernet(self, args):
+        """Scan Ethernet interfaces only"""
+        if not NETWORK_AUDIT_AVAILABLE:
+            print("[!] Network Audit module not available")
+            return None
+    
         try:
-            interface = args[0] if args else None
-            speed = 0.035
-            
-            # Check for speed parameter
-            if args:
-                for arg in args:
-                    if arg.startswith('--speed='):
-                        try:
-                            speed = float(arg.split('=')[1])
-                        except:
-                            pass
-            
-            print(f"{Fore.LIGHTCYAN_EX}Live monitoring mode - Press Ctrl+C to stop{Style.RESET_ALL}")
-            
-            wifi = WiFiAudit(interface=interface)
-            wifi.pen_speed = speed
-            
-            # Live monitoring loop
-            while True:
-                wifi.results['access_points'] = []
-                wifi.run()
-                time.sleep(2)
-                os.system('cls' if platform.system() == 'Windows' else 'clear')
-                
-        except KeyboardInterrupt:
-            print(f"\n{Fore.LIGHTYELLOW_EX}Live monitoring stopped{Style.RESET_ALL}")
+            print("\n" + "="*60)
+            print("🔌 Ethernet Interface Scan")
+            print("="*60)
+        
+            # Detect Ethernet interfaces only
+            auditor = NetworkAudit()
+        
+            # Detect and display Ethernet interfaces
+            interfaces = auditor._detect_all_interfaces()
+            eth_interfaces = [i for i in interfaces if i.get('type') == 'Ethernet']
+        
+            print(f"\nFound {len(eth_interfaces)} Ethernet interfaces:")
+            for eth in eth_interfaces:
+                print(f"  🔌 {eth.get('name', 'Unknown')}")
+                print(f"     IP: {eth.get('ip', 'N/A')}")
+                print(f"     MAC: {eth.get('mac', 'Unknown')}")
+        
+            return None
+        
         except Exception as e:
-            self._print_error(f"Live monitoring failed: {str(e)}")
+            print(f"[!] Error during Ethernet scan: {e}")
+            return None
+
+    def cmd_network_live(self, args):
+        """Live network monitoring mode"""
+        if not NETWORK_AUDIT_AVAILABLE:
+            print("[!] Network Audit module not available")
+            return None
     
-    def cmd_wifi_interface(self, args=None):
-        """Scan using a specific WiFi interface"""
-        if not WIFI_AUDIT_AVAILABLE:
-            self._print_error("WiFi Audit module not available.")
-            return
-        
-        if not args:
-            self._print_error("Please specify an interface.")
-            self._print_info("Usage: wifi-interface <interface_name> [--speed=0.035]")
-            self._print_info("Example: wifi-interface wlan0")
-            return
-        
         try:
-            interface = args[0]
-            speed = 0.035
-            
-            # Check for speed parameter
-            for arg in args[1:]:
-                if arg.startswith('--speed='):
-                    try:
-                        speed = float(arg.split('=')[1])
-                    except:
-                        pass
-            
-            wifi = WiFiAudit(interface=interface)
-            wifi.pen_speed = speed
-            wifi.run()
-            
-        except KeyboardInterrupt:
-            print(f"\n{Fore.YELLOW}[!] WiFi scan interrupted{Style.RESET_ALL}")
-        except Exception as e:
-            self._print_error(f"WiFi scan failed: {str(e)}")
-    
-    def cmd_wifi_help(self, args=None):
-        """Show WiFi audit help"""
-        if not WIFI_AUDIT_AVAILABLE:
-            self._print_error("WiFi Audit module not available.")
-            return
+            print("\n" + "="*60)
+            print("📡 Live Network Monitoring")
+            print("="*60)
+            print("Press Ctrl+C to stop monitoring")
+            print("="*60 + "\n")
         
-        help_text = f"""
-{Fore.CYAN}╔═══════════════════════════════════════════════════════════════════════════╗
-║                     📡 WIFI SECURITY AUDIT COMMANDS  v{WiFiAudit.VERSION}           ║
-╠═══════════════════════════════════════════════════════════════════════════╣
-║  {Fore.YELLOW}wifi{Fore.CYAN}                    - Run WiFi security audit (auto-detect)
-║  {Fore.YELLOW}wifi-scan{Fore.CYAN}              - Quick WiFi scan
-║  {Fore.YELLOW}wifi-live{Fore.CYAN}              - Live monitoring mode (refreshes)
-║  {Fore.YELLOW}wifi-interface{Fore.CYAN} <iface> - Scan using specific interface
-║  {Fore.YELLOW}wifi-help{Fore.CYAN}              - Show this help
-║  {Fore.YELLOW}wifi-status{Fore.CYAN}            - Show WiFi module status
-║                                                               ║
-║  {Fore.YELLOW}Options:{Fore.CYAN}                                                 ║
-║  {Fore.GREEN}wifi --speed=0.02{Fore.CYAN}      - Set typing speed
-║  {Fore.GREEN}wifi-interface wlan0{Fore.CYAN}   - Scan using wlan0
-║                                                               ║
-║  {Fore.YELLOW}Features:{Fore.CYAN}                                                 ║
-║  • Detect and analyze nearby WiFi networks                   ║
-║  • Identify security protocols (WEP, WPA, WPA2, WPA3)       ║
-║  • Detect rogue access points                                ║
-║  • Signal strength analysis and mapping                      ║
-║  • Generate detailed reports (JSON, PDF, HTML)              ║
-║  • Cross-platform support (Windows, Linux, macOS)           ║
-║                                                               ║
-║  {Fore.YELLOW}Examples:{Fore.CYAN}                                                 ║
-║  {Fore.GREEN}wifi{Fore.CYAN}                  - Auto-detect and scan
-║  {Fore.GREEN}wifi wlan0{Fore.CYAN}           - Scan using wlan0 interface
-║  {Fore.GREEN}wifi-live{Fore.CYAN}            - Start live monitoring
-║  {Fore.GREEN}wifi-interface eth1{Fore.CYAN}  - Scan using eth1
-╚═══════════════════════════════════════════════════════════════════════════╝{Style.RESET_ALL}
-"""
+            # Run with live flag
+            import subprocess
+            import sys
+        
+            # Get path to network_audit.py
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            script_path = os.path.join(script_dir, 'network_audit.py')
+        
+            if os.path.exists(script_path):
+                subprocess.run([sys.executable, script_path, '--live'])
+            else:
+                print("[!] network_audit.py not found")
+                return None
+        
+            return None
+        
+        except KeyboardInterrupt:
+            print("\n[!] Live monitoring stopped")
+            return None
+        except Exception as e:
+            print(f"[!] Error: {e}")
+            return None
+
+    def cmd_network_status(self, args):
+        """Show network module status"""
+        print("\n" + "="*50)
+        print("🌐 NETWORK MODULE STATUS")
+        print("="*50)
+        print(f"  Module Available: {'✅ Yes' if NETWORK_AUDIT_AVAILABLE else '❌ No'}")
+        print(f"  Platform: {platform.system()}")
+        print(f"  Hostname: {socket.gethostname()}")
+    
+        if NETWORK_AUDIT_AVAILABLE:
+            try:
+                # Check if NetworkAudit class is accessible
+                temp = NetworkAudit()
+                print(f"  Version: {temp.VERSION}")
+                print(f"  Supports WiFi + Ethernet: ✅ Yes")
+            
+                # Detect interfaces
+                interfaces = temp._detect_all_interfaces()
+                wifi_count = len([i for i in interfaces if i.get('type') == 'WiFi'])
+                eth_count = len([i for i in interfaces if i.get('type') == 'Ethernet'])
+            
+                print(f"  WiFi Interfaces Found: {wifi_count}")
+                print(f"  Ethernet Interfaces Found: {eth_count}")
+            
+            except Exception as e:
+                print(f"  Error checking module: {e}")
+    
+        print("="*50 + "\n")
+        return None
+
+    def cmd_network_help(self, args):
+        """Show network audit help"""
+        help_text = """
+    ╔══════════════════════════════════════════════════════════════╗
+    ║                    🌐 NETWORK AUDIT COMMANDS                ║
+    ╠══════════════════════════════════════════════════════════════╣
+    ║  network / net        - Scan WiFi + Ethernet networks      ║
+    ║  network-scan / net-scan - Scan all networks              ║
+    ║  network-wifi / net-wifi - Scan WiFi only                 ║
+    ║  network-eth / net-eth   - Scan Ethernet only             ║
+    ║  network-live / net-live  - Live monitoring               ║
+    ║  wifi-interface / net-interface - Use specific interface ║
+    ║  network-status / net-status - Show status               ║
+    ║  network-help / net-help   - Show help                   ║
+    ╠══════════════════════════════════════════════════════════════╣
+    ║ Examples:                                                   ║
+    ║  network                     - Full network audit           ║
+    ║  network wlan0               - Use specific interface      ║
+    ║  network-wifi                - WiFi only scan              ║
+    ║  network-eth                 - Ethernet only scan          ║
+    ║  network-live                - Live monitoring mode        ║
+    ║  wifi-interface wlan0        - Scan with wlan0             ║
+    ╚══════════════════════════════════════════════════════════════╝
+        """
         print(help_text)
-    
-    def cmd_wifi_status(self, args=None):
-        """Show WiFi module status"""
-        print(f"\n{Fore.CYAN}╔══════════════════════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.WHITE}📡 WIFI AUDIT MODULE STATUS{Fore.CYAN}                                  ║{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}╠════════════════════════════════════════════════════════════════╣{Style.RESET_ALL}")
-        
-        if WIFI_AUDIT_AVAILABLE:
-            print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.GREEN}✅{Style.RESET_ALL} Module Status:  Loaded Successfully           {Fore.CYAN}║{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.CYAN}📌{Style.RESET_ALL} Version:        {WiFiAudit.VERSION}                    {Fore.CYAN}║{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.CYAN}📌{Style.RESET_ALL} Platform:       {platform.system()}                      {Fore.CYAN}║{Style.RESET_ALL}")
-            
-            # Check PDF availability
-            try:
-                import reportlab
-                print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.GREEN}✅{Style.RESET_ALL} PDF Support:     Available (reportlab)            {Fore.CYAN}║{Style.RESET_ALL}")
-            except:
-                print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.RED}❌{Style.RESET_ALL} PDF Support:     Not installed (pip install reportlab){Fore.CYAN}║{Style.RESET_ALL}")
-            
-            # Check for wireless interface
-            try:
-                if platform.system() == "Windows":
-                    result = subprocess.run(['netsh', 'wlan', 'show', 'interfaces'], 
-                                          capture_output=True, text=True, timeout=5)
-                    if 'SSID' in result.stdout:
-                        print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.GREEN}✅{Style.RESET_ALL} WiFi Hardware:   Detected                      {Fore.CYAN}║{Style.RESET_ALL}")
-                    else:
-                        print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.YELLOW}⚠️{Style.RESET_ALL} WiFi Hardware:   Not detected/No adapter       {Fore.CYAN}║{Style.RESET_ALL}")
-                else:
-                    result = subprocess.run(['iwconfig'], capture_output=True, text=True, timeout=5)
-                    if 'IEEE 802.11' in result.stdout:
-                        print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.GREEN}✅{Style.RESET_ALL} WiFi Hardware:   Detected                      {Fore.CYAN}║{Style.RESET_ALL}")
-                    else:
-                        print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.YELLOW}⚠️{Style.RESET_ALL} WiFi Hardware:   Not detected                  {Fore.CYAN}║{Style.RESET_ALL}")
-            except:
-                print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.YELLOW}⚠️{Style.RESET_ALL} WiFi Hardware:   Unable to check                {Fore.CYAN}║{Style.RESET_ALL}")
-            
-        else:
-            print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.RED}❌{Style.RESET_ALL} Module Status:  NOT Loaded                    {Fore.CYAN}║{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.YELLOW}⚠️{Style.RESET_ALL} Action:         Download wifi_audit.py        {Fore.CYAN}║{Style.RESET_ALL}")
-        
-        print(f"{Fore.CYAN}╠════════════════════════════════════════════════════════════════╣{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.YELLOW}Type 'wifi' to start scanning{Fore.CYAN}                              ║{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}╚════════════════════════════════════════════════════════════════╝{Style.RESET_ALL}")
-        print()
-    
+        return None
+
     def cmd_modules_status(self, args=None):
         """Show status of all loaded modules"""
         self.console.print(f"\n[cyan]╔══════════════════════════════════════════════════════════════╗[/]")
@@ -3774,8 +4209,8 @@ class SecurityTerminal:
             self.console.print(f"[cyan]║[/]  [red]❌[/red] IOC Education Module  Not Available           [cyan]║[/]")
         
         # WiFi Audit Module
-        if WIFI_AUDIT_AVAILABLE:
-            self.console.print(f"[cyan]║[/]  [green]✅[/green] WiFi Audit Module     v{WiFiAudit.VERSION}        [cyan]║[/]")
+        if NETWORK_AUDIT_AVAILABLE:
+            self.console.print(f"[cyan]║[/]  [green]✅[/green] WiFi Audit Module     v{NetworkAudit.VERSION}        [cyan]║[/]")
         else:
             self.console.print(f"[cyan]║[/]  [red]❌[/red] WiFi Audit Module     Not Available           [cyan]║[/]")
         
@@ -4025,8 +4460,8 @@ class SecurityTerminal:
             self.console.print(f"[cyan]║[/]  [red]❌[/red] IOC Education Module  Not Available           [cyan]║[/]")
         
         # WiFi Audit Module
-        if WIFI_AUDIT_AVAILABLE:
-            self.console.print(f"[cyan]║[/]  [green]✅[/green] WiFi Audit Module     v{WiFiAudit.VERSION}        [cyan]║[/]")
+        if NETWORK_AUDIT_AVAILABLE:
+            self.console.print(f"[cyan]║[/]  [green]✅[/green] WiFi Audit Module     v{NetworkAudit.VERSION}        [cyan]║[/]")
         else:
             self.console.print(f"[cyan]║[/]  [red]❌[/red] WiFi Audit Module     Not Available           [cyan]║[/]")
         
@@ -15683,7 +16118,29 @@ class SecurityTerminal:
             self.harden_ssh_only()
             return
     # ==================== END HARDENING COMMANDS ====================
-    # ====================start of sqlmap commands shortcuts=========================
+            # ========== DASHBOARD COMMANDS HERE ==========
+        elif cmd in ["dashboard", "dash", "security-dashboard"]:
+             self.cmd_dashboard([])
+             return
+            
+        elif cmd in ["dashboard-stop", "dash-stop"]:
+             self.cmd_dashboard_stop([])
+             return
+            
+        elif cmd in ["dashboard-status", "dash-status"]:
+             self.cmd_dashboard_status([])
+             return
+            
+        elif cmd in ["dashboard-browser", "dash-browser"]:
+             self.cmd_dashboard_browser([])
+             return
+            
+        elif cmd in ["dashboard-help", "dash-help"]:
+             self.cmd_dashboard_help([])
+             return
+    
+
+# ====================start of sqlmap commands shortcuts=========================
         # Add these to your process_handle() method
 
         # Handle 'soc' commands first
@@ -15723,31 +16180,33 @@ class SecurityTerminal:
                 print("   Available: start, stop, status, dashboard, enhanced, ioc, scan, report, help")
                 return
         # =============================================
-          # WIFI AUDIT COMMANDS
-        # ============================================================
-        elif cmd in ["wifi", "wifi-scan", "wifi-audit", "wifi-info", "wifiinfo"]:
-            # Run WiFi security audit
-            self.cmd_wifi(args)
+        # ENHANCED NETWORK AUDIT COMMANDS (WiFi + Ethernet)
+        # =============================================
+
+        # WiFi aliases now point to network audit
+        elif cmd in ["wifi", "wifi-scan", "wifi-audit", "wifi-info", "wifiinfo", "network", "net"]:
+            # Run network security audit (WiFi + Ethernet)
+            self.cmd_network_scan(args)
             return
 
-        elif cmd in ["wifi-live"]:
-            # Live WiFi monitoring mode
-            self.cmd_wifi_live(args)
+        elif cmd in ["wifi-live", "net-live"]:
+            # Live network monitoring
+            self.cmd_network_live(args)
             return
 
-        elif cmd in ["wifi-interface"]:
-            # Scan using specific WiFi interface
-            self.cmd_wifi_interface(args)
+        elif cmd in ["wifi-interface", "net-interface"]:
+            # Scan using specific interface
+            self.cmd_network_interface(args)
             return
 
-        elif cmd in ["wifi-help"]:
-            # Show WiFi audit help
-            self.cmd_wifi_help()
+        elif cmd in ["wifi-help", "net-help"]:
+            # Show network audit help
+            self.cmd_network_help(args)
             return
 
-        elif cmd in ["wifi-status"]:
-            # Show WiFi module status
-            self.cmd_wifi_status()
+        elif cmd in ["wifi-status", "net-status"]:
+            # Show network module status
+            self.cmd_network_status(args)
             return
 
         # ============================================================
@@ -17161,7 +17620,7 @@ class SecurityTerminal:
             self.monitor_ransomware()
             self.show_tip(cmd)
         elif cmd.startswith("wifi-info"): 
-            self.wifi_audit(cmd.split()[1] if len(cmd.split()) > 1 else "wlp2s0")
+            self.NetworkAudit(cmd.split()[1] if len(cmd.split()) > 1 else "wlp2s0")
             self.show_tip(cmd)
         elif cmd.startswith("stegcheck"): 
             self.check_steganography(cmd.split()[1] if len(cmd.split()) > 1 else input("Image path: "))
@@ -17283,6 +17742,13 @@ class SecurityTerminal:
                 ("dnssec [DOMAIN]", "Validate DNSSEC"),
                 ("nmap <TARGET>", "Basic port scan"),
                 ("nmap -sS <TARGET>", "Stealth SYN scan"),
+                ("network",          "# Full network audit (WiFi + Ethernet)"),
+                ("network-wifi",     " # WiFi only"),
+                ("network-eth",      " # Ethernet only"),
+                ("network-live",     " # Live monitoring"),
+                ("network wlan0",    "# Use specific interface"),
+                ("network-status",   "# Check module status"),
+                ("network-help",     "# Show help"),
                 ("nmap -sU <TARGET>", "UDP port scan"),
                 ("nmap -O <TARGET>", "OS fingerprinting"),
                 ("msfvenom", "Generate payloads for exploits"),
@@ -17402,6 +17868,8 @@ class SecurityTerminal:
                 ("reload", "Reload configuration"),
                 ("refresh", "Refresh system state"),
                 ("sysinfo", "Detailed system report"),
+                ("dashboard", "starting the dsterminal security dashboard"),
+                ("security-dashboard", "startin the security dashboard"),
                 ("scan-full", "Run full system scan"),
                 ("full-scan", "Run full system scan"),
                 ("deep-scan", "Run deep system scan"),
@@ -17834,12 +18302,134 @@ class SecurityTerminal:
 
 # --------------------help menu ends here from above========================
 # =============================END==========================================
+    from prompt_toolkit.styles import Style as PromptStyle
 
+    def _start_cursor_blink(self):
+        """Start the animated cursor in a background thread"""
+        self.cursor_running = True
+        self.cursor_thread = threading.Thread(target=self._animate_cursor, daemon=True)
+        self.cursor_thread.start()
+    
+    def _animate_cursor(self):
+        """Animate cursor with blinking and color cycling"""
+        while self.cursor_running:
+            self.cursor_visible = not self.cursor_visible
+            if not self.cursor_visible:
+                self.cursor_color_index = (self.cursor_color_index + 1) % len(self.cursor_colors)
+            time.sleep(0.5)
+    
+    def _get_cursor_char(self) -> str:
+        """Return the cursor character based on blink state"""
+        return "▌" if self.cursor_visible else " "
+    
+    def _get_cursor_color(self) -> str:
+        """Get the current cursor color"""
+        return self.cursor_colors[self.cursor_color_index]
+    
+    def _get_uptime(self) -> str:
+        """Get formatted uptime"""
+        if hasattr(self, 'start_time'):
+            uptime = datetime.now() - self.start_time
+            hours = int(uptime.total_seconds() // 3600)
+            minutes = int((uptime.total_seconds() % 3600) // 60)
+            return f"{hours}h {minutes}m"
+        return "0h 0m"
+    
+    def _update_siem_metrics(self):
+        """Update SIEM metrics in real-time"""
+        # Simulate live data changes
+        self.alert_count += random.randint(-5, 10)
+        self.alert_count = max(100, min(400, self.alert_count))
+        
+        self.critical_alerts += random.randint(-1, 2)
+        self.critical_alerts = max(5, min(30, self.critical_alerts))
+        
+        self.high_alerts += random.randint(-2, 3)
+        self.high_alerts = max(20, min(80, self.high_alerts))
+        
+        self.incident_count += random.randint(-1, 1)
+        self.incident_count = max(8, min(25, self.incident_count))
+        
+        self.risk_score += random.randint(-2, 3)
+        self.risk_score = max(50, min(95, self.risk_score))
+        
+        self.event_rate += random.randint(-10, 20)
+        self.event_rate = max(50, min(300, self.event_rate))
+        
+        self.active_sessions += random.randint(-1, 1)
+        self.active_sessions = max(1, min(10, self.active_sessions))
+    
+    def _get_prompt_siem_dashboard(self) -> HTML:
+        """Multi-Line SIEM Dashboard Prompt with live stats"""
+        # Update metrics
+        self._update_siem_metrics()
+        
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        hostname = socket.gethostname()
+        version = "3.1.113"
+        
+        # Get cursor
+        cursor_char = self._get_cursor_char()
+        cursor_color = self._get_cursor_color()
+        
+        # Color coding based on values
+        alert_color = 'ansired' if self.alert_count > 300 else 'ansiyellow' if self.alert_count > 200 else 'ansigreen'
+        critical_color = 'ansired' if self.critical_alerts > 20 else 'ansiyellow' if self.critical_alerts > 10 else 'ansigreen'
+        high_color = 'ansiyellow' if self.high_alerts > 50 else 'ansigreen'
+        incident_color = 'ansired' if self.incident_count > 15 else 'ansiyellow' if self.incident_count > 10 else 'ansigreen'
+        risk_color = 'ansired' if self.risk_score > 70 else 'ansiyellow' if self.risk_score > 50 else 'ansigreen'
+        
+        # Build SIEM Dashboard Prompt
+        return HTML(
+            f"<ansiwhite>┌─[</ansiwhite>"
+            f"<ansiyellow>{timestamp}</ansiyellow>"
+            f"<ansiwhite>]</ansiwhite> "
+            f"<ansicyan>📊</ansicyan> "
+            f"<ansigreen>SIEM=>DSTERMINAL CYBER-OPS</ansigreen> "
+            f"<ansiwhite>v{version}</ansiwhite>\n"
+            f"<ansiwhite>├─</ansiwhite> "
+            f"<ansiyellow>Alerts:</ansiyellow> "
+            f"<{alert_color}>{self.alert_count}</{alert_color}> "
+            f"<ansiwhite>│</ansiwhite> "
+            f"<ansiyellow>Critical:</ansiyellow> "
+            f"<{critical_color}>{self.critical_alerts}</{critical_color}> "
+            f"<ansiwhite>│</ansiwhite> "
+            f"<ansiyellow>High:</ansiyellow> "
+            f"<{high_color}>{self.high_alerts}</{high_color}>\n"
+            f"<ansiwhite>├─</ansiwhite> "
+            f"<ansiyellow>Incidents:</ansiyellow> "
+            f"<{incident_color}>{self.incident_count}</{incident_color}> "
+            f"<ansiwhite>│</ansiwhite> "
+            f"<ansiyellow>MTTR:</ansiyellow> "
+            f"<ansigreen>{self.mttr}</ansigreen> "
+            f"<ansiwhite>│</ansiwhite> "
+            f"<ansiyellow>Risk:</ansiyellow> "
+            f"<{risk_color}>{self.risk_score}%</{risk_color}>\n"
+            f"<ansiwhite>├─</ansiwhite> "
+            f"<ansiyellow>EPS (Events Per Second):</ansiyellow> "
+            f"<ansigreen>{self.event_rate}/s</ansigreen> "
+            f"<ansiwhite>│</ansiwhite> "
+            f"<ansiyellow>Sessions:</ansiyellow> "
+            f"<ansicyan>{self.active_sessions}</ansicyan> "
+            f"<ansiwhite>│</ansiwhite> "
+            f"<ansiyellow>Uptime:</ansiyellow> "
+            f"<ansigreen>{self._get_uptime()}</ansigreen>\n"
+            f"<ansiwhite>└─</ansiwhite>"
+            f"<ansired>❯</ansired> "
+            f"<style color='{cursor_color}'>{cursor_char}</style> "
+        )
+    
     def run(self):
+        """Run the terminal with SIEM Dashboard prompt"""
         self.print_banner()
         
         # Define available commands for autocompletion
         COMMANDS = {
+            "help": None,
+            "exit": None,
+            "clear": None,
+            "dashboard": None,
+            "status": None,
             "system": {"scan": None, "info": None},
             "net": {"mon": None, "scan": None},
             "encrypt": None,
@@ -17854,12 +18444,11 @@ class SecurityTerminal:
             "portsweep": None,
             "hashfile": None,
             "sysinfo": None,
+            "security-dashboard": None,
             "exploit": None,
             "exploit-scan": None,
             "vuln": None,
             "vuln-scan": None,
-            # "module-status": None,
-            "net -n mon": None,
             "exploit-list": None,
             "exploit-help": None,
             "dst-modules": None,
@@ -17893,8 +18482,6 @@ class SecurityTerminal:
             "mkdir": None,
             "touch": None,
             "clear": None,
-            "help": None,
-            "exit": None,
             "monitor": None,
             "service": {"start": None, "stop": None, "status": None},
             "list-backups": None,
@@ -17939,7 +18526,6 @@ class SecurityTerminal:
             "sqlmap-lab-status": None,
             "sqlmap-lab": None,
             "sqlmap-secure": None,
-            "certcheck": None,
             "harden": None,
             "harden -t sys": None,
             "harden-quick": None,
@@ -18029,7 +18615,6 @@ class SecurityTerminal:
             "integrity-forensic-report": None,
             "integrity-forensic-timeline-report": None,
             "integrity-forensic-report-timeline": None,
-            "integrity-forensic-timeline-report": None,
             "integ": None,
             "integrity": {"scan": None, "restore": None, "report": None, "forensic": {"timeline": None, "report": None}},
             "integrity": {"monitor": None, "scan": None, "restore": None, "report": None, "forensic": {"timeline": None, "report": None, "alerts": None, "history": None, "logs": None, "pdf": None, "csv": None, "json": None, "xml": None, "list": None, "ls": None, "info": None, "status": None, "help": None}},
@@ -18042,9 +18627,6 @@ class SecurityTerminal:
             "system": {"scan": None, "scan --all": None, "info": None, "report": None, "help": None, "version": None, "update": None, "list": None, "ls": None, "status": None, "logs": None, "pdf": None, "csv": None, "json": None, "xml": None},
             "net": {"mon": None, "scan": None, "report": None, "help": None, "version": None, "update": None, "list": None, "ls": None, "status": None, "logs": None, "pdf": None, "csv": None, "json": None, "xml": None},
             "shutdown": None,
-            "clear": None,
-            "clear terminal": None,
-            "help": None,
             "scan-status": None,
             "scan-quick": None,
             "scan-full": None,
@@ -18053,7 +18635,6 @@ class SecurityTerminal:
             "ds": None,
             "quick-scan": None,
             "ss": None,
-            "killproc": None,
             "dst-logs": None,
             "dst-refresh": None,
             "dst-financial": None,
@@ -18104,7 +18685,6 @@ class SecurityTerminal:
             "wlan-scan": None,
             "soc-intel": None,
             "recon-ng": None,
-            
             "wifi-audit": None,
             "wifi-scan": None,
             "wifi-audit [IFACE]": None,
@@ -18136,20 +18716,33 @@ class SecurityTerminal:
             "webssl": None,
             "web-vuln":None,
             "webvuln": None,
-            
             "web-full":None,
             "webfull": None,
-            }
+        }
         
         completer = NestedCompleter.from_nested_dict(COMMANDS)
-        # Define styles to keep toolbar fixed
-        from prompt_toolkit import PromptSession
-        from prompt_toolkit.styles import Style
-        style = Style.from_dict({
-            'bottom-toolbar': 'bg:#1a1a2e #33ff33',
-            'bottom-toolbar.text': "#078507",
-        })
-
+        
+        # Style for the bottom toolbar
+        try:
+            # Try to import Style class properly
+            from prompt_toolkit.styles import Style as PromptStyle
+            style = PromptStyle([
+                ('bottom-toolbar', 'bg:#1a1a2e #33ff33'),
+                ('bottom-toolbar.text', '#078507'),
+            ])
+        except (ImportError, TypeError):
+            # Fallback: Use dict style
+            try:
+                from prompt_toolkit.styles import Style
+                style = Style.from_dict({
+                    'bottom-toolbar': 'bg:#1a1a2e #33ff33',
+                    'bottom-toolbar.text': '#078507',
+                })
+            except:
+                # Final fallback: No style
+                style = None
+        
+        # Create the prompt session
         self.session = PromptSession(
             history=FileHistory('.dst_history'),
             auto_suggest=AutoSuggestFromHistory(),
@@ -18157,72 +18750,57 @@ class SecurityTerminal:
             bottom_toolbar=HTML(
                 "<b>DSTerminal</b> v{} | Mode: <style bg='{}'>{}</style>"
             ).format(
-                CONFIG["CURRENT_VERSION"],
+                "3.1.113",
                 "ansired" if self.is_admin() else "ansigreen",
                 "ADMIN" if self.is_admin() else "USER",
             ),
             style=style,
-            # Add this to ensure the toolbar doesn't scroll with content
             reserve_space_for_menu=0,
             complete_while_typing=True,
             refresh_interval=0.5,
-            )
+        )
         
         while True:
             try:
-            # Real SOC terminal components:
-            # [TIMESTAMP] [HOSTNAME] [ENV] [SEVERITY] [SESSION] USER@TERMINAL>
-            
-                timestamp = datetime.now().strftime("%H:%M:%S")
-                hostname = socket.gethostname()
-                env = "PROD"  # or "DEV", "STAGING", "INCIDENT"
-            
-            
-            # Dynamic severity based on context
-                if hasattr(self, 'current_incident') and self.current_incident:
-                    severity = f"<ansired>CRITICAL</ansired>"
-                elif hasattr(self, 'active_threats') and self.active_threats > 0:
-                    severity = f"<ansiyellow>HIGH</ansiyellow>"
-                else:
-                    severity = f"<ansigreen>NORMAL</ansigreen>"
-            
-            # Session/ticket tracking
-                session_id = getattr(self, 'session_id', 'SOC001')
-                session_id = self.session_id
-            
-            # Build the SOC prompt
-                prompt_text = HTML(
-                    f"<ansiwhite>[{timestamp}]</ansiwhite> "
-                    f"<ansicyan>{hostname}</ansicyan> "
-                    f"<ansiyellow>[{env}]</ansiyellow> "
-                    f"{severity} "
-                    f"<ansimagenta>[{session_id}]</ansimagenta>\n"
-                    f"<ansigreen>🔹 {self.operator_username}</ansigreen> "
-                    f"<ansiwhite>@</ansiwhite> "
-                    f"<ansiblue>soc-terminal</ansiblue> "
-                    f"<ansiwhite>:</ansiwhite> "
-                    f"<ansired>~$ </ansired>"
-                )
-            
+                # Build SIEM Dashboard prompt with animated cursor
+                prompt_text = self._get_prompt_siem_dashboard()
+                
+                # Get user input
                 user_input = self.session.prompt(prompt_text)
+                
                 self.log_command(user_input)
-                # Log the command to SIEM
                 self.log_to_siem(f"Command executed: {user_input}")
-                # Detect exit command
+                
                 if user_input.lower() == "exit":
                     self.save_session_end()
-                    print_formatted_text(HTML("<ansiyellow>[+] Operator session closed. Log saved.</ansiyellow>"))
+                    from rich import print as rich_print
+                    rich_print("\033[93md. Log saved.\033[0m")
                     break
-
-                # Handle normal commands
+                
                 self.handle_command(user_input.strip())
-            
+                
             except KeyboardInterrupt:
                 print("\n[!] Use 'exit' to quit or 'help' for commands")
             except Exception as e:
                 print(f"[!] SOC Terminal Error: {str(e)}")
-            # Log to SIEM
                 self.log_to_siem(f"Terminal error: {str(e)}")
+    
+    def stop_cursor_animation(self):
+        """Stop the cursor animation thread"""
+        self.cursor_running = False
+        if hasattr(self, 'cursor_thread') and self.cursor_thread:
+            self.cursor_thread.join(timeout=1)
+
+@contextlib.contextmanager
+def suppress_output():
+    """Context manager to suppress stdout"""
+    with open(os.devnull, 'w') as devnull:
+        old_stdout = sys.stdout
+        sys.stdout = devnull
+        try:
+            yield
+        finally:
+            sys.stdout = old_stdout
 
 if __name__ == "__main__":
     if '--monitor-only' in sys.argv:
@@ -18231,20 +18809,32 @@ if __name__ == "__main__":
         
         workspace_path = sys.argv[ws_idx + 1] if ws_idx else os.getcwd()
         
-        print("""
+        # Check for quiet mode
+        quiet = '--quiet' in sys.argv or '-q' in sys.argv
+        
+        # Show banner only if not quiet
+        if not quiet:
+            print("""
 ╔══════════════════════════════════════════════════════╗
 ║         DSTERMINAL DELETION PROTECTION               ║
 ║         Background Monitoring Active                 ║
 ║         Close this window to stop                    ║
 ╚══════════════════════════════════════════════════════╝
-        """)
+            """)
         
         # Load config with all paths
         if paths_idx:
             monitor_paths = sys.argv[paths_idx + 1].split(',')
         else:
-            pd = PlatformDetector()
-            monitor_paths = pd.get_trash_paths()
+            if quiet:
+                with suppress_output():
+                    from deletion_protection import PlatformDetector
+                    pd = PlatformDetector()
+                    monitor_paths = pd.get_trash_paths()
+            else:
+                from deletion_protection import PlatformDetector
+                pd = PlatformDetector()
+                monitor_paths = pd.get_trash_paths()
         
         config = {
             'version': '3.1.113',
@@ -18254,23 +18844,39 @@ if __name__ == "__main__":
             'encrypt_backups': False,
         }
         
-        ws = SimpleWorkspace(workspace_path)
-        monitor = DSTerminalMonitor(config, ws, interactive=False, ui=None)
+        # Initialize workspace and monitor
+        if quiet:
+            with suppress_output():
+                ws = SimpleWorkspace(workspace_path)
+                monitor = DSTerminalMonitor(config, ws, interactive=False, ui=None)
+        else:
+            ws = SimpleWorkspace(workspace_path)
+            monitor = DSTerminalMonitor(config, ws, interactive=False, ui=None)
         
         from watchdog.observers import Observer
         observer = Observer()
         
+        monitored_count = 0
         for path in monitor_paths:
             if os.path.exists(path):
                 try:
                     observer.schedule(monitor, path=path, recursive=True)
-                    print(f"  ✓ Monitoring: {path}")
+                    if not quiet:
+                        print(f"  ✓ Monitoring: {path}")
+                    monitored_count += 1
                 except Exception as e:
-                    print(f"  ✗ Skipping {path}: {e}")
+                    if not quiet:
+                        print(f"  ✗ Skipping {path}: {e}")
+            else:
+                if not quiet:
+                    print(f"  ✗ Path not found: {path}")
         
         observer.start()
-        print(f"\n[*] Monitoring {len(monitor_paths)} folders.")
-        print("[*] Press Ctrl+C to stop.\n")
+        
+        if not quiet:
+            print(f"\n[*] Monitoring {monitored_count} folders.")
+            print("[*] Press Ctrl+C to stop.\n")
+        
         sys.stdout.flush()
         
         try:
@@ -18278,14 +18884,23 @@ if __name__ == "__main__":
                 time.sleep(1)
                 sys.stdout.flush()
         except KeyboardInterrupt:
-            print("\n[*] Stopping...")
+            if not quiet:
+                print("\n[*] Stopping...")
             observer.stop()
             observer.join()
             monitor.cleanup()
-            print("[✓] Monitoring stopped.")
+            if not quiet:
+                print("[✓] Monitoring stopped.")
         
         sys.exit(0)
     
     # Normal terminal startup
-    terminal = SecurityTerminal()
+    quiet = '--quiet' in sys.argv or '-q' in sys.argv
+    
+    if quiet:
+        # Initialize with quiet mode
+        terminal = SecurityTerminal(quiet=True)
+    else:
+        terminal = SecurityTerminal()
+    
     terminal.run()

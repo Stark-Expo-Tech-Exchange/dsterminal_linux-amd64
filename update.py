@@ -161,7 +161,7 @@ class UpdateManager:
             "🚀 System will be ready for restart...",
             "📊 Update summary will be generated...",
             "🎉 Update process verification successful!",
-                        "⚡ Applying optimizations...",
+            "⚡ Applying optimizations...",
             "🔄 Rolling back failed components...",
             "🔐 Encrypting sensitive data...",
             "🧩 Integrating with system services...",
@@ -240,13 +240,6 @@ class UpdateManager:
         """Check GitHub for latest release"""
         try:
             import requests
-
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    pass
-
             from datetime import datetime
             
             # Get current version from config
@@ -344,7 +337,6 @@ except ImportError:
                 asset_name = selected_asset.get("name")
                 asset_size = selected_asset.get("size", 0)
                 self.console.print(f"[dim]Found asset: {asset_name} ({asset_size:,} bytes)[/dim]")
-
             
             return {
                 "version": version,
@@ -365,13 +357,6 @@ except ImportError:
         """Download update with progress bar - Supports both public and private repos"""
         try:
             import requests
-
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    pass
-
             import os
             
             self.console.print(f"\n[cyan]📥 Downloading update from DSTerminal Update Module...[/cyan]")
@@ -949,7 +934,7 @@ if __name__ == "__main__":
         def __init__(self):
             self.config = {
                 "CURRENT_VERSION": "3.1.113",
-                "GITHUB_TOKEN": os.environ.get("GITHUB_TOKEN", "os.environ.get("GITHUB_TOKEN", "")")
+                "GITHUB_TOKEN": os.environ.get("GITHUB_TOKEN", "")
             }
         
         def get(self, key, default=None):

@@ -1,7 +1,8 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\tools"
   ],
-  "SelectedNode": "\\installer_output",
+  "SelectedNode": "\\wifi_audit.py",
   "PreviewInSolutionExplorer": false
 }

@@ -8,7 +8,7 @@ Complete security lab environment with:
 - Integrated Interactive Dashboard
 - Process & Application Monitoring
 - Menu-Driven Interface
-- Automated Reporting with DSTERMINAL v4.0.0.113 Watermark
+- Automated Reporting with DSTERMINAL v3.1.113 Watermark
 - Cross-platform Support
 """
 
@@ -96,7 +96,7 @@ from soc_enhanced_modules import EnhancedModulesManager
 # CONSTANTS
 # ============================================================
 
-VERSION = "v4.0.0.113"
+VERSION = "v3.1.113"
 PLATFORM = "DSTERMINAL Cyber Ops Platform"
 WATERMARK_TEXT = f"{PLATFORM} {VERSION}"
 

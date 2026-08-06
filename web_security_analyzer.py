@@ -3069,42 +3069,29 @@ class SecurityDashboard:
             .replace("'", '&#39;')
             .encode('ascii', 'xmlcharrefreplace')
             .decode('ascii'))
-    
+
     def _export_html(self):
         """Export to HTML with platform-specific remediation"""
         try:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = os.path.expanduser(f"~/DSTerminal_Workspace/reports/report_{timestamp}.html")
             os.makedirs(os.path.dirname(filename), exist_ok=True)
-            
-            # Use self.escape_html instead of the undefined escape_html function
-            def escape_html(text):
-                if not text:
-                    return ""
-                return (str(text)
-                    .replace('&', '&amp;')
-                    .replace('<', '&lt;')
-                    .replace('>', '&gt;')
-                    .replace('"', '&quot;')
-                    .replace("'", '&#39;')
-                    .encode('ascii', 'xmlcharrefreplace')
-                    .decode('ascii'))
-            
+        
             # Generate platform info HTML
             platform = self.current_report.platform_remediation.get('platform', {})
             platform_html = f'''
             <div class="platform-info">
                 <h3>Detected Platform</h3>
                 <table>
-                    <tr><td><strong>Web Server:</strong></td><td>{escape_html(platform.get('webserver', 'Unknown'))}</td></tr>
-                    <tr><td><strong>Operating System:</strong></td><td>{escape_html(platform.get('os', 'Unknown'))}</td></tr>
-                    <tr><td><strong>Language:</strong></td><td>{escape_html(platform.get('language', 'Unknown'))}</td></tr>
-                    <tr><td><strong>Framework:</strong></td><td>{escape_html(platform.get('framework', 'None detected'))}</td></tr>
-                    <tr><td><strong>Cloud Provider:</strong></td><td>{escape_html(platform.get('cloud_provider', 'None detected'))}</td></tr>
+                    <tr><td><strong>Web Server:</strong></td><td>{self.escape_html(platform.get('webserver', 'Unknown'))}</td></tr>
+                    <tr><td><strong>Operating System:</strong></td><td>{self.escape_html(platform.get('os', 'Unknown'))}</td></tr>
+                    <tr><td><strong>Language:</strong></td><td>{self.escape_html(platform.get('language', 'Unknown'))}</td></tr>
+                    <tr><td><strong>Framework:</strong></td><td>{self.escape_html(platform.get('framework', 'None detected'))}</td></tr>
+                    <tr><td><strong>Cloud Provider:</strong></td><td>{self.escape_html(platform.get('cloud_provider', 'None detected'))}</td></tr>
                 </table>
             </div>
             '''
-            
+        
             # Generate findings HTML with platform-specific remediation
             findings_html = ''
             for f in self.current_report.findings:
@@ -3113,35 +3100,35 @@ class SecurityDashboard:
                     remediation_html = '<div class="remediation"><h4>🔧 Platform-Specific Remediation</h4>'
                     for config_type, config_data in f.remediation_configs.items():
                         if config_data:
-                            remediation_html += f'<h5>{escape_html(config_data.get("title", config_type))}</h5>'
+                            remediation_html += f'<h5>{self.escape_html(config_data.get("title", config_type))}</h5>'
                             if config_data.get('code'):
-                                remediation_html += f'<div class="remediation-code">{escape_html(config_data["code"])}</div>'
+                                remediation_html += f'<div class="remediation-code">{self.escape_html(config_data["code"])}</div>'
                             if config_data.get('commands'):
                                 remediation_html += '<div class="commands">'
                                 for cmd in config_data.get('commands', []):
                                     if cmd.strip():
-                                        remediation_html += f'$ {escape_html(cmd)}\n'
+                                        remediation_html += f'$ {self.escape_html(cmd)}\n'
                                 remediation_html += '</div>'
                     remediation_html += '</div>'
-                
+            
                 findings_html += f'''
                 <div class="finding severity-{f.severity.lower()}">
-                    <h3>{escape_html(f.severity)}: {escape_html(f.title)}</h3>
-                    <p><strong>Category:</strong> {escape_html(f.category)}</p>
-                    <p><strong>Description:</strong> {escape_html(f.description)}</p>
-                    <p><strong>Recommendation:</strong> {escape_html(f.recommendation)}</p>
-                    {f'<p><strong>CVE:</strong> {escape_html(f.cve)}</p>' if f.cve else ''}
-                    {f'<p><strong>Evidence:</strong> <code>{escape_html(f.evidence)}</code></p>' if f.evidence else ''}
+                    <h3>{self.escape_html(f.severity)}: {self.escape_html(f.title)}</h3>
+                    <p><strong>Category:</strong> {self.escape_html(f.category)}</p>
+                    <p><strong>Description:</strong> {self.escape_html(f.description)}</p>
+                    <p><strong>Recommendation:</strong> {self.escape_html(f.recommendation)}</p>
+                    {f'<p><strong>CVE:</strong> {self.escape_html(f.cve)}</p>' if f.cve else ''}
+                    {f'<p><strong>Evidence:</strong> <code>{self.escape_html(f.evidence)}</code></p>' if f.evidence else ''}
                     <p><strong>Fix Priority:</strong> {getattr(f, 'fix_priority', 'MEDIUM')}</p>
                     {remediation_html}
                 </div>
                 '''
-            
+        
             html = f'''<!DOCTYPE html>
     <html>
     <head>
         <meta charset="UTF-8">
-        <title>Security Report - {escape_html(self.current_report.url)}</title>
+        <title>Security Report - {self.escape_html(self.current_report.url)}</title>
         <style>
             body {{ font-family: 'Courier New', monospace; background: #0a0e0a; color: #00ff41; margin: 40px; }}
             .container {{ max-width: 1400px; margin: 0 auto; }}
@@ -3168,33 +3155,33 @@ class SecurityDashboard:
         <div class="container">
             <div class="header">
                 <h1>Web Security Analysis Report</h1>
-                <p>URL: {escape_html(self.current_report.url)}</p>
-                <p>Date: {escape_html(self.current_report.timestamp)}</p>
+                <p>URL: {self.escape_html(self.current_report.url)}</p>
+                <p>Date: {self.escape_html(self.current_report.timestamp)}</p>
                 <p>Risk Score: {self.current_report.risk_score}/100</p>
                 <p>Generated by: {PLATFORM} {VERSION}</p>
             </div>
             <div class="summary">
                 <h2>Executive Summary</h2>
-                <pre>{escape_html(self.current_report.summary)}</pre>
+                <pre>{self.escape_html(self.current_report.summary)}</pre>
             </div>
             <h2>Server Information</h2>
             <table>
                 <tr><th>Property</th><th>Value</th></tr>
-                {''.join(f'<tr><td>{escape_html(k)}</td><td>{escape_html(v)}</td></tr>' for k, v in self.current_report.server_info.items())}
+                {''.join(f'<tr><td>{self.escape_html(k)}</td><td>{self.escape_html(v)}</td></tr>' for k, v in self.current_report.server_info.items())}
             </table>
             <h2>Technologies Detected</h2>
-            <p>{', '.join(escape_html(t) for t in self.current_report.technologies) if self.current_report.technologies else 'None'}</p>
+            <p>{', '.join(self.escape_html(t) for t in self.current_report.technologies) if self.current_report.technologies else 'None'}</p>
             {platform_html}
             <h2>Security Headers</h2>
             <table>
                 <tr><th>Header</th><th>Value</th><th>Status</th></tr>
-                {''.join(f'<tr><td>{escape_html(h)}</td><td>{escape_html(v)}</td><td>{v != "Not Set" and "✅ Set" or "❌ Missing"}</td></tr>' for h, v in self.current_report.security_headers.items())}
+                {''.join(f'<tr><td>{self.escape_html(h)}</td><td>{self.escape_html(v)}</td><td>{v != "Not Set" and "✅ Set" or "❌ Missing"}</td></tr>' for h, v in self.current_report.security_headers.items())}
             </table>
             <h2>Security Findings with Platform-Specific Remediation ({len(self.current_report.findings)})</h2>
             {findings_html}
             <h2>Exposed Files ({len(self.current_report.exposed_files)})</h2>
             <ul>
-                {''.join(f'<li>{escape_html(f)}</li>' for f in self.current_report.exposed_files[:20])}
+                {''.join(f'<li>{self.escape_html(f)}</li>' for f in self.current_report.exposed_files[:20])}
                 {f'<li>... and {len(self.current_report.exposed_files) - 20} more</li>' if len(self.current_report.exposed_files) > 20 else ''}
             </ul>
             <div class="watermark">
@@ -3206,20 +3193,21 @@ class SecurityDashboard:
         </div>
     </body>
     </html>'''
-            
+        
             with open(filename, 'w', encoding='utf-8') as f:
                 f.write(html)
-            
+        
             self.console.print(f"[green]✅ HTML saved: {filename}[/green]")
-            
+        
             try:
                 webbrowser.open(f"file://{filename}")
             except:
                 pass
-                
+            
         except Exception as e:
             self.console.print(f"[red]❌ HTML export failed: {e}[/red]")
-            
+
+
     def _generate_remediation_html(self, configs: Dict) -> str:
         """Generate HTML for remediation configurations"""
         if not configs:

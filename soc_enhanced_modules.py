@@ -683,7 +683,7 @@ class EnhancedReportGenerator:
         report = {
             'metadata': {
                 'generated': datetime.now().isoformat(),
-                'version': 'v4.0.0.113',
+                'version': 'v3.1.113',
                 'platform': 'DSTERMINAL Cyber Ops Platform'
             },
             'executive_summary': self._generate_executive_summary(threats, stats),
