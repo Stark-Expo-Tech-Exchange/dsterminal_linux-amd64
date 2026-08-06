@@ -1,10 +1,4 @@
-﻿Here is a **comprehensive, professional `README.md`** file tailored specifically for your **DSTerminal v4.0.0.113** project. 
-
-It covers installation, license validation (the 3-attempt system you built), features, dependencies, and a clear legal disclaimer for an offensive security tool.
-
----
-
-### Instructions:
+﻿### Instructions:
 1. Open a new text file in your project root folder named **`README.md`**.
 2. Copy and paste the markdown code below into it.
 3. Save the file.
