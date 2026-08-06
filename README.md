@@ -1,222 +1,134 @@
-﻿
-# DSTerminal Updates Test Repository
+﻿Here is a **comprehensive, professional `README.md`** file tailored specifically for your **DSTerminal v4.0.0.113** project. 
 
-[![Version](https://img.shields.io/badge/version-v1.0.0-blue.svg)](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/releases)
-[![Release Date](https://img.shields.io/badge/release-2026--07--30-green.svg)](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/releases)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-
-> **Public test repository** for the DSTerminal automatic update feature.
+It covers installation, license validation (the 3-attempt system you built), features, dependencies, and a clear legal disclaimer for an offensive security tool.
 
 ---
 
-## ðŸ“‹ Latest Version
-
-| Version | Release Date | Status |
-|---------|-------------|--------|
-| **v1.0.0** | 2026-07-30 | âœ… Stable |
-
----
-
-## ðŸš€ Features Tested
-
-This repository is used to validate the DSTerminal update mechanism:
-
-| Feature | Status |
-|---------|--------|
-| GitHub API Integration | âœ… |
-| Automatic Update Detection | âœ… |
-| Download Progress Tracking | âœ… |
-| Installer Execution | âœ… |
-| Version Comparison | âœ… |
-| Release Notes Display | âœ… |
-
----
-
-## ðŸ“¦ Installation
-
-### Option 1: Download Latest Release
-1. Visit the [Releases Page](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/releases)
-2. Download the latest installer (`.exe` or `.zip`)
-3. Run the installer
-
-### Option 2: Automatic Update
-```bash
-# Run DSTerminal update command
-python update.py
-```
-
-### Option 3: Manual Build
-```bash
-# Clone the repository
-git clone https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest.git
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run DSTerminal
-python main.py
-```
-
----
-
-## ðŸ”§ Development
-
-### Prerequisites
-- Python 3.8+
-- pip (Python package manager)
-
-### Setup
-```bash
-# Create virtual environment
-python -m venv venv
-
-# Activate virtual environment
-# Windows:
-venv\Scripts\activate
-# Linux/Mac:
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Create .env file with your tokens
-cp .env.example .env
-# Edit .env with your GitHub token
-```
-
-### Environment Variables
-Create a `.env` file with:
-```env
-GITHUB_TOKEN=your_github_token_here
-VT_API_KEY=your_vt_api_key_here
-CURRENT_VERSION=4.0.0.113
-```
-
----
-
-## ðŸ§ª Testing
-
-### Quick Test
-```bash
-# Check for updates
-python update.py
-
-# Test release verification
-python verify_release.py
-```
-
-### Integration Tests
-```bash
-# Run all tests
-pytest tests/
-
-# Run specific test
-pytest tests/test_update.py -v
-```
-## ðŸ›¡ï¸ Security Notes
-
-- **Never commit** `.env` files or hardcoded tokens
-- **Use environment variables** for sensitive data
-- **Rotate tokens** regularly
-- **Enable 2FA** on your GitHub account
-
----
-
-## ðŸ“„ License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## ðŸ¤ Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-## ðŸ“ž Support
-
-For issues or questions:
-- Open an [Issue](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/issues)
-- Contact the development team
-
----
-
-## ðŸ”— Related Repositories
-
-- [DSTerminal Main](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal)
-- [DSTerminal Docs](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal-docs)
-- [DSTerminal Tools](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal-tools)
-
----
-
-**âš ï¸ Note:** This is a **public test repository** for the DSTerminal update feature. The actual application is available in the main DSTerminal repository.
-
----
-
-## ðŸ“Š Badges
-
-[![GitHub last commit](https://img.shields.io/github/last-commit/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest.svg)](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/commits/main)
-[![GitHub issues](https://img.shields.io/github/issues/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest.svg)](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/issues)
-[![GitHub pull requests](https://img.shields.io/github/issues-pr/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest.svg)](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/pulls)
-[![GitHub stars](https://img.shields.io/github/stars/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest.svg)](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/stargazers)
-```
-
-## ðŸŽ¨ Alternative Minimal Version
-
-If you prefer a cleaner, more minimal approach:
+### Instructions:
+1. Open a new text file in your project root folder named **`README.md`**.
+2. Copy and paste the markdown code below into it.
+3. Save the file.
 
 ```markdown
-# DSTerminal Updates Test Repository
+# DSTerminal Cyber-Ops Platform v4.0.0.113
 
-Public test repository for the DSTerminal automatic update feature.
+![Version](https://img.shields.io/badge/version-4.0.0.113-blue)
+![License](https://img.shields.io/badge/license-Commercial-red)
 
-## ðŸ“¦ Latest Release
-- **Version:** v1.0.0
-- **Date:** 2026-07-30
-- **Download:** [Releases Page](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/releases)
-
-## âœ… Features Tested
-- GitHub API Integration
-- Automatic Update Detection
-- Download Progress Tracking
-- Installer Execution
-
-## ðŸš€ Quick Start
-```bash
-# Test update functionality
-python update.py
-
-# Verify release
-python verify_release.py
-```
-
-## ðŸ”§ Setup
-1. Clone the repository
-2. Install dependencies: `pip install -r requirements.txt`
-3. Configure `.env` file with your GitHub token
-
-## ðŸ“„ License
-MIT License
+**DSTerminal** is a comprehensive, modular Security Operations Center (SOC) and penetration testing platform developed by **Stark Expo Tech Exchange**. It combines network scanning, vulnerability assessment, threat intelligence, automated forensics, and real-time honeypot deception technology into a single terminal-driven interface.
 
 ---
 
-âš ï¸ **Note:** This repository is for testing purposes only.
-```
+## 🚀 Features
 
-## Key Improvements Made:
+- **🔐 License Key Validation**: Secure commercial licensing with a built-in 3-trial attempt limit and automatic rollback upon failure.
+- **🛡️ ShieldCore Honeypot System**: Deploys decoy files across user directories and system workspaces to detect unauthorized access.
+- **📡 Network Scanning & Enumeration**: Integrates with `nmap`, `sqlmap`, `nikto`, and `whois` for comprehensive reconnaissance.
+- **📊 Web Security Analysis**: Built-in web vulnerability scanner (`web_security_analyzer.py`) and VirusTotal API integration.
+- **📈 Real-Time SOC Dashboard**: Monitors logs, quarantines threats, and generates structured reports.
+- **🛠️ Dependency Management**: Automated installation scripts for Python, Npcap, and all required third-party tools.
+- **📂 Modular Architecture**: Built in Python 3.11+, easily extendable with custom modules.
 
-1. **Professional Structure** - Proper sections with clear headings
-2. **Status Badges** - Visual indicators for version, release date, etc.
-3. **Feature Status Table** - Clear overview of tested features
-4. **Installation Options** - Multiple ways to install/use
-5. **Security Notes** - Important security guidelines
-6. **Contributing Guide** - How to contribute
-7. **Support Information** - Where to get help
-8. **Clean Formatting** - Consistent and readable markdown
-9. **No Unwanted Issues** - Clean, professional tone
-10. **Better Visuals** - Emojis, tables, and code blocks
+---
+
+## 📋 System Requirements
+
+| Requirement | Specification |
+| :--- | :--- |
+| **Operating System** | Windows 10 (v10.0) or higher |
+| **Privileges** | Administrator rights required for dependency installation (Npcap, Nmap) |
+| **Python** | Version 3.11+ (automatically installed if missing) |
+| **Disk Space** | ~1 GB for full installation (includes bundled security tools) |
+
+---
+
+## 📥 Installation
+
+1. Download the latest installer: `DSTerminal_Installer_2026_v4.0.0.113.exe`.
+2. Run the executable. If Windows SmartScreen appears, click **"More info"** and then **"Run anyway"**.
+3. **License Validation**:
+   - You will be prompted to enter a license key upon installation.
+   - Format: `STARK-XXXXXXXX-XXXXXXXX-XXXXXXXX` (Example: `STARK-A1B2C3D4-E5F6G7H8-I9J0K1L2`)
+   - You have **3 attempts** to enter a valid key.
+4. Follow the on-screen prompts to select components (Core, Dependencies, Tools, VT Module, etc.).
+5. The installer will automatically download and install missing dependencies (Npcap, Nmap, Python, and required PIP packages).
+6. Launch DSTerminal from your desktop shortcut or Start Menu.
+
+---
+
+## 🔑 License Validation
+
+DSTerminal uses a strict, validation-based licensing system to prevent unauthorized use.
+
+- **Validation Logic**: The installer verifies the format of the key (`STARK-XXXX-XXXX-XXXX`).
+- **Trial Limits**: Users are limited to **3 failed attempts**. On the 3rd failure, the installer automatically aborts and rolls back all file changes.
+- **Key Storage**: Upon successful validation, the license key is saved to `%APPDATA%\DSTerminal\license.key` for future application verification.
+
+---
+
+## 🧩 Modules & Components
+
+| Component | Description |
+| :--- | :--- |
+| **Core** | Main executable, launcher, and configuration files. *(Required)* |
+| **VT Module** | VirusTotal threat intelligence integration (`vt_scan.py`). |
+| **Nmap** | Network discovery and security auditing tool. |
+| **SQLMap** | Automatic SQL injection and database takeover tool. |
+| **Nikto** | Web server vulnerability scanner. |
+| **Npcap** | Packet capturing library required for network sniffing. |
+| **FFmpeg** | Multi-media analysis framework for video/audio forensics. |
+| **Update Helper** | PowerShell scripts to check for updates and auto-patch. |
+| **Report Templates** | Pre-formatted PDF and HTML templates for penetration test reporting. |
+
+---
+
+## 🛠️ Development & Building
+
+If you wish to build the installer from source:
+
+1. Ensure Python 3.11+ and Inno Setup 7+ are installed.
+2. Install Python dependencies:
+   ```powershell
+   pip install -r requirements.txt
+   ```
+3. Run the PowerShell build script:
+   ```powershell
+   .\build.ps1
+   ```
+4. The installer `.exe` will be output to the `installer_output` directory.
+
+---
+
+## ⚠️ Legal Disclaimer
+
+**DSTerminal is an offensive security and penetration testing tool.**
+
+By using this software, you agree to the [End User License Agreement](LICENSE.txt) (EULA). You are **solely responsible** for ensuring that you have explicit, written authorization to scan, test, or monitor any networks, systems, or devices that you target with this software.
+
+- **Unauthorized scanning** or testing is illegal in most jurisdictions (including the CFAA in the US).
+- Stark Expo Tech Exchange assumes **zero liability** for any misuse, illegal activity, or damages caused by the use of this software.
+
+---
+
+## 📞 Contact & Support
+
+For license inquiries, technical support, or to report violations of the EULA:
+
+**Stark Expo Tech Exchange**
+- 🌐 Website: [https://www.starkexpotechexchange.mw](https://www.starkexpotechexchange.mw)
+- 📧 Email: `licensing@starkexpotechexchange.mw` / `starkec.team@outlook.com`
+- 📞 Phone: [+265] 993 076 724 / 886 283 247
+- 🐛 Bug Reports: [GitHub Issues](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/issues)
+
+---
+
+## 📄 License & Copyright
+
+**DSTerminal v4.0.0.113**  
+Copyright © 2024-2026 Stark Expo Tech Exchange. All Rights Reserved.
+
+This software is proprietary and strictly licensed. Unauthorized copying, distribution, or reverse engineering is prohibited.
+
+---
+
+*Last Updated: July 6, 2026*
