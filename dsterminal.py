@@ -2911,7 +2911,7 @@ class SecurityTerminal:
                     from update import UpdateManager
                     
                     # Get token from environment
-                    github_token = os.environ.get("GITHUB_TOKEN", "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")
+                    github_token = os.environ.get("GITHUB_TOKEN", "")
                     
                     self.update_config = {
                         "CURRENT_VERSION": self.version,
