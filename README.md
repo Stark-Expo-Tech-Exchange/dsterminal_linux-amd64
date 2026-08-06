@@ -1,9 +1,4 @@
-﻿### Instructions:
-1. Open a new text file in your project root folder named **`README.md`**.
-2. Copy and paste the markdown code below into it.
-3. Save the file.
-
-```markdown
+﻿```markdown
 # DSTerminal Cyber-Ops Platform v4.0.0.113
 
 ![Version](https://img.shields.io/badge/version-4.0.0.113-blue)
