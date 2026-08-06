@@ -1,123 +1,276 @@
-﻿```markdown
-# DSTerminal Cyber-Ops Platform v4.0.0.113
+﻿# DSTerminal
+                               
+# A Multi-Tool Cybersecurity Command Center
+    ╔═══════════════════════════════════════════════════════════════════============═══╗
+                ██████╗ ███████╗███████╗███████╗███╗   ██╗███████╗██╗  ██╗                                    
+                ██╔══██╗██╔════╝██╔════╝██╔════╝████╗  ██║██╔════╝╚██╗██╔╝                                    
+                ██║  ██║█████╗  █████╗  █████╗  ██╔██╗ ██║█████╗   ╚███╔╝                                     
+                ██║  ██║██╔══╝  ██╔══╝  ██╔══╝  ██║╚██╗██║██╔══╝   ██╔██╗                                     
+                ██████╔╝██║     ██║     ███████╗██║ ╚████║███████╗██╔╝ ██╗                                    
+                ╚═════╝ ╚═╝     ╚═╝     ╚══════╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝   
+        
+    ╠════════════════════════════════════════════════════════════════============══════╣
+    ║    Defensive Security Terminal v4.0.0.113 | {Platform[release]}                  ║
+    ║    Developed by: Spark Wilson Spink | © 2024| Powered by Stark Expo Tech Exchange║
+    ║    Type 'help' for available commands                                            ║
+    ║ (🔍, ⚡, 🛡️) 🌐 ⚡ CLI Mode: USER               
+    ╚════════════════════════════════════════════════════════════════════============══╝
+        
 
-![Version](https://img.shields.io/badge/version-4.0.0.113-blue)
-![License](https://img.shields.io/badge/license-Commercial-red)
 
-**DSTerminal** is a comprehensive, modular Security Operations Center (SOC) and penetration testing platform developed by **Stark Expo Tech Exchange**. It combines network scanning, vulnerability assessment, threat intelligence, automated forensics, and real-time honeypot deception technology into a single terminal-driven interface.
+**DSTerminal**: A lightweight, powerful terminal tool designed to assist IT professionals and cybersecurity defenders in network reconnaissance, system information gathering, and incident response tasks. It provides essential command-line utilities to help map networks, identify potential vulnerabilities, and support defensive security operations.
+
+![Image](https://images.openai.com/static-rsc-4/qwzChE9Pa5e-b-kRRtd3B3thplwdztPRYDfnah-yJ-cw_Pmj5MKQ_RMEeK7Fv7bmjfno8srVZygQjM15cCh5VUIK4Nq2I1Bv-v0kYyqXOtWCRS4p64lpaEuRtM2wTdH_SUU_URH4-9mgMUhCs707nh6Z50-hOuZDl97pWRQJhwmUism9mvII1C-C1e7lbdDU?purpose=fullsize)
+
+![Image](https://images.openai.com/static-rsc-4/xpb9U2AzIL0tzsbKQrQYYL_pxkNhJ-aJhd92gv3-7CtzoERODwqJ1Gnh6VY4QVBUcRSAM7fdlnwUbUJVa52-Bji3yRaQJr4ZN8cTeLLePvWtC6s_gskoSe2T5JLMafYkhhqrkFqtUWNuo1Bb-H11jkrwmZE-fcBm_d55tM4EKkLlHtON8wi5ZZbCxyREC0aZ?purpose=fullsize)
+
+![Image](https://images.openai.com/static-rsc-4/sozNA3VmrcUEibzgPxhu8XpJbq6ArzEt7LD7XH1CsksYBJ6O27sYk81M886KVIq9n1e4IeUxRLL2lh3QHi9Qb_gt-lQMoxWv2IgCsi-EkMWdN6ugXp_shMk_AnUulc4-K6u-nsR3_jLzovmsckY1jXQyaipT3CVvakPR9FW3gbH8iAPSbkPlCm0WSMl3don0?purpose=fullsize)
+
+![Image](https://images.openai.com/static-rsc-4/dgga3nbqUvm3Ggm2EKIJUDz6X5PbUhZJvmkypaUOg1TDnOE3JQ-n7Z6XzZmvEOcZ5kr5K5t86GTs92f20r7E55mzeLMxNfDE1PmyLzrMRIec9dvmEYuAmkAVPE-tQc47Db7SDplKe9psb5ZujuFMJpSFbVj06vPpd8ubAmkCHyMbsa33omIgBeqfTJKvLj1L?purpose=fullsize)
+
+## DSTerminal
+
+DSTerminal is a cybersecurity and digital forensics software platform designed to assist professionals in investigating and responding to cyber incidents. It integrates evidence acquisition, analysis, and reporting into a unified environment, improving efficiency and accuracy in forensic workflows.
+
+### Key facts
+
+* **Domain:** Cybersecurity and digital forensics
+* **Primary use:** Incident response and forensic investigation
+* **Core features:** Data acquisition, threat analysis, case management
+* **Users:** Security analysts, digital forensics experts, law enforcement
+* **Platform type:** Integrated software suite
+
+### Functionality and design
+
+DSTerminal provides tools to collect, preserve, and analyze digital evidence from diverse data sources while maintaining forensic integrity. It supports structured case management, chain-of-custody tracking, and automated correlation of evidence to aid investigators in identifying threat patterns and root causes. Its modular interface allows customization for specific investigative needs.
+
+### Role in cybersecurity operations
+
+The platform enhances security operations centers (SOCs) by centralizing digital forensics processes and accelerating incident response. By correlating logs, memory dumps, and network artifacts, DSTerminal helps analysts reconstruct attack timelines, detect data breaches, and generate court-admissible reports. Its integration with other cybersecurity tools supports comprehensive threat intelligence workflows.
+
+### Adoption and impact
+
+DSTerminal is used across government agencies, corporate security teams, and forensic laboratories. Its value lies in enabling timely, accurate investigations and supporting legal or compliance requirements related to digital evidence handling. The platform reflects the growing convergence between cybersecurity defense and forensic accountability.
+
+
+# 1. Core Concept
+
+DSTerminal is an all-in-one CLI (Command Line Interface) platform designed for:
+
+    Defensive Security (Blue Team operations)
+
+    System, Database, Network & Applications Hardening
+
+    Forensic Analysis
+
+    Threat Hunting
+
+    Network Monitoring
+
+# 2. Key Components
+    	        
++--------------------------------------------------------------------------------------+
+|                                                                                      |
+| **Module**        |  **Functionality**                        | **Example Commands** |
+|---------------------------------------------|-----------------|----------------------|
+| System Scanner    |  Malware detection, process analysis      |  scan, memdump       |
+| Network Suite     |  Port scanning, traffic monitoring        |  netmon, portsweep   |
+| Forensics Kit     |  File hashing, memory forensics           |  hashfile, stegcheck |
+| Port Scanner      |  OS security configuration                |  vtscan, exploitcheck|
+|---------------------------|------------------|----------------|----------------------|
+| Hardening Tools   |  VirusTotal integration, CVE checks       |                      |
+|                                                               |                      |
+|---------------------------|------------------|----------------|----------------------|
+ 
+
+
+
+# 3. Technical Architecture
+# Diagram
+**📐 Defensive Security Terminal – Modular Architecture >>Arquitectura del Terminal de Seguridad**
+
++-----------------------------------------------------------+
+|                                                           |
+|                                                           |
++-----------------------------------------------------------+
+|                                                           |
+| 1. Monitoring Engine       |  Network Monitor  |  Log Analyzer  |
+|---------------------------|-------------------|----------------|
+| - Packet capture (tcpdump, Wireshark)                     |
+| - Live log tailing (syslog, auth logs, app logs)          |
+|                                                           |
+| 2. Vulnerability Scanner   |  Port Scanner   |  Config Checker |
+|---------------------------|------------------|----------------|
+| - Nmap safe scan modes                                      |
+| - OS/hardware CVE check                                     |
+| - Misconfiguration detection                                |
+|                                                           |
+| 3. Incident Response       |  Kill Process   |  Quarantine Tool|
+|---------------------------|------------------|----------------|
+| - Auto-isolate suspicious device                          |
+| - Stop malicious scripts                                   |
+|                                                           |
+| 4. Threat Intelligence     |  VirusTotal API |  IOC Matching   |
+|---------------------------|------------------|----------------|
+| - Domain/IP reputation lookup                             |
+| - Local IOC database search                                |
+|                                                           |
+| 5. Security Hardening      |  Firewall Config|  Patch Checker  |
+|---------------------------|------------------|----------------|
+| - UFW/iptables scripts                                     |
+| - Secure file permissions scanner                          |
+|                                                           |
+| 6. Automation & Scheduler  |  Cron Jobs      |  Email Alerts   |
+|---------------------------|------------------|----------------|
+| - Schedule vulnerability scans                            |
+| - Alert SOC or admin on detection                          |
+|                                                           |
+| 7. Training Simulator      |  Simulated Attacks |  Quiz Mode    |
+|---------------------------|------------------|----------------|
+| - Generate fake logs, phishing emails                     |
+| - Terminal-based training questions                        |
+|                                                           |
++-----------------------------------------------------------+
+|   Data Storage: JSON Logs | SQLite | Encrypted Vault     
+|                   By: SparkWilsonSpink
++-----------------------------------------------------------+
+
+4. **Unique Features**
+
+    Unified Workflow: Combines tools usually requiring multiple separate utilities (Wireshark+Volatility+Hashcat)
+
+    Live Triage: Real-time system monitoring with watchfolder and regmon
+
+    Cross-Platform: Windows/Linux/macOS support via Python
+
+    Encrypted Operations: Built-in Fernet crypto for secure file operations
+
+5. # Use Cases
+
+    **Incident Response**
+    portsweep → netmon → killproc for rapid threat containment
+
+    **Compliance Audits**
+    chkintegrity -- verifies critical system files against baselines
+
+    **Pentest Recon**
+    sqlmap [URL] + certcheck for web app testing
+
+6. # Comparison to Existing Tools
+**Tool**	                    **DSTerminal Advantage**
+Kali Linux Tools	            Pre-integrated workflow
+Wireshark	                    CLI-first for remote systems
+Process Hacker	                Cross-platform Python implementation
+
+
+7. # Sample Workflow
+
+1. scan                     # Detect suspicious processes
+2. portsweep 192.168.1.1    # Find open ports
+3. vtscan malware.exe       # Cloud sandbox analysis
+4. harden                   # Apply security patches
+
+8. # Ideal User Base
+
+    **SOC Analysts:** For quick triage
+
+    **SysAdmins:** For hardening checks
+
+    **Forensic Investigators:** Lightweight evidence collection
+
+    **Bug Hunters:** Integrated web tools
+ 
+
+This conceptual framework positions DSTerminal as more than just a script collection - it's a unified interface for defensive cybersecurity operations.
 
 ---
 
-## 🚀 Features
+## Features
 
-- **🔐 License Key Validation**: Secure commercial licensing with a built-in 3-trial attempt limit and automatic rollback upon failure.
-- **🛡️ ShieldCore Honeypot System**: Deploys decoy files across user directories and system workspaces to detect unauthorized access.
-- **📡 Network Scanning & Enumeration**: Integrates with `nmap`, `sqlmap`, `nikto`, and `whois` for comprehensive reconnaissance.
-- **📊 Web Security Analysis**: Built-in web vulnerability scanner (`web_security_analyzer.py`) and VirusTotal API integration.
-- **📈 Real-Time SOC Dashboard**: Monitors logs, quarantines threats, and generates structured reports.
-- **🛠️ Dependency Management**: Automated installation scripts for Python, Npcap, and all required third-party tools.
-- **📂 Modular Architecture**: Built in Python 3.11+, easily extendable with custom modules.
-
----
-
-## 📋 System Requirements
-
-| Requirement | Specification |
-| :--- | :--- |
-| **Operating System** | Windows 10 (v10.0) or higher |
-| **Privileges** | Administrator rights required for dependency installation (Npcap, Nmap) |
-| **Python** | Version 3.11+ (automatically installed if missing) |
-| **Disk Space** | ~1 GB for full installation (includes bundled security tools) |
+- Network scanning to discover devices, open ports, and running services  
+- System information retrieval for quick diagnostics  
+- Log and process inspection for incident response  
+- Basic vulnerability and misconfiguration awareness  
+- Supports automation through scripting and terminal commands  
+- Portable and easy to install with minimal dependencies  
 
 ---
 
-## 📥 Installation
+## Why DSTerminal?
 
-1. Download the latest installer: `DSTerminal_Installer_2026_v4.0.0.113.exe`.
-2. Run the executable. If Windows SmartScreen appears, click **"More info"** and then **"Run anyway"**.
-3. **License Validation**:
-   - You will be prompted to enter a license key upon installation.
-   - Format: `STARK-XXXXXXXX-XXXXXXXX-XXXXXXXX` (Example: `STARK-A1B2C3D4-E5F6G7H8-I9J0K1L2`)
-   - You have **3 attempts** to enter a valid key.
-4. Follow the on-screen prompts to select components (Core, Dependencies, Tools, VT Module, etc.).
-5. The installer will automatically download and install missing dependencies (Npcap, Nmap, Python, and required PIP packages).
-6. Launch DSTerminal from your desktop shortcut or Start Menu.
+In a fast-evolving threat landscape, defenders need efficient tools to maintain visibility into their infrastructure and respond rapidly to incidents. DSTerminal empowers security teams to:
 
----
+- **Map networks** and detect unauthorized devices or services  
+- **Gather vital system data** for troubleshooting and auditing  
+- **Test and validate** security controls like firewalls and IDS/IPS  
+- **Support forensic investigations** by collecting system states  
+- **Train and build cybersecurity skills** in realistic environments  
 
-## 🔑 License Validation
+---------------------------
 
-DSTerminal uses a strict, validation-based licensing system to prevent unauthorized use.
+## Installation
 
-- **Validation Logic**: The installer verifies the format of the key (`STARK-XXXX-XXXX-XXXX`).
-- **Trial Limits**: Users are limited to **3 failed attempts**. On the 3rd failure, the installer automatically aborts and rolls back all file changes.
-- **Key Storage**: Upon successful validation, the license key is saved to `%APPDATA%\DSTerminal\license.key` for future application verification.
+### From prebuilt package (.deb for Debian-based Linux)
 
----
+## bash
+- sudo dpkg -i dsterminal_starkterm_v2.2024_deb.deb
 
-## 🧩 Modules & Components
+- sudo apt-get install -f   -----# To fix any missing dependencies
 
-| Component | Description |
-| :--- | :--- |
-| **Core** | Main executable, launcher, and configuration files. *(Required)* |
-| **VT Module** | VirusTotal threat intelligence integration (`vt_scan.py`). |
-| **Nmap** | Network discovery and security auditing tool. |
-| **SQLMap** | Automatic SQL injection and database takeover tool. |
-| **Nikto** | Web server vulnerability scanner. |
-| **Npcap** | Packet capturing library required for network sniffing. |
-| **FFmpeg** | Multi-media analysis framework for video/audio forensics. |
-| **Update Helper** | PowerShell scripts to check for updates and auto-patch. |
-| **Report Templates** | Pre-formatted PDF and HTML templates for penetration test reporting. |
+## Manual installation
 
----
+    Make sure you have Python 3.11.0 >= installed
 
-## 🛠️ Development & Building
+    Download or clone the repository ==== git clone https://github.com/Stark-Expo-Tech-Exchange/DSTerminal.git
 
-If you wish to build the installer from source:
 
-1. Ensure Python 3.11+ and Inno Setup 7+ are installed.
-2. Install Python dependencies:
-   ```powershell
-   pip install -r requirements.txt
-   ```
-3. Run the PowerShell build script:
-   ```powershell
-   .\build.ps1
-   ```
-4. The installer `.exe` will be output to the `installer_output` directory.
+    Build the executable with PyInstaller (requires Python 3.11+ and virtual environment)
 
----
+    Copy the executable to /usr/local/bin or your preferred PATH directory
 
-## ⚠️ Legal Disclaimer
+    Make it executable:
 
-**DSTerminal is an offensive security and penetration testing tool.**
+    chmod +x /usr/local/bin/dsterminal
 
-By using this software, you agree to the [End User License Agreement](LICENSE.txt) (EULA). You are **solely responsible** for ensuring that you have explicit, written authorization to scan, test, or monitor any networks, systems, or devices that you target with this software.
+--------
 
-- **Unauthorized scanning** or testing is illegal in most jurisdictions (including the CFAA in the US).
-- Stark Expo Tech Exchange assumes **zero liability** for any misuse, illegal activity, or damages caused by the use of this software.
+## Usage
 
----
+Run the terminal tool from your command line:
 
-## 📞 Contact & Support
+dsterminal
+----------------------------------------
+----------------------------------------
+Use built-in commands to perform network scans, check system info, and monitor logs. Refer to the built-in help or documentation for detailed command usage.
+Security Benefits
 
-For license inquiries, technical support, or to report violations of the EULA:
+**DSTerminal** contributes to defensive cybersecurity by:
 
-**Stark Expo Tech Exchange**
-- 🌐 Website: [https://www.starkexpotechexchange.mw](https://www.starkexpotechexchange.mw)
-- 📧 Email: `licensing@starkexpotechexchange.mw` / `starkec.team@outlook.com`
-- 📞 Phone: [+265] 993 076 724 / 886 283 247
-- 🐛 Bug Reports: [GitHub Issues](https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest/issues)
+    Providing real-time network reconnaissance to identify unknown devices and open ports
 
----
+    Enabling quick system audits to detect misconfigurations and vulnerabilities
 
-## 📄 License & Copyright
+    Assisting in incident response through log and process inspection
 
-**DSTerminal v4.0.0.113**  
-Copyright © 2024-2026 Stark Expo Tech Exchange. All Rights Reserved.
+    Supporting security control testing to validate firewall and IDS effectiveness
 
-This software is proprietary and strictly licensed. Unauthorized copying, distribution, or reverse engineering is prohibited.
+    Facilitating training and awareness for cybersecurity teams
 
----
+This makes **DSTerminal** an essential part of a defensive toolkit to maintain visibility, readiness, and resilience against cyber threats.
 
-*Last Updated: July 6, 2026*
+
+## Contribution
+Contributions, bug reports, and feature requests are welcome! Please open an issue or submit a pull request.
+License
+
+
+## Specific license
+MIT, GPL, etc.
+
+## Contact
+For questions or support, contact:
+Spark Wilson Spink
+Email: sparkwilson2041@gmail.com / starkec.team@outlook.com
+Phone: +265 993 076 724
+
+**DSTerminal**  – Empowering defenders with essential terminal tools.
