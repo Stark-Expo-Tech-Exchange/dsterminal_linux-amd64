@@ -1,11 +1,49 @@
 ﻿#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 """
 Web Security Analyzer - DSTERMINAL Enterprise Edition v4.0.0.113
 Enhanced with Platform-Specific Remediation Configurations
 """
 
-import os
 import sys
+import io
+import os
+import platform
+
+# ============================================================
+# ENCODING FIX - MUST BE AT THE TOP
+# ============================================================
+
+def fix_encoding():
+    """Fix encoding issues for all platforms, especially Windows"""
+    # Set UTF-8 as default encoding
+    if sys.stdout.encoding != 'utf-8':
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+    
+    # Windows-specific fixes
+    if platform.system() == 'Windows':
+        try:
+            import ctypes
+            kernel32 = ctypes.windll.kernel32
+            # Set console code page to UTF-8
+            kernel32.SetConsoleCP(65001)
+            kernel32.SetConsoleOutputCP(65001)
+            # Enable ANSI escape sequences
+            handle = kernel32.GetStdHandle(-11)  # STD_OUTPUT_HANDLE
+            mode = ctypes.c_ulong()
+            if kernel32.GetConsoleMode(handle, ctypes.byref(mode)):
+                ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
+                if not (mode.value & ENABLE_VIRTUAL_TERMINAL_PROCESSING):
+                    kernel32.SetConsoleMode(handle, mode.value | ENABLE_VIRTUAL_TERMINAL_PROCESSING)
+        except:
+            pass
+
+# Apply encoding fix immediately
+fix_encoding()
+
+# Now the rest of your imports
 import re
 import json
 import time
@@ -19,9 +57,7 @@ from dataclasses import dataclass, field
 from urllib.parse import urlparse, urljoin, parse_qs, quote
 from io import BytesIO
 import queue
-import platform 
 import random
-
 
 # Rich imports for advanced UI
 try:
@@ -107,7 +143,6 @@ def should_use_colors():
 # Set global flag
 USE_COLORS = should_use_colors()
 
-
 # ============================================================
 # CONSTANTS
 # ============================================================
@@ -181,7 +216,6 @@ class Colors:
 # Initialize colors on Windows
 Colors.init_colors()
 
-
 # ============================================================
 # TYPEWRITER CLASS - DEFINED AFTER Colors
 # ============================================================
@@ -234,7 +268,7 @@ class TypeWriter:
     def _type_line(self, text, color, pause_between_chars, pen_effect):
         """Type a single line with pen effects"""
         
-        pause_chars = ['.', ',', '!', '?', ';', ':', '...', 'â€”', 'â€“']
+        pause_chars = ['.', ',', '!', '?', ';', ':', '...', '—', '–']
         
         for i, char in enumerate(text):
             if self._stop_typing:
@@ -308,7 +342,7 @@ class TypeWriter:
         cursor_chars = ['|', '/', '-', '\\']
         cursor_idx = 0
         
-        display_text = text if USE_COLORS else strip_ansi(text)
+        display_text = text if USE_COLORS else Colors.strip(text)
         
         for i in range(len(display_text) + 1):
             if self._stop_typing:
@@ -555,17 +589,17 @@ server {
             configs['security_headers'] = {
                 'title': 'Cloudflare Security Headers (Cloudflare Dashboard)',
                 'code': '''# Cloudflare Dashboard Configuration:
-1. Go to Cloudflare Dashboard â†’ SSL/TLS â†’ Edge Certificates
+1. Go to Cloudflare Dashboard → SSL/TLS → Edge Certificates
 2. Enable "Always Use HTTPS"
 3. Enable "HTTP Strict Transport Security (HSTS)"
    - max-age: 31536000
    - Include subdomains: Yes
    - Preload: Yes
-4. Go to Security â†’ Settings
+4. Go to Security → Settings
    - Security Level: High
    - Challenge Passage: 30 minutes
    - Browser Integrity Check: On
-5. Go to Rules â†’ Page Rules (for custom headers)
+5. Go to Rules → Page Rules (for custom headers)
    - Create rule for: *yourdomain.com/*
    - Add: 
      - X-Frame-Options: DENY
@@ -992,7 +1026,6 @@ sudo yum install htop iotop -y''',
         
         return configs
 
-
 # ============================================================
 # DATA CLASSES
 # ============================================================
@@ -1031,7 +1064,6 @@ class WebSecurityReport:
     risk_score: int = 0
     summary: str = ""
     platform_remediation: Dict[str, Any] = field(default_factory=dict)
-
 
 # ============================================================
 # WEB SECURITY ANALYZER
@@ -1541,31 +1573,31 @@ Platform Information:
 """
         
         report.summary = f"""
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚                    SECURITY ANALYSIS SUMMARY                 â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚ Target: {report.url}                                        â”‚
-â”‚ Risk Score: {report.risk_score}/100                         â”‚
-â”‚                                                             â”‚
-â”‚ Findings by Severity:                                       â”‚
-â”‚  â€¢ CRITICAL: {severity_counts['CRITICAL']}                  â”‚
-â”‚  â€¢ HIGH: {severity_counts['HIGH']}                          â”‚
-â”‚  â€¢ MEDIUM: {severity_counts['MEDIUM']}                      â”‚
-â”‚  â€¢ LOW: {severity_counts['LOW']}                            â”‚
-â”‚  â€¢ INFO: {severity_counts['INFO']}                          â”‚
-â”‚                                                             â”‚
-â”‚ Fix Priority:                                               â”‚
-â”‚  â€¢ CRITICAL (Fix Now): {priority_counts['CRITICAL']}        â”‚
-â”‚  â€¢ HIGH (Fix ASAP): {priority_counts['HIGH']}               â”‚
-â”‚  â€¢ MEDIUM (Plan Next): {priority_counts['MEDIUM']}          â”‚
-â”‚  â€¢ LOW (Consider Later): {priority_counts['LOW']}           â”‚
-â”‚                                                             â”‚
-â”‚ {platform_info}                                             â”‚
-â”‚ Technologies: {', '.join(report.technologies) if report.technologies else 'None'} â”‚
-â”‚ Exposed Files: {len(report.exposed_files)}                  â”‚
-â”‚ Security Headers Present: {sum(1 for v in report.security_headers.values() if v != 'Not Set')}/{len(report.security_headers)} â”‚
-â”‚ Forms Analyzed: {len(report.forms)}                         â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                    SECURITY ANALYSIS SUMMARY                                 │
+├────────────────────────────────────────────────────────────────────────────────┤
+│ Target: {report.url}                                        │
+│ Risk Score: {report.risk_score}/100                         │
+│                                                             │
+│ Findings by Severity:                                       │
+│  • CRITICAL: {severity_counts['CRITICAL']}                  │
+│  • HIGH: {severity_counts['HIGH']}                          │
+│  • MEDIUM: {severity_counts['MEDIUM']}                      │
+│  • LOW: {severity_counts['LOW']}                            │
+│  • INFO: {severity_counts['INFO']}                          │
+│                                                             │
+│ Fix Priority:                                               │
+│  • CRITICAL (Fix Now): {priority_counts['CRITICAL']}        │
+│  • HIGH (Fix ASAP): {priority_counts['HIGH']}               │
+│  • MEDIUM (Plan Next): {priority_counts['MEDIUM']}          │
+│  • LOW (Consider Later): {priority_counts['LOW']}           │
+│                                                             │
+│ {platform_info}                                             │
+│ Technologies: {', '.join(report.technologies) if report.technologies else 'None'} │
+│ Exposed Files: {len(report.exposed_files)}                  │
+│ Security Headers Present: {sum(1 for v in report.security_headers.values() if v != 'Not Set')}/{len(report.security_headers)} │
+│ Forms Analyzed: {len(report.forms)}                         │
+└────────────────────────────────────────────────────────────────────────────────┘
 """
     
     def cmd_scan_xss(self, url: str) -> List[Dict]:
@@ -1728,10 +1760,10 @@ Platform Information:
         
         # Banner with fast typing
         banner_lines = [
-            "â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—",
-            "â•‘  ðŸ” WEB SECURITY ANALYSIS REPORT                                  â•‘",
-            "â•‘  Generated by DSTERMINAL Security Suite v4.0.0.113                  â•‘",
-            "â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•"
+            "╔══════════════════════════════════════════════════════════════════╗",
+            "║  🔐 WEB SECURITY ANALYSIS REPORT                                  ║",
+            "║  Generated by DSTERMINAL Security Suite v4.0.0.113                  ║",
+            "╚══════════════════════════════════════════════════════════════════╝"
         ]
         self.typer.type_banner(banner_lines, color=Colors.CYAN)
         print()
@@ -1746,21 +1778,21 @@ Platform Information:
         
         # Platform Information
         platform = report.platform_remediation.get('platform', {})
-        self.typer.type_text("â”Œâ”€ PLATFORM DETECTED â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€", color=Colors.CYAN)
-        self.typer.type_text(f"â”‚ Web Server: {platform.get('webserver', 'Unknown')}", color=Colors.GREEN, pen_effect=True)
-        self.typer.type_text(f"â”‚ OS: {platform.get('os', 'Unknown')}", color=Colors.GREEN, pen_effect=True)
-        self.typer.type_text(f"â”‚ Language: {platform.get('language', 'Unknown')}", color=Colors.GREEN, pen_effect=True)
-        self.typer.type_text(f"â”‚ Framework: {platform.get('framework', 'None detected')}", color=Colors.GREEN, pen_effect=True)
-        self.typer.type_text(f"â”‚ Cloud Provider: {platform.get('cloud_provider', 'None detected')}", color=Colors.GREEN, pen_effect=True)
-        self.typer.type_text("â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€", color=Colors.CYAN)
+        self.typer.type_text("┌── PLATFORM DETECTED ───────────────────────────────────", color=Colors.CYAN)
+        self.typer.type_text(f"│ Web Server: {platform.get('webserver', 'Unknown')}", color=Colors.GREEN, pen_effect=True)
+        self.typer.type_text(f"│ OS: {platform.get('os', 'Unknown')}", color=Colors.GREEN, pen_effect=True)
+        self.typer.type_text(f"│ Language: {platform.get('language', 'Unknown')}", color=Colors.GREEN, pen_effect=True)
+        self.typer.type_text(f"│ Framework: {platform.get('framework', 'None detected')}", color=Colors.GREEN, pen_effect=True)
+        self.typer.type_text(f"│ Cloud Provider: {platform.get('cloud_provider', 'None detected')}", color=Colors.GREEN, pen_effect=True)
+        self.typer.type_text("└────────────────────────────────────────────────────────", color=Colors.CYAN)
         print()
         
         # Technologies
         if report.technologies:
-            self.typer.type_text("â”Œâ”€ TECHNOLOGIES DETECTED â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€", color=Colors.MAGENTA)
+            self.typer.type_text("┌── TECHNOLOGIES DETECTED ─────────────────────────", color=Colors.MAGENTA)
             for tech in report.technologies:
-                self.typer.type_text(f"â”‚ â€¢ {tech}", color=Colors.CYAN, pen_effect=True)
-            self.typer.type_text("â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€", color=Colors.MAGENTA)
+                self.typer.type_text(f"│ • {tech}", color=Colors.CYAN, pen_effect=True)
+            self.typer.type_text("└────────────────────────────────────────────────────", color=Colors.MAGENTA)
             print()
         
         # Findings Summary
@@ -1768,18 +1800,18 @@ Platform Information:
         for finding in report.findings:
             severity_counts[finding.severity] += 1
         
-        self.typer.type_text("â”Œâ”€ FINDINGS SUMMARY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€", color=Colors.YELLOW)
-        self.typer.type_text(f"â”‚ CRITICAL: {severity_counts['CRITICAL']}", color=Colors.RED, pen_effect=True)
-        self.typer.type_text(f"â”‚ HIGH: {severity_counts['HIGH']}", color=Colors.RED, pen_effect=True)
-        self.typer.type_text(f"â”‚ MEDIUM: {severity_counts['MEDIUM']}", color=Colors.YELLOW, pen_effect=True)
-        self.typer.type_text(f"â”‚ LOW: {severity_counts['LOW']}", color=Colors.GREEN, pen_effect=True)
-        self.typer.type_text(f"â”‚ INFO: {severity_counts['INFO']}", color=Colors.CYAN, pen_effect=True)
-        self.typer.type_text("â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€", color=Colors.YELLOW)
+        self.typer.type_text("┌── FINDINGS SUMMARY ────────────────────────────────", color=Colors.YELLOW)
+        self.typer.type_text(f"│ CRITICAL: {severity_counts['CRITICAL']}", color=Colors.RED, pen_effect=True)
+        self.typer.type_text(f"│ HIGH: {severity_counts['HIGH']}", color=Colors.RED, pen_effect=True)
+        self.typer.type_text(f"│ MEDIUM: {severity_counts['MEDIUM']}", color=Colors.YELLOW, pen_effect=True)
+        self.typer.type_text(f"│ LOW: {severity_counts['LOW']}", color=Colors.GREEN, pen_effect=True)
+        self.typer.type_text(f"│ INFO: {severity_counts['INFO']}", color=Colors.CYAN, pen_effect=True)
+        self.typer.type_text("└──────────────────────────────────────────────────────", color=Colors.YELLOW)
         print()
         
         # Detailed Findings (only show first 5 if verbose)
         if verbose:
-            self.typer.type_text("â”Œâ”€ DETAILED FINDINGS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€", color=Colors.CYAN)
+            self.typer.type_text("┌── DETAILED FINDINGS ──────────────────────────────", color=Colors.CYAN)
             
             # Sort findings by severity
             severity_order = {'CRITICAL': 0, 'HIGH': 1, 'MEDIUM': 2, 'LOW': 3, 'INFO': 4}
@@ -1788,32 +1820,32 @@ Platform Information:
             for i, finding in enumerate(sorted_findings[:5]):  # Show top 5
                 severity_color = Colors.RED if finding.severity in ['CRITICAL', 'HIGH'] else Colors.YELLOW if finding.severity == 'MEDIUM' else Colors.GREEN
                 
-                self.typer.type_text(f"â”‚ â—‰ {finding.severity} {finding.title}", color=severity_color, pen_effect=True)
+                self.typer.type_text(f"│ ◉ {finding.severity} {finding.title}", color=severity_color, pen_effect=True)
                 
                 # Type description slowly
                 if hasattr(finding, 'description'):
-                    self.typer.type_text(f"â”‚    {finding.description[:80]}...", color=Colors.DIM, pen_effect=True)
+                    self.typer.type_text(f"│    {finding.description[:80]}...", color=Colors.DIM, pen_effect=True)
                 
                 # Show fix priority
                 priority = getattr(finding, 'fix_priority', 'MEDIUM')
                 priority_color = Colors.RED if priority == 'CRITICAL' else Colors.YELLOW if priority == 'HIGH' else Colors.GREEN
-                self.typer.type_text(f"â”‚    Priority: {priority}", color=priority_color, pen_effect=True)
+                self.typer.type_text(f"│    Priority: {priority}", color=priority_color, pen_effect=True)
                 
                 if hasattr(finding, 'recommendation'):
-                    self.typer.type_text(f"â”‚    Fix: {finding.recommendation[:60]}...", color=Colors.GREEN, pen_effect=True)
+                    self.typer.type_text(f"│    Fix: {finding.recommendation[:60]}...", color=Colors.GREEN, pen_effect=True)
                 
                 # Show if platform remediation available
                 if finding.remediation_configs:
-                    self.typer.type_text(f"â”‚    âœ“ Platform-specific remediation available", color=Colors.CYAN, pen_effect=True)
+                    self.typer.type_text(f"│    ✓ Platform-specific remediation available", color=Colors.CYAN, pen_effect=True)
                 
                 if i < len(sorted_findings[:5]) - 1:
-                    self.typer.type_text("â”‚", color=Colors.DIM)
+                    self.typer.type_text("│", color=Colors.DIM)
                     time.sleep(0.15)
             
             if len(sorted_findings) > 5:
-                self.typer.type_text(f"â”‚ ... and {len(sorted_findings) - 5} more findings", color=Colors.DIM, pen_effect=True)
+                self.typer.type_text(f"│ ... and {len(sorted_findings) - 5} more findings", color=Colors.DIM, pen_effect=True)
             
-            self.typer.type_text("â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€", color=Colors.CYAN)
+            self.typer.type_text("└──────────────────────────────────────────────────────", color=Colors.CYAN)
             print()
         
         # Security Headers
@@ -1825,17 +1857,16 @@ Platform Information:
         
         # Exposed Files
         if report.exposed_files:
-            self.typer.type_text(f"âš ï¸  Exposed Files: {len(report.exposed_files)}", 
+            self.typer.type_text(f"⚠️  Exposed Files: {len(report.exposed_files)}", 
                                 color=Colors.RED, pen_effect=True)
             for file in report.exposed_files[:3]:
-                self.typer.type_text(f"   â€¢ {file}", color=Colors.DIM, pen_effect=True)
+                self.typer.type_text(f"   • {file}", color=Colors.DIM, pen_effect=True)
             if len(report.exposed_files) > 3:
                 self.typer.type_text(f"   ... and {len(report.exposed_files) - 3} more", color=Colors.DIM, pen_effect=True)
         
         # Wait for user
-        self.typer.type_text("\n" + "â”€" * 50, color=Colors.DIM)
+        self.typer.type_text("\n" + "─" * 50, color=Colors.DIM)
         self.typer.type_text("Press Enter to continue...", color=Colors.YELLOW, pen_effect=True)
-        
 
 # ============================================================
 # ENHANCED PDF REPORT GENERATOR WITH PLATFORM REMEDIATION
@@ -1851,7 +1882,7 @@ class PDFReportGenerator:
     def generate_report(self, report: WebSecurityReport, filename: str = None) -> Optional[str]:
         """Generate PDF report with platform-specific remediation"""
         if not REPORTLAB_AVAILABLE:
-            print("[red]âŒ ReportLab not installed. Install: pip install reportlab[/red]")
+            print("[red]❌ ReportLab not installed. Install: pip install reportlab[/red]")
             return None
         
         try:
@@ -2040,7 +2071,7 @@ class PDFReportGenerator:
                 story.append(Paragraph("Security Headers", heading_style))
                 header_data = [["Header", "Value", "Status"]]
                 for header, value in report.security_headers.items():
-                    status = "âœ… Set" if value != 'Not Set' else "âŒ Missing"
+                    status = "✅ Set" if value != 'Not Set' else "❌ Missing"
                     header_data.append([header, value[:40], status])
                 
                 if len(header_data) > 1:
@@ -2080,7 +2111,7 @@ class PDFReportGenerator:
                 f"Cloud Provider: {platform.get('cloud_provider', 'None detected')}",
             ]
             for info in platform_info:
-                story.append(Paragraph(f"â€¢ {info}", body_style))
+                story.append(Paragraph(f"• {info}", body_style))
             story.append(Spacer(1, 10))
             
             # Security Headers Configuration
@@ -2244,20 +2275,19 @@ class PDFReportGenerator:
             # FOOTER
             # ================================================================
             story.append(Spacer(1, 30))
-            story.append(Paragraph("â”€" * 80, footer_style))
+            story.append(Paragraph("─" * 80, footer_style))
             story.append(Spacer(1, 6))
-            story.append(Paragraph(f"Â© 2024 {PLATFORM} | All Rights Reserved", footer_style))
+            story.append(Paragraph(f"© 2024 {PLATFORM} | All Rights Reserved", footer_style))
             story.append(Paragraph("This report is for AUTHORIZED SECURITY TESTING & EDUCATIONAL PURPOSES only. Use it responsibly.", footer_style))
             story.append(Paragraph(f"Generated by DSTERMINAL Security Analyzer {VERSION}", footer_style))
             
             doc.build(story, onFirstPage=add_watermark, onLaterPages=add_watermark)
-            print(f"[green]âœ… PDF Report generated: {filename}[/green]")
+            print(f"[green]✅ PDF Report generated: {filename}[/green]")
             return filename
             
         except Exception as e:
-            print(f"[red]âŒ PDF generation failed: {str(e)}[/red]")
+            print(f"[red]❌ PDF generation failed: {str(e)}[/red]")
             return None
-
 
 # ============================================================
 # MAIN DASHBOARD
@@ -2297,9 +2327,8 @@ class SecurityDashboard:
         if not hasattr(self, 'typer'):
             self.typer = TypeWriter('fast')
         
-        
         # Main scan announcement with pen effect
-        self.typer.type_text("ðŸš€ Starting Full Security Scan", color=Colors.GREEN, pen_effect=True)
+        self.typer.type_text("🚀 Starting Full Security Scan", color=Colors.GREEN, pen_effect=True)
         self.typer.type_text(f"Target: {self.target_url}", color=Colors.CYAN, pen_effect=True)
         print()   
         
@@ -2312,9 +2341,9 @@ class SecurityDashboard:
             try:
                 self._show_main_layout()
                 choice = Prompt.ask(
-                    f"\n[{self.colors['primary']}]â”Œâ”€[/{self.colors['primary']}]"
+                    f"\n[{self.colors['primary']}]┌──[/{self.colors['primary']}]"
                     f"[{self.colors['info']}] Select Option [/{self.colors['info']}]"
-                    f"[{self.colors['primary']}]â”€â–º[/{self.colors['primary']}]",
+                    f"[{self.colors['primary']}]──►[/{self.colors['primary']}]",
                     choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "h", "q"],
                     default="h"
                 )
@@ -2356,41 +2385,58 @@ class SecurityDashboard:
         os.system('cls' if os.name == 'nt' else 'clear')
     
     def _get_centered_banner(self) -> Panel:
-        """Generate centered hacker-style banner"""
-        banner_text = """
-    [bold green]â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ•—[/bold green]
-    [bold green]â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•â•šâ•â•â–ˆâ–ˆâ•”â•â•â•â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘[/bold green]
-    [bold green]â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•”â–ˆâ–ˆâ–ˆâ–ˆâ•”â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â–ˆâ–ˆâ•— â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘[/bold green]
-    [bold green]â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â•šâ•â•â•â•â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘â•šâ•â•[/bold green]
-    [bold green]â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘ â•šâ•â• â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘ â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•—[/bold green]
-    [bold green]â•šâ•â•â•â•â•â• â•šâ•â•â•â•â•â•â•   â•šâ•â•   â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•â•šâ•â•     â•šâ•â•â•šâ•â•â•šâ•â•  â•šâ•â•â•â•â•šâ•â•  â•šâ•â•â•šâ•â•[/bold green]
+        """Generate centered hacker-style banner with random colors"""
+        import random
+    
+        # ANSI color names for Rich
+        color_palette = ['red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white']
+    
+        # Pick random colors for each element
+        ascii_color = random.choice(color_palette)
+        title_color = random.choice([c for c in color_palette if c != ascii_color])
+        subtitle_color = random.choice([c for c in color_palette if c not in [ascii_color, title_color]])
+        border_color = random.choice([c for c in color_palette if c not in [ascii_color, title_color, subtitle_color]])
+    
+        # If not enough colors, reuse but ensure different
+        if border_color == ascii_color:
+            border_color = random.choice(color_palette)
+    
+        banner_text = f"""
+    ╔══════════════════════════════════════════════════════════════╗
+    ║  [bold {ascii_color}]██████╗ ███████╗████████╗███████╗██████╗ ███╗   ███╗██╗███╗   ██╗ █████╗ ██╗         [/bold {ascii_color}]║
+    ║  [bold {ascii_color}]██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║████╗  ██║██╔══██╗██║         [/bold {ascii_color}]║
+    ║  [bold {ascii_color}]██║  ██║███████╗   ██║   █████╗  ██████╔╝██╔████╔██║██║██╔██╗ ██║███████║██║         [/bold {ascii_color}]║
+    ║  [bold {ascii_color}]██║  ██║╚════██║   ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██║██║╚██╗██║██╔══██║██║         [/bold {ascii_color}]║
+    ║  [bold {ascii_color}]██████╔╝███████║   ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║██║  ██║███████╗    [/bold {ascii_color}]║
+    ║  [bold {ascii_color}]╚═════╝ ╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝    [/bold {ascii_color}]║
+    ╚══════════════════════════════════════════════════════════════╝
 
-    [bold cyan]       DSTERMINAL Cyber Ops Platform v4.0.0.113[/bold cyan]
-    [dim]â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•[/dim]
-    [bold yellow]ðŸŒðŸ”’[/bold yellow] Web System Application Security Analysis Module
-    [bold yellow]ðŸ“„[/bold yellow] Platform-Specific Remediation Configurations
-    [bold red]ðŸ’€[/bold red] For Educational & Authorized Security Testing Only
+    [bold {subtitle_color}]       DSTERMINAL Cyber Ops Platform v4.0.0.113[/bold {subtitle_color}]
+    [dim]────────────────────────────────────────────────────────────────────────────────[/dim]
+    [bold yellow]🌐🔒[/bold yellow] Web System Application Security Analysis Module
+    [bold yellow]📄[/bold yellow] Platform-Specific Remediation Configurations
+    [bold red]💀[/bold red] For Educational & Authorized Security Testing Only
     """
         return Panel(
             banner_text,
-            title="[bold cyan]DSTERMINAL SECURITY SUITE[/bold cyan]",
-            border_style="cyan",
+            title=f"[bold {title_color}]DSTERMINAL SECURITY SUITE[/bold {title_color}]",
+            border_style=border_color,
             box=box.HEAVY,
             padding=(1, 2),
-            width=80
+            width=100
         )
         
     def _show_centered_banner(self):
         """Display the centered hacker-style banner"""
         self.console.print(Align.center(self._get_centered_banner()))
-        
-        status = "â•" * 78
+    
+        status = "─" * 78
         self.console.print(f"\n[dim]{status}[/dim]")
         self.console.print(
             Align.center(
-                f"[green]â–º[/green] [dim]System:[/dim] [cyan]ACTIVE[/cyan] "
-                f"[green]â”‚[/green] [dim]Mode:[/dim] [yellow]SECURITY ANALYSIS[/yellow] "
-                f"[green]â”‚[/green] [dim]Version:[/dim] [cyan]{VERSION}[/cyan]"
+                f"[green]►[/green] [dim]System:[/dim] [cyan]ACTIVE[/cyan] "
+                f"[green]│[/green] [dim]Mode:[/dim] [yellow]SECURITY ANALYSIS[/yellow] "
+                f"[green]│[/green] [dim]Version:[/dim] [cyan]{VERSION}[/cyan]"
             )
         )
         self.console.print(f"[dim]{status}[/dim]\n")
@@ -2402,7 +2448,7 @@ class SecurityDashboard:
         
         left_panel = Panel(
             self._get_left_panel_content(),
-            title="[bold green]â–‘ SYSTEM INFO â–‘[/bold green]",
+            title="[bold green]▪ SYSTEM INFO ▪[/bold green]",
             border_style="green",
             box=box.HEAVY,
             width=35
@@ -2410,7 +2456,7 @@ class SecurityDashboard:
         
         center_panel = Panel(
             self._get_center_panel_content(),
-            title="[bold cyan]â–‘ MAIN MENU â–‘[/bold cyan]",
+            title="[bold cyan]▪ MAIN MENU ▪[/bold cyan]",
             border_style="cyan",
             box=box.HEAVY,
             width=45
@@ -2418,7 +2464,7 @@ class SecurityDashboard:
         
         right_panel = Panel(
             self._get_right_panel_content(),
-            title="[bold yellow]â–‘ STATUS â–‘[/bold yellow]",
+            title="[bold yellow]▪ STATUS ▪[/bold yellow]",
             border_style="yellow",
             box=box.HEAVY,
             width=35
@@ -2437,46 +2483,46 @@ class SecurityDashboard:
     def _get_left_panel_content(self) -> str:
         """Left panel content"""
         content = f"""
-[{self.colors['info']}]â”Œâ”€ SESSION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['info']}]
-[{self.colors['primary']}]â”‚[/{self.colors['primary']}] [dim]Time:[/dim] {datetime.now().strftime('%H:%M:%S')}
-[{self.colors['primary']}]â”‚[/{self.colors['primary']}] [dim]Date:[/dim] {datetime.now().strftime('%Y-%m-%d')}
-[{self.colors['primary']}]â”‚[/{self.colors['primary']}] [dim]Scans:[/dim] {len(self.scan_history)}
-[{self.colors['primary']}]â”‚[/{self.colors['primary']}] [dim]Status:[/dim] {'ðŸŸ¢ Active' if not self.is_running else 'ðŸ”„ Scanning'}
-[{self.colors['info']}]â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['info']}]
+[{self.colors['info']}]┌── SESSION ──────────────────[/{self.colors['info']}]
+[{self.colors['primary']}]│[/{self.colors['primary']}] [dim]Time:[/dim] {datetime.now().strftime('%H:%M:%S')}
+[{self.colors['primary']}]│[/{self.colors['primary']}] [dim]Date:[/dim] {datetime.now().strftime('%Y-%m-%d')}
+[{self.colors['primary']}]│[/{self.colors['primary']}] [dim]Scans:[/dim] {len(self.scan_history)}
+[{self.colors['primary']}]│[/{self.colors['primary']}] [dim]Status:[/dim] {'🟢 Active' if not self.is_running else '🔄 Scanning'}
+[{self.colors['info']}]└──────────────────────────────────[/{self.colors['info']}]
 
-[{self.colors['accent']}]â”Œâ”€ PLATFORM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['accent']}]
-[{self.colors['accent']}]â”‚[/{self.colors['accent']}] [dim]Name:[/dim] {PLATFORM}
-[{self.colors['accent']}]â”‚[/{self.colors['accent']}] [dim]Version:[/dim] {VERSION}
-[{self.colors['accent']}]â”‚[/{self.colors['accent']}] [dim]Mode:[/dim] [green]AUTHORIZED/EDUCATIONAL[/green]
-[{self.colors['accent']}]â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['accent']}]
+[{self.colors['accent']}]┌── PLATFORM ─────────────────[/{self.colors['accent']}]
+[{self.colors['accent']}]│[/{self.colors['accent']}] [dim]Name:[/dim] {PLATFORM}
+[{self.colors['accent']}]│[/{self.colors['accent']}] [dim]Version:[/dim] {VERSION}
+[{self.colors['accent']}]│[/{self.colors['accent']}] [dim]Mode:[/dim] [green]AUTHORIZED/EDUCATIONAL[/green]
+[{self.colors['accent']}]└──────────────────────────────────[/{self.colors['accent']}]
 
-[{self.colors['warning']}]â”Œâ”€ SECURITY TIPS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['warning']}]
-[{self.colors['warning']}]â”‚[/{self.colors['warning']}] â€¢ [dim]Always get permission[/dim]
-[{self.colors['warning']}]â”‚[/{self.colors['warning']}] â€¢ [dim]Test responsibly[/dim]
-[{self.colors['warning']}]â”‚[/{self.colors['warning']}] â€¢ [dim]Document findings[/dim]
-[{self.colors['warning']}]â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['warning']}]
+[{self.colors['warning']}]┌── SECURITY TIPS ───────────[/{self.colors['warning']}]
+[{self.colors['warning']}]│[/{self.colors['warning']}] • [dim]Always get permission[/dim]
+[{self.colors['warning']}]│[/{self.colors['warning']}] • [dim]Test responsibly[/dim]
+[{self.colors['warning']}]│[/{self.colors['warning']}] • [dim]Document findings[/dim]
+[{self.colors['warning']}]└──────────────────────────────────[/{self.colors['warning']}]
 """
         return content
     
     def _get_center_panel_content(self) -> str:
         """Center panel with menu options"""
         content = f"""
-[{self.colors['primary']}]â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—[/{self.colors['primary']}]
-[{self.colors['primary']}]â•‘[/{self.colors['primary']}]               [{self.colors['info']}]ðŸ“‹ MAIN MENU[/{self.colors['info']}]                 [{self.colors['primary']}]â•‘[/{self.colors['primary']}]
-[{self.colors['primary']}]â•‘â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•‘[/{self.colors['primary']}]
-[{self.colors['primary']}]â•‘[/{self.colors['primary']}]  [{self.colors['accent']}]1.[/{self.colors['accent']}] [{self.colors['primary']}]ðŸš€[/{self.colors['primary']}] Full Security Scan          [{self.colors['primary']}]â•‘[/{self.colors['primary']}]
-[{self.colors['primary']}]â•‘[/{self.colors['primary']}]  [{self.colors['accent']}]2.[/{self.colors['accent']}] [{self.colors['info']}]ðŸ“‹[/{self.colors['info']}] Scan Headers                [{self.colors['primary']}]â•‘[/{self.colors['primary']}]
-[{self.colors['primary']}]â•‘[/{self.colors['primary']}]  [{self.colors['accent']}]3.[/{self.colors['accent']}] [{self.colors['warning']}]ðŸ”§[/{self.colors['warning']}] Scan Technologies           [{self.colors['primary']}]â•‘[/{self.colors['primary']}]
-[{self.colors['primary']}]â•‘[/{self.colors['primary']}]  [{self.colors['accent']}]4.[/{self.colors['accent']}] [{self.colors['danger']}]ðŸ’‰[/{self.colors['danger']}] Scan XSS                    [{self.colors['primary']}]â•‘[/{self.colors['primary']}]
-[{self.colors['primary']}]â•‘[/{self.colors['primary']}]  [{self.colors['accent']}]5.[/{self.colors['accent']}] [{self.colors['warning']}]ðŸ”[/{self.colors['warning']}] Scan CSRF                   [{self.colors['primary']}]â•‘[/{self.colors['primary']}]
-[{self.colors['primary']}]â•‘[/{self.colors['primary']}]  [{self.colors['accent']}]6.[/{self.colors['accent']}] [{self.colors['info']}]ðŸª[/{self.colors['info']}] Scan Session/Cookies        [{self.colors['primary']}]â•‘[/{self.colors['primary']}]
-[{self.colors['primary']}]â•‘[/{self.colors['primary']}]  [{self.colors['accent']}]7.[/{self.colors['accent']}] [{self.colors['accent']}]ðŸ˜[/{self.colors['accent']}] Scan PHP                    [{self.colors['primary']}]â•‘[/{self.colors['primary']}]
-[{self.colors['primary']}]â•‘[/{self.colors['primary']}]  [{self.colors['accent']}]8.[/{self.colors['accent']}] [{self.colors['accent']}]ðŸŒ[/{self.colors['accent']}] Scan Apache                 [{self.colors['primary']}]â•‘[/{self.colors['primary']}]
-[{self.colors['primary']}]â•‘[/{self.colors['primary']}]  [{self.colors['accent']}]9.[/{self.colors['accent']}] [{self.colors['warning']}]ðŸ“„[/{self.colors['warning']}] Export Report with Remediation[{self.colors['primary']}]â•‘[/{self.colors['primary']}]
-[{self.colors['primary']}]â•‘â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•‘[/{self.colors['primary']}]
-[{self.colors['primary']}]â•‘[/{self.colors['primary']}]  [{self.colors['accent']}]h.[/{self.colors['accent']}] [{self.colors['info']}]â“[/{self.colors['info']}] Help                        [{self.colors['primary']}]â•‘[/{self.colors['primary']}]
-[{self.colors['primary']}]â•‘[/{self.colors['primary']}]  [{self.colors['accent']}]q.[/{self.colors['accent']}] [{self.colors['danger']}]ðŸšª[/{self.colors['danger']}] Exit                        [{self.colors['primary']}]â•‘[/{self.colors['primary']}]
-[{self.colors['primary']}]â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•[/{self.colors['primary']}]
+[{self.colors['primary']}]╔══════════════════════════════════════╗
+[{self.colors['primary']}]║               [{self.colors['info']}]📋 MAIN MENU[/{self.colors['info']}]                 ║
+[{self.colors['primary']}]║──────────────────────────────────║
+[{self.colors['primary']}]║  [{self.colors['accent']}]1.[/{self.colors['accent']}] [{self.colors['primary']}]🚀[/{self.colors['primary']}] Full Security Scan          ║
+[{self.colors['primary']}]║  [{self.colors['accent']}]2.[/{self.colors['accent']}] [{self.colors['info']}]📋[/{self.colors['info']}] Scan Headers                ║
+[{self.colors['primary']}]║  [{self.colors['accent']}]3.[/{self.colors['accent']}] [{self.colors['warning']}]🔧[/{self.colors['warning']}] Scan Technologies           ║
+[{self.colors['primary']}]║  [{self.colors['accent']}]4.[/{self.colors['accent']}] [{self.colors['danger']}]💉[/{self.colors['danger']}] Scan XSS                    ║
+[{self.colors['primary']}]║  [{self.colors['accent']}]5.[/{self.colors['accent']}] [{self.colors['warning']}]🔐[/{self.colors['warning']}] Scan CSRF                   ║
+[{self.colors['primary']}]║  [{self.colors['accent']}]6.[/{self.colors['accent']}] [{self.colors['info']}]🍪[/{self.colors['info']}] Scan Session/Cookies        ║
+[{self.colors['primary']}]║  [{self.colors['accent']}]7.[/{self.colors['accent']}] [{self.colors['accent']}]🐘[/{self.colors['accent']}] Scan PHP                    ║
+[{self.colors['primary']}]║  [{self.colors['accent']}]8.[/{self.colors['accent']}] [{self.colors['accent']}]🌐[/{self.colors['accent']}] Scan Apache                 ║
+[{self.colors['primary']}]║  [{self.colors['accent']}]9.[/{self.colors['accent']}] [{self.colors['warning']}]📄[/{self.colors['warning']}] Export Report with Remediation║
+[{self.colors['primary']}]║──────────────────────────────────║
+[{self.colors['primary']}]║  [{self.colors['accent']}]h.[/{self.colors['accent']}] [{self.colors['info']}]❓[/{self.colors['info']}] Help                        ║
+[{self.colors['primary']}]║  [{self.colors['accent']}]q.[/{self.colors['accent']}] [{self.colors['danger']}]🚪[/{self.colors['danger']}] Exit                        ║
+[{self.colors['primary']}]╚══════════════════════════════════════╝
 """
         return content
     
@@ -2490,35 +2536,35 @@ class SecurityDashboard:
                 risk_color = "yellow"
             
             content = f"""
-[{self.colors['info']}]â”Œâ”€ LAST SCAN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['info']}]
-[{self.colors['info']}]â”‚[/{self.colors['info']}] [dim]Target:[/dim] {self.current_report.url[:25]}...
-[{self.colors['info']}]â”‚[/{self.colors['info']}] [dim]Risk:[/dim] [{risk_color}]{self.current_report.risk_score}/100[/{risk_color}]
-[{self.colors['info']}]â”‚[/{self.colors['info']}] [dim]Findings:[/dim] {len(self.current_report.findings)}
-[{self.colors['info']}]â”‚[/{self.colors['info']}] [dim]Files:[/dim] {len(self.current_report.exposed_files)}
-[{self.colors['info']}]â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['info']}]
+[{self.colors['info']}]┌── LAST SCAN ──────────────────[/{self.colors['info']}]
+[{self.colors['info']}]│[/{self.colors['info']}] [dim]Target:[/dim] {self.current_report.url[:25]}...
+[{self.colors['info']}]│[/{self.colors['info']}] [dim]Risk:[/dim] [{risk_color}]{self.current_report.risk_score}/100[/{risk_color}]
+[{self.colors['info']}]│[/{self.colors['info']}] [dim]Findings:[/dim] {len(self.current_report.findings)}
+[{self.colors['info']}]│[/{self.colors['info']}] [dim]Files:[/dim] {len(self.current_report.exposed_files)}
+[{self.colors['info']}]└──────────────────────────────────[/{self.colors['info']}]
 """
             if self.current_report.findings:
                 critical = sum(1 for f in self.current_report.findings if f.severity == 'CRITICAL')
                 high = sum(1 for f in self.current_report.findings if f.severity == 'HIGH')
                 content += f"""
-[{self.colors['danger']}]â”Œâ”€ FINDINGS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['danger']}]
-[{self.colors['danger']}]â”‚[/{self.colors['danger']}] [dim]Critical:[/dim] [red]{critical}[/red]
-[{self.colors['danger']}]â”‚[/{self.colors['danger']}] [dim]High:[/dim] [yellow]{high}[/yellow]
-[{self.colors['danger']}]â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['danger']}]
+[{self.colors['danger']}]┌── FINDINGS ───────────────────[/{self.colors['danger']}]
+[{self.colors['danger']}]│[/{self.colors['danger']}] [dim]Critical:[/dim] [red]{critical}[/red]
+[{self.colors['danger']}]│[/{self.colors['danger']}] [dim]High:[/dim] [yellow]{high}[/yellow]
+[{self.colors['danger']}]└──────────────────────────────────[/{self.colors['danger']}]
 """
         else:
             content = f"""
-[{self.colors['dim']}]â”Œâ”€ STATUS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['dim']}]
-[{self.colors['dim']}]â”‚[/{self.colors['dim']}] [dim]No scans performed yet[/dim]
-[{self.colors['dim']}]â”‚[/{self.colors['dim']}] [dim]Run option 1 to start[/dim]
-[{self.colors['dim']}]â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['dim']}]
+[{self.colors['dim']}]┌── STATUS ─────────────────────[/{self.colors['dim']}]
+[{self.colors['dim']}]│[/{self.colors['dim']}] [dim]No scans performed yet[/dim]
+[{self.colors['dim']}]│[/{self.colors['dim']}] [dim]Run option 1 to start[/dim]
+[{self.colors['dim']}]└──────────────────────────────────[/{self.colors['dim']}]
 """
         
         content += f"""
-[{self.colors['primary']}]â”Œâ”€ STATISTICS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['primary']}]
-[{self.colors['primary']}]â”‚[/{self.colors['primary']}] [dim]History:[/dim] {len(self.scan_history)}
-[{self.colors['primary']}]â”‚[/{self.colors['primary']}] [dim]Uptime:[/dim] {self._get_uptime()}
-[{self.colors['primary']}]â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['primary']}]
+[{self.colors['primary']}]┌── STATISTICS ────────────────[/{self.colors['primary']}]
+[{self.colors['primary']}]│[/{self.colors['primary']}] [dim]History:[/dim] {len(self.scan_history)}
+[{self.colors['primary']}]│[/{self.colors['primary']}] [dim]Uptime:[/dim] {self._get_uptime()}
+[{self.colors['primary']}]└──────────────────────────────────[/{self.colors['primary']}]
 """
         return content
     
@@ -2531,13 +2577,13 @@ class SecurityDashboard:
     
     def _show_status_bar(self):
         """Show the bottom status bar"""
-        status = "â•" * 80
+        status = "─" * 80
         self.console.print(f"\n[dim]{status}[/dim]")
         self.console.print(
             Align.center(
-                f"[green]â–¶[/green] [dim]Ready[/dim] [green]â”‚[/green] "
-                f"[dim]Press[/dim] [yellow]h[/yellow] [dim]for help[/dim] [green]â”‚[/green] "
-                f"[dim]Press[/dim] [yellow]q[/yellow] [dim]to quit[/dim] [green]â”‚[/green] "
+                f"[green]▶[/green] [dim]Ready[/dim] [green]│[/green] "
+                f"[dim]Press[/dim] [yellow]h[/yellow] [dim]for help[/dim] [green]│[/green] "
+                f"[dim]Press[/dim] [yellow]q[/yellow] [dim]to quit[/dim] [green]│[/green] "
                 f"[dim]Version[/dim] [cyan]{VERSION}[/cyan]"
             )
         )
@@ -2545,67 +2591,67 @@ class SecurityDashboard:
     
     def _show_error(self, message: str):
         """Show error message"""
-        self.console.print(f"\n[{self.colors['danger']}]â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—[/{self.colors['danger']}]")
-        self.console.print(f"[{self.colors['danger']}]â•‘[/{self.colors['danger']}]  [red]âœ– ERROR OCCURRED[/red]                    [{self.colors['danger']}]â•‘[/{self.colors['danger']}]")
-        self.console.print(f"[{self.colors['danger']}]â•‘â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•‘[/{self.colors['danger']}]")
-        self.console.print(f"[{self.colors['danger']}]â•‘[/{self.colors['danger']}]  {message[:50]}{'...' if len(message) > 50 else ''} [{self.colors['danger']}]â•‘[/{self.colors['danger']}]")
-        self.console.print(f"[{self.colors['danger']}]â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•[/{self.colors['danger']}]")
+        self.console.print(f"\n[{self.colors['danger']}]╔══════════════════════════════════════════╗[/{self.colors['danger']}]")
+        self.console.print(f"[{self.colors['danger']}]║[/{self.colors['danger']}]  [red]✖ ERROR OCCURRED[/red]                    ║")
+        self.console.print(f"[{self.colors['danger']}]║──────────────────────────────────║[/{self.colors['danger']}]")
+        self.console.print(f"[{self.colors['danger']}]║[/{self.colors['danger']}]  {message[:50]}{'...' if len(message) > 50 else ''} ║")
+        self.console.print(f"[{self.colors['danger']}]╚══════════════════════════════════════════╝[/{self.colors['danger']}]")
         input("\n[dim]Press Enter to continue...[/dim]")
     
     def _show_success(self, message: str):
         """Show success message"""
-        self.console.print(f"\n[{self.colors['primary']}]â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—[/{self.colors['primary']}]")
-        self.console.print(f"[{self.colors['primary']}]â•‘[/{self.colors['primary']}]  [green]âœ” SUCCESS[/green]                         [{self.colors['primary']}]â•‘[/{self.colors['primary']}]")
-        self.console.print(f"[{self.colors['primary']}]â•‘â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•‘[/{self.colors['primary']}]")
-        self.console.print(f"[{self.colors['primary']}]â•‘[/{self.colors['primary']}]  {message[:50]}{'...' if len(message) > 50 else ''} [{self.colors['primary']}]â•‘[/{self.colors['primary']}]")
-        self.console.print(f"[{self.colors['primary']}]â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•[/{self.colors['primary']}]")
+        self.console.print(f"\n[{self.colors['primary']}]╔══════════════════════════════════════════╗[/{self.colors['primary']}]")
+        self.console.print(f"[{self.colors['primary']}]║[/{self.colors['primary']}]  [green]✔ SUCCESS[/green]                         ║")
+        self.console.print(f"[{self.colors['primary']}]║──────────────────────────────────║[/{self.colors['primary']}]")
+        self.console.print(f"[{self.colors['primary']}]║[/{self.colors['primary']}]  {message[:50]}{'...' if len(message) > 50 else ''} ║")
+        self.console.print(f"[{self.colors['primary']}]╚══════════════════════════════════════════╝[/{self.colors['primary']}]")
     
     def _show_help(self):
         """Show help"""
         self._clear_screen()
         self._show_centered_banner()
-        
+    
         help_content = f"""
-[{self.colors['info']}]â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—[/{self.colors['info']}]
-[{self.colors['info']}]â•‘[/{self.colors['info']}]  [{self.colors['primary']}]â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•—  â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  [/{self.colors['primary']}]            [{self.colors['info']}]â•‘[/{self.colors['info']}]
-[{self.colors['info']}]â•‘[/{self.colors['info']}]  [{self.colors['primary']}]â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•— [/{self.colors['primary']}]            [{self.colors['info']}]â•‘[/{self.colors['info']}]
-[{self.colors['info']}]â•‘[/{self.colors['info']}]  [{self.colors['primary']}]â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â• [/{self.colors['primary']}]            [{self.colors['info']}]â•‘[/{self.colors['info']}]
-[{self.colors['info']}]â•‘[/{self.colors['info']}]  [{self.colors['primary']}]â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•â•  [/{self.colors['primary']}]            [{self.colors['info']}]â•‘[/{self.colors['info']}]
-[{self.colors['info']}]â•‘[/{self.colors['info']}]  [{self.colors['primary']}]â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘      [/{self.colors['primary']}]            [{self.colors['info']}]â•‘[/{self.colors['info']}]
-[{self.colors['info']}]â•‘[/{self.colors['info']}]  [{self.colors['primary']}]â•šâ•â•â•â•â•â• â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•â•šâ•â•      [/{self.colors['primary']}]            [{self.colors['info']}]â•‘[/{self.colors['info']}]
-[{self.colors['info']}]â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•[/{self.colors['info']}]
+    [{self.colors['info']}]╔══════════════════════════════════════════════════════════════════╗
+    [{self.colors['info']}]║  [/{self.colors['info']}]██████╗ ███████╗████████╗███████╗██████╗ ███╗   ███╗██╗███╗   ██╗ █████╗ ██╗      ║
+    [{self.colors['info']}]║  [/{self.colors['info']}]██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║████╗  ██║██╔══██╗██║      ║
+    [{self.colors['info']}]║  [/{self.colors['info']}]██║  ██║███████╗   ██║   █████╗  ██████╔╝██╔████╔██║██║██╔██╗ ██║███████║██║      ║
+    [{self.colors['info']}]║  [/{self.colors['info']}]██║  ██║╚════██║   ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██║██║╚██╗██║██╔══██║██║      ║
+    [{self.colors['info']}]║  [/{self.colors['info']}]██████╔╝███████║   ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║██║  ██║███████╗║
+    [{self.colors['info']}]║  [/{self.colors['info']}]╚═════╝ ╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝║
+    [{self.colors['info']}]╚══════════════════════════════════════════════════════════════════╝[/{self.colors['info']}]
 
-[{self.colors['primary']}]â”Œâ”€ COMMAND REFERENCE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['primary']}]
-[{self.colors['primary']}]â”‚[/{self.colors['primary']}]  [{self.colors['accent']}]1.[/{self.colors['accent']}] Full Security Scan     - Comprehensive analysis with platform remediation
-[{self.colors['primary']}]â”‚[/{self.colors['primary']}]  [{self.colors['accent']}]2.[/{self.colors['accent']}] Scan Headers          - HTTP security headers
-[{self.colors['primary']}]â”‚[/{self.colors['primary']}]  [{self.colors['accent']}]3.[/{self.colors['accent']}] Scan Technologies    - Frameworks & CMS detection
-[{self.colors['primary']}]â”‚[/{self.colors['primary']}]  [{self.colors['accent']}]4.[/{self.colors['accent']}] Scan XSS              - Cross-Site Scripting testing
-[{self.colors['primary']}]â”‚[/{self.colors['primary']}]  [{self.colors['accent']}]5.[/{self.colors['accent']}] Scan CSRF             - Cross-Site Request Forgery
-[{self.colors['primary']}]â”‚[/{self.colors['primary']}]  [{self.colors['accent']}]6.[/{self.colors['accent']}] Scan Session         - Cookie & session security
-[{self.colors['primary']}]â”‚[/{self.colors['primary']}]  [{self.colors['accent']}]7.[/{self.colors['accent']}] Scan PHP             - PHP vulnerabilities
-[{self.colors['primary']}]â”‚[/{self.colors['primary']}]  [{self.colors['accent']}]8.[/{self.colors['accent']}] Scan Apache          - Apache vulnerabilities
-[{self.colors['primary']}]â”‚[/{self.colors['primary']}]  [{self.colors['accent']}]9.[/{self.colors['accent']}] Export Report        - PDF with platform-specific remediation
-[{self.colors['primary']}]â”‚[/{self.colors['primary']}]  [{self.colors['accent']}]h.[/{self.colors['accent']}] Help               - This help screen
-[{self.colors['primary']}]â”‚[/{self.colors['primary']}]  [{self.colors['accent']}]q.[/{self.colors['accent']}] Exit               - Quit dashboard
-[{self.colors['primary']}]â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['primary']}]
+    [{self.colors['primary']}]┌── COMMAND REFERENCE ───────────────────────────────────────┐
+    [{self.colors['primary']}]│[/{self.colors['primary']}]  [{self.colors['accent']}]1.[/{self.colors['accent']}] Full Security Scan     - Comprehensive analysis with platform remediation
+    [{self.colors['primary']}]│[/{self.colors['primary']}]  [{self.colors['accent']}]2.[/{self.colors['accent']}] Scan Headers          - HTTP security headers
+    [{self.colors['primary']}]│[/{self.colors['primary']}]  [{self.colors['accent']}]3.[/{self.colors['accent']}] Scan Technologies    - Frameworks & CMS detection
+    [{self.colors['primary']}]│[/{self.colors['primary']}]  [{self.colors['accent']}]4.[/{self.colors['accent']}] Scan XSS              - Cross-Site Scripting testing
+    [{self.colors['primary']}]│[/{self.colors['primary']}]  [{self.colors['accent']}]5.[/{self.colors['accent']}] Scan CSRF             - Cross-Site Request Forgery
+    [{self.colors['primary']}]│[/{self.colors['primary']}]  [{self.colors['accent']}]6.[/{self.colors['accent']}] Scan Session         - Cookie & session security
+    [{self.colors['primary']}]│[/{self.colors['primary']}]  [{self.colors['accent']}]7.[/{self.colors['accent']}] Scan PHP             - PHP vulnerabilities
+    [{self.colors['primary']}]│[/{self.colors['primary']}]  [{self.colors['accent']}]8.[/{self.colors['accent']}] Scan Apache          - Apache vulnerabilities
+    [{self.colors['primary']}]│[/{self.colors['primary']}]  [{self.colors['accent']}]9.[/{self.colors['accent']}] Export Report        - PDF with platform-specific remediation
+    [{self.colors['primary']}]│[/{self.colors['primary']}]  [{self.colors['accent']}]h.[/{self.colors['accent']}] Help               - This help screen
+    [{self.colors['primary']}]│[/{self.colors['primary']}]  [{self.colors['accent']}]q.[/{self.colors['accent']}] Exit               - Quit dashboard
+    [{self.colors['primary']}]└────────────────────────────────────────────────────────────┘
 
-[{self.colors['info']}]â”Œâ”€ PLATFORM-SPECIFIC REMEDIATION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['info']}]
-[{self.colors['info']}]â”‚[/{self.colors['info']}]  [dim]Each finding includes remediation based on detected platform:[/dim]
-[{self.colors['info']}]â”‚[/{self.colors['info']}]  â€¢ [cyan]Web Server[/cyan] - ...
-[{self.colors['info']}]â”‚[/{self.colors['info']}]  â€¢ [cyan]Language[/cyan] - ...
-[{self.colors['info']}]â”‚[/{self.colors['info']}]  â€¢ [cyan]Framework[/cyan] - ...
-[{self.colors['info']}]â”‚[/{self.colors['info']}]  â€¢ [cyan]OS[/cyan] - ...
-[{self.colors['info']}]â”‚[/{self.colors['info']}]  â€¢ [cyan]Cloud[/cyan] - ...
-[{self.colors['info']}]â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['info']}]
+    [{self.colors['info']}]┌── PLATFORM-SPECIFIC REMEDIATION ──────────────────────────┐
+    [{self.colors['info']}]│[/{self.colors['info']}]  [dim]Each finding includes remediation based on detected platform:[/dim]
+    [{self.colors['info']}]│[/{self.colors['info']}]  • [cyan]Web Server[/cyan] - ...
+    [{self.colors['info']}]│[/{self.colors['info']}]  • [cyan]Language[/cyan] - ...
+    [{self.colors['info']}]│[/{self.colors['info']}]  • [cyan]Framework[/cyan] - ...
+    [{self.colors['info']}]│[/{self.colors['info']}]  • [cyan]OS[/cyan] - ...
+    [{self.colors['info']}]│[/{self.colors['info']}]  • [cyan]Cloud[/cyan] - ...
+    [{self.colors['info']}]└────────────────────────────────────────────────────────────┘
 
-[{self.colors['warning']}]â”Œâ”€ SECURITY NOTICE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['warning']}]
-[{self.colors['warning']}]â”‚[/{self.colors['warning']}]  âš ï¸ This tool is for EDUCATIONAL PURPOSES only
-[{self.colors['warning']}]â”‚[/{self.colors['warning']}]  âš ï¸ Only test systems you own or have permission to test
-[{self.colors['warning']}]â”‚[/{self.colors['warning']}]  âš ï¸ Unauthorized testing is illegal and unethical
-[{self.colors['warning']}]â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['warning']}]
-"""
+    [{self.colors['warning']}]┌── SECURITY NOTICE ──────────────────────────────────────┐
+    [{self.colors['warning']}]│[/{self.colors['warning']}]  ⚠️ This tool is for AUTHORIZED/EDUCATIONAL PURPOSES only
+    [{self.colors['warning']}]│[/{self.colors['warning']}]  ⚠️ Only test systems you own or have permission to test
+    [{self.colors['warning']}]│[/{self.colors['warning']}]  ⚠️ Unauthorized testing is illegal and unethical
+    [{self.colors['warning']}]└────────────────────────────────────────────────────────────┘
+    """
         self.console.print(help_content)
-        input(f"\n[{self.colors}]Press Enter to return to menu...[/{self.colors}]")
+        input(f"\n[{self.colors['dim']}]Press Enter to return to menu...[/{self.colors['dim']}]")
         self._clear_screen()
         self._show_centered_banner()
     
@@ -2619,7 +2665,7 @@ class SecurityDashboard:
             self.typer = TypeWriter('fast')
         
         url = Prompt.ask(
-            f"[{self.colors['primary']}]â”Œâ”€ Target URL â”€â”€â–º[/{self.colors['primary']}]",
+            f"[{self.colors['primary']}]┌── Target URL ──►[/{self.colors['primary']}]",
             default="https://example.com"
         )
         
@@ -2627,7 +2673,7 @@ class SecurityDashboard:
             url = 'https://' + url
         
         if not Confirm.ask(
-            f"[{self.colors['warning']}]âš ï¸ Do you have permission to test {url}?[/{self.colors['warning']}]",
+            f"[{self.colors['warning']}]⚠️ Do you have permission to test {url}?[/{self.colors['warning']}]",
             default=False
         ):
             self._show_error("Scan aborted - permission required")
@@ -2668,7 +2714,7 @@ class SecurityDashboard:
                 progress.update(task, description="[yellow]Checking Apache...", advance=20)
                 report.apache_vulnerabilities = self.analyzer.cmd_scan_apache(url)
                 
-                progress.update(task, description="[green]âœ“ Scan complete!", completed=100)
+                progress.update(task, description="[green]✓ Scan complete!", completed=100)
             
             self.current_report = report
             self.scan_history.append(report)
@@ -2687,30 +2733,30 @@ class SecurityDashboard:
         self._show_centered_banner()
         
         url = Prompt.ask(
-            f"[{self.colors['primary']}]â”Œâ”€ Target URL â”€â”€â–º[/{self.colors['primary']}]",
+            f"[{self.colors['primary']}]┌── Target URL ──►[/{self.colors['primary']}]",
             default="https://example.com"
         )
         
         if not url.startswith(('http://', 'https://')):
             url = 'https://' + url
         
-        self.console.print(f"[{self.colors['primary']}]ðŸ“‹ Scanning Headers[/{self.colors['primary']}]")
+        self.console.print(f"[{self.colors['primary']}]📋 Scanning Headers[/{self.colors['primary']}]")
         self.console.print(f"[dim]Target: {url}[/dim]")
         
         try:
             result = self.analyzer.cmd_scan_headers(url)
             
-            self.console.print(f"\n[{self.colors['primary']}]â”Œâ”€ HEADERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['primary']}]")
+            self.console.print(f"\n[{self.colors['primary']}]┌── HEADERS ────────────────────────────────────────[/{self.colors['primary']}]")
             for key, value in result.get('headers', {}).items():
-                self.console.print(f"[{self.colors['primary']}]â”‚[/{self.colors['primary']}] [cyan]{key}:[/cyan] {value}")
-            self.console.print(f"[{self.colors['primary']}]â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['primary']}]")
+                self.console.print(f"[{self.colors['primary']}]│[/{self.colors['primary']}] [cyan]{key}:[/cyan] {value}")
+            self.console.print(f"[{self.colors['primary']}]└────────────────────────────────────────────────────[/{self.colors['primary']}]")
             
-            self.console.print(f"\n[{self.colors['warning']}]â”Œâ”€ SECURITY HEADERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['warning']}]")
+            self.console.print(f"\n[{self.colors['warning']}]┌── SECURITY HEADERS ────────────────────────────────[/{self.colors['warning']}]")
             for key, value in result.get('security_headers', {}).items():
-                status = "âœ…" if value != 'Not Set' else "âŒ"
+                status = "✅" if value != 'Not Set' else "❌"
                 color = "green" if value != 'Not Set' else "red"
-                self.console.print(f"[{self.colors['warning']}]â”‚[/{self.colors['warning']}] [{color}]{status}[/{color}] [cyan]{key}:[/cyan] {value}")
-            self.console.print(f"[{self.colors['warning']}]â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['warning']}]")
+                self.console.print(f"[{self.colors['warning']}]│[/{self.colors['warning']}] [{color}]{status}[/{color}] [cyan]{key}:[/cyan] {value}")
+            self.console.print(f"[{self.colors['warning']}]└────────────────────────────────────────────────────[/{self.colors['warning']}]")
             
             self._show_success("Headers scan completed")
             
@@ -2727,25 +2773,25 @@ class SecurityDashboard:
         self._show_centered_banner()
         
         url = Prompt.ask(
-            f"[{self.colors['primary']}]â”Œâ”€ Target URL â”€â”€â–º[/{self.colors['primary']}]",
+            f"[{self.colors['primary']}]┌── Target URL ──►[/{self.colors['primary']}]",
             default="https://example.com"
         )
         
         if not url.startswith(('http://', 'https://')):
             url = 'https://' + url
         
-        self.console.print(f"[{self.colors['primary']}]ðŸ”§ Detecting Technologies[/{self.colors['primary']}]")
+        self.console.print(f"[{self.colors['primary']}]🔧 Detecting Technologies[/{self.colors['primary']}]")
         self.console.print(f"[dim]Target: {url}[/dim]")
         
         try:
             techs = self.analyzer.cmd_scan_technologies(url)
             
-            self.console.print(f"\n[{self.colors['primary']}]â”Œâ”€ TECHNOLOGIES DETECTED â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['primary']}]")
+            self.console.print(f"\n[{self.colors['primary']}]┌── TECHNOLOGIES DETECTED ─────────────────────────[/{self.colors['primary']}]")
             for tech in techs:
-                self.console.print(f"[{self.colors['primary']}]â”‚[/{self.colors['primary']}] â€¢ [cyan]{tech}[/cyan]")
+                self.console.print(f"[{self.colors['primary']}]│[/{self.colors['primary']}] • [cyan]{tech}[/cyan]")
             if not techs:
-                self.console.print(f"[{self.colors['primary']}]â”‚[/{self.colors['primary']}] [dim]No technologies detected[/dim]")
-            self.console.print(f"[{self.colors['primary']}]â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['primary']}]")
+                self.console.print(f"[{self.colors['primary']}]│[/{self.colors['primary']}] [dim]No technologies detected[/dim]")
+            self.console.print(f"[{self.colors['primary']}]└────────────────────────────────────────────────────[/{self.colors['primary']}]")
             
             self._show_success(f"Found {len(techs)} technologies")
             
@@ -2762,30 +2808,30 @@ class SecurityDashboard:
         self._show_centered_banner()
         
         url = Prompt.ask(
-            f"[{self.colors['primary']}]â”Œâ”€ Target URL â”€â”€â–º[/{self.colors['primary']}]",
+            f"[{self.colors['primary']}]┌── Target URL ──►[/{self.colors['primary']}]",
             default="https://example.com"
         )
         
         if not url.startswith(('http://', 'https://')):
             url = 'https://' + url
         
-        self.console.print(f"[{self.colors['primary']}]ðŸ’‰ Scanning for XSS[/{self.colors['primary']}]")
+        self.console.print(f"[{self.colors['primary']}]💉 Scanning for XSS[/{self.colors['primary']}]")
         self.console.print(f"[dim]Target: {url}[/dim]")
         
         try:
             results = self.analyzer.cmd_scan_xss(url)
             
             if results:
-                self.console.print(f"\n[{self.colors['danger']}]â”Œâ”€ XSS VULNERABILITIES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['danger']}]")
+                self.console.print(f"\n[{self.colors['danger']}]┌── XSS VULNERABILITIES ───────────────────────────[/{self.colors['danger']}]")
                 for r in results:
                     if r.get('vulnerable'):
-                        self.console.print(f"[{self.colors['danger']}]â”‚[/{self.colors['danger']}] [red]âœ–[/red] {r.get('field', 'Unknown')}")
-                        self.console.print(f"[{self.colors['danger']}]â”‚[/{self.colors['danger']}]    [dim]Payload:[/dim] [yellow]{r.get('payload', 'N/A')}[/yellow]")
-                self.console.print(f"[{self.colors['danger']}]â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['danger']}]")
+                        self.console.print(f"[{self.colors['danger']}]│[/{self.colors['danger']}] [red]✖[/red] {r.get('field', 'Unknown')}")
+                        self.console.print(f"[{self.colors['danger']}]│[/{self.colors['danger']}]    [dim]Payload:[/dim] [yellow]{r.get('payload', 'N/A')}[/yellow]")
+                self.console.print(f"[{self.colors['danger']}]└────────────────────────────────────────────────────[/{self.colors['danger']}]")
             else:
-                self.console.print(f"\n[{self.colors['primary']}]â”Œâ”€ XSS RESULTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['primary']}]")
-                self.console.print(f"[{self.colors['primary']}]â”‚[/{self.colors['primary']}] [green]âœ… No XSS vulnerabilities found[/green]")
-                self.console.print(f"[{self.colors['primary']}]â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['primary']}]")
+                self.console.print(f"\n[{self.colors['primary']}]┌── XSS RESULTS ───────────────────────────────────[/{self.colors['primary']}]")
+                self.console.print(f"[{self.colors['primary']}]│[/{self.colors['primary']}] [green]✅ No XSS vulnerabilities found[/green]")
+                self.console.print(f"[{self.colors['primary']}]└────────────────────────────────────────────────────[/{self.colors['primary']}]")
             
             self._show_success("XSS scan completed")
             
@@ -2802,30 +2848,30 @@ class SecurityDashboard:
         self._show_centered_banner()
         
         url = Prompt.ask(
-            f"[{self.colors['primary']}]â”Œâ”€ Target URL â”€â”€â–º[/{self.colors['primary']}]",
+            f"[{self.colors['primary']}]┌── Target URL ──►[/{self.colors['primary']}]",
             default="https://example.com"
         )
         
         if not url.startswith(('http://', 'https://')):
             url = 'https://' + url
         
-        self.console.print(f"[{self.colors['primary']}]ðŸ” Scanning for CSRF[/{self.colors['primary']}]")
+        self.console.print(f"[{self.colors['primary']}]🔐 Scanning for CSRF[/{self.colors['primary']}]")
         self.console.print(f"[dim]Target: {url}[/dim]")
         
         try:
             results = self.analyzer.cmd_scan_csrf(url)
             
             if results:
-                self.console.print(f"\n[{self.colors['warning']}]â”Œâ”€ CSRF TEST RESULTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['warning']}]")
+                self.console.print(f"\n[{self.colors['warning']}]┌── CSRF TEST RESULTS ─────────────────────────────[/{self.colors['warning']}]")
                 for r in results:
-                    status = "âŒ VULNERABLE" if r.get('vulnerable') else "âœ… SECURE"
+                    status = "❌ VULNERABLE" if r.get('vulnerable') else "✅ SECURE"
                     color = "red" if r.get('vulnerable') else "green"
-                    self.console.print(f"[{self.colors['warning']}]â”‚[/{self.colors['warning']}] [{color}]{status}[/{color}] {r.get('form_action', 'Unknown')[:40]}")
-                self.console.print(f"[{self.colors['warning']}]â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['warning']}]")
+                    self.console.print(f"[{self.colors['warning']}]│[/{self.colors['warning']}] [{color}]{status}[/{color}] {r.get('form_action', 'Unknown')[:40]}")
+                self.console.print(f"[{self.colors['warning']}]└────────────────────────────────────────────────────[/{self.colors['warning']}]")
             else:
-                self.console.print(f"\n[{self.colors['primary']}]â”Œâ”€ CSRF RESULTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['primary']}]")
-                self.console.print(f"[{self.colors['primary']}]â”‚[/{self.colors['primary']}] [green]âœ… No CSRF vulnerabilities found[/green]")
-                self.console.print(f"[{self.colors['primary']}]â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['primary']}]")
+                self.console.print(f"\n[{self.colors['primary']}]┌── CSRF RESULTS ──────────────────────────────────[/{self.colors['primary']}]")
+                self.console.print(f"[{self.colors['primary']}]│[/{self.colors['primary']}] [green]✅ No CSRF vulnerabilities found[/green]")
+                self.console.print(f"[{self.colors['primary']}]└────────────────────────────────────────────────────[/{self.colors['primary']}]")
             
             self._show_success("CSRF scan completed")
             
@@ -2842,30 +2888,30 @@ class SecurityDashboard:
         self._show_centered_banner()
         
         url = Prompt.ask(
-            f"[{self.colors['primary']}]â”Œâ”€ Target URL â”€â”€â–º[/{self.colors['primary']}]",
+            f"[{self.colors['primary']}]┌── Target URL ──►[/{self.colors['primary']}]",
             default="https://example.com"
         )
         
         if not url.startswith(('http://', 'https://')):
             url = 'https://' + url
         
-        self.console.print(f"[{self.colors['primary']}]ðŸª Scanning Session Security[/{self.colors['primary']}]")
+        self.console.print(f"[{self.colors['primary']}]🍪 Scanning Session Security[/{self.colors['primary']}]")
         self.console.print(f"[dim]Target: {url}[/dim]")
         
         try:
             results = self.analyzer.cmd_scan_session(url)
             
             if results:
-                self.console.print(f"\n[{self.colors['warning']}]â”Œâ”€ SESSION VULNERABILITIES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['warning']}]")
+                self.console.print(f"\n[{self.colors['warning']}]┌── SESSION VULNERABILITIES ───────────────────────[/{self.colors['warning']}]")
                 for r in results:
-                    self.console.print(f"[{self.colors['warning']}]â”‚[/{self.colors['warning']}] [red]âœ–[/red] Cookie: [cyan]{r.get('cookie', 'Unknown')}[/cyan]")
+                    self.console.print(f"[{self.colors['warning']}]│[/{self.colors['warning']}] [red]✖[/red] Cookie: [cyan]{r.get('cookie', 'Unknown')}[/cyan]")
                     for vuln in r.get('vulnerabilities', []):
-                        self.console.print(f"[{self.colors['warning']}]â”‚[/{self.colors['warning']}]    [dim]-[/dim] {vuln}")
-                self.console.print(f"[{self.colors['warning']}]â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['warning']}]")
+                        self.console.print(f"[{self.colors['warning']}]│[/{self.colors['warning']}]    [dim]-[/dim] {vuln}")
+                self.console.print(f"[{self.colors['warning']}]└────────────────────────────────────────────────────[/{self.colors['warning']}]")
             else:
-                self.console.print(f"\n[{self.colors['primary']}]â”Œâ”€ SESSION RESULTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['primary']}]")
-                self.console.print(f"[{self.colors['primary']}]â”‚[/{self.colors['primary']}] [green]âœ… No session vulnerabilities found[/green]")
-                self.console.print(f"[{self.colors['primary']}]â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['primary']}]")
+                self.console.print(f"\n[{self.colors['primary']}]┌── SESSION RESULTS ──────────────────────────────[/{self.colors['primary']}]")
+                self.console.print(f"[{self.colors['primary']}]│[/{self.colors['primary']}] [green]✅ No session vulnerabilities found[/green]")
+                self.console.print(f"[{self.colors['primary']}]└────────────────────────────────────────────────────[/{self.colors['primary']}]")
             
             self._show_success("Session scan completed")
             
@@ -2882,15 +2928,14 @@ class SecurityDashboard:
         self._show_centered_banner()
         
         url = Prompt.ask(
-            f"[{self.colors['primary']}]â”Œâ”€ Target URL â”€â”€â–º[/{self.colors['primary']}]",
+            f"[{self.colors['primary']}]┌── Target URL ──►[/{self.colors['primary']}]",
             default="https://example.com"
         )
         
         if not url.startswith(('http://', 'https://')):
             url = 'https://' + url
         
-        
-        self.console.print(f"[{self.colors['primary']}]ðŸ˜ Scanning PHP Security[/{self.colors['primary']}]")
+        self.console.print(f"[{self.colors['primary']}]🐘 Scanning PHP Security[/{self.colors['primary']}]")
         self.console.print(f"[dim]Target: {url}[/dim]")
     
         
@@ -2898,14 +2943,14 @@ class SecurityDashboard:
             results = self.analyzer.cmd_scan_php(url)
             
             if results:
-                self.console.print(f"\n[{self.colors['primary']}]â”Œâ”€ PHP INFORMATION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['primary']}]")
+                self.console.print(f"\n[{self.colors['primary']}]┌── PHP INFORMATION ──────────────────────────────[/{self.colors['primary']}]")
                 for r in results:
-                    self.console.print(f"[{self.colors['primary']}]â”‚[/{self.colors['primary']}] [cyan]{r.get('type', 'Unknown')}:[/cyan] {r.get('version', 'N/A')}")
-                self.console.print(f"[{self.colors['primary']}]â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['primary']}]")
+                    self.console.print(f"[{self.colors['primary']}]│[/{self.colors['primary']}] [cyan]{r.get('type', 'Unknown')}:[/cyan] {r.get('version', 'N/A')}")
+                self.console.print(f"[{self.colors['primary']}]└────────────────────────────────────────────────────[/{self.colors['primary']}]")
             else:
-                self.console.print(f"\n[{self.colors['primary']}]â”Œâ”€ PHP RESULTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['primary']}]")
-                self.console.print(f"[{self.colors['primary']}]â”‚[/{self.colors['primary']}] [dim]No PHP information detected[/dim]")
-                self.console.print(f"[{self.colors['primary']}]â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['primary']}]")
+                self.console.print(f"\n[{self.colors['primary']}]┌── PHP RESULTS ─────────────────────────────────[/{self.colors['primary']}]")
+                self.console.print(f"[{self.colors['primary']}]│[/{self.colors['primary']}] [dim]No PHP information detected[/dim]")
+                self.console.print(f"[{self.colors['primary']}]└────────────────────────────────────────────────────[/{self.colors['primary']}]")
             
             self._show_success("PHP scan completed")
             
@@ -2922,15 +2967,14 @@ class SecurityDashboard:
         self._show_centered_banner()
         
         url = Prompt.ask(
-            f"[{self.colors['primary']}]â”Œâ”€ Target URL â”€â”€â–º[/{self.colors['primary']}]",
+            f"[{self.colors['primary']}]┌── Target URL ──►[/{self.colors['primary']}]",
             default="https://example.com"
         )
         
         if not url.startswith(('http://', 'https://')):
             url = 'https://' + url
         
-        
-        self.console.print(f"[{self.colors['primary']}]ðŸŒ Scanning Apache Security[/{self.colors['primary']}]")
+        self.console.print(f"[{self.colors['primary']}]🌐 Scanning Apache Security[/{self.colors['primary']}]")
         self.console.print(f"[dim]Target: {url}[/dim]")
     
         
@@ -2938,14 +2982,14 @@ class SecurityDashboard:
             results = self.analyzer.cmd_scan_apache(url)
             
             if results:
-                self.console.print(f"\n[{self.colors['primary']}]â”Œâ”€ APACHE INFORMATION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['primary']}]")
+                self.console.print(f"\n[{self.colors['primary']}]┌── APACHE INFORMATION ───────────────────────────[/{self.colors['primary']}]")
                 for r in results:
-                    self.console.print(f"[{self.colors['primary']}]â”‚[/{self.colors['primary']}] [cyan]{r.get('type', 'Unknown')}:[/cyan] {r.get('version', 'N/A')}")
-                self.console.print(f"[{self.colors['primary']}]â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['primary']}]")
+                    self.console.print(f"[{self.colors['primary']}]│[/{self.colors['primary']}] [cyan]{r.get('type', 'Unknown')}:[/cyan] {r.get('version', 'N/A')}")
+                self.console.print(f"[{self.colors['primary']}]└────────────────────────────────────────────────────[/{self.colors['primary']}]")
             else:
-                self.console.print(f"\n[{self.colors['primary']}]â”Œâ”€ APACHE RESULTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['primary']}]")
-                self.console.print(f"[{self.colors['primary']}]â”‚[/{self.colors['primary']}] [dim]No Apache information detected[/dim]")
-                self.console.print(f"[{self.colors['primary']}]â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['primary']}]")
+                self.console.print(f"\n[{self.colors['primary']}]┌── APACHE RESULTS ───────────────────────────────[/{self.colors['primary']}]")
+                self.console.print(f"[{self.colors['primary']}]│[/{self.colors['primary']}] [dim]No Apache information detected[/dim]")
+                self.console.print(f"[{self.colors['primary']}]└────────────────────────────────────────────────────[/{self.colors['primary']}]")
             
             self._show_success("Apache scan completed")
             
@@ -2965,8 +3009,7 @@ class SecurityDashboard:
         self._clear_screen()
         self._show_centered_banner()
         
-        
-        self.console.print(f"[{self.colors['primary']}]ðŸ“„ Export Report with Platform-Specific Remediation[/{self.colors['primary']}]")
+        self.console.print(f"[{self.colors['primary']}]📄 Export Report with Platform-Specific Remediation[/{self.colors['primary']}]")
         self.console.print(f"[dim]Target: {self.current_report.url}[/dim]")
         self.console.print(f"[dim]Risk Score: {self.current_report.risk_score}/100[/dim]")
         self.console.print(f"[dim]Findings: {len(self.current_report.findings)}[/dim]")
@@ -2975,10 +3018,8 @@ class SecurityDashboard:
         platform = self.current_report.platform_remediation.get('platform', {})
         self.console.print(f"[dim]Detected Platform: {platform.get('webserver', 'Unknown')} + {platform.get('language', 'Unknown')}[/dim]")
         
-    
-        
         choice = Prompt.ask(
-            f"[{self.colors['primary']}]â”Œâ”€ Export Format â”€â”€â–º[/{self.colors['primary']}]",
+            f"[{self.colors['primary']}]┌── Export Format ──►[/{self.colors['primary']}]",
             choices=["pdf", "json", "html", "all", "c"],
             default="pdf"
         )
@@ -3008,13 +3049,13 @@ class SecurityDashboard:
         try:
             pdf_path = self.pdf_generator.generate_report(self.current_report)
             if pdf_path:
-                self.console.print(f"[green]âœ… PDF saved: {pdf_path}[/green]")
+                self.console.print(f"[green]✅ PDF saved: {pdf_path}[/green]")
                 try:
                     os.startfile(pdf_path) if os.name == 'nt' else webbrowser.open(f"file://{pdf_path}")
                 except:
                     pass
         except Exception as e:
-            self.console.print(f"[red]âŒ PDF export failed: {e}[/red]")
+            self.console.print(f"[red]❌ PDF export failed: {e}[/red]")
     
     def _export_json(self):
         """Export to JSON with platform-specific remediation"""
@@ -3052,10 +3093,10 @@ class SecurityDashboard:
             with open(filename, 'w', encoding='utf-8') as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
             
-            self.console.print(f"[green]âœ… JSON saved: {filename}[/green]")
+            self.console.print(f"[green]✅ JSON saved: {filename}[/green]")
             
         except Exception as e:
-            self.console.print(f"[red]âŒ JSON export failed: {e}[/red]")
+            self.console.print(f"[red]❌ JSON export failed: {e}[/red]")
     
     def escape_html(self, text):
         """Escape HTML special characters"""
@@ -3097,7 +3138,7 @@ class SecurityDashboard:
             for f in self.current_report.findings:
                 remediation_html = ''
                 if f.remediation_configs:
-                    remediation_html = '<div class="remediation"><h4>ðŸ”§ Platform-Specific Remediation</h4>'
+                    remediation_html = '<div class="remediation"><h4>🔧 Platform-Specific Remediation</h4>'
                     for config_type, config_data in f.remediation_configs.items():
                         if config_data:
                             remediation_html += f'<h5>{self.escape_html(config_data.get("title", config_type))}</h5>'
@@ -3125,79 +3166,79 @@ class SecurityDashboard:
                 '''
         
             html = f'''<!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Security Report - {self.escape_html(self.current_report.url)}</title>
-        <style>
-            body {{ font-family: 'Courier New', monospace; background: #0a0e0a; color: #00ff41; margin: 40px; }}
-            .container {{ max-width: 1400px; margin: 0 auto; }}
-            .header {{ background: #0d120d; border: 2px solid #00ff41; padding: 20px; border-radius: 10px; }}
-            .finding {{ background: #0d120d; border: 1px solid #00ff41; padding: 15px; margin: 15px 0; border-radius: 5px; }}
-            .severity-critical {{ border-color: #ff0044; }}
-            .severity-high {{ border-color: #ff6b35; }}
-            .severity-medium {{ border-color: #ffcc00; }}
-            .severity-low {{ border-color: #00cc33; }}
-            .summary {{ background: #0d120d; border: 1px solid #00ff41; padding: 20px; border-radius: 5px; white-space: pre-wrap; }}
-            .remediation {{ background: #1a1a2e; border: 1px solid #00ff8844; padding: 15px; margin: 10px 0; border-radius: 5px; }}
-            .remediation-code {{ background: #0a0a0a; padding: 10px; border: 1px solid #446644; border-radius: 3px; font-family: 'Courier New', monospace; color: #00ff88; white-space: pre-wrap; }}
-            .commands {{ background: #0a0a0a; padding: 10px; border: 1px solid #444466; border-radius: 3px; font-family: 'Courier New', monospace; color: #88ccff; white-space: pre-wrap; }}
-            .platform-info {{ background: #0d120d; border: 1px solid #00ff8844; padding: 20px; border-radius: 5px; margin: 20px 0; }}
-            table {{ width: 100%; border-collapse: collapse; margin: 20px 0; }}
-            th, td {{ padding: 10px; border: 1px solid #00ff41; text-align: left; }}
-            th {{ background: #0d120d; color: #00ff41; }}
-            .watermark {{ color: #1a3a1a; text-align: center; margin-top: 50px; font-size: 12px; }}
-            h3 {{ color: #ffcc00; }}
-            h4 {{ color: #00ff88; }}
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="header">
-                <h1>Web Security Analysis Report</h1>
-                <p>URL: {self.escape_html(self.current_report.url)}</p>
-                <p>Date: {self.escape_html(self.current_report.timestamp)}</p>
-                <p>Risk Score: {self.current_report.risk_score}/100</p>
-                <p>Generated by: {PLATFORM} {VERSION}</p>
-            </div>
-            <div class="summary">
-                <h2>Executive Summary</h2>
-                <pre>{self.escape_html(self.current_report.summary)}</pre>
-            </div>
-            <h2>Server Information</h2>
-            <table>
-                <tr><th>Property</th><th>Value</th></tr>
-                {''.join(f'<tr><td>{self.escape_html(k)}</td><td>{self.escape_html(v)}</td></tr>' for k, v in self.current_report.server_info.items())}
-            </table>
-            <h2>Technologies Detected</h2>
-            <p>{', '.join(self.escape_html(t) for t in self.current_report.technologies) if self.current_report.technologies else 'None'}</p>
-            {platform_html}
-            <h2>Security Headers</h2>
-            <table>
-                <tr><th>Header</th><th>Value</th><th>Status</th></tr>
-                {''.join(f'<tr><td>{self.escape_html(h)}</td><td>{self.escape_html(v)}</td><td>{v != "Not Set" and "âœ… Set" or "âŒ Missing"}</td></tr>' for h, v in self.current_report.security_headers.items())}
-            </table>
-            <h2>Security Findings with Platform-Specific Remediation ({len(self.current_report.findings)})</h2>
-            {findings_html}
-            <h2>Exposed Files ({len(self.current_report.exposed_files)})</h2>
-            <ul>
-                {''.join(f'<li>{self.escape_html(f)}</li>' for f in self.current_report.exposed_files[:20])}
-                {f'<li>... and {len(self.current_report.exposed_files) - 20} more</li>' if len(self.current_report.exposed_files) > 20 else ''}
-            </ul>
-            <div class="watermark">
-                â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•<br>
-                {PLATFORM} {VERSION} â”‚ DSTERMINAL Security Analyzer<br>
-                âš ï¸ This analysis is for AUTHORIZED/EDUCATIONAL purposes only.<br>
-                â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-            </div>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Security Report - {self.escape_html(self.current_report.url)}</title>
+    <style>
+        body {{ font-family: 'Courier New', monospace; background: #0a0e0a; color: #00ff41; margin: 40px; }}
+        .container {{ max-width: 1400px; margin: 0 auto; }}
+        .header {{ background: #0d120d; border: 2px solid #00ff41; padding: 20px; border-radius: 10px; }}
+        .finding {{ background: #0d120d; border: 1px solid #00ff41; padding: 15px; margin: 15px 0; border-radius: 5px; }}
+        .severity-critical {{ border-color: #ff0044; }}
+        .severity-high {{ border-color: #ff6b35; }}
+        .severity-medium {{ border-color: #ffcc00; }}
+        .severity-low {{ border-color: #00cc33; }}
+        .summary {{ background: #0d120d; border: 1px solid #00ff41; padding: 20px; border-radius: 5px; white-space: pre-wrap; }}
+        .remediation {{ background: #1a1a2e; border: 1px solid #00ff8844; padding: 15px; margin: 10px 0; border-radius: 5px; }}
+        .remediation-code {{ background: #0a0a0a; padding: 10px; border: 1px solid #446644; border-radius: 3px; font-family: 'Courier New', monospace; color: #00ff88; white-space: pre-wrap; }}
+        .commands {{ background: #0a0a0a; padding: 10px; border: 1px solid #444466; border-radius: 3px; font-family: 'Courier New', monospace; color: #88ccff; white-space: pre-wrap; }}
+        .platform-info {{ background: #0d120d; border: 1px solid #00ff8844; padding: 20px; border-radius: 5px; margin: 20px 0; }}
+        table {{ width: 100%; border-collapse: collapse; margin: 20px 0; }}
+        th, td {{ padding: 10px; border: 1px solid #00ff41; text-align: left; }}
+        th {{ background: #0d120d; color: #00ff41; }}
+        .watermark {{ color: #1a3a1a; text-align: center; margin-top: 50px; font-size: 12px; }}
+        h3 {{ color: #ffcc00; }}
+        h4 {{ color: #00ff88; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Web Security Analysis Report</h1>
+            <p>URL: {self.escape_html(self.current_report.url)}</p>
+            <p>Date: {self.escape_html(self.current_report.timestamp)}</p>
+            <p>Risk Score: {self.current_report.risk_score}/100</p>
+            <p>Generated by: {PLATFORM} {VERSION}</p>
         </div>
-    </body>
-    </html>'''
+        <div class="summary">
+            <h2>Executive Summary</h2>
+            <pre>{self.escape_html(self.current_report.summary)}</pre>
+        </div>
+        <h2>Server Information</h2>
+        <table>
+            <tr><th>Property</th><th>Value</th></tr>
+            {''.join(f'<tr><td>{self.escape_html(k)}</td><td>{self.escape_html(v)}</td></tr>' for k, v in self.current_report.server_info.items())}
+        </table>
+        <h2>Technologies Detected</h2>
+        <p>{', '.join(self.escape_html(t) for t in self.current_report.technologies) if self.current_report.technologies else 'None'}</p>
+        {platform_html}
+        <h2>Security Headers</h2>
+        <table>
+            <tr><th>Header</th><th>Value</th><th>Status</th></tr>
+            {''.join(f'<tr><td>{self.escape_html(h)}</td><td>{self.escape_html(v)}</td><td>{v != "Not Set" and "✅ Set" or "❌ Missing"}</td></tr>' for h, v in self.current_report.security_headers.items())}
+        </table>
+        <h2>Security Findings with Platform-Specific Remediation ({len(self.current_report.findings)})</h2>
+        {findings_html}
+        <h2>Exposed Files ({len(self.current_report.exposed_files)})</h2>
+        <ul>
+            {''.join(f'<li>{self.escape_html(f)}</li>' for f in self.current_report.exposed_files[:20])}
+            {f'<li>... and {len(self.current_report.exposed_files) - 20} more</li>' if len(self.current_report.exposed_files) > 20 else ''}
+        </ul>
+        <div class="watermark">
+            ────────────────────────────────────────────────────────────────────────────────<br>
+            {PLATFORM} {VERSION} │ DSTERMINAL Security Analyzer<br>
+            ⚠️ This analysis is for AUTHORIZED/EDUCATIONAL purposes only.<br>
+            ────────────────────────────────────────────────────────────────────────────────
+        </div>
+    </div>
+</body>
+</html>'''
         
             with open(filename, 'w', encoding='utf-8') as f:
                 f.write(html)
         
-            self.console.print(f"[green]âœ… HTML saved: {filename}[/green]")
+            self.console.print(f"[green]✅ HTML saved: {filename}[/green]")
         
             try:
                 webbrowser.open(f"file://{filename}")
@@ -3205,15 +3246,14 @@ class SecurityDashboard:
                 pass
             
         except Exception as e:
-            self.console.print(f"[red]âŒ HTML export failed: {e}[/red]")
-
+            self.console.print(f"[red]❌ HTML export failed: {e}[/red]")
 
     def _generate_remediation_html(self, configs: Dict) -> str:
         """Generate HTML for remediation configurations"""
         if not configs:
             return ""
         
-        html = '<div class="remediation"><h4>ðŸ”§ Platform-Specific Remediation</h4>'
+        html = '<div class="remediation"><h4>🔧 Platform-Specific Remediation</h4>'
         
         def escape_html(text):
             if not text:
@@ -3256,9 +3296,7 @@ class SecurityDashboard:
             input(f"\n[{self.colors['dim']}]Press Enter to continue...[/{self.colors['dim']}]")
             return
         
-        
-        self.console.print(f"[{self.colors['primary']}]ðŸ“Š Scan History[/{self.colors['primary']}]")
-    
+        self.console.print(f"[{self.colors['primary']}]📊 Scan History[/{self.colors['primary']}]")
         
         for i, report in enumerate(self.scan_history[-10:], 1):
             risk_color = "green"
@@ -3267,12 +3305,12 @@ class SecurityDashboard:
             elif report.risk_score >= 40:
                 risk_color = "yellow"
             
-            self.console.print(f"\n[{self.colors['primary']}]â”Œâ”€ SCAN #{i} â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['primary']}]")
-            self.console.print(f"[{self.colors['primary']}]â”‚[/{self.colors['primary']}] [cyan]Target:[/cyan] {report.url}")
-            self.console.print(f"[{self.colors['primary']}]â”‚[/{self.colors['primary']}] [cyan]Time:[/cyan] {report.timestamp}")
-            self.console.print(f"[{self.colors['primary']}]â”‚[/{self.colors['primary']}] [cyan]Risk:[/cyan] [{risk_color}]{report.risk_score}/100[/{risk_color}]")
-            self.console.print(f"[{self.colors['primary']}]â”‚[/{self.colors['primary']}] [cyan]Findings:[/cyan] {len(report.findings)}")
-            self.console.print(f"[{self.colors['primary']}]â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€[/{self.colors['primary']}]")
+            self.console.print(f"\n[{self.colors['primary']}]┌── SCAN #{i} ────────────────────────────────────────[/{self.colors['primary']}]")
+            self.console.print(f"[{self.colors['primary']}]│[/{self.colors['primary']}] [cyan]Target:[/cyan] {report.url}")
+            self.console.print(f"[{self.colors['primary']}]│[/{self.colors['primary']}] [cyan]Time:[/cyan] {report.timestamp}")
+            self.console.print(f"[{self.colors['primary']}]│[/{self.colors['primary']}] [cyan]Risk:[/cyan] [{risk_color}]{report.risk_score}/100[/{risk_color}]")
+            self.console.print(f"[{self.colors['primary']}]│[/{self.colors['primary']}] [cyan]Findings:[/cyan] {len(report.findings)}")
+            self.console.print(f"[{self.colors['primary']}]└────────────────────────────────────────────────────[/{self.colors['primary']}]")
         
         input(f"\n[{self.colors['dim']}]Press Enter to continue...[/{self.colors['dim']}]")
         self._clear_screen()
@@ -3286,7 +3324,7 @@ class SecurityDashboard:
             self.typer = TypeWriter('fast')
         
         # Header with typing effect
-        self.typer.type_text("ðŸ“Š SECURITY ANALYSIS REPORT", color=Colors.CYAN, pen_effect=True)
+        self.typer.type_text("📊 SECURITY ANALYSIS REPORT", color=Colors.CYAN, pen_effect=True)
         print()
         
         # Risk Score
@@ -3299,21 +3337,21 @@ class SecurityDashboard:
             risk_color = Colors.YELLOW
             risk_text = "MEDIUM RISK"
         
-        self.typer.type_text("â”Œâ”€ RISK ASSESSMENT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€", color=Colors.CYAN, pen_effect=False)
-        self.typer.type_text(f"â”‚ Score: {report.risk_score}/100", color=risk_color, pen_effect=True)
-        self.typer.type_text(f"â”‚ Level: {risk_text}", color=risk_color, pen_effect=True)
-        self.typer.type_text("â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€", color=Colors.CYAN, pen_effect=False)
+        self.typer.type_text("┌── RISK ASSESSMENT ──────────────────────────────────", color=Colors.CYAN, pen_effect=False)
+        self.typer.type_text(f"│ Score: {report.risk_score}/100", color=risk_color, pen_effect=True)
+        self.typer.type_text(f"│ Level: {risk_text}", color=risk_color, pen_effect=True)
+        self.typer.type_text("└────────────────────────────────────────────────────", color=Colors.CYAN, pen_effect=False)
         print()
         
         # Platform Info
         platform = report.platform_remediation.get('platform', {})
-        self.typer.type_text("â”Œâ”€ DETECTED PLATFORM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€", color=Colors.MAGENTA, pen_effect=False)
-        self.typer.type_text(f"â”‚ Web Server: {platform.get('webserver', 'Unknown')}", color=Colors.GREEN, pen_effect=True)
-        self.typer.type_text(f"â”‚ OS: {platform.get('os', 'Unknown')}", color=Colors.GREEN, pen_effect=True)
-        self.typer.type_text(f"â”‚ Language: {platform.get('language', 'Unknown')}", color=Colors.GREEN, pen_effect=True)
-        self.typer.type_text(f"â”‚ Framework: {platform.get('framework', 'None detected')}", color=Colors.GREEN, pen_effect=True)
-        self.typer.type_text(f"â”‚ Cloud: {platform.get('cloud_provider', 'None detected')}", color=Colors.GREEN, pen_effect=True)
-        self.typer.type_text("â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€", color=Colors.MAGENTA, pen_effect=False)
+        self.typer.type_text("┌── DETECTED PLATFORM ──────────────────────────────", color=Colors.MAGENTA, pen_effect=False)
+        self.typer.type_text(f"│ Web Server: {platform.get('webserver', 'Unknown')}", color=Colors.GREEN, pen_effect=True)
+        self.typer.type_text(f"│ OS: {platform.get('os', 'Unknown')}", color=Colors.GREEN, pen_effect=True)
+        self.typer.type_text(f"│ Language: {platform.get('language', 'Unknown')}", color=Colors.GREEN, pen_effect=True)
+        self.typer.type_text(f"│ Framework: {platform.get('framework', 'None detected')}", color=Colors.GREEN, pen_effect=True)
+        self.typer.type_text(f"│ Cloud: {platform.get('cloud_provider', 'None detected')}", color=Colors.GREEN, pen_effect=True)
+        self.typer.type_text("└────────────────────────────────────────────────────", color=Colors.MAGENTA, pen_effect=False)
         print()
         
         # Fix Priority
@@ -3322,12 +3360,12 @@ class SecurityDashboard:
             priority = getattr(finding, 'fix_priority', 'MEDIUM')
             priority_counts[priority] = priority_counts.get(priority, 0) + 1
         
-        self.typer.type_text("â”Œâ”€ FIX PRIORITY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€", color=Colors.YELLOW, pen_effect=False)
-        self.typer.type_text(f"â”‚ CRITICAL (Fix Now): {priority_counts['CRITICAL']}", color=Colors.RED, pen_effect=True)
-        self.typer.type_text(f"â”‚ HIGH (Fix ASAP): {priority_counts['HIGH']}", color=Colors.RED, pen_effect=True)
-        self.typer.type_text(f"â”‚ MEDIUM (Plan Next): {priority_counts['MEDIUM']}", color=Colors.YELLOW, pen_effect=True)
-        self.typer.type_text(f"â”‚ LOW (Consider): {priority_counts['LOW']}", color=Colors.GREEN, pen_effect=True)
-        self.typer.type_text("â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€", color=Colors.YELLOW, pen_effect=False)
+        self.typer.type_text("┌── FIX PRIORITY ────────────────────────────────────", color=Colors.YELLOW, pen_effect=False)
+        self.typer.type_text(f"│ CRITICAL (Fix Now): {priority_counts['CRITICAL']}", color=Colors.RED, pen_effect=True)
+        self.typer.type_text(f"│ HIGH (Fix ASAP): {priority_counts['HIGH']}", color=Colors.RED, pen_effect=True)
+        self.typer.type_text(f"│ MEDIUM (Plan Next): {priority_counts['MEDIUM']}", color=Colors.YELLOW, pen_effect=True)
+        self.typer.type_text(f"│ LOW (Consider): {priority_counts['LOW']}", color=Colors.GREEN, pen_effect=True)
+        self.typer.type_text("└────────────────────────────────────────────────────", color=Colors.YELLOW, pen_effect=False)
         print()
         
         # Findings Summary
@@ -3335,18 +3373,18 @@ class SecurityDashboard:
         for finding in report.findings:
             severity_counts[finding.severity] += 1
         
-        self.typer.type_text("â”Œâ”€ FINDINGS SUMMARY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€", color=Colors.YELLOW, pen_effect=False)
-        self.typer.type_text(f"â”‚ CRITICAL: {severity_counts['CRITICAL']}", color=Colors.RED, pen_effect=True)
-        self.typer.type_text(f"â”‚ HIGH: {severity_counts['HIGH']}", color=Colors.RED, pen_effect=True)
-        self.typer.type_text(f"â”‚ MEDIUM: {severity_counts['MEDIUM']}", color=Colors.YELLOW, pen_effect=True)
-        self.typer.type_text(f"â”‚ LOW: {severity_counts['LOW']}", color=Colors.GREEN, pen_effect=True)
-        self.typer.type_text(f"â”‚ INFO: {severity_counts['INFO']}", color=Colors.CYAN, pen_effect=True)
-        self.typer.type_text("â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€", color=Colors.YELLOW, pen_effect=False)
+        self.typer.type_text("┌── FINDINGS SUMMARY ───────────────────────────────", color=Colors.YELLOW, pen_effect=False)
+        self.typer.type_text(f"│ CRITICAL: {severity_counts['CRITICAL']}", color=Colors.RED, pen_effect=True)
+        self.typer.type_text(f"│ HIGH: {severity_counts['HIGH']}", color=Colors.RED, pen_effect=True)
+        self.typer.type_text(f"│ MEDIUM: {severity_counts['MEDIUM']}", color=Colors.YELLOW, pen_effect=True)
+        self.typer.type_text(f"│ LOW: {severity_counts['LOW']}", color=Colors.GREEN, pen_effect=True)
+        self.typer.type_text(f"│ INFO: {severity_counts['INFO']}", color=Colors.CYAN, pen_effect=True)
+        self.typer.type_text("└────────────────────────────────────────────────────", color=Colors.YELLOW, pen_effect=False)
         print()
         
         # Detailed Findings - Show top 10
         if report.findings:
-            self.typer.type_text("â”Œâ”€ DETAILED FINDINGS WITH PLATFORM REMEDIATION â”€â”€", color=Colors.CYAN, pen_effect=False)
+            self.typer.type_text("┌── DETAILED FINDINGS WITH PLATFORM REMEDIATION ────", color=Colors.CYAN, pen_effect=False)
             
             # Sort findings by severity
             severity_order = {'CRITICAL': 0, 'HIGH': 1, 'MEDIUM': 2, 'LOW': 3, 'INFO': 4}
@@ -3357,57 +3395,56 @@ class SecurityDashboard:
                 priority = getattr(finding, 'fix_priority', 'MEDIUM')
                 priority_color = Colors.RED if priority == 'CRITICAL' else Colors.YELLOW if priority == 'HIGH' else Colors.GREEN
                 
-                self.typer.type_text(f"â”‚ â—‰ {finding.severity} {finding.title[:50]}", color=severity_color, pen_effect=True)
-                self.typer.type_text(f"â”‚    Priority: {priority}", color=priority_color, pen_effect=True)
+                self.typer.type_text(f"│ ◉ {finding.severity} {finding.title[:50]}", color=severity_color, pen_effect=True)
+                self.typer.type_text(f"│    Priority: {priority}", color=priority_color, pen_effect=True)
                 
                 if hasattr(finding, 'recommendation'):
                     rec = finding.recommendation[:60]
-                    self.typer.type_text(f"â”‚    Fix: {rec}{'...' if len(finding.recommendation) > 60 else ''}", 
+                    self.typer.type_text(f"│    Fix: {rec}{'...' if len(finding.recommendation) > 60 else ''}", 
                                         color=Colors.GREEN, pen_effect=True)
                 
                 if finding.remediation_configs:
-                    self.typer.type_text(f"â”‚    âœ“ Platform-specific remediation available", 
+                    self.typer.type_text(f"│    ✓ Platform-specific remediation available", 
                                         color=Colors.CYAN, pen_effect=True)
                 
                 if i < len(sorted_findings[:10]) - 1:
-                    self.typer.type_text("â”‚", color=Colors.DIM, pen_effect=False)
+                    self.typer.type_text("│", color=Colors.DIM, pen_effect=False)
                     time.sleep(0.05)
             
             if len(sorted_findings) > 10:
-                self.typer.type_text(f"â”‚ ... and {len(sorted_findings) - 10} more findings", 
+                self.typer.type_text(f"│ ... and {len(sorted_findings) - 10} more findings", 
                                     color=Colors.DIM, pen_effect=True)
             
-            self.typer.type_text("â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€", color=Colors.CYAN, pen_effect=False)
+            self.typer.type_text("└────────────────────────────────────────────────────", color=Colors.CYAN, pen_effect=False)
             print()
         
         # Technologies
         if report.technologies:
-            self.typer.type_text("â”Œâ”€ TECHNOLOGIES DETECTED â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€", color=Colors.MAGENTA, pen_effect=False)
+            self.typer.type_text("┌── TECHNOLOGIES DETECTED ─────────────────────────", color=Colors.MAGENTA, pen_effect=False)
             for tech in report.technologies:
-                self.typer.type_text(f"â”‚ â€¢ {tech}", color=Colors.CYAN, pen_effect=True)
-            self.typer.type_text("â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€", color=Colors.MAGENTA, pen_effect=False)
+                self.typer.type_text(f"│ • {tech}", color=Colors.CYAN, pen_effect=True)
+            self.typer.type_text("└────────────────────────────────────────────────────", color=Colors.MAGENTA, pen_effect=False)
             print()
             
     def _exit_dashboard(self):
         """Exit the dashboard"""
         self._clear_screen()
         self.console.print(Align.center(f"""
-[{self.colors['primary']}]â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
-[{self.colors['primary']}]â•‘[/{self.colors['primary']}]  [{self.colors['info']}]â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•—  â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—[/{self.colors['primary']}]  [{self.colors['primary']}]â•‘
-[{self.colors['primary']}]â•‘[/{self.colors['primary']}]  [{self.colors['info']}]â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•‘â•šâ•â•â–ˆâ–ˆâ•”â•â•â•[/{self.colors['primary']}]  [{self.colors['primary']}]â•‘
-[{self.colors['primary']}]â•‘[/{self.colors['primary']}]  [{self.colors['info']}]â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   [/{self.colors['primary']}]  [{self.colors['primary']}]â•‘
-[{self.colors['primary']}]â•‘[/{self.colors['primary']}]  [{self.colors['info']}]â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   [/{self.colors['primary']}]  [{self.colors['primary']}]â•‘
-[{self.colors['primary']}]â•‘[/{self.colors['primary']}]  [{self.colors['info']}]â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   [/{self.colors['primary']}]  [{self.colors['primary']}]â•‘
-[{self.colors['primary']}]â•‘[/{self.colors['primary']}]  [{self.colors['info']}]â•šâ•â•â•â•â•â• â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•â•šâ•â•â•â•â•â•â•â•šâ•â•   â•šâ•â•   [/{self.colors['primary']}]  [{self.colors['primary']}]â•‘
-[{self.colors['primary']}]â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•[/{self.colors['primary']}]
+[{self.colors['primary']}]╔══════════════════════════════════════════════════════════════════╗
+[{self.colors['primary']}]║  [{self.colors['info']}]██████╗ ███████╗████████╗███████╗██████╗ ███╗   ███╗██╗███╗   ██╗ █████╗ ██╗     ║
+[{self.colors['primary']}]║  [{self.colors['info']}]██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║████╗  ██║██╔══██╗██║     ║
+[{self.colors['primary']}]║  [{self.colors['info']}]██║  ██║█████╗     ██║   █████╗  ██████╔╝██╔████╔██║██║██╔██╗ ██║███████║██║     ║
+[{self.colors['primary']}]║  [{self.colors['info']}]██║  ██║██╔══╝     ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██║██║╚██╗██║██╔══██║██║     ║
+[{self.colors['primary']}]║  [{self.colors['info']}]██████╔╝███████╗   ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║██║  ██║███████╗║
+[{self.colors['primary']}]║  [{self.colors['info']}]╚═════╝ ╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝║
+[{self.colors['primary']}]╚══════════════════════════════════════════════════════════════════╝[/{self.colors['primary']}]
 
-[{self.colors['primary']}]ðŸ‘‹ Thank you for using DSTERMINAL Security Analyzer[/{self.colors['primary']}]
+[{self.colors['primary']}]👋 Thank you for using DSTERMINAL Security Analyzer[/{self.colors['primary']}]
 [{self.colors['dim']}] {PLATFORM} {VERSION}[/{self.colors['dim']}]
-[{self.colors['dim']}]ðŸ”’ Always test responsibly and ethically.[/{self.colors['dim']}]
+[{self.colors['dim']}]🔒 Always test responsibly and ethically.[/{self.colors['dim']}]
 """))
         time.sleep(1.5)
         sys.exit(0)
-
 
 # ============================================================
 # MAIN ENTRY POINT
@@ -3418,11 +3455,11 @@ def main():
     
     # Check for required dependencies
     if not REQUESTS_AVAILABLE:
-        print("[red]âŒ requests not installed. Run: pip install requests[/red]")
+        print("[red]❌ requests not installed. Run: pip install requests[/red]")
         sys.exit(1)
     
     if not BS4_AVAILABLE:
-        print("[red]âŒ beautifulsoup4 not installed. Run: pip install beautifulsoup4[/red]")
+        print("[red]❌ beautifulsoup4 not installed. Run: pip install beautifulsoup4[/red]")
         sys.exit(1)
     
     # Clear screen and show banner
@@ -3432,21 +3469,21 @@ def main():
     typer = TypeWriter('fast')
     
     # Show legal warning with typing effect
-    typer.type_text("â•" * 80, color=Colors.DIM)
-    typer.type_text("âš ï¸  LEGAL WARNING AND DISCLAIMER âš ï¸ : ", color=Colors.RED, pen_effect=True)
-    typer.type_text("â•" * 80, color=Colors.DIM)
+    typer.type_text("─" * 80, color=Colors.DIM)
+    typer.type_text("⚠️  LEGAL WARNING AND DISCLAIMER ⚠️ : ", color=Colors.RED, pen_effect=True)
+    typer.type_text("─" * 80, color=Colors.DIM)
     typer.type_text("This Module is for EDUCATIONAL PURPOSES and AUTHORIZED SECURITY TESTING only.", color=Colors.YELLOW, pen_effect=True)
     typer.type_text("Do not use on systems you do not own or do not have explicit permission to test.", color=Colors.YELLOW, pen_effect=True)
-    typer.type_text("â•" * 80, color=Colors.DIM)
+    typer.type_text("─" * 80, color=Colors.DIM)
     typer.type_text("\n", newline=True)
     
     # Show banner with fast typing
     banner_lines = [
-        "â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—",
-        "â•‘  ðŸ” DSTERMINAL Systems & Web Security Analyzer v4.0.0.113          â•‘",
-        "â•‘  ðŸ“„ Platform-Specific Remediation Configurations                 â•‘",
-        "â•‘  ðŸ’€ For Educational & Authorized Security Testing Only           â•‘",
-        "â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•"
+        "╔══════════════════════════════════════════════════════════════════╗",
+        "║  🔐 DSTERMINAL Systems & Web Security Analyzer v4.0.0.113          ║",
+        "║  📄 Platform-Specific Remediation Configurations                 ║",
+        "║  💀 For Educational & Authorized Security Testing Only           ║",
+        "╚══════════════════════════════════════════════════════════════════╝"
     ]
     typer.type_banner(banner_lines, color=Colors.CYAN)
     typer.type_text("\n", newline=True)
@@ -3468,10 +3505,10 @@ def main():
         dashboard = SecurityDashboard()
         dashboard.run()
     except KeyboardInterrupt:
-        typer.type_text("\n\nâš ï¸  Interrupted by user", color=Colors.YELLOW)
+        typer.type_text("\n\n⚠️  Interrupted by user", color=Colors.YELLOW)
         sys.exit(0)
     except Exception as e:
-        typer.type_text(f"\nâŒ Fatal error: {e}", color=Colors.RED)
+        typer.type_text(f"\n❌ Fatal error: {e}", color=Colors.RED)
         import traceback
         traceback.print_exc()
         input("\nPress Enter to exit...")

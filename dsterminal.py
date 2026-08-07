@@ -185,6 +185,20 @@ from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit.formatted_text import HTML
 from prompt_toolkit.shortcuts import print_formatted_text
 
+# Prompt toolkit imports
+try:
+    from prompt_toolkit import PromptSession
+    from prompt_toolkit.history import FileHistory
+    from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+    from prompt_toolkit.formatted_text import HTML
+    from prompt_toolkit.styles import Style
+    from prompt_toolkit.completion import NestedCompleter
+    from prompt_toolkit.layout.processors import Processor, Transformation
+    from prompt_toolkit.buffer import Buffer
+except ImportError as e:
+    print(f"[!] prompt_toolkit not available: {e}")
+    sys.exit(1)
+
 from colorama import Fore, Style, init
 # from pyfiglet import figlet_format
 from pyfiglet import figlet_format
@@ -336,6 +350,22 @@ crypto_engine = CryptoEngine()
 # =========================
 # Place this right after your imports, before any classes
 # =========================
+class Colors:
+    """ANSI color codes for terminal output"""
+    HEADER = '\033[95m'
+    BLUE = '\033[94m'
+    CYAN = '\033[96m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    END = '\033[0m'
+    BLACK = '\033[90m'
+    MAGENTA = '\033[95m'
+    WHITE = '\033[97m'
+    DIM = '\033[2m'
+
 
 class SimpleWorkspace:
     """Minimal workspace wrapper for string paths."""
@@ -1858,6 +1888,35 @@ def typewrite_effect(text, delay=0.02, color_effects=True):
             time.sleep(delay)
         console.print()  # New line
         time.sleep(delay * 1.5)
+
+# ============================================================
+# CUSTOM PLACEHOLDER PROCESSOR WITH RANDOM COLORS
+# ============================================================
+
+class PlaceholderProcessor(Processor):
+    """Processor that adds placeholder text to empty buffer with random colors"""
+    
+    def __init__(self, get_placeholder_data):
+        self.get_placeholder_data = get_placeholder_data
+    
+    def apply_transformation(self, transformation_input):
+        # Only show placeholder when buffer is empty
+        if transformation_input.document.text:
+            return Transformation(transformation_input.fragments)
+        
+        placeholder_data = self.get_placeholder_data()
+        if not placeholder_data or not placeholder_data['text']:
+            return Transformation(transformation_input.fragments)
+        
+        # Create formatted text with each character having its own color
+        formatted = []
+        for char, color in placeholder_data['colored_chars']:
+            if color:
+                formatted.append((f'fg:{color}', char))
+            else:
+                formatted.append(('', char))
+        
+        return Transformation(formatted)
 # ============================================
 # SECURITY TERMINAL CLASS - Now with fast init
 # ============================================
@@ -1929,6 +1988,12 @@ class SecurityTerminal:
         self.soc_dashboard_active = False
         self.dashboard_thread = None
         self.dashboard_port = 5000
+
+        self.cursor_thread = None
+        self.start_time = datetime.now()
+        self.current_input = ""
+        self.placeholder_text = ""
+ 
 
         """Initialize SOC Lab - Called from __init__"""
         self.soc_lab = None
@@ -2183,7 +2248,344 @@ class SecurityTerminal:
             self._display_initialization_banner()
 
     # ========== COMMAND INITIALIZATION METHODS ==========
+    #=====================================================
+        # ============================================================
+    # CURSOR BLINK & ANIMATION
+    # ============================================================
 
+    def _start_cursor_blink(self):
+        """Start the animated cursor in a background thread"""
+        self.cursor_running = True
+        self.cursor_thread = threading.Thread(target=self._animate_cursor, daemon=True)
+        self.cursor_thread.start()
+
+    def _animate_cursor(self):
+        """Animate cursor with blinking and color cycling"""
+        while self.cursor_running:
+            self.cursor_visible = not self.cursor_visible
+            if not self.cursor_visible:
+                self.cursor_color_index = (self.cursor_color_index + 1) % len(self.cursor_colors)
+            # Invalidate app to update cursor
+            if hasattr(self, 'app') and self.app:
+                try:
+                    self.app.invalidate()
+                except:
+                    pass
+            time.sleep(0.5)
+
+    def _get_cursor_char(self) -> str:
+        """Return the cursor character based on blink state"""
+        return "▌" if self.cursor_visible else " "
+
+    def _get_cursor_color(self) -> str:
+        """Get the current cursor color"""
+        return self.cursor_colors[self.cursor_color_index]
+
+    def _get_uptime(self) -> str:
+        """Get formatted uptime"""
+        if hasattr(self, 'start_time'):
+            uptime = datetime.now() - self.start_time
+            hours = int(uptime.total_seconds() // 3600)
+            minutes = int((uptime.total_seconds() % 3600) // 60)
+            return f"{hours}h {minutes}m"
+        return "0h 0m"
+
+    def _update_siem_metrics(self):
+        """Update SIEM metrics in real-time"""
+        # Simulate live data changes
+        self.alert_count += random.randint(-5, 10)
+        self.alert_count = max(100, min(400, self.alert_count))
+        
+        self.critical_alerts += random.randint(-1, 2)
+        self.critical_alerts = max(5, min(30, self.critical_alerts))
+        
+        self.high_alerts += random.randint(-2, 3)
+        self.high_alerts = max(20, min(80, self.high_alerts))
+        
+        self.incident_count += random.randint(-1, 1)
+        self.incident_count = max(8, min(25, self.incident_count))
+        
+        self.risk_score += random.randint(-2, 3)
+        self.risk_score = max(50, min(95, self.risk_score))
+        
+        self.event_rate += random.randint(-10, 20)
+        self.event_rate = max(50, min(300, self.event_rate))
+        
+        self.active_sessions += random.randint(-1, 1)
+        self.active_sessions = max(1, min(10, self.active_sessions))
+
+    # ============================================================
+    # INTELLIGENT PLACEHOLDER PROMPTS WITH COMMAND GUIDANCE
+    # ============================================================
+
+    def _get_placeholder_texts(self) -> list:
+        """Return intelligent placeholder prompts with command guidance"""
+        return [
+            "Type 'help' to see all available commands...",
+            "Try 'system scan' to check for vulnerabilities...",
+            "Use 'net mon' to monitor network traffic...",
+            "Run 'soc status' to check security operations center...",
+            "Type 'dashboard' to view live security metrics...",
+            "Need to harden your system? Try 'harden'...",
+            "Check for threats with 'ransomwatch'...",
+            "Use 'integrity scan' to verify file integrity...",
+            "Try 'crypto-verify' for cryptographic verification...",
+            "Explore security modules with 'dst-modules'...",
+            "Run 'vuln-scan' to identify vulnerabilities...",
+            "Use 'recon' for network reconnaissance...",
+            "Try 'sqlmap' for SQL injection testing...",
+            "Use 'nikto' for web server scanning...",
+            "Run 'trufflehog' to find secrets in code...",
+            "Type 'exploit-scan' to check for exploits...",
+            "Use 'forensic' for forensic analysis...",
+            "Try 'fraud-investigate' for fraud detection...",
+            "Run 'integrity restore' to restore files...",
+            "Use 'crypto-backup' for cryptographic backups...",
+            "Type 'system info' to view system information...",
+            "Try 'net scan' for network scanning...",
+            "Use 'websec' for web security analysis...",
+            "Run 'wifi-audit' for wireless security audit...",
+            "Type 'soc-intel' for threat intelligence...",
+            "Need help? Type 'help <command>' for details...",
+            "Use 'clear' to clean the terminal screen...",
+            "Run 'dst-status' to check DSTERMINAL status...",
+            "Type 'exit' to close the terminal safely...",
+            "Remember to always verify with 'integrity verify'...",
+            "Stay secure with 'harden-full' for complete hardening...",
+            "Monitor your system with 'monitor start'...",
+            "Check logs with 'dst-logs'...",
+            "Use 'recon-full' for thorough reconnaissance...",
+            "Try 'crypto-list' to list available crypto tools...",
+            "Run 'stegcheck' for steganography detection...",
+            "Use 'memdump' for memory analysis...",
+            "Secure your network with 'harden-ssh'...",
+            "Check firewall with 'harden-fw'...",
+            "Use 'soc-reports' to generate security reports...",
+            "Try 'ioc-education' to learn about IOCs...",
+            "Run 'integrity-report' for integrity reports...",
+            "Use 'crypto-export' to export crypto keys...",
+            "Type 'harden-status' to check hardening status...",
+            "Need to restore? Try 'restore-last'...",
+            "Use 'list-backups' to see available backups...",
+            "Try 'dst-workspace' to manage workspaces...",
+            "Run 'auto-discover' for automatic discovery...",
+            "Monitor all with 'monitor-all'...",
+            "Type 'show-paths' to see configured paths...",
+            "Use 'registry mon' to monitor registry...",
+            "Run 'soc-start' to start SOC monitoring...",
+            "Try 'soc-quick' for quick SOC scan...",
+            "Generate reports with 'soc-report'...",
+            "Check alerts with 'soc-alerts'...",
+            "Use 'soc-map' for SOC mapping...",
+            "Type 'soc-history' to view SOC history...",
+            "Run 'soc-pdf' to export SOC report as PDF...",
+            "Need to scan? Try 'scan-full' for complete scan...",
+            "Use 'quick-scan' for fast scanning...",
+            "Try 'deep-scan' for thorough analysis...",
+            "Run 'web-security' for web security audit...",
+            "Use 'web-scan' for web scanning...",
+            "Check headers with 'web-headers'...",
+            "Verify SSL with 'web-ssl'...",
+            "Find vulnerabilities with 'web-vuln'...",
+            "Type 'web-full' for complete web analysis...",
+            "Type 'exit' to close, or 'help' to explore..."
+        ]
+
+    def _get_color_palette(self) -> list:
+        """Return color palette for placeholder text"""
+        return [
+            '#ff6b6b',  # Red
+            '#ffa94d',  # Orange
+            '#ffd93d',  # Yellow
+            '#6bcb77',  # Green
+            '#4d96ff',  # Blue
+            '#9b59b6',  # Purple
+            '#ff6b9d',  # Pink
+            '#00d2d3',  # Cyan
+            '#f368e0',  # Magenta
+            '#ff9ff3',  # Light Pink
+            '#54a0ff',  # Light Blue
+            '#5f27cd',  # Dark Purple
+            '#01a3a4',  # Teal
+            '#f8a5c2',  # Rose
+            '#778beb',  # Periwinkle
+        ]
+
+    def _animate_placeholder(self):
+        """Background thread to animate the typing effect with random colors"""
+        color_palette = self._get_color_palette()
+        
+        # Initialize if not exists
+        if not hasattr(self, 'placeholder_text'):
+            self.placeholder_text = ""
+        if not hasattr(self, 'placeholder_colors'):
+            self.placeholder_colors = []
+        if not hasattr(self, 'placeholder_lock'):
+            self.placeholder_lock = threading.Lock()
+        
+        while self.cursor_running:
+            # Check if user is typing
+            if hasattr(self, 'current_input') and self.current_input:
+                with self.placeholder_lock:
+                    self.placeholder_text = ""
+                    self.placeholder_colors = []
+                time.sleep(0.1)
+                continue
+            
+            # Pick random sentence
+            full_text = random.choice(self._get_placeholder_texts())
+            typed_text = ""
+            temp_colors = []
+            
+            # Type each character with random color
+            for char in full_text:
+                if not self.cursor_running:
+                    return
+                
+                # Check if user started typing
+                if hasattr(self, 'current_input') and self.current_input:
+                    break
+                
+                typed_text += char
+                color = random.choice(color_palette)
+                temp_colors.append((char, color))
+                
+                with self.placeholder_lock:
+                    self.placeholder_text = typed_text
+                    self.placeholder_colors = temp_colors
+                
+                # Invalidate app to redraw prompt
+                if hasattr(self, 'app') and self.app:
+                    try:
+                        self.app.invalidate()
+                    except:
+                        pass
+                
+                # Natural typing delay
+                delay = random.uniform(0.02, 0.08)
+                
+                # Pause longer after punctuation
+                if char in ['.', ',', '!', '?', ';', ':']:
+                    delay *= 2.0
+                
+                # Random hesitation
+                if random.random() < 0.03:
+                    delay += random.uniform(0.1, 0.3)
+                
+                # Faster after spaces
+                if char == ' ':
+                    delay *= 0.6
+                
+                time.sleep(delay)
+            
+            # Pause after typing
+            if not (hasattr(self, 'current_input') and self.current_input):
+                time.sleep(random.uniform(1.0, 2.0))
+            
+            # Erase the text
+            while len(typed_text) > 0:
+                if not self.cursor_running:
+                    return
+                
+                # Check if user started typing
+                if hasattr(self, 'current_input') and self.current_input:
+                    break
+                
+                typed_text = typed_text[:-1]
+                if temp_colors:
+                    temp_colors.pop()
+                
+                with self.placeholder_lock:
+                    self.placeholder_text = typed_text
+                    self.placeholder_colors = temp_colors
+                
+                # Invalidate app to redraw prompt
+                if hasattr(self, 'app') and self.app:
+                    try:
+                        self.app.invalidate()
+                    except:
+                        pass
+                
+                # Erasing speed (faster than typing)
+                time.sleep(random.uniform(0.01, 0.03))
+            
+            # Idle before next sentence
+            if not (hasattr(self, 'current_input') and self.current_input):
+                time.sleep(random.uniform(0.5, 1.0))
+
+    def _get_placeholder_data(self) -> dict:
+        """Return current placeholder text and colors"""
+        if hasattr(self, 'current_input') and self.current_input:
+            return {'text': '', 'colored_chars': []}
+        
+        with self.placeholder_lock if hasattr(self, 'placeholder_lock') else threading.Lock():
+            return {
+                'text': self.placeholder_text if hasattr(self, 'placeholder_text') else "",
+                'colored_chars': self.placeholder_colors if hasattr(self, 'placeholder_colors') else []
+            }
+
+    def _get_prompt_siem_dashboard(self) -> HTML:
+        """Multi-Line SIEM Dashboard Prompt with live stats"""
+        # Update metrics
+        self._update_siem_metrics()
+        
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        version = "4.0.0.113"
+        
+        # Get cursor
+        cursor_char = self._get_cursor_char()
+        cursor_color = self._get_cursor_color()
+        
+        # Color coding based on values
+        alert_color = 'ansired' if self.alert_count > 300 else 'ansiyellow' if self.alert_count > 200 else 'ansigreen'
+        critical_color = 'ansired' if self.critical_alerts > 20 else 'ansiyellow' if self.critical_alerts > 10 else 'ansigreen'
+        high_color = 'ansiyellow' if self.high_alerts > 50 else 'ansigreen'
+        incident_color = 'ansired' if self.incident_count > 15 else 'ansiyellow' if self.incident_count > 10 else 'ansigreen'
+        risk_color = 'ansired' if self.risk_score > 70 else 'ansiyellow' if self.risk_score > 50 else 'ansigreen'
+        
+        # Build SIEM Dashboard Prompt - NO PLACEHOLDER HERE!
+        prompt_layout = (
+            f"<ansiwhite>┌─[</ansiwhite>"
+            f"<ansiyellow>{timestamp}</ansiyellow>"
+            f"<ansiwhite>]</ansiwhite> "
+            f"<ansicyan>📊</ansicyan> "
+            f"<ansigreen>SIEM=>DSTERMINAL CYBER-OPS</ansigreen> "
+            f"<ansiwhite>v{version}</ansiwhite>\n"
+            f"<ansiwhite>├─</ansiwhite> "
+            f"<ansiyellow>Alerts:</ansiyellow> "
+            f"<{alert_color}>{self.alert_count}</{alert_color}> "
+            f"<ansiwhite>│</ansiwhite> "
+            f"<ansiyellow>Critical:</ansiyellow> "
+            f"<{critical_color}>{self.critical_alerts}</{critical_color}> "
+            f"<ansiwhite>│</ansiwhite> "
+            f"<ansiyellow>High:</ansiyellow> "
+            f"<{high_color}>{self.high_alerts}</{high_color}>\n"
+            f"<ansiwhite>├─</ansiwhite> "
+            f"<ansiyellow>Incidents:</ansiyellow> "
+            f"<{incident_color}>{self.incident_count}</{incident_color}> "
+            f"<ansiwhite>│</ansiwhite> "
+            f"<ansiyellow>MTTR:</ansiyellow> "
+            f"<ansigreen>{self.mttr}</ansigreen> "
+            f"<ansiwhite>│</ansiwhite> "
+            f"<ansiyellow>Risk:</ansiyellow> "
+            f"<{risk_color}>{self.risk_score}%</{risk_color}>\n"
+            f"<ansiwhite>├─</ansiwhite> "
+            f"<ansiyellow>EPS (Events Per Second):</ansiyellow> "
+            f"<ansigreen>{self.event_rate}/s</ansigreen> "
+            f"<ansiwhite>│</ansiwhite> "
+            f"<ansiyellow>Sessions:</ansiyellow> "
+            f"<ansicyan>{self.active_sessions}</ansicyan> "
+            f"<ansiwhite>│</ansiwhite> "
+            f"<ansiyellow>Uptime:</ansiyellow> "
+            f"<ansigreen>{self._get_uptime()}</ansigreen>\n"
+            f"<ansiwhite>└─</ansiwhite>"
+            f"<ansired>❯</ansired> "
+            f"<style color='{cursor_color}'>{cursor_char}</style> "
+        )
+        
+        return HTML(prompt_layout)
+
+    #======================================================
     def _get_terminal_width(self):
         try:
             return shutil.get_terminal_size().columns
@@ -2884,10 +3286,38 @@ class SecurityTerminal:
         # Minimal logging setup
         pass
     
-    def log_to_siem(self, message):
-        """Log to SIEM - Fast"""
-        pass
-    
+    def is_admin(self) -> bool:
+        """Check if running with admin privileges"""
+        try:
+            return os.getuid() == 0
+        except AttributeError:
+            import ctypes
+            return ctypes.windll.shell32.IsUserAnAdmin() != 0
+
+    def log_command(self, cmd):
+        """Log command to file"""
+        try:
+            with open(self.log_file, 'a') as f:
+                f.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {cmd}\n")
+        except:
+            pass
+
+    def log_to_siem(self, msg):
+        """Log to SIEM"""
+        try:
+            with open(self.log_file, 'a') as f:
+                f.write(f"[SIEM] {msg}\n")
+        except:
+            pass
+
+    def save_session_end(self):
+        """Save session end"""
+        try:
+            with open(self.log_file, 'a') as f:
+                f.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Session ended\n")
+        except:
+            pass
+
     def log_event(self, event_type, message):
         """Log event - Fast"""
         pass
@@ -18302,126 +18732,20 @@ class SecurityTerminal:
 
 # --------------------help menu ends here from above========================
 # =============================END==========================================
-    from prompt_toolkit.styles import Style as PromptStyle
+    # ============================================================
+    # CURSOR BLINK & ANIMATION
+    # ============================================================
 
-    def _start_cursor_blink(self):
-        """Start the animated cursor in a background thread"""
-        self.cursor_running = True
-        self.cursor_thread = threading.Thread(target=self._animate_cursor, daemon=True)
-        self.cursor_thread.start()
-    
-    def _animate_cursor(self):
-        """Animate cursor with blinking and color cycling"""
-        while self.cursor_running:
-            self.cursor_visible = not self.cursor_visible
-            if not self.cursor_visible:
-                self.cursor_color_index = (self.cursor_color_index + 1) % len(self.cursor_colors)
-            time.sleep(0.5)
-    
-    def _get_cursor_char(self) -> str:
-        """Return the cursor character based on blink state"""
-        return "▌" if self.cursor_visible else " "
-    
-    def _get_cursor_color(self) -> str:
-        """Get the current cursor color"""
-        return self.cursor_colors[self.cursor_color_index]
-    
-    def _get_uptime(self) -> str:
-        """Get formatted uptime"""
-        if hasattr(self, 'start_time'):
-            uptime = datetime.now() - self.start_time
-            hours = int(uptime.total_seconds() // 3600)
-            minutes = int((uptime.total_seconds() % 3600) // 60)
-            return f"{hours}h {minutes}m"
-        return "0h 0m"
-    
-    def _update_siem_metrics(self):
-        """Update SIEM metrics in real-time"""
-        # Simulate live data changes
-        self.alert_count += random.randint(-5, 10)
-        self.alert_count = max(100, min(400, self.alert_count))
-        
-        self.critical_alerts += random.randint(-1, 2)
-        self.critical_alerts = max(5, min(30, self.critical_alerts))
-        
-        self.high_alerts += random.randint(-2, 3)
-        self.high_alerts = max(20, min(80, self.high_alerts))
-        
-        self.incident_count += random.randint(-1, 1)
-        self.incident_count = max(8, min(25, self.incident_count))
-        
-        self.risk_score += random.randint(-2, 3)
-        self.risk_score = max(50, min(95, self.risk_score))
-        
-        self.event_rate += random.randint(-10, 20)
-        self.event_rate = max(50, min(300, self.event_rate))
-        
-        self.active_sessions += random.randint(-1, 1)
-        self.active_sessions = max(1, min(10, self.active_sessions))
-    
-    def _get_prompt_siem_dashboard(self) -> HTML:
-        """Multi-Line SIEM Dashboard Prompt with live stats"""
-        # Update metrics
-        self._update_siem_metrics()
-        
-        timestamp = datetime.now().strftime("%H:%M:%S")
-        hostname = socket.gethostname()
-        version = "4.0.0.113"
-        
-        # Get cursor
-        cursor_char = self._get_cursor_char()
-        cursor_color = self._get_cursor_color()
-        
-        # Color coding based on values
-        alert_color = 'ansired' if self.alert_count > 300 else 'ansiyellow' if self.alert_count > 200 else 'ansigreen'
-        critical_color = 'ansired' if self.critical_alerts > 20 else 'ansiyellow' if self.critical_alerts > 10 else 'ansigreen'
-        high_color = 'ansiyellow' if self.high_alerts > 50 else 'ansigreen'
-        incident_color = 'ansired' if self.incident_count > 15 else 'ansiyellow' if self.incident_count > 10 else 'ansigreen'
-        risk_color = 'ansired' if self.risk_score > 70 else 'ansiyellow' if self.risk_score > 50 else 'ansigreen'
-        
-        # Build SIEM Dashboard Prompt
-        return HTML(
-            f"<ansiwhite>┌─[</ansiwhite>"
-            f"<ansiyellow>{timestamp}</ansiyellow>"
-            f"<ansiwhite>]</ansiwhite> "
-            f"<ansicyan>📊</ansicyan> "
-            f"<ansigreen>SIEM=>DSTERMINAL CYBER-OPS</ansigreen> "
-            f"<ansiwhite>v{version}</ansiwhite>\n"
-            f"<ansiwhite>├─</ansiwhite> "
-            f"<ansiyellow>Alerts:</ansiyellow> "
-            f"<{alert_color}>{self.alert_count}</{alert_color}> "
-            f"<ansiwhite>│</ansiwhite> "
-            f"<ansiyellow>Critical:</ansiyellow> "
-            f"<{critical_color}>{self.critical_alerts}</{critical_color}> "
-            f"<ansiwhite>│</ansiwhite> "
-            f"<ansiyellow>High:</ansiyellow> "
-            f"<{high_color}>{self.high_alerts}</{high_color}>\n"
-            f"<ansiwhite>├─</ansiwhite> "
-            f"<ansiyellow>Incidents:</ansiyellow> "
-            f"<{incident_color}>{self.incident_count}</{incident_color}> "
-            f"<ansiwhite>│</ansiwhite> "
-            f"<ansiyellow>MTTR:</ansiyellow> "
-            f"<ansigreen>{self.mttr}</ansigreen> "
-            f"<ansiwhite>│</ansiwhite> "
-            f"<ansiyellow>Risk:</ansiyellow> "
-            f"<{risk_color}>{self.risk_score}%</{risk_color}>\n"
-            f"<ansiwhite>├─</ansiwhite> "
-            f"<ansiyellow>EPS (Events Per Second):</ansiyellow> "
-            f"<ansigreen>{self.event_rate}/s</ansigreen> "
-            f"<ansiwhite>│</ansiwhite> "
-            f"<ansiyellow>Sessions:</ansiyellow> "
-            f"<ansicyan>{self.active_sessions}</ansicyan> "
-            f"<ansiwhite>│</ansiwhite> "
-            f"<ansiyellow>Uptime:</ansiyellow> "
-            f"<ansigreen>{self._get_uptime()}</ansigreen>\n"
-            f"<ansiwhite>└─</ansiwhite>"
-            f"<ansired>❯</ansired> "
-            f"<style color='{cursor_color}'>{cursor_char}</style> "
-        )
-    
     def run(self):
-        """Run the terminal with SIEM Dashboard prompt"""
+        """Run the terminal with SIEM Dashboard prompt and intelligent placeholder"""
         self.print_banner()
+        
+        # Initialize placeholder variables
+        self.placeholder_text = ""
+        self.placeholder_colors = []
+        self.placeholder_lock = threading.Lock()
+        self.current_input = ""
+        self.placeholder_active = True
         
         # Define available commands for autocompletion
         COMMANDS = {
@@ -18724,14 +19048,12 @@ class SecurityTerminal:
         
         # Style for the bottom toolbar
         try:
-            # Try to import Style class properly
             from prompt_toolkit.styles import Style as PromptStyle
             style = PromptStyle([
                 ('bottom-toolbar', 'bg:#1a1a2e #33ff33'),
                 ('bottom-toolbar.text', '#078507'),
             ])
         except (ImportError, TypeError):
-            # Fallback: Use dict style
             try:
                 from prompt_toolkit.styles import Style
                 style = Style.from_dict({
@@ -18739,10 +19061,15 @@ class SecurityTerminal:
                     'bottom-toolbar.text': '#078507',
                 })
             except:
-                # Final fallback: No style
                 style = None
         
-        # Create the prompt session
+        # Start cursor blink
+        self._start_cursor_blink()
+        
+        # Create placeholder processor
+        placeholder_processor = PlaceholderProcessor(self._get_placeholder_data)
+        
+        # Create the prompt session WITH the placeholder processor
         self.session = PromptSession(
             history=FileHistory('.dst_history'),
             auto_suggest=AutoSuggestFromHistory(),
@@ -18758,15 +19085,52 @@ class SecurityTerminal:
             reserve_space_for_menu=0,
             complete_while_typing=True,
             refresh_interval=0.5,
+            input_processors=[placeholder_processor],  # <-- THIS IS THE KEY!
         )
+        
+        # Get the application reference
+        self.app = self.session.app
+        
+        # START THE INTELLIGENT PLACEHOLDER ANIMATION THREAD
+        placeholder_thread = threading.Thread(target=self._animate_placeholder, daemon=True)
+        placeholder_thread.start()
+        
+        # Watch buffer for changes to detect user typing
+        buffer = self.session.default_buffer
+        
+        def on_text_changed(_):
+            """Detect when buffer content changes"""
+            text = buffer.text
+            
+            with self.placeholder_lock:
+                if text:
+                    # User is typing - hide placeholder
+                    self.current_input = text
+                    self.placeholder_text = ""
+                    self.placeholder_colors = []
+                else:
+                    # Buffer is empty - resume placeholder
+                    self.current_input = ""
+            
+            # Redraw prompt
+            if self.app:
+                try:
+                    self.app.invalidate()
+                except:
+                    pass
+        
+        buffer.on_text_changed += on_text_changed
         
         while True:
             try:
                 # Build SIEM Dashboard prompt with animated cursor
                 prompt_text = self._get_prompt_siem_dashboard()
                 
-                # Get user input
+                # Get user input - placeholder is now handled by the processor
                 user_input = self.session.prompt(prompt_text)
+                
+                # Store the input to prevent placeholder from overriding what the user typed
+                self.current_input = user_input
                 
                 self.log_command(user_input)
                 self.log_to_siem(f"Command executed: {user_input}")
@@ -18784,12 +19148,20 @@ class SecurityTerminal:
             except Exception as e:
                 print(f"[!] SOC Terminal Error: {str(e)}")
                 self.log_to_siem(f"Terminal error: {str(e)}")
-    
+            finally:
+                # Clear input after command execution to allow placeholder to resume
+                with self.placeholder_lock:
+                    self.current_input = ""
+                    # Reset placeholder to trigger new sentence
+                    self.placeholder_text = ""
+                    self.placeholder_colors = []
+
     def stop_cursor_animation(self):
         """Stop the cursor animation thread"""
         self.cursor_running = False
         if hasattr(self, 'cursor_thread') and self.cursor_thread:
             self.cursor_thread.join(timeout=1)
+
 
 @contextlib.contextmanager
 def suppress_output():
