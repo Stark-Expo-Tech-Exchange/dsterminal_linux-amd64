@@ -3,7 +3,17 @@
 DSTerminal Integrity Monitor Module
 Comprehensive system integrity monitoring with real-time alerts
 All reports saved to DSTerminal workspace
-"""
+"""import sys
+if sys.platform == 'win32':
+    import os
+    import msvcrt
+    # Ensure stdout is properly set
+    if hasattr(sys.stdout, 'buffer'):
+        sys.stdout = open(sys.stdout.fileno(), 'w', encoding='utf-8', errors='ignore')
+    if hasattr(sys.stderr, 'buffer'):
+        sys.stderr = open(sys.stderr.fileno(), 'w', encoding='utf-8', errors='ignore')
+        
+
 # At the VERY TOP of integrity_monitor.py, add:
 # CRITICAL FIX: Import colorama FIRST
 from colorama import Fore, Style, init as colorama_init

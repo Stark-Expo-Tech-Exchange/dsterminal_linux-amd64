@@ -13,7 +13,16 @@ Complete security lab environment with:
 - Automated Reporting with DSTERMINAL v4.0.0.113 Watermark
 - Cross-platform Support
 """
-
+import sys
+if sys.platform == 'win32':
+    import os
+    import msvcrt
+    # Ensure stdout is properly set
+    if hasattr(sys.stdout, 'buffer'):
+        sys.stdout = open(sys.stdout.fileno(), 'w', encoding='utf-8', errors='ignore')
+    if hasattr(sys.stderr, 'buffer'):
+        sys.stderr = open(sys.stderr.fileno(), 'w', encoding='utf-8', errors='ignore')
+        
 import os
 import sys
 import time

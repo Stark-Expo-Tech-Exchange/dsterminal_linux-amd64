@@ -1,14 +1,76 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
 Web Security Analyzer - DSTERMINAL Enterprise Edition v4.0.0.113
 Enhanced with Platform-Specific Remediation Configurations
 """
-
+import sys
+if sys.platform == 'win32':
+    import os
+    import msvcrt
+    # Ensure stdout is properly set
+    if hasattr(sys.stdout, 'buffer'):
+        sys.stdout = open(sys.stdout.fileno(), 'w', encoding='utf-8', errors='ignore')
+    if hasattr(sys.stderr, 'buffer'):
+        sys.stderr = open(sys.stderr.fileno(), 'w', encoding='utf-8', errors='ignore')
+        
+# ============================================================
+# FIX UNICODE ENCODING ISSUES FOR WINDOWS CONSOLE
+# ============================================================
 import sys
 import io
 import os
+
+# Safe stdout/stderr handling for GUI executables
+if sys.platform == 'win32':
+    try:
+        # Set console code page to UTF-8 (only if console exists)
+        if sys.stdout is not None:
+            os.system('chcp 65001 > nul')
+    except:
+        pass
+    
+    # Replace stdout/stderr with UTF-8 wrappers (only if they exist)
+    if sys.stdout is not None and hasattr(sys.stdout, 'buffer'):
+        try:
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
+        except:
+            pass
+    if sys.stderr is not None and hasattr(sys.stderr, 'buffer'):
+        try:
+            sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='ignore')
+        except:
+            pass
+
+def safe_print_unicode(message):
+    """Safely print unicode/emoji characters on Windows"""
+    try:
+        # Check if stdout exists before printing
+        if sys.stdout is not None:
+            print(message)
+        # If stdout is None (windowed mode), log to file instead
+        else:
+            try:
+                log_path = os.path.join(os.path.dirname(sys.executable), 'dsterminal.log')
+                with open(log_path, 'a', encoding='utf-8') as f:
+                    f.write(message + '\n')
+            except:
+                pass
+    except UnicodeEncodeError:
+        clean_message = message.encode('ascii', 'ignore').decode('ascii')
+        if sys.stdout is not None:
+            print(clean_message)
+        else:
+            try:
+                log_path = os.path.join(os.path.dirname(sys.executable), 'dsterminal.log')
+                with open(log_path, 'a', encoding='utf-8') as f:
+                    f.write(clean_message + '\n')
+            except:
+                pass
+    except:
+        pass  # Silent fail for GUI mode
+
 import platform
 
 # ============================================================
