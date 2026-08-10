@@ -3,7 +3,7 @@ from PyInstaller.utils.hooks import collect_all
 
 datas = [('static', 'static'), ('3486-removebg-preview.ico', '.')]
 binaries = []
-hiddenimports = ['psutil', 'netifaces', 'flask', 'flask_socketio', 'socketio', 'engineio', 'werkzeug', 'werkzeug.wsgi', 'jinja2', 'markupsafe', 'datetime', 'json', 'hashlib', 'threading', 'subprocess', 'shutil', 'platform', 'webbrowser', 'random', 'time', 'os', 'sys', 'logging', 'contextlib', 'io']
+hiddenimports = ['psutil', 'netifaces', 'flask', 'flask_socketio', 'socketio', 'engineio', 'werkzeug', 'werkzeug.wsgi', 'jinja2', 'markupsafe', 'datetime', 'json', 'hashlib', 'threading', 'subprocess', 'shutil', 'platform', 'webbrowser', 'random', 'time', 'os', 'sys', 'logging', 'contextlib', 'io', 'colorama', 'colorama.ansitowin32', 'colorama.win32', 'colorama.initialise']
 tmp_ret = collect_all('flask')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 tmp_ret = collect_all('flask_socketio')
@@ -29,7 +29,7 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=['numpy', 'pandas', 'PIL', 'opencv-python', 'cv2', 'torch', 'tensorflow', 'scipy', 'sklearn', 'PyQt5', 'PyQt6', 'tkinter', 'test', 'pytest', 'setuptools', 'pip', '_tkinter', 'tkinter', 'distutils', 'wheel'],
+    excludes=['pandas', 'opencv-python', 'cv2', 'torch', 'tensorflow', 'scipy', 'sklearn', 'PyQt5', 'PyQt6', 'tkinter', 'test', 'pytest', 'setuptools', 'pip', '_tkinter', 'tkinter', 'distutils', 'wheel'],
     noarchive=False,
     optimize=0,
 )

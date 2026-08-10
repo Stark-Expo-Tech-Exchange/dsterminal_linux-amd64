@@ -78,6 +78,10 @@ if ($BuildPy) {
         --hidden-import logging `
         --hidden-import contextlib `
         --hidden-import io `
+        --hidden-import colorama `
+        --hidden-import colorama.ansitowin32 `
+        --hidden-import colorama.win32 `
+        --hidden-import colorama.initialise `
         --collect-all flask `
         --collect-all flask_socketio `
         --collect-all werkzeug `
@@ -85,9 +89,7 @@ if ($BuildPy) {
         --collect-all markupsafe `
         --collect-all python_socketio `
         --collect-all python_engineio `
-        --exclude-module numpy `
         --exclude-module pandas `
-        --exclude-module PIL `
         --exclude-module opencv-python `
         --exclude-module cv2 `
         --exclude-module torch `
