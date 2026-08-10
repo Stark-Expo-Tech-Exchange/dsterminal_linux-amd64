@@ -1,0 +1,22 @@
+{
+  "report_id": "DST-20260808_220947",
+  "timestamp": "2026-08-08T22:09:47.018656",
+  "version": "4.0.0.113",
+  "watermark": "DSTERMINAL CYBER OPS v4.0.0.113",
+  "incident": {
+    "threat_level": "SUSPICIOUS",
+    "file_path": "Full System Scan",
+    "description": "Full system scan found 1 potential threats",
+    "recommendations": [
+      "Review scan results",
+      "Quarantine infected files"
+    ]
+  },
+  "system_info": {
+    "hostname": "DESKTOP-EBIM7VT",
+    "os": "Windows-10-10.0.26200-SP0",
+    "cpu": 0.0,
+    "memory": 73.4,
+    "disk": 29.8
+  }
+}

@@ -126,11 +126,7 @@ def generate_pdf():
     story.append(Spacer(1, 30))
     
     story.append(Paragraph(
-<<<<<<< HEAD
         '<font size=14 color="#00ff9d">Version 4.0.0.113</font>',
-=======
-        '<font size=14 color="#00ff9d">Version 2.1.0</font>',
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         styles['Normal']
     ))
     story.append(Spacer(1, 20))
@@ -143,20 +139,20 @@ def generate_pdf():
     
     # ASCII Art
     ascii_art = """
-    â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
-    â•‘     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ–ˆâ•— â•‘
-    â•‘     â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•â•šâ•â•â–ˆâ–ˆâ•”â•â•â•â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ•‘ â•‘
-    â•‘     â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•”â–ˆâ–ˆâ–ˆâ–ˆâ•”â–ˆâ–ˆâ•‘ â•‘
-    â•‘     â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â•šâ•â•â•â•â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘ â•‘
-    â•‘     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘ â•šâ•â• â–ˆâ–ˆâ•‘ â•‘
-    â•‘     â•šâ•â•â•â•â•â• â•šâ•â•â•â•â•â•â•   â•šâ•â•   â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•â•šâ•â•     â•šâ•â• â•‘
-    â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    ╔═══════════════════════════════════════════════════════════════════════════════╗
+    ║     ██████╗ ███████╗████████╗███████╗██████╗ ███╗   ███╗██╗███╗   ██╗ █████╗ ██╗ ║
+    ║     ██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║████╗  ██║██╔══██╗██║ ║
+    ║     ██║  ██║███████╗   ██║   █████╗  ██████╔╝██╔████╔██║██║██╔██╗ ██║███████║██║ ║
+    ║     ██║  ██║╚════██║   ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██║██║╚██╗██║██╔══██║██║ ║
+    ║     ██████╔╝███████║   ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║██║  ██║██║ ║
+    ║     ╚═════╝ ╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚═╝ ║
+    ╚═══════════════════════════════════════════════════════════════════════════════╝
     """
     story.append(Preformatted(ascii_art, styles['CyberCode']))
     story.append(Spacer(1, 30))
     
     story.append(Paragraph(
-        "âš ï¸ FOR AUTHORIZED SECURITY PERSONNEL ONLY âš ï¸",
+        "⚠️ FOR AUTHORIZED SECURITY PERSONNEL ONLY ⚠️",
         styles['Warning']
     ))
     
@@ -208,16 +204,16 @@ def generate_pdf():
     story.append(Paragraph("Key Features:", styles['CyberHeading2']))
     
     features = [
-        "â€¢ Real-time network monitoring with threat detection and geolocation",
-        "â€¢ AES-256 encryption for file protection and secure key management",
-        "â€¢ Memory forensics and volatile data analysis",
-        "â€¢ System hardening and vulnerability assessment",
-        "â€¢ Steganography detection in images and files",
-        "â€¢ Integration with VirusTotal API for hash lookups",
-        "â€¢ Metasploit Framework integration for penetration testing",
-        "â€¢ Automated PDF report generation for compliance",
-        "â€¢ SSL/TLS certificate analysis and security auditing",
-        "â€¢ SQL injection scanning with sqlmap integration"
+        "• Real-time network monitoring with threat detection and geolocation",
+        "• AES-256 encryption for file protection and secure key management",
+        "• Memory forensics and volatile data analysis",
+        "• System hardening and vulnerability assessment",
+        "• Steganography detection in images and files",
+        "• Integration with VirusTotal API for hash lookups",
+        "• Metasploit Framework integration for penetration testing",
+        "• Automated PDF report generation for compliance",
+        "• SSL/TLS certificate analysis and security auditing",
+        "• SQL injection scanning with sqlmap integration"
     ]
     
     for feature in features:
@@ -228,19 +224,11 @@ def generate_pdf():
     # Status Table
     status_data = [
         ["COMPONENT", "STATUS", "VERSION"],
-<<<<<<< HEAD
-        ["DSTerminal Core", "â— ONLINE", "4.0.0.113"],
-        ["Network Monitor", "â— ACTIVE", "4.0.0.113"],
-        ["Encryption Module", "â— READY", "4.0.0.113"],
-        ["Forensics Engine", "â— LOADED", "4.0.0.113"],
-        ["API Gateway", "â— CONNECTED", "4.0.0.113"]
-=======
-        ["DSTerminal Core", "â— ONLINE", "2.1.0"],
-        ["Network Monitor", "â— ACTIVE", "2.1.0"],
-        ["Encryption Module", "â— READY", "2.1.0"],
-        ["Forensics Engine", "â— LOADED", "2.1.0"],
-        ["API Gateway", "â— CONNECTED", "2.1.0"]
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
+        ["DSTerminal Core", "● ONLINE", "4.0.0.113"],
+        ["Network Monitor", "● ACTIVE", "4.0.0.113"],
+        ["Encryption Module", "● READY", "4.0.0.113"],
+        ["Forensics Engine", "● LOADED", "4.0.0.113"],
+        ["API Gateway", "● CONNECTED", "4.0.0.113"]
     ]
     
     status_table = Table(status_data, colWidths=[150, 100, 100])
@@ -320,11 +308,7 @@ def generate_pdf():
     
     story.append(Preformatted(
         "# DSTerminal Windows Installer\n\n"
-<<<<<<< HEAD
         "1. Download DSTerminal_Installer_v4.0.0.113.exe from GitHub\n"
-=======
-        "1. Download DSTerminal_Installer_v2.1.0.exe from GitHub\n"
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
         "2. Run the installer (no administrator rights required)\n"
         "3. Follow the setup wizard to choose installation options\n"
         "4. Select components to install (Core, Documentation, Tools)\n"
@@ -388,10 +372,10 @@ def generate_pdf():
     
     story.append(Preformatted(
         "[22:41:49] WILSON-SON [PROD] NORMAL [SOC-5BD39]\n"
-        "ðŸ”¹ OP-189EA9 @ soc-terminal : ~$ help\n\n"
-        "â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—\n"
-        "â•‘           DSTERMINAL HELP MENU                    â•‘\n"
-        "â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•",
+        "🔹 OP-189EA9 @ soc-terminal : ~$ help\n\n"
+        "╔═══════════════════════════════════════════════════════════════════════════════╗\n"
+        "║           DSTERMINAL HELP MENU                    ║\n"
+        "╚═══════════════════════════════════════════════════════════════════════════════╝",
         styles['CyberCode']
     ))
     
@@ -475,12 +459,12 @@ def generate_pdf():
     story.append(Preformatted(
         "system scan -All [--quick] [--deep] [--output <file>]\n\n"
         "Performs comprehensive DSTerminal security scan including:\n"
-        "â€¢ Memory analysis and process inspection\n"
-        "â€¢ File integrity verification\n"
-        "â€¢ Network connection monitoring\n"
-        "â€¢ Registry analysis (Windows systems)\n"
-        "â€¢ Scheduled tasks and services review\n"
-        "â€¢ Malware persistence mechanism detection",
+        "• Memory analysis and process inspection\n"
+        "• File integrity verification\n"
+        "• Network connection monitoring\n"
+        "• Registry analysis (Windows systems)\n"
+        "• Scheduled tasks and services review\n"
+        "• Malware persistence mechanism detection",
         styles['CyberCode']
     ))
     
@@ -489,11 +473,11 @@ def generate_pdf():
     story.append(Preformatted(
         "exploitcheck\n\n"
         "Checks for critical vulnerabilities:\n"
-        "â€¢ CVE-2021-44228 - Log4j Remote Code Execution\n"
-        "â€¢ CVE-2017-0144 - EternalBlue SMB Exploit\n"
-        "â€¢ CVE-2021-3156 - Sudo Buffer Overflow\n"
-        "â€¢ Local privilege escalation vectors\n"
-        "â€¢ Kernel exploit detection",
+        "• CVE-2021-44228 - Log4j Remote Code Execution\n"
+        "• CVE-2017-0144 - EternalBlue SMB Exploit\n"
+        "• CVE-2021-3156 - Sudo Buffer Overflow\n"
+        "• Local privilege escalation vectors\n"
+        "• Kernel exploit detection",
         styles['CyberCode']
     ))
     
@@ -502,10 +486,10 @@ def generate_pdf():
     story.append(Preformatted(
         "check integrity\n\n"
         "Verifies critical system files:\n"
-        "â€¢ Windows: kernel32.dll, cmd.exe, powershell.exe\n"
-        "â€¢ Linux: /bin/bash, /usr/bin/sudo, /bin/ls\n"
-        "â€¢ macOS: /bin/bash, /usr/bin/sudo\n"
-        "â€¢ Checks file sizes, modification times, and hashes",
+        "• Windows: kernel32.dll, cmd.exe, powershell.exe\n"
+        "• Linux: /bin/bash, /usr/bin/sudo, /bin/ls\n"
+        "• macOS: /bin/bash, /usr/bin/sudo\n"
+        "• Checks file sizes, modification times, and hashes",
         styles['CyberCode']
     ))
     
@@ -521,13 +505,13 @@ def generate_pdf():
     story.append(Preformatted(
         "net -n mon [--duration <sec>] [--export <file>] [--geoip]\n\n"
         "DSTerminal Network Monitoring Features:\n"
-        "â€¢ Live connection tracking with ESTABLISHED/LISTEN states\n"
-        "â€¢ Bandwidth usage monitoring (upload/download)\n"
-        "â€¢ Geolocation of remote IP addresses\n"
-        "â€¢ Threat scoring system (LOW/MEDIUM/HIGH)\n"
-        "â€¢ Automated PDF forensic report generation\n"
-        "â€¢ Intrusion detection alerts for port scans\n"
-        "â€¢ ISP and country information for connections",
+        "• Live connection tracking with ESTABLISHED/LISTEN states\n"
+        "• Bandwidth usage monitoring (upload/download)\n"
+        "• Geolocation of remote IP addresses\n"
+        "• Threat scoring system (LOW/MEDIUM/HIGH)\n"
+        "• Automated PDF forensic report generation\n"
+        "• Intrusion detection alerts for port scans\n"
+        "• ISP and country information for connections",
         styles['CyberCode']
     ))
     
@@ -535,9 +519,9 @@ def generate_pdf():
     
     threat_data = [
         ["Threat Score", "Risk Level", "Indicator"],
-        ["0-3 points", "LOW", "âœ“ (Green)"],
-        ["4-6 points", "MEDIUM", "âš  (Yellow)"],
-        ["7+ points", "HIGH", "âœ– (Red)"]
+        ["0-3 points", "LOW", "✓ (Green)"],
+        ["4-6 points", "MEDIUM", "⚠ (Yellow)"],
+        ["7+ points", "HIGH", "✖ (Red)"]
     ]
     
     threat_table = Table(threat_data, colWidths=[120, 120, 120])
@@ -560,10 +544,10 @@ def generate_pdf():
     story.append(Preformatted(
         "portsweep <target> [--ports range]\n\n"
         "DSTerminal port scanner scans:\n"
-        "â€¢ Common ports: 21,22,23,25,53,80,110,135,139,143\n"
-        "â€¢ Additional ports: 443,445,3389,8080,8443\n"
-        "â€¢ Custom port ranges (e.g., --ports 1-1024)\n"
-        "â€¢ Service identification when possible",
+        "• Common ports: 21,22,23,25,53,80,110,135,139,143\n"
+        "• Additional ports: 443,445,3389,8080,8443\n"
+        "• Custom port ranges (e.g., --ports 1-1024)\n"
+        "• Service identification when possible",
         styles['CyberCode']
     ))
     
@@ -572,9 +556,9 @@ def generate_pdf():
     story.append(Preformatted(
         "traceroute <target>\n\n"
         "Network path analysis:\n"
-        "â€¢ Traces route to target destination\n"
-        "â€¢ Shows intermediate hops\n"
-        "â€¢ Response time measurements",
+        "• Traces route to target destination\n"
+        "• Shows intermediate hops\n"
+        "• Response time measurements",
         styles['CyberCode']
     ))
     
@@ -610,17 +594,17 @@ def generate_pdf():
     story.append(Paragraph("8.2 Encryption Features", styles['CyberHeading3']))
     
     crypto_features = [
-        "â€¢ AES-256 encryption using Fernet implementation",
-        "â€¢ Automatic key generation and secure storage (~/.dsterminal_key)",
-        "â€¢ Secure file deletion with multiple overwrite passes",
-        "â€¢ File integrity verification with SHA-256 hashing",
-        "â€¢ QR code key backup for offline storage",
-        "â€¢ Encrypted file inventory management",
-        "â€¢ Key ID tracking for multiple keys"
+        "• AES-256 encryption using Fernet implementation",
+        "• Automatic key generation and secure storage (~/.dsterminal_key)",
+        "• Secure file deletion with multiple overwrite passes",
+        "• File integrity verification with SHA-256 hashing",
+        "• QR code key backup for offline storage",
+        "• Encrypted file inventory management",
+        "• Key ID tracking for multiple keys"
     ]
     
     for feature in crypto_features:
-        story.append(Paragraph(f"  â€¢ {feature}", styles['CyberBody']))
+        story.append(Paragraph(f"  • {feature}", styles['CyberBody']))
     
     story.append(PageBreak())
     
@@ -634,12 +618,12 @@ def generate_pdf():
     story.append(Preformatted(
         "memdump [--output <file>]\n\n"
         "DSTerminal Memory Forensics captures:\n"
-        "â€¢ Running processes and their memory maps\n"
-        "â€¢ Active network connections\n"
-        "â€¢ Open file handles\n"
-        "â€¢ Loaded kernel modules\n"
-        "â€¢ Windows registry hives\n"
-        "â€¢ Process environment variables",
+        "• Running processes and their memory maps\n"
+        "• Active network connections\n"
+        "• Open file handles\n"
+        "• Loaded kernel modules\n"
+        "• Windows registry hives\n"
+        "• Process environment variables",
         styles['CyberCode']
     ))
     
@@ -648,11 +632,11 @@ def generate_pdf():
     story.append(Preformatted(
         "stegcheck <image_path>\n\n"
         "DSTerminal Steganalysis includes:\n"
-        "â€¢ Least Significant Bit (LSB) analysis\n"
-        "â€¢ Entropy calculation and evaluation\n"
-        "â€¢ Known steganography tool signatures\n"
-        "â€¢ EXIF metadata examination\n"
-        "â€¢ File structure anomaly detection",
+        "• Least Significant Bit (LSB) analysis\n"
+        "• Entropy calculation and evaluation\n"
+        "• Known steganography tool signatures\n"
+        "• EXIF metadata examination\n"
+        "• File structure anomaly detection",
         styles['CyberCode']
     ))
     
@@ -661,11 +645,11 @@ def generate_pdf():
     story.append(Preformatted(
         "ransomwatch\n\n"
         "DSTerminal Ransomware Scanner detects:\n"
-        "â€¢ Suspicious file extensions (.encrypted, .locked, .crypt)\n"
-        "â€¢ Mass file encryption patterns\n"
-        "â€¢ Ransom note creation\n"
-        "â€¢ Bitcoin wallet address generation\n"
-        "â€¢ Process behavior anomalies",
+        "• Suspicious file extensions (.encrypted, .locked, .crypt)\n"
+        "• Mass file encryption patterns\n"
+        "• Ransom note creation\n"
+        "• Bitcoin wallet address generation\n"
+        "• Process behavior anomalies",
         styles['CyberCode']
     ))
     
@@ -681,13 +665,13 @@ def generate_pdf():
     story.append(Preformatted(
         "harden -t sys [--dry-run]\n\n"
         "DSTerminal Hardening applies:\n"
-        "â€¢ Windows: Disables SMB1 protocol\n"
-        "â€¢ Windows: Configures firewall rules\n"
-        "â€¢ Linux: Enables UFW firewall\n"
-        "â€¢ Linux: Secures SSH configuration\n"
-        "â€¢ Disables unnecessary services\n"
-        "â€¢ Applies CIS benchmark recommendations\n"
-        "â€¢ Configures system auditing",
+        "• Windows: Disables SMB1 protocol\n"
+        "• Windows: Configures firewall rules\n"
+        "• Linux: Enables UFW firewall\n"
+        "• Linux: Secures SSH configuration\n"
+        "• Disables unnecessary services\n"
+        "• Applies CIS benchmark recommendations\n"
+        "• Configures system auditing",
         styles['CyberCode']
     ))
     
@@ -698,11 +682,11 @@ def generate_pdf():
     story.append(Preformatted(
         "macspoof [interface]\n\n"
         "DSTerminal MAC Changer:\n"
-        "â€¢ Generates random valid MAC addresses\n"
-        "â€¢ Auto-detects active network interface\n"
-        "â€¢ Supports Linux, Windows, and macOS\n"
-        "â€¢ Verifies MAC change success\n"
-        "â€¢ Progress animation during spoofing",
+        "• Generates random valid MAC addresses\n"
+        "• Auto-detects active network interface\n"
+        "• Supports Linux, Windows, and macOS\n"
+        "• Verifies MAC change success\n"
+        "• Progress animation during spoofing",
         styles['CyberCode']
     ))
     
@@ -711,11 +695,11 @@ def generate_pdf():
     story.append(Preformatted(
         "clearlogs\n\n"
         "DSTerminal Log Cleaner:\n"
-        "â€¢ Windows: Application, System, Security event logs\n"
-        "â€¢ Linux: /var/log/* files\n"
-        "â€¢ Systemd journal (journalctl)\n"
-        "â€¢ Shell history files\n"
-        "â€¢ Application-specific logs",
+        "• Windows: Application, System, Security event logs\n"
+        "• Linux: /var/log/* files\n"
+        "• Systemd journal (journalctl)\n"
+        "• Shell history files\n"
+        "• Application-specific logs",
         styles['CyberCode']
     ))
     
@@ -732,12 +716,12 @@ def generate_pdf():
         "transfertrace\n"
         "extract -money\n\n"
         "DSTerminal Financial Simulator:\n"
-        "â€¢ SWIFT network transaction simulation\n"
-        "â€¢ Cryptocurrency exchange monitoring\n"
-        "â€¢ Payment processor analysis\n"
-        "â€¢ Money laundering pattern detection\n"
-        "â€¢ Transaction visualization\n"
-        "â€¢ Suspicious activity reporting",
+        "• SWIFT network transaction simulation\n"
+        "• Cryptocurrency exchange monitoring\n"
+        "• Payment processor analysis\n"
+        "• Money laundering pattern detection\n"
+        "• Transaction visualization\n"
+        "• Suspicious activity reporting",
         styles['CyberCode']
     ))
     
@@ -746,10 +730,10 @@ def generate_pdf():
     story.append(Preformatted(
         "shutdown\n\n"
         "DSTerminal Emergency Shutdown:\n"
-        "â€¢ Requires explicit confirmation ('YES')\n"
-        "â€¢ 15-second countdown with visual indicator\n"
-        "â€¢ Forces system shutdown\n"
-        "â€¢ Supports Windows and Linux",
+        "• Requires explicit confirmation ('YES')\n"
+        "• 15-second countdown with visual indicator\n"
+        "• Forces system shutdown\n"
+        "• Supports Windows and Linux",
         styles['CyberCode']
     ))
     
@@ -824,20 +808,20 @@ def generate_pdf():
     
     story.append(Preformatted(
         "DSTerminal Installation Directory:\n"
-        "â”œâ”€â”€ dsterminal.exe (Main executable)\n"
-        "â”œâ”€â”€ config/ (Configuration files)\n"
-        "â”œâ”€â”€ docs/ (Documentation)\n"
-        "â”œâ”€â”€ tools/ (Helper utilities)\n"
-        "â”œâ”€â”€ templates/ (Report templates)\n"
-        "â”œâ”€â”€ logs/ (Application logs)\n"
-        "â””â”€â”€ updates/ (Downloaded updates)\n\n"
+        "├── dsterminal.exe (Main executable)\n"
+        "├── config/ (Configuration files)\n"
+        "├── docs/ (Documentation)\n"
+        "├── tools/ (Helper utilities)\n"
+        "├── templates/ (Report templates)\n"
+        "├── logs/ (Application logs)\n"
+        "└── updates/ (Downloaded updates)\n\n"
         "DSTerminal Workspace:\n"
-        "â”œâ”€â”€ operators/ (Session logs)\n"
-        "â”œâ”€â”€ scans/ (Scan results)\n"
-        "â”œâ”€â”€ reports/ (Generated reports)\n"
-        "â”œâ”€â”€ exploits/ (Safe exploit storage)\n"
-        "â”œâ”€â”€ sandbox/ (Testing environment)\n"
-        "â””â”€â”€ quarantine/ (Isolated threats)",
+        "├── operators/ (Session logs)\n"
+        "├── scans/ (Scan results)\n"
+        "├── reports/ (Generated reports)\n"
+        "├── exploits/ (Safe exploit storage)\n"
+        "├── sandbox/ (Testing environment)\n"
+        "└── quarantine/ (Isolated threats)",
         styles['CyberCode']
     ))
     
@@ -858,9 +842,9 @@ def generate_pdf():
     
     story.append(Preformatted(
         "DSTerminal Update Channels:\n\n"
-        "â€¢ Stable Channel: Production-ready releases\n"
-        "â€¢ Beta Channel: Early access to new features\n"
-        "â€¢ Nightly Channel: Daily development builds\n\n"
+        "• Stable Channel: Production-ready releases\n"
+        "• Beta Channel: Early access to new features\n"
+        "• Nightly Channel: Daily development builds\n\n"
         "Select during installation or in config/update_channel.conf",
         styles['CyberCode']
     ))
@@ -884,28 +868,24 @@ def generate_pdf():
     
     # Build PDF
     doc.build(story)
-    print(f"[âœ“] DSTerminal User Guide PDF generated successfully: {PDF_PATH}")
-    print(f"[âœ“] File size: {os.path.getsize(PDF_PATH) / 1024:.2f} KB")
+    print(f"[✓] DSTerminal User Guide PDF generated successfully: {PDF_PATH}")
+    print(f"[✓] File size: {os.path.getsize(PDF_PATH) / 1024:.2f} KB")
 
 # ============================================================
 # MAIN EXECUTION
 # ============================================================
 if __name__ == "__main__":
     print("=" * 60)
-<<<<<<< HEAD
     print("DSTerminal User Guide Generator v4.0.0.113")
-=======
-    print("DSTerminal User Guide Generator v2.1.0")
->>>>>>> a9c582c3eccfbce9c5ab735ec9d5e5c57fe2ab44
     print("=" * 60)
     
     try:
         generate_pdf()
         print("\n" + "=" * 60)
-        print("âœ… DSTerminal Documentation Complete!")
-        print("ðŸ“„ PDF Location: docs/user_guide.pdf")
+        print("✅ DSTerminal Documentation Complete!")
+        print("📄 PDF Location: docs/user_guide.pdf")
         print("=" * 60)
     except Exception as e:
-        print(f"\nâŒ Error generating DSTerminal user guide: {e}")
+        print(f"\n❌ Error generating DSTerminal user guide: {e}")
         import traceback
         traceback.print_exc()

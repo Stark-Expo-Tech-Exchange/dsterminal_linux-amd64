@@ -1,0 +1,14 @@
+*.py
+*.pyc
+*.pyo
+*.pyw
+*.txt
+*.md
+*.log
+*.json
+test_*.py
+setup.py
+requirements.txt
+CHANGELOG.txt
+README.txt
+LICENSE.txt

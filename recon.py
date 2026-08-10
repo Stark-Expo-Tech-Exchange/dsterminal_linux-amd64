@@ -26,25 +26,12 @@ def get_workspace_dir() -> Path:
     home = Path.home()
     workspace = home / "dsterminal_workspace"
     workspace.mkdir(exist_ok=True)
-    
-    # Create subdirectories for different report types
-    # (workspace / "integrity_reports").mkdir(exist_ok=True)
-    # (workspace / "network_reports").mkdir(exist_ok=True)
-    # (workspace / "compliance_reports").mkdir(exist_ok=True)
-    # (workspace / "logs").mkdir(exist_ok=True)
-    # (workspace / "baselines").mkdir(exist_ok=True)
-    # (workspace / "alerts").mkdir(exist_ok=True)
-    # (workspace / "quarantine").mkdir(exist_ok=True)
-    # (workspace / "forensic").mkdir(exist_ok=True)
-    # (workspace / "auto_quarantine").mkdir(exist_ok=True)
-    # (workspace / "scans").mkdir(exist_ok=True)
-    
     return workspace
 
 WORKSPACE = get_workspace_dir()
 
 # -------------------------------
-# COLORS (Define before use)
+# COLORS
 # -------------------------------
 
 MATRIX_COLORS = ['\033[92m', '\033[93m', '\033[94m', '\033[95m', '\033[96m', '\033[91m']
@@ -56,17 +43,18 @@ GREEN = '\033[92m'
 RED = '\033[91m'
 BLUE = '\033[94m'
 MAGENTA = '\033[95m'
+DIM = '\033[2m'
+BLINK = '\033[5m'
 
 # -------------------------------
 # GLOBAL VARIABLES FOR MODULE EXPORT
 # -------------------------------
 
-# These will be set when the module is imported
 current_target = None
 current_dashboard = None
 
 # -------------------------------
-# TARGET VALIDATION (only when run as script)
+# TARGET VALIDATION
 # -------------------------------
 
 def get_target_from_args():
@@ -84,86 +72,91 @@ def init_scan_directories(target):
     SCAN_ROOT = WORKSPACE / "scans"
     SCAN_ROOT.mkdir(exist_ok=True)
     
-    # Create target-specific directory with sanitized name (remove special chars)
     safe_target = "".join(c for c in target if c.isalnum() or c in '.-_')
     TARGET_DIR = SCAN_ROOT / safe_target
     TARGET_DIR.mkdir(exist_ok=True)
     
     timestamp = time.strftime("%Y%m%d_%H%M%S")
-    
-    # Create session directory for this scan run
     SESSION_DIR = TARGET_DIR / f"scan_{timestamp}"
     SESSION_DIR.mkdir(exist_ok=True)
     
     return SESSION_DIR, timestamp
 
 # -------------------------------
-# ASCII ART & STYLING
-# -------------------------------
-
-ASCII_LOGO = """
-    â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
-    â•‘     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ–ˆâ•— â•‘
-    â•‘     â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•â•šâ•â•â–ˆâ–ˆâ•”â•â•â•â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ•‘ â•‘
-    â•‘     â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•”â–ˆâ–ˆâ–ˆâ–ˆâ•”â–ˆâ–ˆâ•‘ â•‘
-    â•‘     â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â•šâ•â•â•â•â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘ â•‘
-    â•‘     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘ â•šâ•â• â–ˆâ–ˆâ•‘ â•‘
-    â•‘     â•šâ•â•â•â•â•â• â•šâ•â•â•â•â•â•â•   â•šâ•â•   â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â•â•šâ•â•     â•šâ•â• â•‘
-    â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-"""
-
-# Circle rotation frames
-CIRCLE_FRAMES = [
-    "â—", "â—“", "â—‘", "â—’",  # Basic rotation
-    "â¦¾", "â¦¿", "â¬¤", "â—‹",  # Solid/empty
-    "âŸ³", "âŸ²", "â†»", "â†º",  # Rotation arrows
-    "â—œ", "â—", "â—ž", "â—Ÿ",  # Quarter circles
-]
-
-# Progress bar styles
-PROGRESS_BARS = [
-    "â–±â–±â–±â–±â–±â–±â–±â–±â–±â–±",
-    "â–°â–±â–±â–±â–±â–±â–±â–±â–±â–±",
-    "â–°â–°â–±â–±â–±â–±â–±â–±â–±â–±",
-    "â–°â–°â–°â–±â–±â–±â–±â–±â–±â–±",
-    "â–°â–°â–°â–°â–±â–±â–±â–±â–±â–±",
-    "â–°â–°â–°â–°â–°â–±â–±â–±â–±â–±",
-    "â–°â–°â–°â–°â–°â–°â–±â–±â–±â–±",
-    "â–°â–°â–°â–°â–°â–°â–°â–±â–±â–±",
-    "â–°â–°â–°â–°â–°â–°â–°â–°â–±â–±",
-    "â–°â–°â–°â–°â–°â–°â–°â–°â–°â–±",
-    "â–°â–°â–°â–°â–°â–°â–°â–°â–°â–°",
-]
-
-# -------------------------------
 # TERMINAL UTILITIES
 # -------------------------------
 
-width = shutil.get_terminal_size((120, 20)).columns
+try:
+    width = shutil.get_terminal_size((120, 20)).columns
+except:
+    width = 120
 
-def center_text(text):
+def center(text):
     """Center text with color support"""
-    # Remove color codes for length calculation
     clean_text = text
-    for code in [RESET, BOLD, CYAN, YELLOW, GREEN, RED, BLUE, MAGENTA] + MATRIX_COLORS:
+    for code in [RESET, BOLD, CYAN, YELLOW, GREEN, RED, BLUE, MAGENTA, DIM, BLINK] + MATRIX_COLORS:
         clean_text = clean_text.replace(code, '')
     
     padding = max(0, (width - len(clean_text)) // 2)
-    print(" " * padding + text)
+    return " " * padding + text
+
+def center_print(text):
+    """Print centered text"""
+    print(center(text))
 
 def clear():
     os.system("cls" if os.name == "nt" else "clear")
 
 def matrix_rain_effect(lines=3):
     """Create a Matrix-style digital rain effect"""
-    chars = "01ã‚¢ã‚¤ã‚¦ã‚¨ã‚ªã‚«ã‚­ã‚¯ã‚±ã‚³ã‚µã‚·ã‚¹ã‚»ã‚½ã‚¿ãƒãƒ„ãƒ†ãƒˆ"
+    chars = "01"
     for _ in range(lines):
         line = ""
-        for _ in range(width // 4):
+        for _ in range(min(width // 4, 30)):
             color = random.choice(MATRIX_COLORS)
             line += color + random.choice(chars) + RESET
-        print(line)
+        print(center(line))
         time.sleep(0.03)
+
+def draw_glowing_box(title, content_lines, title_color=CYAN, border_color=CYAN, 
+                     content_color=GREEN, blink_title=False, glow_border=True):
+    """Draw a glowing neon hacker-styled centered box with ASCII characters"""
+    box_width = min(width - 4, 70)
+    left_margin = max(0, (width - box_width) // 2)
+    inner = box_width - 4
+    
+    import textwrap
+    wrapped = []
+    for line in content_lines:
+        if not line.strip():
+            wrapped.append("")
+            continue
+        line = line.rstrip()
+        wrapped.extend(textwrap.wrap(line, inner, break_long_words=False, replace_whitespace=False))
+    
+    glow_prefix = BOLD if glow_border else ""
+    title_prefix = BOLD
+    if blink_title:
+        title_prefix += BLINK
+    
+    top = glow_prefix + border_color + "+" + "-" * (box_width - 2) + "+" + RESET
+    mid = glow_prefix + border_color + "+" + "-" * (box_width - 2) + "+" + RESET
+    bot = glow_prefix + border_color + "+" + "-" * (box_width - 2) + "+" + RESET
+    
+    title_text = f" {title} ".center(box_width - 2)
+    title_line = title_prefix + title_color + "|" + title_text + "|" + RESET
+    if blink_title:
+        title_line += RESET
+    
+    lines = [top, title_line, mid]
+    
+    for line in wrapped:
+        padded_line = line.ljust(inner)
+        lines.append(glow_prefix + border_color + "| " + RESET + content_color + padded_line + RESET + glow_prefix + border_color + " |" + RESET)
+    
+    lines.append(bot)
+    
+    return [(" " * left_margin) + line for line in lines]
 
 def save_output_to_file(session_dir, timestamp, scan_name, output_lines):
     """Save scan output to workspace file"""
@@ -178,19 +171,19 @@ def save_output_to_file(session_dir, timestamp, scan_name, output_lines):
     return output_file
 
 def check_command_exists(command):
-    """Check if a command exists on the system (cross-platform)"""
+    """Check if a command exists on the system"""
     try:
-        if os.name == "nt":  # Windows
-            subprocess.run(["where", command], capture_output=True, check=True)
-        else:  # Unix/Linux/Mac
-            subprocess.run(["which", command], capture_output=True, check=True)
-        return True
-    except subprocess.CalledProcessError:
+        if os.name == "nt":
+            result = subprocess.run(["where", command], capture_output=True, text=True, timeout=5)
+        else:
+            result = subprocess.run(["which", command], capture_output=True, text=True, timeout=5)
+        return result.returncode == 0
+    except Exception:
         return False
 
-# -------------------------------
-# REAL-TIME SOC DASHBOARD
-# -------------------------------
+# ============================================================
+# CINEMATIC SOC DASHBOARD
+# ============================================================
 
 class SOCDashboard:
     def __init__(self):
@@ -201,9 +194,9 @@ class SOCDashboard:
             'metasploit': {'progress': 0, 'status': 'IDLE', 'findings': 0, 'output': []}
         }
         self.active_scans = []
-        self.circle_index = 0
-        self.bar_index = 0
         self.lock = threading.Lock()
+        self.spinner_frames = ["[+]", "[*]", "[-]", "[.]"]
+        self.progress_chars = ["#", "=", "*", "+"]
         
     def update_metric(self, scan_name, progress=None, status=None, findings=None, output_line=None):
         """Update a specific metric"""
@@ -229,56 +222,85 @@ class SOCDashboard:
         else:
             return YELLOW
     
-    def render_three_column_circles(self):
-        """Render three centered column circles with real-time progress"""
+    def get_status_icon(self, status):
+        """Get icon based on status"""
+        if status == 'COMPLETE':
+            return "[+]"
+        elif status == 'RUNNING':
+            return "[*]"
+        elif status == 'ERROR':
+            return "[!]"
+        else:
+            return "[.]"
+    
+    def render_progress_bar(self, progress, width=20):
+        """Render ASCII progress bar"""
+        filled = int(progress / 100 * width)
+        bar = "[" + "#" * filled + "." * (width - filled) + "]"
+        return bar
+    
+    def render_three_column_panels(self):
+        """Render three centered column panels with real-time progress"""
         with self.lock:
-            # Get current frame and bar
-            circle = CIRCLE_FRAMES[self.circle_index % len(CIRCLE_FRAMES)]
-            bar = PROGRESS_BARS[self.bar_index % len(PROGRESS_BARS)]
-            
-            # Calculate column width (each column gets 1/3 of terminal width)
             col_width = width // 3
             
-            # Column 1: Port Scan (LEFT)
-            col1_status = self.get_status_color(self.scan_metrics['ports']['status'])
-            col1_title = f"{col1_status}{circle}{RESET} PORTS"
-            col1_prog = f"{CYAN}[{bar}]{RESET}"
-            col1_find = f"{GREEN}âš¡{self.scan_metrics['ports']['findings']}{RESET}"
+            # Column 1: Port Scan
+            status1 = self.get_status_color(self.scan_metrics['ports']['status'])
+            icon1 = self.get_status_icon(self.scan_metrics['ports']['status'])
+            bar1 = self.render_progress_bar(self.scan_metrics['ports']['progress'])
+            col1 = [
+                f"{status1}{icon1}{RESET} PORT SCAN",
+                f"{CYAN}{bar1}{RESET} {self.scan_metrics['ports']['progress']}%",
+                f"{GREEN}Findings: {self.scan_metrics['ports']['findings']}{RESET}",
+                f"{status1}{self.scan_metrics['ports']['status']}{RESET}"
+            ]
             
-            # Column 2: DNS (CENTER)
-            col2_status = self.get_status_color(self.scan_metrics['dns']['status'])
-            col2_title = f"{col2_status}{circle}{RESET} DNS"
-            col2_prog = f"{CYAN}[{bar}]{RESET}"
-            col2_find = f"{GREEN}âš¡{self.scan_metrics['dns']['findings']}{RESET}"
+            # Column 2: DNS
+            status2 = self.get_status_color(self.scan_metrics['dns']['status'])
+            icon2 = self.get_status_icon(self.scan_metrics['dns']['status'])
+            bar2 = self.render_progress_bar(self.scan_metrics['dns']['progress'])
+            col2 = [
+                f"{status2}{icon2}{RESET} DNS RESOLUTION",
+                f"{CYAN}{bar2}{RESET} {self.scan_metrics['dns']['progress']}%",
+                f"{GREEN}Findings: {self.scan_metrics['dns']['findings']}{RESET}",
+                f"{status2}{self.scan_metrics['dns']['status']}{RESET}"
+            ]
             
-            # Column 3: WHOIS (RIGHT)
-            col3_status = self.get_status_color(self.scan_metrics['whois']['status'])
-            col3_title = f"{col3_status}{circle}{RESET} WHOIS"
-            col3_prog = f"{CYAN}[{bar}]{RESET}"
-            col3_find = f"{GREEN}âš¡{self.scan_metrics['whois']['findings']}{RESET}"
+            # Column 3: WHOIS
+            status3 = self.get_status_color(self.scan_metrics['whois']['status'])
+            icon3 = self.get_status_icon(self.scan_metrics['whois']['status'])
+            bar3 = self.render_progress_bar(self.scan_metrics['whois']['progress'])
+            col3 = [
+                f"{status3}{icon3}{RESET} WHOIS LOOKUP",
+                f"{CYAN}{bar3}{RESET} {self.scan_metrics['whois']['progress']}%",
+                f"{GREEN}Findings: {self.scan_metrics['whois']['findings']}{RESET}",
+                f"{status3}{self.scan_metrics['whois']['status']}{RESET}"
+            ]
             
-            # Pad each column to exactly col_width characters
-            col1_title_padded = col1_title.ljust(col_width)
-            col2_title_padded = col2_title.ljust(col_width)
-            col3_title_padded = col3_title.ljust(col_width)
+            # Pad each column
+            rows = max(len(col1), len(col2), len(col3))
             
-            col1_prog_padded = col1_prog.ljust(col_width)
-            col2_prog_padded = col2_prog.ljust(col_width)
-            col3_prog_padded = col3_prog.ljust(col_width)
-            
-            col1_find_padded = f"FINDINGS: {col1_find}".ljust(col_width)
-            col2_find_padded = f"FINDINGS: {col2_find}".ljust(col_width)
-            col3_find_padded = f"FINDINGS: {col3_find}".ljust(col_width)
-            
-            # Print the three columns side by side
-            print()
-            print(f"{col1_title_padded}{col2_title_padded}{col3_title_padded}")
-            print(f"{col1_prog_padded}{col2_prog_padded}{col3_prog_padded}")
-            print(f"{col1_find_padded}{col2_find_padded}{col3_find_padded}")
-            
-            # Update frame indices
-            self.circle_index += 1
-            self.bar_index = (self.bar_index + 1) % len(PROGRESS_BARS)
+            for i in range(rows):
+                line1 = col1[i] if i < len(col1) else ""
+                line2 = col2[i] if i < len(col2) else ""
+                line3 = col3[i] if i < len(col3) else ""
+                
+                # Pad each line to column width
+                clean1 = line1
+                for code in [RESET, BOLD, CYAN, YELLOW, GREEN, RED, BLUE, MAGENTA, DIM, BLINK]:
+                    clean1 = clean1.replace(code, '')
+                clean2 = line2
+                for code in [RESET, BOLD, CYAN, YELLOW, GREEN, RED, BLUE, MAGENTA, DIM, BLINK]:
+                    clean2 = clean2.replace(code, '')
+                clean3 = line3
+                for code in [RESET, BOLD, CYAN, YELLOW, GREEN, RED, BLUE, MAGENTA, DIM, BLINK]:
+                    clean3 = clean3.replace(code, '')
+                
+                padded1 = line1 + " " * (col_width - len(clean1)) if len(clean1) < col_width else line1[:col_width]
+                padded2 = line2 + " " * (col_width - len(clean2)) if len(clean2) < col_width else line2[:col_width]
+                padded3 = line3 + " " * (col_width - len(clean3)) if len(clean3) < col_width else line3[:col_width]
+                
+                print(padded1 + padded2 + padded3)
     
     def get_summary(self):
         """Get summary of all scan metrics"""
@@ -290,23 +312,27 @@ class SOCDashboard:
             for name, metrics in self.scan_metrics.items()
         }
 
-# -------------------------------
+# ============================================================
 # CINEMATIC SPINNER WITH DASHBOARD
-# -------------------------------
+# ============================================================
 
 class CinematicSpinner:
     def __init__(self, dashboard, scan_name):
         self.dashboard = dashboard
         self.scan_name = scan_name
         self.stop_event = threading.Event()
+        self.spinner_frames = ["[+]", "[*]", "[-]", "[.]"]
         
     def animate_with_dashboard(self):
         """Enhanced spinner that updates the three-column dashboard"""
         start_time = time.time()
         last_dashboard_update = 0
+        frame_idx = 0
         
         while not self.stop_event.is_set():
             elapsed = int(time.time() - start_time)
+            frame = self.spinner_frames[frame_idx % len(self.spinner_frames)]
+            frame_idx += 1
             
             # Update dashboard every 0.2 seconds
             if time.time() - last_dashboard_update > 0.2:
@@ -320,7 +346,7 @@ class CinematicSpinner:
                     status='RUNNING'
                 )
                 
-                # Clear and redraw dashboard
+                # Redraw dashboard
                 self.redraw_dashboard()
                 last_dashboard_update = time.time()
             
@@ -336,26 +362,23 @@ class CinematicSpinner:
     
     def redraw_dashboard(self):
         """Redraw the entire dashboard"""
-        # Move cursor up to redraw dashboard area (8 lines)
+        # Move cursor up to redraw dashboard area
         print("\033[8A", end="")
         
         # Redraw SOC header
-        center_text(f"{BOLD}{CYAN}â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—{RESET}")
-        center_text(f"{BOLD}{CYAN}â•‘                    ðŸŽ¯ SOC DASHBOARD ðŸŽ¯                            â•‘{RESET}")
-        center_text(f"{BOLD}{CYAN}â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•{RESET}")
+        center_print(f"{BOLD}{CYAN}+{'-' * 60}+{RESET}")
+        center_print(f"{BOLD}{CYAN}|                    [*] SOC DASHBOARD [*]                            |{RESET}")
+        center_print(f"{BOLD}{CYAN}+{'-' * 60}+{RESET}")
         
-        # Render three-column circles
-        self.dashboard.render_three_column_circles()
+        # Render three-column panels
+        self.dashboard.render_three_column_panels()
         
         # Separator
-        center_text(f"{BOLD}{CYAN}{'â”€' * 50}{RESET}")
-        
-        # Show current scan info
-        print()
+        center_print(f"{BOLD}{CYAN}{'-' * 60}{RESET}")
 
-# -------------------------------
+# ============================================================
 # SCAN ENGINE
-# -------------------------------
+# ============================================================
 
 def run_cinematic_scan(label, command, scan_name, dashboard, session_dir, timestamp, target):
     """Execute scan with cinematic effects and dashboard updates"""
@@ -372,7 +395,6 @@ def run_cinematic_scan(label, command, scan_name, dashboard, session_dir, timest
     findings_count = 0
     
     try:
-        # Use shell=True for compatibility with commands like 'nslookup'
         process = subprocess.Popen(
             command,
             shell=True,
@@ -420,30 +442,32 @@ def run_cinematic_scan(label, command, scan_name, dashboard, session_dir, timest
     if output_lines:
         output_file = save_output_to_file(session_dir, timestamp, scan_name, output_lines)
         
-        # Display limited results
-        print()
-        center_text(f"{BOLD}{GREEN}â•â•â•â•â• SCAN RESULTS: {scan_name.upper()} â•â•â•â•â•{RESET}")
-        for line in output_lines[:15]:  # Show first 15 lines
-            if line.strip():
-                # Truncate long lines and clean for display
-                display_line = line[:80] if len(line) > 80 else line
-                center_text(f"  {display_line}")
-        if len(output_lines) > 15:
-            center_text(f"  ... and {len(output_lines) - 15} more lines")
-        center_text(f"{BOLD}{CYAN}Results saved to: {output_file}{RESET}")
+        # Display limited results in a colorful box
+        result_box = draw_glowing_box(
+            f"SCAN RESULTS: {scan_name.upper()}",
+            output_lines[:10],
+            title_color=MAGENTA,
+            border_color=CYAN,
+            content_color=GREEN,
+            blink_title=True
+        )
+        for line in result_box:
+            print(line)
+        if len(output_lines) > 10:
+            center_print(f"{DIM}... and {len(output_lines) - 10} more lines{RESET}")
+        center_print(f"{CYAN}[+] Results saved to: {output_file}{RESET}")
         print()
     
     return output_lines
 
-# -------------------------------
+# ============================================================
 # MAIN RECON FUNCTION
-# -------------------------------
+# ============================================================
 
 def run_recon(target=None):
     """Main reconnaissance function - can be called from other modules"""
     global current_target, current_dashboard
     
-    # Use provided target or get from args
     if target is None:
         target = get_target_from_args()
     
@@ -456,15 +480,20 @@ def run_recon(target=None):
     clear()
     
     # Matrix rain intro
-    matrix_rain_effect(5)
+    matrix_rain_effect(3)
     time.sleep(0.5)
     
-    # Animated logo
-    center_text(f"{BOLD}{CYAN}")
-    for line in ASCII_LOGO.split('\n'):
-        if line.strip():
-            center_text(f"{CYAN}{line}{RESET}")
-            time.sleep(0.05)
+    # Animated banner
+    banner_lines = [
+        f"{BOLD}{CYAN}+{'-' * 60}+{RESET}",
+        f"{BOLD}{CYAN}|        [*] DSTERMINAL RECONNAISSANCE ENGINE [*]           |{RESET}",
+        f"{BOLD}{CYAN}+{'-' * 60}+{RESET}",
+        f"{BOLD}{YELLOW}|        [*] TARGET: {target.upper():<30}           |{RESET}",
+        f"{BOLD}{CYAN}+{'-' * 60}+{RESET}"
+    ]
+    for line in banner_lines:
+        center_print(line)
+        time.sleep(0.1)
     
     time.sleep(0.5)
     
@@ -476,20 +505,18 @@ def run_recon(target=None):
     current_dashboard = dashboard
     
     # Initial dashboard render
-    center_text(f"{BOLD}{CYAN}â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—{RESET}")
-    center_text(f"{BOLD}{CYAN}â•‘                    ðŸŽ¯ REAL-TIME SOC DASHBOARD ðŸŽ¯                 â•‘{RESET}")
-    center_text(f"{BOLD}{CYAN}â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•{RESET}")
+    center_print(f"{BOLD}{CYAN}+{'-' * 60}+{RESET}")
+    center_print(f"{BOLD}{CYAN}|                    [*] SOC DASHBOARD [*]                            |{RESET}")
+    center_print(f"{BOLD}{CYAN}+{'-' * 60}+{RESET}")
     
-    # Initial three-column circles
-    dashboard.render_three_column_circles()
-    center_text(f"{BOLD}{CYAN}{'â”€' * 50}{RESET}")
+    # Initial three-column panels
+    dashboard.render_three_column_panels()
+    center_print(f"{BOLD}{CYAN}{'-' * 60}{RESET}")
     
-    # Target display
-    target_text = f"ðŸŽ¯ TARGET ACQUIRED: {target.upper()} ðŸŽ¯"
-    center_text(f"{BOLD}{GREEN}{target_text}{RESET}")
-    center_text(f"{BOLD}{CYAN}{'â”€' * 50}{RESET}")
-    print()
-    center_text(f"{BOLD}{YELLOW}ðŸ“ SCAN DIRECTORY: {session_dir}{RESET}")
+    # Target and directory info
+    center_print(f"{BOLD}{GREEN}[+] TARGET ACQUIRED: {target.upper()}{RESET}")
+    center_print(f"{BOLD}{YELLOW}[+] SCAN DIRECTORY: {session_dir}{RESET}")
+    center_print(f"{BOLD}{CYAN}{'-' * 60}{RESET}")
     print()
     
     time.sleep(1)
@@ -499,9 +526,9 @@ def run_recon(target=None):
     # -------------------------------
     
     scans = [
-        ("ðŸ” PORT SCAN", f"nmap -F {target}", "ports"),
-        ("ðŸŒ DNS RESOLUTION", f"nslookup {target}", "dns"),
-        ("ðŸ“‹ WHOIS LOOKUP", f"whois {target}", "whois"),
+        ("[+] PORT SCAN", f"nmap -F {target}", "ports"),
+        ("[+] DNS RESOLUTION", f"nslookup {target}", "dns"),
+        ("[+] WHOIS LOOKUP", f"whois {target}", "whois"),
     ]
     
     # -------------------------------
@@ -510,29 +537,26 @@ def run_recon(target=None):
     
     for label, cmd, scan_name in scans:
         print()
-        center_text(f"{BOLD}{MAGENTA}{label}{RESET}")
+        center_print(f"{BOLD}{MAGENTA}{label}{RESET}")
         print()
         
-        # Check if command exists before running
         cmd_name = cmd.split()[0]
         if check_command_exists(cmd_name) or cmd_name in ['nslookup', 'whois']:
             run_cinematic_scan(label, cmd, scan_name, dashboard, session_dir, timestamp, target)
         else:
-            center_text(f"{BOLD}{YELLOW}âš  {cmd_name} not found - skipping{RESET}")
+            center_print(f"{BOLD}{YELLOW}[!] {cmd_name} not found - skipping{RESET}")
             dashboard.update_metric(scan_name, status='ERROR', findings=0)
         
-        # Brief pause between scans
         time.sleep(0.5)
         matrix_rain_effect(1)
     
     # -------------------------------
-    # METASPLOIT SEARCH (optional - only if msfconsole is available)
+    # METASPLOIT SEARCH
     # -------------------------------
     
-    # Check if metasploit is available using cross-platform function
     if check_command_exists("msfconsole"):
         run_cinematic_scan(
-            "ðŸ’€ METASPLOIT SEARCH",
+            "[+] METASPLOIT SEARCH",
             f'msfconsole -q -x "search {target}; exit"',
             "metasploit",
             dashboard,
@@ -541,7 +565,7 @@ def run_recon(target=None):
             target
         )
     else:
-        center_text(f"{BOLD}{YELLOW}âš  Metasploit not found - skipping{RESET}")
+        center_print(f"{BOLD}{YELLOW}[!] Metasploit not found - skipping{RESET}")
         dashboard.update_metric('metasploit', status='ERROR', findings=0)
     
     # -------------------------------
@@ -576,63 +600,58 @@ def run_recon(target=None):
     # -------------------------------
     
     print("\n" * 2)
-    center_text(f"{BOLD}{GREEN}â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—{RESET}")
-    center_text(f"{BOLD}{GREEN}â•‘                    ðŸ INFORMATION GATHERING COMPLETE ðŸ           â•‘{RESET}")
-    center_text(f"{BOLD}{GREEN}â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•{RESET}")
+    
+    # Final completion box
+    final_box = draw_glowing_box(
+        "[+] INFORMATION GATHERING COMPLETE [+]",
+        [
+            f"Total Findings: {sum(m['findings'] for m in dashboard.get_summary().values())}",
+            f"Scan Session: {session_dir}",
+            f"Summary Report: {summary_file}"
+        ],
+        title_color=GREEN,
+        border_color=GREEN,
+        content_color=CYAN,
+        blink_title=True
+    )
+    for line in final_box:
+        print(line)
+    
+    print()
     
     # Final three-column summary
-    dashboard.render_three_column_circles()
+    dashboard.render_three_column_panels()
     
-    # Summary statistics
-    summary = dashboard.get_summary()
-    total_findings = sum(m['findings'] for m in summary.values())
-    center_text(f"{BOLD}{CYAN}{'â”€' * 50}{RESET}")
-    center_text(f"{BOLD}{YELLOW}TOTAL FINDINGS: {total_findings}{RESET}")
-    center_text(f"{BOLD}{YELLOW}SCAN SESSION: {session_dir}{RESET}")
-    center_text(f"{BOLD}{YELLOW}SUMMARY REPORT: {summary_file}{RESET}")
-    center_text(f"{BOLD}{GREEN}{'â•' * 50}{RESET}")
+    # Separator
+    center_print(f"{BOLD}{CYAN}{'-' * 60}{RESET}")
     
     # Matrix rain outro
     matrix_rain_effect(2)
     print()
-    center_text(f"{BOLD}{CYAN}âš¡ DSTERMINAL SOC - RECONNAISSANCE COMPLETE âš¡{RESET}")
+    center_print(f"{BOLD}{CYAN}[+] DSTERMINAL SOC - RECONNAISSANCE COMPLETE [+]{RESET}")
     print()
     
     return True
 
-# -------------------------------
+# ============================================================
 # RECON MENU FUNCTION
-# -------------------------------
+# ============================================================
 
 def recon_menu():
     """Interactive menu for reconnaissance"""
-    print(f"{BOLD}{CYAN}â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—{RESET}")
-    print(f"{BOLD}{CYAN}â•‘           RECONNAISSANCE MENU                â•‘{RESET}")
-    print(f"{BOLD}{CYAN}â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•{RESET}")
+    print(f"{BOLD}{CYAN}+{'-' * 50}+{RESET}")
+    print(f"{BOLD}{CYAN}|           RECONNAISSANCE MENU                |{RESET}")
+    print(f"{BOLD}{CYAN}+{'-' * 50}+{RESET}")
     print()
-    print(f"{GREEN}1. Quick Scan (Ports, DNS, WHOIS){RESET}")
-    print(f"{GREEN}2. Full Scan (with Metasploit){RESET}")
-    print(f"{GREEN}3. Custom Target{RESET}")
-    print(f"{RED}0. Exit{RESET}")
+    print(f"{GREEN}[1] Quick Scan (Ports, DNS, WHOIS){RESET}")
+    print(f"{GREEN}[2] Full Scan (with Metasploit){RESET}")
+    print(f"{GREEN}[3] Custom Target{RESET}")
+    print(f"{RED}[0] Exit{RESET}")
     print()
     
     choice = input(f"{YELLOW}Select option: {RESET}").strip()
     
-    if choice == "1":
-        target = input(f"{CYAN}Enter target (IP or domain): {RESET}").strip()
-        if target:
-            run_recon(target)
-        else:
-            print(f"{RED}[!] No target specified{RESET}")
-        
-    elif choice == "2":
-        target = input(f"{CYAN}Enter target (IP or domain): {RESET}").strip()
-        if target:
-            run_recon(target)
-        else:
-            print(f"{RED}[!] No target specified{RESET}")
-    
-    elif choice == "3":
+    if choice == "1" or choice == "2" or choice == "3":
         target = input(f"{CYAN}Enter target (IP or domain): {RESET}").strip()
         if target:
             run_recon(target)
@@ -647,15 +666,13 @@ def recon_menu():
         print(f"{RED}[!] Invalid option{RESET}")
 
 # -------------------------------
-# MAIN EXECUTION (when run as script)
+# MAIN EXECUTION
 # -------------------------------
 
 if __name__ == "__main__":
     target = get_target_from_args()
     
     if target:
-        # Run recon directly with target from command line
         run_recon(target)
     else:
-        # Show menu if no target provided
         recon_menu()

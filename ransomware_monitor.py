@@ -1,4 +1,7 @@
-﻿"""
+﻿#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
 Ransomware Detection & Monitoring System with Backup Recovery
 Version: 4.0.0.113
 Author: Spark Wilson Spink
@@ -207,774 +210,104 @@ class RansomwareMonitor:
         self.seen_files = {}
         self.poll_interval = 2  # seconds
 
-
-    def _display_live_dashboard(self, refresh_rate: float = 0.5):
-        """
-        Enterprise-grade live dashboard with real-time updates.
-        
-        Parameters
-        ----------
-        refresh_rate : float
-            Dashboard refresh interval in seconds.
-        """
-        if not self.use_rich or not self.console:
-            self._display_simple_dashboard()
-            return
-
-        from rich.align import Align
-        from rich.console import Group
-        from rich.live import Live
-        from rich.table import Table
-        from rich.text import Text
-        from rich.panel import Panel
-        from rich.layout import Layout
-        from rich import box
-        from datetime import datetime
-
-        # ================================================================
-        # 1. Build Header
-        # ================================================================
-        def build_header():
-            """Create the dashboard header panel."""
-            header_text = Text("ðŸ›¡ï¸  DSTERMINAL RANSOMWARE MONITOR", style="bold cyan")
-            header_text.append("  |  ", style="bright_blue")
-            header_text.append("REAL-TIME THREAT INTELLIGENCE", style="bold white")
-            
-            header = Panel(
-                Align.center(header_text),
-                border_style="bright_blue",
-                box=box.DOUBLE,
-                padding=(1, 2),
-            )
-            return header
-
-        # ================================================================
-        # 2. Build Status Panel
-        # ================================================================
-        def build_status_panel(status):
-            """Create the main status panel with threat indicator."""
-            status_color = "red" if status.get("ransomware_detected", False) else "green"
-            status_text = "ðŸš¨ ACTIVE THREAT" if status.get("ransomware_detected", False) else "âœ… SYSTEM CLEAN"
-            
-            threat_level = status.get("threat_level", "NORMAL")
-            threat_color = status.get("threat_color", "green")
-            
-            # Threat indicator with animation
-            threat_indicator = Text()
-            if threat_level == "CRITICAL":
-                threat_indicator.append("â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ", style="bold red blink")
-            elif threat_level == "HIGH":
-                threat_indicator.append("â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ", style="bold yellow")
-            elif threat_level == "MEDIUM":
-                threat_indicator.append("â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ", style="bold orange")
-            else:
-                threat_indicator.append("â–ˆâ–ˆâ–ˆâ–ˆ", style="bold green")
-            
-            table = Table(show_header=False, box=box.ROUNDED, expand=True)
-            table.add_column("Metric", style="cyan", width=20)
-            table.add_column("Value", style="white")
-            
-            table.add_row("Status", f"[{status_color}]{status_text}[/{status_color}]")
-            table.add_row("Threat Level", f"[{threat_color}]{threat_level}[/{threat_color}]")
-            table.add_row("Threat Indicator", threat_indicator)
-            table.add_row("Uptime", status.get("uptime", "N/A"))
-            table.add_row("Running", "âœ…" if status.get("running", False) else "âŒ")
-            table.add_row("Monitored Dirs", str(status.get("monitored_dirs", 0)))
-            table.add_row("Total Alerts", str(status.get("total_alerts", 0)))
-            
-            panel = Panel(
-                table,
-                title="[bold cyan]ðŸ“Š System Status[/bold cyan]",
-                border_style="bright_blue",
-                box=box.HEAVY,
-                padding=(1, 2),
-            )
-            return panel
-
-        # ================================================================
-        # 3. Build Statistics Panel
-        # ================================================================
-        def build_stats_panel(status):
-            """Create the statistics panel with activity metrics."""
-            stats = status.get("stats", {})
-            backup = status.get("backup", {})
-            
-            table = Table(show_header=False, box=box.ROUNDED, expand=True)
-            table.add_column("Metric", style="cyan", width=20)
-            table.add_column("Value", style="white", justify="right")
-            
-            # Activity stats
-            table.add_row("ðŸ“ Files Created", str(stats.get("files_created", 0)))
-            table.add_row("ðŸ“ Files Modified", str(stats.get("files_modified", 0)))
-            table.add_row("ðŸ—‘ï¸ Files Deleted", str(stats.get("files_deleted", 0)))
-            table.add_row("ðŸ”„ Files Renamed", str(stats.get("files_renamed", 0)))
-            table.add_row("", "")
-            table.add_row("ðŸ” Suspicious Processes", str(status.get("suspicious_processes", 0)))
-            table.add_row("âš ï¸ Suspicious Events", str(status.get("suspicious_events", 0)))
-            table.add_row("ðŸ”” Alerts Triggered", str(stats.get("alerts_triggered", 0)))
-            table.add_row("ðŸ“Š Scans Performed", str(stats.get("total_scans", 0)))
-            
-            panel = Panel(
-                table,
-                title="[bold yellow]ðŸ“ˆ Activity Statistics[/bold yellow]",
-                border_style="yellow",
-                box=box.HEAVY,
-                padding=(1, 2),
-            )
-            return panel
-
-        # ================================================================
-        # 4. Build Backup Panel
-        # ================================================================
-        def build_backup_panel(status):
-            """Create the backup statistics panel."""
-            backup = status.get("backup", {})
-            
-            table = Table(show_header=False, box=box.ROUNDED, expand=True)
-            table.add_column("Metric", style="cyan", width=20)
-            table.add_column("Value", style="white", justify="right")
-            
-            table.add_row("ðŸ’¾ Backup Enabled", "âœ…" if backup.get("enabled", False) else "âŒ")
-            table.add_row("Files Backed Up", str(backup.get("files_backed_up", 0)))
-            table.add_row("ðŸ”’ Quarantined", str(backup.get("files_quarantined", 0)))
-            table.add_row("ðŸ”„ Restored", str(backup.get("files_restored", 0)))
-            table.add_row("ðŸ“¦ Backup Size", f"{backup.get('backup_size_mb', 0.0):.2f} MB")
-            table.add_row("â™»ï¸ Recycle Bin", f"{backup.get('recycle_bin_size_mb', 0.0):.2f} MB")
-            table.add_row("ðŸ“‚ Total Backups", str(backup.get("total_backups", 0)))
-            
-            panel = Panel(
-                table,
-                title="[bold magenta]ðŸ’¾ Backup & Recovery[/bold magenta]",
-                border_style="magenta",
-                box=box.HEAVY,
-                padding=(1, 2),
-            )
-            return panel
-
-        # ================================================================
-        # 5. Build Events Panel
-        # ================================================================
-        def build_events_panel(limit: int = 8):
-            """Create the recent events panel."""
-            events = self.get_events(limit)
-            
-            table = Table(
-                box=box.ROUNDED,
-                expand=True,
-                show_header=True,
-                header_style="bold cyan",
-            )
-            table.add_column("Time", style="dim", width=10)
-            table.add_column("Type", style="yellow", width=10)
-            table.add_column("File", style="white", no_wrap=False)
-            
-            if not events:
-                table.add_row("â€”", "â€”", "[dim]No recent events[/dim]")
-            else:
-                for event in events[-limit:]:
-                    if hasattr(event, 'event_type'):
-                        event_type = event.event_type
-                        path = Path(event.path).name if hasattr(event, 'path') else 'unknown'
-                        timestamp = datetime.fromisoformat(event.timestamp).strftime("%H:%M:%S")
-                    else:
-                        event_type = event.get('event_type', 'unknown')
-                        path = Path(event.get('path', '')).name
-                        timestamp = event.get('timestamp', '')[:8]
-                    
-                    if event_type == 'created':
-                        type_display = "ðŸ“ CREATE"
-                        color = "green"
-                    elif event_type == 'deleted':
-                        type_display = "ðŸ—‘ï¸ DELETE"
-                        color = "red"
-                    elif event_type == 'modified':
-                        type_display = "ðŸ“ MODIFY"
-                        color = "yellow"
-                    else:
-                        type_display = "ðŸ”„ MOVE"
-                        color = "blue"
-                    
-                    table.add_row(
-                        timestamp,
-                        f"[{color}]{type_display}[/{color}]",
-                        path[:40]
-                    )
-            
-            panel = Panel(
-                table,
-                title="[bold cyan]ðŸ”„ Recent File Events[/bold cyan]",
-                border_style="cyan",
-                box=box.HEAVY,
-                padding=(1, 2),
-            )
-            return panel
-
-        # ================================================================
-        # 6. Build Footer
-        # ================================================================
-        def build_footer():
-            """Create the dashboard footer."""
-            footer_text = Text()
-            footer_text.append("DSTerminal v4.0.0.113", style="dim")
-            footer_text.append("  |  ", style="bright_blue")
-            footer_text.append(f"Session: {self.session_id}", style="dim")
-            footer_text.append("  |  ", style="bright_blue")
-            footer_text.append("Press Ctrl+C to exit", style="yellow")
-            
-            footer = Panel(
-                Align.center(footer_text),
-                border_style="bright_blue",
-                box=box.HEAVY,
-                padding=(0, 2),
-            )
-            return footer
-
-        # ================================================================
-        # 7. Main Layout
-        # ================================================================
-        def build_layout():
-            """Build the complete dashboard layout."""
-            status = self.get_status()
-            
-            # Top row: Status + Stats
-            top_row = Layout()
-            top_row.split_row(
-                Layout(build_status_panel(status), ratio=1),
-                Layout(build_stats_panel(status), ratio=1),
-            )
-            
-            # Middle row: Backup + Events
-            middle_row = Layout()
-            middle_row.split_row(
-                Layout(build_backup_panel(status), ratio=1),
-                Layout(build_events_panel(), ratio=1),
-            )
-            
-            # Full layout
-            layout = Layout()
-            layout.split(
-                Layout(build_header(), size=5),
-                Layout(top_row),
-                Layout(middle_row),
-                Layout(build_footer(), size=3),
-            )
-            
-            return layout
-
-        # ================================================================
-        # 8. Live Loop
-        # ================================================================
-        try:
-            with Live(
-                console=self.console,
-                refresh_per_second=1 / refresh_rate,
-                screen=True,
-                transient=False,
-                auto_refresh=True,
-            ) as live:
-                while not self._stop_event.is_set():
-                    live.update(build_layout())
-                    time.sleep(refresh_rate)
-                    
-        except KeyboardInterrupt:
-            self.console.print("\n[bold yellow]Dashboard closed.[/bold yellow]")
-        except Exception as e:
-            self._log_message(f"Dashboard error: {e}", "ERROR")
-            self._display_simple_dashboard()
-
-
     def _get_monitored_dirs(self) -> List[Path]:
-        """Discover directories to monitor and display a rich discovery dashboard."""
-
+        """Discover directories to monitor"""
         home = Path.home()
         dirs = []
 
-        # -------------------------------------------------------
-        # Rich Discovery Header
-        # -------------------------------------------------------
+        if platform.system() == "Windows":
+            user_dirs = [
+                home / "Documents",
+                home / "Desktop",
+                home / "Downloads",
+                home / "Pictures",
+                home / "Music",
+                home / "Videos",
+                home / "AppData" / "Local" / "Temp",
+                home / "AppData" / "Roaming",
+                home / "AppData" / "Local",
+                home / "OneDrive" if (home / "OneDrive").exists() else None,
+                home / "Favorites",
+                home / "Links",
+                home / "Contacts",
+                home / "Searches",
+                home / "Saved Games",
+                home / "3D Objects",
+            ]
 
-        if self.use_rich:
+            for d in user_dirs:
+                if d and d.exists():
+                    dirs.append(d)
 
-            from rich.align import Align
-            from rich.console import Group
-            from rich.panel import Panel
-            from rich.progress import (
-                Progress,
-                SpinnerColumn,
-                TextColumn,
-                BarColumn,
-                TimeElapsedColumn,
-            )
-            from rich.live import Live
-            from rich.table import Table
-            from rich.columns import Columns
+            common_dirs = [
+                Path(os.environ.get("TEMP", "C:\\Temp")),
+                Path(os.environ.get("TMP", "C:\\Temp")),
+                Path("C:\\ProgramData"),
+                Path("C:\\Users\\Public"),
+                Path("C:\\Windows\\Temp"),
+            ]
 
-            header = Panel(
-                Align.center(
-                    "[bold cyan]DSTerminal[/bold cyan]\n"
-                    "[bold white]Ransomware Monitor[/bold white]\n"
-                    "[bright_green]Directory Discovery Module[/bright_green]"
-                ),
-                border_style="cyan",
-                padding=(1, 4),
-            )
-
-            progress = Progress(
-                SpinnerColumn(style="cyan"),
-                TextColumn("[bold white]{task.description}"),
-                BarColumn(bar_width=None),
-                TextColumn("[green]{task.completed}"),
-                TimeElapsedColumn(),
-                expand=True,
-            )
-
-            task = progress.add_task("Discovering directories...", total=100)
-
-            with Live(
-                Group(
-                    Align.center(header),
-                    "",
-                    progress
-                ),
-                refresh_per_second=20,
-                console=self.console,
-            ) as live:
-
-                # ---------------------------------------------------
-                # Windows
-                # ---------------------------------------------------
-
-                if platform.system() == "Windows":
-
-                    user_dirs = [
-                        home / "Documents",
-                        home / "Desktop",
-                        home / "Downloads",
-                        home / "Pictures",
-                        home / "Music",
-                        home / "Videos",
-                        home / "AppData" / "Local" / "Temp",
-                        home / "AppData" / "Roaming",
-                        home / "AppData" / "Local",
-                        home / "OneDrive" if (home / "OneDrive").exists() else None,
-                        home / "Favorites",
-                        home / "Links",
-                        home / "Contacts",
-                        home / "Searches",
-                        home / "Saved Games",
-                        home / "3D Objects",
-                    ]
-
-                    total = len(user_dirs)
-
-                    for i, d in enumerate(user_dirs):
-
-                        progress.update(task, completed=((i + 1) / total) * 60)
-
-                        if d and d.exists():
-                            dirs.append(d)
-
-                    common_dirs = [
-                        Path(os.environ.get("TEMP", "C:\\Temp")),
-                        Path(os.environ.get("TMP", "C:\\Temp")),
-                        Path("C:\\ProgramData"),
-                        Path("C:\\Users\\Public"),
-                        Path("C:\\Windows\\Temp"),
-                    ]
-
-                    start = len(user_dirs)
-
-                    for j, d in enumerate(common_dirs):
-
-                        progress.update(
-                            task,
-                            completed=60 + ((j + 1) / len(common_dirs)) * 40,
-                        )
-
-                        if d.exists():
-                            try:
-                                dirs.append(d)
-                            except Exception:
-                                pass
-
-                # ---------------------------------------------------
-                # Linux / macOS
-                # ---------------------------------------------------
-
-                else:
-
-                    user_dirs = [
-                        home,
-                        home / "Documents",
-                        home / "Desktop",
-                        home / "Downloads",
-                        home / "Pictures",
-                        home / "Music",
-                        home / "Videos",
-                        home / ".local",
-                        home / ".config",
-                        home / ".cache",
-                        home / ".ssh",
-                        home / ".gnupg",
-                    ]
-
-                    total = len(user_dirs)
-
-                    for i, d in enumerate(user_dirs):
-
-                        progress.update(task, completed=((i + 1) / total) * 60)
-
-                        if d.exists():
-                            dirs.append(d)
-
-                    system_dirs = [
-                        Path("/tmp"),
-                        Path("/var/tmp"),
-                        Path("/var/log"),
-                        Path("/opt"),
-                        Path("/usr/local"),
-                    ]
-
-                    for j, d in enumerate(system_dirs):
-
-                        progress.update(
-                            task,
-                            completed=60 + ((j + 1) / len(system_dirs)) * 40,
-                        )
-
-                        if d.exists():
-                            try:
-                                dirs.append(d)
-                            except Exception:
-                                pass
-
+            for d in common_dirs:
+                if d.exists():
+                    try:
+                        dirs.append(d)
+                    except Exception:
+                        pass
         else:
+            user_dirs = [
+                home,
+                home / "Documents",
+                home / "Desktop",
+                home / "Downloads",
+                home / "Pictures",
+                home / "Music",
+                home / "Videos",
+                home / ".local",
+                home / ".config",
+                home / ".cache",
+                home / ".ssh",
+                home / ".gnupg",
+            ]
 
-            # Original behaviour
+            for d in user_dirs:
+                if d.exists():
+                    dirs.append(d)
 
-            if platform.system() == "Windows":
+            system_dirs = [
+                Path("/tmp"),
+                Path("/var/tmp"),
+                Path("/var/log"),
+                Path("/opt"),
+                Path("/usr/local"),
+            ]
 
-                user_dirs = [
-                    home / "Documents",
-                    home / "Desktop",
-                    home / "Downloads",
-                    home / "Pictures",
-                    home / "Music",
-                    home / "Videos",
-                    home / "AppData" / "Local" / "Temp",
-                    home / "AppData" / "Roaming",
-                    home / "AppData" / "Local",
-                    home / "OneDrive" if (home / "OneDrive").exists() else None,
-                    home / "Favorites",
-                    home / "Links",
-                    home / "Contacts",
-                    home / "Searches",
-                    home / "Saved Games",
-                    home / "3D Objects",
-                ]
-
-                for d in user_dirs:
-                    if d and d.exists():
+            for d in system_dirs:
+                if d.exists():
+                    try:
                         dirs.append(d)
-
-                common_dirs = [
-                    Path(os.environ.get("TEMP", "C:\\Temp")),
-                    Path(os.environ.get("TMP", "C:\\Temp")),
-                    Path("C:\\ProgramData"),
-                    Path("C:\\Users\\Public"),
-                    Path("C:\\Windows\\Temp"),
-                ]
-
-                for d in common_dirs:
-                    if d.exists():
-                        try:
-                            dirs.append(d)
-                        except Exception:
-                            pass
-
-            else:
-
-                user_dirs = [
-                    home,
-                    home / "Documents",
-                    home / "Desktop",
-                    home / "Downloads",
-                    home / "Pictures",
-                    home / "Music",
-                    home / "Videos",
-                    home / ".local",
-                    home / ".config",
-                    home / ".cache",
-                    home / ".ssh",
-                    home / ".gnupg",
-                ]
-
-                for d in user_dirs:
-                    if d.exists():
-                        dirs.append(d)
-
-                system_dirs = [
-                    Path("/tmp"),
-                    Path("/var/tmp"),
-                    Path("/var/log"),
-                    Path("/opt"),
-                    Path("/usr/local"),
-                ]
-
-                for d in system_dirs:
-                    if d.exists():
-                        try:
-                            dirs.append(d)
-                        except Exception:
-                            pass
-
-        # -------------------------------------------------------
-        # Remove duplicates
-        # -------------------------------------------------------
+                    except Exception:
+                        pass
 
         unique_dirs = []
         seen = set()
 
         for d in dirs:
-
             try:
-
                 if str(d) not in seen and d.exists():
-
                     unique_dirs.append(d)
-
                     seen.add(str(d))
-
             except Exception:
                 pass
-
-        # -------------------------------------------------------
-        # Rich Results
-        # -------------------------------------------------------
-
-        if self.use_rich:
-
-            table = Table(
-                title="[bold cyan]Monitored Directories[/bold cyan]",
-                border_style="bright_blue",
-                expand=True,
-            )
-
-            table.add_column("#", justify="center", style="cyan", width=4)
-            table.add_column("Directory", style="white")
-            table.add_column("Status", justify="center", style="green")
-
-            for idx, directory in enumerate(unique_dirs, 1):
-                table.add_row(
-                    str(idx),
-                    str(directory),
-                    "[green]âœ“ Active[/green]",
-                )
-
-            stats = Table.grid(expand=True)
-
-            stats.add_column(justify="center")
-            stats.add_column(justify="center")
-            stats.add_column(justify="center")
-
-            stats.add_row(
-                Panel(
-                    f"[bold cyan]{platform.system()}[/bold cyan]",
-                    title="Operating System",
-                    border_style="cyan",
-                ),
-                Panel(
-                    f"[bold green]{len(unique_dirs)}[/bold green]",
-                    title="Directories",
-                    border_style="green",
-                ),
-                Panel(
-                    "[bold yellow]READY[/bold yellow]",
-                    title="Monitor Status",
-                    border_style="yellow",
-                ),
-            )
-
-            self.console.print()
-            self.console.print(Align.center(stats))
-            self.console.print()
-            self.console.print(Align.center(table))
-            self.console.print()
-
 
         return unique_dirs
     
     def _get_watched_extensions(self) -> Set[str]:
-        """
-        Configure file extension monitoring.
-
-        An empty set means DSTerminal monitors ALL file extensions.
-        """
-
-        watched_extensions: Set[str] = set()
-
-        if self.use_rich:
-
-            from rich.align import Align
-            from rich.console import Group
-            from rich.panel import Panel
-            from rich.table import Table
-            from rich.columns import Columns
-            from rich.text import Text
-
-            # ==========================================================
-            # Header
-            # ==========================================================
-
-            header = Panel(
-                Align.center(
-                    Text.from_markup(
-                        "[bold bright_cyan]"
-                        "DSTerminal Cyber Defense Platform\n"
-                        "[bold white]FILE EXTENSION MONITORING POLICY[/bold white]"
-                    )
-                ),
-                border_style="bright_cyan",
-                padding=(1, 3),
-            )
-
-            # ==========================================================
-            # Policy Information
-            # ==========================================================
-
-            policy = Table.grid(expand=True)
-            policy.add_column(style="cyan", justify="right", width=24)
-            policy.add_column(style="white")
-
-            policy.add_row("Monitoring Mode", "[bold bright_green]FULL SYSTEM[/bold bright_green]")
-            policy.add_row("Extension Filter", "[yellow]Disabled[/yellow]")
-            policy.add_row("Coverage", "[green]All File Types[/green]")
-            policy.add_row("Detection Policy", "[cyan]Universal[/cyan]")
-            policy.add_row("Status", "[bold green]ACTIVE[/bold green]")
-
-            policy_panel = Panel(
-                policy,
-                title="[bold green]Monitoring Configuration[/bold green]",
-                border_style="green",
-                padding=(1, 2),
-            )
-
-            # ==========================================================
-            # Coverage Table
-            # ==========================================================
-
-            table = Table(
-                title="[bold bright_magenta]Protected File Categories[/bold bright_magenta]",
-                border_style="magenta",
-                expand=True,
-                show_lines=True,
-            )
-
-            table.add_column("Category", style="cyan", justify="center")
-            table.add_column("Examples", style="white")
-            table.add_column("Status", justify="center")
-
-            table.add_row(
-                "Documents",
-                "*.docx  *.pdf  *.xlsx  *.pptx  *.txt",
-                "[green]âœ“[/green]"
-            )
-
-            table.add_row(
-                "Images",
-                "*.jpg  *.png  *.bmp  *.gif",
-                "[green]âœ“[/green]"
-            )
-
-            table.add_row(
-                "Videos",
-                "*.mp4  *.avi  *.mkv",
-                "[green]âœ“[/green]"
-            )
-
-            table.add_row(
-                "Audio",
-                "*.mp3  *.wav  *.flac",
-                "[green]âœ“[/green]"
-            )
-
-            table.add_row(
-                "Archives",
-                "*.zip  *.rar  *.7z",
-                "[green]âœ“[/green]"
-            )
-
-            table.add_row(
-                "Source Code",
-                "*.py  *.cpp  *.js  *.java",
-                "[green]âœ“[/green]"
-            )
-
-            table.add_row(
-                "Executables",
-                "*.exe  *.dll  *.bat  *.ps1",
-                "[green]âœ“[/green]"
-            )
-
-            table.add_row(
-                "System Files",
-                "*.*",
-                "[bold bright_green]MONITORED[/bold bright_green]"
-            )
-
-            # ==========================================================
-            # Summary Boxes
-            # ==========================================================
-
-            summary = Columns(
-                [
-                    Panel(
-                        Align.center(
-                            "[bold bright_green]ALL FILES[/bold bright_green]"
-                        ),
-                        title="Coverage",
-                        border_style="green",
-                        expand=True,
-                    ),
-                    Panel(
-                        Align.center(
-                            "[bold bright_cyan]NO FILTERS[/bold bright_cyan]"
-                        ),
-                        title="Policy",
-                        border_style="cyan",
-                        expand=True,
-                    ),
-                    Panel(
-                        Align.center(
-                            "[bold yellow]REAL-TIME[/bold yellow]"
-                        ),
-                        title="Detection",
-                        border_style="yellow",
-                        expand=True,
-                    ),
-                ],
-                expand=True,
-            )
-
-            self.console.print()
-            self.console.print(Align.center(header))
-            self.console.print()
-            self.console.print(Align.center(summary))
-            self.console.print()
-            self.console.print(Align.center(policy_panel))
-            self.console.print()
-            self.console.print(Align.center(table))
-            self.console.print()
-
-        return watched_extensions
+        """Configure file extension monitoring - empty set = monitor all"""
+        return set()
     
     def _get_suspicious_extensions(self) -> Set[str]:
-        """
-        Load suspicious file extensions commonly associated with
-        ransomware activity.
-        """
-
-        extensions = {
+        """Load suspicious file extensions commonly associated with ransomware"""
+        return {
             '.encrypted', '.enc', '.crypt', '.locked', '.ransom',
             '.worm', '.virus', '.infected', '.crypto', '.crypter',
             '.lol', '.bad', '.hacked', '.breached', '.compromised',
@@ -982,80 +315,10 @@ class RansomwareMonitor:
             '.key', '.key2', '.key3', '.decryptor', '.cryptor',
             '.0x', '.1x', '.2x', '.3x', '.4x', '.5x', '.6x', '.7x', '.8x', '.9x'
         }
-
-        if self.use_rich:
-
-            from rich.align import Align
-            from rich.columns import Columns
-            from rich.panel import Panel
-            from rich.table import Table
-
-            table = Table(
-                title="[bold bright_red]Suspicious Extension Indicators[/]",
-                border_style="bright_red",
-                expand=True,
-                show_lines=True,
-            )
-
-            table.add_column("#", width=4, justify="center", style="cyan")
-            table.add_column("Extension", style="yellow")
-            table.add_column("Detection", justify="center", style="green")
-
-            for i, ext in enumerate(sorted(extensions), 1):
-                table.add_row(str(i), ext, "[bold green]ACTIVE[/]")
-
-            summary = Columns(
-                [
-                    Panel(
-                        Align.center(
-                            f"[bold bright_red]{len(extensions)}[/]\nIndicators"
-                        ),
-                        border_style="red",
-                        title="IOC Database",
-                    ),
-                    Panel(
-                        Align.center(
-                            "[bold bright_green]REAL-TIME[/]"
-                        ),
-                        border_style="green",
-                        title="Detection",
-                    ),
-                    Panel(
-                        Align.center(
-                            "[bold cyan]ENABLED[/]"
-                        ),
-                        border_style="cyan",
-                        title="Status",
-                    ),
-                ],
-                expand=True,
-            )
-
-            self.console.print()
-            self.console.print(
-                Align.center(
-                    Panel.fit(
-                        "[bold bright_red]DSTerminal[/]\n"
-                        "[bold white]Suspicious Extension Database[/]",
-                        border_style="bright_red",
-                    )
-                )
-            )
-            self.console.print()
-            self.console.print(summary)
-            self.console.print()
-            self.console.print(table)
-            self.console.print()
-
-
-        return extensions
+    
     def _get_suspicious_names(self) -> Set[str]:
-        """
-        Load suspicious filenames commonly associated with
-        ransomware notes.
-        """
-
-        names = {
+        """Load suspicious filenames commonly associated with ransomware notes"""
+        return {
             'readme.txt', 'howtodecrypt.txt', 'decrypt.txt',
             'payment.txt', 'ransom.txt', 'help.txt',
             '!readme.txt', '!!!readme.txt', 'read_me.txt',
@@ -1065,76 +328,6 @@ class RansomwareMonitor:
             'README.txt', 'READ_ME.txt', 'DECRYPT.txt',
             'HowToDecrypt.txt', 'RansomNote.txt'
         }
-
-        if self.use_rich:
-
-            from rich.align import Align
-            from rich.columns import Columns
-            from rich.panel import Panel
-            from rich.table import Table
-
-            table = Table(
-                title="[bold yellow]Ransom Note Filename Indicators[/]",
-                border_style="yellow",
-                expand=True,
-                show_lines=True,
-            )
-
-            table.add_column("#", width=4, justify="center", style="cyan")
-            table.add_column("Filename", style="white")
-            table.add_column("Threat Type", justify="center", style="red")
-
-            for i, name in enumerate(sorted(names), 1):
-                table.add_row(
-                    str(i),
-                    name,
-                    "[bold red]RANSOM NOTE[/]",
-                )
-
-            summary = Columns(
-                [
-                    Panel(
-                        Align.center(
-                            f"[bold yellow]{len(names)}[/]\nSignatures"
-                        ),
-                        border_style="yellow",
-                        title="Filename IOC",
-                    ),
-                    Panel(
-                        Align.center(
-                            "[bold green]MONITORING[/]"
-                        ),
-                        border_style="green",
-                        title="Status",
-                    ),
-                    Panel(
-                        Align.center(
-                            "[bold cyan]REAL-TIME[/]"
-                        ),
-                        border_style="cyan",
-                        title="Detection",
-                    ),
-                ],
-                expand=True,
-            )
-
-            self.console.print()
-            self.console.print(
-                Align.center(
-                    Panel.fit(
-                        "[bold yellow]DSTerminal[/]\n"
-                        "[bold white]Ransom Note Signature Database[/]",
-                        border_style="yellow",
-                    )
-                )
-            )
-            self.console.print()
-            self.console.print(summary)
-            self.console.print()
-            self.console.print(table)
-            self.console.print()
-
-        return names
     
     def _get_ransomware_processes(self) -> Set[str]:
         """Get known ransomware process names"""
@@ -1171,7 +364,6 @@ class RansomwareMonitor:
             else:
                 print(f"{Fore.CYAN}[{timestamp}] [RANSOM] {message}{Style.RESET_ALL}")
 
-# ===============================================
     def create_test_file(self):
         """Create a test file to demonstrate monitoring and backup"""
         test_dir = Path.home() / "Documents"
@@ -1187,12 +379,12 @@ class RansomwareMonitor:
                 f.write("Ransomware Monitor Test File\n")
                 f.write("Delete this file to test backup and restore functionality.\n")
             
-            self._log_message(f"âœ… Created test file: {test_file.name}", "SUCCESS")
-            print(f"\n{Fore.GREEN}âœ… Test file created: {test_file}{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}ðŸ“ Delete this file to test backup and restore.{Style.RESET_ALL}")
+            self._log_message(f"✅ Created test file: {test_file.name}", "SUCCESS")
+            print(f"\n{Fore.GREEN}✅ Test file created: {test_file}{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}📝 Delete this file to test backup and restore.{Style.RESET_ALL}")
             return str(test_file)
         except Exception as e:
-            self._log_message(f"âš ï¸ Failed to create test file: {str(e)}", "WARNING")
+            self._log_message(f"⚠️ Failed to create test file: {str(e)}", "WARNING")
             return None
     
     def _backup_file(self, file_path: Path, event_type: str = "deleted") -> Optional[Path]:
@@ -1201,27 +393,22 @@ class RansomwareMonitor:
             return None
         
         try:
-            # Check if file exists
             if not file_path.exists():
-                self._log_message(f"âš ï¸ File not found for backup: {file_path.name}", "DEBUG")
+                self._log_message(f"⚠️ File not found for backup: {file_path.name}", "DEBUG")
                 return None
             
-            # Get file info before backup
             file_size = file_path.stat().st_size
             file_name = file_path.name
             
-            # Create backup path with timestamp
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]  # Include microseconds
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
             backup_name = f"{file_path.stem}_{timestamp}{file_path.suffix}"
             
-            # Determine backup directory
             try:
                 if event_type == "deleted":
                     backup_dir = self.recycle_dir / file_path.parent.relative_to(file_path.parent.anchor)
                 else:
                     backup_dir = self.backup_dir / file_path.parent.relative_to(file_path.parent.anchor)
             except ValueError:
-                # If can't get relative path, use sanitized absolute path
                 sanitized_parent = str(file_path.parent).replace(':', '').replace('\\', '_').replace('/', '_')
                 if event_type == "deleted":
                     backup_dir = self.recycle_dir / sanitized_parent
@@ -1231,13 +418,9 @@ class RansomwareMonitor:
             backup_dir.mkdir(parents=True, exist_ok=True)
             backup_path = backup_dir / backup_name
             
-            # Copy file to backup
             shutil.copy2(file_path, backup_path)
-            
-            # Calculate hash
             file_hash = self._calculate_hash(file_path)
             
-            # Update stats
             self.backup_stats['files_backed_up'] += 1
             self.backup_stats['backup_size_bytes'] += file_size
             self.backup_stats['last_backup'] = datetime.now()
@@ -1246,12 +429,11 @@ class RansomwareMonitor:
             if event_type == "deleted":
                 self.backup_stats['recycle_bin_size'] += file_size
             
-            self._log_message(f"ðŸ’¾ Backed up: {file_name} ({file_size} bytes)", "BACKUP")
-            
+            self._log_message(f"💾 Backed up: {file_name} ({file_size} bytes)", "BACKUP")
             return backup_path
             
         except Exception as e:
-            self._log_message(f"âš ï¸ Backup failed for {file_path.name}: {str(e)}", "WARNING")
+            self._log_message(f"⚠️ Backup failed for {file_path.name}: {str(e)}", "WARNING")
             return None  
     
     def _calculate_hash(self, file_path: Path) -> str:
@@ -1271,14 +453,12 @@ class RansomwareMonitor:
             if not backup_path.exists():
                 return False
             
-            # Determine original name
             parts = backup_path.stem.rsplit('_', 1)
             if len(parts) == 2:
                 original_name = parts[0] + backup_path.suffix
             else:
                 original_name = backup_path.name
             
-            # Determine restore location
             if self.recycle_dir in backup_path.parents:
                 relative = backup_path.relative_to(self.recycle_dir)
                 restore_path = Path.home() / relative.parent / original_name
@@ -1286,16 +466,13 @@ class RansomwareMonitor:
                 relative = backup_path.relative_to(self.backup_dir)
                 restore_path = Path.home() / relative.parent / original_name
             
-            # Create parent directories
             restore_path.parent.mkdir(parents=True, exist_ok=True)
             
-            # Restore file
             shutil.copy2(backup_path, restore_path)
             
             self.backup_stats['files_restored'] += 1
-            self._log_message(f"ðŸ”„ Restored: {backup_path.name} â†’ {restore_path}", "SUCCESS")
+            self._log_message(f"🔄 Restored: {backup_path.name} -> {restore_path}", "SUCCESS")
             
-            # Remove backup after successful restore
             try:
                 backup_path.unlink()
             except:
@@ -1304,7 +481,7 @@ class RansomwareMonitor:
             return True
             
         except Exception as e:
-            self._log_message(f"âš ï¸ Restore failed: {str(e)}", "WARNING")
+            self._log_message(f"⚠️ Restore failed: {str(e)}", "WARNING")
             return False
 
     def _quarantine_file(self, file_path: Path) -> Optional[Path]:
@@ -1318,12 +495,12 @@ class RansomwareMonitor:
             shutil.move(str(file_path), str(quarantine_path))
             
             self.backup_stats['files_quarantined'] += 1
-            self._log_message(f"ðŸš¨ Quarantined: {file_path.name}", "ERROR")
+            self._log_message(f"🚨 Quarantined: {file_path.name}", "ERROR")
             
             return quarantine_path
             
         except Exception as e:
-            self._log_message(f"âš ï¸ Quarantine failed: {str(e)}", "WARNING")
+            self._log_message(f"⚠️ Quarantine failed: {str(e)}", "WARNING")
             return None
 
     def start_monitoring(self) -> bool:
@@ -1340,24 +517,20 @@ class RansomwareMonitor:
         self._stop_event.clear()
         self.stats['start_time'] = datetime.now()
         
-        # Start the monitor thread
         self.monitor_thread = threading.Thread(target=self._monitor_loop, daemon=True)
         self.monitor_thread.start()
         
-        # Start the file system watcher
         if WATCHDOG_AVAILABLE:
             self._start_watchdog()
         else:
             self._log_message("Watchdog not available - using polling mode", "WARNING")
         
-        # Start the polling thread for extra reliability
         self.polling_thread = threading.Thread(target=self._polling_loop, daemon=True)
         self.polling_thread.start()
         
         self._log_message("Ransomware monitoring active", "SUCCESS")
         return True
 
-# Replace the _start_watchdog method with this fixed version
     def _start_watchdog(self):
         """Start watchdog file system observer with backup support"""
         try:
@@ -1370,42 +543,36 @@ class RansomwareMonitor:
                     if not event.is_directory:
                         self.event_count += 1
                         self.monitor._handle_file_event('created', event.src_path)
-                        self.monitor._log_message(f"ðŸ“ Created: {Path(event.src_path).name}", "EVENT")
+                        self.monitor._log_message(f"📁 Created: {Path(event.src_path).name}", "EVENT")
                 
                 def on_modified(self, event):
                     if not event.is_directory:
                         self.event_count += 1
                         self.monitor._handle_file_event('modified', event.src_path)
-                        self.monitor._log_message(f"ðŸ“ Modified: {Path(event.src_path).name}", "EVENT")
+                        self.monitor._log_message(f"📝 Modified: {Path(event.src_path).name}", "EVENT")
                 
                 def on_deleted(self, event):
                     if not event.is_directory:
                         file_path = Path(event.src_path)
                         self.event_count += 1
-                        self.monitor._log_message(f"ðŸ—‘ï¸ Deleted: {file_path.name}", "EVENT")
+                        self.monitor._log_message(f"🗑️ Deleted: {file_path.name}", "EVENT")
                         
-                        # CRITICAL: Backup the file immediately
                         if self.monitor.backup_enabled:
-                            # Try multiple backup methods
                             backup_path = None
                             
-                            # Method 1: Direct backup (if file still exists)
                             if file_path.exists():
                                 backup_path = self.monitor._backup_file(file_path, "deleted")
                             
-                            # Method 2: Try to get from cache or history
                             if not backup_path:
-                                # Check if we have the file in our seen_files cache
                                 dir_key = str(file_path.parent)
                                 if dir_key in self.monitor.seen_files:
                                     if file_path.name in self.monitor.seen_files[dir_key]:
-                                        # We saw this file before, try to recover
                                         backup_path = self.monitor._backup_polled_file(file_path, file_path.name, file_path.parent)
                             
                             if backup_path:
-                                self.monitor._log_message(f"ðŸ’¾ Backed up deleted file: {file_path.name}", "BACKUP")
+                                self.monitor._log_message(f"💾 Backed up deleted file: {file_path.name}", "BACKUP")
                             else:
-                                self.monitor._log_message(f"âš ï¸ Could not backup: {file_path.name}", "WARNING")
+                                self.monitor._log_message(f"⚠️ Could not backup: {file_path.name}", "WARNING")
                         
                         self.monitor._handle_file_event('deleted', event.src_path)
                 
@@ -1413,9 +580,8 @@ class RansomwareMonitor:
                     if not event.is_directory:
                         self.event_count += 1
                         self.monitor._handle_file_event('moved', event.src_path, event.dest_path)
-                        self.monitor._log_message(f"â†”ï¸ Moved: {Path(event.src_path).name} â†’ {Path(event.dest_path).name}", "EVENT")
+                        self.monitor._log_message(f"↔️ Moved: {Path(event.src_path).name} -> {Path(event.dest_path).name}", "EVENT")
             
-            # Use PollingObserver for Windows
             try:
                 self.observer = PollingObserver()
                 self._log_message("Using PollingObserver for file system monitoring", "INFO")
@@ -1436,13 +602,13 @@ class RansomwareMonitor:
             
             if success_count > 0:
                 self.observer.start()
-                self._log_message(f"âœ… File system watcher active ({success_count} directories)", "SUCCESS")
+                self._log_message(f"✅ File system watcher active ({success_count} directories)", "SUCCESS")
             else:
-                self._log_message("âš ï¸ No directories could be monitored - using polling mode", "WARNING")
+                self._log_message("⚠️ No directories could be monitored - using polling mode", "WARNING")
                 self.observer = None
                 
         except Exception as e:
-            self._log_message(f"âš ï¸ Failed to start watchdog: {str(e)}", "WARNING")
+            self._log_message(f"⚠️ Failed to start watchdog: {str(e)}", "WARNING")
             self.observer = None
     
     def _polling_loop(self):
@@ -1451,13 +617,11 @@ class RansomwareMonitor:
         
         while not self._stop_event.is_set():
             try:
-                # Check directories for changes
                 for dir_path in self.monitored_dirs[:10]:
                     if not dir_path.exists():
                         continue
                     
                     try:
-                        # Get current files in directory
                         current_files = set()
                         file_info = {}
                         for item in dir_path.iterdir():
@@ -1473,32 +637,27 @@ class RansomwareMonitor:
                         
                         dir_key = str(dir_path)
                         
-                        # Check for new files
                         if dir_key in self.seen_files:
                             for file_name in current_files:
                                 if file_name not in self.seen_files[dir_key]:
                                     file_path = dir_path / file_name
                                     self._handle_file_event('created', str(file_path))
-                                    self._log_message(f"ðŸ“ [Poll] Created: {file_name}", "EVENT")
+                                    self._log_message(f"📁 [Poll] Created: {file_name}", "EVENT")
                             
-                            # Check for deleted files
                             for file_name in self.seen_files[dir_key]:
                                 if file_name not in current_files:
                                     file_path = dir_path / file_name
-                                    self._log_message(f"ðŸ—‘ï¸ [Poll] Deleted: {file_name}", "EVENT")
+                                    self._log_message(f"🗑️ [Poll] Deleted: {file_name}", "EVENT")
                                     
-                                    # CRITICAL FIX: Backup deleted file from polling
                                     if self.backup_enabled:
-                                        # Try to backup the file (it might still exist in a temp location)
                                         backup_path = self._backup_polled_file(file_path, file_name, dir_path)
                                         if backup_path:
-                                            self._log_message(f"ðŸ’¾ [Poll] Backed up deleted file: {file_name}", "BACKUP")
+                                            self._log_message(f"💾 [Poll] Backed up deleted file: {file_name}", "BACKUP")
                                         else:
-                                            self._log_message(f"âš ï¸ [Poll] Could not backup: {file_name}", "WARNING")
+                                            self._log_message(f"⚠️ [Poll] Could not backup: {file_name}", "WARNING")
                                     
                                     self._handle_file_event('deleted', str(file_path))
                         
-                        # Update seen files
                         self.seen_files[dir_key] = current_files
                         
                     except Exception as e:
@@ -1516,31 +675,17 @@ class RansomwareMonitor:
             return None
         
         try:
-            # First check if the file still exists in its original location
             if file_path.exists():
                 return self._backup_file(file_path, "deleted")
             
-            # Check Windows Recycle Bin for the file
             if platform.system() == 'Windows':
-                import ctypes
-                from ctypes import wintypes
-                
                 try:
-                    # Use shell32 to check recycle bin
-                    import ctypes.wintypes
-                    shell32 = ctypes.windll.shell32
-                    
-                    # Check if file is in recycle bin
-                    # This is a simple check - the actual file might be in Recycle Bin
                     recycle_path = Path(os.environ.get('SystemDrive', 'C:')) / '$Recycle.Bin'
                     if recycle_path.exists():
                         for item in recycle_path.rglob(f'*{file_name}*'):
                             if item.is_file():
-                                # Found a matching file in recycle bin, copy it
                                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
                                 backup_name = f"{file_path.stem}_{timestamp}{file_path.suffix}"
-                                
-                                # Determine backup directory
                                 backup_dir = self.recycle_dir / "recovered_from_recycle"
                                 backup_dir.mkdir(parents=True, exist_ok=True)
                                 backup_path = backup_dir / backup_name
@@ -1552,18 +697,15 @@ class RansomwareMonitor:
                                 self.backup_stats['recycle_bin_size'] += item.stat().st_size
                                 self.backup_stats['total_backups'] += 1
                                 
-                                self._log_message(f"ðŸ’¾ Recovered from Recycle Bin: {file_name}", "BACKUP")
+                                self._log_message(f"💾 Recovered from Recycle Bin: {file_name}", "BACKUP")
                                 return backup_path
                 except:
                     pass
             
-            # If file can't be found, it might be a temp file or already gone
             if file_path.suffix.lower() in ['.tmp', '.temp', '.log']:
-                self._log_message(f"â­ï¸ Skipping temp file: {file_name}", "DEBUG")
+                self._log_message(f"⏭️ Skipping temp file: {file_name}", "DEBUG")
                 return None
             
-            # Try to create a placeholder backup with metadata
-            # This is a fallback - we'll create a text file with info about the deleted file
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
             backup_dir = self.recycle_dir / "deleted_file_records"
             backup_dir.mkdir(parents=True, exist_ok=True)
@@ -1586,11 +728,11 @@ class RansomwareMonitor:
             self.backup_stats['files_backed_up'] += 1
             self.backup_stats['total_backups'] += 1
             
-            self._log_message(f"ðŸ“ Created deletion record for: {file_name}", "INFO")
+            self._log_message(f"📝 Created deletion record for: {file_name}", "INFO")
             return backup_path
             
         except Exception as e:
-            self._log_message(f"âš ï¸ Backup failed for {file_name}: {str(e)}", "WARNING")
+            self._log_message(f"⚠️ Backup failed for {file_name}: {str(e)}", "WARNING")
             return None
     
     def _handle_file_event(self, event_type: str, path: str, dest_path: str = None):
@@ -1598,7 +740,6 @@ class RansomwareMonitor:
         try:
             file_path = Path(path)
             
-            # Get file size
             size = 0
             if file_path.exists():
                 try:
@@ -1614,7 +755,6 @@ class RansomwareMonitor:
                 extension=file_path.suffix.lower()
             )
             
-            # Check for suspicious patterns
             self._check_for_ransomware_patterns(event)
             self.file_activity_log.append(event)
             
@@ -1685,14 +825,14 @@ class RansomwareMonitor:
                 self.stats['suspicious_processes'] += len(suspicious)
                 self.detected_processes.extend(suspicious)
                 
-                self._log_message(f"âš ï¸ Detected {len(suspicious)} suspicious processes", "WARNING")
+                self._log_message(f"⚠️ Detected {len(suspicious)} suspicious processes", "WARNING")
                 for proc in suspicious[:5]:
-                    self._log_message(f"   â— {proc.name} (PID: {proc.pid})", "WARNING")
+                    self._log_message(f"   ❗ {proc.name} (PID: {proc.pid})", "WARNING")
                 
                 if len(suspicious) >= self.SUSPICIOUS_PROCESS_THRESHOLD:
                     self.ransomware_detected = True
                     self.threat_level = ThreatLevel.CRITICAL
-                    self._log_message("ðŸš¨ CRITICAL: Ransomware activity detected!", "ERROR")
+                    self._log_message("🚨 CRITICAL: Ransomware activity detected!", "ERROR")
                     
         except Exception as e:
             pass
@@ -1709,12 +849,12 @@ class RansomwareMonitor:
         deleted = len([e for e in recent_events if e.event_type == 'deleted'])
         
         if created > self.FILE_CREATION_RATE_THRESHOLD:
-            self._log_message(f"âš ï¸ High file creation: {created} files in {timeframe}s", "WARNING")
+            self._log_message(f"⚠️ High file creation: {created} files in {timeframe}s", "WARNING")
             if self.threat_level.value[0] != "CRITICAL":
                 self.threat_level = ThreatLevel.HIGH
         
         if deleted > self.DELETE_RATE_THRESHOLD:
-            self._log_message(f"âš ï¸ High file deletion: {deleted} files in {timeframe}s", "WARNING")
+            self._log_message(f"⚠️ High file deletion: {deleted} files in {timeframe}s", "WARNING")
             if self.threat_level.value[0] != "CRITICAL":
                 self.threat_level = ThreatLevel.HIGH
 
@@ -1726,7 +866,7 @@ class RansomwareMonitor:
         if file_path.suffix.lower() in self.suspicious_extensions:
             event.is_suspicious = True
             self.suspicious_events.append(event)
-            self._log_message(f"ðŸš¨ Suspicious extension: {file_path.name}", "ERROR")
+            self._log_message(f"🚨 Suspicious extension: {file_path.name}", "ERROR")
             self.ransomware_detected = True
             self.threat_level = ThreatLevel.CRITICAL
             if self.backup_enabled and file_path.exists():
@@ -1735,7 +875,7 @@ class RansomwareMonitor:
         if file_name in self.suspicious_names:
             event.is_suspicious = True
             self.suspicious_events.append(event)
-            self._log_message(f"ðŸš¨ Suspicious file: {file_path.name}", "WARNING")
+            self._log_message(f"🚨 Suspicious file: {file_path.name}", "WARNING")
             self.ransomware_detected = True
             if self.threat_level.value[0] != "CRITICAL":
                 self.threat_level = ThreatLevel.HIGH
@@ -1744,7 +884,7 @@ class RansomwareMonitor:
             if any(ext in file_name for ext in ['.txt', '.html', '.hta', '.lnk']):
                 event.is_suspicious = True
                 self.suspicious_events.append(event)
-                self._log_message(f"ðŸ“ Ransom note: {file_path.name}", "ERROR")
+                self._log_message(f"📝 Ransom note: {file_path.name}", "ERROR")
 
     def _update_threat_level(self):
         """Update threat level based on recent activity"""
@@ -1833,7 +973,7 @@ class RansomwareMonitor:
 
     def scan_for_ransomware(self, path: str = None) -> List[dict]:
         """Manual scan for ransomware indicators"""
-        self._log_message("ðŸ” Starting manual ransomware scan...", "INFO")
+        self._log_message("🔍 Starting manual ransomware scan...", "INFO")
         self.stats['total_scans'] += 1
         
         if path is None:
@@ -1847,7 +987,7 @@ class RansomwareMonitor:
             if not scan_path.exists():
                 continue
             
-            self._log_message(f"ðŸ“‚ Scanning: {scan_path}", "INFO")
+            self._log_message(f"📂 Scanning: {scan_path}", "INFO")
             
             try:
                 for root, dirs, files in os.walk(str(scan_path)):
@@ -1885,14 +1025,14 @@ class RansomwareMonitor:
         if found:
             self.ransomware_detected = True
             self.threat_level = ThreatLevel.CRITICAL
-            self._log_message(f"ðŸš¨ Found {len(found)} ransomware indicators!", "ERROR")
-            print(f"\n{Fore.RED}ðŸš¨ RANSOMWARE INDICATORS FOUND: {len(found)}{Style.RESET_ALL}")
+            self._log_message(f"🚨 Found {len(found)} ransomware indicators!", "ERROR")
+            print(f"\n{Fore.RED}🚨 RANSOMWARE INDICATORS FOUND: {len(found)}{Style.RESET_ALL}")
             for item in found[:10]:
                 print(f"  {Fore.RED}[!] {item['type']}: {Path(item['path']).name}{Style.RESET_ALL}")
             if len(found) > 10:
                 print(f"  {Fore.YELLOW}... and {len(found) - 10} more{Style.RESET_ALL}")
         else:
-            print(f"\n{Fore.GREEN}âœ… No ransomware indicators found{Style.RESET_ALL}")
+            print(f"\n{Fore.GREEN}✅ No ransomware indicators found{Style.RESET_ALL}")
             self.ransomware_detected = False
         
         return found
@@ -1904,7 +1044,6 @@ class RansomwareMonitor:
             return False
         
         if backup_name:
-            # Restore specific file
             backup_path = self.recycle_dir / backup_name
             if not backup_path.exists():
                 backup_path = self.backup_dir / backup_name
@@ -1914,19 +1053,18 @@ class RansomwareMonitor:
                 self._log_message(f"Backup file not found: {backup_name}", "WARNING")
                 return False
         else:
-            # Restore all files from recycle bin
             restored = 0
             for backup_path in self.recycle_dir.rglob("*"):
                 if backup_path.is_file():
                     if self._restore_from_backup(backup_path):
                         restored += 1
-            self._log_message(f"âœ… Restored {restored} files from recycle bin", "SUCCESS")
+            self._log_message(f"✅ Restored {restored} files from recycle bin", "SUCCESS")
             return restored > 0
 
     def clear_backups(self, confirm: bool = True) -> bool:
         """Clear all backups (with confirmation)"""
         if confirm:
-            print(f"{Fore.RED}âš ï¸ WARNING: This will permanently delete all backups!{Style.RESET_ALL}")
+            print(f"{Fore.RED}⚠️ WARNING: This will permanently delete all backups!{Style.RESET_ALL}")
             response = input(f"{Fore.YELLOW}Are you sure? (yes/no): {Style.RESET_ALL}")
             if response.lower() != 'yes':
                 return False
@@ -1969,7 +1107,7 @@ class RansomwareMonitor:
                 'total_backups': 0
             }
             
-            self._log_message("ðŸ§¹ All backups cleared", "INFO")
+            self._log_message("🧹 All backups cleared", "INFO")
             return True
             
         except Exception as e:
@@ -1977,14 +1115,7 @@ class RansomwareMonitor:
             return False
 
     def display_dashboard(self, refresh_rate: float = 0.5):
-        """
-        Launch the ransomware monitoring dashboard with left/right layout.
-        
-        Parameters
-        ----------
-        refresh_rate : float
-            Dashboard refresh interval in seconds.
-        """
+        """Launch the ransomware monitoring dashboard with left/right layout."""
         if self.use_rich and self.console:
             try:
                 self._display_live_dashboard(refresh_rate)
@@ -1996,70 +1127,16 @@ class RansomwareMonitor:
         else:
             self._display_simple_dashboard()
 
-    # Compatibility wrapper methods for older CLI integration
-    def _ransomware_start(self):
-        return self.start_monitoring()
-
-    def _ransomware_stop(self):
-        return self.stop_monitoring()
-
-    def _ransomware_scan(self, path: str = None):
-        return self.scan_for_ransomware(path)
-
-    def _ransomware_events(self, limit=20):
-        """Show recent file events"""
-        events = self.get_events(limit)
-        
-        # simple printout
-        print(f"\n{Fore.CYAN}Recent Events:{Style.RESET_ALL}")
-        if not events:
-            print(f"  {Fore.YELLOW}No events recorded yet{Style.RESET_ALL}")
-        else:
-            for event in events[-10:]:
-                event_color = Fore.GREEN if event.event_type == 'created' else Fore.RED if event.event_type == 'deleted' else Fore.YELLOW
-                print(f"  {event_color}{event.event_type}: {Path(event.path).name}{Style.RESET_ALL}")
-        
-        # Show count
-        if len(events) > 10:
-            print(f"\n{Fore.CYAN}Showing 10 of {len(events)} events. Use 'events <n>' to see more.{Style.RESET_ALL}")
-
-    def _ransomware_suspicious(self, limit=10):
-        """Show suspicious events"""
-        events = self.get_suspicious_events(limit)
-        
-        print(f"\n{Fore.RED}Suspicious Events:{Style.RESET_ALL}")
-        if not events:
-            print(f"  {Fore.GREEN}No suspicious events{Style.RESET_ALL}")
-        else:
-            for event in events:
-                print(f"  [!] {event.event_type}: {Path(event.path).name}")
-
-    def _ransomware_dashboard(self):
-        return self.display_dashboard()
-
-    def _ransomware_export(self, fmt: str = 'json'):
-        return self.export_report(fmt)
-
-    def _ransomware_restore(self):
-        # interactive restore like older CLI: restore all
-        return self.restore_file()
-
-    def _ransomware_clear_backups(self):
-        return self.clear_backups()
-
-    def _ransomware_interactive(self):
-        return self.interactive_menu()
-
     def _display_simple_dashboard(self):
         """Display simple dashboard without Rich"""
         status = self.get_status()
         
-        print(f"\n{Fore.CYAN}{'='*80}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE}ðŸ›¡ï¸  RANSOMWARE DETECTION DASHBOARD{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}{'='*80}{Style.RESET_ALL}")
+        print(f"\n{Fore.CYAN}{'=' * 80}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE}🛡️  RANSOMWARE DETECTION DASHBOARD{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}{'=' * 80}{Style.RESET_ALL}")
         
         status_color = Fore.RED if status['ransomware_detected'] else Fore.GREEN
-        status_text = "ðŸš¨ ACTIVE THREAT" if status['ransomware_detected'] else "âœ… SYSTEM CLEAN"
+        status_text = "🚨 ACTIVE THREAT" if status['ransomware_detected'] else "✅ SYSTEM CLEAN"
         print(f"{Fore.YELLOW}Status:{Style.RESET_ALL} {status_color}{status_text}{Style.RESET_ALL}")
         
         print(f"{Fore.YELLOW}Threat Level:{Style.RESET_ALL} {status['threat_color']}{status['threat_level']}{Style.RESET_ALL}")
@@ -2077,7 +1154,7 @@ class RansomwareMonitor:
         
         print(f"\n{Fore.CYAN}Backup Statistics:{Style.RESET_ALL}")
         backup = status['backup']
-        print(f"  Backup Enabled: {'âœ…' if backup['enabled'] else 'âŒ'}")
+        print(f"  Backup Enabled: {'✅' if backup['enabled'] else '❌'}")
         print(f"  Files Backed Up: {backup['files_backed_up']}")
         print(f"  Files Quarantined: {backup['files_quarantined']}")
         print(f"  Files Restored: {backup['files_restored']}")
@@ -2088,19 +1165,12 @@ class RansomwareMonitor:
         if status['suspicious_events'] > 0:
             print(f"\n{Fore.RED}Recent Suspicious Events:{Style.RESET_ALL}")
             for event in self.get_suspicious_events(5):
-                print(f"  {Fore.YELLOW}â€¢ {event.event_type}: {Path(event.path).name}{Style.RESET_ALL}")
+                print(f"  {Fore.YELLOW}• {event.event_type}: {Path(event.path).name}{Style.RESET_ALL}")
         
-        print(f"{Fore.CYAN}{'='*80}{Style.RESET_ALL}\n")
+        print(f"{Fore.CYAN}{'=' * 80}{Style.RESET_ALL}\n")
     
     def _display_live_dashboard(self, refresh_rate: float = 0.5):
-        """
-        Enterprise-grade live dashboard with left/right layout.
-        
-        Parameters
-        ----------
-        refresh_rate : float
-            Dashboard refresh interval in seconds.
-        """
+        """Enterprise-grade live dashboard with bold continuous lines."""
         if not self.use_rich or not self.console:
             self._display_simple_dashboard()
             return
@@ -2115,51 +1185,44 @@ class RansomwareMonitor:
         from rich import box
         from datetime import datetime
 
-        # ================================================================
-        # 1. Build Header
-        # ================================================================
+        # Use double border with bold continuous lines
+        BOLD_BOX = box.DOUBLE_EDGE
+
         def build_header():
-            """Create the dashboard header panel."""
-            header_text = Text("ðŸ›¡ï¸  DSTERMINAL RANSOMWARE MONITOR", style="bold cyan")
+            header_text = Text("🛡️  DSTERMINAL RANSOMWARE MONITOR", style="bold cyan")
             header_text.append("  |  ", style="bright_blue")
             header_text.append("REAL-TIME THREAT INTELLIGENCE", style="bold white")
             
             header = Panel(
                 Align.center(header_text),
                 border_style="bright_blue",
-                box=box.DOUBLE,
+                box=BOLD_BOX,
                 padding=(1, 2),
             )
             return header
 
-        # ================================================================
-        # 2. Build Left Panel - Status & Threat Info
-        # ================================================================
         def build_left_panel(status):
-            """Create the left panel with status and threat information."""
             status_color = "red" if status.get("ransomware_detected", False) else "green"
-            status_text = "ðŸš¨ ACTIVE THREAT" if status.get("ransomware_detected", False) else "âœ… SYSTEM CLEAN"
+            status_text = "🚨 ACTIVE THREAT" if status.get("ransomware_detected", False) else "✅ SYSTEM CLEAN"
             
             threat_level = status.get("threat_level", "NORMAL")
             threat_color = status.get("threat_color", "green")
             
-            # Threat indicator bar
             threat_indicator = Text()
             if threat_level == "CRITICAL":
-                threat_indicator.append("â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ", style="bold red")
+                threat_indicator.append("████████████████████", style="bold red")
                 threat_indicator.append(" CRITICAL", style="bold red")
             elif threat_level == "HIGH":
-                threat_indicator.append("â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ", style="bold yellow")
+                threat_indicator.append("████████████████", style="bold yellow")
                 threat_indicator.append(" HIGH", style="bold yellow")
             elif threat_level == "MEDIUM":
-                threat_indicator.append("â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ", style="bold orange1")
+                threat_indicator.append("██████████", style="bold orange1")
                 threat_indicator.append(" MEDIUM", style="bold orange1")
             else:
-                threat_indicator.append("â–ˆâ–ˆâ–ˆâ–ˆ", style="bold green")
+                threat_indicator.append("████", style="bold green")
                 threat_indicator.append(" LOW", style="bold green")
             
-            # Status Table
-            table = Table(show_header=False, box=box.ROUNDED, expand=True)
+            table = Table(show_header=False, box=BOLD_BOX, expand=True)
             table.add_column("Metric", style="cyan", width=18)
             table.add_column("Value", style="white")
             
@@ -2167,12 +1230,11 @@ class RansomwareMonitor:
             table.add_row("Threat Level", f"[{threat_color}]{threat_level}[/{threat_color}]")
             table.add_row("Threat Indicator", threat_indicator)
             table.add_row("Uptime", status.get("uptime", "N/A"))
-            table.add_row("Running", "âœ…" if status.get("running", False) else "âŒ")
+            table.add_row("Running", "✅" if status.get("running", False) else "❌")
             table.add_row("Monitored Dirs", str(status.get("monitored_dirs", 0)))
             table.add_row("Total Alerts", str(status.get("total_alerts", 0)))
             
-            # System Info
-            system_table = Table(show_header=False, box=box.ROUNDED, expand=True)
+            system_table = Table(show_header=False, box=BOLD_BOX, expand=True)
             system_table.add_column("Metric", style="cyan", width=18)
             system_table.add_column("Value", style="white")
             
@@ -2180,69 +1242,57 @@ class RansomwareMonitor:
             system_table.add_row("Hostname", socket.gethostname())
             system_table.add_row("Session", self.session_id)
             
-            # Combine panels
             left_layout = Layout()
             left_layout.split(
-                Layout(Panel(table, title="[bold cyan]ðŸ“Š System Status[/bold cyan]", border_style="cyan", box=box.HEAVY), size=12),
-                Layout(Panel(system_table, title="[bold blue]ðŸ’» System Info[/bold blue]", border_style="blue", box=box.HEAVY), size=6),
+                Layout(Panel(table, title="[bold cyan]📊 System Status[/bold cyan]", border_style="cyan", box=BOLD_BOX), size=12),
+                Layout(Panel(system_table, title="[bold blue]💻 System Info[/bold blue]", border_style="blue", box=BOLD_BOX), size=6),
             )
             
             return left_layout
 
-        # ================================================================
-        # 3. Build Right Panel - Statistics & Activity
-        # ================================================================
         def build_right_panel(status):
-            """Create the right panel with statistics and activity."""
             stats = status.get("stats", {})
             backup = status.get("backup", {})
             
-            # Activity Statistics
-            stats_table = Table(show_header=False, box=box.ROUNDED, expand=True)
+            stats_table = Table(show_header=False, box=BOLD_BOX, expand=True)
             stats_table.add_column("Metric", style="cyan", width=18)
             stats_table.add_column("Value", style="white", justify="right")
             
-            stats_table.add_row("ðŸ“ Files Created", str(stats.get("files_created", 0)))
-            stats_table.add_row("ðŸ“ Files Modified", str(stats.get("files_modified", 0)))
-            stats_table.add_row("ðŸ—‘ï¸ Files Deleted", str(stats.get("files_deleted", 0)))
-            stats_table.add_row("ðŸ”„ Files Renamed", str(stats.get("files_renamed", 0)))
+            stats_table.add_row("📁 Files Created", str(stats.get("files_created", 0)))
+            stats_table.add_row("📝 Files Modified", str(stats.get("files_modified", 0)))
+            stats_table.add_row("🗑️ Files Deleted", str(stats.get("files_deleted", 0)))
+            stats_table.add_row("🔄 Files Renamed", str(stats.get("files_renamed", 0)))
             stats_table.add_row("", "")
-            stats_table.add_row("ðŸ” Suspicious Processes", str(status.get("suspicious_processes", 0)))
-            stats_table.add_row("âš ï¸ Suspicious Events", str(status.get("suspicious_events", 0)))
-            stats_table.add_row("ðŸ”” Alerts Triggered", str(stats.get("alerts_triggered", 0)))
-            stats_table.add_row("ðŸ“Š Scans Performed", str(stats.get("total_scans", 0)))
+            stats_table.add_row("🔍 Suspicious Processes", str(status.get("suspicious_processes", 0)))
+            stats_table.add_row("⚠️ Suspicious Events", str(status.get("suspicious_events", 0)))
+            stats_table.add_row("🔔 Alerts Triggered", str(stats.get("alerts_triggered", 0)))
+            stats_table.add_row("📊 Scans Performed", str(stats.get("total_scans", 0)))
             
-            # Backup Statistics
-            backup_table = Table(show_header=False, box=box.ROUNDED, expand=True)
+            backup_table = Table(show_header=False, box=BOLD_BOX, expand=True)
             backup_table.add_column("Metric", style="cyan", width=18)
             backup_table.add_column("Value", style="white", justify="right")
             
-            backup_table.add_row("ðŸ’¾ Backup Enabled", "âœ…" if backup.get("enabled", False) else "âŒ")
+            backup_table.add_row("💾 Backup Enabled", "✅" if backup.get("enabled", False) else "❌")
             backup_table.add_row("Files Backed Up", str(backup.get("files_backed_up", 0)))
-            backup_table.add_row("ðŸ”’ Quarantined", str(backup.get("files_quarantined", 0)))
-            backup_table.add_row("ðŸ”„ Restored", str(backup.get("files_restored", 0)))
-            backup_table.add_row("ðŸ“¦ Backup Size", f"{backup.get('backup_size_mb', 0.0):.2f} MB")
-            backup_table.add_row("â™»ï¸ Recycle Bin", f"{backup.get('recycle_bin_size_mb', 0.0):.2f} MB")
-            backup_table.add_row("ðŸ“‚ Total Backups", str(backup.get("total_backups", 0)))
+            backup_table.add_row("🔒 Quarantined", str(backup.get("files_quarantined", 0)))
+            backup_table.add_row("🔄 Restored", str(backup.get("files_restored", 0)))
+            backup_table.add_row("📦 Backup Size", f"{backup.get('backup_size_mb', 0.0):.2f} MB")
+            backup_table.add_row("♻️ Recycle Bin", f"{backup.get('recycle_bin_size_mb', 0.0):.2f} MB")
+            backup_table.add_row("📂 Total Backups", str(backup.get("total_backups", 0)))
             
-            # Combine panels
             right_layout = Layout()
             right_layout.split(
-                Layout(Panel(stats_table, title="[bold yellow]ðŸ“ˆ Activity Statistics[/bold yellow]", border_style="yellow", box=box.HEAVY), size=12),
-                Layout(Panel(backup_table, title="[bold magenta]ðŸ’¾ Backup & Recovery[/bold magenta]", border_style="magenta", box=box.HEAVY), size=10),
+                Layout(Panel(stats_table, title="[bold yellow]📈 Activity Statistics[/bold yellow]", border_style="yellow", box=BOLD_BOX), size=12),
+                Layout(Panel(backup_table, title="[bold magenta]💾 Backup & Recovery[/bold magenta]", border_style="magenta", box=BOLD_BOX), size=10),
             )
             
             return right_layout
 
-        # ================================================================
-        # 4. Build Events Panel (Bottom)
-        # ================================================================
         def build_events_panel(limit: int = 8):
-            """Create the recent events panel."""
             events = self.get_events(limit)
             
             table = Table(
-                box=box.ROUNDED,
+                box=BOLD_BOX,
                 expand=True,
                 show_header=True,
                 header_style="bold cyan",
@@ -2252,7 +1302,7 @@ class RansomwareMonitor:
             table.add_column("File", style="white", no_wrap=False)
             
             if not events:
-                table.add_row("â€”", "â€”", "[dim]No recent events[/dim]")
+                table.add_row("—", "—", "[dim]No recent events[/dim]")
             else:
                 for event in events[-limit:]:
                     if hasattr(event, 'event_type'):
@@ -2268,22 +1318,21 @@ class RansomwareMonitor:
                         timestamp = event.get('timestamp', '')[:8]
                     
                     if event_type == 'created':
-                        type_display = "ðŸ“ CREATE"
+                        type_display = "📁 CREATE"
                         color = "green"
                     elif event_type == 'deleted':
-                        type_display = "ðŸ—‘ï¸ DELETE"
+                        type_display = "🗑️ DELETE"
                         color = "red"
                     elif event_type == 'modified':
-                        type_display = "ðŸ“ MODIFY"
+                        type_display = "📝 MODIFY"
                         color = "yellow"
                     elif event_type == 'moved':
-                        type_display = "ðŸ”„ MOVE"
+                        type_display = "🔄 MOVE"
                         color = "blue"
                     else:
-                        type_display = "â“ OTHER"
+                        type_display = "❓ OTHER"
                         color = "white"
                     
-                    # Truncate long file names
                     if len(path) > 40:
                         path = path[:37] + "..."
                     
@@ -2295,18 +1344,14 @@ class RansomwareMonitor:
             
             panel = Panel(
                 table,
-                title="[bold cyan]ðŸ”„ Recent File Events[/bold cyan]",
+                title="[bold cyan]🔄 Recent File Events[/bold cyan]",
                 border_style="cyan",
-                box=box.HEAVY,
+                box=BOLD_BOX,
                 padding=(1, 2),
             )
             return panel
 
-        # ================================================================
-        # 5. Build Footer
-        # ================================================================
         def build_footer():
-            """Create the dashboard footer."""
             footer_text = Text()
             footer_text.append("DSTerminal v4.0.0.113", style="dim")
             footer_text.append("  |  ", style="bright_blue")
@@ -2319,26 +1364,20 @@ class RansomwareMonitor:
             footer = Panel(
                 Align.center(footer_text),
                 border_style="bright_blue",
-                box=box.HEAVY,
+                box=BOLD_BOX,
                 padding=(0, 2),
             )
             return footer
 
-        # ================================================================
-        # 6. Main Layout - Left/Right Split
-        # ================================================================
         def build_layout():
-            """Build the complete dashboard layout with left/right split."""
             status = self.get_status()
             
-            # Main body with left/right split
             body = Layout()
             body.split_row(
                 Layout(build_left_panel(status), ratio=1),
                 Layout(build_right_panel(status), ratio=1),
             )
             
-            # Full layout
             layout = Layout()
             layout.split(
                 Layout(build_header(), size=5),
@@ -2349,9 +1388,6 @@ class RansomwareMonitor:
             
             return layout
 
-        # ================================================================
-        # 7. Live Loop
-        # ================================================================
         try:
             with Live(
                 console=self.console,
@@ -2368,113 +1404,8 @@ class RansomwareMonitor:
             self.console.print("\n[bold yellow]Dashboard closed.[/bold yellow]")
         except Exception as e:
             self._log_message(f"Dashboard error: {e}", "ERROR")
-            self._display_simple_dashboard()  
-    def _display_rich_dashboard(self):
-        """Display dashboard using Rich library"""
-        status = self.get_status()
-        
-        layout = Layout()
-        layout.split(
-            Layout(name="header", size=5),
-            Layout(name="body"),
-            Layout(name="footer", size=3)
-        )
-        layout["body"].split_row(
-            Layout(name="left", ratio=2),
-            Layout(name="right", ratio=1)
-        )
-        
-        header_text = Text("ðŸ›¡ï¸ RANSOMWARE DETECTION DASHBOARD", style="bold cyan")
-        header = Panel(
-            Align.center(header_text),
-            border_style="bright_blue",
-            box=box.DOUBLE
-        )
-        layout["header"].update(header)
-        
-        status_color = "red" if status['ransomware_detected'] else "green"
-        status_text = "ðŸš¨ ACTIVE THREAT" if status['ransomware_detected'] else "âœ… SYSTEM CLEAN"
-        
-        status_table = Table(show_header=False, box=box.ROUNDED)
-        status_table.add_column("Metric", style="cyan")
-        status_table.add_column("Value", style="white")
-        
-        status_table.add_row("Status", f"[{status_color}]{status_text}[/{status_color}]")
-        status_table.add_row("Threat Level", f"[{status['threat_color']}]{status['threat_level']}[/{status['threat_color']}]")
-        status_table.add_row("Uptime", status['uptime'])
-        status_table.add_row("Running", "âœ…" if status['running'] else "âŒ")
-        status_table.add_row("Monitored Dirs", str(status['monitored_dirs']))
-        status_table.add_row("Total Alerts", str(status['total_alerts']))
-        
-        left_panel = Panel(
-            status_table,
-            title="Status",
-            border_style="bright_blue",
-            box=box.HEAVY
-        )
-        layout["left"].update(left_panel)
-        
-        stats_table = Table(show_header=False, box=box.ROUNDED)
-        stats_table.add_column("Metric", style="cyan")
-        stats_table.add_column("Value", style="white")
-        
-        stats = status['stats']
-        stats_table.add_row("Files Created", str(stats['files_created']))
-        stats_table.add_row("Files Modified", str(stats['files_modified']))
-        stats_table.add_row("Files Deleted", str(stats['files_deleted']))
-        stats_table.add_row("Files Renamed", str(stats['files_renamed']))
-        stats_table.add_row("Suspicious Processes", str(status['suspicious_processes']))
-        stats_table.add_row("Suspicious Events", str(status['suspicious_events']))
-        stats_table.add_row("Scans Performed", str(stats['total_scans']))
-        
-        backup = status['backup']
-        stats_table.add_row("Backup Enabled", "âœ…" if backup['enabled'] else "âŒ")
-        stats_table.add_row("Files Backed Up", str(backup['files_backed_up']))
-        stats_table.add_row("Files Quarantined", str(backup['files_quarantined']))
-        stats_table.add_row("Files Restored", str(backup['files_restored']))
-        stats_table.add_row("Backup Size", f"{backup['backup_size_mb']} MB")
-        stats_table.add_row("Recycle Bin Size", f"{backup['recycle_bin_size_mb']} MB")
-        
-        right_panel = Panel(
-            stats_table,
-            title="Statistics",
-            border_style="bright_blue",
-            box=box.HEAVY
-        )
-        layout["right"].update(right_panel)
-        
-        footer_text = Text(
-            f"Session: {self.session_id} | "
-            f"Started: {stats['start_time'].strftime('%Y-%m-%d %H:%M:%S')} | "
-            f"Last Scan: {stats['last_scan'].strftime('%H:%M:%S') if stats['last_scan'] else 'Never'}"
-        )
-        footer = Panel(
-            Align.center(footer_text),
-            border_style="bright_blue",
-            box=box.HEAVY
-        )
-        layout["footer"].update(footer)
-        
-        if status['suspicious_events'] > 0:
-            self.console.print()
-            self.console.print(Text("Recent Suspicious Events", style="bold red"))
-            
-            events_table = Table(box=box.ROUNDED)
-            events_table.add_column("Time", style="dim")
-            events_table.add_column("Type", style="yellow")
-            events_table.add_column("File", style="white")
-            
-            for event in self.get_suspicious_events(5):
-                path = Path(event.path)
-                events_table.add_row(
-                    datetime.fromisoformat(event.timestamp).strftime("%H:%M:%S"),
-                    event.event_type,
-                    path.name
-                )
-            self.console.print(events_table)
-        
-        self.console.print(layout)
- 
+            self._display_simple_dashboard()
+
     def interactive_menu(self):
         """Interactive menu for ransomware monitoring with backup options"""
         while True:
@@ -2483,40 +1414,37 @@ class RansomwareMonitor:
             status = self.get_status()
             backup = status['backup']
             
-            print(f"\n{Fore.CYAN}{'='*80}{Style.RESET_ALL}")
-            print(f"{Fore.WHITE}ðŸ›¡ï¸  RANSOMWARE DETECTION & MONITORING SYSTEM{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}{'='*80}{Style.RESET_ALL}")
+            print(f"\n{Fore.CYAN}{'=' * 80}{Style.RESET_ALL}")
+            print(f"{Fore.WHITE}🛡️  RANSOMWARE DETECTION & MONITORING SYSTEM{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}{'=' * 80}{Style.RESET_ALL}")
             
             status_color = Fore.RED if status['ransomware_detected'] else Fore.GREEN
-            status_text = "ðŸš¨ ACTIVE" if status['ransomware_detected'] else "âœ… CLEAN"
+            status_text = "🚨 ACTIVE" if status['ransomware_detected'] else "✅ CLEAN"
             print(f"{Fore.YELLOW}Status:{Style.RESET_ALL} {status_color}{status_text}{Style.RESET_ALL} | "
                 f"{Fore.YELLOW}Level:{Style.RESET_ALL} {status['threat_color']}{status['threat_level']}{Style.RESET_ALL} | "
                 f"{Fore.YELLOW}Uptime:{Style.RESET_ALL} {status['uptime']}")
-            print(f"{Fore.CYAN}{'-'*80}{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}{'-' * 80}{Style.RESET_ALL}")
             
             print(f"""
-    {Fore.GREEN}â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”{Style.RESET_ALL}
-    {Fore.GREEN}â”‚{Style.RESET_ALL}  {Fore.CYAN}1.{Style.RESET_ALL} Start Monitoring      {Fore.CYAN}2.{Style.RESET_ALL} Stop Monitoring       {Fore.CYAN}3.{Style.RESET_ALL} Scan Now
-    {Fore.GREEN}â”‚{Style.RESET_ALL}  {Fore.CYAN}4.{Style.RESET_ALL} View Events          {Fore.CYAN}5.{Style.RESET_ALL} View Suspicious      {Fore.CYAN}6.{Style.RESET_ALL} Dashboard
-    {Fore.GREEN}â”‚{Style.RESET_ALL}  {Fore.CYAN}7.{Style.RESET_ALL} Export JSON          {Fore.CYAN}8.{Style.RESET_ALL} Export PDF           {Fore.CYAN}9.{Style.RESET_ALL} Export HTML
-    {Fore.GREEN}â”‚{Style.RESET_ALL}  {Fore.CYAN}10.{Style.RESET_ALL}Restore Files        {Fore.CYAN}11.{Style.RESET_ALL}Clear Backups         {Fore.CYAN}12.{Style.RESET_ALL}Exit
-    {Fore.GREEN}â”‚{Style.RESET_ALL}  {Fore.CYAN}13.{Style.RESET_ALL}Create Test File
-    {Fore.GREEN}â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜{Style.RESET_ALL}
+    {Fore.GREEN}┌──────────────────────────────────────────────────────────────────────────────────┐{Style.RESET_ALL}
+    {Fore.GREEN}│{Style.RESET_ALL}  {Fore.CYAN}1.{Style.RESET_ALL} Start Monitoring      {Fore.CYAN}2.{Style.RESET_ALL} Stop Monitoring       {Fore.CYAN}3.{Style.RESET_ALL} Scan Now
+    {Fore.GREEN}│{Style.RESET_ALL}  {Fore.CYAN}4.{Style.RESET_ALL} View Events          {Fore.CYAN}5.{Style.RESET_ALL} View Suspicious      {Fore.CYAN}6.{Style.RESET_ALL} Dashboard
+    {Fore.GREEN}│{Style.RESET_ALL}  {Fore.CYAN}7.{Style.RESET_ALL} Export JSON          {Fore.CYAN}8.{Style.RESET_ALL} Export PDF           {Fore.CYAN}9.{Style.RESET_ALL} Export HTML
+    {Fore.GREEN}│{Style.RESET_ALL}  {Fore.CYAN}10.{Style.RESET_ALL}Restore Files        {Fore.CYAN}11.{Style.RESET_ALL}Clear Backups         {Fore.CYAN}12.{Style.RESET_ALL}Exit
+    {Fore.GREEN}│{Style.RESET_ALL}  {Fore.CYAN}13.{Style.RESET_ALL}Create Test File
+    {Fore.GREEN}└──────────────────────────────────────────────────────────────────────────────────┘{Style.RESET_ALL}
     """)
             
             print(f"{Fore.CYAN}Quick Stats:{Style.RESET_ALL}")
             print(f"  Files Changed: {status['stats']['files_created'] + status['stats']['files_modified']} | "
                 f"Deleted: {status['stats']['files_deleted']} | "
                 f"Alerts: {status['stats']['alerts_triggered']}")
-            print(f"  ðŸ’¾ Backed Up: {backup['files_backed_up']} | "
-                f"ðŸ”’ Quarantined: {backup['files_quarantined']} | "
-                f"ðŸ“¦ Size: {backup['backup_size_mb']} MB")
+            print(f"  💾 Backed Up: {backup['files_backed_up']} | "
+                f"🔒 Quarantined: {backup['files_quarantined']} | "
+                f"📦 Size: {backup['backup_size_mb']} MB")
             
             choice = input(f"\n{Fore.YELLOW}Select option (1-13): {Style.RESET_ALL}").strip()
             
-            # =============================================================
-            # Handle Choice
-            # =============================================================
             if choice == '1':
                 self.start_monitoring()
                 input(f"\n{Fore.YELLOW}Press Enter to continue...{Style.RESET_ALL}")
@@ -2553,15 +1481,41 @@ class RansomwareMonitor:
             elif choice == '12':
                 if self.is_running:
                     self.stop_monitoring()
-                print(f"{Fore.GREEN}ðŸ‘‹ Exiting Ransomware Monitor{Style.RESET_ALL}")
+                print(f"{Fore.GREEN}👋 Exiting Ransomware Monitor{Style.RESET_ALL}")
                 break
             elif choice == '13':
                 self.create_test_file()
                 input(f"\n{Fore.YELLOW}Press Enter to continue...{Style.RESET_ALL}")
             else:
-                print(f"{Fore.RED}âŒ Invalid option{Style.RESET_ALL}")
+                print(f"{Fore.RED}❌ Invalid option{Style.RESET_ALL}")
                 time.sleep(1)
                 input(f"\n{Fore.YELLOW}Press Enter to continue...{Style.RESET_ALL}")
+
+    def _ransomware_events(self, limit=20):
+        """Show recent file events"""
+        events = self.get_events(limit)
+        
+        print(f"\n{Fore.CYAN}Recent Events:{Style.RESET_ALL}")
+        if not events:
+            print(f"  {Fore.YELLOW}No events recorded yet{Style.RESET_ALL}")
+        else:
+            for event in events[-10:]:
+                event_color = Fore.GREEN if event.event_type == 'created' else Fore.RED if event.event_type == 'deleted' else Fore.YELLOW
+                print(f"  {event_color}{event.event_type}: {Path(event.path).name}{Style.RESET_ALL}")
+        
+        if len(events) > 10:
+            print(f"\n{Fore.CYAN}Showing 10 of {len(events)} events. Use 'events <n>' to see more.{Style.RESET_ALL}")
+
+    def _ransomware_suspicious(self, limit=10):
+        """Show suspicious events"""
+        events = self.get_suspicious_events(limit)
+        
+        print(f"\n{Fore.RED}Suspicious Events:{Style.RESET_ALL}")
+        if not events:
+            print(f"  {Fore.GREEN}No suspicious events{Style.RESET_ALL}")
+        else:
+            for event in events:
+                print(f"  [!] {event.event_type}: {Path(event.path).name}")
 
     def export_report(self, format_type: str = "json", filename: str = None):
         """Export ransomware monitoring report in various formats"""
@@ -2646,8 +1600,8 @@ class RansomwareMonitor:
                 json.dump(report, f, indent=2, default=datetime_to_str)
             
             self._log_message(f"JSON report exported: {filepath}", "SUCCESS")
-            print(f"\n{Fore.GREEN}âœ… JSON report exported successfully!{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}ðŸ“„ Location: {filepath}{Style.RESET_ALL}")
+            print(f"\n{Fore.GREEN}✅ JSON report exported successfully!{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}📂 Location: {filepath}{Style.RESET_ALL}")
             return str(filepath)
         except Exception as e:
             self._log_message(f"Failed to export JSON: {str(e)}", "ERROR")
@@ -2709,7 +1663,7 @@ class RansomwareMonitor:
                 (f"<b>Timestamp:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", normal_style),
                 (f"<b>System:</b> {platform.system()} {platform.release()}", normal_style),
                 (f"<b>Hostname:</b> {socket.gethostname()}", normal_style),
-                (f"<b>Status:</b> {'ðŸ”´ THREAT DETECTED' if self.ransomware_detected else 'âœ… SYSTEM CLEAN'}", normal_style),
+                (f"<b>Status:</b> {'🔴 THREAT DETECTED' if self.ransomware_detected else '✅ SYSTEM CLEAN'}", normal_style),
                 (f"<b>Threat Level:</b> {status['threat_level']}", normal_style),
                 (f"<b>Uptime:</b> {status['uptime']}", normal_style),
                 (f"<b>Monitored Directories:</b> {status['monitored_dirs']}", normal_style)
@@ -2842,8 +1796,8 @@ class RansomwareMonitor:
             
             doc.build(story)
             
-            print(f"\n{Fore.GREEN}âœ… PDF report exported successfully!{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}ðŸ“„ Location: {filepath}{Style.RESET_ALL}")
+            print(f"\n{Fore.GREEN}✅ PDF report exported successfully!{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}📂 Location: {filepath}{Style.RESET_ALL}")
             return str(filepath)
             
         except Exception as e:
@@ -2880,13 +1834,13 @@ class RansomwareMonitor:
 </head>
 <body>
     <div class="container">
-        <h1>ðŸ›¡ï¸ Ransomware Detection Report</h1>
+        <h1>🛡️ Ransomware Detection Report</h1>
         <div class="header">
             <p><strong>Report ID:</strong> {self.session_id}</p>
             <p><strong>Timestamp:</strong> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
             <p><strong>System:</strong> {platform.system()} {platform.release()}</p>
             <p><strong>Hostname:</strong> {socket.gethostname()}</p>
-            <p><strong>Status:</strong> <span class="{'status-critical' if self.ransomware_detected else 'status-normal'}">{'ðŸ”´ THREAT DETECTED' if self.ransomware_detected else 'âœ… SYSTEM CLEAN'}</span></p>
+            <p><strong>Status:</strong> <span class="{'status-critical' if self.ransomware_detected else 'status-normal'}">{'🔴 THREAT DETECTED' if self.ransomware_detected else '✅ SYSTEM CLEAN'}</span></p>
             <p><strong>Threat Level:</strong> {status['threat_level']}</p>
             <p><strong>Uptime:</strong> {status['uptime']}</p>
         </div>
@@ -2941,8 +1895,8 @@ class RansomwareMonitor:
                 f.write(html_content)
             
             self._log_message(f"HTML report exported: {filepath}", "SUCCESS")
-            print(f"\n{Fore.GREEN}âœ… HTML report exported successfully!{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}ðŸ“„ Location: {filepath}{Style.RESET_ALL}")
+            print(f"\n{Fore.GREEN}✅ HTML report exported successfully!{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}📂 Location: {filepath}{Style.RESET_ALL}")
             return str(filepath)
         except Exception as e:
             self._log_message(f"Failed to export HTML: {str(e)}", "ERROR")
@@ -3013,7 +1967,7 @@ def cmd_ransomware(dsterminal_instance, args):
     elif cmd == 'restore':
         filename = args[1] if len(args) > 1 else None
         if monitor.restore_file(filename):
-            print(f"{Fore.GREEN}âœ… Files restored successfully!{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}✅ Files restored successfully!{Style.RESET_ALL}")
         else:
             print(f"{Fore.YELLOW}No files to restore or file not found.{Style.RESET_ALL}")
     elif cmd == 'clear-backups':
@@ -3048,25 +2002,25 @@ def cmd_ransomware(dsterminal_instance, args):
 def main():
     """Standalone execution with interactive menu"""
     print(f"""
-{Fore.CYAN}â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—{Style.RESET_ALL}
-{Fore.CYAN}â•‘{Style.RESET_ALL}  {Fore.WHITE}ðŸ›¡ï¸  RANSOMWARE DETECTION & MONITORING SYSTEM v4.0.0.113{Style.RESET_ALL}          {Fore.CYAN}â•‘{Style.RESET_ALL}
-{Fore.CYAN}â•‘{Style.RESET_ALL}  {Fore.YELLOW}Developed by: Spark Wilson Spink | Â© 2024{Style.RESET_ALL}                              {Fore.CYAN}â•‘{Style.RESET_ALL}
-{Fore.CYAN}â•‘{Style.RESET_ALL}  {Fore.CYAN}Platform: {platform.system()} {platform.release()}{Style.RESET_ALL}                               {Fore.CYAN}â•‘{Style.RESET_ALL}
-{Fore.CYAN}â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•{Style.RESET_ALL}
+{Fore.CYAN}┌──────────────────────────────────────────────────────────────────────────────────────┐{Style.RESET_ALL}
+{Fore.CYAN}│{Style.RESET_ALL}  {Fore.WHITE}🛡️  RANSOMWARE DETECTION & MONITORING SYSTEM v4.0.0.113{Style.RESET_ALL}          {Fore.CYAN}│{Style.RESET_ALL}
+{Fore.CYAN}│{Style.RESET_ALL}  {Fore.YELLOW}Developed by: Spark Wilson Spink | © 2024{Style.RESET_ALL}                              {Fore.CYAN}│{Style.RESET_ALL}
+{Fore.CYAN}│{Style.RESET_ALL}  {Fore.CYAN}Platform: {platform.system()} {platform.release()}{Style.RESET_ALL}                               {Fore.CYAN}│{Style.RESET_ALL}
+{Fore.CYAN}└──────────────────────────────────────────────────────────────────────────────────────┘{Style.RESET_ALL}
     """)
     
     monitor = RansomwareMonitor(use_rich=False, backup_enabled=True)
     
     if not WATCHDOG_AVAILABLE:
-        print(f"{Fore.YELLOW}âš ï¸ Watchdog not available - installing...{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}⚠️ Watchdog not available - installing...{Style.RESET_ALL}")
         try:
             subprocess.run([sys.executable, '-m', 'pip', 'install', 'watchdog'], capture_output=True)
-            print(f"{Fore.GREEN}âœ… Watchdog installed. Please restart.{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}✅ Watchdog installed. Please restart.{Style.RESET_ALL}")
         except:
-            print(f"{Fore.YELLOW}âš ï¸ Could not install watchdog. Using polling mode.{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}⚠️ Could not install watchdog. Using polling mode.{Style.RESET_ALL}")
     
     if not REPORTLAB_AVAILABLE:
-        print(f"{Fore.YELLOW}âš ï¸ ReportLab not available - PDF export disabled{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}⚠️ ReportLab not available - PDF export disabled{Style.RESET_ALL}")
         print(f"{Fore.YELLOW}   Install with: pip install reportlab{Style.RESET_ALL}")
     
     monitor.interactive_menu()

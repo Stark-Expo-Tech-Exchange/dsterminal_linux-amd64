@@ -1,0 +1,43 @@
+
+    ╔═══════════════════════════════════════════════════════════════════════════════╗
+    ║              DSTERMINAL CYBER OPS                           ║
+    ║                   INCIDENT REPORT                           ║
+    ╚═══════════════════════════════════════════════════════════════════════════════╝
+    
+    Report ID: DST-20260808_180618
+    Version: 4.0.0.113
+    Generated: 2026-08-08 18:06:18
+    
+    ╔═══════════════════════════════════════════════════════════════════════════════╗
+    ║                    INCIDENT DETAILS                         ║
+    ╚═══════════════════════════════════════════════════════════════════════════════╝
+    
+    Threat Level: RANSOMWARE_DETECTED
+    File: C:\Users\DSTERMINAL-V3.1.113\Desktop\test_ransomware.txt
+    Description: Ransomware detected in file: test_ransomware.txt
+    
+    ╔═══════════════════════════════════════════════════════════════════════════════╗
+    ║                  SYSTEM INFORMATION                         ║
+    ╚═══════════════════════════════════════════════════════════════════════════════╝
+    
+    Hostname: DESKTOP-EBIM7VT
+    OS: Windows-10-10.0.26200-SP0
+    CPU: 0.0%
+    Memory: 76.8%
+    Disk: 29.7%
+    
+    ╔═══════════════════════════════════════════════════════════════════════════════╗
+    ║                  RECOMMENDATIONS                            ║
+    ╚═══════════════════════════════════════════════════════════════════════════════╝
+    
+    • 🔴 IMMEDIATE: Quarantine the infected file: test_ransomware.txt
+• 🔴 IMMEDIATE: Do not pay the ransom
+• 🟡 Identify the ransomware variant
+• 🟡 Restore files from backups
+• 🟢 Report to IT Security team
+    
+    ╔═══════════════════════════════════════════════════════════════════════════════╗
+    ║              DSTERMINAL CYBER OPS v4.0.0.113                                    ║
+    ║              Classified - Confidential                      ║
+    ╚═══════════════════════════════════════════════════════════════════════════════╝
+    

@@ -1,7 +1,29 @@
 ﻿# -*- coding: utf-8 -*-
 import sys
+import io
+import os
+
+if sys.platform == 'win32':
+    try:
+        os.system('chcp 65001 > nul')
+    except:
+        pass
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='ignore')
+
+def safe_print_unicode(message):
+    """Safely print unicode/emoji characters on Windows"""
+    try:
+        print(message)
+    except UnicodeEncodeError:
+        clean_message = message.encode('ascii', 'ignore').decode('ascii')
+        print(clean_message)
+
+import sys
 import subprocess
 import os
+import io
+
 import platform
 
 def maximize_terminal():
@@ -136,10 +158,10 @@ try:
         EducationTypingEngine = edu_module.EducationTypingEngine
         engine = EducationTypingEngine(speed=0.03)
     else:
-        print(f"⚠ edu_typing_engine.py not found at: {edu_path}")
+        safe_print_unicode(f"⚠ edu_typing_engine.py not found at: {edu_path}")
         engine = None
 except Exception as e:
-    print(f"⚠ Education typing engine import error: {e}")
+    safe_print_unicode(f"⚠ Education typing engine import error: {e}")
     engine = None
 
 # ============================================
@@ -196,7 +218,7 @@ try:
     from prompt_toolkit.layout.processors import Processor, Transformation
     from prompt_toolkit.buffer import Buffer
 except ImportError as e:
-    print(f"[!] prompt_toolkit not available: {e}")
+    safe_print_unicode(f"[!] prompt_toolkit not available: {e}")
     sys.exit(1)
 
 from colorama import Fore, Style, init
@@ -252,8 +274,7 @@ try:
     WEB_SECURITY_AVAILABLE = True
 except ImportError as e:
     WEB_SECURITY_AVAILABLE = False
-    print(f"Warning: web_security_analyzer module not found: {e}")
-
+    safe_print_unicode(f"Warning: web_security_analyzer module not found: {e}")
 # =================import deletion_protection+++++++++++++++++++++
 # ============================================================
 # CUSTOM COLORAMA EXTENSION - FIX FOR DIM
@@ -314,8 +335,7 @@ try:
     PDF_AVAILABLE = True
 except ImportError:
     PDF_AVAILABLE = False
-    print("[!] ReportLab not installed. PDF export disabled. Install with: pip install reportlab")
-# =================================================================================
+    safe_print_unicode("[!] ReportLab not installed. PDF export disabled. Install with: pip install reportlab")# =================================================================================
 # =================================================================================
 # =================================================================================
 import io

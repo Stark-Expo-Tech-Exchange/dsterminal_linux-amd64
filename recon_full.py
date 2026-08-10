@@ -54,18 +54,14 @@ def get_target_from_args():
 
 def init_scan_directories(target):
     """Initialize scan directories for a specific target"""
-    # Sanitize target name for filesystem
     safe_target = "".join(c for c in target if c.isalnum() or c in '.-_')
     
-    # Create scan directory in workspace
     SCAN_ROOT = WORKSPACE / "scans"
     SCAN_ROOT.mkdir(exist_ok=True)
     
-    # Create target-specific directory
     TARGET_DIR = SCAN_ROOT / safe_target
     TARGET_DIR.mkdir(exist_ok=True)
     
-    # Create session directory for this scan run
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     SESSION_DIR = TARGET_DIR / f"scan_{timestamp}"
     SESSION_DIR.mkdir(exist_ok=True)
@@ -76,7 +72,10 @@ def init_scan_directories(target):
 # TERMINAL SETUP
 # -------------------------------
 
-width = shutil.get_terminal_size((120, 20)).columns
+try:
+    width = shutil.get_terminal_size((120, 20)).columns
+except:
+    width = 120
 
 # -------------------------------
 # COLORS
@@ -90,14 +89,16 @@ MAGENTA = "\033[95m"
 BLUE = "\033[94m"
 RESET = "\033[0m"
 BOLD = "\033[1m"
+DIM = "\033[2m"
+BLINK = "\033[5m"
 
 # -------------------------------
 # ANIMATION FRAMES
 # -------------------------------
 
-big_spinner_frames = ["â—¢     â—£", " â—¢   â—£ ", "  â—¢ â—£  ", "   â—£   ", "  â—¥ â—¤  ", " â—¥   â—¤ "]
-radar_frames = ["â—œ", "â—", "â—ž", "â—Ÿ"]
-scanning_frames = ["ðŸ”", "ðŸ”Ž", "ðŸ“¡", "ðŸ›°", "âš¡", "ðŸ’€"]
+big_spinner_frames = ["[+]     [*]", " [+]   [*] ", "  [+] [*]  ", "   [*]   ", "  [-] [*]  ", " [-]   [*] "]
+radar_frames = ["[+]", "[*]", "[-]", "[.]"]
+scanning_frames = ["[*]", "[+]", "[-]", "[.]", "[+]", "[*]"]
 
 # -------------------------------
 # GLOBAL DATA
@@ -129,15 +130,14 @@ scan_findings = {
     "msf": 0
 }
 
-# -------------------------------
-# UTILITIES
-# -------------------------------
+# ============================================================
+# COLORFUL CENTERED DASHBOARD FUNCTIONS
+# ============================================================
 
 def center(text):
     """Center text with color support"""
-    # Remove color codes for length calculation
     clean_text = text
-    for code in [RESET, BOLD, CYAN, YELLOW, GREEN, RED, BLUE, MAGENTA]:
+    for code in [RESET, BOLD, CYAN, YELLOW, GREEN, RED, BLUE, MAGENTA, DIM, BLINK]:
         clean_text = clean_text.replace(code, '')
     
     padding = max(0, (width - len(clean_text)) // 2)
@@ -146,12 +146,52 @@ def center(text):
 def clear():
     os.system("cls" if os.name == "nt" else "clear")
 
+def draw_glowing_box(title, content_lines, title_color=CYAN, border_color=CYAN, 
+                     content_color=GREEN, blink_title=False, glow_border=True):
+    """Draw a glowing neon hacker-styled centered box with ASCII characters"""
+    box_width = min(width - 4, 80)
+    left_margin = max(0, (width - box_width) // 2)
+    inner = box_width - 4
+    
+    import textwrap
+    wrapped = []
+    for line in content_lines:
+        if not line.strip():
+            wrapped.append("")
+            continue
+        line = line.rstrip()
+        wrapped.extend(textwrap.wrap(line, inner, break_long_words=False, replace_whitespace=False))
+    
+    glow_prefix = BOLD if glow_border else ""
+    title_prefix = BOLD
+    if blink_title:
+        title_prefix += BLINK
+    
+    top = glow_prefix + border_color + "+" + "-" * (box_width - 2) + "+" + RESET
+    mid = glow_prefix + border_color + "+" + "-" * (box_width - 2) + "+" + RESET
+    bot = glow_prefix + border_color + "+" + "-" * (box_width - 2) + "+" + RESET
+    
+    title_text = f" {title} ".center(box_width - 2)
+    title_line = title_prefix + title_color + "|" + title_text + "|" + RESET
+    if blink_title:
+        title_line += RESET
+    
+    lines = [top, title_line, mid]
+    
+    for line in wrapped:
+        padded_line = line.ljust(inner)
+        lines.append(glow_prefix + border_color + "| " + RESET + content_color + padded_line + RESET + glow_prefix + border_color + " |" + RESET)
+    
+    lines.append(bot)
+    
+    return [(" " * left_margin) + line for line in lines]
+
 def check_command_exists(command):
-    """Check if a command exists on the system (cross-platform)"""
+    """Check if a command exists on the system"""
     try:
-        if os.name == "nt":  # Windows
+        if os.name == "nt":
             result = subprocess.run(["where", command], capture_output=True, text=True, timeout=5)
-        else:  # Unix/Linux/Mac
+        else:
             result = subprocess.run(["which", command], capture_output=True, text=True, timeout=5)
         return result.returncode == 0
     except Exception:
@@ -183,9 +223,8 @@ def save_summary(session_dir, timestamp, target):
         f.write("ALERT FEED\n")
         f.write("-"*60 + "\n\n")
         for alert in alert_feed:
-            # Remove color codes for file
             clean_alert = alert
-            for code in [RED, GREEN, YELLOW, CYAN, MAGENTA, BLUE, RESET, BOLD]:
+            for code in [RED, GREEN, YELLOW, CYAN, MAGENTA, BLUE, RESET, BOLD, DIM, BLINK]:
                 clean_alert = clean_alert.replace(code, '')
             f.write(f"{clean_alert}\n")
     
@@ -242,22 +281,19 @@ def threat_intel():
     append_alert("CVE database loaded", "INFO")
 
 # -------------------------------
-# CUSTOM PORT SCANNER (When nmap is not available)
+# CUSTOM PORT SCANNER
 # -------------------------------
 
 def custom_port_scan(target, ports=None, timeout=2):
-    """Custom TCP port scanner using Python sockets"""
     if ports is None:
-        # Common ports to scan
         ports = [21, 22, 23, 25, 53, 80, 110, 111, 135, 139, 143, 443, 445, 
                  993, 995, 1433, 1723, 3306, 3389, 5432, 5900, 6379, 8080, 8443, 27017]
     
     findings = []
     
-    # Resolve hostname to IP
     try:
         ip = socket.gethostbyname(target)
-        append_alert(f"Resolved {target} â†’ {ip}", "INFO")
+        append_alert(f"Resolved {target} -> {ip}", "INFO")
     except socket.gaierror:
         append_alert(f"Cannot resolve hostname: {target}", "WARN")
         return findings
@@ -272,23 +308,18 @@ def custom_port_scan(target, ports=None, timeout=2):
             sock.close()
             
             if result == 0:
-                # Port is open
                 service_name = socket.getservbyport(port, 'tcp') if port <= 49151 else "unknown"
                 findings.append(f"Port {port}/tcp open - {service_name}")
-                scan_outputs["port"].append(f"{GREEN}ðŸ”“ Port {port}: OPEN ({service_name}){RESET}")
+                scan_outputs["port"].append(f"{GREEN}[+] Port {port}: OPEN ({service_name}){RESET}")
                 scan_findings["port"] += 1
                 analyze_port(str(port), service_name)
-                
-                # Increase risk score for open ports
                 risk_scores["port"] = min(risk_scores["port"] + 5, 100)
                 
-        except socket.timeout:
-            continue
-        except Exception as e:
+        except:
             continue
     
     if not findings:
-        scan_outputs["port"].append(f"{YELLOW}âš  No open ports found on common ports{RESET}")
+        scan_outputs["port"].append(f"{YELLOW}[*] No open ports found on common ports{RESET}")
         append_alert("No common open ports detected", "INFO")
     else:
         append_alert(f"Found {len(findings)} open ports", "INFO")
@@ -304,7 +335,6 @@ def geo_lookup(target):
         result = subprocess.run(f"nslookup {target}", shell=True, capture_output=True, text=True, timeout=10)
         if result.returncode == 0:
             append_alert("DNS intelligence collected", "INFO")
-            # Parse IP addresses
             for line in result.stdout.split('\n'):
                 if 'Address:' in line and 'Addresses' not in line:
                     ip = line.split('Address:')[-1].strip()
@@ -319,36 +349,6 @@ def geo_lookup(target):
         append_alert(f"DNS lookup failed: {str(e)}", "WARN")
 
 # -------------------------------
-# SOC BOX DRAWING
-# -------------------------------
-
-def draw_box(title, content_lines):
-    box_width = width // 3 - 2
-    max_lines = 15  # Keep last 15 lines visible
-    
-    # Ensure box_width is reasonable
-    if box_width < 20:
-        box_width = 30
-    
-    top = "â”Œ" + "â”€" * (box_width - 2) + "â”"
-    bottom = "â””" + "â”€" * (box_width - 2) + "â”˜"
-    title_line = f"â”‚ {title[:box_width-4].ljust(box_width-4)} â”‚"
-    
-    # Keep only the last max_lines
-    if len(content_lines) > max_lines:
-        content_lines = content_lines[-max_lines:]
-    
-    padded = []
-    for line in content_lines:
-        # Clean line for display
-        clean_line = line
-        for code in [RESET, BOLD, CYAN, YELLOW, GREEN, RED, BLUE, MAGENTA]:
-            clean_line = clean_line.replace(code, '')
-        padded.append(f"â”‚ {clean_line[:box_width-4].ljust(box_width-4)} â”‚")
-    
-    return [top, title_line] + padded + [bottom]
-
-# -------------------------------
 # SPINNER / PROGRESS ENGINE
 # -------------------------------
 
@@ -357,11 +357,10 @@ def spinner_panel(label, flag):
     while not stop_flags.get(flag, True):
         frame = next(frames)
         progress = int(risk_scores.get(flag, 0) / 5)
-        bar = "[" + ("â–ˆ" * progress).ljust(20) + "]"
+        bar = "[" + ("#" * progress).ljust(20) + "]"
         scan_icon = next(itertools.cycle(scanning_frames))
         header = f"{CYAN}{scan_icon} {frame} {label} {bar} {risk_scores.get(flag, 0)}%{RESET}"
         
-        # Update only header line
         if flag in scan_outputs:
             if scan_outputs[flag]:
                 if len(scan_outputs[flag]) > 0:
@@ -371,15 +370,13 @@ def spinner_panel(label, flag):
             else:
                 scan_outputs[flag].append(header)
         
-        # Increment score slowly for effect (max 90% during scan)
         if flag in risk_scores and risk_scores[flag] < 90:
             risk_scores[flag] = min(risk_scores[flag] + random.randint(1, 3), 90)
         
         time.sleep(0.3)
     
-    # Final completion header
     final_score = risk_scores.get(flag, 0)
-    status_icon = "âœ“" if final_score < 50 else "âš " if final_score < 75 else "ðŸ”´"
+    status_icon = "[+]" if final_score < 50 else "[*]" if final_score < 75 else "[!]"
     status_color = GREEN if final_score < 50 else YELLOW if final_score < 75 else RED
     header = f"{status_color}{status_icon} {label} COMPLETE - Risk Score: {final_score}%{RESET}"
     
@@ -390,44 +387,17 @@ def spinner_panel(label, flag):
             scan_outputs[flag].append(header)
 
 # -------------------------------
-# RADAR ANIMATION
-# -------------------------------
-
-def radar_animation():
-    i = 0
-    while not all(stop_flags.values()):
-        r = radar_frames[i % len(radar_frames)]
-        timestamp_str = datetime.now().strftime("%H:%M:%S")
-        radar_text = f"{MAGENTA}ðŸ›° THREAT RADAR {r} [{timestamp_str}]{RESET}"
-        print(center(radar_text))
-        i += 1
-        time.sleep(0.5)
-        print("\033[1A", end="")  # Move up one line
-
-# -------------------------------
-# ALERT PANEL
-# -------------------------------
-
-def alert_panel():
-    while not all(stop_flags.values()):
-        print(center(f"{YELLOW}{'â•' * 40}{RESET}"))
-        print(center(f"{YELLOW}âš¡ LIVE ALERT FEED âš¡{RESET}"))
-        print(center(f"{YELLOW}{'â”€' * 40}{RESET}"))
-        for a in alert_feed[-5:]:  # Show last 5 alerts
-            print(center(a))
-        time.sleep(1.5)
-        # Move cursor up to refresh
-        print("\033[{}A".format(len(alert_feed[-5:]) + 3), end="")
-
-# -------------------------------
 # LIVE BOX DISPLAY
 # -------------------------------
 
 def display_boxes():
     while not all(stop_flags.values()):
-        box_port = draw_box("ðŸ” PORT SCAN", scan_outputs.get("port", ["Initializing..."]))
-        box_dns = draw_box("ðŸŒ DNS / WHOIS", scan_outputs.get("dns", ["Initializing..."]))
-        box_msf = draw_box("ðŸ’€ METASPLOIT", scan_outputs.get("msf", ["Initializing..."]))
+        box_port = draw_glowing_box("PORT SCAN", scan_outputs.get("port", ["Initializing..."]), 
+                                    title_color=CYAN, border_color=CYAN, content_color=GREEN)
+        box_dns = draw_glowing_box("DNS / WHOIS", scan_outputs.get("dns", ["Initializing..."]),
+                                   title_color=MAGENTA, border_color=MAGENTA, content_color=BLUE)
+        box_msf = draw_glowing_box("METASPLOIT", scan_outputs.get("msf", ["Initializing..."]),
+                                   title_color=RED, border_color=RED, content_color=YELLOW)
         
         rows = max(len(box_port), len(box_dns), len(box_msf))
         
@@ -437,8 +407,37 @@ def display_boxes():
             m = box_msf[i] if i < len(box_msf) else " " * (width // 3)
             print(p + d + m)
         
-        time.sleep(0.3)
+        time.sleep(0.5)
         print("\033[{}A".format(rows), end="")
+
+# -------------------------------
+# ALERT PANEL
+# -------------------------------
+
+def alert_panel():
+    while not all(stop_flags.values()):
+        print(center(f"{YELLOW}{'-' * 40}{RESET}"))
+        print(center(f"{YELLOW}[+] LIVE ALERT FEED [+]{RESET}"))
+        print(center(f"{YELLOW}{'-' * 40}{RESET}"))
+        for a in alert_feed[-5:]:
+            print(center(a))
+        time.sleep(1.5)
+        print("\033[{}A".format(len(alert_feed[-5:]) + 3), end="")
+
+# -------------------------------
+# RADAR ANIMATION
+# -------------------------------
+
+def radar_animation():
+    i = 0
+    while not all(stop_flags.values()):
+        r = radar_frames[i % len(radar_frames)]
+        timestamp_str = datetime.now().strftime("%H:%M:%S")
+        radar_text = f"{MAGENTA}[*] THREAT RADAR {r} [{timestamp_str}]{RESET}"
+        print(center(radar_text))
+        i += 1
+        time.sleep(0.5)
+        print("\033[1A", end="")
 
 # -------------------------------
 # LIVE SCAN ENGINE
@@ -471,16 +470,13 @@ def run_scan(label, command, flag, outfile, session_dir, timestamp, target):
                 f.write(line)
                 line = line.strip()
                 
-                # Parse and display relevant findings
                 if line:
-                    # Port scan findings
                     if flag == "port" and ("/tcp" in line.lower() or "/udp" in line.lower() or "open" in line.lower()):
                         findings_count += 1
                         if flag in scan_outputs:
-                            scan_outputs[flag].append(f"{CYAN}ðŸ”“ {line[:50]}{RESET}")
+                            scan_outputs[flag].append(f"{CYAN}[+] {line[:50]}{RESET}")
                         scan_findings[flag] = findings_count
                         
-                        # Extract port number for analysis
                         try:
                             port_part = line.split('/')[0]
                             if port_part.isdigit():
@@ -488,30 +484,26 @@ def run_scan(label, command, flag, outfile, session_dir, timestamp, target):
                         except:
                             pass
                     
-                    # DNS findings
                     elif flag == "dns" and ("address" in line.lower() or "canonical" in line.lower()):
                         findings_count += 1
                         if flag in scan_outputs:
-                            scan_outputs[flag].append(f"{GREEN}ðŸ“ {line[:50]}{RESET}")
+                            scan_outputs[flag].append(f"{GREEN}[+] {line[:50]}{RESET}")
                         scan_findings[flag] = findings_count
                     
-                    # WHOIS findings
                     elif flag == "dns" and any(x in line.lower() for x in ['org', 'name', 'email', 'registrar']):
                         findings_count += 1
                         if flag in scan_outputs:
-                            scan_outputs[flag].append(f"{BLUE}ðŸ“‹ {line[:50]}{RESET}")
+                            scan_outputs[flag].append(f"{BLUE}[+] {line[:50]}{RESET}")
                         scan_findings[flag] = findings_count
                     
-                    # Metasploit findings
                     elif flag == "msf" and any(x in line.lower() for x in ['exploit', 'auxiliary', 'module']):
                         findings_count += 1
                         if flag in scan_outputs:
-                            scan_outputs[flag].append(f"{RED}ðŸ’€ {line[:50]}{RESET}")
+                            scan_outputs[flag].append(f"{RED}[!] {line[:50]}{RESET}")
                         scan_findings[flag] = findings_count
                     
-                    # General output for other lines
                     elif line and len(line) > 5:
-                        if flag in scan_outputs and len(scan_outputs[flag]) < 50:  # Limit display
+                        if flag in scan_outputs and len(scan_outputs[flag]) < 50:
                             scan_outputs[flag].append(f"{CYAN}{line[:50]}{RESET}")
         
         process.wait()
@@ -524,48 +516,46 @@ def run_scan(label, command, flag, outfile, session_dir, timestamp, target):
     except FileNotFoundError:
         append_alert(f"{label} failed: command not found - {command.split()[0]}", "WARN")
         if flag in scan_outputs:
-            scan_outputs[flag].append(f"{RED}âŒ Command not found: {command.split()[0]}{RESET}")
+            scan_outputs[flag].append(f"{RED}[!] Command not found: {command.split()[0]}{RESET}")
     except Exception as e:
         append_alert(f"{label} failed: {str(e)[:50]}", "WARN")
         if flag in scan_outputs:
-            scan_outputs[flag].append(f"{RED}âŒ Error: {str(e)[:50]}{RESET}")
+            scan_outputs[flag].append(f"{RED}[!] Error: {str(e)[:50]}{RESET}")
     
     finally:
         stop_flags[flag] = True
-        append_alert(f"{label} results saved â†’ {outfile}", "INFO")
+        append_alert(f"{label} results saved -> {outfile}", "INFO")
         spinner.join(timeout=2)
 
 # -------------------------------
-# SOC HEADER
+# SOC HEADER WITH GLOW
 # -------------------------------
 
 def soc_header(target):
     clear()
-    print(center(f"{BOLD}{CYAN}{'â•' * 60}{RESET}"))
-    print(center(f"{BOLD}{CYAN}ðŸ›¡ DSTERMINAL CYBER DEFENSE OPERATIONS CENTER ðŸ›¡{RESET}"))
-    print(center(f"{BOLD}{CYAN}{'â•' * 60}{RESET}"))
-    print(center(f"{BOLD}{YELLOW}ðŸŽ¯ TARGET â†’ {target}{RESET}"))
-    print(center(f"{CYAN}ðŸ“¡ Full Reconnaissance | Threat Intelligence | Vulnerability Discovery{RESET}"))
-    print(center(f"{CYAN}ðŸ“ Workspace: {WORKSPACE}{RESET}"))
-    print(center(f"{CYAN}{'â”€' * 60}{RESET}"))
+    print(center(f"{BOLD}{CYAN}{'=' * 60}{RESET}"))
+    print(center(f"{BOLD}{CYAN}[+] DSTERMINAL CYBER DEFENSE OPERATIONS CENTER [+]{RESET}"))
+    print(center(f"{BOLD}{CYAN}{'=' * 60}{RESET}"))
+    print(center(f"{BOLD}{YELLOW}[+] TARGET -> {target}{RESET}"))
+    print(center(f"{CYAN}[+] Full Reconnaissance | Threat Intelligence | Vulnerability Discovery{RESET}"))
+    print(center(f"{CYAN}[+] Workspace: {WORKSPACE}{RESET}"))
+    print(center(f"{CYAN}{'-' * 60}{RESET}"))
     print()
 
-# -------------------------------
+# ============================================================
 # MAIN FULL RECON FUNCTION
-# -------------------------------
+# ============================================================
 
 def run_full_recon(target=None):
     """Main full reconnaissance function - can be called from other modules"""
     global current_target, current_session_dir, stop_flags, scan_outputs, risk_scores, scan_findings, alert_feed
     
-    # Reset global state
     alert_feed = []
     stop_flags = {k: False for k in stop_flags}
     scan_outputs = {k: [] for k in scan_outputs}
     risk_scores = {k: 0 for k in risk_scores}
     scan_findings = {k: 0 for k in scan_findings}
     
-    # Use provided target or get from args
     if target is None:
         target = get_target_from_args()
     
@@ -575,19 +565,15 @@ def run_full_recon(target=None):
     
     current_target = target
     
-    # Initialize scan directories
     session_dir, timestamp, safe_target = init_scan_directories(target)
     current_session_dir = session_dir
     
-    # SOC Header
     soc_header(target)
     
-    # Initialize alerts
     append_alert("SOC systems online", "INFO")
     append_alert("Threat radar active", "INFO")
     append_alert(f"Target acquired: {target}", "INFO")
     
-    # Run initial lookups
     geo_lookup(target)
     threat_intel()
     
@@ -608,7 +594,7 @@ def run_full_recon(target=None):
     box_thread.start()
     
     # -------------------------------
-    # SCAN FILES (Save to session directory)
+    # SCAN FILES
     # -------------------------------
     
     nmap_file = session_dir / f"port_scan_{timestamp}.txt"
@@ -621,26 +607,20 @@ def run_full_recon(target=None):
     
     threads = []
     
-    # Check if nmap is available
     nmap_available = check_command_exists("nmap")
     
     if nmap_available:
         append_alert("Nmap detected - using advanced port scanning", "INFO")
-        # Use nmap for port scanning
         threads.append(threading.Thread(
             target=run_scan,
             args=("PORT SCAN", f"nmap -F {target}", "port", nmap_file, session_dir, timestamp, target)
         ))
     else:
         append_alert("Nmap not found - using Python socket scanner", "INFO")
-        # Use custom Python port scanner as fallback
-        # Run custom scan directly in this thread
-        scan_outputs["port"].append(f"{YELLOW}ðŸ” Using Python socket scanner (nmap not available){RESET}")
+        scan_outputs["port"].append(f"{YELLOW}[*] Using Python socket scanner (nmap not available){RESET}")
         
-        # Run the custom port scan
         findings = custom_port_scan(target)
         
-        # Save results to file
         with open(nmap_file, "w", encoding="utf-8") as f:
             f.write(f"DSTerminal Port Scan (Custom Scanner)\n")
             f.write(f"Target: {target}\n")
@@ -649,26 +629,22 @@ def run_full_recon(target=None):
             for finding in findings:
                 f.write(finding + "\n")
         
-        # Mark port scan as complete
         stop_flags["port"] = True
         risk_scores["port"] = min(risk_scores["port"] + len(findings) * 2, 100)
         append_alert(f"Port scan completed with {len(findings)} open ports", "INFO")
         
-        # Add a completion header
         final_score = risk_scores["port"]
-        status_icon = "âœ“" if final_score < 50 else "âš " if final_score < 75 else "ðŸ”´"
+        status_icon = "[+]" if final_score < 50 else "[*]" if final_score < 75 else "[!]"
         status_color = GREEN if final_score < 50 else YELLOW if final_score < 75 else RED
         header = f"{status_color}{status_icon} PORT SCAN COMPLETE - Risk Score: {final_score}%{RESET}"
         if scan_outputs["port"]:
             scan_outputs["port"].insert(0, header)
     
-    # DNS/WHOIS scan
     threads.append(threading.Thread(
         target=run_scan,
         args=("DNS / WHOIS", f"nslookup {target}", "dns", dns_file, session_dir, timestamp, target)
     ))
     
-    # Metasploit search (only if available)
     if check_command_exists("msfconsole"):
         threads.append(threading.Thread(
             target=run_scan,
@@ -677,22 +653,18 @@ def run_full_recon(target=None):
     else:
         append_alert("Metasploit not found - skipping exploit search", "WARN")
         stop_flags["msf"] = True
-        scan_outputs["msf"].append(f"{YELLOW}âš  Metasploit not available on this system{RESET}")
+        scan_outputs["msf"].append(f"{YELLOW}[*] Metasploit not available on this system{RESET}")
     
-    # Start all scan threads (only if nmap was used)
     for t in threads:
         t.daemon = True
         t.start()
     
-    # Wait for all threads to complete
     for t in threads:
-        t.join(timeout=60)  # Timeout after 60 seconds
+        t.join(timeout=60)
     
-    # Stop monitoring threads
     for flag in stop_flags:
         stop_flags[flag] = True
     
-    # Give monitoring threads time to exit
     time.sleep(1)
     
     # -------------------------------
@@ -702,17 +674,23 @@ def run_full_recon(target=None):
     summary_file = save_summary(session_dir, timestamp, target)
     
     # -------------------------------
-    # FINAL DISPLAY
+    # FINAL DISPLAY - CENTERED COLORFUL
     # -------------------------------
     
     soc_header(target)
     print()
     
-    # Final boxes
+    # Final boxes with different colors
     final_boxes = [
-        draw_box("ðŸ” PORT SCAN RESULTS", scan_outputs.get("port", ["No results"])[-10:] if scan_outputs.get("port") else ["No results"]),
-        draw_box("ðŸŒ DNS / WHOIS RESULTS", scan_outputs.get("dns", ["No results"])[-10:] if scan_outputs.get("dns") else ["No results"]),
-        draw_box("ðŸ’€ METASPLOIT RESULTS", scan_outputs.get("msf", ["Not available"])[-10:] if scan_outputs.get("msf") else ["Not available"])
+        draw_glowing_box("PORT SCAN RESULTS", 
+                        scan_outputs.get("port", ["No results"])[-10:] if scan_outputs.get("port") else ["No results"],
+                        title_color=CYAN, border_color=CYAN, content_color=GREEN, blink_title=True),
+        draw_glowing_box("DNS / WHOIS RESULTS", 
+                        scan_outputs.get("dns", ["No results"])[-10:] if scan_outputs.get("dns") else ["No results"],
+                        title_color=MAGENTA, border_color=MAGENTA, content_color=BLUE, blink_title=True),
+        draw_glowing_box("METASPLOIT RESULTS", 
+                        scan_outputs.get("msf", ["Not available"])[-10:] if scan_outputs.get("msf") else ["Not available"],
+                        title_color=RED, border_color=RED, content_color=YELLOW, blink_title=True)
     ]
     
     rows = max(len(final_boxes[0]), len(final_boxes[1]), len(final_boxes[2]))
@@ -724,12 +702,12 @@ def run_full_recon(target=None):
         print(p + d + m)
     
     print()
-    print(center(f"{BOLD}{GREEN}{'â•' * 60}{RESET}"))
-    print(center(f"{BOLD}{GREEN}âœ… ALL SCANS COMPLETE âœ…{RESET}"))
-    print(center(f"{BOLD}{CYAN}ðŸ“ Results stored in: {session_dir}{RESET}"))
-    print(center(f"{BOLD}{CYAN}ðŸ“„ Summary report: {summary_file}{RESET}"))
+    print(center(f"{BOLD}{GREEN}{'=' * 60}{RESET}"))
+    print(center(f"{BOLD}{GREEN}[+] ALL SCANS COMPLETE [+]{RESET}"))
+    print(center(f"{BOLD}{CYAN}[+] Results stored in: {session_dir}{RESET}"))
+    print(center(f"{BOLD}{CYAN}[+] Summary report: {summary_file}{RESET}"))
     
-    # Display final risk assessment
+    # Final risk assessment
     risk_values = [r for r in risk_scores.values() if r > 0]
     if risk_values:
         total_risk = sum(risk_values) / len(risk_values)
@@ -743,7 +721,7 @@ def run_full_recon(target=None):
         risk_level = f"{YELLOW}UNKNOWN{RESET}"
     
     print(center(f"{BOLD}Overall Risk Assessment: {risk_level}{RESET}"))
-    print(center(f"{BOLD}{GREEN}{'â•' * 60}{RESET}"))
+    print(center(f"{BOLD}{GREEN}{'=' * 60}{RESET}"))
     print()
     
     return True
@@ -754,33 +732,19 @@ def run_full_recon(target=None):
 
 def full_recon_menu():
     """Interactive menu for full reconnaissance"""
-    print(f"{BOLD}{CYAN}â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—{RESET}")
-    print(f"{BOLD}{CYAN}â•‘        FULL RECONNAISSANCE MENU              â•‘{RESET}")
-    print(f"{BOLD}{CYAN}â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•{RESET}")
+    print(f"{BOLD}{CYAN}+{'-' * 50}+{RESET}")
+    print(f"{BOLD}{CYAN}|        FULL RECONNAISSANCE MENU              |{RESET}")
+    print(f"{BOLD}{CYAN}+{'-' * 50}+{RESET}")
     print()
-    print(f"{GREEN}1. Run Full Recon on Target{RESET}")
-    print(f"{GREEN}2. Quick Scan (Ports, DNS, WHOIS){RESET}")
-    print(f"{GREEN}3. Full Scan (with Metasploit){RESET}")
-    print(f"{RED}0. Exit{RESET}")
+    print(f"{GREEN}[1] Run Full Recon on Target{RESET}")
+    print(f"{GREEN}[2] Quick Scan (Ports, DNS, WHOIS){RESET}")
+    print(f"{GREEN}[3] Full Scan (with Metasploit){RESET}")
+    print(f"{RED}[0] Exit{RESET}")
     print()
     
     choice = input(f"{YELLOW}Select option: {RESET}").strip()
     
-    if choice == "1":
-        target = input(f"{CYAN}Enter target (IP or domain): {RESET}").strip()
-        if target:
-            run_full_recon(target)
-        else:
-            print(f"{RED}[!] No target specified{RESET}")
-    
-    elif choice == "2":
-        target = input(f"{CYAN}Enter target (IP or domain): {RESET}").strip()
-        if target:
-            run_full_recon(target)
-        else:
-            print(f"{RED}[!] No target specified{RESET}")
-    
-    elif choice == "3":
+    if choice == "1" or choice == "2" or choice == "3":
         target = input(f"{CYAN}Enter target (IP or domain): {RESET}").strip()
         if target:
             run_full_recon(target)
@@ -795,15 +759,13 @@ def full_recon_menu():
         print(f"{RED}[!] Invalid option{RESET}")
 
 # -------------------------------
-# MAIN EXECUTION (when run as script)
+# MAIN EXECUTION
 # -------------------------------
 
 if __name__ == "__main__":
     target = get_target_from_args()
     
     if target:
-        # Run full recon directly with target from command line
         run_full_recon(target)
     else:
-        # Show menu if no target provided
         full_recon_menu()

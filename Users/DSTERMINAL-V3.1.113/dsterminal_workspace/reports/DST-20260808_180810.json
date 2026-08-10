@@ -1,0 +1,25 @@
+{
+  "report_id": "DST-20260808_180810",
+  "timestamp": "2026-08-08T18:08:10.430460",
+  "version": "4.0.0.113",
+  "watermark": "DSTERMINAL CYBER OPS v4.0.0.113",
+  "incident": {
+    "threat_level": "RANSOMWARE_DETECTED",
+    "file_path": "C:\\Users\\DSTERM~1.113\\AppData\\Local\\Temp\\system_backup.bak",
+    "description": "Ransomware detected in file: system_backup.bak",
+    "recommendations": [
+      "\ud83d\udd34 IMMEDIATE: Quarantine the infected file: system_backup.bak",
+      "\ud83d\udd34 IMMEDIATE: Do not pay the ransom",
+      "\ud83d\udfe1 Identify the ransomware variant",
+      "\ud83d\udfe1 Restore files from backups",
+      "\ud83d\udfe2 Report to IT Security team"
+    ]
+  },
+  "system_info": {
+    "hostname": "DESKTOP-EBIM7VT",
+    "os": "Windows-10-10.0.26200-SP0",
+    "cpu": 30.3,
+    "memory": 77.9,
+    "disk": 29.7
+  }
+}

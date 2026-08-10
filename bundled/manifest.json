@@ -1,47 +1,31 @@
-﻿{
-  "created": "2026-06-29 09:24:13",
+{
+  "version": "4.0.0.113",
+  "created": "2026-08-09 08:32:01",
   "packages": {
-    "nmap": {
-      "bundled": true,
-      "path": "C:\\Users\\User\\Desktop\\desktop files\\DSTerminal_releases_latest\\bundled\\nmap",
-      "files": [
-        "nmap-7.95-setup.exe"
-      ]
-    },
-    "npcap": {
-      "bundled": true,
-      "path": "C:\\Users\\User\\Desktop\\desktop files\\DSTerminal_releases_latest\\bundled\\npcap",
-      "files": [
-        "npcap-1.79.exe"
-      ]
-    },
-    "metasploit": {
-      "bundled": true,
-      "path": "C:\\Users\\User\\Desktop\\desktop files\\DSTerminal_releases_latest\\bundled\\metasploit",
-      "files": [
-        "metasploit-latest-windows-x64-installer.exe"
-      ]
-    },
-    "sqlmap": {
-      "bundled": true,
-      "path": "C:\\Users\\User\\Desktop\\desktop files\\DSTerminal_releases_latest\\bundled\\sqlmap",
-      "files": [
-        "sqlmap.zip"
-      ]
+    "whois": {
+      "files": "whois.ps1",
+      "path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\DSTerminal_releases_latest\\bundled\\whois",
+      "bundled": true
     },
     "nikto": {
-      "bundled": true,
-      "path": "C:\\Users\\User\\Desktop\\desktop files\\DSTerminal_releases_latest\\bundled\\nikto",
-      "files": [
-        "nikto.zip"
-      ]
+      "files": "nikto.zip",
+      "path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\DSTerminal_releases_latest\\bundled\\nikto",
+      "bundled": true
     },
-    "whois": {
-      "bundled": true,
-      "path": "C:\\Users\\User\\Desktop\\desktop files\\DSTerminal_releases_latest\\bundled\\whois",
-      "files": [
-        "whois.ps1"
-      ]
+    "sqlmap": {
+      "files": "sqlmap.zip",
+      "path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\DSTerminal_releases_latest\\bundled\\sqlmap",
+      "bundled": true
+    },
+    "npcap": {
+      "files": "npcap-1.79.exe",
+      "path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\DSTerminal_releases_latest\\bundled\\npcap",
+      "bundled": true
+    },
+    "nmap": {
+      "files": "nmap-7.95-setup.exe",
+      "path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\DSTerminal_releases_latest\\bundled\\nmap",
+      "bundled": true
     }
   }
 }

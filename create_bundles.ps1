@@ -1,13 +1,17 @@
 ﻿# ============================================================================
 # DSTERMINAL BUNDLE CREATOR - PowerShell Version
-# Version: 2.1.327
+# Version: 2.1.328
 # Description: Creates bundled packages from downloaded installers
 # ============================================================================
 
 #Requires -Version 5.1
 
 param(
-    [switch]$Clean
+    [switch]$Clean,
+    [string]$SourceDir,
+    [switch]$SkipNikto,
+    [switch]$SkipNmap,
+    [switch]$SkipNpcap
 )
 
 # ============================================================================
@@ -30,23 +34,101 @@ function Write-SectionHeader {
 }
 
 # ============================================================================
+# CREATE ZIP WITH EXCLUSIONS
+# ============================================================================
+function Create-ZipWithExclusions {
+    param(
+        [string]$SourcePath,
+        [string]$DestinationPath,
+        [string[]]$ExcludePatterns
+    )
+    
+    try {
+        # Create temp directory for filtered files
+        $tempFilterDir = Join-Path $env:TEMP "nikto_filter_$(Get-Random)"
+        New-Item -ItemType Directory -Path $tempFilterDir -Force | Out-Null
+        
+        # Copy files excluding problematic ones
+        $files = Get-ChildItem -Path $SourcePath -File -Recurse
+        $excludedCount = 0
+        
+        foreach ($file in $files) {
+            $exclude = $false
+            $relativePath = $file.FullName.Substring($SourcePath.Length + 1)
+            
+            foreach ($pattern in $ExcludePatterns) {
+                if ($relativePath -match $pattern) {
+                    $exclude = $true
+                    $excludedCount++
+                    Write-ColorOutput "      Excluding: $relativePath" Yellow
+                    break
+                }
+            }
+            
+            if (-not $exclude) {
+                $destFile = Join-Path $tempFilterDir $relativePath
+                $destDir = Split-Path $destFile -Parent
+                if (-not (Test-Path $destDir)) {
+                    New-Item -ItemType Directory -Path $destDir -Force | Out-Null
+                }
+                Copy-Item -Path $file.FullName -Destination $destFile -Force
+            }
+        }
+        
+        Write-ColorOutput "      Excluded $excludedCount files" Yellow
+        
+        # Create zip from filtered directory
+        if ((Get-ChildItem -Path $tempFilterDir -File -Recurse).Count -gt 0) {
+            Compress-Archive -Path "$tempFilterDir\*" -DestinationPath $DestinationPath -Force
+            Write-ColorOutput "      Created zip with filtered content" Green
+            
+            # Clean up temp directory
+            Remove-Item -Recurse -Force $tempFilterDir -ErrorAction SilentlyContinue
+            return $true
+        } else {
+            Write-ColorOutput "      No files to zip after filtering" Yellow
+            Remove-Item -Recurse -Force $tempFilterDir -ErrorAction SilentlyContinue
+            return $false
+        }
+    } catch {
+        Write-ColorOutput "      Error creating zip: $_" Red
+        return $false
+    }
+}
+
+# ============================================================================
 # MAIN FUNCTION
 # ============================================================================
 function Create-Bundles {
     Write-SectionHeader "DSTerminal Bundle Creator"
     
-    # Setup paths - Use current directory
+    # Setup paths
     $scriptDir = Get-Location
     $bundleDir = Join-Path $scriptDir "bundled"
     $homeDir = $HOME
-    $sourceDir = Join-Path $homeDir "DSTerminal"
-    $sourceDir = Join-Path $sourceDir "downloads"
-    $tempDir = Join-Path $homeDir "DSTerminal"
-    $tempDir = Join-Path $tempDir "temp"
+    
+    # Determine source directory
+    if ($SourceDir) {
+        $sourceDir = $SourceDir
+        Write-ColorOutput "Using source directory from parameter: $sourceDir" Cyan
+    } elseif (Test-Path (Join-Path $scriptDir "downloads")) {
+        $sourceDir = Join-Path $scriptDir "downloads"
+        Write-ColorOutput "Using source directory: $sourceDir (current directory)" Cyan
+    } else {
+        $sourceDir = Join-Path $scriptDir "installers"
+        if (-not (Test-Path $sourceDir)) {
+            $sourceDir = Join-Path $homeDir "DSTerminal"
+            $sourceDir = Join-Path $sourceDir "downloads"
+        }
+        Write-ColorOutput "Using source directory: $sourceDir" Cyan
+    }
+    
+    $tempDir = Join-Path $scriptDir "temp"
     
     Write-ColorOutput "Script directory: $scriptDir" Cyan
     Write-ColorOutput "Bundle directory: $bundleDir" Cyan
     Write-ColorOutput "Source directory: $sourceDir" Cyan
+    Write-ColorOutput "Temp directory: $tempDir" Cyan
     
     # Create directories if they don't exist
     if (-not (Test-Path $bundleDir)) {
@@ -56,13 +138,6 @@ function Create-Bundles {
     if (-not (Test-Path $tempDir)) {
         New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
         Write-ColorOutput "Created temp directory: $tempDir" Green
-    }
-    
-    # Check source directory
-    if (-not (Test-Path $sourceDir)) {
-        Write-ColorOutput "  Source directory not found: $sourceDir" Red
-        Write-ColorOutput "  Please run the installer first to download the files." Yellow
-        return
     }
     
     # Clean temp directory
@@ -80,38 +155,46 @@ function Create-Bundles {
     
     # Define packages
     $packages = @{
-        'nmap' = @{
-            'file' = 'nmap-7.95-setup.exe'
-            'description' = 'Nmap network scanner'
+        'whois' = @{
+            'file' = 'whois.ps1'
+            'description' = 'Whois lookup script'
+            'create_script' = $true
         }
-        'npcap' = @{
-            'file' = 'npcap-1.79.exe'
-            'description' = 'Npcap packet capture library'
-        }
-        'metasploit' = @{
-            'file' = 'metasploit-latest-windows-x64-installer.exe'
-            'description' = 'Metasploit Framework'
+        'nikto' = @{
+            'file' = 'nikto.zip'
+            'description' = 'Web server scanner'
+            'create_from_git' = 'https://github.com/sullo/nikto.git'
+            'skip' = $SkipNikto
         }
         'sqlmap' = @{
             'file' = 'sqlmap.zip'
             'description' = 'SQL injection tool'
             'create_from_git' = 'https://github.com/sqlmapproject/sqlmap.git'
         }
-        'nikto' = @{
-            'file' = 'nikto.zip'
-            'description' = 'Web server scanner'
-            'create_from_git' = 'https://github.com/sullo/nikto.git'
+        'npcap' = @{
+            'file' = 'npcap-1.79.exe'
+            'description' = 'Npcap packet capture library'
+            'download_url' = 'https://npcap.com/dist/npcap-1.79.exe'
+            'skip' = $SkipNpcap
         }
-        'whois' = @{
-            'file' = 'whois.ps1'
-            'description' = 'Whois lookup script'
-            'create_script' = $true
+        'nmap' = @{
+            'file' = 'nmap-7.95-setup.exe'
+            'description' = 'Nmap network scanner'
+            'download_url' = 'https://nmap.org/dist/nmap-7.95-setup.exe'
+            'skip' = $SkipNmap
         }
     }
     
     # Bundle each package
     foreach ($packageName in $packages.Keys) {
         $info = $packages[$packageName]
+        
+        # Check if package should be skipped
+        if ($info.ContainsKey('skip') -and $info['skip']) {
+            Write-ColorOutput "`n  Skipping $packageName ($($info['description']))..." Yellow
+            continue
+        }
+        
         Write-ColorOutput "`n  Processing $packageName ($($info['description']))..." Cyan
         
         # Create package directory
@@ -124,33 +207,33 @@ function Create-Bundles {
         if ($info.ContainsKey('create_script') -and $info['create_script']) {
             # Create whois script
             if ($packageName -eq 'whois') {
-                $scriptContent = @'
+                $scriptContent = @"
 param(
-    [Parameter(Mandatory=$true)]
-    [string]$Domain
+    [Parameter(Mandatory=`$true)]
+    [string]`$Domain
 )
 
-$whoisServer = "whois.internic.net"
+`$whoisServer = "whois.internic.net"
 try {
-    $tcp = New-Object System.Net.Sockets.TcpClient($whoisServer, 43)
-    $stream = $tcp.GetStream()
-    $writer = New-Object System.IO.StreamWriter($stream)
-    $writer.WriteLine($Domain)
-    $writer.Flush()
+    `$tcp = New-Object System.Net.Sockets.TcpClient(`$whoisServer, 43)
+    `$stream = `$tcp.GetStream()
+    `$writer = New-Object System.IO.StreamWriter(`$stream)
+    `$writer.WriteLine(`$Domain)
+    `$writer.Flush()
     
-    $reader = New-Object System.IO.StreamReader($stream)
-    while ($line = $reader.ReadLine()) {
-        if ($line -match "^>") { continue }
-        Write-Host $line
+    `$reader = New-Object System.IO.StreamReader(`$stream)
+    while (`$line = `$reader.ReadLine()) {
+        if (`$line -match "^>") { continue }
+        Write-Host `$line
     }
     
-    $reader.Close()
-    $writer.Close()
-    $tcp.Close()
+    `$reader.Close()
+    `$writer.Close()
+    `$tcp.Close()
 } catch {
-    Write-Error "Error querying WHOIS: $_"
+    Write-Error "Error querying WHOIS: `$_"
 }
-'@
+"@
                 $destFile = Join-Path $packageDir 'whois.ps1'
                 Set-Content -Path $destFile -Value $scriptContent -Encoding UTF8
                 Write-ColorOutput "    Created whois script" Green
@@ -165,6 +248,14 @@ try {
         elseif ($info.ContainsKey('create_from_git')) {
             # Clone from git and create zip
             Write-ColorOutput "    Cloning from: $($info['create_from_git'])" Yellow
+            
+            # Check if git is available
+            $gitCmd = Get-Command git -ErrorAction SilentlyContinue
+            if (-not $gitCmd) {
+                Write-ColorOutput "    Git not found! Please install Git to bundle $packageName" Red
+                Write-ColorOutput "    Download from: https://git-scm.com/download/win" Yellow
+                continue
+            }
             
             $repoUrl = $info['create_from_git']
             $repoName = Split-Path $repoUrl -Leaf
@@ -210,19 +301,37 @@ try {
                         continue
                     }
                     
-                    # Create zip using Compress-Archive
-                    Compress-Archive -Path "$repoDir\*" -DestinationPath $zipPath -Force
-                    
-                    if ((Test-Path $zipPath) -and ((Get-Item $zipPath).Length -gt 0)) {
-                        Write-ColorOutput "    Created zip from git" Green
-                        
-                        # Create checksum
-                        $checksum = Get-FileHash -Path $zipPath -Algorithm SHA256
-                        $checksumFile = Join-Path $packageDir "$packageName.sha256"
-                        Set-Content -Path $checksumFile -Value $checksum.Hash
-                        Write-ColorOutput "    Created checksum for $packageName" Green
+                    # Special handling for nikto - exclude problematic files
+                    if ($packageName -eq 'nikto') {
+                        Write-ColorOutput "    Nikto detected - excluding problematic files" Yellow
+                        $success = Create-ZipWithExclusions -SourcePath $repoDir -DestinationPath $zipPath -ExcludePatterns @(
+                            'program\\nikto\.pl$',
+                            'program\\nikto\.pl\.original$'
+                        )
+                        if ($success) {
+                            Write-ColorOutput "    Created zip with exclusions" Green
+                            $checksum = Get-FileHash -Path $zipPath -Algorithm SHA256
+                            $checksumFile = Join-Path $packageDir "$packageName.sha256"
+                            Set-Content -Path $checksumFile -Value $checksum.Hash
+                            Write-ColorOutput "    Created checksum for $packageName" Green
+                        } else {
+                            Write-ColorOutput "    Failed to create zip" Red
+                        }
                     } else {
-                        Write-ColorOutput "    Failed to create zip (empty or missing)" Red
+                        # Regular zip creation
+                        Compress-Archive -Path "$repoDir\*" -DestinationPath $zipPath -Force
+                        
+                        if ((Test-Path $zipPath) -and ((Get-Item $zipPath).Length -gt 0)) {
+                            Write-ColorOutput "    Created zip from git" Green
+                            
+                            # Create checksum
+                            $checksum = Get-FileHash -Path $zipPath -Algorithm SHA256
+                            $checksumFile = Join-Path $packageDir "$packageName.sha256"
+                            Set-Content -Path $checksumFile -Value $checksum.Hash
+                            Write-ColorOutput "    Created checksum for $packageName" Green
+                        } else {
+                            Write-ColorOutput "    Failed to create zip (empty or missing)" Red
+                        }
                     }
                     
                 } catch {
@@ -232,7 +341,7 @@ try {
             }
         }
         else {
-            # Copy from downloads
+            # Copy from source directory
             $srcFile = Join-Path $sourceDir $info['file']
             $destFile = Join-Path $packageDir $info['file']
             
@@ -248,7 +357,10 @@ try {
                 Write-ColorOutput "    Created checksum for $packageName" Green
             } else {
                 Write-ColorOutput "    Source file not found: $srcFile" Yellow
-                Write-ColorOutput "    Please download $($info['file']) first." Yellow
+                if ($info.ContainsKey('download_url')) {
+                    Write-ColorOutput "    Please download from: $($info['download_url'])" Cyan
+                    Write-ColorOutput "    Or place it in: $sourceDir" Yellow
+                }
             }
         }
     }
@@ -257,6 +369,7 @@ try {
     $manifestPath = Join-Path $bundleDir "manifest.json"
     $manifest = @{
         'created' = (Get-Date -Format 'yyyy-MM-dd HH:mm:ss')
+        'version' = '4.0.0.113'
         'packages' = @{}
     }
     
@@ -264,10 +377,12 @@ try {
         $packageDir = Join-Path $bundleDir $packageName
         if (Test-Path $packageDir) {
             $files = Get-ChildItem -Path $packageDir -File | Where-Object { $_.Name -notlike '*.sha256' } | Select-Object -ExpandProperty Name
-            $manifest['packages'][$packageName] = @{
-                'bundled' = $true
-                'path' = $packageDir
-                'files' = $files
+            if ($files) {
+                $manifest['packages'][$packageName] = @{
+                    'bundled' = $true
+                    'path' = $packageDir
+                    'files' = $files
+                }
             }
         }
     }
@@ -281,21 +396,23 @@ try {
     Write-ColorOutput "`n  Next steps:" Yellow
     Write-ColorOutput "  1. The 'bundled' folder is now ready" White
     Write-ColorOutput "  2. Run DSTerminal - it will use bundled packages first" White
-    Write-ColorOutput "  3. To force using bundles: python dsterminal.py --install-all" White
     
     # Display bundle sizes
     Write-ColorOutput "`n  Bundle Summary:" Cyan
     $totalSize = 0
+    $hasContent = $false
     foreach ($packageName in $packages.Keys) {
         $packageDir = Join-Path $bundleDir $packageName
         if (Test-Path $packageDir) {
-            $size = (Get-ChildItem -Path $packageDir -File -Recurse | Measure-Object -Property Length -Sum).Sum
+            $files = Get-ChildItem -Path $packageDir -File -Recurse | Where-Object { $_.Name -notlike '*.sha256' }
+            $size = ($files | Measure-Object -Property Length -Sum).Sum
             if ($size -and $size -gt 0) {
                 $sizeMB = $size / (1024 * 1024)
-                Write-ColorOutput "    $packageName : $('{0:F2}' -f $sizeMB) MB" White
+                Write-ColorOutput "    $packageName : $('{0:F2}' -f $sizeMB) MB ($($files.Count) files)" White
                 $totalSize += $size
+                $hasContent = $true
             } else {
-                Write-ColorOutput "    $packageName : 0.00 MB (No files)" Yellow
+                Write-ColorOutput "    $packageName : 0.00 MB (No files - check source)" Yellow
             }
         }
     }
@@ -306,7 +423,6 @@ try {
 # ============================================================================
 # MAIN EXECUTION
 # ============================================================================
-# Get script directory using current location
 $scriptDir = Get-Location
 
 if ($Clean) {
@@ -317,6 +433,11 @@ if ($Clean) {
         Write-ColorOutput "  Removed: $bundleDir" Green
     } else {
         Write-ColorOutput "  No bundled directory found" Yellow
+    }
+    $tempDir = Join-Path $scriptDir "temp"
+    if (Test-Path $tempDir) {
+        Remove-Item -Recurse -Force $tempDir
+        Write-ColorOutput "  Removed: $tempDir" Green
     }
 }
 

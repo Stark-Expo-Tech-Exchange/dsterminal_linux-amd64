@@ -1,4 +1,6 @@
 ﻿#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 """
 DSTERMINAL - ENCRYPTION SUITE [EDITION]
 Interactive cinematic mode with real-time encryption visualization
@@ -63,6 +65,7 @@ class Colors:
     WHITE = '\033[97m'
     DIM = '\033[2m'
     BLINK = '\033[5m'
+    RESET = '\033[0m'
     
     # Background colors
     BG_BLACK = '\033[40m'
@@ -189,7 +192,7 @@ class MatrixRain:
 
 
 class RotatingBox:
-    """Animated rotating box with content"""
+    """Animated rotating box with content - BOLD CONTINUOUS LINES"""
     
     def __init__(self, width=40, title=""):
         self.width = width
@@ -197,27 +200,34 @@ class RotatingBox:
         self.frames = 0
     
     def render(self, content_lines, color=Colors.CYAN):
-        frames = ['â•”', 'â•—', 'â•š', 'â•']
-        corners = frames[self.frames % 4]
+        # Use bold continuous box drawing characters
+        top_left = "┌"
+        top_right = "┐"
+        bottom_left = "└"
+        bottom_right = "┘"
+        horizontal = "─"
+        vertical = "│"
         
-        if self.frames % 8 < 4:
-            print(f"{color}â”Œâ”€{self.title.center(self.width-4, 'â”€')}â”€â”{Colors.END}")
-        else:
-            print(f"{color}â•­â”€{self.title.center(self.width-4, 'â”€')}â”€â•®{Colors.END}")
+        # Top border with title
+        title_display = self.title if self.title else ""
+        title_line = f"{top_left}{horizontal}{title_display.center(self.width-2, horizontal)}{horizontal}{top_right}"
+        print(f"{color}{title_line}{Colors.END}")
         
+        # Content lines
         for line in content_lines:
-            print(f"{color}â”‚{Colors.END} {line.ljust(self.width-2)} {color}â”‚{Colors.END}")
+            # Clean line for width calculation
+            clean_line = strip_ansi(line)
+            padding = max(0, self.width - 2 - len(clean_line))
+            print(f"{color}{vertical}{Colors.END} {line}{' ' * padding} {color}{vertical}{Colors.END}")
         
-        if self.frames % 8 < 4:
-            print(f"{color}â””{'â”€' * (self.width-2)}â”˜{Colors.END}")
-        else:
-            print(f"{color}â•°{'â”€' * (self.width-2)}â•¯{Colors.END}")
-        
+        # Bottom border
+        bottom_line = f"{bottom_left}{horizontal * (self.width - 2)}{bottom_right}"
+        print(f"{color}{bottom_line}{Colors.END}")
         self.frames += 1
 
 
 class AnimatedTable:
-    """Animated table with rotating columns"""
+    """Animated table with rotating columns - BOLD CONTINUOUS LINES"""
     
     def __init__(self, headers):
         self.headers = headers
@@ -229,30 +239,37 @@ class AnimatedTable:
             for i, cell in enumerate(row):
                 col_widths[i] = max(col_widths[i], len(str(cell)))
         
-        if self.rotation % 2 == 0:
-            separator = f"{color}â”œ{'â”€â”¼â”€'.join(['â”€' * w for w in col_widths])}â”¤{Colors.END}"
-        else:
-            separator = f"{color}â•ž{'â•â•ªâ•'.join(['â•' * w for w in col_widths])}â•¡{Colors.END}"
-        
+        # Build the table with bold continuous lines
         header_line = ''
         for i, h in enumerate(self.headers):
             header_line += f" {h.center(col_widths[i])} "
             if i < len(self.headers)-1:
-                header_line += f"{color}â”‚{Colors.END}"
+                header_line += f"{color}│{Colors.END}"
         
-        print(f"{color}â”Œ{'â”€' * (sum(col_widths) + len(self.headers)*3 - 1)}â”{Colors.END}")
-        print(f"{color}â”‚{Colors.END}{header_line}{color}â”‚{Colors.END}")
-        print(separator)
+        # Top border
+        total_width = sum(col_widths) + len(self.headers) * 3 - 1
+        top_border = "┌" + "─" * total_width + "┐"
+        print(f"{color}{top_border}{Colors.END}")
         
+        # Header row
+        print(f"{color}│{Colors.END}{header_line}{color}│{Colors.END}")
+        
+        # Separator
+        sep = "├" + "─┼─".join(["─" * w for w in col_widths]) + "┤"
+        print(f"{color}{sep}{Colors.END}")
+        
+        # Data rows
         for row in rows:
             row_line = ''
             for i, cell in enumerate(row):
                 row_line += f" {str(cell).ljust(col_widths[i])} "
                 if i < len(row)-1:
-                    row_line += f"{color}â”‚{Colors.END}"
-            print(f"{color}â”‚{Colors.END}{row_line}{color}â”‚{Colors.END}")
+                    row_line += f"{color}│{Colors.END}"
+            print(f"{color}│{Colors.END}{row_line}{color}│{Colors.END}")
         
-        print(f"{color}â””{'â”€' * (sum(col_widths) + len(self.headers)*3 - 1)}â”˜{Colors.END}")
+        # Bottom border
+        bottom_border = "└" + "─" * total_width + "┘"
+        print(f"{color}{bottom_border}{Colors.END}")
         self.rotation += 1
 
 
@@ -405,17 +422,17 @@ class ReportGenerator:
         if REPORT_AVAILABLE:
             try:
                 self._generate_pdf(pdf_path, operation_type, details)
-                self.typer.type_text(f"ðŸ“„ PDF Report: {pdf_path}", color=Colors.CYAN)
+                self.typer.type_text("PDF Report: {}".format(pdf_path), color=Colors.CYAN)
             except Exception as e:
-                self.typer.type_text(f"âš ï¸ PDF generation failed: {e}", color=Colors.YELLOW)
+                self.typer.type_text("PDF generation failed: {}".format(e), color=Colors.YELLOW)
         else:
-            self.typer.type_text("âš ï¸ PDF generation unavailable (install reportlab)", color=Colors.YELLOW)
+            self.typer.type_text("PDF generation unavailable (install reportlab)", color=Colors.YELLOW)
         
         try:
             self._generate_html(html_path, operation_type, details)
-            self.typer.type_text(f"ðŸŒ HTML Report: {html_path}", color=Colors.CYAN)
+            self.typer.type_text("HTML Report: {}".format(html_path), color=Colors.CYAN)
         except Exception as e:
-            self.typer.type_text(f"âš ï¸ HTML generation failed: {e}", color=Colors.YELLOW)
+            self.typer.type_text("HTML generation failed: {}".format(e), color=Colors.YELLOW)
         
         return {'pdf': pdf_path if os.path.exists(pdf_path) else None, 
                 'html': html_path if os.path.exists(html_path) else None}
@@ -431,15 +448,15 @@ class ReportGenerator:
         if REPORT_AVAILABLE:
             try:
                 self._generate_pdf(pdf_path, f"TEST: {operation_type}", details)
-                self.typer.type_text(f"ðŸ“„ Test Report (PDF): {pdf_path}", color=Colors.CYAN)
+                self.typer.type_text("Test Report (PDF): {}".format(pdf_path), color=Colors.CYAN)
             except Exception as e:
-                self.typer.type_text(f"âš ï¸ PDF generation failed: {e}", color=Colors.YELLOW)
+                self.typer.type_text("PDF generation failed: {}".format(e), color=Colors.YELLOW)
         
         try:
             self._generate_html(html_path, f"TEST: {operation_type}", details)
-            self.typer.type_text(f"ðŸŒ Test Report (HTML): {html_path}", color=Colors.CYAN)
+            self.typer.type_text("Test Report (HTML): {}".format(html_path), color=Colors.CYAN)
         except Exception as e:
-            self.typer.type_text(f"âš ï¸ HTML generation failed: {e}", color=Colors.YELLOW)
+            self.typer.type_text("HTML generation failed: {}".format(e), color=Colors.YELLOW)
         
         return {'pdf': pdf_path if os.path.exists(pdf_path) else None, 
                 'html': html_path if os.path.exists(html_path) else None}
@@ -544,16 +561,16 @@ class ReportGenerator:
             story.append(Spacer(1, 12))
         
         story.append(Paragraph("RECOMMENDATIONS", heading_style))
-        story.append(Paragraph("â€¢ Always keep your encryption key in a secure location", body_style))
-        story.append(Paragraph("â€¢ Create multiple backups of your encryption key", body_style))
-        story.append(Paragraph("â€¢ Use the QR code export feature for secure key sharing", body_style))
-        story.append(Paragraph("â€¢ Regularly verify your encrypted data integrity", body_style))
+        story.append(Paragraph("• Always keep your encryption key in a secure location", body_style))
+        story.append(Paragraph("• Create multiple backups of your encryption key", body_style))
+        story.append(Paragraph("• Use the QR code export feature for secure key sharing", body_style))
+        story.append(Paragraph("• Regularly verify your encrypted data integrity", body_style))
         story.append(Spacer(1, 12))
         
-        story.append(Paragraph("<b><font color='red'>âš ï¸ ENCRYPT WITH CAUTION</font></b>", warning_style))
-        story.append(Paragraph("<font color='red'>â€¢ Losing your encryption key means losing your data permanently</font>", warning_style))
-        story.append(Paragraph("<font color='red'>â€¢ Always test decryption before deleting original files</font>", warning_style))
-        story.append(Paragraph("<font color='red'>â€¢ Use strong passwords and secure storage for your keys</font>", warning_style))
+        story.append(Paragraph("<b><font color='red'>⚠️ ENCRYPT WITH CAUTION</font></b>", warning_style))
+        story.append(Paragraph("<font color='red'>• Losing your encryption key means losing your data permanently</font>", warning_style))
+        story.append(Paragraph("<font color='red'>• Always test decryption before deleting original files</font>", warning_style))
+        story.append(Paragraph("<font color='red'>• Use strong passwords and secure storage for your keys</font>", warning_style))
         story.append(Spacer(1, 12))
         
         story.append(Spacer(1, 36))
@@ -682,7 +699,7 @@ class ReportGenerator:
             padding-left: 20px;
         }}
         .recommendation:before {{
-            content: "â–¸ ";
+            content: "▸ ";
             color: #00ccff;
         }}
     </style>
@@ -696,7 +713,7 @@ class ReportGenerator:
         </div>
         
         <div class="section">
-            <div class="section-title">ðŸ“‹ REPORT INFORMATION</div>
+            <div class="section-title">REPORT INFORMATION</div>
             <div class="info-row">
                 <span class="info-label">Operation:</span>
                 <span class="info-value">{operation_type}</span>
@@ -712,7 +729,7 @@ class ReportGenerator:
         </div>
         
         <div class="section">
-            <div class="section-title">ðŸ”‘ ENCRYPTION KEY INFORMATION</div>
+            <div class="section-title">ENCRYPTION KEY INFORMATION</div>
             <div class="info-row">
                 <span class="info-label">Key ID:</span>
                 <span class="info-value">{key_info.get('key_id', 'N/A')}</span>
@@ -732,7 +749,7 @@ class ReportGenerator:
         </div>
         
         <div class="section">
-            <div class="section-title">ðŸ“ OPERATION DETAILS</div>
+            <div class="section-title">OPERATION DETAILS</div>
             <div class="info-row">
                 <span class="info-label">Target:</span>
                 <span class="info-value">{details.get('target', 'N/A')}</span>
@@ -748,15 +765,15 @@ class ReportGenerator:
         </div>
         
         <div class="section">
-            <div class="section-title">ðŸ“„ FILES PROCESSED</div>
+            <div class="section-title">FILES PROCESSED</div>
             <div class="file-list">
-                {''.join([f'<div class="file-item">ðŸ“Ž {f.get("name", "Unknown")} <span class="status">{f.get("status", "Processed")}</span></div>' for f in details.get('files', [])[:100]])}
+                {''.join([f'<div class="file-item"> {f.get("name", "Unknown")} <span class="status">{f.get("status", "Processed")}</span></div>' for f in details.get('files', [])[:100]])}
                 {f'<div class="file-item" style="color:#666;">... and {len(details.get("files", []))-100} more files</div>' if len(details.get('files', [])) > 100 else ''}
             </div>
         </div>
         
         <div class="section">
-            <div class="section-title">ðŸ’¡ RECOMMENDATIONS</div>
+            <div class="section-title">RECOMMENDATIONS</div>
             <div class="recommendation">Always keep your encryption key in a secure location</div>
             <div class="recommendation">Create multiple backups of your encryption key</div>
             <div class="recommendation">Use the QR code export feature for secure key sharing</div>
@@ -765,10 +782,10 @@ class ReportGenerator:
         </div>
         
         <div class="warning">
-            <div class="warning-title">âš ï¸ ENCRYPT WITH CAUTION</div>
-            <div style="color:#ff6666;padding:5px 0;">â€¢ Losing your encryption key means losing your data permanently</div>
-            <div style="color:#ff6666;padding:5px 0;">â€¢ Always test decryption before deleting original files</div>
-            <div style="color:#ff6666;padding:5px 0;">â€¢ Use strong passwords and secure storage for your keys</div>
+            <div class="warning-title">ENCRYPT WITH CAUTION</div>
+            <div style="color:#ff6666;padding:5px 0;">• Losing your encryption key means losing your data permanently</div>
+            <div style="color:#ff6666;padding:5px 0;">• Always test decryption before deleting original files</div>
+            <div style="color:#ff6666;padding:5px 0;">• Use strong passwords and secure storage for your keys</div>
         </div>
         
         <div class="footer">
@@ -798,19 +815,19 @@ class QRCodeManager:
             os.makedirs(self.qr_dir, mode=0o700, exist_ok=True)
         
         if not self.available:
-            self.typer.type_text("âš ï¸ QR Code features are disabled. Missing dependencies.", color=Colors.YELLOW)
-            self.typer.type_text("ðŸ’¡ Install: pip install qrcode[pil] pillow opencv-python-headless", color=Colors.CYAN)
+            self.typer.type_text("QR Code features are disabled. Missing dependencies.", color=Colors.YELLOW)
+            self.typer.type_text("Install: pip install qrcode[pil] pillow opencv-python-headless", color=Colors.CYAN)
     
     def generate_qr_code(self, key_data=None, filename=None):
         """Generate QR code from encryption key"""
         if not self.available:
-            self.typer.type_text("âŒ QR Code feature unavailable. Missing dependencies.", color=Colors.RED)
-            self.typer.type_text("ðŸ’¡ Install: pip install qrcode[pil] pillow opencv-python-headless", color=Colors.CYAN)
+            self.typer.type_text("QR Code feature unavailable. Missing dependencies.", color=Colors.RED)
+            self.typer.type_text("Install: pip install qrcode[pil] pillow opencv-python-headless", color=Colors.CYAN)
             return None
             
         if key_data is None:
             if not os.path.exists(KEY_FILE):
-                self.typer.type_text("âŒ No encryption key found", color=Colors.RED)
+                self.typer.type_text("No encryption key found", color=Colors.RED)
                 self.typer.type_text("Run 'Setup Encryption System' first.", color=Colors.YELLOW)
                 return None
             
@@ -818,7 +835,7 @@ class QRCodeManager:
                 key_data = f.read().strip()
         
         try:
-            self.typer.type_text("ðŸ“± Generating QR code...", color=Colors.YELLOW)
+            self.typer.type_text("Generating QR code...", color=Colors.YELLOW)
             time.sleep(0.5)
             
             qr = qrcode.QRCode(
@@ -844,7 +861,7 @@ class QRCodeManager:
             
             ascii_qr = self._generate_ascii_qr(qr)
             
-            self.typer.type_text("âœ… QR code generated successfully!", color=Colors.GREEN)
+            self.typer.type_text("QR code generated successfully!", color=Colors.GREEN)
             
             return {
                 'filepath': filepath,
@@ -853,7 +870,7 @@ class QRCodeManager:
                 'key_id': hashlib.sha256(key_data.encode()).hexdigest()[:16]
             }
         except Exception as e:
-            self.typer.type_text(f"âŒ Failed to generate QR code: {str(e)}", color=Colors.RED)
+            self.typer.type_text("Failed to generate QR code: {}".format(str(e)), color=Colors.RED)
             return None
     
     def _generate_ascii_qr(self, qr):
@@ -862,24 +879,24 @@ class QRCodeManager:
         size = len(matrix)
         
         ascii_lines = []
-        ascii_lines.append("â”Œ" + "â”€" * (size * 2 + 2) + "â”")
+        ascii_lines.append("┌" + "─" * (size * 2 + 2) + "┐")
         
         for row in matrix:
-            line = "â”‚ "
+            line = "│ "
             for cell in row:
-                line += "â–ˆâ–ˆ" if cell else "  "
-            line += " â”‚"
+                line += "██" if cell else "  "
+            line += " │"
             ascii_lines.append(line)
         
-        ascii_lines.append("â””" + "â”€" * (size * 2 + 2) + "â”˜")
+        ascii_lines.append("└" + "─" * (size * 2 + 2) + "┘")
         
         return "\n".join(ascii_lines)
     
     def scan_qr_code(self, image_path=None):
         """Scan QR code from image file using OpenCV"""
         if not self.available:
-            self.typer.type_text("âŒ QR Code scanning unavailable. Missing dependencies.", color=Colors.RED)
-            self.typer.type_text("ðŸ’¡ Install: pip install opencv-python-headless pillow", color=Colors.CYAN)
+            self.typer.type_text("QR Code scanning unavailable. Missing dependencies.", color=Colors.RED)
+            self.typer.type_text("Install: pip install opencv-python-headless pillow", color=Colors.CYAN)
             return None
             
         if image_path is None:
@@ -888,36 +905,36 @@ class QRCodeManager:
                 if qr_files:
                     qr_files.sort(key=lambda x: os.path.getmtime(os.path.join(self.qr_dir, x)), reverse=True)
                     image_path = os.path.join(self.qr_dir, qr_files[0])
-                    self.typer.type_text(f"ðŸ“· Using most recent QR code: {qr_files[0]}", color=Colors.CYAN)
+                    self.typer.type_text("Using most recent QR code: {}".format(qr_files[0]), color=Colors.CYAN)
                 else:
-                    self.typer.type_text(f"âŒ No QR code images found in {self.qr_dir}", color=Colors.RED)
+                    self.typer.type_text("No QR code images found in {}".format(self.qr_dir), color=Colors.RED)
                     return None
             else:
-                self.typer.type_text(f"âŒ QR code directory not found", color=Colors.RED)
+                self.typer.type_text("QR code directory not found", color=Colors.RED)
                 return None
         
         if not os.path.exists(image_path):
-            self.typer.type_text(f"âŒ QR code image not found: {image_path}", color=Colors.RED)
+            self.typer.type_text("QR code image not found: {}".format(image_path), color=Colors.RED)
             return None
         
         try:
-            self.typer.type_text("ðŸ” Scanning QR code with OpenCV...", color=Colors.YELLOW)
+            self.typer.type_text("Scanning QR code with OpenCV...", color=Colors.YELLOW)
             time.sleep(0.5)
             
             img = cv2.imread(image_path)
             if img is None:
-                self.typer.type_text("âŒ Failed to read image", color=Colors.RED)
+                self.typer.type_text("Failed to read image", color=Colors.RED)
                 return None
             
             detector = cv2.QRCodeDetector()
             data, bbox, _ = detector.detectAndDecode(img)
             
             if not data:
-                self.typer.type_text("âŒ No QR code found in image", color=Colors.RED)
+                self.typer.type_text("No QR code found in image", color=Colors.RED)
                 return None
             
             qr_data = data.strip()
-            self.typer.type_text(f"ðŸ“Š QR data length: {len(qr_data)} characters", color=Colors.DIM)
+            self.typer.type_text("QR data length: {} characters".format(len(qr_data)), color=Colors.DIM)
             
             try:
                 test_cipher = Fernet(qr_data.encode())
@@ -927,7 +944,7 @@ class QRCodeManager:
                 
                 if test_data == decrypted:
                     key_id = hashlib.sha256(qr_data.encode()).hexdigest()[:16]
-                    self.typer.type_text("âœ… QR code scanned successfully!", color=Colors.GREEN)
+                    self.typer.type_text("QR code scanned successfully!", color=Colors.GREEN)
                     return {
                         'key': qr_data,
                         'key_id': key_id,
@@ -935,15 +952,15 @@ class QRCodeManager:
                         'valid': True
                     }
                 else:
-                    self.typer.type_text("âŒ QR code data validation failed", color=Colors.RED)
+                    self.typer.type_text("QR code data validation failed", color=Colors.RED)
                     return None
                     
             except Exception as e:
-                self.typer.type_text(f"âŒ Invalid key format in QR code: {str(e)}", color=Colors.RED)
+                self.typer.type_text("Invalid key format in QR code: {}".format(str(e)), color=Colors.RED)
                 return None
                 
         except Exception as e:
-            self.typer.type_text(f"âŒ Failed to scan QR code: {str(e)}", color=Colors.RED)
+            self.typer.type_text("Failed to scan QR code: {}".format(str(e)), color=Colors.RED)
             return None
     
     def import_key_from_qr(self, image_path=None):
@@ -951,7 +968,7 @@ class QRCodeManager:
         PlatformUtils.clear_screen()
         box = RotatingBox(50, " QR KEY IMPORT ")
         
-        self.typer.type_text("ðŸ” Scanning QR code for encryption key...", color=Colors.YELLOW)
+        self.typer.type_text("Scanning QR code for encryption key...", color=Colors.YELLOW)
         
         for i in range(5):
             sys.stdout.write(f"\r{Colors.GREEN}[{'=' * i}{' ' * (4 - i)}] Scanning{'.' * (i % 3 + 1)}  {Colors.END}")
@@ -963,18 +980,18 @@ class QRCodeManager:
         
         if not result:
             content = [
-                f"{Colors.RED}âŒ QR SCAN FAILED{Colors.END}",
+                "QR SCAN FAILED",
                 "",
-                f"{Colors.YELLOW}Could not extract a valid encryption key{Colors.END}",
-                f"{Colors.CYAN}Make sure the QR code contains a valid Fernet key{Colors.END}"
+                "Could not extract a valid encryption key",
+                "Make sure the QR code contains a valid Fernet key"
             ]
             box.render(content, color=Colors.RED)
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
             return False
         
-        self.typer.type_text(f"âœ… QR Code scanned successfully!", color=Colors.GREEN)
-        self.typer.type_text(f"Key ID: {result['key_id']}", color=Colors.CYAN)
-        self.typer.type_text(f"Source: {result['source']}", color=Colors.CYAN)
+        self.typer.type_text("QR Code scanned successfully!", color=Colors.GREEN)
+        self.typer.type_text("Key ID: {}".format(result['key_id']), color=Colors.CYAN)
+        self.typer.type_text("Source: {}".format(result['source']), color=Colors.CYAN)
         
         key_dir = os.path.dirname(KEY_FILE)
         if not os.path.exists(key_dir):
@@ -991,12 +1008,12 @@ class QRCodeManager:
         self.crypto.cipher = Fernet(result['key'].encode())
         
         content = [
-            f"{Colors.GREEN}âœ… KEY IMPORTED SUCCESSFULLY{Colors.END}",
-            f"{Colors.BOLD}Key ID:{Colors.END} {Colors.CYAN}{result['key_id']}{Colors.END}",
-            f"{Colors.BOLD}Source:{Colors.END} {result['source']}",
-            f"{Colors.BOLD}Location:{Colors.END} {KEY_FILE}",
+            "KEY IMPORTED SUCCESSFULLY",
+            "Key ID: {}".format(result['key_id']),
+            "Source: {}".format(result['source']),
+            "Location: {}".format(KEY_FILE),
             "",
-            f"{Colors.GREEN}âœ“ Encryption system now uses the imported key{Colors.END}"
+            "Encryption system now uses the imported key"
         ]
         box.render(content, color=Colors.GREEN)
         
@@ -1010,14 +1027,14 @@ class QRCodeManager:
         
         if not self.available:
             content = [
-                f"{Colors.RED}âŒ QR Code feature unavailable{Colors.END}",
+                "QR Code feature unavailable",
                 "",
-                f"{Colors.YELLOW}Missing required dependencies:{Colors.END}",
-                f"{Colors.CYAN}â€¢ qrcode[pil]{Colors.END}",
-                f"{Colors.CYAN}â€¢ pillow{Colors.END}",
-                f"{Colors.CYAN}â€¢ opencv-python-headless{Colors.END}",
+                "Missing required dependencies:",
+                "  - qrcode[pil]",
+                "  - pillow",
+                "  - opencv-python-headless",
                 "",
-                f"{Colors.CYAN}ðŸ’¡ Install with: pip install qrcode[pil] pillow opencv-python-headless{Colors.END}"
+                "Install with: pip install qrcode[pil] pillow opencv-python-headless"
             ]
             box.render(content, color=Colors.RED)
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
@@ -1025,8 +1042,8 @@ class QRCodeManager:
         
         if not os.path.exists(KEY_FILE):
             content = [
-                f"{Colors.RED}âŒ No encryption key found{Colors.END}",
-                f"{Colors.YELLOW}Run 'Setup Encryption System' first.{Colors.END}"
+                "No encryption key found",
+                "Run 'Setup Encryption System' first."
             ]
             box.render(content, color=Colors.RED)
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
@@ -1035,15 +1052,15 @@ class QRCodeManager:
         with open(KEY_FILE, "r") as f:
             key = f.read().strip()
         
-        self.typer.type_text("ðŸ“± Generating QR code for your encryption key...", color=Colors.YELLOW)
+        self.typer.type_text("Generating QR code for your encryption key...", color=Colors.YELLOW)
         
         result = self.generate_qr_code(key)
         
         if not result:
             content = [
-                f"{Colors.RED}âŒ QR CODE GENERATION FAILED{Colors.END}",
+                "QR CODE GENERATION FAILED",
                 "",
-                f"{Colors.YELLOW}Could not generate QR code{Colors.END}"
+                "Could not generate QR code"
             ]
             box.render(content, color=Colors.RED)
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
@@ -1052,23 +1069,23 @@ class QRCodeManager:
         key_id = result['key_id']
         
         content = [
-            f"{Colors.GREEN}âœ… QR CODE GENERATED{Colors.END}",
-            f"{Colors.BOLD}Key ID:{Colors.END} {Colors.CYAN}{key_id}{Colors.END}",
-            f"{Colors.BOLD}Saved as:{Colors.END} {result['filepath']}",
+            "QR CODE GENERATED",
+            "Key ID: {}".format(key_id),
+            "Saved as: {}".format(result['filepath']),
             "",
-            f"{Colors.YELLOW}ASCII QR Code:{Colors.END}",
+            "ASCII QR Code:",
             "",
             result['ascii'],
             "",
-            f"{Colors.RED}âš ï¸  Share this QR code securely with recipients{Colors.END}",
-            f"{Colors.RED}âš ï¸  Anyone who scans this QR gets your encryption key{Colors.END}",
+            "Share this QR code securely with recipients",
+            "Anyone who scans this QR gets your encryption key",
             "",
-            f"{Colors.CYAN}To import this key, use 'Import Key from QR' option{Colors.END}"
+            "To import this key, use 'Import Key from QR' option"
         ]
         box.render(content, color=Colors.YELLOW)
         
         if PlatformUtils.copy_to_clipboard(key):
-            self.typer.type_text("âœ“ Key copied to clipboard!", color=Colors.GREEN)
+            self.typer.type_text("Key copied to clipboard!", color=Colors.GREEN)
         
         input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
     
@@ -1078,7 +1095,7 @@ class QRCodeManager:
         box = RotatingBox(60, " QR CODE INVENTORY ")
         
         if not os.path.exists(self.qr_dir):
-            content = [f"{Colors.YELLOW}QR directory not found: {self.qr_dir}{Colors.END}"]
+            content = ["QR directory not found: {}".format(self.qr_dir)]
             box.render(content, color=Colors.RED)
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
             return
@@ -1086,7 +1103,7 @@ class QRCodeManager:
         qr_files = [f for f in os.listdir(self.qr_dir) if f.endswith('.png')]
         
         if not qr_files:
-            content = [f"{Colors.YELLOW}No QR codes found in {self.qr_dir}{Colors.END}"]
+            content = ["No QR codes found in {}".format(self.qr_dir)]
             box.render(content, color=Colors.RED)
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
             return
@@ -1099,12 +1116,12 @@ class QRCodeManager:
             size = os.path.getsize(filepath)
             size_str = f"{size/1024:.1f} KB"
             created = datetime.fromtimestamp(os.path.getmtime(filepath)).strftime("%Y-%m-%d %H:%M")
-            rows.append([f"{i}", f"ðŸ“± {file}", size_str, created])
+            rows.append([f"{i}", file, size_str, created])
         
         table = AnimatedTable(headers)
         table.render(rows)
         
-        self.typer.type_text(f"Total QR codes: {len(qr_files)}", color=Colors.CYAN)
+        self.typer.type_text("Total QR codes: {}".format(len(qr_files)), color=Colors.CYAN)
         
         input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
 
@@ -1115,22 +1132,22 @@ class QRCodeManager:
         
         if not self.available:
             content = [
-                f"{Colors.RED}âŒ QR Code feature unavailable{Colors.END}",
+                "QR Code feature unavailable",
                 "",
-                f"{Colors.YELLOW}Cannot restore from QR without QR dependencies{Colors.END}",
-                f"{Colors.CYAN}ðŸ’¡ Install: pip install qrcode[pil] pillow opencv-python-headless{Colors.END}"
+                "Cannot restore from QR without QR dependencies",
+                "Install: pip install qrcode[pil] pillow opencv-python-headless"
             ]
             box.render(content, color=Colors.RED)
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
             return
         
         content = [
-            f"{Colors.RED}âš ï¸  EMERGENCY KEY RESTORE{Colors.END}",
+            "EMERGENCY KEY RESTORE",
             "",
-            f"{Colors.YELLOW}This will restore your encryption key from a QR code backup{Colors.END}",
-            f"{Colors.YELLOW}Use this if you've lost your key file or forgotten it{Colors.END}",
+            "This will restore your encryption key from a QR code backup",
+            "Use this if you've lost your key file or forgotten it",
             "",
-            f"{Colors.CYAN}Do you have a QR code image saved?{Colors.END}"
+            "Do you have a QR code image saved?"
         ]
         box.render(content, color=Colors.RED)
         
@@ -1142,13 +1159,13 @@ class QRCodeManager:
         
         if choice == '1':
             if not os.path.exists(self.qr_dir):
-                self.typer.type_text("âŒ QR directory not found", color=Colors.RED)
+                self.typer.type_text("QR directory not found", color=Colors.RED)
                 input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
                 return
                 
             qr_files = [f for f in os.listdir(self.qr_dir) if f.endswith('.png')]
             if not qr_files:
-                self.typer.type_text("âŒ No QR codes found", color=Colors.RED)
+                self.typer.type_text("No QR codes found", color=Colors.RED)
                 input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
                 return
             
@@ -1164,10 +1181,10 @@ class QRCodeManager:
                     qr_path = os.path.join(self.qr_dir, qr_files[idx])
                     self.import_key_from_qr(qr_path)
                 else:
-                    self.typer.type_text("âŒ Invalid selection", color=Colors.RED)
+                    self.typer.type_text("Invalid selection", color=Colors.RED)
                     input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
             except ValueError:
-                self.typer.type_text("âŒ Invalid input", color=Colors.RED)
+                self.typer.type_text("Invalid input", color=Colors.RED)
                 input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
                 
         elif choice == '2':
@@ -1175,7 +1192,7 @@ class QRCodeManager:
             if os.path.exists(path):
                 self.import_key_from_qr(path)
             else:
-                self.typer.type_text(f"âŒ File not found: {path}", color=Colors.RED)
+                self.typer.type_text("File not found: {}".format(path), color=Colors.RED)
                 input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
         else:
             self.typer.type_text("Restore cancelled", color=Colors.YELLOW)
@@ -1196,9 +1213,9 @@ class DirectoryEncryptor:
         if not os.path.exists(self.encrypted_dir):
             try:
                 os.makedirs(self.encrypted_dir, mode=0o700, exist_ok=True)
-                self.typer.type_text(f"âœ… Created encrypted directory: {self.encrypted_dir}", color=Colors.GREEN)
+                self.typer.type_text("Created encrypted directory: {}".format(self.encrypted_dir), color=Colors.GREEN)
             except Exception as e:
-                self.typer.type_text(f"âš ï¸ Could not create encrypted directory: {e}", color=Colors.YELLOW)
+                self.typer.type_text("Could not create encrypted directory: {}".format(e), color=Colors.YELLOW)
     
     def should_exclude(self, filepath):
         filename = os.path.basename(filepath)
@@ -1226,26 +1243,26 @@ class DirectoryEncryptor:
         """Encrypt directory - Cross-platform using ZIP"""
         
         if not self.crypto.cipher:
-            self.typer.type_text("âŒ Encryption not initialized. Setup encryption first.", color=Colors.RED)
+            self.typer.type_text("Encryption not initialized. Setup encryption first.", color=Colors.RED)
             return False, None
         
         if not os.path.exists(directory_path):
-            self.typer.type_text(f"âŒ Directory not found: {directory_path}", color=Colors.RED)
+            self.typer.type_text("Directory not found: {}".format(directory_path), color=Colors.RED)
             return False, None
         
         if not os.path.isdir(directory_path):
-            self.typer.type_text(f"âŒ Path is not a directory: {directory_path}", color=Colors.RED)
+            self.typer.type_text("Path is not a directory: {}".format(directory_path), color=Colors.RED)
             return False, None
         
-        self.typer.type_text(f"ðŸ“‚ Scanning directory: {directory_path}", color=Colors.CYAN)
+        self.typer.type_text("Scanning directory: {}".format(directory_path), color=Colors.CYAN)
         file_tree = self.get_file_tree(directory_path)
         
         if not file_tree:
-            self.typer.type_text("âš ï¸ No files found to encrypt", color=Colors.YELLOW)
+            self.typer.type_text("No files found to encrypt", color=Colors.YELLOW)
             return False, None
         
         total_files = len(file_tree)
-        self.typer.type_text(f"ðŸ“ Found {total_files} files to encrypt", color=Colors.GREEN)
+        self.typer.type_text("Found {} files to encrypt".format(total_files), color=Colors.GREEN)
         
         dir_name = os.path.basename(directory_path)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -1297,16 +1314,16 @@ class DirectoryEncryptor:
                         progress_callback(idx, total_files, rel_path)
                     
                     if idx % 10 == 0 or idx == total_files:
-                        self.typer.type_text(f"  Progress: {idx}/{total_files} files encrypted", color=Colors.DIM)
+                        self.typer.type_text("  Progress: {}/{} files encrypted".format(idx, total_files), color=Colors.DIM)
                         
                 except Exception as e:
-                    self.typer.type_text(f"  âš ï¸ Failed to encrypt {rel_path}: {str(e)}", color=Colors.RED)
+                    self.typer.type_text("  Failed to encrypt {}: {}".format(rel_path, str(e)), color=Colors.RED)
             
             manifest_path = os.path.join(temp_dir, self.manifest_file)
             with open(manifest_path, 'w') as f:
                 json.dump(metadata, f, indent=2)
             
-            self.typer.type_text("ðŸ“¦ Creating encrypted container...", color=Colors.YELLOW)
+            self.typer.type_text("Creating encrypted container...", color=Colors.YELLOW)
             
             import zipfile
             with zipfile.ZipFile(encrypted_container, 'w', zipfile.ZIP_DEFLATED) as zipf:
@@ -1322,15 +1339,15 @@ class DirectoryEncryptor:
             with open(manifest_backup, 'w') as f:
                 json.dump(metadata, f, indent=2)
             
-            self.typer.type_text(f"âœ… Directory encrypted successfully!", color=Colors.GREEN)
-            self.typer.type_text(f"   Container: {encrypted_container}", color=Colors.CYAN)
-            self.typer.type_text(f"   Format: ZIP (cross-platform)", color=Colors.CYAN)
-            self.typer.type_text(f"   Total files: {total_files}", color=Colors.CYAN)
-            self.typer.type_text(f"   Total size: {self.crypto.human_readable_size(metadata['total_size'])}", color=Colors.CYAN)
+            self.typer.type_text("Directory encrypted successfully!", color=Colors.GREEN)
+            self.typer.type_text("   Container: {}".format(encrypted_container), color=Colors.CYAN)
+            self.typer.type_text("   Format: ZIP (cross-platform)", color=Colors.CYAN)
+            self.typer.type_text("   Total files: {}".format(total_files), color=Colors.CYAN)
+            self.typer.type_text("   Total size: {}".format(self.crypto.human_readable_size(metadata['total_size'])), color=Colors.CYAN)
             
-            self.crypto.add_activity(f"Encrypted directory: {dir_name} ({total_files} files)")
+            self.crypto.add_activity("Encrypted directory: {} ({} files)".format(dir_name, total_files))
             
-            self.typer.type_text("ðŸ“Š Generating report...", color=Colors.YELLOW)
+            self.typer.type_text("Generating report...", color=Colors.YELLOW)
             key_info = self.crypto.get_key_info()
             report_details = {
                 'target': directory_path,
@@ -1346,7 +1363,7 @@ class DirectoryEncryptor:
             return True, encrypted_container
             
         except Exception as e:
-            self.typer.type_text(f"âŒ Failed to encrypt directory: {str(e)}", color=Colors.RED)
+            self.typer.type_text("Failed to encrypt directory: {}".format(str(e)), color=Colors.RED)
             if os.path.exists(temp_dir):
                 shutil.rmtree(temp_dir)
             return False, None
@@ -1355,18 +1372,18 @@ class DirectoryEncryptor:
         """Decrypt directory - Auto-detects format for cross-platform compatibility"""
         
         if not self.crypto.cipher:
-            self.typer.type_text("âŒ Decryption not initialized. Setup encryption first.", color=Colors.RED)
+            self.typer.type_text("Decryption not initialized. Setup encryption first.", color=Colors.RED)
             return False
         
         if not os.path.exists(encrypted_container):
-            self.typer.type_text(f"âŒ Container not found: {encrypted_container}", color=Colors.RED)
+            self.typer.type_text("Container not found: {}".format(encrypted_container), color=Colors.RED)
             return False
         
         temp_dir = tempfile.mkdtemp(prefix="dsterminal_dec_")
         processed_files = []
         
         try:
-            self.typer.type_text(f"ðŸ“¦ Extracting container...", color=Colors.YELLOW)
+            self.typer.type_text("Extracting container...", color=Colors.YELLOW)
             
             extracted = False
             format_used = "unknown"
@@ -1378,7 +1395,7 @@ class DirectoryEncryptor:
                     zipf.extractall(temp_dir)
                 extracted = True
                 format_used = "ZIP"
-                self.typer.type_text(f"   âœ… Detected and extracted as ZIP archive", color=Colors.GREEN)
+                self.typer.type_text("   Detected and extracted as ZIP archive", color=Colors.GREEN)
             except:
                 pass
             
@@ -1389,7 +1406,7 @@ class DirectoryEncryptor:
                         tarf.extractall(temp_dir)
                     extracted = True
                     format_used = "TAR.GZ"
-                    self.typer.type_text(f"   âœ… Detected and extracted as TAR.GZ archive", color=Colors.GREEN)
+                    self.typer.type_text("   Detected and extracted as TAR.GZ archive", color=Colors.GREEN)
                 except:
                     pass
             
@@ -1400,18 +1417,18 @@ class DirectoryEncryptor:
                         tarf.extractall(temp_dir)
                     extracted = True
                     format_used = "TAR"
-                    self.typer.type_text(f"   âœ… Detected and extracted as TAR archive", color=Colors.GREEN)
+                    self.typer.type_text("   Detected and extracted as TAR archive", color=Colors.GREEN)
                 except:
                     pass
             
             if not extracted:
-                self.typer.type_text(f"   âŒ Could not extract container (unsupported format)", color=Colors.RED)
+                self.typer.type_text("   Could not extract container (unsupported format)", color=Colors.RED)
                 shutil.rmtree(temp_dir)
                 return False
             
             extracted_items = os.listdir(temp_dir)
             if not extracted_items:
-                self.typer.type_text("âŒ Empty container", color=Colors.RED)
+                self.typer.type_text("Empty container", color=Colors.RED)
                 shutil.rmtree(temp_dir)
                 return False
             
@@ -1428,7 +1445,7 @@ class DirectoryEncryptor:
                         break
                 
                 if not os.path.exists(manifest_path):
-                    self.typer.type_text("âŒ Manifest not found in container", color=Colors.RED)
+                    self.typer.type_text("Manifest not found in container", color=Colors.RED)
                     shutil.rmtree(temp_dir)
                     return False
             
@@ -1442,7 +1459,7 @@ class DirectoryEncryptor:
             os.makedirs(output_dir, exist_ok=True)
             
             total_files = len(metadata['files'])
-            self.typer.type_text(f"ðŸ“ Decrypting {total_files} files...", color=Colors.CYAN)
+            self.typer.type_text("Decrypting {} files...".format(total_files), color=Colors.CYAN)
             
             decrypted_count = 0
             for idx, file_info in enumerate(metadata['files'], 1):
@@ -1453,7 +1470,7 @@ class DirectoryEncryptor:
                 dec_path = os.path.join(output_dir, file_info['path'])
                 
                 if not os.path.exists(enc_path):
-                    self.typer.type_text(f"  âš ï¸ Encrypted file not found: {file_info['path']}", color=Colors.RED)
+                    self.typer.type_text("  Encrypted file not found: {}".format(file_info['path']), color=Colors.RED)
                     continue
                 
                 try:
@@ -1475,21 +1492,21 @@ class DirectoryEncryptor:
                     })
                     
                     if idx % 10 == 0 or idx == total_files:
-                        self.typer.type_text(f"  Progress: {idx}/{total_files} files decrypted", color=Colors.DIM)
+                        self.typer.type_text("  Progress: {}/{} files decrypted".format(idx, total_files), color=Colors.DIM)
                         
                 except Exception as e:
-                    self.typer.type_text(f"  âŒ Failed to decrypt {file_info['path']}: {str(e)}", color=Colors.RED)
+                    self.typer.type_text("  Failed to decrypt {}: {}".format(file_info['path'], str(e)), color=Colors.RED)
             
             shutil.rmtree(temp_dir)
             
-            self.typer.type_text(f"âœ… Directory decrypted successfully!", color=Colors.GREEN)
-            self.typer.type_text(f"   Output: {output_dir}", color=Colors.CYAN)
-            self.typer.type_text(f"   Files decrypted: {decrypted_count}/{total_files}", color=Colors.CYAN)
-            self.typer.type_text(f"   Format: {format_used} (auto-detected)", color=Colors.CYAN)
+            self.typer.type_text("Directory decrypted successfully!", color=Colors.GREEN)
+            self.typer.type_text("   Output: {}".format(output_dir), color=Colors.CYAN)
+            self.typer.type_text("   Files decrypted: {}/{}".format(decrypted_count, total_files), color=Colors.CYAN)
+            self.typer.type_text("   Format: {} (auto-detected)".format(format_used), color=Colors.CYAN)
             
-            self.crypto.add_activity(f"Decrypted directory: {metadata['original_name']} ({decrypted_count} files)")
+            self.crypto.add_activity("Decrypted directory: {} ({} files)".format(metadata['original_name'], decrypted_count))
             
-            self.typer.type_text("ðŸ“Š Generating report...", color=Colors.YELLOW)
+            self.typer.type_text("Generating report...", color=Colors.YELLOW)
             key_info = self.crypto.get_key_info()
             total_size = 0
             for root, dirs, files in os.walk(output_dir):
@@ -1511,7 +1528,7 @@ class DirectoryEncryptor:
             return True
             
         except Exception as e:
-            self.typer.type_text(f"âŒ Failed to decrypt directory: {str(e)}", color=Colors.RED)
+            self.typer.type_text("Failed to decrypt directory: {}".format(str(e)), color=Colors.RED)
             if os.path.exists(temp_dir):
                 shutil.rmtree(temp_dir)
             return False
@@ -1585,8 +1602,8 @@ class CryptoEngine:
         self.update_stats()
         
         if not QR_DEPS_AVAILABLE:
-            self.typer.type_text("âš ï¸ QR Code features are disabled.", color=Colors.YELLOW)
-            self.typer.type_text("ðŸ’¡ To enable QR features, install missing dependencies:", color=Colors.CYAN)
+            self.typer.type_text("QR Code features are disabled.", color=Colors.YELLOW)
+            self.typer.type_text("To enable QR features, install missing dependencies:", color=Colors.CYAN)
             self.typer.type_text("   pip install qrcode[pil] pillow opencv-python-headless", color=Colors.CYAN)
     
     def main(self):
@@ -1595,18 +1612,18 @@ class CryptoEngine:
             PlatformUtils.clear_screen()
             self.show_dashboard(with_typing=False)
             
-            print(f"\n{Colors.DIM}â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—")
-            print(f"â•‘  {Colors.CYAN}â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”{Colors.DIM}â•‘")
-            print(f"â•‘  {Colors.CYAN}â”‚  {Colors.GREEN}01{Colors.CYAN} Setup System     {Colors.GREEN}02{Colors.CYAN} Encrypt File   {Colors.GREEN}03{Colors.CYAN} Decrypt File   {Colors.GREEN}04{Colors.CYAN} Encrypt Dir  â”‚{Colors.DIM}â•‘")
-            print(f"â•‘  {Colors.CYAN}â”‚  {Colors.GREEN}05{Colors.CYAN} Decrypt Dir      {Colors.GREEN}06{Colors.CYAN} Backup Key     {Colors.GREEN}07{Colors.CYAN} QR Generate    {Colors.GREEN}08{Colors.CYAN} Export Key   â”‚{Colors.DIM}â•‘")
-            print(f"â•‘  {Colors.CYAN}â”‚  {Colors.GREEN}09{Colors.CYAN} Import Key       {Colors.GREEN}10{Colors.CYAN} List Files     {Colors.GREEN}11{Colors.CYAN} File Info      {Colors.GREEN}12{Colors.CYAN} Verify Sys  â”‚{Colors.DIM}â•‘")
-            print(f"â•‘  {Colors.CYAN}â”‚  {Colors.GREEN}13{Colors.CYAN} Reports          {Colors.GREEN}14{Colors.CYAN} QR Import      {Colors.GREEN}15{Colors.CYAN} QR Restore     {Colors.GREEN}16{Colors.CYAN} QR List     â”‚{Colors.DIM}â•‘")
-            print(f"â•‘  {Colors.CYAN}â”‚  {Colors.GREEN}17{Colors.CYAN} Clean QR         {Colors.GREEN}18{Colors.CYAN} Encrypted Dirs {Colors.GREEN}19{Colors.CYAN} Debug Info     {Colors.GREEN}20{Colors.CYAN} Encrypt Testâ”‚{Colors.DIM}â•‘")
-            print(f"â•‘  {Colors.CYAN}â”‚  {Colors.GREEN}21{Colors.CYAN} Decrypt Test     {Colors.GREEN}00{Colors.CYAN} Return to DSTERMINAL                                â”‚{Colors.DIM}â•‘")
-            print(f"â•‘  {Colors.CYAN}â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜{Colors.DIM}â•‘")
-            print(f"â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•{Colors.END}")
+            print(f"\n{Colors.DIM}┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────┐")
+            print(f"│  {Colors.CYAN}┌────────────────────────────────────────────────────────────────────────────────────────────────────┐{Colors.DIM}│")
+            print(f"│  {Colors.CYAN}│  {Colors.GREEN}01{Colors.CYAN} Setup System     {Colors.GREEN}02{Colors.CYAN} Encrypt File   {Colors.GREEN}03{Colors.CYAN} Decrypt File   {Colors.GREEN}04{Colors.CYAN} Encrypt Dir  {Colors.CYAN}│{Colors.DIM}│")
+            print(f"│  {Colors.CYAN}│  {Colors.GREEN}05{Colors.CYAN} Decrypt Dir      {Colors.GREEN}06{Colors.CYAN} Backup Key     {Colors.GREEN}07{Colors.CYAN} QR Generate    {Colors.GREEN}08{Colors.CYAN} Export Key   {Colors.CYAN}│{Colors.DIM}│")
+            print(f"│  {Colors.CYAN}│  {Colors.GREEN}09{Colors.CYAN} Import Key       {Colors.GREEN}10{Colors.CYAN} List Files     {Colors.GREEN}11{Colors.CYAN} File Info      {Colors.GREEN}12{Colors.CYAN} Verify Sys  {Colors.CYAN}│{Colors.DIM}│")
+            print(f"│  {Colors.CYAN}│  {Colors.GREEN}13{Colors.CYAN} Reports          {Colors.GREEN}14{Colors.CYAN} QR Import      {Colors.GREEN}15{Colors.CYAN} QR Restore     {Colors.GREEN}16{Colors.CYAN} QR List     {Colors.CYAN}│{Colors.DIM}│")
+            print(f"│  {Colors.CYAN}│  {Colors.GREEN}17{Colors.CYAN} Clean QR         {Colors.GREEN}18{Colors.CYAN} Encrypted Dirs {Colors.GREEN}19{Colors.CYAN} Debug Info     {Colors.GREEN}20{Colors.CYAN} Encrypt Test{Colors.CYAN}│{Colors.DIM}│")
+            print(f"│  {Colors.CYAN}│  {Colors.GREEN}21{Colors.CYAN} Decrypt Test     {Colors.GREEN}00{Colors.CYAN} Return to DSTERMINAL                                {Colors.CYAN}│{Colors.DIM}│")
+            print(f"│  {Colors.CYAN}└────────────────────────────────────────────────────────────────────────────────────────────────────┘{Colors.DIM}│")
+            print(f"└──────────────────────────────────────────────────────────────────────────────────────────────────────────────┘{Colors.END}")
             
-            choice = input(f"\n{Colors.GREEN}â””â”€â”€[{Colors.YELLOW}CRYPTO{Colors.GREEN}]{Colors.END} # ").strip()
+            choice = input(f"\n{Colors.GREEN}└──[{Colors.YELLOW}CRYPTO{Colors.GREEN}]{Colors.END} # ").strip()
             
             if choice in ['01', '1']:
                 self.encrypt_setup()
@@ -1659,11 +1676,11 @@ class CryptoEngine:
                                     count += 1
                                 except:
                                     pass
-                        self.typer.type_text(f"âœ… Deleted {count} QR codes", color=Colors.GREEN)
-                        self.add_activity(f"Cleaned {count} QR codes")
+                        self.typer.type_text("Deleted {} QR codes".format(count), color=Colors.GREEN)
+                        self.add_activity("Cleaned {} QR codes".format(count))
                         input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
                 else:
-                    self.typer.type_text("âŒ QR directory not found", color=Colors.RED)
+                    self.typer.type_text("QR directory not found", color=Colors.RED)
                     input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
             elif choice == '18':
                 self.list_encrypted_dirs()
@@ -1685,20 +1702,17 @@ class CryptoEngine:
     def _debug_info(self):
         """Display debug information"""
         self.typer.type_text("DEBUG INFO", color=Colors.RED)
-        info = PlatformUtils.get_platform_info() if hasattr(PlatformUtils, 'get_platform_info') else {}
-        for key, value in info.items():
-            self.typer.type_text(f"{key}: {value}", color=Colors.CYAN)
-        self.typer.type_text(f"KEY_FILE: {KEY_FILE}", color=Colors.CYAN)
-        self.typer.type_text(f"QR_CODE_DIR: {QR_CODE_DIR}", color=Colors.CYAN)
-        self.typer.type_text(f"BACKUP_DIR: {BACKUP_DIR}", color=Colors.CYAN)
-        self.typer.type_text(f"ENCRYPTED_DIR: {ENCRYPTED_DIR}", color=Colors.CYAN)
-        self.typer.type_text(f"REPORTS_DIR: {REPORTS_DIR}", color=Colors.CYAN)
-        self.typer.type_text(f"Key exists: {os.path.exists(KEY_FILE)}", color=Colors.CYAN)
-        self.typer.type_text(f"QR dir exists: {os.path.exists(QR_CODE_DIR)}", color=Colors.CYAN)
-        self.typer.type_text(f"Encrypted dir exists: {os.path.exists(ENCRYPTED_DIR)}", color=Colors.CYAN)
-        self.typer.type_text(f"Reports dir exists: {os.path.exists(REPORTS_DIR)}", color=Colors.CYAN)
-        self.typer.type_text(f"QR Method: {QR_METHOD}", color=Colors.CYAN)
-        self.typer.type_text(f"Report Available: {REPORT_AVAILABLE}", color=Colors.CYAN)
+        self.typer.type_text("KEY_FILE: {}".format(KEY_FILE), color=Colors.CYAN)
+        self.typer.type_text("QR_CODE_DIR: {}".format(QR_CODE_DIR), color=Colors.CYAN)
+        self.typer.type_text("BACKUP_DIR: {}".format(BACKUP_DIR), color=Colors.CYAN)
+        self.typer.type_text("ENCRYPTED_DIR: {}".format(ENCRYPTED_DIR), color=Colors.CYAN)
+        self.typer.type_text("REPORTS_DIR: {}".format(REPORTS_DIR), color=Colors.CYAN)
+        self.typer.type_text("Key exists: {}".format(os.path.exists(KEY_FILE)), color=Colors.CYAN)
+        self.typer.type_text("QR dir exists: {}".format(os.path.exists(QR_CODE_DIR)), color=Colors.CYAN)
+        self.typer.type_text("Encrypted dir exists: {}".format(os.path.exists(ENCRYPTED_DIR)), color=Colors.CYAN)
+        self.typer.type_text("Reports dir exists: {}".format(os.path.exists(REPORTS_DIR)), color=Colors.CYAN)
+        self.typer.type_text("QR Method: {}".format(QR_METHOD), color=Colors.CYAN)
+        self.typer.type_text("Report Available: {}".format(REPORT_AVAILABLE), color=Colors.CYAN)
     
     def get_key_info(self):
         """Get encryption key information for reports"""
@@ -1869,20 +1883,19 @@ class CryptoEngine:
     def show_dashboard(self, with_typing=True):
         """Show the dashboard with current stats"""
         self.update_stats()
-        # Simple dashboard display
-        print(f"\n{Colors.CYAN}â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—")
-        print(f"â•‘{Colors.YELLOW}                  DSTERMINAL ENCRYPTION SUITE                 {Colors.CYAN}â•‘")
-        print(f"â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£")
-        
         stats = self._stats if hasattr(self, '_stats') else {}
-        print(f"â•‘{Colors.GREEN}  Encryption: {Colors.END}{Colors.GREEN if stats.get('encryption_ready') else Colors.RED}{'ACTIVE' if stats.get('encryption_ready') else 'INACTIVE'}{Colors.END}")
-        print(f"â•‘{Colors.GREEN}  Key ID: {Colors.END}{Colors.CYAN}{stats.get('key_id', 'N/A')}{Colors.END}")
-        print(f"â•‘{Colors.GREEN}  QR Codes: {Colors.END}{Colors.YELLOW}{stats.get('qr_count', 0)}{Colors.END}")
-        print(f"â•‘{Colors.GREEN}  Encrypted Files: {Colors.END}{Colors.MAGENTA}{stats.get('encrypted_count', 0)}{Colors.END}")
-        print(f"â•‘{Colors.GREEN}  Encrypted Dirs: {Colors.END}{Colors.CYAN}{stats.get('encrypted_dirs', 0)}{Colors.END}")
-        print(f"â•‘{Colors.GREEN}  Reports: {Colors.END}{Colors.WHITE}{stats.get('reports_count', 0)}{Colors.END}")
-        print(f"â•‘{Colors.GREEN}  Uptime: {Colors.END}{Colors.DIM}{stats.get('uptime', '00:00:00')}{Colors.END}")
-        print(f"â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•{Colors.END}")
+        
+        print(f"\n{Colors.CYAN}┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────┐")
+        print(f"│{Colors.YELLOW}                  DSTERMINAL ENCRYPTION SUITE                 {Colors.CYAN}│")
+        print(f"│──────────────────────────────────────────────────────────────────────────────────────────────────────────────│")
+        print(f"│{Colors.GREEN}  Encryption: {Colors.END}{Colors.GREEN if stats.get('encryption_ready') else Colors.RED}{'ACTIVE' if stats.get('encryption_ready') else 'INACTIVE'}{Colors.END}")
+        print(f"│{Colors.GREEN}  Key ID: {Colors.END}{Colors.CYAN}{stats.get('key_id', 'N/A')}{Colors.END}")
+        print(f"│{Colors.GREEN}  QR Codes: {Colors.END}{Colors.YELLOW}{stats.get('qr_count', 0)}{Colors.END}")
+        print(f"│{Colors.GREEN}  Encrypted Files: {Colors.END}{Colors.MAGENTA}{stats.get('encrypted_count', 0)}{Colors.END}")
+        print(f"│{Colors.GREEN}  Encrypted Dirs: {Colors.END}{Colors.CYAN}{stats.get('encrypted_dirs', 0)}{Colors.END}")
+        print(f"│{Colors.GREEN}  Reports: {Colors.END}{Colors.WHITE}{stats.get('reports_count', 0)}{Colors.END}")
+        print(f"│{Colors.GREEN}  Uptime: {Colors.END}{Colors.DIM}{stats.get('uptime', '00:00:00')}{Colors.END}")
+        print(f"└──────────────────────────────────────────────────────────────────────────────────────────────────────────────┘{Colors.END}")
     
     def animate_encryption(self, filename, operation="ENCRYPTING"):
         """Show encryption/decryption animation with progress bar"""
@@ -1894,17 +1907,17 @@ class CryptoEngine:
             progress = (i + 1) * 12.5
             bar_length = 30
             filled = int(bar_length * progress // 100)
-            bar = 'â–ˆ' * filled + 'â–‘' * (bar_length - filled)
+            bar = '█' * filled + '░' * (bar_length - filled)
             
             status_msgs = [
-                "â–¶ Initializing encryption vectors...",
-                "â–¶ Generating round keys...",
-                "â–¶ Applying substitution boxes...",
-                "â–¶ Mixing data blocks...",
-                "â–¶ Finalizing operation...",
-                "â–¶ Verifying integrity...",
-                "â–¶ Compressing output...",
-                "â–¶ Complete!"
+                "▶ Initializing encryption vectors...",
+                "▶ Generating round keys...",
+                "▶ Applying substitution boxes...",
+                "▶ Mixing data blocks...",
+                "▶ Finalizing operation...",
+                "▶ Verifying integrity...",
+                "▶ Compressing output...",
+                "▶ Complete!"
             ]
             
             sys.stdout.write('\033[2A')
@@ -1915,7 +1928,7 @@ class CryptoEngine:
             
             time.sleep(0.15)
         
-        print(f"\n{Colors.GREEN}âœ“ {operation} COMPLETE{Colors.END}")
+        print(f"\n{Colors.GREEN}✓ {operation} COMPLETE{Colors.END}")
     
     def encrypt_setup(self):
         """Setup encryption system and generate key"""
@@ -1923,7 +1936,7 @@ class CryptoEngine:
         box = RotatingBox(50, " ENCRYPTION SETUP ")
         
         self.typer.type_text("INITIALIZING SECURE ENCRYPTION SYSTEM", color=Colors.YELLOW)
-        self.typer.type_text("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•", color=Colors.RED)
+        self.typer.type_text("──────────────────────────────────────────────────────────────────", color=Colors.RED)
 
         if os.path.exists(KEY_FILE):
             with open(KEY_FILE) as f:
@@ -1931,21 +1944,21 @@ class CryptoEngine:
             key_id = hashlib.sha256(key.encode()).hexdigest()[:16]
             
             content = [
-                f"{Colors.GREEN}âœ… EXISTING KEY FOUND{Colors.END}",
-                f"{Colors.BOLD}Key ID:{Colors.END} {Colors.CYAN}{key_id}{Colors.END}",
-                f"{Colors.BOLD}Location:{Colors.END} {KEY_FILE}",
-                f"{Colors.BOLD}Status:{Colors.END} {Colors.GREEN}ACTIVE{Colors.END}"
+                "EXISTING KEY FOUND",
+                "Key ID: {}".format(key_id),
+                "Location: {}".format(KEY_FILE),
+                "Status: ACTIVE"
             ]
             box.render(content, color=Colors.GREEN)
             self.add_activity("Setup checked - key exists")
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
             return
 
-        self.typer.type_text("â–¶ Generating quantum-resistant encryption key...", color=Colors.YELLOW)
+        self.typer.type_text("▶ Generating quantum-resistant encryption key...", color=Colors.YELLOW)
         time.sleep(1)
         
         for i in range(3):
-            self.typer.type_text(f"   Entropy pool: {''.join(random.choices('01', k=20))}", color=Colors.CYAN)
+            self.typer.type_text("   Entropy pool: {}".format(''.join(random.choices('01', k=20))), color=Colors.CYAN)
             time.sleep(1.3)
         
         key = Fernet.generate_key().decode()
@@ -1965,13 +1978,13 @@ class CryptoEngine:
         key_id = hashlib.sha256(key.encode()).hexdigest()[:16]
         
         content = [
-            f"{Colors.GREEN}âœ… NEW ENCRYPTION KEY GENERATED{Colors.END}",
-            f"{Colors.BOLD}Key ID:{Colors.END} {Colors.CYAN}{key_id}{Colors.END}",
-            f"{Colors.BOLD}Location:{Colors.END} {KEY_FILE}",
-            f"{Colors.BOLD}Permissions:{Colors.END} {Colors.YELLOW}600 (user only){Colors.END}",
+            "NEW ENCRYPTION KEY GENERATED",
+            "Key ID: {}".format(key_id),
+            "Location: {}".format(KEY_FILE),
+            "Permissions: 600 (user only)",
             "",
-            f"{Colors.RED}âš ï¸  KEEP THIS KEY SAFE!{Colors.END}",
-            f"{Colors.CYAN}ðŸ’¡ Use QR code export to share securely{Colors.END}"
+            "KEEP THIS KEY SAFE!",
+            "Use QR code export to share securely"
         ]
         box.render(content, color=Colors.GREEN)
         
@@ -1998,7 +2011,7 @@ class CryptoEngine:
             with open(path, "rb") as f:
                 data = f.read()
         except Exception as e:
-            self.typer.type_text(f"[!] Failed to read file: {e}", color=Colors.RED)
+            self.typer.type_text("[!] Failed to read file: {}".format(e), color=Colors.RED)
             return
         
         original_size = len(data)
@@ -2006,7 +2019,7 @@ class CryptoEngine:
         try:
             encrypted = self.cipher.encrypt(data)
         except Exception as e:
-            self.typer.type_text(f"[!] Encryption failed: {e}", color=Colors.RED)
+            self.typer.type_text("[!] Encryption failed: {}".format(e), color=Colors.RED)
             return
         
         enc_file = path + ".enc"
@@ -2015,14 +2028,14 @@ class CryptoEngine:
             with open(enc_file, "wb") as f:
                 f.write(encrypted)
         except Exception as e:
-            self.typer.type_text(f"[!] Failed to write encrypted file: {e}", color=Colors.RED)
+            self.typer.type_text("[!] Failed to write encrypted file: {}".format(e), color=Colors.RED)
             return
         
         encrypted_size = len(encrypted)
         
-        print(f"\n{Colors.GREEN}âœ… File encrypted successfully!{Colors.END}")
+        print(f"\n{Colors.GREEN}✓ File encrypted successfully!{Colors.END}")
         print(f"   Output: {enc_file}")
-        print(f"   Original: {self.human_readable_size(original_size)} â†’ Encrypted: {self.human_readable_size(encrypted_size)}")
+        print(f"   Original: {self.human_readable_size(original_size)} → Encrypted: {self.human_readable_size(encrypted_size)}")
         
         try:
             if not os.path.exists(enc_file):
@@ -2038,16 +2051,16 @@ class CryptoEngine:
             test_decrypt = self.cipher.decrypt(full_encrypted_data)
             
             if test_decrypt == data:
-                print(f"{Colors.GREEN}âœ“ Encryption verified successfully!{Colors.END}")
+                print(f"{Colors.GREEN}✓ Encryption verified successfully!{Colors.END}")
             else:
-                print(f"{Colors.YELLOW}âš ï¸  Verification warning: Decrypted data doesn't match original{Colors.END}")
+                print(f"{Colors.YELLOW}⚠️  Verification warning: Decrypted data doesn't match original{Colors.END}")
                 
         except Exception as e:
-            print(f"{Colors.RED}âŒ Encryption verification failed: {str(e)}{Colors.END}")
+            print(f"{Colors.RED}❌ Encryption verification failed: {str(e)}{Colors.END}")
             try:
                 if os.path.exists(enc_file):
                     os.remove(enc_file)
-                    print(f"{Colors.DIM}âœ“ Removed corrupted encrypted file{Colors.END}")
+                    print(f"{Colors.DIM}✓ Removed corrupted encrypted file{Colors.END}")
             except:
                 pass
             return
@@ -2058,28 +2071,28 @@ class CryptoEngine:
 
         if choice == 'y':
             print(f"\n{Colors.YELLOW}File to delete: {path}{Colors.END}")
-            verify = input(f"{Colors.RED}âš ï¸  Confirm deletion of {os.path.basename(path)}? (yes/NO): {Colors.END}").strip().lower()
+            verify = input(f"{Colors.RED}⚠️  Confirm deletion of {os.path.basename(path)}? (yes/NO): {Colors.END}").strip().lower()
             if verify == 'yes':
                 import gc
                 gc.collect()
                 time.sleep(0.5)
                 
-                print(f"{Colors.YELLOW}ðŸ”’ Securely deleting original...{Colors.END}")
+                print(f"{Colors.YELLOW}🔒 Securely deleting original...{Colors.END}")
                 success = self.secure_delete(path, passes=3)
                 
                 if success and not os.path.exists(path):
-                    print(f"{Colors.GREEN}âœ“ Original file securely deleted{Colors.END}")
-                    self.add_activity(f"Securely deleted original: {filename}")
+                    print(f"{Colors.GREEN}✓ Original file securely deleted{Colors.END}")
+                    self.add_activity("Securely deleted original: {}".format(filename))
                 else:
                     if os.path.exists(path):
-                        print(f"{Colors.RED}âŒ File still exists!{Colors.END}")
-                        print(f"{Colors.YELLOW}âš ï¸  Original file kept for safety{Colors.END}")
+                        print(f"{Colors.RED}❌ File still exists!{Colors.END}")
+                        print(f"{Colors.YELLOW}⚠️  Original file kept for safety{Colors.END}")
             else:
-                print(f"{Colors.GREEN}âœ“ Original file kept (user cancelled){Colors.END}")
+                print(f"{Colors.GREEN}✓ Original file kept (user cancelled){Colors.END}")
         else:
-            print(f"{Colors.GREEN}âœ“ Original file kept (safe){Colors.END}")
+            print(f"{Colors.GREEN}✓ Original file kept (safe){Colors.END}")
         
-        self.typer.type_text("ðŸ“Š Generating report...", color=Colors.YELLOW)
+        self.typer.type_text("Generating report...", color=Colors.YELLOW)
         key_info = self.get_key_info()
         report_details = {
             'target': filename,
@@ -2103,7 +2116,7 @@ class CryptoEngine:
             self.typer.type_text("[!] File not found", color=Colors.RED)
             return
         
-        print(f"\n{Colors.YELLOW}ðŸ”“ DECRYPTING FILE: {filename}{Colors.END}")
+        print(f"\n{Colors.YELLOW}🔓 DECRYPTING FILE: {filename}{Colors.END}")
         
         with open(path, "rb") as f:
             data = f.read()
@@ -2115,12 +2128,12 @@ class CryptoEngine:
             with open(out_file, "wb") as f:
                 f.write(decrypted)
             
-            self.add_activity(f"Decrypted: {filename}")
+            self.add_activity("Decrypted: {}".format(filename))
             
-            print(f"\n{Colors.GREEN}âœ… File decrypted successfully!{Colors.END}")
+            print(f"\n{Colors.GREEN}✓ File decrypted successfully!{Colors.END}")
             print(f"   Output: {out_file}")
             
-            self.typer.type_text("ðŸ“Š Generating report...", color=Colors.YELLOW)
+            self.typer.type_text("Generating report...", color=Colors.YELLOW)
             key_info = self.get_key_info()
             report_details = {
                 'target': filename,
@@ -2132,34 +2145,34 @@ class CryptoEngine:
             self.report_gen.generate_report("FILE DECRYPTION", report_details)
             
         except Exception as e:
-            self.typer.type_text(f"âŒ Decryption failed: {e}", color=Colors.RED)
+            self.typer.type_text("❌ Decryption failed: {}".format(e), color=Colors.RED)
     
     def encrypt_directory(self):
         """Encrypt a directory with progress tracking"""
-        print(f"\n{Colors.YELLOW}ðŸ“‚ DIRECTORY ENCRYPTION{Colors.END}")
-        print(f"{Colors.CYAN}{'â”€' * 50}{Colors.END}")
+        print(f"\n{Colors.YELLOW}📂 DIRECTORY ENCRYPTION{Colors.END}")
+        print(f"{Colors.CYAN}{'─' * 50}{Colors.END}")
         
         if not self.cipher:
-            self.typer.type_text("âŒ Encryption not initialized. Setup encryption first.", color=Colors.RED)
+            self.typer.type_text("Encryption not initialized. Setup encryption first.", color=Colors.RED)
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
             return
         
         directory_path = input(f"{Colors.CYAN}Enter directory path to encrypt: {Colors.END}").strip()
         
         if not directory_path:
-            self.typer.type_text("âŒ No directory specified", color=Colors.RED)
+            self.typer.type_text("No directory specified", color=Colors.RED)
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
             return
         
         directory_path = os.path.expanduser(directory_path)
         
         if not os.path.exists(directory_path):
-            self.typer.type_text(f"âŒ Directory not found: {directory_path}", color=Colors.RED)
+            self.typer.type_text("Directory not found: {}".format(directory_path), color=Colors.RED)
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
             return
         
         if not os.path.isdir(directory_path):
-            self.typer.type_text(f"âŒ Path is not a directory: {directory_path}", color=Colors.RED)
+            self.typer.type_text("Path is not a directory: {}".format(directory_path), color=Colors.RED)
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
             return
         
@@ -2173,15 +2186,15 @@ class CryptoEngine:
                     all_files.append(file_path)
                     total_size += size
                 except Exception as e:
-                    print(f"{Colors.YELLOW}âš ï¸  Could not read: {file_path} - {e}{Colors.END}")
+                    print(f"{Colors.YELLOW}⚠️  Could not read: {file_path} - {e}{Colors.END}")
         
         total_files = len(all_files)
         
-        print(f"ðŸ“‚ Directory: {directory_path}")
-        print(f"ðŸ“ Files: {total_files}")
-        print(f"ðŸ“Š Size: {self.human_readable_size(total_size)}")
+        print(f"📂 Directory: {directory_path}")
+        print(f"📁 Files: {total_files}")
+        print(f"📊 Size: {self.human_readable_size(total_size)}")
         
-        print(f"\n{Colors.YELLOW}âš ï¸  After encryption, original files will remain unless deleted{Colors.END}")
+        print(f"\n{Colors.YELLOW}⚠️  After encryption, original files will remain unless deleted{Colors.END}")
         print(f"{Colors.CYAN}Deletion options:{Colors.END}")
         print(f"  1. Keep all original files (safe)")
         print(f"  2. Securely delete ALL original files after encryption (irreversible)")
@@ -2194,7 +2207,7 @@ class CryptoEngine:
             delete_choice = '1'
             print(f"{Colors.YELLOW}Defaulting to 'Keep all files'{Colors.END}")
         
-        confirm = input(f"\n{Colors.RED}âš ï¸  Encrypt this directory? (y/N): {Colors.END}").strip().lower()
+        confirm = input(f"\n{Colors.RED}⚠️  Encrypt this directory? (y/N): {Colors.END}").strip().lower()
         if confirm != 'y':
             self.typer.type_text("Encryption cancelled", color=Colors.YELLOW)
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
@@ -2209,7 +2222,7 @@ class CryptoEngine:
         success, container_path = self.dir_encryptor.encrypt_directory(directory_path, progress_callback)
         
         if success:
-            print(f"\n{Colors.GREEN}âœ… Directory encryption completed successfully!{Colors.END}")
+            print(f"\n{Colors.GREEN}✓ Directory encryption completed successfully!{Colors.END}")
             if container_path:
                 print(f"   Container: {container_path}")
             
@@ -2218,26 +2231,26 @@ class CryptoEngine:
             elif delete_choice == '3':
                 self._delete_original_directory_files(directory_path, all_files, "individual")
             else:
-                print(f"{Colors.GREEN}âœ“ Original files kept (safe){Colors.END}")
+                print(f"{Colors.GREEN}✓ Original files kept (safe){Colors.END}")
         else:
-            print(f"\n{Colors.RED}âŒ Directory encryption failed{Colors.END}")
+            print(f"\n{Colors.RED}❌ Directory encryption failed{Colors.END}")
             
         input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
     
     def decrypt_directory(self):
         """Decrypt a directory"""
-        print(f"\n{Colors.YELLOW}ðŸ“‚ DIRECTORY DECRYPTION{Colors.END}")
-        print(f"{Colors.CYAN}{'â”€' * 50}{Colors.END}")
+        print(f"\n{Colors.YELLOW}📂 DIRECTORY DECRYPTION{Colors.END}")
+        print(f"{Colors.CYAN}{'─' * 50}{Colors.END}")
         
         if not self.cipher:
-            self.typer.type_text("âŒ Decryption not initialized. Setup encryption first.", color=Colors.RED)
+            self.typer.type_text("Decryption not initialized. Setup encryption first.", color=Colors.RED)
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
             return
         
         containers = self.dir_encryptor.list_encrypted_directories()
         
         if not containers:
-            self.typer.type_text("âŒ No encrypted directories found", color=Colors.RED)
+            self.typer.type_text("No encrypted directories found", color=Colors.RED)
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
             return
         
@@ -2254,14 +2267,14 @@ class CryptoEngine:
         elif os.path.exists(choice):
             container_path = choice
         else:
-            self.typer.type_text("âŒ Invalid selection", color=Colors.RED)
+            self.typer.type_text("Invalid selection", color=Colors.RED)
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
             return
         
-        print(f"{Colors.CYAN}ðŸ“¦ Container:{Colors.END} {container_path}")
-        print(f"{Colors.CYAN}ðŸ“ Size:{Colors.END} {self.human_readable_size(os.path.getsize(container_path))}")
+        print(f"{Colors.CYAN}📦 Container:{Colors.END} {container_path}")
+        print(f"{Colors.CYAN}📁 Size:{Colors.END} {self.human_readable_size(os.path.getsize(container_path))}")
         
-        confirm = input(f"\n{Colors.RED}âš ï¸  Decrypt this container? (y/N): {Colors.END}").strip().lower()
+        confirm = input(f"\n{Colors.RED}⚠️  Decrypt this container? (y/N): {Colors.END}").strip().lower()
         if confirm != 'y':
             self.typer.type_text("Decryption cancelled", color=Colors.YELLOW)
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
@@ -2278,9 +2291,9 @@ class CryptoEngine:
         success = self.dir_encryptor.decrypt_directory(container_path, output_dir)
         
         if success:
-            print(f"\n{Colors.GREEN}âœ… Directory decryption completed successfully!{Colors.END}")
+            print(f"\n{Colors.GREEN}✓ Directory decryption completed successfully!{Colors.END}")
         else:
-            print(f"\n{Colors.RED}âŒ Directory decryption failed{Colors.END}")
+            print(f"\n{Colors.RED}❌ Directory decryption failed{Colors.END}")
         
         input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
         self.update_stats()
@@ -2293,7 +2306,7 @@ class CryptoEngine:
         containers = self.dir_encryptor.list_encrypted_directories()
         
         if not containers:
-            content = [f"{Colors.YELLOW}No encrypted directories found.{Colors.END}"]
+            content = ["No encrypted directories found."]
             box.render(content, color=Colors.RED)
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
             return
@@ -2304,7 +2317,7 @@ class CryptoEngine:
         for i, container in enumerate(containers, 1):
             rows.append([
                 f"{i}",
-                f"ðŸ“¦ {container['name'][:30]}",
+                f"📦 {container['name'][:30]}",
                 container['size_human'],
                 container['modified'],
                 container.get('format', 'Unknown')
@@ -2313,8 +2326,8 @@ class CryptoEngine:
         table = AnimatedTable(headers)
         table.render(rows)
         
-        self.typer.type_text(f"Total containers: {len(containers)}", color=Colors.CYAN)
-        self.typer.type_text(f"Location: {ENCRYPTED_DIR}", color=Colors.DIM)
+        self.typer.type_text("Total containers: {}".format(len(containers)), color=Colors.CYAN)
+        self.typer.type_text("Location: {}".format(ENCRYPTED_DIR), color=Colors.DIM)
         
         self.add_activity("Listed encrypted directories")
         input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
@@ -2332,7 +2345,7 @@ class CryptoEngine:
                     encrypted.append(path)
 
         if not encrypted:
-            content = [f"{Colors.YELLOW}No encrypted files found.{Colors.END}"]
+            content = ["No encrypted files found."]
             box.render(content, color=Colors.RED)
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
             return
@@ -2346,7 +2359,7 @@ class CryptoEngine:
             filename = os.path.basename(file)
             if len(filename) > 20:
                 filename = filename[:17] + "..."
-            rows.append([f"{i}", f"ðŸ”’ {filename}", size, mod])
+            rows.append([f"{i}", f"🔒 {filename}", size, mod])
         
         table = AnimatedTable(headers)
         table.render(rows)
@@ -2380,37 +2393,37 @@ class CryptoEngine:
         md5 = hashlib.md5(data).hexdigest()
 
         content = [
-            f"{Colors.BOLD}File:{Colors.END} {filename}",
-            f"{Colors.BOLD}Path:{Colors.END} {path}",
-            f"{Colors.BOLD}Size:{Colors.END} {self.human_readable_size(size)}",
-            f"{Colors.BOLD}SHA256:{Colors.END} {sha256[:32]}...",
-            f"{Colors.BOLD}MD5:{Colors.END} {md5[:16]}..."
+            "File: {}".format(filename),
+            "Path: {}".format(path),
+            "Size: {}".format(self.human_readable_size(size)),
+            "SHA256: {}...".format(sha256[:32]),
+            "MD5: {}...".format(md5[:16])
         ]
         box.render(content, color=Colors.CYAN)
 
-        self.typer.type_text("ðŸ” Encryption Analysis", color=Colors.YELLOW)
-        self.typer.type_text("â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€", color=Colors.CYAN)
+        self.typer.type_text("🔍 Encryption Analysis", color=Colors.YELLOW)
+        self.typer.type_text("──────────────────────────────────────────────────────────────────", color=Colors.CYAN)
         
         try:
             base64.urlsafe_b64decode(data)
-            self.typer.type_text("âœ“ Format: Fernet (AES-256)", color=Colors.GREEN)
+            self.typer.type_text("✓ Format: Fernet (AES-256)", color=Colors.GREEN)
         except Exception:
-            self.typer.type_text("âœ— Format: Unknown", color=Colors.RED)
+            self.typer.type_text("✗ Format: Unknown", color=Colors.RED)
 
-        self.typer.type_text("ðŸ›¡ï¸ Integrity Check", color=Colors.YELLOW)
-        self.typer.type_text("â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€", color=Colors.CYAN)
+        self.typer.type_text("🛡️ Integrity Check", color=Colors.YELLOW)
+        self.typer.type_text("──────────────────────────────────────────────────────────────────", color=Colors.CYAN)
 
         if not self.cipher:
-            self.typer.type_text("âš ï¸ Key not loaded â€” cannot verify integrity", color=Colors.RED)
+            self.typer.type_text("⚠️ Key not loaded — cannot verify integrity", color=Colors.RED)
         else:
             try:
                 self.cipher.decrypt(data)
-                self.typer.type_text("âœ… File integrity: VALID", color=Colors.GREEN)
+                self.typer.type_text("✓ File integrity: VALID", color=Colors.GREEN)
                 self.typer.type_text("   Authentication tag verified", color=Colors.CYAN)
             except Exception:
-                self.typer.type_text("âŒ File integrity: FAILED", color=Colors.RED)
+                self.typer.type_text("❌ File integrity: FAILED", color=Colors.RED)
 
-        self.add_activity(f"Checked info for: {filename}")
+        self.add_activity("Checked info for: {}".format(filename))
         input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
 
     def crypto_verify(self):
@@ -2425,52 +2438,52 @@ class CryptoEngine:
                 key = f.read().strip()
             try:
                 Fernet(key.encode())
-                checks.append(f"{Colors.GREEN}âœ“ Key format valid{Colors.END}")
+                checks.append("✓ Key format valid")
             except:
-                checks.append(f"{Colors.RED}âœ— Invalid key{Colors.END}")
+                checks.append("✗ Invalid key")
         else:
-            checks.append(f"{Colors.RED}âœ— Key file missing{Colors.END}")
+            checks.append("✗ Key file missing")
 
         if self.cipher:
-            checks.append(f"{Colors.GREEN}âœ“ Cipher initialized{Colors.END}")
+            checks.append("✓ Cipher initialized")
             
             test = b"dsterminal test data"
             try:
                 enc = self.cipher.encrypt(test)
                 dec = self.cipher.decrypt(enc)
                 if test == dec:
-                    checks.append(f"{Colors.GREEN}âœ“ Self-test PASSED{Colors.END}")
+                    checks.append("✓ Self-test PASSED")
                 else:
-                    checks.append(f"{Colors.RED}âœ— Self-test FAILED{Colors.END}")
+                    checks.append("✗ Self-test FAILED")
             except:
-                checks.append(f"{Colors.RED}âœ— Encryption test failed{Colors.END}")
+                checks.append("✗ Encryption test failed")
         else:
-            checks.append(f"{Colors.RED}âœ— Cipher not initialized{Colors.END}")
+            checks.append("✗ Cipher not initialized")
 
         if os.path.exists(QR_CODE_DIR):
-            checks.append(f"{Colors.GREEN}âœ“ QR directory exists{Colors.END}")
+            checks.append("✓ QR directory exists")
         else:
-            checks.append(f"{Colors.YELLOW}âš ï¸ QR directory not found{Colors.END}")
+            checks.append("⚠️ QR directory not found")
         
         if os.path.exists(ENCRYPTED_DIR):
-            checks.append(f"{Colors.GREEN}âœ“ Encrypted dir storage exists{Colors.END}")
+            checks.append("✓ Encrypted dir storage exists")
         else:
-            checks.append(f"{Colors.YELLOW}âš ï¸ Encrypted dir storage not found{Colors.END}")
+            checks.append("⚠️ Encrypted dir storage not found")
         
         if os.path.exists(REPORTS_DIR):
-            checks.append(f"{Colors.GREEN}âœ“ Reports directory exists{Colors.END}")
+            checks.append("✓ Reports directory exists")
         else:
-            checks.append(f"{Colors.YELLOW}âš ï¸ Reports directory not found{Colors.END}")
+            checks.append("⚠️ Reports directory not found")
         
         if QR_DEPS_AVAILABLE:
-            checks.append(f"{Colors.GREEN}âœ“ QR dependencies installed{Colors.END}")
+            checks.append("✓ QR dependencies installed")
         else:
-            checks.append(f"{Colors.RED}âœ— QR dependencies missing{Colors.END}")
+            checks.append("✗ QR dependencies missing")
         
         if REPORT_AVAILABLE:
-            checks.append(f"{Colors.GREEN}âœ“ Report generation enabled{Colors.END}")
+            checks.append("✓ Report generation enabled")
         else:
-            checks.append(f"{Colors.RED}âœ— Report generation unavailable{Colors.END}")
+            checks.append("✗ Report generation unavailable")
         
         box.render(checks, color=Colors.YELLOW)
         self.add_activity("System verification completed")
@@ -2482,7 +2495,7 @@ class CryptoEngine:
         box = RotatingBox(50, " KEY BACKUP ")
         
         if not os.path.exists(KEY_FILE):
-            content = [f"{Colors.RED}No key found to backup{Colors.END}"]
+            content = ["No key found to backup"]
             box.render(content, color=Colors.RED)
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
             return
@@ -2496,7 +2509,7 @@ class CryptoEngine:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         backup = os.path.join(BACKUP_DIR, f"dsterminal_key_{timestamp}.backup")
         
-        self.typer.type_text("â–¶ Creating secure backup...", color=Colors.YELLOW)
+        self.typer.type_text("▶ Creating secure backup...", color=Colors.YELLOW)
         time.sleep(1)
         
         with open(backup, "w") as f:
@@ -2508,12 +2521,12 @@ class CryptoEngine:
             pass
         
         content = [
-            f"{Colors.GREEN}âœ… Backup created successfully{Colors.END}",
-            f"{Colors.BOLD}Location:{Colors.END} {backup}",
-            f"{Colors.BOLD}Permissions:{Colors.END} 600",
+            "Backup created successfully",
+            "Location: {}".format(backup),
+            "Permissions: 600",
             "",
-            f"{Colors.YELLOW}âš ï¸ Store this backup securely!{Colors.END}",
-            f"{Colors.CYAN}ðŸ’¡ Consider generating a QR code backup too{Colors.END}"
+            "Store this backup securely!",
+            "Consider generating a QR code backup too"
         ]
         box.render(content, color=Colors.GREEN)
         self.add_activity("Key backup created")
@@ -2525,7 +2538,7 @@ class CryptoEngine:
         box = RotatingBox(50, " IMPORT ENCRYPTION KEY ")
         
         if not key_string:
-            self.typer.type_text("â–¶ Paste the encryption key you received:", color=Colors.YELLOW)
+            self.typer.type_text("▶ Paste the encryption key you received:", color=Colors.YELLOW)
             self.typer.type_text("  (The key looks like: gAAAAAB...)", color=Colors.CYAN)
             key_string = input(f"\n{Colors.GREEN}Key: {Colors.END}").strip()
         
@@ -2553,11 +2566,11 @@ class CryptoEngine:
                 key_id = hashlib.sha256(key_string.encode()).hexdigest()[:16]
                 
                 content = [
-                    f"{Colors.GREEN}âœ… ENCRYPTION KEY IMPORTED SUCCESSFULLY{Colors.END}",
-                    f"{Colors.BOLD}Key ID:{Colors.END} {Colors.CYAN}{key_id}{Colors.END}",
-                    f"{Colors.BOLD}Location:{Colors.END} {KEY_FILE}",
+                    "ENCRYPTION KEY IMPORTED SUCCESSFULLY",
+                    "Key ID: {}".format(key_id),
+                    "Location: {}".format(KEY_FILE),
                     "",
-                    f"{Colors.GREEN}âœ“ You can now decrypt files encrypted with this key{Colors.END}"
+                    "You can now decrypt files encrypted with this key"
                 ]
                 box.render(content, color=Colors.GREEN)
                 
@@ -2569,12 +2582,12 @@ class CryptoEngine:
                 
         except Exception as e:
             content = [
-                f"{Colors.RED}âŒ INVALID KEY FORMAT{Colors.END}",
+                "INVALID KEY FORMAT",
                 "",
-                f"{Colors.YELLOW}The key you provided is not valid.{Colors.END}",
-                f"{Colors.CYAN}Make sure you copied the ENTIRE key string.{Colors.END}",
+                "The key you provided is not valid.",
+                "Make sure you copied the ENTIRE key string.",
                 "",
-                f"{Colors.RED}Error: {str(e)}{Colors.END}"
+                "Error: {}".format(str(e))
             ]
             box.render(content, color=Colors.RED)
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
@@ -2587,8 +2600,8 @@ class CryptoEngine:
         
         if not os.path.exists(KEY_FILE):
             content = [
-                f"{Colors.RED}âŒ No encryption key found{Colors.END}",
-                f"{Colors.YELLOW}Run 'Setup Encryption System' first.{Colors.END}"
+                "No encryption key found",
+                "Run 'Setup Encryption System' first."
             ]
             box.render(content, color=Colors.RED)
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
@@ -2600,23 +2613,23 @@ class CryptoEngine:
         key_id = hashlib.sha256(key.encode()).hexdigest()[:16]
         
         content = [
-            f"{Colors.GREEN}âœ… YOUR ENCRYPTION KEY{Colors.END}",
-            f"{Colors.BOLD}Key ID:{Colors.END} {Colors.CYAN}{key_id}{Colors.END}",
+            "YOUR ENCRYPTION KEY",
+            "Key ID: {}".format(key_id),
             "",
-            f"{Colors.YELLOW}â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—{Colors.END}",
-            f"{Colors.BOLD}{key}{Colors.END}",
-            f"{Colors.YELLOW}â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•{Colors.END}",
+            "┌─────────────────────────────────────────────────────┐",
+            "{}".format(key),
+            "└─────────────────────────────────────────────────────┘",
             "",
-            f"{Colors.RED}âš ï¸  COPY THIS KEY EXACTLY AS SHOWN ABOVE{Colors.END}",
-            f"{Colors.RED}âš ï¸  Share it securely with the recipient{Colors.END}",
+            "COPY THIS KEY EXACTLY AS SHOWN ABOVE",
+            "Share it securely with the recipient",
             "",
-            f"{Colors.CYAN}The recipient should use 'Import Key' option{Colors.END}",
-            f"{Colors.CYAN}ðŸ’¡ Or use QR code export for easier sharing{Colors.END}"
+            "The recipient should use 'Import Key' option",
+            "Or use QR code export for easier sharing"
         ]
         box.render(content, color=Colors.YELLOW)
         
         if PlatformUtils.copy_to_clipboard(key):
-            self.typer.type_text("âœ“ Key copied to clipboard!", color=Colors.GREEN)
+            self.typer.type_text("Key copied to clipboard!", color=Colors.GREEN)
         else:
             self.typer.type_text("Tip: Install 'pyperclip' for auto-copy: pip install pyperclip", color=Colors.YELLOW)
         
@@ -2629,7 +2642,7 @@ class CryptoEngine:
         box = RotatingBox(60, " REPORT INVENTORY ")
         
         if not os.path.exists(REPORTS_DIR):
-            content = [f"{Colors.YELLOW}Reports directory not found: {REPORTS_DIR}{Colors.END}"]
+            content = ["Reports directory not found: {}".format(REPORTS_DIR)]
             box.render(content, color=Colors.RED)
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
             return
@@ -2649,7 +2662,7 @@ class CryptoEngine:
                 })
         
         if not reports:
-            content = [f"{Colors.YELLOW}No reports found.{Colors.END}"]
+            content = ["No reports found."]
             box.render(content, color=Colors.RED)
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
             return
@@ -2660,7 +2673,7 @@ class CryptoEngine:
         for i, report in enumerate(sorted(reports, key=lambda x: x['modified'], reverse=True), 1):
             rows.append([
                 f"{i}",
-                f"ðŸ“„ {report['name'][:30]}",
+                f"📄 {report['name'][:30]}",
                 report['type'],
                 report['size'],
                 report['modified']
@@ -2669,8 +2682,8 @@ class CryptoEngine:
         table = AnimatedTable(headers)
         table.render(rows)
         
-        self.typer.type_text(f"Total reports: {len(reports)}", color=Colors.CYAN)
-        self.typer.type_text(f"Location: {REPORTS_DIR}", color=Colors.DIM)
+        self.typer.type_text("Total reports: {}".format(len(reports)), color=Colors.CYAN)
+        self.typer.type_text("Location: {}".format(REPORTS_DIR), color=Colors.DIM)
         
         self.add_activity("Listed reports")
         input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
@@ -2698,7 +2711,7 @@ class CryptoEngine:
     def encrypt_test(self):
         """Run encryption test"""
         print(f"\n{Colors.YELLOW}ENCRYPTION SYSTEM TEST{Colors.END}")
-        print(f"{Colors.CYAN}{'â”€' * 50}{Colors.END}")
+        print(f"{Colors.CYAN}{'─' * 50}{Colors.END}")
 
         test_file = os.path.join(self.base_dir, "crypto_test.txt")
         
@@ -2707,31 +2720,31 @@ class CryptoEngine:
             f.write(f"Timestamp: {datetime.now().isoformat()}\n")
             f.write("Classified: TOP SECRET\n")
         
-        print(f"{Colors.GREEN}âœ“ Test file created{Colors.END}")
+        print(f"{Colors.GREEN}✓ Test file created{Colors.END}")
         time.sleep(1.5)
         
         self.encrypt_file("crypto_test.txt")
         enc = test_file + ".enc"
         
         if os.path.exists(enc):
-            print(f"{Colors.GREEN}âœ“ Encryption successful{Colors.END}")
+            print(f"{Colors.GREEN}✓ Encryption successful{Colors.END}")
             time.sleep(1.5)
             
             self.decrypt_file("crypto_test.txt.enc")
-            print(f"{Colors.GREEN}âœ“ Decryption successful{Colors.END}")
+            print(f"{Colors.GREEN}✓ Decryption successful{Colors.END}")
             
             with open(test_file, "r") as f:
                 content = f.read()
-            print(f"{Colors.CYAN}âœ“ Data integrity verified{Colors.END}")
+            print(f"{Colors.CYAN}✓ Data integrity verified{Colors.END}")
             
-            print(f"{Colors.YELLOW}ðŸ“Š Generating test report...{Colors.END}")
+            print(f"{Colors.YELLOW}📊 Generating test report...{Colors.END}")
             key_info = self.get_key_info()
             report_details = {
                 'target': 'Test File',
                 'total_files': 1,
                 'total_size': self.human_readable_size(os.path.getsize(test_file)),
                 'files': [
-                    {'name': 'crypto_test.txt', 'status': 'Encrypted â†’ Decrypted', 
+                    {'name': 'crypto_test.txt', 'status': 'Encrypted → Decrypted', 
                     'size': self.human_readable_size(os.path.getsize(test_file))}
                 ],
                 'key_info': key_info,
@@ -2743,7 +2756,7 @@ class CryptoEngine:
             if os.path.exists(f):
                 try:
                     os.remove(f)
-                    print(f"{Colors.DIM}âœ“ Cleaned up: {f}{Colors.END}")
+                    print(f"{Colors.DIM}✓ Cleaned up: {f}{Colors.END}")
                 except:
                     pass
         
@@ -2755,7 +2768,7 @@ class CryptoEngine:
         """Run decryption test"""
         PlatformUtils.clear_screen()
         self.typer.type_text("DECRYPTION SYSTEM TEST", color=Colors.YELLOW)
-        self.typer.type_text("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•", color=Colors.RED)
+        self.typer.type_text("──────────────────────────────────────────────────────────────────", color=Colors.RED)
 
         encrypted_files = []
         for root, dirs, files in os.walk(self.base_dir):
@@ -2764,16 +2777,16 @@ class CryptoEngine:
                     encrypted_files.append(os.path.join(root, file))
         
         if not encrypted_files:
-            self.typer.type_text("âš ï¸ No encrypted files found to test decryption.", color=Colors.YELLOW)
+            self.typer.type_text("⚠️ No encrypted files found to test decryption.", color=Colors.YELLOW)
             self.typer.type_text("Run 'Encrypt Test' first to create a test file.", color=Colors.CYAN)
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
             return
         
-        self.typer.type_text(f"ðŸ“ Found {len(encrypted_files)} encrypted files", color=Colors.CYAN)
+        self.typer.type_text("📁 Found {} encrypted files".format(len(encrypted_files)), color=Colors.CYAN)
         time.sleep(1.5)
         
         test_file = encrypted_files[0]
-        self.typer.type_text(f"ðŸ”“ Testing decryption on: {os.path.basename(test_file)}", color=Colors.GREEN)
+        self.typer.type_text("🔓 Testing decryption on: {}".format(os.path.basename(test_file)), color=Colors.GREEN)
         time.sleep(1.5)
         
         self.animate_encryption(os.path.basename(test_file), "DECRYPTING")
@@ -2782,9 +2795,9 @@ class CryptoEngine:
         
         decrypted_file = test_file.replace(".enc", "")
         if os.path.exists(decrypted_file):
-            self.typer.type_text("âœ… Decryption test successful!", color=Colors.GREEN)
+            self.typer.type_text("✓ Decryption test successful!", color=Colors.GREEN)
             
-            self.typer.type_text("ðŸ“Š Generating test report...", color=Colors.YELLOW)
+            self.typer.type_text("📊 Generating test report...", color=Colors.YELLOW)
             key_info = self.get_key_info()
             report_details = {
                 'target': os.path.basename(test_file),
@@ -2801,18 +2814,18 @@ class CryptoEngine:
             
             try:
                 os.remove(decrypted_file)
-                self.typer.type_text(f"âœ“ Cleaned up: {os.path.basename(decrypted_file)}", color=Colors.DIM)
+                self.typer.type_text("✓ Cleaned up: {}".format(os.path.basename(decrypted_file)), color=Colors.DIM)
             except:
                 pass
         else:
-            self.typer.type_text("âŒ Decryption test failed!", color=Colors.RED)
+            self.typer.type_text("❌ Decryption test failed!", color=Colors.RED)
         
         self.add_activity("Decryption test completed")
         input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
     
     def _delete_original_directory_files(self, directory_path, all_files, mode="all"):
         """Delete original files after directory encryption"""
-        print(f"\n{Colors.YELLOW}ðŸ”’ Processing original file deletion...{Colors.END}")
+        print(f"\n{Colors.YELLOW}🔒 Processing original file deletion...{Colors.END}")
         print(f"{Colors.DIM}Total files to process: {len(all_files)}{Colors.END}")
         
         dir_name = os.path.basename(directory_path)
@@ -2834,7 +2847,7 @@ class CryptoEngine:
                     })
         
         if not containers:
-            print(f"{Colors.RED}âŒ No encrypted container found for this directory!{Colors.END}")
+            print(f"{Colors.RED}❌ No encrypted container found for this directory!{Colors.END}")
             return
         
         latest = sorted(containers, key=lambda x: x['mtime'], reverse=True)[0]
@@ -2847,18 +2860,18 @@ class CryptoEngine:
         else:
             fmt = "Unknown"
         
-        print(f"{Colors.CYAN}ðŸ“¦ Found encrypted container: {os.path.basename(container_path)}{Colors.END}")
+        print(f"{Colors.CYAN}📦 Found encrypted container: {os.path.basename(container_path)}{Colors.END}")
         print(f"{Colors.DIM}   Format: {fmt}{Colors.END}")
         
         if not os.path.exists(container_path) or os.path.getsize(container_path) == 0:
-            print(f"{Colors.RED}âŒ Encrypted container is invalid!{Colors.END}")
+            print(f"{Colors.RED}❌ Encrypted container is invalid!{Colors.END}")
             return
         
         if mode == "all" and len(all_files) > 10:
-            print(f"\n{Colors.RED}âš ï¸  You are about to delete {len(all_files)} files!{Colors.END}")
+            print(f"\n{Colors.RED}⚠️  You are about to delete {len(all_files)} files!{Colors.END}")
             confirm = input(f"{Colors.RED}Type 'DELETE ALL' to confirm: {Colors.END}").strip()
             if confirm != 'DELETE ALL':
-                print(f"{Colors.GREEN}âœ“ Deletion cancelled - all files kept{Colors.END}")
+                print(f"{Colors.GREEN}✓ Deletion cancelled - all files kept{Colors.END}")
                 return
         
         deleted_count = 0
@@ -2871,7 +2884,7 @@ class CryptoEngine:
             filename = os.path.basename(file_path)
             
             if filename in ['.DS_Store', 'Thumbs.db', 'desktop.ini']:
-                print(f"{Colors.DIM}  â­ Skipping system file: {filename}{Colors.END}")
+                print(f"{Colors.DIM}  ⏭ Skipping system file: {filename}{Colors.END}")
                 skipped_count += 1
                 continue
             
@@ -2888,56 +2901,56 @@ class CryptoEngine:
                     print(f"{Colors.GREEN}Switched to 'keep all' mode{Colors.END}")
                     break
                 elif choice != 'y':
-                    print(f"{Colors.GREEN}âœ“ Keeping: {rel_path}{Colors.END}")
+                    print(f"{Colors.GREEN}✓ Keeping: {rel_path}{Colors.END}")
                     kept_count += 1
                     continue
             
             if mode == "all":
                 try:
-                    print(f"{Colors.YELLOW}ðŸ”’ Deleting [{idx}/{len(all_files)}]: {rel_path}{Colors.END}")
+                    print(f"{Colors.YELLOW}🔒 Deleting [{idx}/{len(all_files)}]: {rel_path}{Colors.END}")
                     success = self.secure_delete(file_path, passes=3)
                     
                     if success and not os.path.exists(file_path):
                         deleted_count += 1
-                        print(f"{Colors.GREEN}âœ“ Deleted: {rel_path}{Colors.END}")
-                        self.add_activity(f"Securely deleted original: {rel_path}")
+                        print(f"{Colors.GREEN}✓ Deleted: {rel_path}{Colors.END}")
+                        self.add_activity("Securely deleted original: {}".format(rel_path))
                     else:
                         try:
                             os.remove(file_path)
                             time.sleep(0.1)
                             if not os.path.exists(file_path):
                                 deleted_count += 1
-                                print(f"{Colors.GREEN}âœ“ Deleted (normal): {rel_path}{Colors.END}")
+                                print(f"{Colors.GREEN}✓ Deleted (normal): {rel_path}{Colors.END}")
                             else:
-                                print(f"{Colors.RED}âŒ Failed to delete: {rel_path}{Colors.END}")
+                                print(f"{Colors.RED}❌ Failed to delete: {rel_path}{Colors.END}")
                                 failed_count += 1
                         except Exception as e2:
-                            print(f"{Colors.RED}âŒ Failed to delete: {rel_path} - {e2}{Colors.END}")
+                            print(f"{Colors.RED}❌ Failed to delete: {rel_path} - {e2}{Colors.END}")
                             failed_count += 1
                             
                 except Exception as e:
-                    print(f"{Colors.RED}âŒ Error deleting {rel_path}: {e}{Colors.END}")
+                    print(f"{Colors.RED}❌ Error deleting {rel_path}: {e}{Colors.END}")
                     failed_count += 1
         
-        print(f"\n{Colors.GREEN}ðŸ“Š Deletion Summary:{Colors.END}")
-        print(f"  {Colors.GREEN}âœ“ Securely deleted: {deleted_count} files{Colors.END}")
+        print(f"\n{Colors.GREEN}📊 Deletion Summary:{Colors.END}")
+        print(f"  {Colors.GREEN}✓ Securely deleted: {deleted_count} files{Colors.END}")
         if failed_count > 0:
-            print(f"  {Colors.RED}âŒ Failed to delete: {failed_count} files{Colors.END}")
+            print(f"  {Colors.RED}❌ Failed to delete: {failed_count} files{Colors.END}")
         if kept_count > 0:
-            print(f"  {Colors.YELLOW}âš ï¸  Kept: {kept_count} files{Colors.END}")
+            print(f"  {Colors.YELLOW}⚠️  Kept: {kept_count} files{Colors.END}")
         if skipped_count > 0:
-            print(f"  {Colors.DIM}â­ Skipped: {skipped_count} system files{Colors.END}")
-        print(f"  {Colors.CYAN}ðŸ“¦ Encrypted container: {container_path}{Colors.END}")
+            print(f"  {Colors.DIM}⏭ Skipped: {skipped_count} system files{Colors.END}")
+        print(f"  {Colors.CYAN}📦 Encrypted container: {container_path}{Colors.END}")
         print(f"  {Colors.DIM}   Format: {fmt}{Colors.END}")
         
         if deleted_count > 0:
-            print(f"\n{Colors.RED}âš ï¸  Remember: Deleted files are IRRECOVERABLE!{Colors.END}")
-            print(f"{Colors.CYAN}ðŸ’¡ Keep your encryption key safe to access encrypted data{Colors.END}")
+            print(f"\n{Colors.RED}⚠️  Remember: Deleted files are IRRECOVERABLE!{Colors.END}")
+            print(f"{Colors.CYAN}Keep your encryption key safe to access encrypted data{Colors.END}")
         
         if failed_count > 0:
             retry = input(f"\n{Colors.YELLOW}Some files failed to delete. Retry? (y/N): {Colors.END}").strip().lower()
             if retry == 'y':
-                print(f"{Colors.CYAN}ðŸ”„ Retrying failed deletions...{Colors.END}")
+                print(f"{Colors.CYAN}🔄 Retrying failed deletions...{Colors.END}")
                 remaining = []
                 for file_path in all_files:
                     if os.path.exists(file_path):
@@ -2947,7 +2960,7 @@ class CryptoEngine:
 
     def _delete_remaining_files(self, remaining_files):
         """Delete files that survived the first deletion attempt"""
-        print(f"\n{Colors.YELLOW}ðŸ”’ Attempting to delete {len(remaining_files)} remaining files...{Colors.END}")
+        print(f"\n{Colors.YELLOW}🔒 Attempting to delete {len(remaining_files)} remaining files...{Colors.END}")
         
         deleted_count = 0
         failed_count = 0
@@ -2961,7 +2974,7 @@ class CryptoEngine:
                 time.sleep(0.1)
                 if not os.path.exists(file_path):
                     deleted_count += 1
-                    print(f"{Colors.GREEN}âœ“ Deleted: {rel_path}{Colors.END}")
+                    print(f"{Colors.GREEN}✓ Deleted: {rel_path}{Colors.END}")
                     continue
             except:
                 pass
@@ -2969,19 +2982,19 @@ class CryptoEngine:
             try:
                 if self.secure_delete(file_path, passes=1):
                     deleted_count += 1
-                    print(f"{Colors.GREEN}âœ“ Deleted: {rel_path}{Colors.END}")
+                    print(f"{Colors.GREEN}✓ Deleted: {rel_path}{Colors.END}")
                     continue
             except:
                 pass
             
             failed_count += 1
-            print(f"{Colors.RED}âŒ Could not delete: {rel_path}{Colors.END}")
+            print(f"{Colors.RED}❌ Could not delete: {rel_path}{Colors.END}")
         
-        print(f"\n{Colors.GREEN}ðŸ“Š Retry Summary:{Colors.END}")
-        print(f"  {Colors.GREEN}âœ“ Deleted: {deleted_count} files{Colors.END}")
+        print(f"\n{Colors.GREEN}📊 Retry Summary:{Colors.END}")
+        print(f"  {Colors.GREEN}✓ Deleted: {deleted_count} files{Colors.END}")
         if failed_count > 0:
-            print(f"  {Colors.RED}âŒ Still failed: {failed_count} files{Colors.END}")
-            print(f"{Colors.YELLOW}ðŸ’¡ These files may be open in another program.{Colors.END}")
+            print(f"  {Colors.RED}❌ Still failed: {failed_count} files{Colors.END}")
+            print(f"{Colors.YELLOW}These files may be open in another program.{Colors.END}")
             print(f"{Colors.CYAN}   Close any programs that might be using them and try again.{Colors.END}")
 
 
@@ -2995,6 +3008,6 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print(f"\n\n{Colors.RED}âš ï¸  Termination initiated{Colors.END}")
+        print(f"\n\n{Colors.RED}⚠️  Termination initiated{Colors.END}")
         time.sleep(1.5)
         sys.exit(0)

@@ -1,4 +1,5 @@
 ﻿#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 DSTerminal IOC Education Module
 Standalone module for Indicators of Compromise education
@@ -13,6 +14,28 @@ import shutil
 import re
 from typing import List, Optional, Dict, Any
 
+# ============================================================
+# FIX UNICODE ENCODING ISSUES FOR WINDOWS CONSOLE
+# ============================================================
+import io
+
+if sys.platform == 'win32':
+    try:
+        os.system('chcp 65001 > nul')
+    except:
+        pass
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='ignore')
+
+def safe_print_unicode(message):
+    """Safely print unicode/emoji characters on Windows"""
+    try:
+        print(message)
+    except UnicodeEncodeError:
+        clean_message = message.encode('ascii', 'ignore').decode('ascii')
+        print(clean_message)
+
+# Now continue with imports
 try:
     from colorama import init, Fore, Back, Style
     init(autoreset=True)
@@ -52,7 +75,7 @@ class IOCEducation:
     APP_NAME = "DSTerminal IOC Education"
     
     # Pen typing settings - CONSTANT SPEED
-    PEN_SPEED = 0.035  # Seconds per character (35ms per char â‰ˆ 28 chars/sec)
+    PEN_SPEED = 0.035  # Seconds per character (35ms per char ≈ 28 chars/sec)
     PEN_VARIANCE = 0.008  # Small variance for natural feel
     AUTO_BREAK_CHARS = 80  # Characters before auto line break
     
@@ -69,14 +92,14 @@ class IOCEducation:
     ]
     
     # ========================================================================
-    # IOC LESSONS DATABASE
+    # IOC LESSONS DATABASE - WITH EMOJIS (UTF-8)
     # ========================================================================
     
     IOC_LESSONS = [
         {
             "id": "lesson_1",
-            "title": "ðŸ“Œ WHAT ARE INDICATORS OF COMPROMISE?",
-            "icon": "ðŸ”",
+            "title": "📌 WHAT ARE INDICATORS OF COMPROMISE?",
+            "icon": "🔍",
             "color_scheme": 0,
             "content": [
                 "Indicators of Compromise (IOCs) are forensic artifacts that provide",
@@ -84,17 +107,17 @@ class IOCEducation:
                 "breadcrumbs left behind by attackers that security teams use to",
                 "detect, investigate, and respond to cyber threats.",
                 "",
-                "ðŸ’¡ Think of IOCs like fingerprints at a crime scene - they don't",
+                "💡 Think of IOCs like fingerprints at a crime scene - they don't",
                 "tell you who committed the crime, but they prove that someone was",
                 "there and help you track them down.",
                 "",
-                "ðŸ“Š KEY CHARACTERISTICS:",
-                "  â€¢ Observable - Can be detected by security tools",
-                "  â€¢ Actionable - Can be used to make security decisions",
-                "  â€¢ Verifiable - Can be confirmed through multiple sources",
-                "  â€¢ Timely - Should be current and relevant",
+                "📊 KEY CHARACTERISTICS:",
+                "  • Observable - Can be detected by security tools",
+                "  • Actionable - Can be used to make security decisions",
+                "  • Verifiable - Can be confirmed through multiple sources",
+                "  • Timely - Should be current and relevant",
                 "",
-                "ðŸŽ¯ Real-World Scenario:",
+                "🎯 Real-World Scenario:",
                 "  A security analyst notices a suspicious file hash in the network",
                 "  logs. They cross-reference it with threat intelligence feeds and",
                 "  find it's associated with a known ransomware family. They use this",
@@ -104,85 +127,85 @@ class IOCEducation:
         },
         {
             "id": "lesson_2",
-            "title": "âš¡ IOC vs IOA - UNDERSTANDING THE DIFFERENCE",
-            "icon": "âš¡",
+            "title": "⚡ IOC vs IOA - UNDERSTANDING THE DIFFERENCE",
+            "icon": "⚡",
             "color_scheme": 1,
             "content": [
                 "Many security professionals confuse IOCs with IOAs, but they serve",
                 "different purposes in the security lifecycle.",
                 "",
-                "ðŸ” IOC (Indicator of Compromise) - PAST/FORENSIC",
-                "  â€¢ Evidence that an attack has ALREADY happened",
-                "  â€¢ Things you look for AFTER a breach",
-                "  â€¢ Example: Malware hash, malicious domain, changed registry keys",
-                "  â€¢ Question: 'What did the attacker leave behind?'",
+                "🔍 IOC (Indicator of Compromise) - PAST/FORENSIC",
+                "  • Evidence that an attack has ALREADY happened",
+                "  • Things you look for AFTER a breach",
+                "  • Example: Malware hash, malicious domain, changed registry keys",
+                "  • Question: 'What did the attacker leave behind?'",
                 "",
-                "âš¡ IOA (Indicator of Attack) - PRESENT/ACTIVE",
-                "  â€¢ Evidence that an attack is HAPPENING RIGHT NOW",
-                "  â€¢ Things you look for DURING an active attack",
-                "  â€¢ Example: Unusual login attempts, data exfiltration, privilege escalation",
-                "  â€¢ Question: 'What is the attacker doing right now?'",
+                "⚡ IOA (Indicator of Attack) - PRESENT/ACTIVE",
+                "  • Evidence that an attack is HAPPENING RIGHT NOW",
+                "  • Things you look for DURING an active attack",
+                "  • Example: Unusual login attempts, data exfiltration, privilege escalation",
+                "  • Question: 'What is the attacker doing right now?'",
                 "",
-                "ðŸŽ¯ Real-World Scenario:",
+                "🎯 Real-World Scenario:",
                 "  An organization detects an IOA when they see a user account",
                 "  making multiple failed login attempts followed by a successful login",
                 "  from an unusual location. Meanwhile, IOCs would be the malicious",
                 "  IP addresses and domains that the attacker used, discovered after",
                 "  the investigation begins.",
                 "",
-                "ðŸŽ¯ BOTH are essential for a complete security strategy!",
+                "🎯 BOTH are essential for a complete security strategy!",
                 "  IOCs help you detect past attacks, IOAs help you stop attacks in progress."
             ]
         },
         {
             "id": "lesson_3",
-            "title": "ðŸ“‹ TYPES OF INDICATORS OF COMPROMISE",
-            "icon": "ðŸ“‹",
+            "title": "📋 TYPES OF INDICATORS OF COMPROMISE",
+            "icon": "📋",
             "color_scheme": 2,
             "content": [
                 "There are many types of IOCs that security teams monitor:",
                 "",
-                "ðŸ”‘ 1. FILE HASHES (MD5, SHA-1, SHA-256)",
-                "  â€¢ Unique fingerprint of a file",
-                "  â€¢ Example: 5d41402abc4b2a76b9719d911017c592",
-                "  â€¢ Use: Identify known malware by hash",
+                "🔑 1. FILE HASHES (MD5, SHA-1, SHA-256)",
+                "  • Unique fingerprint of a file",
+                "  • Example: 5d41402abc4b2a76b9719d911017c592",
+                "  • Use: Identify known malware by hash",
                 "",
-                "ðŸŒ 2. DOMAINS",
-                "  â€¢ Malicious websites used for C2, phishing",
-                "  â€¢ Example: malicious-phishing-site.com",
-                "  â€¢ Use: Block domains in DNS or proxy",
+                "🌐 2. DOMAINS",
+                "  • Malicious websites used for C2, phishing",
+                "  • Example: malicious-phishing-site.com",
+                "  • Use: Block domains in DNS or proxy",
                 "",
-                "ðŸ“ 3. IP ADDRESSES",
-                "  â€¢ Command & Control (C2) servers",
-                "  â€¢ Example: 185.130.5.253",
-                "  â€¢ Use: Block IPs in firewall",
+                "📍 3. IP ADDRESSES",
+                "  • Command & Control (C2) servers",
+                "  • Example: 185.130.5.253",
+                "  • Use: Block IPs in firewall",
                 "",
-                "ðŸ”— 4. URLs",
-                "  â€¢ Specific malicious web addresses",
-                "  â€¢ Example: http://bad-site.com/payload.exe",
-                "  â€¢ Use: Block URLs in web filter",
+                "🔗 4. URLs",
+                "  • Specific malicious web addresses",
+                "  • Example: http://bad-site.com/payload.exe",
+                "  • Use: Block URLs in web filter",
                 "",
-                "ðŸ“ 5. FILE PATHS",
-                "  â€¢ Locations where malware is installed",
-                "  â€¢ Example: C:\\Windows\\Temp\\malware.exe",
-                "  â€¢ Use: Delete suspicious files",
+                "📁 5. FILE PATHS",
+                "  • Locations where malware is installed",
+                "  • Example: C:\\Windows\\Temp\\malware.exe",
+                "  • Use: Delete suspicious files",
                 "",
-                "ðŸ”§ 6. REGISTRY KEYS (Windows)",
-                "  â€¢ Persistence mechanisms",
-                "  â€¢ Example: HKLM\\Software\\Microsoft\\Windows\\Run\\Evil",
-                "  â€¢ Use: Remove malicious registry entries",
+                "🔧 6. REGISTRY KEYS (Windows)",
+                "  • Persistence mechanisms",
+                "  • Example: HKLM\\Software\\Microsoft\\Windows\\Run\\Evil",
+                "  • Use: Remove malicious registry entries",
                 "",
-                "ðŸ§  7. PROCESS NAMES",
-                "  â€¢ Known malicious processes",
-                "  â€¢ Example: cryptolocker.exe",
-                "  â€¢ Use: Kill suspicious processes",
+                "🧠 7. PROCESS NAMES",
+                "  • Known malicious processes",
+                "  • Example: cryptolocker.exe",
+                "  • Use: Kill suspicious processes",
                 "",
-                "ðŸ“§ 8. EMAIL ADDRESSES",
-                "  â€¢ Phishing sender addresses",
-                "  â€¢ Example: security@fake-update.com",
-                "  â€¢ Use: Block sender in email filter",
+                "📧 8. EMAIL ADDRESSES",
+                "  • Phishing sender addresses",
+                "  • Example: security@fake-update.com",
+                "  • Use: Block sender in email filter",
                 "",
-                "ðŸŽ¯ Real-World Scenario:",
+                "🎯 Real-World Scenario:",
                 "  A security team receives an alert about a suspicious file. They",
                 "  collect the file hash (SHA-256) and check it against VirusTotal.",
                 "  They find it's a known ransomware variant. They also extract the",
@@ -193,38 +216,38 @@ class IOCEducation:
         },
         {
             "id": "lesson_4",
-            "title": "ðŸŽ¯ IOC CATEGORIES & CONFIDENCE LEVELS",
-            "icon": "ðŸŽ¯",
+            "title": "🎯 IOC CATEGORIES & CONFIDENCE LEVELS",
+            "icon": "🎯",
             "color_scheme": 3,
             "content": [
                 "Not all IOCs are created equal. Security teams categorize them",
                 "based on confidence levels and threat intelligence:",
                 "",
-                "ðŸŸ¢ CATEGORY: CLEAN",
-                "  â€¢ Confidence: 100%",
-                "  â€¢ Action: Do not block",
-                "  â€¢ Description: Confirmed safe, false positive",
-                "  â€¢ Example: notepad.exe (legitimate Windows file)",
+                "🟢 CATEGORY: CLEAN",
+                "  • Confidence: 100%",
+                "  • Action: Do not block",
+                "  • Description: Confirmed safe, false positive",
+                "  • Example: notepad.exe (legitimate Windows file)",
                 "",
-                "ðŸŸ¡ CATEGORY: SUSPICIOUS",
-                "  â€¢ Confidence: 50-70%",
-                "  â€¢ Action: Investigate",
-                "  â€¢ Description: Potentially malicious, needs investigation",
-                "  â€¢ Example: Unknown file in Temp folder",
+                "🟡 CATEGORY: SUSPICIOUS",
+                "  • Confidence: 50-70%",
+                "  • Action: Investigate",
+                "  • Description: Potentially malicious, needs investigation",
+                "  • Example: Unknown file in Temp folder",
                 "",
-                "ðŸ”´ CATEGORY: MALICIOUS",
-                "  â€¢ Confidence: 80-100%",
-                "  â€¢ Action: Block immediately",
-                "  â€¢ Description: Confirmed malicious",
-                "  â€¢ Example: Known ransomware hash",
+                "🔴 CATEGORY: MALICIOUS",
+                "  • Confidence: 80-100%",
+                "  • Action: Block immediately",
+                "  • Description: Confirmed malicious",
+                "  • Example: Known ransomware hash",
                 "",
-                "ðŸ“Š CONFIDENCE SCORING FACTORS:",
-                "  â€¢ Multiple sources = Higher confidence",
-                "  â€¢ Freshness = More recent = Higher confidence",
-                "  â€¢ Source reliability = Trusted source = Higher confidence",
-                "  â€¢ Context = Attack relevance = Higher confidence",
+                "📊 CONFIDENCE SCORING FACTORS:",
+                "  • Multiple sources = Higher confidence",
+                "  • Freshness = More recent = Higher confidence",
+                "  • Source reliability = Trusted source = Higher confidence",
+                "  • Context = Attack relevance = Higher confidence",
                 "",
-                "ðŸŽ¯ Real-World Scenario:",
+                "🎯 Real-World Scenario:",
                 "  An analyst receives an alert about a suspicious file. The file hash",
                 "  is flagged as malicious by 5 out of 70 antivirus engines (low",
                 "  confidence). The analyst investigates further and finds the file",
@@ -236,44 +259,44 @@ class IOCEducation:
         },
         {
             "id": "lesson_5",
-            "title": "ðŸ›¡ï¸ BEST PRACTICES FOR IOC MANAGEMENT",
-            "icon": "ðŸ›¡ï¸",
+            "title": "🛡️ BEST PRACTICES FOR IOC MANAGEMENT",
+            "icon": "🛡️",
             "color_scheme": 4,
             "content": [
                 "Effective IOC management is crucial for a strong security posture:",
                 "",
                 "1. ALWAYS VALIDATE",
-                "  â€¢ Cross-reference multiple sources",
-                "  â€¢ Verify before blocking",
-                "  â€¢ Consider false positives",
+                "  • Cross-reference multiple sources",
+                "  • Verify before blocking",
+                "  • Consider false positives",
                 "",
                 "2. CONTEXT IS KEY",
-                "  â€¢ Understand the attack scenario",
-                "  â€¢ Know your environment",
-                "  â€¢ Relevance matters",
+                "  • Understand the attack scenario",
+                "  • Know your environment",
+                "  • Relevance matters",
                 "",
                 "3. TIMELINESS MATTERS",
-                "  â€¢ Use fresh IOCs",
-                "  â€¢ Remove outdated IOCs",
-                "  â€¢ Regular updates",
+                "  • Use fresh IOCs",
+                "  • Remove outdated IOCs",
+                "  • Regular updates",
                 "",
                 "4. SHARE RESPONSIBLY",
-                "  â€¢ Protect sensitive information",
-                "  â€¢ Use standard formats (STIX)",
-                "  â€¢ Follow sharing protocols",
+                "  • Protect sensitive information",
+                "  • Use standard formats (STIX)",
+                "  • Follow sharing protocols",
                 "",
                 "5. AUTOMATE WHERE POSSIBLE",
-                "  â€¢ Auto-block known threats",
-                "  â€¢ Auto-update IOC feeds",
-                "  â€¢ Auto-generate alerts",
+                "  • Auto-block known threats",
+                "  • Auto-update IOC feeds",
+                "  • Auto-generate alerts",
                 "",
                 "6. DOCUMENT EVERYTHING",
-                "  â€¢ Source of IOC",
-                "  â€¢ Discovery date",
-                "  â€¢ Confidence level",
-                "  â€¢ Related incidents",
+                "  • Source of IOC",
+                "  • Discovery date",
+                "  • Confidence level",
+                "  • Related incidents",
                 "",
-                "ðŸŽ¯ Real-World Scenario:",
+                "🎯 Real-World Scenario:",
                 "  A security team receives a new IOC feed from a trusted source.",
                 "  Instead of blindly blocking all IOCs, they categorize them by",
                 "  confidence level. Critical IOCs are automatically blocked.",
@@ -285,34 +308,34 @@ class IOCEducation:
         },
         {
             "id": "lesson_6",
-            "title": "ðŸ”§ USING IOCS IN SOC LAB",
-            "icon": "ðŸ”§",
+            "title": "🔧 USING IOCS IN SOC LAB",
+            "icon": "🔧",
             "color_scheme": 5,
             "content": [
                 "The DSTerminal SOC Lab provides a complete IOC management system:",
                 "",
                 "STEP 1: Add an IOC",
-                "  â†’ Type: soc ioc",
-                "  â†’ Select type: hash, domain, ip, url, file, registry",
-                "  â†’ Enter value and categorize",
+                "  → Type: soc ioc",
+                "  → Select type: hash, domain, ip, url, file, registry",
+                "  → Enter value and categorize",
                 "",
                 "STEP 2: Test the IOC",
-                "  â†’ The lab will scan your system",
-                "  â†’ Find matching files, processes, or configurations",
+                "  → The lab will scan your system",
+                "  → Find matching files, processes, or configurations",
                 "",
                 "STEP 3: View All IOCs",
-                "  â†’ See all loaded IOCs with categories and sources",
+                "  → See all loaded IOCs with categories and sources",
                 "",
                 "STEP 4: Monitor for IOC Matches",
-                "  â†’ Real-time file system monitoring",
-                "  â†’ Process behavior analysis",
+                "  → Real-time file system monitoring",
+                "  → Process behavior analysis",
                 "",
                 "STEP 5: Respond to IOC Matches",
-                "  â†’ Quarantine malicious files",
-                "  â†’ Block malicious domains and IPs",
-                "  â†’ Terminate malicious processes",
+                "  → Quarantine malicious files",
+                "  → Block malicious domains and IPs",
+                "  → Terminate malicious processes",
                 "",
-                "ðŸŽ¯ Real-World Scenario:",
+                "🎯 Real-World Scenario:",
                 "  A SOC analyst discovers a new ransomware variant in the wild.",
                 "  They extract the file hash, C2 domain, and IP address.",
                 "  Using the SOC Lab, they add these as IOCs. The lab immediately",
@@ -324,30 +347,30 @@ class IOCEducation:
         },
         {
             "id": "lesson_7",
-            "title": "ðŸ“š IOC LEARNING RESOURCES",
-            "icon": "ðŸ“š",
+            "title": "📚 IOC LEARNING RESOURCES",
+            "icon": "📚",
             "color_scheme": 6,
             "content": [
                 "Continue your IOC education with these resources:",
                 "",
                 "ONLINE PLATFORMS:",
-                "  â€¢ VirusTotal: https://www.virustotal.com",
-                "  â€¢ MISP: https://www.misp-project.org",
-                "  â€¢ AlienVault OTX: https://otx.alienvault.com",
-                "  â€¢ AbuseIPDB: https://www.abuseipdb.com",
+                "  • VirusTotal: https://www.virustotal.com",
+                "  • MISP: https://www.misp-project.org",
+                "  • AlienVault OTX: https://otx.alienvault.com",
+                "  • AbuseIPDB: https://www.abuseipdb.com",
                 "",
                 "THREAT INTELLIGENCE FEEDS:",
-                "  â€¢ CISA Alerts: https://www.cisa.gov",
-                "  â€¢ Talos Intelligence: https://talosintelligence.com",
-                "  â€¢ SANS ISC: https://isc.sans.edu",
+                "  • CISA Alerts: https://www.cisa.gov",
+                "  • Talos Intelligence: https://talosintelligence.com",
+                "  • SANS ISC: https://isc.sans.edu",
                 "",
                 "CERTIFICATIONS:",
-                "  â€¢ CISSP - Certified Information Systems Security Professional",
-                "  â€¢ CISA - Certified Information Systems Auditor",
-                "  â€¢ CEH - Certified Ethical Hacker",
-                "  â€¢ GIAC - Global Information Assurance Certification",
+                "  • CISSP - Certified Information Systems Security Professional",
+                "  • CISA - Certified Information Systems Auditor",
+                "  • CEH - Certified Ethical Hacker",
+                "  • GIAC - Global Information Assurance Certification",
                 "",
-                "ðŸŽ¯ Real-World Scenario:",
+                "🎯 Real-World Scenario:",
                 "  A junior security analyst wants to improve their IOC detection",
                 "  skills. They start by using VirusTotal to research suspicious",
                 "  hashes they encounter in their organization. They join the MISP",
@@ -359,47 +382,47 @@ class IOCEducation:
         },
         {
             "id": "lesson_8",
-            "title": "ðŸ’¡ WHY IOCS ARE CRITICAL FOR SECURITY",
-            "icon": "ðŸ’¡",
+            "title": "💡 WHY IOCS ARE CRITICAL FOR SECURITY",
+            "icon": "💡",
             "color_scheme": 7,
             "content": [
                 "IOCs are fundamental to modern cybersecurity operations:",
                 "",
                 "1. EARLY DETECTION",
-                "  â€¢ Identify threats before they cause damage",
-                "  â€¢ Reduce dwell time (time from compromise to detection)",
+                "  • Identify threats before they cause damage",
+                "  • Reduce dwell time (time from compromise to detection)",
                 "",
                 "2. FAST RESPONSE",
-                "  â€¢ Automated blocking of known threats",
-                "  â€¢ Quick containment and remediation",
+                "  • Automated blocking of known threats",
+                "  • Quick containment and remediation",
                 "",
                 "3. THREAT INTELLIGENCE",
-                "  â€¢ Understand attacker TTPs (Tactics, Techniques, Procedures)",
-                "  â€¢ Identify trends and patterns",
-                "  â€¢ Stay ahead of emerging threats",
+                "  • Understand attacker TTPs (Tactics, Techniques, Procedures)",
+                "  • Identify trends and patterns",
+                "  • Stay ahead of emerging threats",
                 "",
                 "4. COMPLIANCE REQUIREMENTS",
-                "  â€¢ GDPR (breach notification)",
-                "  â€¢ HIPAA (patient data protection)",
-                "  â€¢ PCI-DSS (cardholder data security)",
-                "  â€¢ NIST CSF (cybersecurity framework)",
+                "  • GDPR (breach notification)",
+                "  • HIPAA (patient data protection)",
+                "  • PCI-DSS (cardholder data security)",
+                "  • NIST CSF (cybersecurity framework)",
                 "",
                 "5. PROACTIVE HUNTING",
-                "  â€¢ Search for threats proactively",
-                "  â€¢ Find attackers before they strike",
-                "  â€¢ Improve security posture",
+                "  • Search for threats proactively",
+                "  • Find attackers before they strike",
+                "  • Improve security posture",
                 "",
                 "6. ATTRIBUTION",
-                "  â€¢ Identify threat actors",
-                "  â€¢ Link attacks to known groups",
-                "  â€¢ Understand motivations",
+                "  • Identify threat actors",
+                "  • Link attacks to known groups",
+                "  • Understand motivations",
                 "",
                 "7. SHARING & COLLABORATION",
-                "  â€¢ Share intelligence with others",
-                "  â€¢ Benefit from community knowledge",
-                "  â€¢ Contribute to global security",
+                "  • Share intelligence with others",
+                "  • Benefit from community knowledge",
+                "  • Contribute to global security",
                 "",
-                "ðŸŽ¯ Real-World Scenario:",
+                "🎯 Real-World Scenario:",
                 "  A global organization implements a robust IOC program. Within the",
                 "  first month, they detect a known APT group attempting to establish",
                 "  persistence using a previously identified malware variant. The",
@@ -562,17 +585,17 @@ class IOCEducation:
                 )
             )
         
-        top = "â•”" + "â•" * (width - 2) + "â•—"
-        mid = "â• " + "â•" * (width - 2) + "â•£"
-        bot = "â•š" + "â•" * (width - 2) + "â•"
+        top = "╔" + "═" * (width - 2) + "╗"
+        mid = "╠" + "═" * (width - 2) + "╣"
+        bot = "╚" + "═" * (width - 2) + "╝"
         
         print()
         print(" " * left_margin + border_color + top)
         
         title_text = f" {title} "
-        print(" " * left_margin + title_color + "â•‘", end="")
+        print(" " * left_margin + title_color + "║", end="")
         self._pen_type(
-            title_text.center(width - 2) + "â•‘",
+            title_text.center(width - 2) + "║",
             color=title_color,
             speed=pen_speed * 0.5,
             newline=False
@@ -581,14 +604,14 @@ class IOCEducation:
         print(" " * left_margin + border_color + mid)
         
         for line in wrapped:
-            print(" " * left_margin + border_color + "â•‘ " + Style.RESET_ALL, end="")
+            print(" " * left_margin + border_color + "║ " + Style.RESET_ALL, end="")
             self._pen_type(
                 line.ljust(inner),
                 color=content_color,
                 speed=pen_speed,
                 newline=False
             )
-            print(" " * left_margin + border_color + "â•‘")
+            print(" " * left_margin + border_color + "║")
         
         print(" " * left_margin + border_color + bot)
         print()
@@ -644,21 +667,21 @@ class IOCEducation:
         remaining = total_lessons - lessons_shown
         
         prompt_lines = [
-            f"ðŸ“Š Progress: {lessons_shown}/{total_lessons} lessons completed",
-            f"ðŸ“š Remaining: {remaining} lessons available",
+            f"📊 Progress: {lessons_shown}/{total_lessons} lessons completed",
+            f"📖 Remaining: {remaining} lessons available",
             "",
             "Would you like to continue learning about IOCs?"
         ]
         
         if remaining == 0:
             prompt_lines = [
-                "ðŸŽ‰ You've completed all available lessons!",
+                "🎉 You've completed all available lessons!",
                 "",
                 "Would you like to review a random lesson again?"
             ]
         
         self._draw_pen_box(
-            "ðŸ“– CONTINUE LEARNING?",
+            "📖 CONTINUE LEARNING?",
             prompt_lines,
             title_color=Fore.LIGHTYELLOW_EX,
             border_color=Fore.LIGHTYELLOW_EX,
@@ -668,11 +691,11 @@ class IOCEducation:
         )
         
         # Get user input with clear options
-        print(f"\n{Fore.CYAN}â”Œâ”€ {Fore.YELLOW}Select option {Fore.CYAN}â”€â–º{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}â”‚{Style.RESET_ALL}  {Fore.GREEN}[Y]{Style.RESET_ALL} Yes, show me another lesson")
-        print(f"{Fore.CYAN}â”‚{Style.RESET_ALL}  {Fore.RED}[N]{Style.RESET_ALL} No, I'm done for now")
-        print(f"{Fore.CYAN}â”‚{Style.RESET_ALL}  {Fore.YELLOW}[L]{Style.RESET_ALL} List all available lessons")
-        print(f"{Fore.CYAN}â””â”€ {Fore.MAGENTA}Your choice {Fore.CYAN}â–º{Style.RESET_ALL} ", end="")
+        print(f"\n{Fore.CYAN}┌─ {Fore.YELLOW}Select option {Fore.CYAN}─►{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}│{Style.RESET_ALL}  {Fore.GREEN}[Y]{Style.RESET_ALL} Yes, show me another lesson")
+        print(f"{Fore.CYAN}│{Style.RESET_ALL}  {Fore.RED}[N]{Style.RESET_ALL} No, I'm done for now")
+        print(f"{Fore.CYAN}│{Style.RESET_ALL}  {Fore.YELLOW}[L]{Style.RESET_ALL} List all available lessons")
+        print(f"{Fore.CYAN}└─ {Fore.MAGENTA}Your choice {Fore.CYAN}►{Style.RESET_ALL} ", end="")
         
         choice = input().strip().lower()
         
@@ -688,11 +711,11 @@ class IOCEducation:
         """Display a list of all available lessons."""
         lessons_list = []
         for i, lesson in enumerate(self.IOC_LESSONS, 1):
-            status = "âœ…" if lesson["id"] in self.lesson_history else "ðŸ“–"
+            status = "✅" if lesson["id"] in self.lesson_history else "📖"
             lessons_list.append(f"{status} Lesson {i}: {lesson['icon']} {lesson['title']}")
         
         self._draw_pen_box(
-            "ðŸ“š ALL AVAILABLE LESSONS",
+            "📚 ALL AVAILABLE LESSONS",
             lessons_list,
             title_color=Fore.LIGHTCYAN_EX,
             border_color=Fore.LIGHTCYAN_EX,
@@ -716,10 +739,10 @@ class IOCEducation:
         
         total_lessons = len(self.IOC_LESSONS)
         
-        print(f"\n{Fore.CYAN}â•”{'â•' * 60}â•—{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}â•‘{Style.RESET_ALL}  {Fore.LIGHTGREEN_EX}ðŸ›¡ï¸  INTERACTIVE IOC EDUCATION  {Fore.CYAN}â•‘{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}â•‘{Style.RESET_ALL}  {Fore.WHITE}Learn at your own pace{Fore.CYAN}  {Fore.CYAN}â•‘{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}â•š{'â•' * 60}â•{Style.RESET_ALL}")
+        print(f"\n{Fore.CYAN}╔{'═' * 60}╗{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.LIGHTGREEN_EX}🛡️  INTERACTIVE IOC EDUCATION  {Fore.CYAN}║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║{Style.RESET_ALL}  {Fore.WHITE}Learn at your own pace{Fore.CYAN}  {Fore.CYAN}║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}╚{'═' * 60}╝{Style.RESET_ALL}")
         time.sleep(0.5)
         
         while True:
@@ -736,25 +759,25 @@ class IOCEducation:
         os.system('cls' if os.name == 'nt' else 'clear')
         
         farewell_content = [
-            f"ðŸŽ“ You completed {self.lessons_shown} lessons today!",
+            f"🎓 You completed {self.lessons_shown} lessons today!",
             "",
-            "ðŸ›¡ï¸ Remember:",
-            "  â€¢ IOCs are digital breadcrumbs left by attackers",
-            "  â€¢ Use them to detect, investigate, and respond",
-            "  â€¢ Share intelligence with the security community",
+            "🛡️ Remember:",
+            "  • IOCs are digital breadcrumbs left by attackers",
+            "  • Use them to detect, investigate, and respond",
+            "  • Share intelligence with the security community",
             "",
-            "ðŸ“š You can always run this module again to:",
-            "  â€¢ Review any lesson",
-            "  â€¢ Learn new topics",
-            "  â€¢ Stay updated on IOC best practices",
+            "📚 You can always run this module again to:",
+            "  • Review any lesson",
+            "  • Learn new topics",
+            "  • Stay updated on IOC best practices",
             "",
-            "ðŸ’¡ Keep learning, stay secure!",
+            "💡 Keep learning, stay secure!",
             "",
             "Press Enter to exit..."
         ]
         
         self._draw_pen_box(
-            "ðŸŽ‰ LEARNING COMPLETE",
+            "🎉 LEARNING COMPLETE",
             farewell_content,
             title_color=Fore.LIGHTGREEN_EX,
             border_color=Fore.LIGHTGREEN_EX,
@@ -790,20 +813,20 @@ class IOCEducation:
         # HEADER
         # ============================================================
         header_art = [
-            "  â–ˆâ–ˆâ•—  â–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•—  â–ˆâ–ˆâ•—",
-            "  â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•‘ â–ˆâ–ˆâ•”â•",
-            "  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â• ",
-            "  â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•— ",
-            "  â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•—",
-            "  â•šâ•â•  â•šâ•â• â•šâ•â•â•â•â•â•  â•šâ•â•â•â•â•â•â•šâ•â•  â•šâ•â•"
+            "  ██╗  ██╗ ██████╗  ██████╗██╗  ██╗",
+            "  ██║  ██║██╔═══██╗██╔════╝██║  ██║",
+            "  ███████║██║   ██║██║     ███████║",
+            "  ██╔══██║██║   ██║██║     ██╔══██║",
+            "  ██║  ██║╚██████╔╝╚██████╗██║  ██║",
+            "  ╚═╝  ╚═╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝"
         ]
         
         total_lessons = len(self.IOC_LESSONS)
         lesson_num = self.IOC_LESSONS.index(lesson) + 1
         
         self._draw_pen_box(
-            f"ðŸ›¡ï¸ IOC EDUCATION - LESSON {lesson_num}/{total_lessons}",
-            header_art + ["", f"ðŸ’» {self.APP_NAME} v{self.VERSION}"],
+            f"🛡️ IOC EDUCATION - LESSON {lesson_num}/{total_lessons}",
+            header_art + ["", f"💻 {self.APP_NAME} v{self.VERSION}"],
             title_color=Fore.LIGHTCYAN_EX,
             border_color=Fore.LIGHTCYAN_EX,
             content_color=Fore.LIGHTGREEN_EX,
@@ -829,18 +852,18 @@ class IOCEducation:
         # FOOTER WITH PROGRESS
         # ============================================================
         footer_content = [
-            f"ðŸ“š Lessons Completed: {self.lessons_shown}/{total_lessons}",
-            f"ðŸ“– Remaining: {total_lessons - self.lessons_shown}",
+            f"📖 Lessons Completed: {self.lessons_shown}/{total_lessons}",
+            f"📚 Remaining: {total_lessons - self.lessons_shown}",
             "",
         ]
         
         if auto_continue:
-            footer_content.append("â³ Continuing to next lesson in 3 seconds...")
+            footer_content.append("⏳ Continuing to next lesson in 3 seconds...")
         else:
-            footer_content.append("ðŸ’¡ Press Enter to continue...")
+            footer_content.append("💡 Press Enter to continue...")
         
         self._draw_pen_box(
-            "ðŸ“Š PROGRESS",
+            "📊 PROGRESS",
             footer_content,
             title_color=Fore.LIGHTYELLOW_EX,
             border_color=Fore.LIGHTYELLOW_EX,
@@ -883,14 +906,14 @@ def main():
                        help='Run without interactive prompts (show one random lesson)')
     args = parser.parse_args()
     
-    print(f"{Fore.CYAN}DSTerminal IOC Education Module v{IOCEducation.VERSION}{Style.RESET_ALL}")
+    safe_print_unicode(f"{Fore.CYAN}DSTerminal IOC Education Module v{IOCEducation.VERSION}{Style.RESET_ALL}")
     time.sleep(0.5)
     
     if args.list:
-        print(f"\n{Fore.YELLOW}Available Lessons:{Style.RESET_ALL}")
+        safe_print_unicode(f"\n{Fore.YELLOW}Available Lessons:{Style.RESET_ALL}")
         for i, lesson in enumerate(IOCEducation.IOC_LESSONS, 1):
-            print(f"  {i}. {lesson['icon']} {lesson['title']}")
-        print(f"\n{Fore.CYAN}Total: {len(IOCEducation.IOC_LESSONS)} lessons{Style.RESET_ALL}")
+            safe_print_unicode(f"  {i}. {lesson['icon']} {lesson['title']}")
+        safe_print_unicode(f"\n{Fore.CYAN}Total: {len(IOCEducation.IOC_LESSONS)} lessons{Style.RESET_ALL}")
         return
     
     ioc = IOCEducation()

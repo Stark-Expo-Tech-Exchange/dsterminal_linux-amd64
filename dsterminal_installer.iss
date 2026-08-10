@@ -18,7 +18,7 @@ AppComments=Security Operations Center Terminal
 AppCopyright=Copyright © 2024-2026 Stark Expo Tech Exchange
 
 ; Installation Paths (User AppData - No Admin Required)
-DefaultDirName={userappdata}\DSTerminal
+DefaultDirName={pf}\DSTerminal
 DefaultGroupName=DSTerminal
 LicenseFile=license.txt
 OutputDir=installer_output
@@ -54,6 +54,10 @@ VersionInfoProductVersion=4.0.0.113
 CreateUninstallRegKey=yes
 UpdateUninstallLogAppName=yes
 
+; ensure proper permissions
+DirExistsWarning=no
+DisableDirPage=no
+
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
@@ -70,6 +74,14 @@ Name: "templates"; Description: "Report Templates"; Types: full custom
 Name: "ffmpeg"; Description: "FFmpeg (Video Analysis)"; Types: full custom
 Name: "updatehelper"; Description: "Auto-Update Helper Script"; Types: full custom
 Name: "vtmodule"; Description: "VirusTotal Threat Intelligence Module"; Types: full custom
+
+Name: "bundles"; Description: "Bundled Security Tools & Dependencies"; Types: full custom
+Name: "bundles\nmap"; Description: "Nmap Network Scanner"; Types: full
+Name: "bundles\npcap"; Description: "Npcap Packet Capture Library"; Types: full
+Name: "bundles\sqlmap"; Description: "SQLMap (SQL Injection Tool)"; Types: full
+Name: "bundles\nikto"; Description: "Nikto Web Vulnerability Scanner"; Types: full
+Name: "bundles\whois"; Description: "WHOIS Domain Lookup Tool"; Types: full
+
 Name: "dependencies"; Description: "Install Required Dependencies"; Types: full custom
 Name: "dependencies\nmap"; Description: "Nmap Network Scanner"; Types: full
 Name: "dependencies\sqlmap"; Description: "SQLMap (SQL Injection Tool)"; Types: full
@@ -94,6 +106,8 @@ Source: "dist\dsterminal_console.exe"; DestDir: "{app}"; DestName: "dsterminal-c
 
 ; ========== ICON FILES ==========
 Source: "installer_assets\3486-removebg-preview.ico"; DestDir: "{app}"; Flags: ignoreversion; Components: core
+Source: "static\3486-removebg-preview.ico"; DestDir: "{app}"; Flags: ignoreversion; Components: core
+Source: "3486-removebg-preview.ico"; DestDir: "{app}\static"; Flags: ignoreversion
 
 ; ========== LAUNCHER ==========
 Source: "launch_dsterminal.bat"; DestDir: "{app}"; Flags: ignoreversion; Components: core
@@ -105,11 +119,38 @@ Source: "config\default.profile"; DestDir: "{app}\config"; Flags: ignoreversion;
 Source: "requirements.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: core
 
 ; ========== VT MODULE FILES ==========
-Source: "vt_scan.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
-Source: "web_security_analyzer.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
-Source: "edu_typing_engine.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
-Source: "recon.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
-Source: "recon_full.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
+;Source: "vt_scan.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
+;Source: "web_security_analyzer.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
+;Source: "edu_typing_engine.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
+;Source: "recon.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
+;Source: "recon_full.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
+
+;Source: "soc_automated_lab.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
+;Source: "update.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
+;Source: "dsterminal_complete.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
+
+;Source: "dsterminal_dashboard.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
+;Source: "sqlmap_advanced.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
+;Source: "soc_enhanced_modules.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
+
+; ========== BUNDLED PACKAGES ==========
+; Nmap
+Source: "bundled\nmap\*"; DestDir: "{app}\bundled\nmap"; Flags: ignoreversion recursesubdirs; Components: bundles\nmap
+
+; Npcap
+Source: "bundled\npcap\*"; DestDir: "{app}\bundled\npcap"; Flags: ignoreversion recursesubdirs; Components: bundles\npcap
+
+; SQLMap
+Source: "bundled\sqlmap\*"; DestDir: "{app}\bundled\sqlmap"; Flags: ignoreversion recursesubdirs; Components: bundles\sqlmap
+
+; Nikto
+Source: "bundled\nikto\*"; DestDir: "{app}\bundled\nikto"; Flags: ignoreversion recursesubdirs; Components: bundles\nikto
+
+; Whois
+Source: "bundled\whois\*"; DestDir: "{app}\bundled\whois"; Flags: ignoreversion recursesubdirs; Components: bundles\whois
+
+; Bundle manifest
+Source: "bundled\manifest.json"; DestDir: "{app}\bundled"; Flags: ignoreversion; Components: bundles
 
 ; ========== DOCUMENTATION ==========
 Source: "docs\*"; DestDir: "{app}\docs"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: docs
@@ -145,7 +186,7 @@ Source: "tools\install_nikto.ps1"; DestDir: "{app}\tools"; Flags: ignoreversion;
 Source: "tools\install_python_packages.ps1"; DestDir: "{app}\tools"; Flags: ignoreversion; Components: dependencies\packages
 
 [Dirs]
-; Create workspace directories
+; Create workspace directories in AppData (not in Program Files)
 Name: "{userappdata}\DSTerminal_Workspace"
 Name: "{userappdata}\DSTerminal_Workspace\operators"
 Name: "{userappdata}\DSTerminal_Workspace\scans"
@@ -156,11 +197,24 @@ Name: "{userappdata}\DSTerminal_Workspace\quarantine"
 Name: "{userappdata}\DSTerminal_Workspace\logs"
 Name: "{userappdata}\DSTerminal_Workspace\config"
 
-; Application directories
+Name: "{userappdata}\DSTerminal\workspace"
+Name: "{userappdata}\DSTerminal\workspace\operators"
+Name: "{userappdata}\DSTerminal\workspace\scans"
+Name: "{userappdata}\DSTerminal\workspace\reports"
+Name: "{userappdata}\DSTerminal\workspace\exploits"
+Name: "{userappdata}\DSTerminal\workspace\sandbox"
+Name: "{userappdata}\DSTerminal\workspace\quarantine"
+Name: "{userappdata}\DSTerminal\workspace\logs"
+Name: "{userappdata}\DSTerminal\workspace\config"
+Name: "{userappdata}\DSTerminal\workspace\bundled"
+
+; Application directories in Program Files
 Name: "{app}\logs"; Flags: uninsalwaysuninstall
 Name: "{app}\updates"; Flags: uninsalwaysuninstall
 Name: "{app}\cache"; Flags: uninsalwaysuninstall
 Name: "{app}\temp"; Flags: uninsalwaysuninstall
+Name: "{app}\config"; Flags: uninsalwaysuninstall
+Name: "{app}\bundled"; Flags: uninsalwaysuninstall
 
 [Icons]
 ; Desktop shortcut
@@ -178,11 +232,25 @@ Filename: "{app}\docs\index.html"; Description: "View DSTerminal Documentation";
 ; Launch DSTerminal after install
 Filename: "{app}\launch_dsterminal.bat"; Description: "Launch DSTerminal"; Flags: nowait postinstall skipifsilent; Components: core
 
+; Run during installation
+Filename: "powershell.exe"; \
+    Parameters: "-ExecutionPolicy Bypass -File '{app}\tools\install_bundled_deps.ps1'"; \
+    Components: bundles; \
+    Flags: runhidden; \
+    StatusMsg: "Installing dependencies... (GUI wizards will open)"
+    
+; Launch dependency installation batch file
+;Filename: "{app}\tools\install_dependencies.bat"; \
+;   Description: "Install Nmap, Npcap and other security tools"; \
+;   Components: bundles; \
+;  Flags: postinstall nowait shellexec; \
+; StatusMsg: "Launching dependency installers..."; \
+;Tasks: installdeps
+
 [Registry]
 ; Add DSTerminal to user PATH
 Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "PATH"; \
 ValueData: "{olddata};{app}"; Flags: preservestringtype
-
 [Code]
 // ============================================================
 // LICENSE KEY VALIDATION WITH 3-TRIAL LIMIT AND ROLLBACK

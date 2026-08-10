@@ -156,24 +156,24 @@ class SystemIntegrityMonitor:
         self.auto_remediation = AutoRemediation(self)
         
         if self.colorama_available:
-            print(f"{Fore.GREEN}âœ“ Auto-remediation initialized{Style.RESET_ALL}")
+            print(f"{Fore.GREEN} Auto-remediation initialized{Style.RESET_ALL}")
         else:
-            print("âœ“ Auto-remediation initialized")
+            print(" Auto-remediation initialized")
     # ==========================
     # Initialize forensic analyzer
         self.forensic = ForensicAnalyzer(self)
     
         if self.colorama_available:
-            print(f"{Fore.GREEN}âœ“ Forensic Analyzer initialized{Style.RESET_ALL}")
+            print(f"{Fore.GREEN} Forensic Analyzer initialized{Style.RESET_ALL}")
         else:
-            print("âœ“ Forensic Analyzer initialized")
+            print(" Forensic Analyzer initialized")
     # ===========================
         if self.colorama_available:
-            print(f"{Fore.GREEN}âœ“ System Integrity Monitor initialized{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}âœ“ Workspace: {self.workspace}{Style.RESET_ALL}")
+            print(f"{Fore.GREEN} System Integrity Monitor initialized{Style.RESET_ALL}")
+            print(f"{Fore.CYAN} Workspace: {self.workspace}{Style.RESET_ALL}")
         else:
-            print("âœ“ System Integrity Monitor initialized")
-            print(f"âœ“ Workspace: {self.workspace}")
+            print(" System Integrity Monitor initialized")
+            print(f" Workspace: {self.workspace}")
     # ==============================
     # cinematic animation log
     # ==============================
@@ -372,7 +372,7 @@ class SystemIntegrityMonitor:
         terminal_width = shutil.get_terminal_size().columns
         print(f"\r{' ' * terminal_width}", end='\r')
     
-        print(f"\n{Fore.GREEN}âœ“ Found {count} configuration items{Style.RESET_ALL}")
+        print(f"\n{Fore.GREEN} Found {count} configuration items{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'â”€' * 60}{Style.RESET_ALL}\n")
     
     def _scan_category(self, category, results, target_key=None):
@@ -414,10 +414,10 @@ class SystemIntegrityMonitor:
         print(f"\r{' ' * terminal_width}", end='\r')
 
         if self.colorama_available:
-            print(f"\n{Fore.GREEN}âœ“ Found {count} {category}{Style.RESET_ALL}")
+            print(f"\n{Fore.GREEN} Found {count} {category}{Style.RESET_ALL}")
             print(f"{Fore.CYAN}{'â”€' * 60}{Style.RESET_ALL}\n")
         else:
-            print(f"\nâœ“ Found {count} {category}")
+            print(f"\n Found {count} {category}")
             print(f"{'â”€' * 60}\n")
 
         return count
@@ -452,7 +452,7 @@ class SystemIntegrityMonitor:
         terminal_width = shutil.get_terminal_size().columns
         print(f"\r{' ' * terminal_width}", end='\r')
     
-        print(f"\n{Fore.GREEN}âœ“ Found {count} log files{Style.RESET_ALL}")
+        print(f"\n{Fore.GREEN} Found {count} log files{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'â”€' * 60}{Style.RESET_ALL}\n")
 
     def _scan_databases(self, results):
@@ -485,7 +485,7 @@ class SystemIntegrityMonitor:
         terminal_width = shutil.get_terminal_size().columns
         print(f"\r{' ' * terminal_width}", end='\r')
     
-        print(f"\n{Fore.GREEN}âœ“ Found {count} database files{Style.RESET_ALL}")
+        print(f"\n{Fore.GREEN} Found {count} database files{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'â”€' * 60}{Style.RESET_ALL}\n")
 
     def _scan_system_files(self, results):
@@ -521,7 +521,7 @@ class SystemIntegrityMonitor:
         terminal_width = shutil.get_terminal_size().columns
         print(f"\r{' ' * terminal_width}", end='\r')
     
-        print(f"\n{Fore.GREEN}âœ“ Found {count} critical system files{Style.RESET_ALL}")
+        print(f"\n{Fore.GREEN} Found {count} critical system files{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'â”€' * 60}{Style.RESET_ALL}\n")
 
     def _scan_user_files(self, results):
@@ -554,7 +554,7 @@ class SystemIntegrityMonitor:
         terminal_width = shutil.get_terminal_size().columns
         print(f"\r{' ' * terminal_width}", end='\r')
     
-        print(f"\n{Fore.GREEN}âœ“ Found {count} user files{Style.RESET_ALL}")
+        print(f"\n{Fore.GREEN} Found {count} user files{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'â”€' * 60}{Style.RESET_ALL}\n")
 
     def _print_progress(self, current, total, message):
@@ -777,10 +777,10 @@ class SystemIntegrityMonitor:
             json.dump(baseline, f, indent=2, default=str)
         
         if self.colorama_available:
-            print(f"\n{Fore.GREEN}âœ“ Baseline created successfully{Style.RESET_ALL}")
+            print(f"\n{Fore.GREEN} Baseline created successfully{Style.RESET_ALL}")
             print(f"{Fore.CYAN}Saved to: {baseline_file}{Style.RESET_ALL}")
         else:
-            print(f"\nâœ“ Baseline created successfully")
+            print(f"\n Baseline created successfully")
             print(f"Saved to: {baseline_file}")
         
         return baseline
@@ -993,9 +993,9 @@ class SystemIntegrityMonitor:
             f.write("=" * 80 + "\n")
         
         if self.colorama_available:
-            print(f"{Fore.GREEN}âœ“ Text report saved to workspace: {report_file}{Style.RESET_ALL}")
+            print(f"{Fore.GREEN} Text report saved to workspace: {report_file}{Style.RESET_ALL}")
         else:
-            print(f"âœ“ Text report saved to workspace: {report_file}")
+            print(f" Text report saved to workspace: {report_file}")
         
         return report_file
     
@@ -1035,9 +1035,9 @@ class SystemIntegrityMonitor:
             json.dump(report_data, f, indent=2, default=str)
         
         if self.colorama_available:
-            print(f"{Fore.GREEN}âœ“ JSON report saved to workspace: {report_file}{Style.RESET_ALL}")
+            print(f"{Fore.GREEN} JSON report saved to workspace: {report_file}{Style.RESET_ALL}")
         else:
-            print(f"âœ“ JSON report saved to workspace: {report_file}")
+            print(f" JSON report saved to workspace: {report_file}")
         
         return report_file
     
@@ -1136,9 +1136,9 @@ class SystemIntegrityMonitor:
         try:
             pdf.output(report_file)
             if self.colorama_available:
-                print(f"{Fore.GREEN}âœ“ PDF report saved to workspace: {report_file}{Style.RESET_ALL}")
+                print(f"{Fore.GREEN} PDF report saved to workspace: {report_file}{Style.RESET_ALL}")
             else:
-                print(f"âœ“ PDF report saved to workspace: {report_file}")
+                print(f" PDF report saved to workspace: {report_file}")
             return report_file
         except Exception as e:
             if self.colorama_available:
@@ -1159,12 +1159,12 @@ class SystemIntegrityMonitor:
         
         if self.colorama_available:
             print(f"\n{Fore.GREEN}{'='*60}{Style.RESET_ALL}")
-            print(f"{Fore.GREEN}âœ“ ALL REPORTS SAVED TO WORKSPACE{Style.RESET_ALL}")
+            print(f"{Fore.GREEN} ALL REPORTS SAVED TO WORKSPACE{Style.RESET_ALL}")
             print(f"{Fore.GREEN}{'='*60}{Style.RESET_ALL}")
             print(f"{Fore.CYAN}Workspace location: {self.workspace}/integrity_reports/{Style.RESET_ALL}")
         else:
             print("\n" + "="*60)
-            print("âœ“ ALL REPORTS SAVED TO WORKSPACE")
+            print(" ALL REPORTS SAVED TO WORKSPACE")
             print("="*60)
             print(f"Workspace location: {self.workspace}/integrity_reports/")
         
@@ -1243,10 +1243,10 @@ class SystemIntegrityMonitor:
             self._display_mitigation_summary(changes)
             
             if self.colorama_available:
-                print(f"\n{Fore.GREEN}âœ“ Full integrity check complete{Style.RESET_ALL}")
+                print(f"\n{Fore.GREEN} Full integrity check complete{Style.RESET_ALL}")
                 print(f"{Fore.CYAN}Reports saved to: {self.report_dir}{Style.RESET_ALL}")
             else:
-                print(f"\nâœ“ Full integrity check complete")
+                print(f"\n Full integrity check complete")
                 print(f"Reports saved to: {self.report_dir}")
         else:
             if self.colorama_available:
@@ -1823,9 +1823,9 @@ class ForensicAnalyzer:
                 self._generate_txt_forensic_report(report_file, timeline, file_path, days)
             
             if self.colorama_available:
-                print(f"{Fore.GREEN}âœ“ Forensic report generated: {report_file}{Style.RESET_ALL}")
+                print(f"{Fore.GREEN} Forensic report generated: {report_file}{Style.RESET_ALL}")
             else:
-                print(f"âœ“ Forensic report generated: {report_file}")
+                print(f" Forensic report generated: {report_file}")
             
             return report_file
             
@@ -2283,9 +2283,9 @@ class ForensicAnalyzer:
                 f.write("=" * 80 + "\n")
             
             if self.colorama_available:
-                print(f"{Fore.GREEN}âœ“ Incident report generated: {report_file}{Style.RESET_ALL}")
+                print(f"{Fore.GREEN} Incident report generated: {report_file}{Style.RESET_ALL}")
             else:
-                print(f"âœ“ Incident report generated: {report_file}")
+                print(f" Incident report generated: {report_file}")
             
             return report_file
             
@@ -2337,9 +2337,9 @@ class ForensicAnalyzer:
                     })
                     
                     if self.colorama_available:
-                        print(f"{Fore.GREEN}âœ“ Evidence exported: {evidence_path}{Style.RESET_ALL}")
+                        print(f"{Fore.GREEN} Evidence exported: {evidence_path}{Style.RESET_ALL}")
                     else:
-                        print(f"âœ“ Evidence exported: {evidence_path}")
+                        print(f" Evidence exported: {evidence_path}")
                 else:
                     if self.colorama_available:
                         print(f"{Fore.YELLOW}âš  File not found: {file_path}{Style.RESET_ALL}")
@@ -2534,9 +2534,9 @@ class AutoRemediation:
             }
             
             if self.colorama_available:
-                print(f"{Fore.YELLOW}âœ“ File quarantined: {quarantine_path}{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW} File quarantined: {quarantine_path}{Style.RESET_ALL}")
             else:
-                print(f"âœ“ File quarantined: {quarantine_path}")
+                print(f" File quarantined: {quarantine_path}")
             
         except Exception as e:
             result['success'] = False
@@ -2635,9 +2635,9 @@ class AutoRemediation:
             result['details']['message'] = "File access blocked (read-only)"
             
             if self.colorama_available:
-                print(f"{Fore.YELLOW}âœ“ File access blocked: {file_path}{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW} File access blocked: {file_path}{Style.RESET_ALL}")
             else:
-                print(f"âœ“ File access blocked: {file_path}")
+                print(f" File access blocked: {file_path}")
             
         except Exception as e:
             result['success'] = False
@@ -2750,9 +2750,9 @@ class AutoRemediation:
                 os.remove(metadata_file)
             
             if self.colorama_available:
-                print(f"{Fore.GREEN}âœ“ File restored to: {original_path}{Style.RESET_ALL}")
+                print(f"{Fore.GREEN} File restored to: {original_path}{Style.RESET_ALL}")
             else:
-                print(f"âœ“ File restored to: {original_path}")
+                print(f" File restored to: {original_path}")
             
             return True, f"Restored to {original_path}"
             
@@ -2809,5 +2809,5 @@ if __name__ == "__main__":
     
     # Test initialization
     monitor = SystemIntegrityMonitor()
-    print("\nâœ“ Module loaded successfully")
-    print(f"âœ“ All reports will be saved to: {WORKSPACE}/integrity_reports/")
+    print("\n Module loaded successfully")
+    print(f" All reports will be saved to: {WORKSPACE}/integrity_reports/")

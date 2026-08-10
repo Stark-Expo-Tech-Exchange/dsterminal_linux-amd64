@@ -1,0 +1,25 @@
+{
+  "report_id": "DST-20260808_230115",
+  "timestamp": "2026-08-08T23:01:15.764515",
+  "version": "4.0.0.113",
+  "watermark": "DSTERMINAL CYBER OPS v4.0.0.113",
+  "incident": {
+    "threat_level": "RANSOMWARE_DETECTED",
+    "file_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "description": "Ransomware detected in file: honeypot_2.txt",
+    "recommendations": [
+      "\ud83d\udfe2 Auto-quarantine is enabled and will isolate the infected file",
+      "\ud83d\udd34 IMMEDIATE: Do not pay the ransom",
+      "\ud83d\udfe1 Identify the ransomware variant",
+      "\ud83d\udfe1 Restore files from backups",
+      "\ud83d\udfe2 Report to IT Security team"
+    ]
+  },
+  "system_info": {
+    "hostname": "DESKTOP-EBIM7VT",
+    "os": "Windows-10-10.0.26200-SP0",
+    "cpu": 47.1,
+    "memory": 81.9,
+    "disk": 29.8
+  }
+}

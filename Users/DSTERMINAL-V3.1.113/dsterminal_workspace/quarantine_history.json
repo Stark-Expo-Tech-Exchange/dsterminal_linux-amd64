@@ -1,0 +1,1458 @@
+[
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222116\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:21:18.161746",
+    "threat_type": "Ransomware",
+    "file_size": 127
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222130\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:21:32.242246",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222138\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:21:40.629883",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222146\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:21:48.897585",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222200\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:22:02.216683",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222213\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:22:15.894788",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222226\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:22:28.687370",
+    "threat_type": "Ransomware",
+    "file_size": 75
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222240\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:22:42.356072",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222253\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:22:55.924425",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222307\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:23:09.762527",
+    "threat_type": "Ransomware",
+    "file_size": 75
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222321\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:23:23.278656",
+    "threat_type": "Ransomware",
+    "file_size": 75
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222328\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:23:30.759260",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222343\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:23:45.405315",
+    "threat_type": "Ransomware",
+    "file_size": 75
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222358\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:24:00.094551",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222412\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:24:14.836768",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222425\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:24:27.884354",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222433\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:24:35.670698",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222441\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:24:43.509109",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222449\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:24:51.655854",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222457\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:24:59.571879",
+    "threat_type": "Ransomware",
+    "file_size": 75
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222505\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:25:07.721503",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222513\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:25:15.700561",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222521\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:25:23.711516",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222535\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:25:37.125117",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222549\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:25:51.633028",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222602\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:26:04.526287",
+    "threat_type": "Ransomware",
+    "file_size": 75
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222639\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:26:41.858384",
+    "threat_type": "Ransomware",
+    "file_size": 127
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222649\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:26:51.888027",
+    "threat_type": "Ransomware",
+    "file_size": 75
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222659\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:27:01.172617",
+    "threat_type": "Ransomware",
+    "file_size": 75
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222713\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:27:15.565776",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222722\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:27:24.267021",
+    "threat_type": "Ransomware",
+    "file_size": 75
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222735\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:27:37.098263",
+    "threat_type": "Ransomware",
+    "file_size": 75
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222750\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:27:55.964463",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222807\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:28:10.003068",
+    "threat_type": "Ransomware",
+    "file_size": 75
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222823\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:28:25.525496",
+    "threat_type": "Ransomware",
+    "file_size": 75
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222831\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:28:33.931278",
+    "threat_type": "Ransomware",
+    "file_size": 75
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222848\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:28:50.415202",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222903\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:29:05.146015",
+    "threat_type": "Ransomware",
+    "file_size": 75
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222911\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:29:13.933487",
+    "threat_type": "Ransomware",
+    "file_size": 75
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222927\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:29:29.363953",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222941\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:29:43.692535",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_222955\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:29:57.643821",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223009\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:30:14.803649",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223027\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:30:29.404430",
+    "threat_type": "Ransomware",
+    "file_size": 75
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223041\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:30:43.763230",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223057\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:30:59.408016",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223112\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:31:14.370698",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223138\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:31:40.816169",
+    "threat_type": "Ransomware",
+    "file_size": 75
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223148\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:31:50.209489",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223202\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:32:04.435273",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223216\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:32:18.499090",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223230\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:32:32.246187",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223332\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:33:34.493637",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223344\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:33:46.827709",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223355\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:33:57.446201",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223405\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:34:07.161251",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\test_ransomware.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223419\\test_ransomware.txt",
+    "timestamp": "2026-08-08T22:34:21.191878",
+    "threat_type": "Ransomware",
+    "file_size": 33
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223428\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:34:30.771600",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223442\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:34:44.279009",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223452\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:34:54.766794",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223501\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:35:03.045787",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223508\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:35:10.631351",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\test_ransomware.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223516\\test_ransomware.txt",
+    "timestamp": "2026-08-08T22:35:18.207537",
+    "threat_type": "Ransomware",
+    "file_size": 33
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223524\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:35:26.878157",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223535\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:35:37.134433",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223548\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:35:50.234540",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223558\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:36:00.071628",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223608\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:36:10.663393",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223752\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:37:54.645548",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223806\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:38:08.477973",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223814\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:38:16.525296",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223822\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:38:24.855593",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223836\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:38:38.784841",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223850\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:38:52.681589",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_223915\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:39:17.165532",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_224226\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:42:28.349051",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_224240\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:42:42.737278",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_224255\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:42:57.163455",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_224309\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:43:11.030196",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\test_ransomware.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_224322\\test_ransomware.txt",
+    "timestamp": "2026-08-08T22:43:24.891683",
+    "threat_type": "Ransomware",
+    "file_size": 33
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_224332\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:43:34.042511",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_224340\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:43:42.102036",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_224348\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:43:50.164375",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_224356\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:43:58.367535",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_224405\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:44:07.899790",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_224420\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:44:22.031571",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_224443\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:44:45.129999",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_224451\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:44:53.426469",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_224505\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:45:07.531697",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_224513\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:45:15.273617",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_224520\\honeypot_1.txt",
+    "timestamp": "2026-08-08T22:45:22.980400",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_225936\\honeypot_2.txt",
+    "timestamp": "2026-08-08T22:59:38.148187",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_225944\\honeypot_2.txt",
+    "timestamp": "2026-08-08T22:59:46.937303",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_225952\\honeypot_2.txt",
+    "timestamp": "2026-08-08T22:59:54.498881",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_230002\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:00:04.200339",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_230011\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:00:13.460256",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_230020\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:00:22.330761",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_230033\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:00:35.655219",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_230044\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:00:46.733147",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_230051\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:00:53.900846",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_230101\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:01:03.453337",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_230109\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:01:11.476479",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_231910\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:19:12.264224",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_231919\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:19:21.313881",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_231926\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:19:28.580721",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_231936\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:19:38.338379",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_231944\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:19:46.288981",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_231952\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:19:54.788364",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232000\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:20:02.168175",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232009\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:20:11.639970",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232016\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:20:18.875192",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232025\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:20:27.918439",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232033\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:20:35.161611",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232045\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:20:47.815168",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232054\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:20:56.188328",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232102\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:21:04.487915",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232113\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:21:15.136355",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232122\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:21:24.125364",
+    "threat_type": "Ransomware",
+    "file_size": 53
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232626\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:26:28.304659",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232635\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:26:37.031067",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\test_ransomware.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232643\\test_ransomware.txt",
+    "timestamp": "2026-08-08T23:26:45.156569",
+    "threat_type": "Ransomware",
+    "file_size": 33
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232651\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:26:53.686926",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232701\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:27:03.710558",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232712\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:27:14.348738",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232727\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:27:29.721247",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232738\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:27:40.684105",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232747\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:27:49.789125",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232756\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:27:58.090134",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232803\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:28:05.208795",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232811\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:28:13.717319",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232819\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:28:21.655009",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232830\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:28:32.736131",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232838\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:28:40.911729",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232846\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:28:48.164988",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232853\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:28:55.778371",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232900\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:29:02.945728",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232908\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:29:10.471080",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232917\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:29:19.376318",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232924\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:29:26.791764",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232932\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:29:34.123520",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232940\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:29:42.428242",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232947\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:29:49.760662",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_232955\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:29:57.878185",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233003\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:30:05.729034",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233014\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:30:16.140960",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233022\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:30:24.985842",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233031\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:30:33.799324",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233047\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:30:49.988433",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233058\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:31:00.015737",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233106\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:31:08.954108",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233121\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:31:23.943501",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233133\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:31:35.678009",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233142\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:31:44.870223",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233151\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:31:53.295130",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233201\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:32:03.584138",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233216\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:32:18.658363",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233228\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:32:30.635437",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233237\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:32:39.907710",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233253\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:32:55.404174",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233304\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:33:06.808205",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233315\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:33:17.033418",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233323\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:33:25.503749",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233333\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:33:35.821261",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233349\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:33:51.525310",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233401\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:34:03.807337",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233416\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:34:18.051962",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233430\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:34:32.739518",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233441\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:34:43.333581",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233453\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:34:55.255159",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233501\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:35:03.753444",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233511\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:35:13.842385",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233520\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:35:22.584410",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233528\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:35:30.588371",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233536\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:35:38.349679",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233543\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:35:45.690766",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233551\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:35:53.013043",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233558\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:36:00.695216",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233606\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:36:08.677907",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233619\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:36:21.959491",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233627\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:36:29.302069",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233638\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:36:40.984332",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233653\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:36:55.955778",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233705\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:37:07.153465",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233725\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:37:27.732773",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233739\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:37:41.315508",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233749\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:37:51.202176",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233802\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:38:04.068072",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233809\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:38:11.864756",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233819\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:38:21.326561",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233828\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:38:30.107407",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233843\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:38:45.392898",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233856\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:38:58.575197",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233908\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:39:10.765508",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233920\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:39:22.820735",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233932\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:39:34.252423",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233939\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:39:41.660994",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_233950\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:39:52.469737",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_234007\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:40:09.794823",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_234019\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:40:21.242083",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_234028\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:40:30.952462",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_234037\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:40:39.780057",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_234053\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:40:55.518505",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\DSTerminal_releases_latest\\Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\honeypots\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_234106\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:41:08.176024",
+    "threat_type": "Ransomware",
+    "file_size": 89
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\honeypot_1.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_234116\\honeypot_1.txt",
+    "timestamp": "2026-08-08T23:41:19.005224",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\honeypot_2.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_234127\\honeypot_2.txt",
+    "timestamp": "2026-08-08T23:41:29.202672",
+    "threat_type": "Ransomware",
+    "file_size": 43
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Desktop\\test_ransomware.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_235532\\test_ransomware.txt",
+    "timestamp": "2026-08-08T23:55:34.548902",
+    "threat_type": "Ransomware",
+    "file_size": 158
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\ransom_test.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_235735\\ransom_test.txt",
+    "timestamp": "2026-08-08T23:57:37.320514",
+    "threat_type": "Ransomware",
+    "file_size": 51
+  },
+  {
+    "original_path": "C:\\Users\\DSTERMINAL-V3.1.113\\Documents\\ransom_test.txt",
+    "quarantine_path": "C:Users\\DSTERMINAL-V3.1.113\\dsterminal_workspace\\quarantine\\Ransomware_20260808_235815\\ransom_test.txt",
+    "timestamp": "2026-08-08T23:58:17.465104",
+    "threat_type": "Ransomware",
+    "file_size": 51
+  }
+]
