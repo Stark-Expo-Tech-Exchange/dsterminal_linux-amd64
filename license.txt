@@ -1,28 +1,205 @@
-Copyright 2014 Pallets
+DSTERMINAL END USER LICENSE AGREEMENT (EULA)
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
+                    Version 4.0.0.113 | Last Updated: August 27, 2026
 
-1.  Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
+IMPORTANT: PLEASE READ THIS END USER LICENSE AGREEMENT CAREFULLY BEFORE 
+INSTALLING OR USING DSTERMINAL SOFTWARE.
 
-2.  Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in the
-    documentation and/or other materials provided with the distribution.
+THIS IS A LEGAL AGREEMENT BETWEEN YOU (EITHER AN INDIVIDUAL OR A SINGLE 
+ENTITY) AND STARK EXPO TECH EXCHANGE ("LICENSOR") FOR THE DSTERMINAL 
+SOFTWARE PRODUCT ("SOFTWARE").
 
-3.  Neither the name of the copyright holder nor the names of its
-    contributors may be used to endorse or promote products derived from
-    this software without specific prior written permission.
+BY INSTALLING, COPYING, OR OTHERWISE USING THE SOFTWARE, YOU AGREE TO BE 
+BOUND BY THE TERMS OF THIS AGREEMENT. IF YOU DO NOT AGREE TO THE TERMS OF 
+THIS AGREEMENT, DO NOT INSTALL OR USE THE SOFTWARE.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
-TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+───────────────────────────────────────────────────────────────────────────
+
+1. GRANT OF LICENSE
+
+1.1 Commercial License. Licensor grants you a non-exclusive, non-transferable,
+    non-sublicensable license to install and use the Software for internal 
+    business purposes only, subject to the payment of applicable subscription 
+    fees.
+
+1.2 Evaluation License. A limited evaluation license may be available for a 
+    specified trial period. During this period, the Software may have limited 
+    functionality or contain a time restriction.
+
+1.3 Authorized Users. Only licensed users within your organization may access 
+    and use the Software. Each user must have their own license credential.
+
+───────────────────────────────────────────────────────────────────────────
+
+2. RESTRICTIONS
+
+2.1 You may NOT:
+    a) Reverse engineer, decompile, disassemble, or otherwise attempt to 
+       derive the source code of the Software;
+    b) Modify, adapt, translate, or create derivative works based on the 
+       Software;
+    c) Rent, lease, lend, sell, sublicense, assign, distribute, or otherwise 
+       transfer the Software or any rights therein;
+    d) Remove, alter, or obscure any proprietary notices, labels, or marks 
+       from the Software;
+    e) Use the Software for competitive analysis or to develop competing 
+       products;
+    f) Use the Software in any manner that violates applicable laws or 
+       regulations, including unauthorized security testing;
+    g) Share license credentials or allow unauthorized access to the Software.
+
+2.2 The Software is licensed as a single product. Its component parts may not 
+    be separated for use on more than one device or by more than one user.
+
+───────────────────────────────────────────────────────────────────────────
+
+3. INTELLECTUAL PROPERTY RIGHTS
+
+3.1 Ownership. The Software is licensed, not sold. Licensor retains all right, 
+    title, and interest in and to the Software, including all intellectual 
+    property rights therein. This Agreement does not grant you any rights to 
+    any trademarks or service marks of Licensor.
+
+3.2 Confidentiality. The Software constitutes trade secrets and confidential 
+    information of Licensor. You agree to maintain the Software in strict 
+    confidence and not to disclose the Software or any information about the 
+    Software to any third party.
+
+3.3 Audit Rights. Licensor reserves the right to audit your use of the Software 
+    to ensure compliance with this Agreement, upon reasonable notice.
+
+───────────────────────────────────────────────────────────────────────────
+
+4. SUBSCRIPTION AND FEES
+
+4.1 Subscription Required. Access to and use of the Software requires an active 
+    subscription agreement with Licensor. All subscription fees must be paid 
+    in advance.
+
+4.2 Fee Changes. Licensor reserves the right to change subscription fees upon 
+    30 days' written notice. Continued use after fee changes constitutes 
+    acceptance of new fees.
+
+4.3 Non-Payment. Licensor may suspend or terminate access to the Software 
+    immediately if subscription fees are not paid when due.
+
+───────────────────────────────────────────────────────────────────────────
+
+5. NO WARRANTY
+
+5.1 THE SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTY OF 
+    ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES 
+    OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND 
+    NON-INFRINGEMENT.
+
+5.2 LICENSOR DOES NOT WARRANT THAT THE SOFTWARE WILL BE ERROR-FREE, UNINTERRUPTED, 
+    OR FREE OF VULNERABILITIES, OR THAT IT WILL DETECT ALL SECURITY THREATS.
+
+5.3 YOU ASSUME ALL RISKS ASSOCIATED WITH THE USE OF THE SOFTWARE, INCLUDING 
+    BUT NOT LIMITED TO THE RISK OF DAMAGE TO YOUR SYSTEMS OR LOSS OF DATA.
+
+───────────────────────────────────────────────────────────────────────────
+
+6. LIMITATION OF LIABILITY
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL LICENSOR 
+OR ITS SUPPLIERS, AFFILIATES, OR LICENSORS BE LIABLE FOR ANY SPECIAL, INCIDENTAL, 
+INDIRECT, OR CONSEQUENTIAL DAMAGES WHATSOEVER (INCLUDING, WITHOUT LIMITATION, 
+DAMAGES FOR LOSS OF BUSINESS PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS 
+INFORMATION, OR ANY OTHER PECUNIARY LOSS) ARISING OUT OF THE USE OF OR INABILITY 
+TO USE THE SOFTWARE, EVEN IF LICENSOR HAS BEEN ADVISED OF THE POSSIBILITY OF 
+SUCH DAMAGES.
+
+IN ANY CASE, LICENSOR'S ENTIRE LIABILITY UNDER ANY PROVISION OF THIS AGREEMENT 
+SHALL BE LIMITED TO THE AMOUNT ACTUALLY PAID BY YOU FOR THE SOFTWARE DURING THE 
+TWELVE (12) MONTHS PRECEDING THE CLAIM.
+
+───────────────────────────────────────────────────────────────────────────
+
+7. TERM AND TERMINATION
+
+7.1 Term. This Agreement is effective upon your acceptance and continues until 
+    terminated as provided herein.
+
+7.2 Termination for Breach. Licensor may terminate this Agreement immediately 
+    if you fail to comply with any term or condition of this Agreement.
+
+7.3 Termination without Cause. Either party may terminate this Agreement for 
+    any reason upon 30 days' written notice.
+
+7.4 Effect of Termination. Upon termination, you must immediately cease all use 
+    of the Software and destroy all copies of the Software and associated 
+    documentation in your possession or control.
+
+───────────────────────────────────────────────────────────────────────────
+
+8. COMPLIANCE WITH LAWS
+
+You agree to use the Software only for lawful purposes and in compliance with 
+all applicable laws and regulations, including but not limited to:
+
+a) Computer Fraud and Abuse Act (CFAA) and similar state laws;
+b) Data protection and privacy laws (including GDPR, CCPA, etc.);
+c) Export control laws and regulations.
+
+You acknowledge that the Software may be subject to export restrictions and 
+agree not to export or re-export the Software to any restricted destinations 
+or entities.
+
+───────────────────────────────────────────────────────────────────────────
+
+9. AUTHORIZED USE ONLY
+
+The Software is designed for:
+a) Authorized security assessments and penetration testing;
+b) Internal network monitoring and security auditing;
+c) Compliance and regulatory testing.
+
+You represent and warrant that you have proper authorization to test any 
+systems or networks you scan using the Software. Unauthorized scanning or 
+testing may violate applicable laws.
+
+───────────────────────────────────────────────────────────────────────────
+
+10. GOVERNING LAW
+
+This Agreement shall be governed by and construed in accordance with the laws 
+of the Republic of Malawi, without regard to its conflict of laws principles. 
+Any legal action or proceeding arising under this Agreement shall be brought 
+exclusively in the courts located in Lilongwe, Malawi.
+
+───────────────────────────────────────────────────────────────────────────
+
+11. ENTIRE AGREEMENT
+
+This Agreement constitutes the entire agreement between the parties concerning 
+the subject matter hereof and supersedes all prior or contemporaneous 
+understandings, whether written or oral.
+
+───────────────────────────────────────────────────────────────────────────
+
+12. SEVERABILITY
+
+If any provision of this Agreement is held to be unenforceable or invalid, 
+such provision shall be enforced to the maximum extent possible, and the 
+remaining provisions shall continue in full force and effect.
+
+───────────────────────────────────────────────────────────────────────────
+
+13. CONTACT INFORMATION
+
+For license inquiries, support, or to report violations of this Agreement:
+
+Stark Expo Tech Exchange
+Phone: [+265] 993 076 724 / 886 283 247
+Email: licensing@starkexpotechexchange.mw
+     : starkec.team@outlook.com
+     : sparkwilson2041@gmail.com
+Website: https://www.starkexpotechexchange.mw
+
+───────────────────────────────────────────────────────────────────────────
+
+BY INSTALLING OR USING THE SOFTWARE, YOU ACKNOWLEDGE THAT YOU HAVE READ THIS 
+AGREEMENT, UNDERSTAND IT, AND AGREE TO BE BOUND BY ITS TERMS AND CONDITIONS.
+
+© 2026 Stark Expo Tech Exchange. All Rights Reserved.
