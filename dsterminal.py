@@ -9442,13 +9442,7 @@ class SecurityTerminal:
                     return
                 self.touch(args[0])
                 return
-
-            # ============================================================
-            # FIXED: Handle 'debug' command
-            # ============================================================
-            if command == "debug":
-                self.cmd_debug()
-                return
+ 
 
             # ============================================================
             # FIXED: Handle 'sysinfo' command
@@ -9458,18 +9452,7 @@ class SecurityTerminal:
                 self.show_tip(cmd)
                 return
 
-            # ============================================================
-            # FIXED: Handle 'update' command
-            # ============================================================
-            # if command == "update":
-            #     self.check_for_updates()
-            #     self.show_tip(cmd)
-            #     return
-            # ============================================================
-            # DASHBOARD COMMANDS - Direct import like certcheck
-            # ============================================================
-
-                        # Start dashboard
+ 
             # ============================================================
             # DASHBOARD COMMANDS - Direct call to dsterminal_complete
             # ============================================================
@@ -10328,7 +10311,6 @@ class SecurityTerminal:
             if command in ["harden-module", "harden-info"]:
                 print(f"{Fore.CYAN}Hardening Dashboard Module Status:{Style.RESET_ALL}")
                 print(f"  Status: {'Loaded' if HARDENING_DASHBOARD_AVAILABLE else 'Not Available'}")
-                print(f"  Module: hardening_dashboard.py")
                 if HARDENING_DASHBOARD_AVAILABLE and self.hardening_dashboard is not None:
                     try:
                         print(f"  System: {self.hardening_dashboard.system}")
@@ -10337,7 +10319,6 @@ class SecurityTerminal:
                         print(f"  Selected: {len(self.hardening_dashboard.selected_modules)}")
                         print(f"  Results: {len(self.hardening_dashboard.results)}")
                         print(f"  Session: {self.hardening_dashboard.session_id}")
-                        print(f"  Rich Available: {RICH_AVAILABLE}")
                         print(f"  Features: Cinematic UI, Real-time telemetry, Report generation")
                     except Exception as e:
                         print(f"  Error getting details: {e}")
@@ -11660,7 +11641,7 @@ class SecurityTerminal:
                         traceback.print_exc()
                 else:
                     print(f"{Fore.RED}[!] SOC Nmap Dashboard module not available{Style.RESET_ALL}")
-                    print(f"{Fore.YELLOW}💡 Make sure soc_nmap_dashboard.py is in the same directory{Style.RESET_ALL}")
+                    print(f"{Fore.YELLOW}💡 Make sure soc_nmap_dashboard is in the same directory{Style.RESET_ALL}")
                 return
             
             # Quick scan
@@ -11827,7 +11808,6 @@ class SecurityTerminal:
             if command in ["soc-status", "soc-nmap-status"]:
                 print(f"{Fore.CYAN}SOC Nmap Dashboard Status:{Style.RESET_ALL}")
                 print(f"  Status: {'Loaded' if SOC_NMAP_AVAILABLE else 'Not Available'}")
-                print(f"  Module: soc_nmap_dashboard.py")
                 if SOC_NMAP_AVAILABLE and self.soc_nmap is not None:
                     try:
                                                 # ============================================================
@@ -14762,31 +14742,8 @@ class SecurityTerminal:
             "ds": None,
             "ss": None,
 
-            # --------------------------------------------------------
-            # Network
-            # --------------------------------------------------------
-            "net": {
-                "mon": None,
-                "scan": None,
-                "report": None,
-                "help": None,
-                "version": None,
-                "update": None,
-                "list": None,
-                "ls": None,
-                "status": None,
-                "logs": None,
-                "pdf": None,
-                "csv": None,
-                "json": None,
-                "xml": None,
-            },
-
             "netsec": None,
-            "net-n mon": None,
             "netsec-status": None,
-            "network-security": None,
-            "netsec-dashboard": None,
 
             # --------------------------------------------------------
             # Ransom monitoring
@@ -14829,36 +14786,14 @@ class SecurityTerminal:
             # --------------------------------------------------------
             # SOC
             # --------------------------------------------------------
-            "soc": {
-                "start": None,
-                "stop": None,
-                "status": None,
-                "quick": None,
-                "full": None,
-                "dns": None,
-                "map": None,
-                "history": None,
-                "report": None,
-                "alerts": None,
-                "reports": None,
-                "pdf": None,
-                "help": None,
-            },
-
             "soc-quick": None,
             "soc-full": None,
             "soc-dns": None,
             "soc-status": None,
-            "soc-map": None,
             "soc-history": None,
             "soc-report": None,
-            "soc-alerts": None,
             "soc-reports": None,
             "soc-pdf": None,
-            "soc-intel": None,
-            "soc-help": None,
-            "soc-orgs": None,
-            "start soc lab": None,
             "soc lab": None,
             "soclab": None,
             "soc-labs": None,
@@ -14905,23 +14840,7 @@ class SecurityTerminal:
             "dst-refresh": None,
             "dst-logs": None,
 
-            # --------------------------------------------------------
-            # Workspace / monitoring
-            # --------------------------------------------------------
-            "monitor": {
-                "start": None,
-                "stop": None,
-                "status": None,
-                "restart": None,
-                "reload": None,
-                "enable": None,
-                "disable": None,
-                "list": None,
-                "ls": None,
-                "info": None,
-                "help": None,
-            },
-
+ 
             "service": {
                 "start": None,
                 "stop": None,
@@ -14997,10 +14916,8 @@ class SecurityTerminal:
             "harden": None,
             "harden -t sys": None,
             "harden-quick": None,
-            "harden-dry-run": None,
             "harden-restore": None,
             "harden-status": None,
-            "harden-verify": None,
             "harden-full": None,
             "harden-cinematic": None,
             "harden-rollback": None,
@@ -15010,10 +14927,7 @@ class SecurityTerminal:
             "harden-fw": None,
             "harden-firewall": None,
             "harden-ssh": None,
-            "harden-sshd": None,
             "harden-dashboard": None,
-            "harden-menu": None,
-            "harden-help": None,
             "harden-list": None,
             "harden-ls": None,
             "harden-info": None,
@@ -15122,20 +15036,11 @@ class SecurityTerminal:
             "Fraud investigation": None,
             "investigate crypto": None,
             "crypto scam": None,
-            "Crypto Scam investigation": None,
-            "investigate identity": None,
-            "identity theft": None,
-            "investigate insider": None,
-            "insider trading": None,
-            "investigate shell": None,
-            "shell company": None,
-            "investigate bec": None, 
             "bec fraud": None,
             "financial-monitor": None,
             "fraud-monitor": None,
             "financial reports": None, 
             "view-reports": None,
-            "dffenex": None,
             "financial pdf": None,
             "fraud pdf": None,
             "financial status": None,
@@ -15158,8 +15063,7 @@ class SecurityTerminal:
             # --------------------------------------------------------
             # Security tools
             # --------------------------------------------------------
-            "nmap": None,
-            "msf": None,
+
             "sqlmap": None,
             "certcheck": None,
             "cert-help": None,
@@ -15194,44 +15098,10 @@ class SecurityTerminal:
             "watchfolder": None,
             "traceroute": None,
             "stegcheck": None,
-            "memdump": None,
             "torify": None,
 
-            # --------------------------------------------------------
-            # External tools
-            # --------------------------------------------------------
-            "nikto": {
-                "scan": None,
-                "report": None,
-                "help": None,
-                "version": None,
-                "update": None,
-                "list": None,
-                "ls": None,
-                "info": None,
-            },
-
-            "legitify": {
-                "scan": None,
-                "report": None,
-                "help": None,
-                "version": None,
-                "update": None,
-                "list": None,
-                "ls": None,
-                "info": None,
-            },
-
-            "trufflehog": {
-                "scan": None,
-                "report": None,
-                "help": None,
-                "version": None,
-                "update": None,
-                "list": None,
-                "ls": None,
-                "info": None,
-            },
+ 
+ 
 
             # --------------------------------------------------------
             # Wi-Fi
@@ -15252,49 +15122,29 @@ class SecurityTerminal:
             "ws": None,
             "wsa": None,
 
-            "web-scan": {
-                "--full": None,
-                "--headers": None,
-                "--ssl": None,
-                "--vuln": None,
-                "--output": None,
-            },
-
             "webscan": None,
             "web-headers": None,
             "webheaders": None,
             "web-ssl": None,
-            "webssl": None,
-            "web-vuln": None,
-            "webvuln": None,
-            "web-full": None,
-            "webfull": None,
+ 
 
             # SQLMAP COMMANDS
             "sqllab": None,
-            "sqllab stop": None,
-            "advanced sqllab": None,
-            "advanced sqllab stop": None,
+            "sqllab-start": None,
+            "advanced-sqllab": None,
             "sqllab status": None,
-            "advanced sqllab status": None,
             "sqllab secure": None,
-            "advanced sqlmap secure": None,
             "sqllab waf": None,
             "advanced sqlmap waf": None,
             "sqllab techniques": None,
-            "advanced sqlmap techniques": None,
             "sqllab pdf": None,
             "advanced-sqlmap-pdf": None,
-            "sqlmap scan": None,
             "sqlscan": None,
             "advanced-sqlmap-scan": None,
-            "sqlmap install": None,
-            "install sqlmap": None,
             "sqllab reset": None,
             "sqlmap reset": None,
             "sqlmap status": None,
-            "sqlmap help": None,
-            "sqllab help": None,
+
             # --------------------------------------------------------
             # Shell-like commands
             # --------------------------------------------------------
