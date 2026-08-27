@@ -390,20 +390,125 @@ def get_default_whitelist():
         ]
     else:  # Linux
         return [
+            # System binaries - NEVER quarantine these
             "/bin/*",
             "/sbin/*",
             "/usr/bin/*",
             "/usr/sbin/*",
+            "/usr/local/bin/*",
+            "/usr/local/sbin/*",
+            
+            # System libraries
             "/lib/*",
             "/lib64/*",
             "/usr/lib/*",
+            "/usr/lib64/*",
+            "/usr/local/lib/*",
+            
+            # System configuration - critical
             "/etc/passwd",
             "/etc/shadow",
             "/etc/group",
             "/etc/sudoers",
+            "/etc/hosts",
+            "/etc/hostname",
+            "/etc/resolv.conf",
+            "/etc/fstab",
+            "/etc/crontab",
+            "/etc/cron.d/*",
+            "/etc/cron.hourly/*",
+            "/etc/cron.daily/*",
+            "/etc/cron.weekly/*",
+            "/etc/cron.monthly/*",
+            
+            # Boot files - NEVER quarantine
             "/boot/*",
             "/vmlinuz*",
             "/initrd*",
+            "/System.map*",
+            "/grub/*",
+            
+            # Kernel modules
+            "/lib/modules/*",
+            "/usr/lib/modules/*",
+            
+            # System logs
+            "/var/log/*",
+            "/var/log/syslog",
+            "/var/log/auth.log",
+            "/var/log/kern.log",
+            
+            # Package manager files - critical
+            "/var/lib/dpkg/*",
+            "/var/cache/apt/*",
+            "/var/lib/apt/*",
+            "/etc/apt/*",
+            
+            # SSH keys and configs - NEVER quarantine
+            "/etc/ssh/*",
+            "/root/.ssh/*",
+            "/home/*/.ssh/*",
+            
+            # System services
+            "/etc/systemd/*",
+            "/lib/systemd/*",
+            "/usr/lib/systemd/*",
+            
+            # Network configs
+            "/etc/network/*",
+            "/etc/NetworkManager/*",
+            
+            # Security configs
+            "/etc/security/*",
+            "/etc/pam.d/*",
+            "/etc/apparmor/*",
+            "/etc/apparmor.d/*",
+            
+            # Common application directories
+            "/usr/share/*",
+            "/usr/local/share/*",
+            "/opt/*",
+            
+            # Python system packages - NEVER quarantine
+            "/usr/lib/python*",
+            "/usr/local/lib/python*",
+            "/usr/lib/python3/*",
+            "/usr/lib/python3/dist-packages/*",
+            
+            # User home directories - exclude but be careful
+            "/home/*",
+            
+            # Docker and container stuff
+            "/var/lib/docker/*",
+            "/etc/docker/*",
+            
+            # Common web server paths
+            "/var/www/*",
+            "/usr/share/nginx/*",
+            "/etc/apache2/*",
+            "/etc/nginx/*",
+            
+            # Database files
+            "/var/lib/mysql/*",
+            "/var/lib/postgresql/*",
+            "/var/lib/mongodb/*",
+            
+            # System temp (exclude from quarantine)
+            "/tmp/*",
+            "/var/tmp/*",
+            "/var/run/*",
+            
+            # Important system files
+            "/etc/hosts.allow",
+            "/etc/hosts.deny",
+            "/etc/nsswitch.conf",
+            "/etc/timezone",
+            "/etc/localtime",
+            
+            # Certificates - NEVER quarantine
+            "/etc/ssl/*",
+            "/usr/local/share/ca-certificates/*",
+            "/usr/share/ca-certificates/*",
         ]
 
 def load_whitelist():
@@ -434,7 +539,6 @@ def save_blacklist(blacklist):
 
 whitelist = load_whitelist()
 blacklist = load_blacklist()
-
 # ============================================================
 # CROSS-PLATFORM SHIELD CORE
 # ============================================================
