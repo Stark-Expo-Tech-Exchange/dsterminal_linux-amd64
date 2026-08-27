@@ -1,28 +1,3 @@
-# ============================================================
-# DSTerminal® Console Build Orchestrator
-# ============================================================
-#
-# IMPORTANT:
-#   This script ORCHESTRATES the existing full PyInstaller spec.
-#
-#   It does NOT generate or replace:
-#
-#       dsterminal_console.spec
-#
-#   The existing spec remains responsible for:
-#       - Flask
-#       - Flask-SocketIO
-#       - python-socketio
-#       - python-engineio
-#       - simple-websocket
-#       - threading backend
-#       - Shield_Core
-#       - application data
-#       - hidden imports
-#       - runtime dependencies
-#
-# ============================================================
-
 [CmdletBinding()]
 param(
     [switch]$Clean,
@@ -58,6 +33,11 @@ $ExePath = Join-Path $DistDir "DSTerminal.exe"
 $WixObj = Join-Path $ProjectRoot "DSTerminal.wixobj"
 $WixSource = Join-Path $ProjectRoot "DSTerminal.wxs"
 $MsiPath = Join-Path $InstallerDir "DSTerminal_Setup.msi"
+
+# Logo paths
+$LogoSrc = Join-Path $ProjectRoot "static\3486-removebg-preview.ico"
+$LogoDest = Join-Path $DistDir "static\3486-removebg-preview.ico"
+$LogoDestRoot = Join-Path $DistDir "3486-removebg-preview.ico"
 
 # ============================================================
 # COLORS
@@ -390,6 +370,22 @@ function Test-Environment {
     Write-Host "  Full spec:" -ForegroundColor $DarkGray
     Write-Host "    $($specInfo.FullName)" -ForegroundColor $White
     Write-Host "    Modified: $($specInfo.LastWriteTime)" -ForegroundColor $White
+    
+    # --------------------------------------------------------
+    # Check logo
+    # --------------------------------------------------------
+    
+    Write-Host ""
+    Write-Host "  Logo file:" -ForegroundColor $DarkGray
+    
+    if (Test-Path -LiteralPath $LogoSrc) {
+        Write-OK "Logo found at: $LogoSrc"
+        $logoInfo = Get-Item -LiteralPath $LogoSrc
+        Write-Host "    Size: $([math]::Round($logoInfo.Length / 1KB, 1)) KB" -ForegroundColor $White
+    } else {
+        Write-Warn "Logo not found at: $LogoSrc"
+        Write-Warn "Logo will be generated from SVG fallback during build."
+    }
 }
 
 # ============================================================
@@ -533,6 +529,82 @@ function Invoke-Clean {
 }
 
 # ============================================================
+# COPY LOGO TO DIST
+# ============================================================
+
+# ============================================================
+# COPY LOGO TO DIST
+# ============================================================
+
+function Copy-LogoToDist {
+    Write-Host ""
+    Write-Host "  Copying logo to dist folder..." -ForegroundColor $DarkGray
+    
+    # Create static directory in dist if it doesn't exist
+    $staticDir = Join-Path $DistDir "static"
+    New-Item -ItemType Directory -Force -Path $staticDir | Out-Null
+    
+    # Define logo locations - FIXED: Added missing commas
+    $logoLocations = @(
+        $LogoDest,
+        $LogoDestRoot,
+        (Join-Path $DistDir "static\logo.ico"),
+        (Join-Path $DistDir "logo.ico")
+    )
+    
+    $logoFound = $false
+    
+    # First try to copy from source
+    if (Test-Path -LiteralPath $LogoSrc) {
+        foreach ($dest in $logoLocations) {
+            try {
+                Copy-Item -LiteralPath $LogoSrc -Destination $dest -Force -ErrorAction Stop
+                Write-OK "Copied logo to: $dest"
+                $logoFound = $true
+            } catch {
+                Write-Warn "Failed to copy logo to: $dest"
+            }
+        }
+    }
+    
+    # If logo not found, try to copy from installer assets
+    if (-not $logoFound) {
+        $altLogoSrc = Join-Path $ProjectRoot "installer_assets\3486-removebg-preview.ico"
+        if (Test-Path -LiteralPath $altLogoSrc) {
+            foreach ($dest in $logoLocations) {
+                try {
+                    Copy-Item -LiteralPath $altLogoSrc -Destination $dest -Force -ErrorAction Stop
+                    Write-OK "Copied logo from installer_assets to: $dest"
+                    $logoFound = $true
+                } catch {
+                    Write-Warn "Failed to copy logo from installer_assets to: $dest"
+                }
+            }
+        }
+    }
+    
+    # Try to copy from the project root static folder
+    if (-not $logoFound) {
+        $rootLogoSrc = Join-Path $ProjectRoot "3486-removebg-preview.ico"
+        if (Test-Path -LiteralPath $rootLogoSrc) {
+            foreach ($dest in $logoLocations) {
+                try {
+                    Copy-Item -LiteralPath $rootLogoSrc -Destination $dest -Force -ErrorAction Stop
+                    Write-OK "Copied logo from root to: $dest"
+                    $logoFound = $true
+                } catch {
+                    Write-Warn "Failed to copy logo from root to: $dest"
+                }
+            }
+        }
+    }
+    
+    if (-not $logoFound) {
+        Write-Warn "No logo file found. Will rely on SVG fallback in the application."
+    }
+}
+
+# ============================================================
 # BUILD PYINSTALLER
 # ============================================================
 
@@ -585,6 +657,11 @@ function Invoke-PyInstallerBuild {
         "    Shield_Core:  controlled by spec" `
         -ForegroundColor $White
 
+    # --------------------------------------------------------
+    # Copy logo to dist before building
+    # --------------------------------------------------------
+    Copy-LogoToDist
+
     Write-Host ""
     Write-Host `
         "  Running PyInstaller..." `
@@ -620,6 +697,24 @@ function Invoke-PyInstallerBuild {
         "  Size:   $sizeMB MB" `
         -ForegroundColor $Cyan
 
+    # --------------------------------------------------------
+    # Verify logo was included
+    # --------------------------------------------------------
+    Write-Host ""
+    Write-Host "  Verifying logo in dist:" -ForegroundColor $DarkGray
+
+    $logoCheckPaths = @(
+        (Join-Path $DistDir "static\3486-removebg-preview.ico"),
+        (Join-Path $DistDir "3486-removebg-preview.ico")
+    )
+
+    foreach ($path in $logoCheckPaths) {
+        if (Test-Path -LiteralPath $path) {
+            Write-OK "Logo found at: $path"
+        } else {
+            Write-Warn "Logo not found at: $path"
+        }
+    }
     # --------------------------------------------------------
     # Metadata
     # --------------------------------------------------------
@@ -887,6 +982,19 @@ function Invoke-InstallerBuild {
 
                 </File>
 
+                <!-- Include logo files -->
+                <File
+                    Id="LogoFile1"
+                    Name="3486-removebg-preview.ico"
+                    Source="dist\static\3486-removebg-preview.ico"
+                    Vital="no"/>
+                    
+                <File
+                    Id="LogoFile2"
+                    Name="3486-removebg-preview.ico"
+                    Source="dist\3486-removebg-preview.ico"
+                    Vital="no"/>
+
             </Component>
 
         </DirectoryRef>
@@ -1008,6 +1116,39 @@ function Invoke-PortableBuild {
     Write-OK "Copied DSTerminal.exe"
 
     # --------------------------------------------------------
+    # Copy logo to portable directory
+    # --------------------------------------------------------
+    
+    Write-Host "  Copying logo to portable directory..." -ForegroundColor $DarkGray
+    
+    $portableStaticDir = Join-Path $portableDir "static"
+    New-Item -ItemType Directory -Force -Path $portableStaticDir | Out-Null
+    
+    $logoLocations = @(
+        Join-Path $DistDir "static\3486-removebg-preview.ico",
+        Join-Path $DistDir "3486-removebg-preview.ico"
+    )
+    
+    $logoCopied = $false
+    foreach ($src in $logoLocations) {
+        if (Test-Path -LiteralPath $src) {
+            try {
+                Copy-Item -LiteralPath $src -Destination (Join-Path $portableStaticDir "3486-removebg-preview.ico") -Force
+                Copy-Item -LiteralPath $src -Destination (Join-Path $portableDir "3486-removebg-preview.ico") -Force
+                Write-OK "Copied logo from: $src"
+                $logoCopied = $true
+                break
+            } catch {
+                Write-Warn "Failed to copy logo from: $src"
+            }
+        }
+    }
+    
+    if (-not $logoCopied) {
+        Write-Warn "No logo found to copy to portable directory."
+    }
+
+    # --------------------------------------------------------
     # Launcher
     # --------------------------------------------------------
 
@@ -1093,6 +1234,7 @@ FEATURES
 - Shield_Core analysis
 - Flask-SocketIO realtime services
 - Console-based interface
+- Built-in DSTERMINAL logo
 
 NOTES
 -----

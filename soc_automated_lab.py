@@ -1200,11 +1200,12 @@ class ReportGenerator:
     
     def _add_watermark(self, canvas_obj, doc):
         canvas_obj.saveState()
-        canvas_obj.setFillColor(colors.HexColor('#cccccc'))
+        # Use reportlab_colors instead of colors
+        canvas_obj.setFillColor(reportlab_colors.HexColor('#cccccc'))
         canvas_obj.setFont('Helvetica-Bold', 40)
         canvas_obj.rotate(45)
         canvas_obj.drawString(150, 100, WATERMARK_TEXT)
-        canvas_obj.setFillColor(colors.HexColor('#dddddd'))
+        canvas_obj.setFillColor(reportlab_colors.HexColor('#dddddd'))
         canvas_obj.setFont('Helvetica', 20)
         canvas_obj.rotate(-30)
         canvas_obj.drawString(400, -50, WATERMARK_TEXT)
@@ -1227,11 +1228,12 @@ class ReportGenerator:
             
             styles = getSampleStyleSheet()
             
+            # Use reportlab_colors instead of colors
             title_style = ParagraphStyle(
                 'CustomTitle',
                 parent=styles['Heading1'],
                 fontSize=24,
-                textColor=colors.HexColor('#0066cc'),
+                textColor=reportlab_colors.HexColor('#0066cc'),
                 alignment=TA_CENTER,
                 spaceAfter=20,
                 fontName='Helvetica-Bold'
@@ -1241,7 +1243,7 @@ class ReportGenerator:
                 'Heading',
                 parent=styles['Heading2'],
                 fontSize=16,
-                textColor=colors.HexColor('#004d99'),
+                textColor=reportlab_colors.HexColor('#004d99'),
                 spaceAfter=10,
                 spaceBefore=15,
                 fontName='Helvetica-Bold'
@@ -1251,7 +1253,7 @@ class ReportGenerator:
                 'Body',
                 parent=styles['Normal'],
                 fontSize=10,
-                textColor=colors.HexColor('#333333'),
+                textColor=reportlab_colors.HexColor('#333333'),
                 alignment=TA_LEFT,
                 spaceAfter=6,
                 fontName='Helvetica'
@@ -1261,7 +1263,7 @@ class ReportGenerator:
                 'Footer',
                 parent=styles['Normal'],
                 fontSize=8,
-                textColor=colors.HexColor('#666666'),
+                textColor=reportlab_colors.HexColor('#666666'),
                 alignment=TA_CENTER,
                 spaceAfter=4
             )
@@ -1295,14 +1297,14 @@ class ReportGenerator:
                 
                 proc_table = PDFTable(proc_data, colWidths=[3*inch, 3*inch])
                 proc_table.setStyle(TableStyle([
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#34495e')),
-                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                    ('BACKGROUND', (0, 0), (-1, 0), reportlab_colors.HexColor('#34495e')),
+                    ('TEXTCOLOR', (0, 0), (-1, 0), reportlab_colors.whitesmoke),
                     ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                     ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
                     ('FONTSIZE', (0, 0), (-1, 0), 10),
                     ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
-                    ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8f9fa')),
-                    ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
+                    ('BACKGROUND', (0, 1), (-1, -1), reportlab_colors.HexColor('#f8f9fa')),
+                    ('GRID', (0, 0), (-1, -1), 1, reportlab_colors.HexColor('#dee2e6')),
                 ]))
                 story.append(proc_table)
                 story.append(Spacer(1, 20))
@@ -1319,14 +1321,14 @@ class ReportGenerator:
             
             stats_table = PDFTable(stats_data, colWidths=[3*inch, 3*inch])
             stats_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#34495e')),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('BACKGROUND', (0, 0), (-1, 0), reportlab_colors.HexColor('#34495e')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), reportlab_colors.whitesmoke),
                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
                 ('FONTSIZE', (0, 0), (-1, 0), 10),
                 ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8f9fa')),
-                ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
+                ('BACKGROUND', (0, 1), (-1, -1), reportlab_colors.HexColor('#f8f9fa')),
+                ('GRID', (0, 0), (-1, -1), 1, reportlab_colors.HexColor('#dee2e6')),
             ]))
             story.append(stats_table)
             story.append(Spacer(1, 20))
@@ -1346,14 +1348,14 @@ class ReportGenerator:
                 
                 proc_list_table = PDFTable(proc_list_data, colWidths=[0.8*inch, 1.5*inch, 1.2*inch, 0.8*inch, 1*inch, 0.8*inch])
                 proc_list_table.setStyle(TableStyle([
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#34495e')),
-                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                    ('BACKGROUND', (0, 0), (-1, 0), reportlab_colors.HexColor('#34495e')),
+                    ('TEXTCOLOR', (0, 0), (-1, 0), reportlab_colors.whitesmoke),
                     ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                     ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
                     ('FONTSIZE', (0, 0), (-1, 0), 8),
                     ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
-                    ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8f9fa')),
-                    ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
+                    ('BACKGROUND', (0, 1), (-1, -1), reportlab_colors.HexColor('#f8f9fa')),
+                    ('GRID', (0, 0), (-1, -1), 1, reportlab_colors.HexColor('#dee2e6')),
                     ('FONTSIZE', (0, 1), (-1, -1), 8),
                 ]))
                 story.append(proc_list_table)
@@ -1372,14 +1374,14 @@ class ReportGenerator:
                 
                 threat_table = PDFTable(threat_data, colWidths=[1.5*inch, 1*inch, 1.5*inch, 3*inch])
                 threat_table.setStyle(TableStyle([
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#34495e')),
-                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                    ('BACKGROUND', (0, 0), (-1, 0), reportlab_colors.HexColor('#34495e')),
+                    ('TEXTCOLOR', (0, 0), (-1, 0), reportlab_colors.whitesmoke),
                     ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                     ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
                     ('FONTSIZE', (0, 0), (-1, 0), 9),
                     ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
-                    ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8f9fa')),
-                    ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
+                    ('BACKGROUND', (0, 1), (-1, -1), reportlab_colors.HexColor('#f8f9fa')),
+                    ('GRID', (0, 0), (-1, -1), 1, reportlab_colors.HexColor('#dee2e6')),
                 ]))
                 story.append(threat_table)
             
@@ -1396,7 +1398,7 @@ class ReportGenerator:
         except Exception as e:
             self.logger.error(f"PDF generation failed: {e}")
             return self._generate_txt_report(filepath.replace('.pdf', '.txt'), report_id, stats, threats, lab_state, timestamp, process_stats, processes)
-    
+            
     def _generate_html_report(self, filepath: str, report_id: str, stats: Dict, threats: List, lab_state: str, timestamp: datetime, process_stats: Dict, processes: List) -> str:
         try:
             process_rows = ''

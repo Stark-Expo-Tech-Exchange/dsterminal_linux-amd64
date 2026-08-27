@@ -113,6 +113,15 @@ Source: "installer_assets\3486-removebg-preview.ico"; DestDir: "{app}"; Flags: i
 Source: "static\3486-removebg-preview.ico"; DestDir: "{app}"; Flags: ignoreversion; Components: core
 Source: "3486-removebg-preview.ico"; DestDir: "{app}\static"; Flags: ignoreversion
 
+; ========== LOGO / ICON FILES ==========
+; Copy logo to multiple locations for redundancy
+Source: "static\3486-removebg-preview.ico"; DestDir: "{app}\static"; Flags: ignoreversion; Components: core
+Source: "static\3486-removebg-preview.ico"; DestDir: "{app}"; Flags: ignoreversion; Components: core
+Source: "static\3486-removebg-preview.ico"; DestDir: "{userappdata}\DSTerminal_Workspace\static"; Flags: ignoreversion; Components: core
+
+; Also copy to the workspace static folder during installation
+Source: "static\3486-removebg-preview.ico"; DestDir: "{userappdata}\DSTerminal_Workspace\static"; Flags: ignoreversion; Components: core
+
 ; ========== LAUNCHER ==========
 Source: "launch_dsterminal.bat"; DestDir: "{app}"; Flags: ignoreversion; Components: core
 
@@ -215,31 +224,74 @@ Name: "{app}\bundled"; Flags: uninsalwaysuninstall
 Name: "{app}\docs"; Flags: uninsalwaysuninstall
 
 [Icons]
-; Desktop shortcut for DSTerminal
-Name: "{userdesktop}\DSTerminal CyberOps"; Filename: "{app}\dsterminal.exe"; WorkingDir: "{app}"; IconFilename: "{app}\dsterminal.exe"; Tasks: desktopicon; Comment: "DSTerminal Security Terminal"
+; Desktop shortcut for DSTerminal - FIXED
+Name: "{userdesktop}\DSTerminal CyberOps"; \
+    Filename: "{app}\dsterminal.exe"; \
+    WorkingDir: "{app}"; \
+    IconFilename: "{app}\dsterminal.exe"; \
+    IconIndex: 0; \
+    Tasks: desktopicon; \
+    Comment: "DSTerminal Security Terminal"
 
 ; ========== DOCUMENTATION DESKTOP SHORTCUT ==========
-; Cyber-Ops Documentation shortcut on Desktop (named "Cyber-Ops Documentation")
-Name: "{userdesktop}\Cyber-Ops Documentation"; Filename: "{app}\docs\Cyber-Ops_Documentation.html"; IconFilename: "{app}\dsterminal.exe"; Tasks: docshortcut; Comment: "DSTerminal Cyber-Ops Documentation"; Components: docs
+; Cyber-Ops Documentation shortcut on Desktop
+Name: "{userdesktop}\Cyber-Ops Documentation"; \
+    Filename: "{app}\docs\Cyber-Ops_Documentation.html"; \
+    IconFilename: "{app}\dsterminal.exe"; \
+    Tasks: docshortcut; \
+    Comment: "DSTerminal Cyber-Ops Documentation"; \
+    Components: docs
 
 ; Alternative documentation shortcut (if PDF exists)
-Name: "{userdesktop}\Cyber-Ops Documentation (PDF)"; Filename: "{app}\docs\Dsterminal_Manifest_v4.0.0.113.pdf"; IconFilename: "{app}\dsterminal.exe"; Tasks: docshortcut; Comment: "DSTerminal Cyber-Ops Documentation (PDF)"; Components: docs
+Name: "{userdesktop}\Cyber-Ops Documentation (PDF)"; \
+    Filename: "{app}\docs\Dsterminal_Manifest_v4.0.0.113.pdf"; \
+    IconFilename: "{app}\dsterminal.exe"; \
+    Tasks: docshortcut; \
+    Comment: "DSTerminal Cyber-Ops Documentation (PDF)"; \
+    Components: docs
 
 ; ========== START MENU SHORTCUTS ==========
-Name: "{group}\DSTerminal CyberOps"; Filename: "{app}\dsterminal.exe"; WorkingDir: "{app}"; IconFilename: "{app}\dsterminal.exe"; Comment: "Launch DSTerminal Cyber Ops Platform"
-Name: "{group}\Uninstall DSTerminal"; Filename: "{uninstallexe}"; Comment: "Remove DSTerminal from your system"
+Name: "{group}\DSTerminal CyberOps"; \
+    Filename: "{app}\dsterminal.exe"; \
+    WorkingDir: "{app}"; \
+    IconFilename: "{app}\dsterminal.exe"; \
+    IconIndex: 0; \
+    Comment: "Launch DSTerminal Cyber Ops Platform"
+
+Name: "{group}\Uninstall DSTerminal"; \
+    Filename: "{uninstallexe}"; \
+    Comment: "Remove DSTerminal from your system"
 
 ; Start Menu documentation shortcuts
-Name: "{group}\Cyber-Ops Documentation"; Filename: "{app}\docs\Cyber-Ops_Documentation.html"; IconFilename: "{app}\dsterminal.exe"; Components: docs
-Name: "{group}\DSTerminal Quick Start"; Filename: "{app}\QUICKSTART.txt"; Components: docs
+Name: "{group}\Cyber-Ops Documentation"; \
+    Filename: "{app}\docs\Cyber-Ops_Documentation.html"; \
+    IconFilename: "{app}\dsterminal.exe"; \
+    Components: docs
+
+Name: "{group}\DSTerminal Quick Start"; \
+    Filename: "{app}\QUICKSTART.txt"; \
+    Components: docs
 
 [Run]
 ; Launch documentation after install
-Filename: "{app}\docs\Cyber-Ops_Documentation.html"; Description: "View Cyber-Ops Documentation"; Flags: postinstall shellexec skipifsilent; Components: docs
+Filename: "{app}\docs\Cyber-Ops_Documentation.html"; \
+    Description: "View Cyber-Ops Documentation"; \
+    Flags: postinstall shellexec skipifsilent; \
+    Components: docs
 
-; Launch DSTerminal after install
-Filename: "{app}\dsterminal.exe"; Description: "Launch DSTerminal"; Flags: nowait postinstall skipifsilent; Components: core
+; Launch DSTerminal after install - SIMPLIFIED
+Filename: "{app}\dsterminal.exe"; \
+    Description: "Launch DSTerminal"; \
+    Flags: nowait postinstall skipifsilent; \
+    Components: core
 
+; Alternative: Launch using Windows start command
+Filename: "{cmd}"; \
+    Parameters: "/c start ""DSTerminal"" /D ""{app}"" ""{app}\dsterminal.exe"""; \
+    Description: "Launch DSTerminal (alternate)"; \
+    Flags: postinstall nowait skipifsilent hidewizard; \
+    Components: core
+    
 ; ========== DEPENDENCY INSTALLATION DURING SETUP ==========
 ; Run dependency installation during installation
 Filename: "powershell.exe"; \
@@ -277,6 +329,14 @@ Root: HKCU; Subkey: "Software\DSTerminal"; ValueType: string; ValueName: "DocPat
 ; Register documentation path
 Root: HKCU; Subkey: "Software\DSTerminal\Documentation"; ValueType: string; ValueName: "DocsPath"; ValueData: "{app}\docs\Cyber-Ops_Documentation.html"
 Root: HKCU; Subkey: "Software\DSTerminal\Documentation"; ValueType: string; ValueName: "QuickStartPath"; ValueData: "{app}\QUICKSTART.txt"
+
+; ========== ADD APPLICATION REGISTRATION FOR TASKBAR ICON ==========
+; Register AppUserModelID for Windows taskbar
+Root: HKCU; Subkey: "Software\Classes\AppUserModelId\StarkExpoTechExchange.DSTerminal"; ValueType: string; ValueName: "DisplayName"; ValueData: "DSTerminal CyberOps"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\AppUserModelId\StarkExpoTechExchange.DSTerminal"; ValueType: string; ValueName: "IconUri"; ValueData: "{app}\dsterminal.exe"; Flags: uninsdeletekey
+
+; Add to Windows Application Compatibility
+Root: HKCU; Subkey: "Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"; ValueType: string; ValueName: "{app}\dsterminal.exe"; ValueData: "~ DISABLEAAM"; Flags: uninsdeletekey
 
 ; ============================================================
 ; LICENSE KEY VALIDATION WITH 3-TRIAL LIMIT AND ROLLBACK

@@ -558,45 +558,85 @@ def copy_logo_to_workspace():
     """Copy logo from installation directory to workspace static folder"""
     logo_dest = os.path.join(STATIC_DIR, '3486-removebg-preview.ico')
     
+    # Ensure the static directory exists
+    os.makedirs(STATIC_DIR, exist_ok=True)
+    
     if os.path.exists(logo_dest):
         print(f"[LOGO] Logo already exists at: {logo_dest}")
         return True
     
+    # Get the base directory where the application is running
+    if getattr(sys, 'frozen', False):
+        # Running as compiled executable
+        base_dir = os.path.dirname(sys.executable)
+    else:
+        # Running as script
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    # Extended list of possible source locations
     logo_source_paths = [
-        os.path.join(os.path.dirname(sys.executable), 'static', '3486-removebg-preview.ico'),
-        os.path.join(os.path.dirname(sys.executable), '3486-removebg-preview.ico'),
+        # From the application directory (EXE location)
+        os.path.join(base_dir, 'static', '3486-removebg-preview.ico'),
+        os.path.join(base_dir, '3486-removebg-preview.ico'),
+        # From the current working directory
+        os.path.join(os.getcwd(), 'static', '3486-removebg-preview.ico'),
+        os.path.join(os.getcwd(), '3486-removebg-preview.ico'),
+        # From the workspace directory
+        os.path.join(WORKSPACE_DIR, 'static', '3486-removebg-preview.ico'),
+        # From the script directory (when running as script)
         os.path.join(os.path.dirname(__file__), 'static', '3486-removebg-preview.ico'),
         os.path.join(os.path.dirname(__file__), '3486-removebg-preview.ico'),
+        # From installer assets (during build)
         os.path.join('installer_assets', '3486-removebg-preview.ico'),
+        # From the bundled resources (PyInstaller)
+        os.path.join(sys._MEIPASS, 'static', '3486-removebg-preview.ico') if hasattr(sys, '_MEIPASS') else None,
+        # From common installation paths
+        os.path.join('C:\\Program Files (x86)\\DSTerminal', 'static', '3486-removebg-preview.ico'),
+        os.path.join('C:\\Program Files (x86)\\DSTerminal', '3486-removebg-preview.ico'),
+        # From AppData
+        os.path.join(os.environ.get('APPDATA', ''), 'DSTerminal', 'static', '3486-removebg-preview.ico'),
     ]
+    
+    # Filter out None values
+    logo_source_paths = [p for p in logo_source_paths if p]
     
     for source in logo_source_paths:
         if os.path.exists(source):
             try:
                 shutil.copy2(source, logo_dest)
+                print(f"[LOGO] ✅ Copied logo from: {source}")
                 return True
             except Exception as e:
-                return False    
-    # Create SVG fallback
+                print(f"[LOGO] ⚠️ Failed to copy from {source}: {e}")
+                continue
+    
+    # If no logo found, create SVG as a proper .ico file
+    print("[LOGO] ⚠️ No logo found, creating SVG icon...")
     try:
-        svg_content = '''<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
-            <rect x="10" y="10" width="180" height="180" rx="20" stroke="#00ff88" stroke-width="4" fill="none"/>
-            <text x="100" y="90" font-family="Courier New, monospace" font-size="48" font-weight="bold" fill="#00ff88" text-anchor="middle">D</text>
-            <text x="100" y="130" font-family="Courier New, monospace" font-size="16" fill="#00ff88" text-anchor="middle">TERMINAL</text>
-            <circle cx="100" cy="50" r="4" fill="#00ff88">
+        # Create SVG content with proper DSTERMINAL branding
+        svg_content = '''<svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#00ff88;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#00ccff;stop-opacity:1" />
+                </linearGradient>
+            </defs>
+            <rect x="4" y="4" width="40" height="40" rx="8" stroke="#00ff88" stroke-width="2" fill="none"/>
+            <text x="24" y="28" font-family="'Courier New', monospace" font-size="22" font-weight="bold" fill="url(#grad1)" text-anchor="middle">D</text>
+            <text x="24" y="40" font-family="'Courier New', monospace" font-size="7" fill="#00ff88" text-anchor="middle">TERMINAL</text>
+            <circle cx="24" cy="16" r="2" fill="#00ff88" opacity="0.6">
                 <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
             </circle>
         </svg>'''
+        
         with open(logo_dest, 'w', encoding='utf-8') as f:
             f.write(svg_content)
-        print(f"[LOGO] Created SVG placeholder logo at: {logo_dest}")
+        print(f"[LOGO] ✅ Created SVG placeholder at: {logo_dest}")
         return True
     except Exception as e:
-        print(f"[LOGO] Failed to create placeholder: {e}")
+        print(f"[LOGO] ❌ Failed to create placeholder: {e}")
     
     return False
-
-copy_logo_to_workspace()
 
 # ============================================================
 # FLASK APP

@@ -4025,7 +4025,6 @@ class SecurityTerminal:
             "🔒 Use 'security' as alias for system commands...",
             "⚡ Try 'scan' as alias for system commands...",
             "💻 Use 'sys' as alias for system commands...",
-            "🌐 Run 'net -n mon' for live network monitoring...",
             "🔍 Use 'exploitcheck' to check for critical CVEs...",
             "🦠 Try 'vtscan' for VirusTotal file analysis...",
             "🧹 Use 'clearlogs' to securely wipe system logs...",
@@ -4148,7 +4147,6 @@ class SecurityTerminal:
             "💻 Use 'dst-platform' for platform info...",
             "🤖 Try 'auto-discover' to discover assets...",
             "👁️ Run 'monitor-all' to monitor all components...",
-            "📂 Use 'watch-folders' to watch folders...",
             "📍 Try 'show-paths' to show system paths...",
             "🔄 Run 'dst-reload' to reload config...",
             "📦 Use 'dst-update' to update DSTerminal...",
@@ -4238,10 +4236,6 @@ class SecurityTerminal:
             "✅ Use 'service enable' to enable...",
             "❌ Try 'service disable' to disable...",
             "📋 Run 'service list' to list services...",
-            "👁️ Use 'monitor' for monitoring menu...",
-            "▶️ Try 'monitor start' to start...",
-            "⏹️ Run 'monitor stop' to stop...",
-            "📊 Use 'monitor status' for status...",
 
             # ============================================================
             # SECURITY SCANNERS
@@ -4261,9 +4255,7 @@ class SecurityTerminal:
             # ============================================================
             # SOC (Detailed Information Reconnaissance)
             # ============================================================
-            "🛡️ Use 'soc' for SOC menu...",
             "💻 Try 'soc terminal' for SOC terminal...",
-            "👁️ Run 'soc monitor' for monitoring...",
             "📂 Use 'soc workspace' for workspace...",
             "⚡ Try 'soc-quick' for quick scan...",
             "🔍 Run 'soc-full' for full audit...",
@@ -4296,7 +4288,6 @@ class SecurityTerminal:
             # ============================================================
             # NETWORK MONITORING
             # ============================================================
-            "📡 Use 'net mon' for monitoring...",
             "🔍 Try 'net scan' for scanning...",
             "📄 Run 'net report' for report...",
             "❓ Use 'net help' for help...",
@@ -10411,14 +10402,7 @@ class SecurityTerminal:
                 self.show_tip(cmd)
                 return
 
-            # ============================================================
-            # FIXED: Handle 'net -n mon' command
-            # ============================================================
-            if original_cmd.lower() == "net -n mon":
-                self.network_monitor()
-                self.show_tip(cmd)
-                return
-
+ 
             # ============================================================
             # FIXED: Handle 'system scan -all' command
             # ============================================================
@@ -10776,6 +10760,21 @@ class SecurityTerminal:
             # ENCRYPTION SUITE COMMANDS - Direct import like web-security
             # ============================================================
             
+            # Encryption Setup
+            if command in ["encrypt-setup", "encryption-setup", "crypto-setup", "setup-encryption"]:
+                if CRYPTO_AVAILABLE and CryptoEngine is not None:
+                    try:
+                        print(f"{Fore.CYAN}[*] Running encryption system setup...{Style.RESET_ALL}")
+                        crypto = CryptoEngine()
+                        crypto.encrypt_setup()
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] Encryption setup failed: {e}{Style.RESET_ALL}")
+                        import traceback
+                        traceback.print_exc()
+                else:
+                    print(f"{Fore.RED}[!] Encryption Suite module not available{Style.RESET_ALL}")
+                    print(f"{Fore.YELLOW}💡 Make sure encryption_suite.py is in the same directory{Style.RESET_ALL}")
+                return
             # Launch Encryption Suite Interactive Console
             if command in ['encryption', 'crypto', 'encrypt-suite']:
                 if CRYPTO_AVAILABLE and crypto_main is not None:
@@ -11113,7 +11112,7 @@ class SecurityTerminal:
                 return
 
             # Crypto help
-            if command in ['crypto help', 'crypthelp']:
+            if command in ['crypto-help', 'crypthelp']:
                 print(f"\n{Fore.CYAN}Encryption Suite Commands:{Style.RESET_ALL}")
                 print(f"{Fore.CYAN}{'═' * 60}{Style.RESET_ALL}")
                 print(f"  {Fore.GREEN}encryption{Style.RESET_ALL}           - Launch interactive encryption console")
@@ -13683,9 +13682,7 @@ class SecurityTerminal:
                 self.cmd_monitor_all(args)
                 return
 
-            if command == "watch-folders":
-                self.cmd_start_folder_watcher(args)
-                return
+ 
 
             if command == "show-paths":
                 print("\n📁 Monitored Paths:")
@@ -14059,7 +14056,6 @@ class SecurityTerminal:
                 ("security", "Alias for system command"),
                 ("scan", "Alias for system command"),
                 ("sys", "Alias for system command"),
-                ("net -n mon", "Live network monitoring"),
                 ("exploitcheck", "Check for critical CVEs"),
                 ("vtscan", "VirusTotal file analysis"),
                 ("clearlogs", "Securely wipe system logs"),
@@ -14196,7 +14192,6 @@ class SecurityTerminal:
                 ("dst-platform", "Show DSTerminal platform info"),
                 ("auto-discover", "Auto-discover network assets"),
                 ("monitor-all", "Monitor all system components"),
-                ("watch-folders", "Watch specified folders"),
                 ("show-paths", "Show system paths"),
                 ("dst-reload", "Reload DSTerminal configuration"),
                 ("dst-update", "Update DSTerminal"),
@@ -14958,13 +14953,7 @@ class SecurityTerminal:
             "restore-id": None,
             "restore-last": None,
             "add-path": None,
-            "dst-workspace": None,
-            "dst-cleanup": None,
             "dst-platform": None,
-            "auto-discover": None,
-            "monitor-all": None,
-            "watch-folders": None,
-            "show-paths": None,
 
             # --------------------------------------------------------
             # Integrity
@@ -15070,6 +15059,8 @@ class SecurityTerminal:
             # --------------------------------------------------------
             "encrypt": None,
             "encryption": None,
+            "encrypt-setup": None,
+            "encryption-setup": None,
             "crypto-key": None,
             "cryptokey": None,
             "crypto-debug": None,
@@ -15110,9 +15101,9 @@ class SecurityTerminal:
             "crypto status": None,
             "crypto export": None,
             "crypto import": None,
-            "crypto setup": None,
-            "crypto help": None,
-            "'crypthelp": None,
+            "crypto-setup": None,
+            "crypto-help": None,
+            "crypthelp": None,
 
             # --------------------------------------------------------
             # Forensics / investigation
@@ -15127,9 +15118,6 @@ class SecurityTerminal:
             "trace": None,
             "financial": None,
             "investigate": None,
-            "investigate-ml": None,
-            "money laundering": None,
-            "investigate wire": None,
             "wire fraud": None,
             "Fraud investigation": None,
             "investigate crypto": None,
@@ -15137,15 +15125,12 @@ class SecurityTerminal:
             "Crypto Scam investigation": None,
             "investigate identity": None,
             "identity theft": None,
-            "Theft investigation": None,
             "investigate insider": None,
             "insider trading": None,
             "investigate shell": None,
             "shell company": None,
             "investigate bec": None, 
             "bec fraud": None,
-            "investigatemalawi": None,
-            "malawi bec": None,
             "financial-monitor": None,
             "fraud-monitor": None,
             "financial reports": None, 
