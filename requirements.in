@@ -1,0 +1,36 @@
+# DSTerminal dependencies for Linux - Python 3.13.5
+
+# Core
+prompt_toolkit
+colorama
+rich
+requests
+psutil
+netifaces
+watchdog
+
+# Security
+cryptography
+pyOpenSSL
+python-whois
+
+# Visualization
+folium
+plotly
+Pillow
+numpy
+
+# PDF
+reportlab
+
+# Web
+Flask
+Flask-SocketIO
+python-socketio
+eventlet
+
+# Utilities
+tqdm
+pyfiglet
+lxml
+beautifulsoup4
