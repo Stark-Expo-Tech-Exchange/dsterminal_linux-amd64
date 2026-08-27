@@ -2,6 +2,8 @@
 import sys
 # -*- coding: utf-8 -*-
 
+ 
+
 # ============================================================
 # FIX: Handle OSError 22 on Windows
 # ============================================================
@@ -11,43 +13,13 @@ if sys.platform == "win32":
         sp.run(["chcp", "65001"], capture_output=True, shell=True)
     except:
         pass
+
 
 _original_stdout_write = sys.stdout.write
 
 def _safe_stdout_write(text):
     try:
         _original_stdout_write(text)
-    except OSError as e:
-        if e.errno == 22:
-            try:
-                clean = text.encode("ascii", "ignore").decode("ascii")
-                _original_stdout_write(clean)
-            except:
-                pass
-        else:
-            raise
-    except UnicodeEncodeError:
-        try:
-            clean = text.encode("ascii", "ignore").decode("ascii")
-            _original_stdout_write(clean)
-        except:
-            pass
-
-sys.stdout.write = _safe_stdout_write
-
-
-# ============================================================
-# FIX: Handle OSError 22 on Windows
-# ============================================================
-if sys.platform == "win32":
-    try:
-        import subprocess as sp
-        sp.run(["chcp", "65001"], capture_output=True, shell=True)
-    except:
-        pass
-
-
-    try:
     except OSError as e:
         if e.errno == 22:
             try:

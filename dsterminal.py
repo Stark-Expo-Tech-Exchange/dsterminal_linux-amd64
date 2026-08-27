@@ -1347,7 +1347,38 @@ except ImportError as e:
     EnhancedReportGenerator = None
     safe_print_unicode(f"Warning: SOC Enhanced Modules not found: {e}")
 
+# ============================================================
+# 20. IMPORT CRYPTO ENGINE
+# ============================================================
+try:
+    from crypto_engine import CryptoEngine, main as crypto_main
+    from crypto_engine import Colors as CryptoColors
+    CRYPTO_AVAILABLE = True
+    safe_print_unicode("[+] Encryption Suite loaded successfully")
+except ImportError as e:
+    CRYPTO_AVAILABLE = False
+    CryptoEngine = None
+    crypto_main = None
+    CryptoColors = None
+    safe_print_unicode(f"[!] Encryption Suite module not found: {e}")
+    safe_print_unicode(f"[!] Make sure crypto_engine is in the same directory")
 
+# ============================================================
+#21. IMPORT SQLMAP ADVANCED SCANNER & LEARNING LAB
+# ============================================================
+try:
+    from sqlmap_advanced import EnhancedSQLMapScanner, EnhancedSQLInjectionLab, main as sqlmap_main
+    from sqlmap_advanced import Colors as SQLMapColors
+    SQLMAP_AVAILABLE = True
+    safe_print_unicode("[+] SQLMap Advanced Scanner loaded successfully")
+except ImportError as e:
+    SQLMAP_AVAILABLE = False
+    EnhancedSQLMapScanner = None
+    EnhancedSQLInjectionLab = None
+    sqlmap_main = None
+    SQLMapColors = None
+    safe_print_unicode(f"[!] SQLMap Advanced module not found: {e}")
+    safe_print_unicode(f"[!] Make sure sqlmap_advanced is in the same directory")
 #  ============================================
 # OTHER IMPORTS - Fast, no delays
 # ============================================
@@ -2899,6 +2930,17 @@ class SecurityTerminal:
                 self.recon_full = None
 
         # ============================================================
+        # ENCRYPTION SUITE INITIALIZATION
+        # ============================================================
+        self.crypto_engine = None
+        if CRYPTO_AVAILABLE and CryptoEngine is not None:
+            try:
+                self.crypto_engine = CryptoEngine()
+                safe_print_unicode("[+] Encryption Engine initialized")
+            except Exception as e:
+                safe_print_unicode(f"[!] Failed to initialize encryption engine: {e}")
+                self.crypto_engine = None
+        # ============================================================
         # RECONNAISSANCE MODULE
         # ============================================================
         self.recon = None
@@ -2914,6 +2956,19 @@ class SecurityTerminal:
             except Exception as e:
                 safe_print_unicode(f"[!] Reconnaissance Module init failed: {e}")
                 self.recon = None
+        
+        # ============================================================
+        # SQLMAP ADVANCED SCANNER INITIALIZATION
+        # ============================================================
+        self.sqlmap_scanner = None
+        if SQLMAP_AVAILABLE and EnhancedSQLMapScanner is not None:
+            try:
+                self.sqlmap_scanner = EnhancedSQLMapScanner(verbose=True)
+                safe_print_unicode("[+] SQLMap Advanced Scanner initialized")
+            except Exception as e:
+                safe_print_unicode(f"[!] Failed to initialize SQLMap scanner: {e}")
+                self.sqlmap_scanner = None
+
         # ============================================
         # 16. DASHBOARD INTEGRATION
         # ========================================================
@@ -10396,50 +10451,242 @@ class SecurityTerminal:
 
  
             # ============================================================
-            # FIXED: Handle SQLMap commands
+            # SQLMAP ADVANCED COMMANDS - Direct import like web-security
             # ============================================================
-            if command == "sqlmap":
-                self.sql_injection_scan(args)
+
+            # Launch SQLMap Advanced Learning Lab
+            if command in ['sqllab', 'advanced sqllab', 'sql-lab']:
+                if SQLMAP_AVAILABLE and EnhancedSQLMapScanner is not None:
+                    try:
+                        print(f"{Fore.GREEN}[+] Starting Advanced SQL Injection Learning Lab...{Style.RESET_ALL}")
+                        print(f"{Fore.DIM}   Complete SQL Injection Learning Platform{Style.RESET_ALL}")
+                        print(f"{Fore.DIM}   Features: WAF Bypass, Second-Order Injection, Out-of-Band Exfiltration{Style.RESET_ALL}\n")
+                        
+                        # Get port from args or use default
+                        port = 8080
+                        if args and len(args) > 0:
+                            try:
+                                port = int(args[0])
+                            except:
+                                print(f"{Fore.YELLOW}[!] Using default port 8080{Style.RESET_ALL}")
+                        
+                        # Start the lab
+                        scanner = EnhancedSQLMapScanner(verbose=True)
+                        scanner.start_lab(port=port, open_browser=True)
+                        
+                        # Keep running until user stops
+                        print(f"{Fore.CYAN}[*] Lab running on http://localhost:{port}{Style.RESET_ALL}")
+                        print(f"{Fore.YELLOW}[!] Press Ctrl+C to stop the server{Style.RESET_ALL}")
+                        
+                        try:
+                            while scanner.lab.running:
+                                time.sleep(0.5)
+                        except KeyboardInterrupt:
+                            scanner.stop_lab()
+                            print(f"{Fore.GREEN}[+] Lab stopped{Style.RESET_ALL}")
+                            
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] SQLMap Lab failed: {e}{Style.RESET_ALL}")
+                        import traceback
+                        traceback.print_exc()
+                else:
+                    print(f"{Fore.RED}[!] SQLMap Advanced module not available{Style.RESET_ALL}")
+                    print(f"{Fore.YELLOW}💡 Make sure sqlmap_advanced.py is in the same directory{Style.RESET_ALL}")
                 return
 
-            if command == "sqllab":
-                self.cmd_sqllab(args)
+            # Stop SQLMap Lab
+            if command in ['sqllab stop', 'advanced sqllab stop']:
+                if SQLMAP_AVAILABLE and EnhancedSQLMapScanner is not None:
+                    try:
+                        scanner = EnhancedSQLMapScanner(verbose=True)
+                        scanner.stop_lab()
+                        print(f"{Fore.GREEN}[+] SQLMap Lab stopped{Style.RESET_ALL}")
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] Failed to stop lab: {e}{Style.RESET_ALL}")
+                else:
+                    print(f"{Fore.RED}[!] SQLMap Advanced module not available{Style.RESET_ALL}")
                 return
 
-            if command == "sqlmap-install":
-                self.cmd_sqlmap_install(args)
+            # SQLMap Lab Status
+            if command in ['sqllab status', 'advanced sqllab status']:
+                if SQLMAP_AVAILABLE and EnhancedSQLMapScanner is not None:
+                    try:
+                        scanner = EnhancedSQLMapScanner(verbose=True)
+                        scanner.cmd_advanced_status(None)
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] Failed to get status: {e}{Style.RESET_ALL}")
+                else:
+                    print(f"{Fore.RED}[!] SQLMap Advanced module not available{Style.RESET_ALL}")
                 return
 
-            if command == "sqlmap-reset":
-                self.cmd_sqlmap_reset(args)
+            # SQLMap Secure Mode Toggle
+            if command in ['sqllab secure', 'advanced sqlmap secure']:
+                if SQLMAP_AVAILABLE and EnhancedSQLMapScanner is not None:
+                    try:
+                        scanner = EnhancedSQLMapScanner(verbose=True)
+                        scanner.cmd_advanced_secure(None)
+                        print(f"{Fore.GREEN}[+] Secure mode toggled{Style.RESET_ALL}")
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] Failed to toggle secure mode: {e}{Style.RESET_ALL}")
+                else:
+                    print(f"{Fore.RED}[!] SQLMap Advanced module not available{Style.RESET_ALL}")
                 return
 
-            if command == "sqlmap-secure":
-                self.cmd_sqlmap_secure(args)
+            # SQLMap WAF Mode Toggle
+            if command in ['sqllab waf', 'advanced sqlmap waf']:
+                if SQLMAP_AVAILABLE and EnhancedSQLMapScanner is not None:
+                    try:
+                        scanner = EnhancedSQLMapScanner(verbose=True)
+                        scanner.cmd_advanced_waf(None)
+                        print(f"{Fore.GREEN}[+] WAF mode toggled{Style.RESET_ALL}")
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] Failed to toggle WAF mode: {e}{Style.RESET_ALL}")
+                else:
+                    print(f"{Fore.RED}[!] SQLMap Advanced module not available{Style.RESET_ALL}")
                 return
 
-            if command == "sqlmap-status":
-                self.cmd_sqlmap_status(args)
+            # SQLMap Techniques
+            if command in ['sqllab techniques', 'advanced sqlmap techniques']:
+                if SQLMAP_AVAILABLE and EnhancedSQLMapScanner is not None:
+                    try:
+                        scanner = EnhancedSQLMapScanner(verbose=True)
+                        scanner.cmd_advanced_techniques(None)
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] Failed to show techniques: {e}{Style.RESET_ALL}")
+                else:
+                    print(f"{Fore.RED}[!] SQLMap Advanced module not available{Style.RESET_ALL}")
                 return
 
-            if command == "sqlmap-scan":
-                self.cmd_sqlmap_scan_file(args)
+            # SQLMap PDF Notes
+            if command in ['sqllab pdf', 'advanced-sqlmap-pdf']:
+                if SQLMAP_AVAILABLE and EnhancedSQLMapScanner is not None:
+                    try:
+                        scanner = EnhancedSQLMapScanner(verbose=True)
+                        scanner.cmd_advanced_pdf(None)
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] Failed to generate PDF: {e}{Style.RESET_ALL}")
+                else:
+                    print(f"{Fore.RED}[!] SQLMap Advanced module not available{Style.RESET_ALL}")
+                    print(f"{Fore.YELLOW}💡 Install reportlab: pip install reportlab{Style.RESET_ALL}")
                 return
 
-            if command == "sqlmap-lab":
-                self.cmd_sqllab(args)
+            # SQLMap Scan
+            if command in ['sqlmap scan', 'sqlscan', 'advanced-sqlmap-scan']:
+                if SQLMAP_AVAILABLE and EnhancedSQLMapScanner is not None:
+                    try:
+                        if not args:
+                            print(f"{Fore.YELLOW}[!] Usage: sqlmap-scan <URL> [options]{Style.RESET_ALL}")
+                            print(f"{Fore.YELLOW}💡 Example: sqlmap-scan http://testphp.vulnweb.com/artists.php?artist=1{Style.RESET_ALL}")
+                            print(f"{Fore.YELLOW}💡 Example: sqlmap-scan http://testphp.vulnweb.com/artists.php?artist=1 --level 5 --risk 3{Style.RESET_ALL}")
+                            return
+                        
+                        url = args[0]
+                        if not url.startswith(('http://', 'https://')):
+                            url = 'http://' + url
+                        
+                        options = ' '.join(args[1:]) if len(args) > 1 else ''
+                        
+                        print(f"{Fore.CYAN}[*] Scanning: {url}{Style.RESET_ALL}")
+                        if options:
+                            print(f"{Fore.DIM}[*] Options: {options}{Style.RESET_ALL}")
+                        
+                        scanner = EnhancedSQLMapScanner(verbose=True)
+                        scanner.scan(url, options)
+                        
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] SQLMap scan failed: {e}{Style.RESET_ALL}")
+                        import traceback
+                        traceback.print_exc()
+                else:
+                    print(f"{Fore.RED}[!] SQLMap Advanced module not available{Style.RESET_ALL}")
+                    print(f"{Fore.YELLOW}💡 Make sure sqlmap_advanced.py is in the same directory{Style.RESET_ALL}")
+                    print(f"{Fore.YELLOW}💡 Also ensure sqlmap is installed: pip install sqlmap{Style.RESET_ALL}")
                 return
 
-            if command == "sqlmap-lab-status":
-                self.cmd_sqlmap_status(args)
+            # SQLMap Install
+            if command in ['sqlmap install', 'install sqlmap']:
+                if SQLMAP_AVAILABLE and EnhancedSQLMapScanner is not None:
+                    try:
+                        print(f"{Fore.CYAN}[*] Installing SQLMap...{Style.RESET_ALL}")
+                        scanner = EnhancedSQLMapScanner(verbose=True)
+                        if scanner.install_sqlmap():
+                            print(f"{Fore.GREEN}[+] SQLMap installed successfully!{Style.RESET_ALL}")
+                        else:
+                            print(f"{Fore.RED}[!] SQLMap installation failed{Style.RESET_ALL}")
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] Installation failed: {e}{Style.RESET_ALL}")
+                else:
+                    print(f"{Fore.RED}[!] SQLMap Advanced module not available{Style.RESET_ALL}")
                 return
 
-            if command == "sqlmap-toggle-secure":
-                self.cmd_sqlmap_secure(args)
+            # SQLMap Reset Database
+            if command in ['sqllab reset', 'sqlmap reset']:
+                if SQLMAP_AVAILABLE and EnhancedSQLMapScanner is not None:
+                    try:
+                        scanner = EnhancedSQLMapScanner(verbose=True)
+                        scanner.lab.reset_database()
+                        print(f"{Fore.GREEN}[+] Database reset successfully{Style.RESET_ALL}")
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] Failed to reset database: {e}{Style.RESET_ALL}")
+                else:
+                    print(f"{Fore.RED}[!] SQLMap Advanced module not available{Style.RESET_ALL}")
                 return
 
-            if command == "sqlmap-db-reset":
-                self.cmd_sqlmap_reset(args)
+            # SQLMap Status
+            if command in ['sqlmap status']:
+                if SQLMAP_AVAILABLE and EnhancedSQLMapScanner is not None:
+                    print(f"{Fore.CYAN}SQLMap Advanced Scanner Status:{Style.RESET_ALL}")
+                    print(f"  Status: {'Loaded' if SQLMAP_AVAILABLE else 'Not Available'}")
+                    print(f"  Module: sqlmap_advanced.py")
+                    if SQLMAP_AVAILABLE:
+                        print(f"  Features: Advanced SQL Injection Learning Lab")
+                        print(f"            WAF Bypass Techniques")
+                        print(f"            Second-Order Injection")
+                        print(f"            Out-of-Band Exfiltration")
+                        print(f"            MITRE ATT&CK Mapping")
+                        print(f"            PDF Notes Generation")
+                        print(f"            SQLMap Integration")
+                else:
+                    print(f"{Fore.RED}[!] SQLMap Advanced module not available{Style.RESET_ALL}")
+                return
+
+            # SQLMap Help
+            if command in ['sqlmap help', 'sqllab help']:
+                print(f"\n{Fore.CYAN}SQLMap Advanced Commands:{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}{'═' * 70}{Style.RESET_ALL}")
+                print(f"  {Fore.GREEN}sqllab{Style.RESET_ALL}                    - Start SQL Injection Learning Lab")
+                print(f"  {Fore.GREEN}advanced-sqllab{Style.RESET_ALL}           - Alias for sqllab")
+                print(f"  {Fore.GREEN}sql-lab{Style.RESET_ALL}                   - Alias for sqllab")
+                print(f"  {Fore.GREEN}sqllab-stop{Style.RESET_ALL}               - Stop the lab server")
+                print(f"  {Fore.GREEN}advanced-sqllab-stop{Style.RESET_ALL}      - Alias for sqllab-stop")
+                print(f"  {Fore.GREEN}sqllab-status{Style.RESET_ALL}             - Show lab status")
+                print(f"  {Fore.GREEN}advanced-sqllab-status{Style.RESET_ALL}    - Alias for sqllab-status")
+                print(f"  {Fore.GREEN}sqllab-secure{Style.RESET_ALL}             - Toggle secure mode")
+                print(f"  {Fore.GREEN}advanced-sqlmap-secure{Style.RESET_ALL}    - Alias for sqllab-secure")
+                print(f"  {Fore.GREEN}sqllab-waf{Style.RESET_ALL}                - Toggle WAF mode")
+                print(f"  {Fore.GREEN}advanced-sqlmap-waf{Style.RESET_ALL}       - Alias for sqllab-waf")
+                print(f"  {Fore.GREEN}sqllab-techniques{Style.RESET_ALL}         - View all SQL injection techniques")
+                print(f"  {Fore.GREEN}advanced-sqlmap-techniques{Style.RESET_ALL} - Alias for sqllab-techniques")
+                print(f"  {Fore.GREEN}sqllab-pdf{Style.RESET_ALL}                - Generate PDF notes")
+                print(f"  {Fore.GREEN}advanced-sqlmap-pdf{Style.RESET_ALL}       - Alias for sqllab-pdf")
+                print(f"  {Fore.GREEN}sqlmap-scan <URL>{Style.RESET_ALL}         - Run SQLMap scan")
+                print(f"  {Fore.GREEN}sqlscan <URL>{Style.RESET_ALL}             - Alias for sqlmap-scan")
+                print(f"  {Fore.GREEN}advanced-sqlmap-scan <URL>{Style.RESET_ALL} - Alias for sqlmap-scan")
+                print(f"  {Fore.GREEN}sqlmap-install{Style.RESET_ALL}            - Install SQLMap")
+                print(f"  {Fore.GREEN}install-sqlmap{Style.RESET_ALL}            - Alias for sqlmap-install")
+                print(f"  {Fore.GREEN}sqllab-reset{Style.RESET_ALL}              - Reset lab database")
+                print(f"  {Fore.GREEN}sqlmap-reset{Style.RESET_ALL}              - Alias for sqllab-reset")
+                print(f"  {Fore.GREEN}sqlmap-status{Style.RESET_ALL}             - Show module status")
+                print(f"  {Fore.GREEN}sqlmap-help{Style.RESET_ALL}               - Show this help")
+                print(f"  {Fore.GREEN}sqllab-help{Style.RESET_ALL}               - Alias for sqlmap-help")
+                print(f"\n{Fore.CYAN}Examples:{Style.RESET_ALL}")
+                print(f"  {Fore.YELLOW}sqllab{Style.RESET_ALL}                   - Start the learning lab on port 8080")
+                print(f"  {Fore.YELLOW}sqllab 9090{Style.RESET_ALL}              - Start the lab on port 9090")
+                print(f"  {Fore.YELLOW}sqlmap-scan http://testphp.vulnweb.com/artists.php?artist=1{Style.RESET_ALL}")
+                print(f"  {Fore.YELLOW}sqlmap-scan http://example.com/page.php?id=1 --level 5 --risk 3{Style.RESET_ALL}")
+                print(f"  {Fore.YELLOW}sqllab-techniques{Style.RESET_ALL}         - View all SQL injection techniques")
+                print(f"  {Fore.YELLOW}sqllab-pdf{Style.RESET_ALL}                - Generate comprehensive PDF notes")
+                print(f"{Fore.CYAN}{'═' * 70}{Style.RESET_ALL}")
                 return
 
             # ============================================================
@@ -10523,423 +10770,409 @@ class SecurityTerminal:
                 self.cmd_modules_status()
                 return
 
+ 
+   
             # ============================================================
-            # FIXED: Handle SQLMap Detailed Commands
+            # ENCRYPTION SUITE COMMANDS - Direct import like web-security
             # ============================================================
-            if command in ["sqlmap", "sqlmap-scan"]:
-                if not args:
-                    self.console.print("[red]❌ Usage: sqlmap <url>[/red]")
-                    self.console.print("[yellow]💡 Example: sqlmap https://example.com[/yellow]")
-                    return
-                url = args[0]
-                self.console.print(f"[cyan]🔍 Running SQLMap scan on: {url}[/cyan]")
-                try:
-                    self.scanner.scan(url)
-                except Exception as e:
-                    self.console.print(f"[red]❌ Error: {e}[/red]")
-                return
-
-            if command in ["sqllab", "sqlmap-lab"]:
-                port = 8080
-                if args:
+            
+            # Launch Encryption Suite Interactive Console
+            if command in ['encryption', 'crypto', 'encrypt-suite']:
+                if CRYPTO_AVAILABLE and crypto_main is not None:
                     try:
-                        port = int(args[0])
-                    except ValueError:
-                        self.console.print(f"[red]❌ Invalid port: {args[0]}, using default 8080[/red]")
-                try:
-                    self.scanner.start_lab(port=port, open_browser=True)
-                except Exception as e:
-                    self.console.print(f"[red]❌ Error: {e}[/red]")
-                return
-
-            if command in ["sqllab-stop", "sqlmap-stop"]:
-                try:
-                    self.scanner.stop_lab()
-                    self.console.print("[green]✅ SQL Injection Learning Lab stopped[/green]")
-                except Exception as e:
-                    self.console.print(f"[red]❌ Error: {e}[/red]")
-                return
-
-            if command in ["sqlmap-install", "sqlmap-install"]:
-                self.console.print("[cyan]📦 Installing SQLMap...[/cyan]")
-                try:
-                    if self.scanner.install_sqlmap():
-                        self.console.print("[green]✅ SQLMap installed successfully![/green]")
-                    else:
-                        self.console.print("[red]❌ SQLMap installation failed[/red]")
-                except Exception as e:
-                    self.console.print(f"[red]❌ Error: {e}[/red]")
-                return
-
-            if command in ["sqlmap-reset", "sqlmap-db-reset"]:
-                self.console.print("[yellow]🔄 Resetting SQL Injection Lab database...[/yellow]")
-                try:
-                    self.scanner.lab.reset_database()
-                    self.console.print("[green]✅ Database reset successfully![/green]")
-                except Exception as e:
-                    self.console.print(f"[red]❌ Error: {e}[/red]")
-                return
-
-            if command in ["sqlmap-secure", "sqlmap-toggle-secure"]:
-                try:
-                    self.scanner.lab.set_secure_mode(not self.scanner.lab.secure_mode)
-                    status = "ENABLED" if self.scanner.lab.secure_mode else "DISABLED"
-                    color = "green" if self.scanner.lab.secure_mode else "red"
-                    self.console.print(f"[{color}]🔒 Secure mode: {status}[/{color}]")
-                    if self.scanner.lab.secure_mode:
-                        self.console.print("[green]✅ SQL injection is now PREVENTED[/green]")
-                    else:
-                        self.console.print("[red]⚠️ SQL injection is now POSSIBLE (vulnerable)[/red]")
-                except Exception as e:
-                    self.console.print(f"[red]❌ Error: {e}[/red]")
-                return
-
-            if command in ["sqlmap-waf", "sqlmap-toggle-waf"]:
-                try:
-                    self.scanner.lab.set_waf_mode(not self.scanner.lab.waf_mode)
-                    status = "ENABLED" if self.scanner.lab.waf_mode else "DISABLED"
-                    color = "green" if self.scanner.lab.waf_mode else "red"
-                    self.console.print(f"[{color}]🛡️ WAF mode: {status}[/{color}]")
-                    if self.scanner.lab.waf_mode:
-                        self.console.print("[green]✅ WAF is now actively blocking injection attempts[/green]")
-                    else:
-                        self.console.print("[red]⚠️ WAF is now disabled - injections may pass through[/red]")
-                except Exception as e:
-                    self.console.print(f"[red]❌ Error: {e}[/red]")
-                return
-
-            if command in ["sqlmap-status", "sqlmap-lab-status"]:
-                try:
-                    self.scanner.cmd_advanced_status(args)
-                except Exception as e:
-                    self.console.print(f"[red]❌ Error: {e}[/red]")
-                return
-
-            if command in ["sqlmap-pdf", "sqlmap-notes"]:
-                self.console.print("[cyan]📄 Generating SQL Injection PDF Notes...[/cyan]")
-                try:
-                    pdf_path = self.scanner.lab.generate_pdf_notes()
-                    if pdf_path:
-                        self.console.print(f"[green]✅ PDF Notes generated: {pdf_path}[/green]")
-                        try:
-                            import webbrowser
-                            webbrowser.open(f"file://{pdf_path}")
-                            self.console.print("[green]✅ PDF opened in default viewer[/green]")
-                        except:
-                            pass
-                    else:
-                        self.console.print("[red]❌ PDF generation failed[/red]")
-                except Exception as e:
-                    self.console.print(f"[red]❌ Error: {e}[/red]")
-                return
-
-            if command in ["sqlmap-techniques", "sqlmap-list"]:
-                try:
-                    self.scanner.cmd_advanced_techniques(args)
-                except Exception as e:
-                    self.console.print(f"[red]❌ Error: {e}[/red]")
-                return
-
-            if command in ["sqlmap-info", "sqlmap-version"]:
-                try:
-                    self.cmd_sqlmap_info(args)
-                except Exception as e:
-                    self.console.print(f"[red]❌ Error: {e}[/red]")
-                return
-
-            if command in ["sqlmap-help", "sqlmap-?"]:
-                self._show_sqlmap_help()
-                return
-
-            # ============================================================
-            # FIXED: Handle SQLMap File Scan Commands
-            # ============================================================
-            if command in ["sqlmap-scan-file", "sqlmap-file"]:
-                if not args:
-                    self.console.print("[red]❌ Usage: sqlmap-scan-file <file_path>[/red]")
-                    self.console.print("[yellow]💡 Example: sqlmap-scan-file urls.txt[/yellow]")
-                    return
-                file_path = args[0]
-                if not os.path.exists(file_path):
-                    self.console.print(f"[red]❌ File not found: {file_path}[/red]")
-                    return
-                try:
-                    with open(file_path, 'r') as f:
-                        urls = [line.strip() for line in f if line.strip()]
-                    self.console.print(f"[cyan]📄 Found {len(urls)} URLs in {file_path}[/cyan]")
-                    self.console.print("[yellow]Starting batch scan...[/yellow]")
-                    for i, url in enumerate(urls, 1):
-                        self.console.print(f"\n[cyan][{i}/{len(urls)}] Scanning: {url}[/cyan]")
-                        try:
-                            self.scanner.scan(url)
-                        except Exception as e:
-                            self.console.print(f"[red]❌ Error scanning {url}: {e}[/red]")
-                    self.console.print("[green]✅ All scans completed![/green]")
-                except Exception as e:
-                    self.console.print(f"[red]❌ Error: {e}[/red]")
-                return
-
-            if command in ["sqlmap-export", "sqlmap-report-export"]:
-                if not args:
-                    self.console.print("[red]❌ Usage: sqlmap-export <destination_path>[/red]")
-                    self.console.print("[yellow]💡 Example: sqlmap-export C:\\Users\\User\\Desktop\\report.pdf[/yellow]")
-                    return
-                dest_path = args[0]
-                try:
-                    workspace = os.path.expanduser("~/DSTerminal_Workspace")
-                    scans_dir = os.path.join(workspace, "scans")
-                    if not os.path.exists(scans_dir):
-                        self.console.print("[red]❌ No scan reports found[/red]")
-                        return
-                    import glob
-                    scan_files = glob.glob(os.path.join(scans_dir, "SQLMap_Report_*.pdf"))
-                    if not scan_files:
-                        self.console.print("[red]❌ No reports found[/red]")
-                        return
-                    latest_report = max(scan_files, key=os.path.getctime)
-                    import shutil
-                    shutil.copy2(latest_report, dest_path)
-                    self.console.print(f"[green]✅ Report exported to: {dest_path}[/green]")
-                except Exception as e:
-                    self.console.print(f"[red]❌ Error: {e}[/red]")
-                return
-
-            # ============================================================
-            # FIXED: Handle Crypto Commands
-            # ============================================================
-            if command == "crypto-setup":
-                if self.crypto:
-                    self.crypto.encrypt_setup()
+                        # Launch the encryption suite
+                        print(f"{Fore.GREEN}[+] Starting DSTERMINAL Encryption Suite...{Style.RESET_ALL}")
+                        print(f"{Fore.DIM}   Secure encryption with QR code key management{Style.RESET_ALL}\n")
+                        crypto_main()
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] Encryption Suite failed: {e}{Style.RESET_ALL}")
+                        import traceback
+                        traceback.print_exc()
                 else:
-                    print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+                    print(f"{Fore.RED}[!] Encryption Suite module not available{Style.RESET_ALL}")
+                    print(f"{Fore.YELLOW}💡 Make sure encryption_suite.py is in the same directory{Style.RESET_ALL}")
                 return
 
-            if command == "crypto-encrypt":
-                if self.crypto:
-                    filename = input(f"{Fore.CYAN}File to encrypt: {Style.RESET_ALL}").strip()
-                    if filename:
-                        self.crypto.encrypt_file(filename)
+            # Encryption Test
+            if command in ['encrypt-test', 'encryption-test', 'crypto-test']:
+                if CRYPTO_AVAILABLE and CryptoEngine is not None:
+                    try:
+                        print(f"{Fore.CYAN}[*] Running encryption system test...{Style.RESET_ALL}")
+                        crypto = CryptoEngine()
+                        crypto.encrypt_test()
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] Encryption test failed: {e}{Style.RESET_ALL}")
+                        import traceback
+                        traceback.print_exc()
                 else:
-                    print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+                    print(f"{Fore.RED}[!] Encryption Suite module not available{Style.RESET_ALL}")
+                    print(f"{Fore.YELLOW}💡 Make sure encryption_suite.py is in the same directory{Style.RESET_ALL}")
                 return
 
-            if command == "crypto-decrypt":
-                if self.crypto:
-                    filename = input(f"{Fore.CYAN}File to decrypt: {Style.RESET_ALL}").strip()
-                    if filename:
-                        self.crypto.decrypt_file(filename)
+            # Decryption Test
+            if command in ['decrypt-test', 'decryption-test']:
+                if CRYPTO_AVAILABLE and CryptoEngine is not None:
+                    try:
+                        print(f"{Fore.CYAN}[*] Running decryption system test...{Style.RESET_ALL}")
+                        crypto = CryptoEngine()
+                        crypto.decrypt_test()
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] Decryption test failed: {e}{Style.RESET_ALL}")
+                        import traceback
+                        traceback.print_exc()
                 else:
-                    print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+                    print(f"{Fore.RED}[!] Encryption Suite module not available{Style.RESET_ALL}")
                 return
-
-            if command == "encrypt-dir":
-                if self.crypto:
-                    self.crypto.encrypt_directory()
-                else:
-                    print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
-                return
-
-            if command == "decrypt-dir":
-                if self.crypto:
-                    self.crypto.decrypt_directory()
-                else:
-                    print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
-                return
-
-            if command == "crypto-export":
-                if self.crypto:
-                    self.crypto.export_encryption_key()
-                else:
-                    print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
-                return
-
-            if command == "crypto-import":
-                if self.crypto:
-                    self.crypto.import_encryption_key()
-                else:
-                    print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
-                return
-
-            if command == "crypto-backup":
-                if self.crypto:
-                    self.crypto.crypto_backup()
-                else:
-                    print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
-                return
-
-            if command == "crypto-list":
-                if self.crypto:
-                    self.crypto.crypto_list()
-                else:
-                    print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
-                return
-
-            if command == "crypto-info":
-                if self.crypto:
-                    if args:
-                        self.crypto.crypto_info(args[0])
-                    else:
-                        self.crypto.crypto_info()
-                else:
-                    print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
-                return
-
-            if command == "crypto-verify":
-                if self.crypto:
-                    self.crypto.crypto_verify()
-                else:
-                    print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
-                return
-
-            if command == "crypto-status":
-                if self.crypto:
-                    self.crypto.crypto_status()
-                else:
-                    print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
-                return
-
-            if command == "crypto-reports":
-                if self.crypto:
-                    self.crypto.list_reports()
-                else:
-                    print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
-                return
-
-            if command == "encrypted-dirs":
-                if self.crypto:
-                    self.crypto.list_encrypted_dirs()
-                else:
-                    print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
-                return
-
-            if command == "qr-generate":
-                if self.crypto:
-                    self.crypto.qr_generate()
-                else:
-                    print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
-                return
-
-            if command == "qr-import":
-                if self.crypto:
-                    self.crypto.qr_import()
-                else:
-                    print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
-                return
-
-            if command == "qr-list":
-                if self.crypto:
-                    self.crypto.qr_list()
-                else:
-                    print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
-                return
-
-            if command == "qr-restore":
-                if self.crypto:
-                    self.crypto.qr_restore()
-                else:
-                    print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
-                return
-
-            if command == "clean-qr":
-                if self.crypto:
-                    if os.path.exists(QR_CODE_DIR):
-                        self.crypto.qr_list()
-                        confirm = input(f"\n{Fore.RED}Delete all QR codes? (y/N): {Style.RESET_ALL}").strip().lower()
-                        if confirm == 'y':
-                            count = 0
-                            for f in os.listdir(QR_CODE_DIR):
-                                if f.endswith('.png'):
-                                    try:
-                                        os.remove(os.path.join(QR_CODE_DIR, f))
-                                        count += 1
-                                    except:
-                                        pass
-                            self.crypto.typer.text_type(f"✅ Deleted {count} QR codes", color=Colors.GREEN)
-                            self.crypto.add_activity(f"Cleaned {count} QR codes")
-                            input(f"\n{Fore.YELLOW}Press ENTER to continue...{Style.RESET_ALL}")
-                    else:
-                        self.crypto.typer.text_type("❌ QR directory not found", color=Colors.RED)
-                        input(f"\n{Fore.YELLOW}Press ENTER to continue...{Style.RESET_ALL}")
-                else:
-                    print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
-                return
-
-            if command == "encrypt-test":
-                if self.crypto:
-                    self.crypto.encrypt_test()
-                else:
-                    print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
-                return
-
-            if command == "decrypt-test":
-                if self.crypto:
-                    self.crypto.decrypt_test()
-                else:
-                    print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
-                return
-
-            if command == "crypto-debug":
-                if self.crypto:
-                    self.crypto.typer.text_type("DEBUG INFO", color=Colors.RED)
-                    info = PlatformUtils.get_platform_info()
-                    for key, value in info.items():
-                        self.crypto.typer.text_type(f"{key}: {value}", color=Colors.CYAN)
-                    self.crypto.typer.text_type(f"KEY_FILE: {KEY_FILE}", color=Colors.CYAN)
-                    self.crypto.typer.text_type(f"QR_CODE_DIR: {QR_CODE_DIR}", color=Colors.CYAN)
-                    self.crypto.typer.text_type(f"BACKUP_DIR: {BACKUP_DIR}", color=Colors.CYAN)
-                    self.crypto.typer.text_type(f"ENCRYPTED_DIR: {ENCRYPTED_DIR}", color=Colors.CYAN)
-                    self.crypto.typer.text_type(f"REPORTS_DIR: {REPORTS_DIR}", color=Colors.CYAN)
-                    self.crypto.typer.text_type(f"Key exists: {os.path.exists(KEY_FILE)}", color=Colors.CYAN)
-                    self.crypto.typer.text_type(f"QR dir exists: {os.path.exists(QR_CODE_DIR)}", color=Colors.CYAN)
-                    self.crypto.typer.text_type(f"Encrypted dir exists: {os.path.exists(ENCRYPTED_DIR)}", color=Colors.CYAN)
-                    self.crypto.typer.text_type(f"Reports dir exists: {os.path.exists(REPORTS_DIR)}", color=Colors.CYAN)
-                    self.crypto.typer.text_type(f"QR Method: {QR_METHOD}", color=Colors.CYAN)
-                    self.crypto.typer.text_type(f"Report Available: {REPORT_AVAILABLE}", color=Colors.CYAN)
-                    input(f"\n{Fore.YELLOW}Press ENTER to continue...{Style.RESET_ALL}")
-                else:
-                    print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
-                return
-
-            if command in ["encrypt", "enc", "crypt"]:
-                if self.crypto:
-                    if command == "encrypt" and args:
-                        self.crypto.encrypt_file(args[0])
-                    elif command == "encrypt" and not args:
-                        file = input("File to encrypt: ")
-                        if file:
-                            self.crypto.encrypt_file(file)
+            
+            # Clean QR codes
+            if command in ['clean-qr', 'qr-clean']:
+                if CRYPTO_AVAILABLE and CryptoEngine is not None:
+                    try:
+                        crypto = CryptoEngine()
+                        if os.path.exists(QR_CODE_DIR):
+                            # Show QR list first
+                            crypto.qr_list()
+                            confirm = input(f"\n{Fore.RED}Delete all QR codes? (y/N): {Style.RESET_ALL}").strip().lower()
+                            if confirm == 'y':
+                                count = 0
+                                for f in os.listdir(QR_CODE_DIR):
+                                    if f.endswith('.png'):
+                                        try:
+                                            os.remove(os.path.join(QR_CODE_DIR, f))
+                                            count += 1
+                                        except:
+                                            pass
+                                print(f"{Fore.GREEN}[+] Deleted {count} QR codes{Style.RESET_ALL}")
+                                crypto.add_activity(f"Cleaned {count} QR codes")
                         else:
-                            print("[!] No file specified")
-                    else:
-                        self.crypto.main()
+                            print(f"{Fore.YELLOW}[!] QR directory not found{Style.RESET_ALL}")
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] Failed to clean QR codes: {e}{Style.RESET_ALL}")
                 else:
-                    print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+                    print(f"{Fore.RED}[!] Encryption Suite module not available{Style.RESET_ALL}")
                 return
 
-            if command == "decrypt":
-                if self.crypto:
-                    if args:
-                        self.crypto.decrypt_file(args[0])
-                    else:
-                        file = input("File to decrypt: ")
-                        if file:
-                            self.crypto.decrypt_file(file)
+            # List encrypted directories (if not already added)
+            if command in ['encrypted-dirs', 'encdirs']:
+                if CRYPTO_AVAILABLE and CryptoEngine is not None:
+                    try:
+                        crypto = CryptoEngine()
+                        crypto.list_encrypted_dirs()
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] Failed to list encrypted directories: {e}{Style.RESET_ALL}")
+                else:
+                    print(f"{Fore.RED}[!] Encryption Suite module not available{Style.RESET_ALL}")
+                return
+
+            # Debug info
+            if command in ['crypto-debug', 'encryption-debug']:
+                if CRYPTO_AVAILABLE and CryptoEngine is not None:
+                    try:
+                        crypto = CryptoEngine()
+                        crypto._debug_info()
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] Debug info failed: {e}{Style.RESET_ALL}")
+                else:
+                    print(f"{Fore.RED}[!] Encryption Suite module not available{Style.RESET_ALL}")
+                return
+            # Quick file encryption - direct without interactive console
+            if command in ['encrypt', 'enc']:
+                if CRYPTO_AVAILABLE and CryptoEngine is not None:
+                    try:
+                        if not args:
+                            print(f"{Fore.YELLOW}[!] Usage: encrypt <filename>{Style.RESET_ALL}")
+                            print(f"{Fore.YELLOW}💡 Example: encrypt myfile.txt{Style.RESET_ALL}")
+                            return
+                        
+                        filename = args[0]
+                        if not os.path.exists(filename):
+                            print(f"{Fore.RED}[!] File not found: {filename}{Style.RESET_ALL}")
+                            return
+                        
+                        print(f"{Fore.CYAN}[*] Encrypting: {filename}{Style.RESET_ALL}")
+                        crypto = CryptoEngine()
+                        crypto.encrypt_file(filename)
+                        print(f"{Fore.GREEN}[+] Encryption completed!{Style.RESET_ALL}")
+                        
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] Encryption failed: {e}{Style.RESET_ALL}")
+                        import traceback
+                        traceback.print_exc()
+                else:
+                    print(f"{Fore.RED}[!] Encryption Suite module not available{Style.RESET_ALL}")
+                return
+
+            # Quick file decryption
+            if command in ['decrypt', 'dec']:
+                if CRYPTO_AVAILABLE and CryptoEngine is not None:
+                    try:
+                        if not args:
+                            print(f"{Fore.YELLOW}[!] Usage: decrypt <filename>{Style.RESET_ALL}")
+                            print(f"{Fore.YELLOW}💡 Example: decrypt myfile.txt.enc{Style.RESET_ALL}")
+                            return
+                        
+                        filename = args[0]
+                        if not os.path.exists(filename):
+                            print(f"{Fore.RED}[!] File not found: {filename}{Style.RESET_ALL}")
+                            return
+                        
+                        print(f"{Fore.CYAN}[*] Decrypting: {filename}{Style.RESET_ALL}")
+                        crypto = CryptoEngine()
+                        crypto.decrypt_file(filename)
+                        print(f"{Fore.GREEN}[+] Decryption completed!{Style.RESET_ALL}")
+                        
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] Decryption failed: {e}{Style.RESET_ALL}")
+                        import traceback
+                        traceback.print_exc()
+                else:
+                    print(f"{Fore.RED}[!] Encryption Suite module not available{Style.RESET_ALL}")
+                return
+
+            # Encrypt directory
+            if command in ['encrypt-dir', 'encdir']:
+                if CRYPTO_AVAILABLE and CryptoEngine is not None:
+                    try:
+                        if not args:
+                            print(f"{Fore.YELLOW}[!] Usage: encrypt-dir <directory_path>{Style.RESET_ALL}")
+                            print(f"{Fore.YELLOW}💡 Example: encrypt-dir C:\\Users\\stark\\Documents\\Secret{Style.RESET_ALL}")
+                            return
+                        
+                        dir_path = args[0]
+                        if not os.path.exists(dir_path):
+                            print(f"{Fore.RED}[!] Directory not found: {dir_path}{Style.RESET_ALL}")
+                            return
+                        
+                        if not os.path.isdir(dir_path):
+                            print(f"{Fore.RED}[!] Path is not a directory: {dir_path}{Style.RESET_ALL}")
+                            return
+                        
+                        print(f"{Fore.CYAN}[*] Encrypting directory: {dir_path}{Style.RESET_ALL}")
+                        crypto = CryptoEngine()
+                        result, container_path = crypto.dir_encryptor.encrypt_directory(dir_path)
+                        
+                        if result:
+                            print(f"{Fore.GREEN}[+] Directory encrypted successfully!{Style.RESET_ALL}")
+                            print(f"{Fore.CYAN}   Container: {container_path}{Style.RESET_ALL}")
                         else:
-                            print("[!] No file specified")
+                            print(f"{Fore.RED}[!] Directory encryption failed{Style.RESET_ALL}")
+                        
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] Directory encryption failed: {e}{Style.RESET_ALL}")
+                        import traceback
+                        traceback.print_exc()
                 else:
-                    print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+                    print(f"{Fore.RED}[!] Encryption Suite module not available{Style.RESET_ALL}")
                 return
 
-            if command in ["encrypt-setup", "crypto-init"]:
-                if self.crypto:
-                    self.crypto.encrypt_setup()
+            # Decrypt directory
+            if command in ['decrypt-dir', 'decdir']:
+                if CRYPTO_AVAILABLE and CryptoEngine is not None:
+                    try:
+                        if not args:
+                            print(f"{Fore.YELLOW}[!] Usage: decrypt-dir <container_path>{Style.RESET_ALL}")
+                            print(f"{Fore.YELLOW}💡 Example: decrypt-dir C:\\Users\\stark\\dsterminal_workspace\\crypto\\encrypted\\Secret_20250101.enc_dir.zip{Style.RESET_ALL}")
+                            print(f"{Fore.YELLOW}💡 Tip: Use 'encrypted-dirs' to list available containers{Style.RESET_ALL}")
+                            return
+                        
+                        container_path = args[0]
+                        if not os.path.exists(container_path):
+                            print(f"{Fore.RED}[!] Container not found: {container_path}{Style.RESET_ALL}")
+                            return
+                        
+                        print(f"{Fore.CYAN}[*] Decrypting directory: {container_path}{Style.RESET_ALL}")
+                        crypto = CryptoEngine()
+                        result = crypto.dir_encryptor.decrypt_directory(container_path)
+                        
+                        if result:
+                            print(f"{Fore.GREEN}[+] Directory decrypted successfully!{Style.RESET_ALL}")
+                        else:
+                            print(f"{Fore.RED}[!] Directory decryption failed{Style.RESET_ALL}")
+                        
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] Directory decryption failed: {e}{Style.RESET_ALL}")
+                        import traceback
+                        traceback.print_exc()
                 else:
-                    print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+                    print(f"{Fore.RED}[!] Encryption Suite module not available{Style.RESET_ALL}")
                 return
 
+            # List encrypted directories
+            if command in ['encrypted-dirs', 'encdirs', 'list-encrypted']:
+                if CRYPTO_AVAILABLE and CryptoEngine is not None:
+                    try:
+                        crypto = CryptoEngine()
+                        crypto.list_encrypted_dirs()
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] Failed to list encrypted directories: {e}{Style.RESET_ALL}")
+                        import traceback
+                        traceback.print_exc()
+                else:
+                    print(f"{Fore.RED}[!] Encryption Suite module not available{Style.RESET_ALL}")
+                return
+
+            # QR Code Commands
+            if command in ['qr-export', 'qrexport']:
+                if CRYPTO_AVAILABLE and CryptoEngine is not None:
+                    try:
+                        crypto = CryptoEngine()
+                        crypto.qr_export()
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] QR export failed: {e}{Style.RESET_ALL}")
+                        import traceback
+                        traceback.print_exc()
+                else:
+                    print(f"{Fore.RED}[!] Encryption Suite module not available{Style.RESET_ALL}")
+                return
+
+            if command in ['qr-import', 'qrimport']:
+                if CRYPTO_AVAILABLE and CryptoEngine is not None:
+                    try:
+                        crypto = CryptoEngine()
+                        crypto.qr_import()
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] QR import failed: {e}{Style.RESET_ALL}")
+                        import traceback
+                        traceback.print_exc()
+                else:
+                    print(f"{Fore.RED}[!] Encryption Suite module not available{Style.RESET_ALL}")
+                return
+
+            if command in ['qr-list', 'qrlist']:
+                if CRYPTO_AVAILABLE and CryptoEngine is not None:
+                    try:
+                        crypto = CryptoEngine()
+                        crypto.qr_list()
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] QR list failed: {e}{Style.RESET_ALL}")
+                        import traceback
+                        traceback.print_exc()
+                else:
+                    print(f"{Fore.RED}[!] Encryption Suite module not available{Style.RESET_ALL}")
+                return
+
+            if command in ['qr-restore', 'qrrestore']:
+                if CRYPTO_AVAILABLE and CryptoEngine is not None:
+                    try:
+                        crypto = CryptoEngine()
+                        crypto.qr_restore()
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] QR restore failed: {e}{Style.RESET_ALL}")
+                        import traceback
+                        traceback.print_exc()
+                else:
+                    print(f"{Fore.RED}[!] Encryption Suite module not available{Style.RESET_ALL}")
+                return
+
+            # Crypto Key Management
+            if command in ['crypto-key', 'cryptokey']:
+                if CRYPTO_AVAILABLE and CryptoEngine is not None:
+                    try:
+                        crypto = CryptoEngine()
+                        crypto.crypto_info()
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] Failed to get key info: {e}{Style.RESET_ALL}")
+                else:
+                    print(f"{Fore.RED}[!] Encryption Suite module not available{Style.RESET_ALL}")
+                return
+
+            if command in ['crypto backup', 'cryptobackup']:
+                if CRYPTO_AVAILABLE and CryptoEngine is not None:
+                    try:
+                        crypto = CryptoEngine()
+                        crypto.crypto_backup()
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] Backup failed: {e}{Style.RESET_ALL}")
+                else:
+                    print(f"{Fore.RED}[!] Encryption Suite module not available{Style.RESET_ALL}")
+                return
+
+            if command in ['crypto verify', 'cryptoverify']:
+                if CRYPTO_AVAILABLE and CryptoEngine is not None:
+                    try:
+                        crypto = CryptoEngine()
+                        crypto.crypto_verify()
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] Verification failed: {e}{Style.RESET_ALL}")
+                else:
+                    print(f"{Fore.RED}[!] Encryption Suite module not available{Style.RESET_ALL}")
+                return
+
+            # Crypto status
+            if command in ['crypto status', 'cryptostatus']:
+                print(f"{Fore.CYAN}Encryption Suite Status:{Style.RESET_ALL}")
+                print(f"  Status: {'Loaded' if CRYPTO_AVAILABLE else 'Not Available'}")
+                print(f"  Module: encryption_suite.py")
+                if CRYPTO_AVAILABLE:
+                    print(f"  Features: Fernet AES-256 encryption")
+                    print(f"            File encryption/decryption")
+                    print(f"            Directory encryption/decryption")
+                    print(f"            QR code key management")
+                    print(f"            Key backup/restore")
+                    print(f"            Matrix Rain visualization")
+                return
+
+            # Crypto help
+            if command in ['crypto help', 'crypthelp']:
+                print(f"\n{Fore.CYAN}Encryption Suite Commands:{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}{'═' * 60}{Style.RESET_ALL}")
+                print(f"  {Fore.GREEN}encryption{Style.RESET_ALL}           - Launch interactive encryption console")
+                print(f"  {Fore.GREEN}crypto{Style.RESET_ALL}                - Alias for encryption")
+                print(f"  {Fore.GREEN}encrypt <file>{Style.RESET_ALL}        - Quick encrypt a file")
+                print(f"  {Fore.GREEN}enc <file>{Style.RESET_ALL}            - Alias for encrypt")
+                print(f"  {Fore.GREEN}decrypt <file>{Style.RESET_ALL}        - Quick decrypt a file")
+                print(f"  {Fore.GREEN}dec <file>{Style.RESET_ALL}            - Alias for decrypt")
+                print(f"  {Fore.GREEN}encrypt-dir <path>{Style.RESET_ALL}    - Encrypt a directory")
+                print(f"  {Fore.GREEN}encdir <path>{Style.RESET_ALL}         - Alias for encrypt-dir")
+                print(f"  {Fore.GREEN}decrypt-dir <path>{Style.RESET_ALL}    - Decrypt a directory")
+                print(f"  {Fore.GREEN}decdir <path>{Style.RESET_ALL}         - Alias for decrypt-dir")
+                print(f"  {Fore.GREEN}encrypted-dirs{Style.RESET_ALL}        - List encrypted directories")
+                print(f"  {Fore.GREEN}encdirs{Style.RESET_ALL}               - Alias for encrypted-dirs")
+                print(f"  {Fore.GREEN}qr-export{Style.RESET_ALL}             - Export key as QR code")
+                print(f"  {Fore.GREEN}qrexport{Style.RESET_ALL}              - Alias for qr-export")
+                print(f"  {Fore.GREEN}qr-import{Style.RESET_ALL}             - Import key from QR code")
+                print(f"  {Fore.GREEN}qrimport{Style.RESET_ALL}              - Alias for qr-import")
+                print(f"  {Fore.GREEN}qr-list{Style.RESET_ALL}               - List all QR codes")
+                print(f"  {Fore.GREEN}qrlist{Style.RESET_ALL}                - Alias for qr-list")
+                print(f"  {Fore.GREEN}qr-restore{Style.RESET_ALL}            - Restore key from QR backup")
+                print(f"  {Fore.GREEN}qrrestore{Style.RESET_ALL}             - Alias for qr-restore")
+                print(f"  {Fore.GREEN}crypto-key{Style.RESET_ALL}            - Show encryption key info")
+                print(f"  {Fore.GREEN}cryptokey{Style.RESET_ALL}             - Alias for crypto-key")
+                print(f"  {Fore.GREEN}crypto-backup{Style.RESET_ALL}         - Backup encryption key")
+                print(f"  {Fore.GREEN}cryptobackup{Style.RESET_ALL}          - Alias for crypto-backup")
+                print(f"  {Fore.GREEN}crypto-verify{Style.RESET_ALL}         - Verify encryption system")
+                print(f"  {Fore.GREEN}cryptoverify{Style.RESET_ALL}          - Alias for crypto-verify")
+                print(f"  {Fore.GREEN}crypto-status{Style.RESET_ALL}         - Show module status")
+                print(f"  {Fore.GREEN}crypto-help{Style.RESET_ALL}           - Show this help")
+                print(f"  {Fore.GREEN}crypthelp{Style.RESET_ALL}             - Alias for crypto-help")
+                print(f"\n{Fore.CYAN}Examples:{Style.RESET_ALL}")
+                print(f"  {Fore.YELLOW}encryption{Style.RESET_ALL}           - Launch interactive console")
+                print(f"  {Fore.YELLOW}encrypt secret.txt{Style.RESET_ALL}   - Encrypt a file")
+                print(f"  {Fore.YELLOW}decrypt secret.txt.enc{Style.RESET_ALL} - Decrypt a file")
+                print(f"  {Fore.YELLOW}encrypt-dir ./Documents{Style.RESET_ALL} - Encrypt a directory")
+                print(f"  {Fore.YELLOW}qr-export{Style.RESET_ALL}            - Export key as QR code")
+                print(f"  {Fore.GREEN}encrypt-test{Style.RESET_ALL}            - Run encryption system test")
+                print(f"  {Fore.GREEN}encryption-test{Style.RESET_ALL}         - Alias for encrypt-test")
+                print(f"  {Fore.GREEN}crypto-test{Style.RESET_ALL}             - Alias for encrypt-test")
+                print(f"  {Fore.GREEN}decrypt-test{Style.RESET_ALL}            - Run decryption system test")
+                print(f"  {Fore.GREEN}decryption-test{Style.RESET_ALL}         - Alias for decrypt-test")
+                print(f"  {Fore.GREEN}clean-qr{Style.RESET_ALL}                - Clean/delete all QR codes")
+                print(f"  {Fore.GREEN}qr-clean{Style.RESET_ALL}                - Alias for clean-qr")
+                print(f"  {Fore.GREEN}encrypted-dirs{Style.RESET_ALL}          - List encrypted directories")
+                print(f"  {Fore.GREEN}encdirs{Style.RESET_ALL}                 - Alias for encrypted-dirs")
+                print(f"  {Fore.GREEN}crypto-debug{Style.RESET_ALL}            - Show debug information")
+                print(f"  {Fore.GREEN}encryption-debug{Style.RESET_ALL}        - Alias for crypto-debug")
+                print(f"\n{Fore.CYAN}Examples:{Style.RESET_ALL}")
+                print(f"  {Fore.YELLOW}encrypt-test{Style.RESET_ALL}           - Test encryption system")
+                print(f"  {Fore.YELLOW}decrypt-test{Style.RESET_ALL}           - Test decryption system")
+                print(f"  {Fore.YELLOW}clean-qr{Style.RESET_ALL}               - Clean QR codes")
+                print(f"{Fore.CYAN}{'═' * 60}{Style.RESET_ALL}")
+                return
+                print(f"{Fore.CYAN}{'═' * 60}{Style.RESET_ALL}")
+                return
 
             # ============================================================
-            # FINANCIAL FORENSICS COMMANDS - Direct import like certcheck
+            # FINANCIAL FORENSICS COMMANDS - Direct import
             # ============================================================
 
             # Launch Financial Forensics Suite
@@ -12090,10 +12323,11 @@ class SecurityTerminal:
                 print(f"  {Fore.YELLOW}enhanced-mitre-report{Style.RESET_ALL}")
                 print(f"{Fore.CYAN}{'═' * 60}{Style.RESET_ALL}")
                 return
+ 
             # ============================================================
-            # IOC EDUCATION COMMANDS
+            # IOC EDUCATION COMMANDS - As per your pasted text
             # ============================================================
-            
+
             # Main IOC education command - Interactive learning
             if command in ["ioc", "ioc-guide", "about ioc", "ioc learn", "learn iocs"]:
                 if IOC_EDU_AVAILABLE and self.ioc_edu is not None:
@@ -12110,7 +12344,7 @@ class SecurityTerminal:
                     print(f"{Fore.RED}[!] IOC Education module not available{Style.RESET_ALL}")
                     print(f"{Fore.YELLOW}💡 Make sure ioc_edu.py is in the same directory{Style.RESET_ALL}")
                 return
-            
+
             # Show random lesson (non-interactive)
             if command in ["ioc-lesson", "ioc-single"]:
                 if IOC_EDU_AVAILABLE and self.ioc_edu is not None:
@@ -12125,7 +12359,7 @@ class SecurityTerminal:
                 else:
                     print(f"{Fore.RED}[!] IOC Education module not available{Style.RESET_ALL}")
                 return
-            
+
             # Show all lessons sequentially
             if command in ["ioc-all", "ioc all lessons"]:
                 if IOC_EDU_AVAILABLE and self.ioc_edu is not None:
@@ -12144,7 +12378,7 @@ class SecurityTerminal:
                 else:
                     print(f"{Fore.RED}[!] IOC Education module not available{Style.RESET_ALL}")
                 return
-            
+
             # List all lessons
             if command in ["ioc-list", "ioc-ls", "ioc-lessons"]:
                 if IOC_EDU_AVAILABLE and self.ioc_edu is not None:
@@ -12156,7 +12390,7 @@ class SecurityTerminal:
                 else:
                     print(f"{Fore.RED}[!] IOC Education module not available{Style.RESET_ALL}")
                 return
-            
+
             # Show progress
             if command in ["iocprogress", "ioc-stats", "ioc-info"]:
                 if IOC_EDU_AVAILABLE and self.ioc_edu is not None:
@@ -12181,7 +12415,7 @@ class SecurityTerminal:
                 else:
                     print(f"{Fore.RED}[!] IOC Education module not available{Style.RESET_ALL}")
                 return
-            
+
             # Reset progress
             if command in ["ioc-reset", "ioc clear", "ioc-restart"]:
                 if IOC_EDU_AVAILABLE and self.ioc_edu is not None:
@@ -12195,7 +12429,7 @@ class SecurityTerminal:
                 else:
                     print(f"{Fore.RED}[!] IOC Education module not available{Style.RESET_ALL}")
                 return
-            
+
             # Module status
             if command in ["ioc-status", "ioc-module"]:
                 print(f"{Fore.CYAN}IOC Education Module Status:{Style.RESET_ALL}")
@@ -12216,9 +12450,7 @@ class SecurityTerminal:
                 else:
                     print(f"  💡 Run 'ioc' to start learning")
                 return
-            
-                # ============================================================
-            
+
             # UPDATE MANAGER COMMANDS
             # ============================================================
             
@@ -12311,6 +12543,8 @@ class SecurityTerminal:
             
                 # ============================================================
             
+
+
             # SOC AUTOMATED LAB COMMANDS
             # ============================================================
             
@@ -12774,6 +13008,7 @@ class SecurityTerminal:
                 print(f"  {Fore.YELLOW}web-headers https://example.com{Style.RESET_ALL} - Check headers")
                 print(f"{Fore.CYAN}{'═' * 60}{Style.RESET_ALL}")
                 return
+            
             # ============================================================
             # FIXED: Handle Recon Commands
             # ============================================================
@@ -14834,19 +15069,50 @@ class SecurityTerminal:
             # Cryptography
             # --------------------------------------------------------
             "encrypt": None,
+            "encryption": None,
+            "crypto-key": None,
+            "cryptokey": None,
+            "crypto-debug": None,
+            "encryption-debug": None,
+            "clean-qr": None,
+            "qr-clean": None,
             "decrypt": None,
-            "crypt": None,
+            "dec": None,
+            "encrypt-dir": None,
+            "decrypt-dir": None,
+            "encrypted-dirs": None,
+            "qr-export": None,
+            "qrexport": None,
+            "qr-import": None,
+            "qrimport": None,
+            "qr-list": None,
+            "qrlist": None,
+            "qr-restore": None,
+            "qrrestore": None,
+            "crypto": None,
             "enc": None,
+            "decrypt-test": None,
+            "decryption-test": None,
+            "encryption-test": None,
+            "clean qr": None,
+            "qr-clean": None,
+            "crypto test": None,
             "encrypt-test": None,
             "encrypt-setup": None,
+            "encrypt-suite": None,
             "crypto-list": None,
-            "crypto-info": None,
-            "crypto-verify": None,
-            "crypto-backup": None,
-            "crypto-status": None,
-            "crypto-export": None,
-            "crypto-import": None,
-            "crypto-setup": None,
+            "cryptostatus": None,
+            "crypto info": None,
+            "crypto verify": None,
+            "cryptoverify": None,
+            "crypto backup": None,
+            "cryptobackup": None,
+            "crypto status": None,
+            "crypto export": None,
+            "crypto import": None,
+            "crypto setup": None,
+            "crypto help": None,
+            "'crypthelp": None,
 
             # --------------------------------------------------------
             # Forensics / investigation
@@ -15019,6 +15285,31 @@ class SecurityTerminal:
             "web-full": None,
             "webfull": None,
 
+            # SQLMAP COMMANDS
+            "sqllab": None,
+            "sqllab stop": None,
+            "advanced sqllab": None,
+            "advanced sqllab stop": None,
+            "sqllab status": None,
+            "advanced sqllab status": None,
+            "sqllab secure": None,
+            "advanced sqlmap secure": None,
+            "sqllab waf": None,
+            "advanced sqlmap waf": None,
+            "sqllab techniques": None,
+            "advanced sqlmap techniques": None,
+            "sqllab pdf": None,
+            "advanced-sqlmap-pdf": None,
+            "sqlmap scan": None,
+            "sqlscan": None,
+            "advanced-sqlmap-scan": None,
+            "sqlmap install": None,
+            "install sqlmap": None,
+            "sqllab reset": None,
+            "sqlmap reset": None,
+            "sqlmap status": None,
+            "sqlmap help": None,
+            "sqllab help": None,
             # --------------------------------------------------------
             # Shell-like commands
             # --------------------------------------------------------

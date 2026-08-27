@@ -893,7 +893,7 @@ class QRCodeManager:
                         img = qr.make_image(fill_color="black", back_color="white")
                         img.save(filepath)
                 
-                time.sleep(0.3)
+                time.sleep(1.03)
             
             sys.stdout.write('\r')
             sys.stdout.write(f"{Colors.CYAN}│{Colors.END} {Colors.GREEN}[{'█' * bar_length}]{Colors.END} {Colors.GREEN}100%{Colors.END}")
@@ -2135,7 +2135,7 @@ class CryptoEngine:
                 padding = max(0, (term_width - len(clean_line)) // 2)
                 print(' ' * padding + line)
             
-            choice = input(f"\n{Colors.GREEN}└──[{Colors.YELLOW}CRYPTO{Colors.GREEN}]{Colors.END} # ").strip()
+            choice = input(f"\n{Colors.GREEN}└──[{Colors.YELLOW}CRYPTOGRAPHY1{Colors.GREEN}]{Colors.END} # ").strip()
             
             if choice in ['01', '1']:
                 self.encrypt_setup()
