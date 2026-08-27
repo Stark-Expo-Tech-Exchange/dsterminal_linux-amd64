@@ -1,4 +1,4 @@
-﻿# cleanup_wrappers.ps1
+# cleanup_wrappers.ps1
 Write-Host "Cleaning up old wrappers..." -ForegroundColor Cyan
 
 $wrapperDirs = @(

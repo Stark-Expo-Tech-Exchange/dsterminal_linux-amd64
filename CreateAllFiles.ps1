@@ -1,4 +1,4 @@
-﻿# CreateAllFiles.ps1 - Fixed version
+# CreateAllFiles.ps1 - Fixed version
 Write-Host "Creating all required files for DSTerminal installer..." -ForegroundColor Cyan
 
 # Create directories

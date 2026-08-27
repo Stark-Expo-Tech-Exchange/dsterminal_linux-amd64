@@ -1,5 +1,71 @@
-﻿# soc_enhanced_modules.py
+#!python
+import sys
 """
+
+# ============================================================
+# FIX: Handle OSError 22 on Windows
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(["chcp", "65001"], capture_output=True, shell=True)
+    except:
+        pass
+
+_original_stdout_write = sys.stdout.write
+
+def _safe_stdout_write(text):
+    try:
+        _original_stdout_write(text)
+    except OSError as e:
+        if e.errno == 22:
+            try:
+                clean = text.encode("ascii", "ignore").decode("ascii")
+                _original_stdout_write(clean)
+            except:
+                pass
+        else:
+            raise
+    except UnicodeEncodeError:
+        try:
+            clean = text.encode("ascii", "ignore").decode("ascii")
+            _original_stdout_write(clean)
+        except:
+            pass
+
+sys.stdout.write = _safe_stdout_write
+
+
+# ============================================================
+# FIX: Handle OSError 22 on Windows
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(["chcp", "65001"], capture_output=True, shell=True)
+    except:
+        pass
+
+
+    try:
+    except OSError as e:
+        if e.errno == 22:
+            try:
+                clean = text.encode("ascii", "ignore").decode("ascii")
+                _original_stdout_write(clean)
+            except:
+                pass
+        else:
+            raise
+    except UnicodeEncodeError:
+        try:
+            clean = text.encode("ascii", "ignore").decode("ascii")
+            _original_stdout_write(clean)
+        except:
+            pass
+
+sys.stdout.write = _safe_stdout_write
+
 SOC Enhanced Modules - Complete Integration Package
 Includes:
 - MITRE ATT&CK Mapping with Mitigations
@@ -9,17 +75,7 @@ Includes:
 - Visual Analytics with Charts
 """
 import sys
-if sys.platform == 'win32':
-    import os
-    import msvcrt
-    # Ensure stdout is properly set
-    if hasattr(sys.stdout, 'buffer'):
-        sys.stdout = open(sys.stdout.fileno(), 'w', encoding='utf-8', errors='ignore')
-    if hasattr(sys.stderr, 'buffer'):
-        sys.stderr = open(sys.stderr.fileno(), 'w', encoding='utf-8', errors='ignore')
-        
 import os
-import sys
 import json
 import time
 import hashlib
@@ -30,7 +86,89 @@ from collections import defaultdict, deque
 from typing import Dict, List, Any, Optional, Set
 from dataclasses import dataclass, field
 
-# Try imports with fallbacks
+# ============================================================
+# FIX WINDOWS CONSOLE ENCODING - MUST BE FIRST
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(['chcp', '65001'], capture_output=True, shell=True)
+    except:
+        pass
+    
+    # Fix stdout encoding
+    try:
+        if hasattr(sys.stdout, 'reconfigure'):
+            sys.stdout.reconfigure(encoding='utf-8', errors='ignore')
+        else:
+            import io
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
+    except:
+        pass
+
+# ============================================================
+# ANSI COLOR DEFINITIONS (ALWAYS AVAILABLE)
+# ============================================================
+class Colors:
+    """ANSI color codes for terminal output"""
+    RED = '\033[91m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    BLUE = '\033[94m'
+    MAGENTA = '\033[95m'
+    CYAN = '\033[96m'
+    WHITE = '\033[97m'
+    RESET = '\033[0m'
+    DIM = '\033[2m'
+    BRIGHT = '\033[1m'
+
+# ============================================================
+# TRY TO IMPORT COLORAMA WITH PROPER ERROR HANDLING
+# ============================================================
+try:
+    from colorama import init, Fore, Back, Style
+    init(autoreset=True)
+    COLORS_AVAILABLE = True
+except ImportError:
+    COLORS_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m'
+    })
+    Back = type('Back', (), {'RESET': '\033[49m'})
+except Exception as e:
+    COLORS_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m'
+    })
+    Back = type('Back', (), {'RESET': '\033[49m'})
+
+# ============================================================
+# SIMPLE SAFE PRINT FUNCTION
+# ============================================================
+def safe_print_unicode(message):
+    """Safely print unicode/emoji characters on Windows"""
+    try:
+        print(message)
+    except UnicodeEncodeError:
+        clean_message = message.encode('ascii', 'ignore').decode('ascii')
+        print(clean_message)
+    except Exception:
+        try:
+            print(str(message))
+        except:
+            pass
+
+# ============================================================
+# TRY TO IMPORT OPTIONAL DEPENDENCIES
+# ============================================================
 try:
     import requests
     REQUESTS_AVAILABLE = True
@@ -65,7 +203,6 @@ try:
     RICH_AVAILABLE = True
 except ImportError:
     RICH_AVAILABLE = False
-
 
 # ============================================================
 # MITRE ATT&CK INTEGRATION
@@ -348,9 +485,6 @@ class MITREAttackIntegration:
 
 
 # ============================================================
-# REAL-TIME ALERT DASHBOARD
-# ============================================================
-# ============================================================
 # REAL-TIME ALERT DASHBOARD - BACKGROUND MODE
 # ============================================================
 
@@ -478,9 +612,7 @@ class AlertDashboard:
         self.alerts.clear()
         self.severity_counts.clear()
         self.category_counts.clear()
-# ============================================================
-# THREAT INTELLIGENCE FEEDS
-# ============================================================
+
 
 # ============================================================
 # THREAT INTELLIGENCE FEEDS - FIXED
@@ -526,9 +658,9 @@ class ThreatIntelligence:
                     # Load metadata
                     if 'metadata' in data:
                         self.ioc_metadata = data['metadata']
-                    print(f"âœ… Loaded {self.get_total_iocs()} IOCs from disk")
+                    safe_print_unicode(f"✅ Loaded {self.get_total_iocs()} IOCs from disk")
             except Exception as e:
-                print(f"âš ï¸ Failed to load IOCs: {e}")
+                safe_print_unicode(f"⚠️ Failed to load IOCs: {e}")
     
     def _save_iocs(self):
         """Save IOCs to disk"""
@@ -549,7 +681,7 @@ class ThreatIntelligence:
                 json.dump(data, f, indent=2)
             return True
         except Exception as e:
-            print(f"âŒ Failed to save IOCs: {e}")
+            safe_print_unicode(f"❌ Failed to save IOCs: {e}")
             return False
     
     def add_ioc(self, ioc_type: str, value: str, category: str = 'malicious'):
@@ -561,15 +693,15 @@ class ThreatIntelligence:
         
         # Validate inputs
         if ioc_type not in self.iocs:
-            print(f"âŒ Invalid IOC type: {ioc_type}")
+            safe_print_unicode(f"❌ Invalid IOC type: {ioc_type}")
             return False
         
         if category not in ['malicious', 'suspicious', 'clean']:
-            print(f"âŒ Invalid category: {category}")
+            safe_print_unicode(f"❌ Invalid category: {category}")
             return False
         
         if not value:
-            print("âŒ IOC value cannot be empty")
+            safe_print_unicode("❌ IOC value cannot be empty")
             return False
         
         # Add to appropriate set
@@ -586,7 +718,7 @@ class ThreatIntelligence:
         
         # Save to disk
         self._save_iocs()
-        print(f"âœ… IOC added: {ioc_type} - {value} ({category})")
+        safe_print_unicode(f"✅ IOC added: {ioc_type} - {value} ({category})")
         return True
     
     def check_ioc(self, ioc_type: str, value: str) -> Dict:
@@ -664,6 +796,7 @@ class ThreatIntelligence:
             self._save_iocs()
         
         return removed
+    
     def update_feeds(self):
         """Update threat intelligence feeds"""
         self.last_update = datetime.now()
@@ -721,7 +854,7 @@ class EnhancedReportGenerator:
             'medium': severity_counts.get('MEDIUM', 0),
             'low': severity_counts.get('LOW', 0),
             'risk_score': self._calculate_risk_score(severity_counts),
-            'status': 'ðŸŸ¢ SECURE' if len(threats) == 0 else 'ðŸŸ¡ ACTIVE' if len(threats) < 10 else 'ðŸ”´ CRITICAL'
+            'status': '🟢 SECURE' if len(threats) == 0 else '🟡 ACTIVE' if len(threats) < 10 else '🔴 CRITICAL'
         }
     
     def _calculate_risk_score(self, severity_counts: Dict) -> int:
@@ -852,28 +985,28 @@ class EnhancedReportGenerator:
         if mitre_summary:
             for mitigation in mitre_summary.get('mitigations_needed', []):
                 if mitigation not in recommendations:
-                    recommendations.append(f"ðŸ”§ {mitigation}")
+                    recommendations.append(f"🔧 {mitigation}")
         
         categories = [t.get('category', '') for t in threats]
         if 'ransomware' in categories:
-            recommendations.append("ðŸš¨ Implement ransomware protection and backup strategy")
+            recommendations.append("🚨 Implement ransomware protection and backup strategy")
         if 'malware' in categories:
-            recommendations.append("ðŸ›¡ï¸ Update antivirus and endpoint protection")
+            recommendations.append("🛡️ Update antivirus and endpoint protection")
         if 'phishing' in categories:
-            recommendations.append("ðŸŽ“ Conduct security awareness training")
+            recommendations.append("🎓 Conduct security awareness training")
         if 'data_exfiltration' in categories:
-            recommendations.append("ðŸ”’ Implement data loss prevention (DLP)")
+            recommendations.append("🔒 Implement data loss prevention (DLP)")
         if 'privilege_escalation' in categories:
-            recommendations.append("ðŸ” Review and restrict user privileges")
+            recommendations.append("🔐 Review and restrict user privileges")
         if 'lateral_movement' in categories:
-            recommendations.append("ðŸŒ Segment network and implement zero-trust model")
+            recommendations.append("🌐 Segment network and implement zero-trust model")
         
         if not recommendations:
-            recommendations.append("âœ… System appears secure - maintain monitoring")
+            recommendations.append("✅ System appears secure - maintain monitoring")
         else:
-            recommendations.append("ðŸ“Š Regular security audits and reviews")
-            recommendations.append("ðŸ”„ Keep all systems and software updated")
-            recommendations.append("ðŸ“ Document and review incident response plans")
+            recommendations.append("📊 Regular security audits and reviews")
+            recommendations.append("🔄 Keep all systems and software updated")
+            recommendations.append("📝 Document and review incident response plans")
         
         return list(set(recommendations))
     
@@ -1081,7 +1214,7 @@ class EnhancedReportGenerator:
         .recommendations {{ background: #e8f4fd; padding: 20px; border-radius: 10px; margin: 20px 0; }}
         .recommendations ul {{ list-style-type: none; padding: 0; }}
         .recommendations li {{ padding: 8px 0; padding-left: 25px; position: relative; }}
-        .recommendations li::before {{ content: "âœ…"; position: absolute; left: 0; }}
+        .recommendations li::before {{ content: "✅"; position: absolute; left: 0; }}
         
         .mitre-section {{ background: #f0f0f0; padding: 15px; border-radius: 10px; margin: 15px 0; }}
         .mitre-item {{ background: white; padding: 10px; margin: 5px 0; border-radius: 5px; border-left: 3px solid #667eea; }}
@@ -1103,7 +1236,7 @@ class EnhancedReportGenerator:
 <body>
     <div class="container">
         <div class="header">
-            <h1>ðŸ›¡ï¸ SOC Automated Lab - Comprehensive Security Report</h1>
+            <h1>🛡️ SOC Automated Lab - Comprehensive Security Report</h1>
             <div class="subtitle">Generated: {metadata.get('generated', 'Unknown')}</div>
             <div class="subtitle">{metadata.get('platform', '')} {metadata.get('version', '')}</div>
         </div>
@@ -1136,7 +1269,7 @@ class EnhancedReportGenerator:
         </div>
         
         <div class="section">
-            <h2>ðŸ“Š Executive Summary</h2>
+            <h2>📊 Executive Summary</h2>
             <p><strong>Status:</strong> {exec_summary.get('status', 'UNKNOWN')}</p>
             <p><strong>Risk Level:</strong> {risk.get('level', 'UNKNOWN')}</p>
             <p><strong>Risk Score:</strong> {risk.get('score', 0)}/100</p>
@@ -1144,7 +1277,7 @@ class EnhancedReportGenerator:
         </div>
         
         <div class="section">
-            <h2>ðŸ“ˆ Threat Analytics</h2>
+            <h2>📈 Threat Analytics</h2>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div>
                     <h3>Top Categories</h3>
@@ -1163,7 +1296,7 @@ class EnhancedReportGenerator:
         </div>
         
         <div class="section">
-            <h2>ðŸŽ¯ MITRE ATT&CK Analysis</h2>
+            <h2>🎯 MITRE ATT&CK Analysis</h2>
             <div class="mitre-section">
                 <h3>Techniques Detected</h3>
                 {''.join(f'<div class="mitre-item"><strong>{data.get("name", tech)}</strong> - Used {data.get("count", 0)} times</div>' for tech, data in mitre.get('techniques_used', {}).items())}
@@ -1171,13 +1304,13 @@ class EnhancedReportGenerator:
             <div class="mitre-section">
                 <h3>Mitigations Needed</h3>
                 <ul>
-                    {''.join(f'<li>ðŸ”§ {mitigation}</li>' for mitigation in mitre.get('mitigations_needed', [])[:10])}
+                    {''.join(f'<li>🔧 {mitigation}</li>' for mitigation in mitre.get('mitigations_needed', [])[:10])}
                 </ul>
             </div>
         </div>
         
         <div class="section">
-            <h2>ðŸ–¥ï¸ Process Analytics</h2>
+            <h2>🖥️ Process Analytics</h2>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
                 <div class="summary-card">
                     <div class="value">{process.get('total', 0)}</div>
@@ -1199,7 +1332,7 @@ class EnhancedReportGenerator:
         </div>
         
         <div class="section">
-            <h2>ðŸ” Threat Intelligence</h2>
+            <h2>🔍 Threat Intelligence</h2>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
                 <div class="summary-card">
                     <div class="value">{ioc_summary.get('hashes', {}).get('malicious', 0)}</div>
@@ -1217,7 +1350,7 @@ class EnhancedReportGenerator:
         </div>
         
         <div class="section">
-            <h2>ðŸ“‹ Recommendations</h2>
+            <h2>📋 Recommendations</h2>
             <div class="recommendations">
                 <ul>
                     {''.join(f'<li>{rec}</li>' for rec in recommendations)}
@@ -1227,7 +1360,7 @@ class EnhancedReportGenerator:
         
         <div class="footer">
             <p>Generated by SOC Automated Lab {metadata.get('version', '')}</p>
-            <p>Â© 2024 DSTERMINAL Cyber Ops Platform | All Rights Reserved</p>
+            <p>© 2024 DSTERMINAL Cyber Ops Platform | All Rights Reserved</p>
             <p>This report is for EDUCATIONAL & AUTHORIZED SECURITY TESTING purposes only.</p>
         </div>
     </div>
@@ -1246,9 +1379,6 @@ class EnhancedReportGenerator:
             return 'risk-low'
 
 
-# ============================================================
-# ENHANCED MODULES MANAGER
-# ============================================================
 # ============================================================
 # ENHANCED MODULES MANAGER - FIXED
 # ============================================================
@@ -1286,13 +1416,13 @@ class EnhancedModulesManager:
         """Start all modules"""
         self.is_running = True
         self.alert_dashboard.start()
-        print("âœ… Enhanced Modules started (Background Mode)")
+        safe_print_unicode("✅ Enhanced Modules started (Background Mode)")
     
     def stop(self):
         """Stop all modules"""
         self.is_running = False
         self.alert_dashboard.stop()
-        print("âœ… Enhanced Modules stopped")
+        safe_print_unicode("✅ Enhanced Modules stopped")
     
     def add_ioc(self, ioc_type: str, value: str, category: str = 'malicious') -> bool:
         """Add an IOC - FIXED"""
@@ -1343,26 +1473,6 @@ class EnhancedModulesManager:
             'threat_intel': {
                 'iocs': self.threat_intel.get_ioc_stats(),
                 'total_iocs': self.threat_intel.get_total_iocs(),
-                'last_update': str(self.threat_intel.last_update)
-            },
-            'running': self.is_running
-        }
-        """Get status of all modules"""
-        alert_stats = self.alert_dashboard.get_stats()
-        return {
-            'mitre': {
-                'techniques': len(self.mitre.techniques),
-                'tactics': len(self.mitre.tactics)
-            },
-            'alert_dashboard': {
-                'running': self.alert_dashboard.running,
-                'alerts': alert_stats['total'],
-                'critical': alert_stats['critical'],
-                'high': alert_stats['high'],
-                'medium': alert_stats['medium']
-            },
-            'threat_intel': {
-                'iocs': self.threat_intel.get_ioc_stats(),
                 'last_update': str(self.threat_intel.last_update)
             },
             'running': self.is_running

@@ -1,4 +1,4 @@
-﻿; DSTerminal Installer Script - Non-Admin Safe with Documentation & Auto-Update
+; DSTerminal Installer Script - Non-Admin Safe with Documentation & Auto-Update
 ; Version: 4.0.0.113
 ; Date: 2026
 ; UPDATED: Added vt_scan.py for VirusTotal module

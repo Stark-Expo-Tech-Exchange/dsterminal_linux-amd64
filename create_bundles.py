@@ -1,4 +1,5 @@
-﻿# create_bundles.py - Complete Fixed Version
+#!python
+# create_bundles.py - Complete Fixed Version
 import os
 import sys
 import shutil

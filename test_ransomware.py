@@ -1,3 +1,4 @@
+#!python
 """
 Test Ransomware Detection for DSTerminal Dashboard
 Run this to simulate ransomware activity and test the quarantine feature

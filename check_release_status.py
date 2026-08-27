@@ -1,4 +1,5 @@
-﻿# check_release_status.py
+#!python
+# check_release_status.py
 import requests
 
 GITHUB_TOKEN = "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"

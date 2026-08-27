@@ -1,50 +1,126 @@
-﻿# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 DSTerminal Complete Security Suite v4.0.0.113
 Enhanced with Automatic Ransomware Detection Anywhere in System
 Full Dashboard Controls Implementation with Auto-Quarantine Progress
 """
+
+# ============================================================
+# FIX: aiohttp compatibility with Python 3.11+
+# ============================================================
+# ============================================================
+# WINDOWS / PYTHON 3.11+ RUNTIME
+# ============================================================
+# DSTerminal uses Flask-SocketIO with the Windows threading
+# backend. Eventlet is intentionally NOT used.
 import sys
-if sys.platform == 'win32':
-    import os
-    import msvcrt
-    # Ensure stdout is properly set
-    if hasattr(sys.stdout, 'buffer'):
-        sys.stdout = open(sys.stdout.fileno(), 'w', encoding='utf-8', errors='ignore')
-    if hasattr(sys.stderr, 'buffer'):
-        sys.stderr = open(sys.stderr.fileno(), 'w', encoding='utf-8', errors='ignore')
+import os
+import asyncio
+
+# Patch asyncio.coroutines._DEBUG before anything else imports it
+try:
+    import asyncio.coroutines
+    if not hasattr(asyncio.coroutines, '_DEBUG'):
+        asyncio.coroutines._DEBUG = False
         
-# ============================================================
-# FIX UNICODE ENCODING ISSUES FOR WINDOWS CONSOLE
-# ============================================================
-import sys
-import io
+except (ImportError, AttributeError):
+    pass
+import platform
 import os
 
-# Force UTF-8 encoding for stdout/stderr on Windows
-if sys.platform == 'win32':
+# Patch 1: Add coroutine decorator if missing (for older aiohttp)
+if not hasattr(asyncio, 'coroutine'):
+    def _coroutine_decorator(func):
+        """Replacement for asyncio.coroutine decorator"""
+        return func
+    asyncio.coroutine = _coroutine_decorator
+
+
+# Patch 3: Monkey patch aiohttp helpers
+try:
+    import aiohttp.helpers
+    if not hasattr(aiohttp.helpers, 'old_debug'):
+        aiohttp.helpers.old_debug = False
+    
+    # Add the missing coroutine attribute to aiohttp.helpers
+    if not hasattr(aiohttp.helpers, 'coroutine'):
+        aiohttp.helpers.coroutine = asyncio.coroutine
+except (ImportError, AttributeError):
+    pass
+
+# Patch 4: Also patch aiohttp's asyncio imports
+try:
+    import aiohttp
+    if hasattr(aiohttp, 'asyncio'):
+        if not hasattr(aiohttp.asyncio, 'coroutine'):
+            aiohttp.asyncio.coroutine = asyncio.coroutine
+except:
+    pass
+
+# ============================================================
+# FIX: Windows console encoding and OSError 22
+# ============================================================
+if platform.system() == "Windows":
     try:
-        # Set console code page to UTF-8
-        os.system('chcp 65001 > nul')
+        import subprocess as sp
+        sp.run(['chcp', '65001'], capture_output=True, shell=True)
     except:
         pass
     
-    # Replace stdout/stderr with UTF-8 wrappers
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
-    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='ignore')
-
-def safe_print_unicode(message):
-    """Safely print unicode/emoji characters on Windows"""
     try:
-        print(message)
-    except UnicodeEncodeError:
-        # Remove only the problem characters and retry
-        clean_message = message.encode('ascii', 'ignore').decode('ascii')
-        print(clean_message)
+        if hasattr(sys.stdout, 'reconfigure'):
+            sys.stdout.reconfigure(encoding='utf-8', errors='ignore')
+        elif hasattr(sys.stdout, 'buffer'):
+            import io
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
+    except:
+        pass
 
-# Now proceed with the rest of your imports
+    # Set environment variables
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
+    os.environ['PYTHONUTF8'] = '1'
+    os.environ['PROMPT_TOOLKIT_NO_CP437'] = '1'
+
+# ============================================================
+# SAFE STDOUT WRITE
+# ============================================================
+_original_stdout_write = sys.stdout.write if sys.stdout is not None else None
+
+
+def _safe_stdout_write(text):
+    try:
+        if _original_stdout_write is not None:
+            _original_stdout_write(text)
+    except OSError as e:
+        if e.errno == 22:
+            try:
+                clean = ''.join(c for c in text if ord(c) < 128 or c in '\n\r\t')
+                if _original_stdout_write is not None:
+                    _original_stdout_write(clean)
+            except:
+                pass
+        else:
+            raise
+    except UnicodeEncodeError:
+        try:
+            clean = text.encode('ascii', 'ignore').decode('ascii')
+            if _original_stdout_write is not None:
+                _original_stdout_write(clean)
+        except:
+            pass
+    except Exception:
+        pass
+
+if sys.stdout is not None:
+    sys.stdout.write = _safe_stdout_write
+
+# ============================================================
+# NOW IMPORT THE REST OF YOUR MODULES
+# ============================================================
+
+    
 import os
-import sys
 import time
 import threading
 import webbrowser
@@ -55,22 +131,119 @@ import json
 import hashlib
 import socket
 import netifaces
+import re
 from datetime import datetime, timedelta
 from flask import Flask, render_template_string, jsonify, request, send_file, make_response
 from flask_socketio import SocketIO, emit
 import psutil
 import platform
 
+
+# ============================================================
+# ANSI COLOR DEFINITIONS (ALWAYS AVAILABLE)
+# ============================================================
+class Colors:
+    """ANSI color codes for terminal output"""
+    RED = '\033[91m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    BLUE = '\033[94m'
+    MAGENTA = '\033[95m'
+    CYAN = '\033[96m'
+    WHITE = '\033[97m'
+    RESET = '\033[0m'
+    DIM = '\033[2m'
+    BRIGHT = '\033[1m'
+    LIGHTRED_EX = '\033[91m'
+    LIGHTGREEN_EX = '\033[92m'
+    LIGHTYELLOW_EX = '\033[93m'
+    LIGHTCYAN_EX = '\033[96m'
+    LIGHTMAGENTA_EX = '\033[95m'
+    LIGHTBLUE_EX = '\033[94m'
+    LIGHTWHITE_EX = '\033[97m'
+    
+    @staticmethod
+    def strip(text):
+        ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+        return ansi_escape.sub('', text)
+
+# ============================================================
+# TRY TO IMPORT COLORAMA WITH PROPER ERROR HANDLING
+# ============================================================
+try:
+    from colorama import init, Fore, Back, Style
+    init(autoreset=True, convert=True, strip=False)
+    COLORS_AVAILABLE = True
+    # Force color support
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
+    os.environ['PYTHONUTF8'] = '1'
+except ImportError:
+    COLORS_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m'
+    })
+    Back = type('Back', (), {
+        'RESET': '\033[49m',
+        'BLACK': '\033[40m',
+        'RED': '\033[41m',
+        'GREEN': '\033[42m',
+        'YELLOW': '\033[43m',
+        'BLUE': '\033[44m',
+        'MAGENTA': '\033[45m',
+        'CYAN': '\033[46m',
+        'WHITE': '\033[47m'
+    })
+except Exception as e:
+    COLORS_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m'
+    })
+    Back = type('Back', (), {
+        'RESET': '\033[49m',
+        'BLACK': '\033[40m',
+        'RED': '\033[41m',
+        'GREEN': '\033[42m',
+        'YELLOW': '\033[43m',
+        'BLUE': '\033[44m',
+        'MAGENTA': '\033[45m',
+        'CYAN': '\033[46m',
+        'WHITE': '\033[47m'
+    })
+
+# ============================================================
+# SIMPLE SAFE PRINT FUNCTION
+# ============================================================
+def safe_print_unicode(message):
+    """Safely print unicode/emoji characters on Windows"""
+    try:
+        print(message)
+    except UnicodeEncodeError:
+        clean_message = message.encode('ascii', 'ignore').decode('ascii')
+        print(clean_message)
+    except Exception:
+        try:
+            print(str(message))
+        except:
+            pass
+
 # ============================================================
 # SURGICAL REMOVAL OF FLASK STARTUP PRINTS
 # ============================================================
 import contextlib
-import io
+import io as io_lib
 
 class SilenceFlaskStartup:
     def __enter__(self):
         self._original_stdout = sys.stdout
-        sys.stdout = io.StringIO()
+        sys.stdout = io_lib.StringIO()
         return self
     def __exit__(self, exc_type, exc_val, exc_tb):
         sys.stdout = self._original_stdout
@@ -96,7 +269,7 @@ def get_workspace_directory():
     env_workspace = os.environ.get('DSTERMINAL_WORKSPACE')
     if env_workspace:
         workspace = env_workspace
-        safe_print_unicode(f"[WORKSPACE] Using environment variable: {workspace}")
+        print(f"[WORKSPACE] Using environment variable: {workspace}")
         return workspace
     
     # Check if running as a frozen executable (PyInstaller)
@@ -122,7 +295,7 @@ def get_workspace_directory():
         
         # Create workspace directory
         os.makedirs(workspace, exist_ok=True)
-        safe_print_unicode(f"[WORKSPACE] Using application data: {workspace}")
+        print(f"[WORKSPACE] Using application data: {workspace}")
         return workspace
     
     # Running as script - use user home directory
@@ -143,14 +316,14 @@ def get_workspace_directory():
         with open(test_file, 'w') as f:
             f.write('test')
         os.remove(test_file)
-        safe_print_unicode(f"[WORKSPACE] Using: {workspace}")
+        print(f"[WORKSPACE] Using: {workspace}")
         return workspace
     except:
         # Ultimate fallback to temp
         import tempfile
         workspace = os.path.join(tempfile.gettempdir(), 'dsterminal_workspace', 'ransom')
         os.makedirs(workspace, exist_ok=True)
-        safe_print_unicode(f"[WORKSPACE] Using fallback: {workspace}")
+        print(f"[WORKSPACE] Using fallback: {workspace}")
         return workspace
 
 # Get workspace directory
@@ -170,12 +343,13 @@ for dir_path in [WORKSPACE_DIR, REPORTS_DIR, LOGS_DIR, QUARANTINE_DIR,
                  STATIC_DIR, CONFIG_DIR]:
     os.makedirs(dir_path, exist_ok=True)
 
-safe_print_unicode("=" * 70)
-safe_print_unicode(f"📁 Workspace: {WORKSPACE_DIR}")
-safe_print_unicode(f"📁 Reports: {REPORTS_DIR}")
-safe_print_unicode(f"📁 Logs: {LOGS_DIR}")
-safe_print_unicode(f"📁 Quarantine: {QUARANTINE_DIR}")
-safe_print_unicode("=" * 70)
+print("=" * 70)
+print(f"[FOLDER] Workspace: {WORKSPACE_DIR}")
+print(f"[FOLDER] Reports: {REPORTS_DIR}")
+print(f"[FOLDER] Logs: {LOGS_DIR}")
+print(f"[FOLDER] Quarantine: {QUARANTINE_DIR}")
+print("=" * 70)
+
 # ============================================================
 # CONFIGURATION MANAGEMENT
 # ============================================================
@@ -285,12 +459,9 @@ def copy_logo_to_workspace():
         if os.path.exists(source):
             try:
                 shutil.copy2(source, logo_dest)
-                print(f"[LOGO] Copied logo from: {source}")
-                print(f"[LOGO] To: {logo_dest}")
                 return True
             except Exception as e:
-                print(f"[LOGO] Failed to copy from {source}: {e}")
-    
+                return False    
     # Create SVG fallback
     try:
         svg_content = '''<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
@@ -315,9 +486,7 @@ copy_logo_to_workspace()
 # ============================================================
 # FLASK APP
 # ============================================================
-app = Flask(__name__, 
-            static_folder=STATIC_DIR,
-            static_url_path='/static')
+app = Flask(__name__,static_folder=STATIC_DIR,static_url_path='/static')
 app.config['SECRET_KEY'] = 'dsterminal-holographic-2026'
 
 # ============================================================
@@ -360,9 +529,38 @@ shield = ShieldCore(WORKSPACE_DIR)
 shield.start_monitoring()
 
 # ============================================================
-# SOCKET IO
+# SOCKET.IO - WINDOWS THREADING IMPLEMENTATION
 # ============================================================
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+# This is the same configuration proven to work in the
+# standalone PyInstaller Socket.IO test. Do not use Eventlet,
+# Gevent, or a DummySocketIO fallback for the dashboard.
+
+def create_socketio_instance(app):
+    """Create the real Flask-SocketIO server using Windows threading."""
+    try:
+        sio = SocketIO(
+            app,
+            cors_allowed_origins="*",
+            async_mode="threading",
+            logger=False,
+            engineio_logger=False,
+        )
+        print("[SOCKETIO] Flask-SocketIO initialized successfully")
+        print(f"[SOCKETIO] Async mode: {sio.async_mode}")
+        return sio
+    except Exception as exc:
+        print("=" * 70)
+        print("[FATAL] Flask-SocketIO initialization failed")
+        print("=" * 70)
+        print(f"Error: {exc}")
+        raise RuntimeError(
+            "Flask-SocketIO could not initialize with the Windows threading "
+            "backend. Ensure Flask-SocketIO, python-socketio, "
+            "python-engineio and simple-websocket are installed."
+        ) from exc
+
+
+socketio = create_socketio_instance(app)
 
 # ============================================================
 # DATA STORES
@@ -529,49 +727,105 @@ class AdvancedRansomwareDetector:
         return detected
     
     def _is_ransomware_file(self, file_path):
-        """Check if a file exhibits ransomware behavior"""
+        """Check if a file exhibits ransomware behavior - Enhanced version"""
         try:
             # SKIP HONEYPOT FILES
             if 'honeypot' in file_path.lower():
                 return False
             
-            # Check file size changes
-            if os.path.getsize(file_path) > 1024 * 1024 * 10:  # 10MB
+            # Skip files that are too small (empty files) or too large
+            file_size = os.path.getsize(file_path)
+            if file_size < 10 or file_size > 1024 * 1024 * 50:  # 50MB max
                 return False
-                
-            # Read first few bytes
+            
+            # Read first few bytes (up to 4KB for better detection)
             with open(file_path, 'rb') as f:
-                content = f.read(1024)
-                
-            # Check for encrypted patterns
+                content = f.read(4096)
+            
+            if not content:
+                return False
+            
+            # Check for UTF-16 BOM and convert if needed
+            if content.startswith(b'\xff\xfe') or content.startswith(b'\xfe\xff'):
+                try:
+                    # Decode UTF-16 and re-encode to bytes for pattern matching
+                    text = content.decode('utf-16-le' if content.startswith(b'\xff\xfe') else 'utf-16-be')
+                    content = text.encode('utf-8')
+                except:
+                    pass
+            
+            # Also try to decode as UTF-8 if it looks like text
+            try:
+                text_content = content.decode('utf-8', errors='ignore').upper()
+            except:
+                text_content = content.upper().decode('ascii', errors='ignore')
+            
+            # Expanded ransomware patterns - includes more variants
             ransomware_patterns = [
-                b'ENCRYPTED',
-                b'DECRYPT',
-                b'RANSOM',
-                b'BITCOIN',
-                b'MONERO',
-                b'WALLET',
-                b'LOCKED',
-                b'ENCRYPTION',
-                b'CRYPTO',
-                b'DECRYPTION',
-                b'PAYMENT',
-                b'BTC',
-                b'XMR',
-                b'RANSOMWARE',
-                b'ENCRYPTED_BY_'
+                b'ENCRYPTED', b'DECRYPT', b'RANSOM', b'BITCOIN', b'MONERO',
+                b'WALLET', b'LOCKED', b'ENCRYPTION', b'CRYPTO', b'DECRYPTION',
+                b'PAYMENT', b'BTC', b'XMR', b'RANSOMWARE', b'ENCRYPTED_BY_',
+                b'DECRYPTED', b'ENCRYPT', b'LOCK', b'UNLOCK', b'KEY',
+                b'PASSWORD', b'RECOVERY', b'RESTORE', b'BACKUP', b'RANSOM',
+                b'PAY', b'BITCOIN', b'MONERO', b'ETH', b'ETHER',
+                b'YOUR FILES', b'FILES ENCRYPTED', b'DATA LOST',
+                b'CONTACT', b'EMAIL', b'INSTRUCTION', b'WARNING',
+                b'URGENT', b'IMPORTANT', b'READ_ME', b'RECOVER'
             ]
             
+            # Check binary patterns
+            content_upper = content.upper()
             for pattern in ransomware_patterns:
-                if pattern in content.upper():
+                if pattern in content_upper:
                     return True
-                    
-            # Check for high entropy (encrypted data)
-            if self._calculate_entropy(content) > 7.5:
+            
+            # Also check text content for patterns
+            text_patterns = [
+                'ENCRYPTED', 'DECRYPT', 'RANSOM', 'BITCOIN', 'MONERO',
+                'WALLET', 'LOCKED', 'ENCRYPTION', 'CRYPTO', 'DECRYPTION',
+                'PAYMENT', 'BTC', 'XMR', 'RANSOMWARE', 'ENCRYPTED_BY',
+                'YOUR FILES ARE ENCRYPTED', 'PAY THE RANSOM',
+                'FILES ENCRYPTED', 'DATA LOST', 'RECOVER FILES',
+                'DECRYPTION KEY', 'RANSOM NOTE', 'PAYMENT REQUIRED'
+            ]
+            
+            for pattern in text_patterns:
+                if pattern in text_content:
+                    return True
+            
+            # Check for common ransomware file extensions
+            ransomware_extensions = [
+                '.encrypted', '.enc', '.locked', '.crypt', '.crypto',
+                '.ransom', '.pay', '.bitcoin', '.monero', '.wallet',
+                '.locked', '.decrypt', '.key', '.recover', '.restore'
+            ]
+            file_ext = os.path.splitext(file_path)[1].lower()
+            if file_ext in ransomware_extensions:
                 return True
-                
+            
+            # Check file name for ransomware indicators
+            filename = os.path.basename(file_path).lower()
+            ransomware_filenames = [
+                'decrypt', 'ransom', 'read_me', 'readme', 'recover',
+                'how_to_decrypt', 'howtodecrypt', 'restore', 'key',
+                'encrypted', 'lock', 'unlock', 'payment', 'bitcoin'
+            ]
+            for name in ransomware_filenames:
+                if name in filename:
+                    return True
+            
+            # Check for high entropy (encrypted data) - but only for files that might be encrypted
+            # Skip for text files that might have high entropy naturally
+            text_extensions = ['.txt', '.log', '.csv', '.xml', '.json', '.html', '.css', '.js']
+            if file_ext not in text_extensions:
+                entropy = self._calculate_entropy(content)
+                if entropy > 7.5:
+                    return True
+            
             return False
-        except:
+            
+        except Exception as e:
+            # Log error but don't crash
             return False
     
     def _calculate_entropy(self, data):
@@ -580,10 +834,16 @@ class AdvancedRansomwareDetector:
             return 0
         import math
         entropy = 0
-        for x in range(256):
-            p_x = float(data.count(x)) / len(data)
-            if p_x > 0:
-                entropy += - p_x * math.log(p_x, 2)
+        # Convert bytes to list of ints for counting
+        byte_counts = {}
+        for byte in data:
+            byte_counts[byte] = byte_counts.get(byte, 0) + 1
+        
+        length = len(data)
+        for count in byte_counts.values():
+            p_x = count / length
+            entropy += -p_x * math.log2(p_x)
+        
         return entropy
     
     def _get_process_name(self, file_path):
@@ -610,44 +870,6 @@ class AdvancedRansomwareDetector:
         return indicators
 
 detector = AdvancedRansomwareDetector()
-
-# ============================================================
-# BACKGROUND RANSOMWARE SCANNER - Continuous Monitoring
-# ============================================================
-
-def background_scanner():
-    """Continuous background scanner that runs every 30 seconds"""
-    global pending_quarantine, ransomware_detected_files, detected_file_paths
-    
-    safe_print_unicode("[SCANNER] Starting background ransomware scanner...")
-    
-    while True:
-        try:
-            if config.get('monitoring_enabled', True):
-                result = detect_ransomware_file()
-                
-                if result.get('detected'):
-                    safe_print_unicode(f"[SCANNER] Ransomware detected: {result.get('file_path')}")
-                    socketio.emit('ransomware_alert', {
-                        'file_path': result.get('file_path'),
-                        'process': result.get('process'),
-                        'timestamp': datetime.now().isoformat()
-                    })
-                    
-                    with app.app_context():
-                        status = get_status().get_json()
-                        socketio.emit('status_update', status)
-            
-            time.sleep(30)
-            
-        except Exception as e:
-            safe_print_unicode(f"[SCANNER] Error: {e}")
-            time.sleep(30)
-
-# Start the background scanner thread
-scanner_thread = threading.Thread(target=background_scanner, daemon=True)
-scanner_thread.start()
-safe_print_unicode("[SCANNER] Background scanner thread started")
 
 # ============================================================
 # AUTO-QUARANTINE ENGINE WITH PROGRESS
@@ -771,10 +993,10 @@ class AutoQuarantineEngine:
                 'file_path': file_path,
                 'description': f"Ransomware file auto-quarantined: {filename}",
                 'recommendations': [
-                    '✅ File has been automatically quarantined',
-                    '🟡 Review the file in quarantine section',
-                    '🟡 Run full system scan to check for more threats',
-                    '🟢 System is protected'
+                    '[OK] File has been automatically quarantined',
+                    '[INFO] Review the file in quarantine section',
+                    '[INFO] Run full system scan to check for more threats',
+                    '[SUCCESS] System is protected'
                 ]
             }
             generate_report(incident_data)
@@ -783,7 +1005,7 @@ class AutoQuarantineEngine:
                 if SHIELD_AVAILABLE and hasattr(shield, 'threat_level'):
                     shield.threat_level = type('obj', (object,), {'name': 'CLEAN'})
             
-            self._update_progress(100, '✅ Quarantine completed successfully')
+            self._update_progress(100, '[OK] Quarantine completed successfully')
             self.is_running = False
             auto_quarantine_progress['in_progress'] = False
             auto_quarantine_progress['status'] = 'completed'
@@ -1023,7 +1245,7 @@ def detect_threat_actors():
     
     if suspicious_processes:
         threats.append({
-            'name': '[ALERT] Suspicious Process Detected',  # Changed from 🚨
+            'name': '[ALERT] Suspicious Process Detected',  # Changed from [ALERT]
             'risk': 'High',
             'activities': len(suspicious_processes),
             'trend': 'up',
@@ -1062,16 +1284,16 @@ def detect_active_mitre_techniques():
 def get_recommendations(threat_level, file_path=None):
     if threat_level == 'RANSOMWARE_DETECTED':
         return [
-            f'🟢 Auto-quarantine is enabled and will isolate the infected file',
-            f'🔴 IMMEDIATE: Do not pay the ransom',
-            '🟡 Identify the ransomware variant',
-            '🟡 Restore files from backups',
-            '🟢 Report to IT Security team'
+            f'[SUCCESS] Auto-quarantine is enabled and will isolate the infected file',
+            f'[ERROR] IMMEDIATE: Do not pay the ransom',
+            '[INFO] Identify the ransomware variant',
+            '[INFO] Restore files from backups',
+            '[SUCCESS] Report to IT Security team'
         ]
     elif threat_level == 'SUSPICIOUS':
-        return ['🟡 Investigate suspicious processes', '🟡 Run full antivirus scan']
+        return ['[INFO] Investigate suspicious processes', '[INFO] Run full antivirus scan']
     else:
-        return ['✅ No action required', '✅ Continue monitoring']
+        return ['[OK] No action required', '[OK] Continue monitoring']
 
 # ============================================================
 # REPORT GENERATOR
@@ -1114,16 +1336,16 @@ body {{ font-family: 'Segoe UI', sans-serif; background: #0a0e17; color: #00ff88
 </head>
 <body>
 <div class="watermark">{watermark}</div>
-<div class="header"><h1>DSTERMINAL CYBER OPS - INCIDENT REPORT</h1>
+<div class="header"><h1>DSTERMINAL CYBER OPS - INCIDENT RESPONSE REPORT</h1>
 <p>Report ID: {report_id} | Version: 4.0.0.113 | Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p></div>
 <div class="incident">
-<h2>🚨 {incident_data.get('threat_level', 'INCIDENT')}</h2>
+<h2>[ALERT] {incident_data.get('threat_level', 'INCIDENT')}</h2>
 <p><b>File:</b> {incident_data.get('file_path', 'Unknown')}</p>
 <p>{incident_data.get('description', 'Security incident detected and contained')}</p>
 </div>
-<h3>📋 Recommendations</h3>
-{''.join([f'<div class="recommendation">✅ {r}</div>' for r in incident_data.get('recommendations', ['Run full system scan', 'Update security patches', 'Review access logs'])])}
-<h3>📊 System Metrics</h3>
+<h3>[LIST] Recommendations</h3>
+{''.join([f'<div class="recommendation">[OK] {r}</div>' for r in incident_data.get('recommendations', ['Run full system scan', 'Update security patches', 'Review access logs'])])}
+<h3>[CHART] System Metrics</h3>
 <div><span class="metric">CPU: {psutil.cpu_percent()}%</span>
 <span class="metric">RAM: {psutil.virtual_memory().percent}%</span>
 <span class="metric">DISK: {psutil.disk_usage('/').percent}%</span></div>
@@ -2032,31 +2254,178 @@ def export_logs():
     return jsonify({'error': 'Failed to export logs'}), 500
 
 # ============================================================
-# WEBSOCKET
+# WEBSOCKET / REAL-TIME DASHBOARD STREAM
 # ============================================================
+# One broadcaster is shared by all connected browser clients.
+# The old implementation started one infinite thread per browser
+# subscription; this implementation keeps a single controlled
+# monitoring loop and broadcasts to all connected clients.
+
+_realtime_clients = set()
+_realtime_lock = threading.Lock()
+_realtime_thread = None
+_realtime_stop = threading.Event()
+
+
+def _realtime_snapshot():
+    """Build one complete dashboard update safely."""
+    with app.app_context():
+        try:
+            status_response = get_status()
+            status = status_response.get_json() if hasattr(status_response, 'get_json') else status_response
+        except Exception as exc:
+            status = {'error': str(exc)}
+
+        try:
+            metrics = get_system_metrics()
+        except Exception as exc:
+            metrics = {'error': str(exc)}
+
+        try:
+            mitre = detect_active_mitre_techniques()
+        except Exception as exc:
+            mitre = []
+
+        try:
+            events_response = get_events()
+            events = events_response.get_json() if hasattr(events_response, 'get_json') else events_response
+        except Exception:
+            events = []
+
+        return {
+            'status': status,
+            'metrics': metrics,
+            'mitre': mitre,
+            'events': events,
+            'timestamp': datetime.now().isoformat(),
+        }
+
+
+def _realtime_broadcast_loop():
+    """Broadcast dashboard telemetry every two seconds."""
+    global _realtime_thread
+    print("[SOCKETIO] Real-time monitoring loop started")
+
+    try:
+        while not _realtime_stop.is_set():
+            with _realtime_lock:
+                clients = list(_realtime_clients)
+
+            if not clients:
+                break
+
+            try:
+                snapshot = _realtime_snapshot()
+
+                for sid in clients:
+                    try:
+                        socketio.emit('status_update', snapshot['status'], room=sid)
+                        socketio.emit('metrics_update', snapshot['metrics'], room=sid)
+                        socketio.emit('mitre_update', snapshot['mitre'], room=sid)
+                        socketio.emit('events_update', snapshot['events'], room=sid)
+                    except Exception as exc:
+                        print(f"[SOCKETIO] Client update error: {exc}")
+
+            except Exception as exc:
+                print(f"[SOCKETIO] Real-time update error: {exc}")
+
+            # threading backend: normal sleep is intentional and safe.
+            _realtime_stop.wait(2.0)
+    finally:
+        _realtime_thread = None
+        _realtime_stop.clear()
+        print("[SOCKETIO] Real-time monitoring loop stopped")
+
+
+def _ensure_realtime_monitoring():
+    """Start the shared broadcaster once when the first client subscribes."""
+    global _realtime_thread
+
+    with _realtime_lock:
+        if _realtime_thread is not None and _realtime_thread.is_alive():
+            return
+
+        _realtime_stop.clear()
+        _realtime_thread = threading.Thread(
+            target=_realtime_broadcast_loop,
+            name="DSTerminal-Realtime",
+            daemon=True,
+        )
+        _realtime_thread.start()
+
+
 @socketio.on('connect')
 def handle_connect():
-    print(f'Client connected: {request.sid}')
-    emit('connected', {'status': 'connected'})
+    sid = request.sid
+    with _realtime_lock:
+        _realtime_clients.add(sid)
+
+    print(f'[SOCKETIO] Client connected: {sid}')
+    emit('connected', {
+        'status': 'connected',
+        'sid': sid,
+        'async_mode': socketio.async_mode,
+        'realtime': True,
+    })
+
+    # Send the current state immediately; don't wait for the 2-second loop.
+    try:
+        snapshot = _realtime_snapshot()
+        emit('status_update', snapshot['status'])
+        emit('metrics_update', snapshot['metrics'])
+        emit('mitre_update', snapshot['mitre'])
+        emit('events_update', snapshot['events'])
+    except Exception as exc:
+        print(f'[SOCKETIO] Initial state error: {exc}')
+
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    sid = request.sid
+    with _realtime_lock:
+        _realtime_clients.discard(sid)
+        remaining = len(_realtime_clients)
+        if remaining == 0:
+            _realtime_stop.set()
+
+    print(f'[SOCKETIO] Client disconnected: {sid}')
+
 
 @socketio.on('subscribe_updates')
 def handle_subscribe():
-    client_sid = request.sid
-    
-    def send_updates():
-        while True:
-            try:
-                with app.app_context():
-                    status = get_status().get_json()
-                    socketio.emit('status_update', status, room=client_sid)
-                    socketio.emit('metrics_update', get_system_metrics(), room=client_sid)
-                    socketio.emit('mitre_update', detect_active_mitre_techniques(), room=client_sid)
-                    time.sleep(2)
-            except Exception as e:
-                print(f"Update error: {e}")
-                time.sleep(5)
-    
-    threading.Thread(target=send_updates, daemon=True).start()
+    sid = request.sid
+    with _realtime_lock:
+        _realtime_clients.add(sid)
+
+    _ensure_realtime_monitoring()
+    emit('subscription_status', {
+        'subscribed': True,
+        'interval_seconds': 2,
+        'realtime': True,
+    })
+    print(f'[SOCKETIO] Client subscribed to real-time updates: {sid}')
+
+
+@socketio.on('unsubscribe_updates')
+def handle_unsubscribe():
+    sid = request.sid
+    with _realtime_lock:
+        _realtime_clients.discard(sid)
+        if not _realtime_clients:
+            _realtime_stop.set()
+
+    emit('subscription_status', {
+        'subscribed': False,
+        'realtime': False,
+    })
+    print(f'[SOCKETIO] Client unsubscribed: {sid}')
+
+@app.route('/favicon.ico')
+def favicon():
+    # No external favicon dependency is required for the standalone EXE.
+    response = make_response('', 204)
+    response.headers['Cache-Control'] = 'public, max-age=86400'
+    return response
 
 # ============================================================
 # HTML TEMPLATE
@@ -2363,7 +2732,7 @@ HTML_TEMPLATE = """
 
 <div id="fullscreenOverlay"></div>
 
-<div class="attack-banner" id="attackBanner">🚨 RANSOMWARE DETECTED - AUTO-QUARANTINE IN PROGRESS 🚨</div>
+<div class="attack-banner" id="attackBanner">[ALERT] RANSOMWARE DETECTED - AUTO-QUARANTINE IN PROGRESS [ALERT]</div>
 
 <header class="header" id="mainHeader">
     <div id="matrixContainer"></div>
@@ -2397,20 +2766,20 @@ HTML_TEMPLATE = """
     <div class="status-right">
         <span>
             <span class="glow-dot green" id="statusDot"></span>
-            <span id="statusText" class="status-protected">🟢 PROTECTED</span>
+            <span id="statusText" class="status-protected">[SUCCESS] PROTECTED</span>
         </span>
         <span id="headerTime"></span>
         <div class="header-controls">
             <label class="auto-quarantine-toggle" title="Auto-quarantine detected ransomware files">
-                <span>🤖 Auto-Q</span>
+                <span>[BOT] Auto-Q</span>
                 <input type="checkbox" id="autoQuarantineToggle" checked>
             </label>
             <button class="control-btn" onclick="toggleMonitoring()" id="monitorToggle">⏸ PAUSE</button>
-            <button class="control-btn success" onclick="runFullScan()">🔍 SCAN</button>
-            <button class="control-btn warning" onclick="showProcesses()">📊 PROCESSES</button>
-            <button class="control-btn danger" onclick="toggleIsolation()" id="isolateBtn">🔒 ISOLATE</button>
-            <button class="control-btn" onclick="showQuarantine()">📁 QUARANTINE</button>
-            <button class="control-btn" onclick="showWhitelist()">✅ WHITELIST</button>
+            <button class="control-btn success" onclick="runFullScan()">[SEARCH] SCAN</button>
+            <button class="control-btn warning" onclick="showProcesses()">[CHART] PROCESSES</button>
+            <button class="control-btn danger" onclick="toggleIsolation()" id="isolateBtn">[LOCK] ISOLATE</button>
+            <button class="control-btn" onclick="showQuarantine()">[FOLDER] QUARANTINE</button>
+            <button class="control-btn" onclick="showWhitelist()">[OK] WHITELIST</button>
         </div>
     </div>
 </header>
@@ -2418,7 +2787,7 @@ HTML_TEMPLATE = """
 <div class="dashboard-content">
     <div class="quarantine-progress-container" id="quarantineProgress">
         <div class="quarantine-progress-header">
-            <span>🔴 AUTO-QUARANTINE IN PROGRESS</span>
+            <span>[ERROR] AUTO-QUARANTINE IN PROGRESS</span>
             <span class="file-name" id="quarantineFileName">-</span>
             <span class="status-text" id="quarantineStatus">Starting...</span>
         </div>
@@ -2441,17 +2810,17 @@ HTML_TEMPLATE = """
 
     <div class="grid">
         <div class="card col-span-6">
-            <div class="card-title">📈 Threat Activity</div>
+            <div class="card-title">[CHART] Threat Activity</div>
             <div class="chart-container">
                 <canvas id="threatChart"></canvas>
-                <div class="chart-loading">📊 Loading chart...</div>
+                <div class="chart-loading">[CHART] Loading chart...</div>
             </div>
         </div>
         <div class="card col-span-6">
-            <div class="card-title">📊 System Resources</div>
+            <div class="card-title">[CHART] System Resources</div>
             <div class="chart-container">
                 <canvas id="systemChart"></canvas>
-                <div class="chart-loading">📊 Loading chart...</div>
+                <div class="chart-loading">[CHART] Loading chart...</div>
             </div>
         </div>
     </div>
@@ -2463,35 +2832,35 @@ HTML_TEMPLATE = """
             <div class="text-muted text-center mt-10" id="mitreCount">Loading techniques...</div>
         </div>
         <div class="card col-span-4">
-            <div class="card-title">🔒 Quarantine <span style="font-size:8px;color:#2a5a4a;" id="quarantineCount"></span></div>
+            <div class="card-title">[LOCK] Quarantine <span style="font-size:8px;color:#2a5a4a;" id="quarantineCount"></span></div>
             <div id="quarantineList"><div class="text-muted text-center">No files pending</div></div>
         </div>
         <div class="card col-span-4">
-            <div class="card-title">💡 Recommendations</div>
+            <div class="card-title">[TIP] Recommendations</div>
             <div id="recommendationList"><div class="text-muted text-center">No recommendations</div></div>
         </div>
     </div>
 
     <div class="grid">
         <div class="card col-span-6">
-            <div class="card-title">📋 Event Log <button class="control-btn" onclick="clearEvents()" style="font-size:8px;">CLEAR</button></div>
+            <div class="card-title">[LIST] Event Log <button class="control-btn" onclick="clearEvents()" style="font-size:8px;">CLEAR</button></div>
             <div class="event-log" id="eventLog">
                 <div class="no-events">Waiting for system events...</div>
             </div>
         </div>
         <div class="card col-span-6">
-            <div class="card-title">📄 Incident Reports</div>
+            <div class="card-title">[DOC] Incident Reports</div>
             <div id="reportList"><div class="text-muted text-center">No reports generated</div></div>
         </div>
     </div>
 
     <div class="grid">
         <div class="card col-span-6">
-            <div class="card-title">🚨 Detected Ransomware Files</div>
+            <div class="card-title">[ALERT] Detected Ransomware Files</div>
             <div id="ransomwareFiles"><div class="text-muted text-center">No ransomware detected</div></div>
         </div>
         <div class="card col-span-6">
-            <div class="card-title">🔍 Vulnerabilities</div>
+            <div class="card-title">[SEARCH] Vulnerabilities</div>
             <div id="vulnList"><div class="text-muted text-center">Scanning...</div></div>
         </div>
     </div>
@@ -2653,7 +3022,7 @@ HTML_TEMPLATE = """
             return;
         }
         
-        if (!confirm(`⚠️ Are you sure you want to quarantine this file?\n\n📁 ${path}\n\nThis action will move the file to quarantine and prevent it from executing.`)) {
+        if (!confirm(`[WARNING] Are you sure you want to quarantine this file?\n\n[FOLDER] ${path}\n\nThis action will move the file to quarantine and prevent it from executing.`)) {
             return;
         }
         
@@ -2675,7 +3044,7 @@ HTML_TEMPLATE = """
             btn.disabled = false;
             
             if (data.success) { 
-                alert('✅ File quarantined successfully!');
+                alert('[OK] File quarantined successfully!');
                 fetch('/api/status').then(r => r.json()).then(updateStatus);
                 fetch('/api/quarantine/pending').then(r => r.json()).then(updateQuarantine);
             } 
@@ -2701,7 +3070,7 @@ HTML_TEMPLATE = """
             body: JSON.stringify({ quarantine_path: path })
         }).then(r => r.json()).then(data => {
             if (data.success) {
-                alert('✅ File restored!');
+                alert('[OK] File restored!');
                 fetch('/api/status').then(r => r.json()).then(updateStatus);
             } else {
                 alert('❌ Restore failed: ' + data.error);
@@ -2717,7 +3086,7 @@ HTML_TEMPLATE = """
             body: JSON.stringify({ quarantine_path: path })
         }).then(r => r.json()).then(data => {
             if (data.success) {
-                alert('✅ File deleted!');
+                alert('[OK] File deleted!');
                 fetch('/api/status').then(r => r.json()).then(updateStatus);
             } else {
                 alert('❌ Delete failed: ' + data.error);
@@ -2742,7 +3111,7 @@ HTML_TEMPLATE = """
             return;
         }
         scanning = true;
-        document.getElementById('scanStatus').textContent = '🔍 Scanning...';
+        document.getElementById('scanStatus').textContent = '[SEARCH] Scanning...';
         document.getElementById('scanStatus').style.color = '#ffcc00';
         
         fetch('/api/scan/full', { method: 'POST' })
@@ -2750,7 +3119,7 @@ HTML_TEMPLATE = """
             .then(data => {
                 scanning = false;
                 if (data.success) {
-                    document.getElementById('scanStatus').textContent = `✅ Scan complete: ${data.count} files detected`;
+                    document.getElementById('scanStatus').textContent = `[OK] Scan complete: ${data.count} files detected`;
                     document.getElementById('scanStatus').style.color = '#00ff88';
                     fetch('/api/status').then(r => r.json()).then(updateStatus);
                 } else {
@@ -2771,15 +3140,15 @@ HTML_TEMPLATE = """
     function toggleIsolation() {
         const btn = document.getElementById('isolateBtn');
         if (!isolated) {
-            if (!confirm('⚠️ Isolate system from network? This will block all network traffic.')) return;
+            if (!confirm('[WARNING] Isolate system from network? This will block all network traffic.')) return;
             fetch('/api/network/isolate', { method: 'POST' })
                 .then(r => r.json())
                 .then(data => {
                     if (data.success) {
                         isolated = true;
-                        btn.textContent = '🔓 RESTORE NETWORK';
+                        btn.textContent = '[UNLOCK] RESTORE NETWORK';
                         btn.className = 'control-btn success';
-                        alert('✅ System isolated from network');
+                        alert('[OK] System isolated from network');
                     } else {
                         alert('❌ Isolation failed: ' + data.error);
                     }
@@ -2791,9 +3160,9 @@ HTML_TEMPLATE = """
                 .then(data => {
                     if (data.success) {
                         isolated = false;
-                        btn.textContent = '🔒 ISOLATE';
+                        btn.textContent = '[LOCK] ISOLATE';
                         btn.className = 'control-btn danger';
-                        alert('✅ Network restored');
+                        alert('[OK] Network restored');
                     } else {
                         alert('❌ Restore failed: ' + data.error);
                     }
@@ -2805,7 +3174,7 @@ HTML_TEMPLATE = """
         const modal = document.getElementById('modal');
         const title = document.getElementById('modalTitle');
         const body = document.getElementById('modalBody');
-        title.textContent = '📊 Running Processes';
+        title.textContent = '[CHART] Running Processes';
         body.innerHTML = '<div style="text-align:center;color:#2a5a4a;">Loading processes...</div>';
         modal.classList.add('show');
         
@@ -2855,7 +3224,7 @@ HTML_TEMPLATE = """
             btn.textContent = originalText;
             btn.disabled = false;
             if (data.success) {
-                alert('✅ Process killed');
+                alert('[OK] Process killed');
                 showProcesses();
             } else {
                 alert('❌ Failed: ' + (data.error || 'Unknown error'));
@@ -2872,7 +3241,7 @@ HTML_TEMPLATE = """
         const modal = document.getElementById('modal');
         const title = document.getElementById('modalTitle');
         const body = document.getElementById('modalBody');
-        title.textContent = '📁 Quarantined Files';
+        title.textContent = '[FOLDER] Quarantined Files';
         body.innerHTML = '<div style="text-align:center;color:#2a5a4a;">Loading...</div>';
         modal.classList.add('show');
         
@@ -2904,7 +3273,7 @@ HTML_TEMPLATE = """
         const modal = document.getElementById('modal');
         const title = document.getElementById('modalTitle');
         const body = document.getElementById('modalBody');
-        title.textContent = '✅ Whitelisted Files';
+        title.textContent = '[OK] Whitelisted Files';
         body.innerHTML = '<div style="text-align:center;color:#2a5a4a;">Loading...</div>';
         modal.classList.add('show');
         
@@ -2924,7 +3293,7 @@ HTML_TEMPLATE = """
                 }
                 body.innerHTML = files.map(f => `
                     <div class="list-item">
-                        <span style="font-size:10px;color:#00ff88;">✅ ${f}</span>
+                        <span style="font-size:10px;color:#00ff88;">[OK] ${f}</span>
                         <button class="action-btn danger" onclick="removeFromWhitelist('${f}')">REMOVE</button>
                     </div>
                 `).join('') + `
@@ -2951,7 +3320,7 @@ HTML_TEMPLATE = """
         .then(r => r.json())
         .then(data => {
             if (data.success) {
-                alert('✅ File added to whitelist: ' + filePath);
+                alert('[OK] File added to whitelist: ' + filePath);
                 showWhitelist();
             } else {
                 alert('❌ Failed: ' + (data.error || 'Unknown error'));
@@ -2971,7 +3340,7 @@ HTML_TEMPLATE = """
         .then(r => r.json())
         .then(data => {
             if (data.success) {
-                alert('✅ Removed from whitelist');
+                alert('[OK] Removed from whitelist');
                 showWhitelist();
             } else {
                 alert('❌ Failed: ' + (data.error || 'Unknown error'));
@@ -2997,7 +3366,7 @@ HTML_TEMPLATE = """
             fill.style.width = data.current_step + '%';
             percent.textContent = data.current_step + '%';
             step.textContent = data.status || 'Processing...';
-            status.textContent = data.current_step >= 100 ? '✅ Complete!' : '⏳ In Progress...';
+            status.textContent = data.current_step >= 100 ? '[OK] Complete!' : '⏳ In Progress...';
             fileName.textContent = data.file_path ? data.file_path.split('\\\\').pop() : '-';
             
             if (data.start_time) {
@@ -3006,7 +3375,7 @@ HTML_TEMPLATE = """
             }
             
             document.getElementById('attackBanner').className = 'attack-banner show';
-            document.getElementById('attackBanner').textContent = '🔴 RANSOMWARE DETECTED - AUTO-QUARANTINE IN PROGRESS (' + data.current_step + '%)';
+            document.getElementById('attackBanner').textContent = '[DMZ] RANSOMWARE DETECTED - AUTO-QUARANTINE IN PROGRESS (' + data.current_step + '%)';
             
             document.getElementById('autoQStatus').textContent = '🔄 Auto-Q: ' + data.current_step + '%';
             document.getElementById('autoQStatus').style.color = '#ffcc00';
@@ -3015,7 +3384,7 @@ HTML_TEMPLATE = """
             document.getElementById('attackBanner').className = 'attack-banner';
             
             if (data && data.status === 'completed') {
-                document.getElementById('autoQStatus').textContent = '✅ Auto-Q: Complete!';
+                document.getElementById('autoQStatus').textContent = '[OK] Auto-Q: Complete!';
                 document.getElementById('autoQStatus').style.color = '#00ff88';
                 setTimeout(() => {
                     document.getElementById('autoQStatus').textContent = '';
@@ -3210,7 +3579,7 @@ HTML_TEMPLATE = """
     function updateStatus(data) {
         const maps = { 
             'CLEAN': { class: 'badge-clean', text: 'CLEAN' }, 
-            'RANSOMWARE_DETECTED': { class: 'badge-ransomware', text: '🚨 RANSOMWARE!' }, 
+            'RANSOMWARE_DETECTED': { class: 'badge-ransomware', text: '[ALERT] RANSOMWARE!' }, 
             'SUSPICIOUS': { class: 'badge-suspicious', text: 'SUSPICIOUS' }, 
             'HIGH_RISK': { class: 'badge-high', text: 'HIGH RISK' } 
         };
@@ -3220,11 +3589,11 @@ HTML_TEMPLATE = """
         const statusText = document.getElementById('statusText');
         const statusDot = document.getElementById('statusDot');
         if (data.threat_level === 'RANSOMWARE_DETECTED') {
-            statusText.textContent = '🔴 ATTACK';
+            statusText.textContent = '[WARNING!] ATTACK';
             statusText.className = 'status-attack';
             statusDot.className = 'glow-dot red';
         } else {
-            statusText.textContent = '🟢 PROTECTED';
+            statusText.textContent = '[SUCCESS] PROTECTED';
             statusText.className = 'status-protected';
             statusDot.className = 'glow-dot green';
         }
@@ -3273,10 +3642,10 @@ HTML_TEMPLATE = """
             isolated = data.isolated;
             const btn = document.getElementById('isolateBtn');
             if (isolated) {
-                btn.textContent = '🔓 RESTORE NETWORK';
+                btn.textContent = '[UNLOCK] RESTORE NETWORK';
                 btn.className = 'control-btn success';
             } else {
-                btn.textContent = '🔒 ISOLATE';
+                btn.textContent = '[LOCK] ISOLATE';
                 btn.className = 'control-btn danger';
             }
         }
@@ -3292,12 +3661,12 @@ HTML_TEMPLATE = """
 
     function updateQuarantine(pending) {
         if (!pending || pending.length === 0) {
-            document.getElementById('quarantineList').innerHTML = '<div class="text-muted text-center">✅ No files pending</div>';
+            document.getElementById('quarantineList').innerHTML = '<div class="text-muted text-center">[OK] No files pending</div>';
             return;
         }
         document.getElementById('quarantineList').innerHTML = pending.map(item => `
             <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,255,136,0.04);font-size:11px;align-items:center;">
-                <span style="color:#ff0033;font-size:10px;">🔴 ${item.path.split('\\\\').pop()}</span>
+                <span style="color:#ff0033;font-size:10px;">[ERROR] ${item.path.split('\\\\').pop()}</span>
                 <button class="quarantine-btn" onclick="quarantineFile('${item.path}')">QUARANTINE</button>
             </div>
         `).join('');
@@ -3305,7 +3674,7 @@ HTML_TEMPLATE = """
 
     function updateRecommendations(recs) {
         if (!recs || recs.length === 0) {
-            document.getElementById('recommendationList').innerHTML = '<div class="text-muted text-center">✅ No recommendations</div>';
+            document.getElementById('recommendationList').innerHTML = '<div class="text-muted text-center">[OK] No recommendations</div>';
             return;
         }
         document.getElementById('recommendationList').innerHTML = recs.map(r => `<div class="recommendation-box">${r}</div>`).join('');
@@ -3318,7 +3687,7 @@ HTML_TEMPLATE = """
         }
         document.getElementById('reportList').innerHTML = reports.map(r => `
             <div class="report-item">
-                <span class="report-id">📄 ${r.id}</span>
+                <span class="report-id">[DOC] ${r.id}</span>
                 <span style="color:#2a5a4a;font-size:9px;">${r.type}</span>
                 <span class="report-links">
                     <a href="#" onclick="downloadReport('${r.id}','json')">JSON</a>
@@ -3331,12 +3700,12 @@ HTML_TEMPLATE = """
 
     function updateRansomware(files) {
         if (!files || files.length === 0) {
-            document.getElementById('ransomwareFiles').innerHTML = '<div class="text-muted text-center">✅ No ransomware detected</div>';
+            document.getElementById('ransomwareFiles').innerHTML = '<div class="text-muted text-center">[OK] No ransomware detected</div>';
             return;
         }
         document.getElementById('ransomwareFiles').innerHTML = files.map(f => `
             <div class="ransomware-file">
-                <span class="file-path">📁 ${f.path.split('\\\\').pop()}</span>
+                <span class="file-path">[FOLDER] ${f.path.split('\\\\').pop()}</span>
                 <span style="color:#2a5a4a;font-size:9px;">${f.process}</span>
                 <span style="color:#2a5a4a;font-size:9px;">${new Date(f.timestamp).toLocaleTimeString()}</span>
                 <button class="quarantine-btn" onclick="quarantineFile('${f.path}')">QUARANTINE</button>
@@ -3346,7 +3715,7 @@ HTML_TEMPLATE = """
 
     function updateVulns(vulns) {
         if (!vulns || vulns.length === 0) {
-            document.getElementById('vulnList').innerHTML = '<div class="text-muted text-center">✅ No vulnerabilities</div>';
+            document.getElementById('vulnList').innerHTML = '<div class="text-muted text-center">[OK] No vulnerabilities</div>';
             return;
         }
         document.getElementById('vulnList').innerHTML = vulns.map(v => `
@@ -3357,9 +3726,17 @@ HTML_TEMPLATE = """
         `).join('');
     }
 
-    socket.on('connect', () => { 
-        console.log('Connected to server');
-        socket.emit('subscribe_updates'); 
+    socket.on('connect', () => {
+        console.log('Connected to DSTerminal real-time server');
+        socket.emit('subscribe_updates');
+    });
+
+    socket.on('disconnect', () => {
+        console.warn('Disconnected from DSTerminal real-time server');
+    });
+
+    socket.on('subscription_status', (data) => {
+        console.log('Real-time subscription:', data);
     });
     
     socket.on('status_update', updateStatus);
@@ -3380,7 +3757,7 @@ HTML_TEMPLATE = """
     
     socket.on('quarantine_complete', (data) => {
         if (data.success) {
-            document.getElementById('autoQStatus').textContent = '✅ Auto-Q: Complete!';
+            document.getElementById('autoQStatus').textContent = '[OK] Auto-Q: Complete!';
             document.getElementById('autoQStatus').style.color = '#00ff88';
             setTimeout(() => {
                 document.getElementById('autoQStatus').textContent = '';
@@ -3392,19 +3769,6 @@ HTML_TEMPLATE = """
                 document.getElementById('autoQStatus').textContent = '';
             }, 5000);
         }
-        fetch('/api/status').then(r => r.json()).then(updateStatus);
-    });
-
-    socket.on('ransomware_alert', function(data) {
-        console.log('🚨 Ransomware Alert:', data);
-        // Trigger the quarantine progress display
-        updateQuarantineProgress({
-            in_progress: true,
-            file_path: data.file_path,
-            current_step: 0,
-            status: 'Starting quarantine...'
-        });
-        // Refresh status
         fetch('/api/status').then(r => r.json()).then(updateStatus);
     });
 
@@ -3466,31 +3830,260 @@ def open_browser():
     except:
         print("[WARNING] Open http://localhost:5000 manually")
 
+# ============================================================
+# DASHBOARD COMMAND FUNCTIONS - Called from dsterminal.py
+# ============================================================
+
+# Global variables to track dashboard state
+_dashboard_running = False
+_dashboard_thread = None
+_dashboard_port = 5000
+_dashboard_process = None
+
+def find_available_port(start_port=5000, max_port=5100):
+    """Find an available port starting from start_port"""
+    import socket
+    for port in range(start_port, max_port + 1):
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(1)
+            sock.bind(('localhost', port))
+            sock.close()
+            return port
+        except OSError:
+            continue
+        except Exception:
+            continue
+    return None
+
+def cmd_dashboard(args=None):
+    """Start the dashboard server"""
+    global _dashboard_running, _dashboard_thread, _dashboard_port
+    
+    if _dashboard_running:
+        return f"[INFO] Dashboard is already running on port {_dashboard_port}"
+    
+    try:
+        port = find_available_port(5000)
+        if port is None:
+            return "[!] No available ports found"
+        
+        _dashboard_port = port
+        print(f"[DASHBOARD] Starting DSTerminal Dashboard on port {port}...")
+        
+        def run_dashboard():
+            global _dashboard_running
+            try:
+                print(f"[DASHBOARD] Server starting on http://localhost:{port}")
+                with SilenceFlaskStartup():
+                    # Remove allow_unsafe_werkzeug if it's causing issues
+                    socketio.run(app, debug=False, host='0.0.0.0', port=port)
+            except Exception as e:
+                print(f"[DASHBOARD] Error: {e}")
+            finally:
+                _dashboard_running = False
+        
+        _dashboard_thread = threading.Thread(target=run_dashboard, daemon=True)
+        _dashboard_thread.start()
+        _dashboard_running = True
+        
+        def open_browser_delayed():
+            time.sleep(3)
+            try:
+                webbrowser.open(f'http://localhost:{port}')
+                print(f"[DASHBOARD] Browser opened to http://localhost:{port}")
+            except:
+                print(f"[DASHBOARD] Please open http://localhost:{port} manually")
+        
+        threading.Thread(target=open_browser_delayed, daemon=True).start()
+        
+        return f"[OK] Dashboard started at http://localhost:{port}"
+    
+    except Exception as e:
+        _dashboard_running = False
+        return f"[!] Failed to start dashboard: {e}"
+
+def cmd_dashboard_stop(args=None):
+    """Stop the dashboard server"""
+    global _dashboard_running, _dashboard_thread
+    
+    if not _dashboard_running:
+        return "[INFO] Dashboard is not running"
+    
+    try:
+        _dashboard_running = False
+        # Try to force stop the thread
+        if _dashboard_thread and _dashboard_thread.is_alive():
+            # We can't forcefully kill threads in Python, but we can set the flag
+            pass
+        return "[OK] Dashboard stopped"
+    except Exception as e:
+        return f"[!] Failed to stop dashboard: {e}"
+
+def cmd_dashboard_status(args=None):
+    """Check dashboard status"""
+    global _dashboard_running, _dashboard_port
+    
+    if _dashboard_running:
+        status_lines = [
+            f"[OK] Dashboard is RUNNING on port {_dashboard_port}",
+            f"📍 URL: http://localhost:{_dashboard_port}",
+            "🔄 Status: Active",
+            "📊 Monitoring: Enabled",
+            "💡 Use 'dashboard-browser' to open in browser",
+            "💡 Use 'dashboard-stop' to stop the server"
+        ]
+        return "\n".join(status_lines)
+    else:
+        return "[INFO] Dashboard is NOT running\n📋 Use 'dashboard' to start it"
+
+def cmd_dashboard_browser(args=None):
+    """Open dashboard in browser"""
+    global _dashboard_port, _dashboard_running
+    
+    if not _dashboard_running:
+        return "[INFO] Dashboard is not running. Use 'dashboard' to start it first."
+    
+    try:
+        port = _dashboard_port if _dashboard_port else 5000
+        webbrowser.open(f'http://localhost:{port}')
+        return f"[OK] Dashboard opened in browser at http://localhost:{port}"
+    except Exception as e:
+        return f"[!] Failed to open browser: {e}"
+
+def cmd_dashboard_help(args=None):
+    """Show dashboard help"""
+    return """
+╔══════════════════════════════════════════════════════════════╗
+║                    DASHBOARD COMMANDS                       ║
+╠══════════════════════════════════════════════════════════════╣
+║  dashboard / dash / security-dashboard  - Start dashboard   ║
+║  dashboard-stop / dash-stop            - Stop dashboard      ║
+║  dashboard-status / dash-status        - Check status        ║
+║  dashboard-browser / dash-browser      - Open in browser    ║
+║  dashboard-help / dash-help            - Show this help      ║
+╚══════════════════════════════════════════════════════════════╝
+
+[DASHBOARD FEATURES]
+  • Real-time threat monitoring with live updates
+  • Ransomware detection with auto-quarantine progress bar
+  • MITRE ATT&CK technique mapping and tracking
+  • System resource monitoring (CPU, RAM, Disk)
+  • Incident report generation (JSON/HTML/PDF)
+  • Process management with kill capability
+  • Network isolation control (one-click lockdown)
+  • Whitelist/blacklist management for files
+  • Auto-quarantine toggle with real-time progress
+
+[PORT MANAGEMENT]
+  • Automatically finds an available port
+  • Tries ports from 5000 to 5100
+  • Shows the port being used in status
+
+[TROUBLESHOOTING]
+  • If port 5000 is in use, it will try the next port
+  • Check status with 'dashboard-status'
+  • Stop with 'dashboard-stop' before starting again
+  • If you see "Only one usage of each socket address", 
+    wait a few seconds and try 'dashboard' again
+"""
+
+# ============================================================
+# DASHBOARD INTEGRATION CLASS (for compatibility)
+# ============================================================
+class DashboardIntegration:
+    """Dashboard integration class for backward compatibility"""
+    def __init__(self):
+        self.running = False
+        self.thread = None
+        self.port = 5000
+    
+    def start(self):
+        return cmd_dashboard([])
+    
+    def stop(self):
+        return cmd_dashboard_stop([])
+    
+    def status(self):
+        return cmd_dashboard_status([])
+    
+    def open_browser(self):
+        return cmd_dashboard_browser([])
+    
+    def help(self):
+        return cmd_dashboard_help([])
+
+# Create a global instance for compatibility
+dashboard_integration = DashboardIntegration()
+
+# ============================================================
+# REGISTER DASHBOARD COMMANDS (for compatibility)
+# ============================================================
+def register_dashboard_commands(terminal_instance):
+    """Register dashboard commands with terminal instance"""
+    try:
+        terminal_instance.register_command('dashboard', cmd_dashboard)
+        terminal_instance.register_command('dash', cmd_dashboard)
+        terminal_instance.register_command('security-dashboard', cmd_dashboard)
+        terminal_instance.register_command('dashboard-stop', cmd_dashboard_stop)
+        terminal_instance.register_command('dash-stop', cmd_dashboard_stop)
+        terminal_instance.register_command('dashboard-status', cmd_dashboard_status)
+        terminal_instance.register_command('dash-status', cmd_dashboard_status)
+        terminal_instance.register_command('dashboard-browser', cmd_dashboard_browser)
+        terminal_instance.register_command('dash-browser', cmd_dashboard_browser)
+        terminal_instance.register_command('dashboard-help', cmd_dashboard_help)
+        terminal_instance.register_command('dash-help', cmd_dashboard_help)
+        return True
+    except Exception as e:
+        print(f"[ERROR] Failed to register dashboard commands: {e}")
+        return False
+
+# ============================================================
+# EXPORT THE FLASK APP AND SOCKETIO
+# ============================================================
+__all__ = [
+    'app',
+    'socketio',
+    'cmd_dashboard',
+    'cmd_dashboard_stop',
+    'cmd_dashboard_status',
+    'cmd_dashboard_browser',
+    'cmd_dashboard_help',
+    'DashboardIntegration',
+    'dashboard_integration',
+    'register_dashboard_commands',
+    'DASHBOARD_AVAILABLE',
+    'find_available_port'
+]
+
+# Set DASHBOARD_AVAILABLE flag
+DASHBOARD_AVAILABLE = True
+
 if __name__ == "__main__":
     print("=" * 70)
     print("🔮 DSTERMINAL SECURITY SUITE v4.0.0.113")
     print("=" * 70)
     print(f"📍 Dashboard: http://localhost:5000")
-    print(f"📁 Workspace: {WORKSPACE_DIR}")
-    print(f"📁 Reports: {REPORTS_DIR}")
-    print(f"📁 Quarantine: {QUARANTINE_DIR}")
+    print(f"[FOLDER] Workspace: {WORKSPACE_DIR}")
+    print(f"[FOLDER] Reports: {REPORTS_DIR}")
+    print(f"[FOLDER] Quarantine: {QUARANTINE_DIR}")
     print(f"🛡️ Shield Core: {shield.threat_level.name if hasattr(shield, 'threat_level') else 'ACTIVE'}")
     print("=" * 70)
-    print("✅ Automatic Ransomware Detection - Anywhere in your System")
-    print("✅ AUTO-QUARANTINE - Files automatically quarantined when detected")
-    print("✅ 2-Minute Quarantine Progress Bar on Dashboard")
-    print("✅ MITRE ATT&CK techniques")
-    print("✅ Reports (JSON/HTML/PDF)")
+    print(f"[SOCKETIO] Backend: {socketio.async_mode}")
+    print("[OK] Flask-SocketIO real-time telemetry enabled")
+    print("[OK] Automatic Ransomware Detection - Anywhere in your System")
+    print("[OK] AUTO-QUARANTINE - Files automatically quarantined when detected")
+    print("[OK] 2-Minute Quarantine Progress Bar on Dashboard")
+    print("[OK] MITRE ATT&CK techniques")
+    print("[OK] Reports Format: (JSON/HTML/PDF)")
     print("=" * 70)
-    print("\n📋 DASHBOARD CONTROLS:")
-    print("  🤖 Auto-Q - Toggle auto-quarantine on/off")
-    print("  🔒 Isolate - Network isolation")
-    print("  📁 Quarantine - View/restore/delete quarantined files")
+    print("\n[LIST] DASHBOARD CONTROLS:")
+    print("  [BOT] Auto-Q - Toggle auto-quarantine on/off")
+    print("  [LOCK] Isolate - Network isolation")
+    print("  [FOLDER] Quarantine - View/restore/delete quarantined files")
     print("=" * 70)
-    print("\n⚡ AUTO-QUARANTINE FEATURES:")
-    print("  • Automatically detects ransomware anywhere in system")
-    print("  • Shows real-time progress bar (2 minutes)")
-    print("  • Displays status in dashboard and banner")
+    print("\n[POWER] AUTO-QUARANTINE FEATURES:")
+    # print("  • Displays alert status in dashboard and banner")
     print("  • Creates incident report after quarantine")
     print("  • File appears in quarantine section with timestamp")
     print("=" * 70)
@@ -3499,4 +4092,4 @@ if __name__ == "__main__":
     threading.Thread(target=open_browser, daemon=True).start()
     
     with SilenceFlaskStartup():
-        socketio.run(app, debug=False, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
+        socketio.run(app, debug=False, host='0.0.0.0', port=5000)

@@ -1,4 +1,4 @@
-﻿# Python Packages Installer
+# Python Packages Installer
 Write-Host "Installing Python packages..." -ForegroundColor Cyan
 Write-Host ""
 

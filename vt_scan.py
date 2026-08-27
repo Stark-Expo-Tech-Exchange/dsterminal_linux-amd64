@@ -1,19 +1,44 @@
+#!/usr/bin/env python3
+import sys
+# -*- coding: utf-8 -*-
 """
 DSTerminal - VirusTotal Integration Module
 Enhanced Cinematic SOC Dashboard with Hacking-Style Animation & Auto-Typing
 """
-import sys
-if sys.platform == 'win32':
-    import os
-    import msvcrt
-    # Ensure stdout is properly set
-    if hasattr(sys.stdout, 'buffer'):
-        sys.stdout = open(sys.stdout.fileno(), 'w', encoding='utf-8', errors='ignore')
-    if hasattr(sys.stderr, 'buffer'):
-        sys.stderr = open(sys.stderr.fileno(), 'w', encoding='utf-8', errors='ignore')
-        
+# ============================================================
+# FIX: Handle OSError 22 on Windows
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(["chcp", "65001"], capture_output=True, shell=True)
+    except:
+        pass
+
+_original_stdout_write = sys.stdout.write
+
+def _safe_stdout_write(text):
+    try:
+        _original_stdout_write(text)
+    except OSError as e:
+        if e.errno == 22:
+            try:
+                clean = text.encode("ascii", "ignore").decode("ascii")
+                _original_stdout_write(clean)
+            except:
+                pass
+        else:
+            raise
+    except UnicodeEncodeError:
+        try:
+            clean = text.encode("ascii", "ignore").decode("ascii")
+            _original_stdout_write(clean)
+        except:
+            pass
+
+sys.stdout.write = _safe_stdout_write
+
 import os
-import sys
 import re
 import time
 import json
@@ -28,29 +53,29 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-# Try to import dotenv, but don't fail if not available
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    pass
+# =========================================================
+# FIX WINDOWS CONSOLE ENCODING - MUST BE FIRST
+# =========================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(['chcp', '65001'], capture_output=True, shell=True)
+    except:
+        pass
+    
+    # Fix stdout encoding
+    try:
+        if hasattr(sys.stdout, 'reconfigure'):
+            sys.stdout.reconfigure(encoding='utf-8', errors='ignore')
+        else:
+            import io
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
+    except:
+        pass
 
 # =========================================================
-# ANSI COLOR STRIPPING FOR RESPONSIVE LAYOUT CALCULATIONS
+# ANSI COLOR DEFINITIONS (ALWAYS AVAILABLE)
 # =========================================================
-
-ANSI_ESCAPE_PATTERN = re.compile(
-    r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])'
-)
-
-def strip_ansi(text: str) -> str:
-    """Remove ANSI escape sequences from terminal strings"""
-    return ANSI_ESCAPE_PATTERN.sub('', text)
-
-# -------------------------------
-# GLOWING COLORS & STYLING
-# -------------------------------
-
 RESET = '\033[0m'
 BOLD = '\033[1m'
 DIM = '\033[2m'
@@ -73,15 +98,88 @@ BRIGHT_YELLOW = '\033[93;1m'
 BRIGHT_MAGENTA = '\033[95;1m'
 BRIGHT_BLUE = '\033[94;1m'
 
-# Animation frames
+# =========================================================
+# SIMPLE SAFE PRINT FUNCTION
+# =========================================================
+def safe_print_unicode(message):
+    """Safely print unicode/emoji characters on Windows"""
+    try:
+        print(message)
+    except UnicodeEncodeError:
+        clean_message = message.encode('ascii', 'ignore').decode('ascii')
+        print(clean_message)
+    except Exception:
+        try:
+            print(str(message))
+        except:
+            pass
+
+# =========================================================
+# ANSI COLOR STRIPPING FOR RESPONSIVE LAYOUT CALCULATIONS
+# =========================================================
+ANSI_ESCAPE_PATTERN = re.compile(
+    r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])'
+)
+
+def strip_ansi(text: str) -> str:
+    """Remove ANSI escape sequences from terminal strings"""
+    return ANSI_ESCAPE_PATTERN.sub('', text)
+
+# =========================================================
+# TRY TO IMPORT COLORAMA WITH PROPER ERROR HANDLING
+# =========================================================
+try:
+    from colorama import init, Fore, Back, Style
+    init(autoreset=True)
+    COLORAMA_AVAILABLE = True
+except ImportError:
+    COLORAMA_AVAILABLE = False
+    # Use our defined ANSI colors as fallback
+    Fore = type('Fore', (), {
+        'RED': RED, 'GREEN': GREEN, 'YELLOW': YELLOW, 
+        'CYAN': CYAN, 'MAGENTA': MAGENTA, 'BLUE': BLUE,
+        'WHITE': WHITE, 'RESET': RESET
+    })
+    Back = type('Back', (), {'RESET': ''})
+    Style = type('Style', (), {
+        'RESET_ALL': RESET,
+        'BRIGHT': BOLD,
+        'DIM': DIM
+    })
+except Exception as e:
+    COLORAMA_AVAILABLE = False
+    # Use our defined ANSI colors as fallback
+    Fore = type('Fore', (), {
+        'RED': RED, 'GREEN': GREEN, 'YELLOW': YELLOW, 
+        'CYAN': CYAN, 'MAGENTA': MAGENTA, 'BLUE': BLUE,
+        'WHITE': WHITE, 'RESET': RESET
+    })
+    Back = type('Back', (), {'RESET': ''})
+    Style = type('Style', (), {
+        'RESET_ALL': RESET,
+        'BRIGHT': BOLD,
+        'DIM': DIM
+    })
+
+# =========================================================
+# TRY TO IMPORT DOTENV (OPTIONAL)
+# =========================================================
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
+# =========================================================
+# ANIMATION FRAMES
+# =========================================================
 SCANNING_FRAMES = ["🔍", "🔎", "📡", "🛰️", "⚡", "💀", "🎯", "⚠️", "🔬", "🧬", "✨", "🌟"]
 THREAT_FRAMES = ["◐", "◓", "◑", "◒", "⦾", "⦿", "⬤", "○", "⟳", "⟲", "↻", "↺", "🌀", "⚡"]
 GLOW_FRAMES = ["✨", "⭐", "🌟", "💫", "⚡"]
 
-# -------------------------------
+# =========================================================
 # AUTO-TYPING ENGINE
-# -------------------------------
-
+# =========================================================
 class AutoTypeEngine:
     """Handles auto-typing effects with constant delay"""
     
@@ -158,10 +256,9 @@ class AutoTypeEngine:
         sys.stdout.write(text)
         sys.stdout.flush()
 
-# -------------------------------
+# =========================================================
 # WORKSPACE DIRECTORY SETUP
-# -------------------------------
-
+# =========================================================
 def get_workspace_dir() -> Path:
     """Get the DSTerminal workspace directory"""
     home = Path.home()
@@ -186,10 +283,9 @@ QUARANTINE_DIR = WORKSPACE / "quarantine"
 SOC_ALERTS_DIR = WORKSPACE / "soc_alerts"
 SCAN_HISTORY_FILE = WORKSPACE / "scan_history.json"
 
-# -------------------------------
+# =========================================================
 # CONFIGURATION
-# -------------------------------
-
+# =========================================================
 CONFIG = {
     'VT_API_KEY': os.environ.get('VT_API_KEY', '957166d424812a397e328022b84594a8c02757814f6c04518dce7e81179b4b79'),
     'SOC_OPERATOR_NAME': None,
@@ -201,10 +297,9 @@ def sync_operator_session(operator_name: str, session_id: str):
     CONFIG['SOC_OPERATOR_NAME'] = operator_name
     CONFIG['SOC_SESSION_ID'] = session_id
 
-# -------------------------------
+# =========================================================
 # TERMINAL UTILITIES
-# -------------------------------
-
+# =========================================================
 def get_terminal_width() -> int:
     try:
         return shutil.get_terminal_size((140, 20)).columns
@@ -237,7 +332,7 @@ def matrix_rain(duration: float = 0.5, intensity: int = 3):
         print(center_text(line))
         time.sleep(duration / intensity)
 
-# -------------------------------
+#-----------------------
 # SCAN HISTORY MANAGER
 # -------------------------------
 
@@ -270,7 +365,7 @@ class ScanHistoryManager:
             with open(SCAN_HISTORY_FILE, 'w') as f:
                 json.dump(history, f, indent=2, default=str)
         except Exception as e:
-            print(f"{BRIGHT_RED}[!] Failed to save scan history: {e}{RESET}")
+            safe_print_unicode(f"{BRIGHT_RED}[!] Failed to save scan history: {e}{RESET}")
     
     @staticmethod
     def load_history() -> List[Dict]:
@@ -675,9 +770,9 @@ class ReportGenerator:
         try:
             with open(json_file, 'w', encoding='utf-8') as f:
                 json.dump(report_data, f, indent=2, default=str)
-            print(f"{BRIGHT_GREEN}[✓] JSON report saved: {json_file}{RESET}")
+            safe_print_unicode(f"{BRIGHT_GREEN}[✓] JSON report saved: {json_file}{RESET}")
         except Exception as e:
-            print(f"{BRIGHT_RED}[!] Failed to save JSON report: {e}{RESET}")
+            safe_print_unicode(f"{BRIGHT_RED}[!] Failed to save JSON report: {e}{RESET}")
         
         return json_file
     
@@ -728,7 +823,7 @@ class ReportGenerator:
         elements.append(table)
         
         doc.build(elements)
-        print(f"{BRIGHT_GREEN}[✓] PDF report saved: {pdf_file}{RESET}")
+        safe_print_unicode(f"{BRIGHT_GREEN}[✓] PDF report saved: {pdf_file}{RESET}")
         return pdf_file
     
     @staticmethod
@@ -810,7 +905,7 @@ class VirusTotalScanner:
     
     def _validate_api(self) -> bool:
         if not CONFIG.get('VT_API_KEY'):
-            print(f"{BRIGHT_RED}[!] VirusTotal API key not configured!{RESET}")
+            safe_print_unicode(f"{BRIGHT_RED}[!] VirusTotal API key not configured!{RESET}")
             return False
         return True
     
@@ -823,7 +918,7 @@ class VirusTotalScanner:
                 hashes['sha1'] = hashlib.sha1(data).hexdigest()
                 hashes['sha256'] = hashlib.sha256(data).hexdigest()
         except Exception as e:
-            print(f"{BRIGHT_RED}[!] Hash calculation failed: {e}{RESET}")
+            safe_print_unicode(f"{BRIGHT_RED}[!] Hash calculation failed: {e}{RESET}")
         return hashes
     
     def vt_hash_lookup(self, file_hash: str):
@@ -1214,13 +1309,13 @@ class VirusTotalScanner:
                     malicious = stats.get('malicious', 0)
                     # Add finding to dashboard
                     self.dashboard.add_finding(os.path.basename(file_path), malicious, stats)
-                    print(f"{BRIGHT_GREEN}[✓] Scanned: {os.path.basename(file_path)} - {malicious} detections{RESET}")
+                    safe_print_unicode(f"{BRIGHT_GREEN}[✓] Scanned: {os.path.basename(file_path)} - {malicious} detections{RESET}")
                 else:
                     # If VT doesn't have the file, mark as unknown
                     self.dashboard.add_finding(os.path.basename(file_path), 0, {'status': 'not_found'})
-                    print(f"{BRIGHT_YELLOW}[!] {os.path.basename(file_path)} - Not in VT database{RESET}")
+                    safe_print_unicode(f"{BRIGHT_YELLOW}[!] {os.path.basename(file_path)} - Not in VT database{RESET}")
         except Exception as e:
-            print(f"{BRIGHT_RED}[!] Error scanning {os.path.basename(file_path)}: {e}{RESET}")
+            safe_print_unicode(f"{BRIGHT_RED}[!] Error scanning {os.path.basename(file_path)}: {e}{RESET}")
             # Still add to findings so the counter updates
             self.dashboard.add_finding(os.path.basename(file_path), 0, {'error': str(e)})
             
@@ -1251,8 +1346,8 @@ class VirusTotalScanner:
         if history_entry and history_entry.get('results', {}).get('status') == 'completed':
             self.typer.type_text("✅ Results found in local history!", color=BRIGHT_GREEN)
             results = history_entry.get('results', {})
-            print(f"{BRIGHT_CYAN}File: {results.get('file_name', 'Unknown')}{RESET}")
-            print(f"{BRIGHT_YELLOW}Detections: {results.get('vt_detections', 0)}/{results.get('total_scans', 0)}{RESET}")
+            safe_print_unicode(f"{BRIGHT_CYAN}File: {results.get('file_name', 'Unknown')}{RESET}")
+            safe_print_unicode(f"{BRIGHT_YELLOW}Detections: {results.get('vt_detections', 0)}/{results.get('total_scans', 0)}{RESET}")
             
             risk_score = results.get('final_score', 0)
             if risk_score > 50:
@@ -1468,5 +1563,3 @@ if __name__ == "__main__":
     time.sleep(1)
     
     vt_scan_menu()
-    
-    

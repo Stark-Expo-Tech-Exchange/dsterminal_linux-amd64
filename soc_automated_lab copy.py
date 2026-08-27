@@ -1,4 +1,5 @@
-﻿#!/usr/bin/env python3
+#!python
+import sys
 # -*- coding: utf-8 -*-
 
 """
@@ -14,17 +15,7 @@ Complete security lab environment with:
 - Cross-platform Support
 """
 import sys
-if sys.platform == 'win32':
-    import os
-    import msvcrt
-    # Ensure stdout is properly set
-    if hasattr(sys.stdout, 'buffer'):
-        sys.stdout = open(sys.stdout.fileno(), 'w', encoding='utf-8', errors='ignore')
-    if hasattr(sys.stderr, 'buffer'):
-        sys.stderr = open(sys.stderr.fileno(), 'w', encoding='utf-8', errors='ignore')
-        
 import os
-import sys
 import time
 import json
 import hashlib
@@ -38,7 +29,6 @@ import queue
 import signal
 import atexit
 import random
-import codecs
 from datetime import datetime, timedelta
 from collections import defaultdict, deque
 from typing import Dict, List, Optional, Any, Tuple, Callable
@@ -46,35 +36,104 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 # ============================================================
-# FIX CONSOLE ENCODING FOR WINDOWS
+# FIX UNICODE ENCODING ISSUES FOR WINDOWS CONSOLE
 # ============================================================
+import io
 
-def fix_console_encoding():
-    """Fix console encoding for Windows to display UTF-8 box drawing characters"""
-    if platform.system() == 'Windows':
+def setup_unicode_console():
+    """Setup Unicode console support for Windows without breaking frozen apps"""
+    if sys.platform == 'win32':
+        try:
+            # Try to set console codepage to UTF-8
+            os.system('chcp 65001 > nul 2>&1')
+        except:
+            pass
+        
+        # Enable virtual terminal processing for colors
         try:
             import ctypes
             kernel32 = ctypes.windll.kernel32
-            kernel32.SetConsoleCP(65001)
-            kernel32.SetConsoleOutputCP(65001)
-            
             handle = kernel32.GetStdHandle(-11)
             mode = ctypes.c_ulong()
             if kernel32.GetConsoleMode(handle, ctypes.byref(mode)):
                 ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
                 if not (mode.value & ENABLE_VIRTUAL_TERMINAL_PROCESSING):
                     kernel32.SetConsoleMode(handle, mode.value | ENABLE_VIRTUAL_TERMINAL_PROCESSING)
-            
-            if sys.stdout.encoding != 'utf-8':
-                sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
-                sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
         except:
             pass
 
-# Apply encoding fix
-fix_console_encoding()
+# Call setup - this does NOT reassign stdout/stderr
+setup_unicode_console()
 
+def safe_print_unicode(message):
+    """Safely print unicode/emoji characters on Windows"""
+    try:
+        print(message)
+    except UnicodeEncodeError:
+        clean_message = message.encode('ascii', 'ignore').decode('ascii')
+        print(clean_message)
+    except Exception:
+        try:
+            print(str(message))
+        except:
+            pass
+
+# ============================================================
+# COLORAMA - DISABLE AUTO-CONVERT TO AVOID FD ISSUES
+# ============================================================
+try:
+    from colorama import init, Fore, Back, Style
+    # IMPORTANT: Disable auto-convert and strip to avoid file descriptor issues
+    init(autoreset=True, convert=False, strip=False)
+    COLORS_AVAILABLE = True
+except ImportError:
+    COLORS_AVAILABLE = False
+    # Fallback color codes
+    class Fore:
+        BLACK = '\033[30m'
+        RED = '\033[31m'
+        GREEN = '\033[32m'
+        YELLOW = '\033[33m'
+        BLUE = '\033[34m'
+        MAGENTA = '\033[35m'
+        CYAN = '\033[36m'
+        WHITE = '\033[37m'
+        RESET = '\033[0m'
+        LIGHTRED_EX = '\033[91m'
+        LIGHTGREEN_EX = '\033[92m'
+        LIGHTYELLOW_EX = '\033[93m'
+        LIGHTCYAN_EX = '\033[96m'
+        LIGHTMAGENTA_EX = '\033[95m'
+        LIGHTBLUE_EX = '\033[94m'
+        LIGHTWHITE_EX = '\033[97m'
+    
+    class Style:
+        RESET_ALL = '\033[0m'
+        BRIGHT = '\033[1m'
+        DIM = '\033[2m'
+    
+    class Back:
+        RESET = '\033[49m'
+        BLACK = '\033[40m'
+        RED = '\033[41m'
+        GREEN = '\033[42m'
+        YELLOW = '\033[43m'
+        BLUE = '\033[44m'
+        MAGENTA = '\033[45m'
+        CYAN = '\033[46m'
+        WHITE = '\033[47m'
+
+# If colorama is available but we want to ensure it works properly
+if COLORS_AVAILABLE:
+    try:
+        import colorama
+        colorama.init(autoreset=True, convert=False, strip=False)
+    except:
+        pass
+
+# ============================================================
 # Try imports with fallbacks
+# ============================================================
 try:
     import psutil
     PSUTIL_AVAILABLE = True
@@ -131,7 +190,13 @@ try:
 except ImportError:
     JINJA_AVAILABLE = False
 
-from soc_enhanced_modules import EnhancedModulesManager
+# Try to import enhanced modules
+try:
+    from soc_enhanced_modules import EnhancedModulesManager
+    ENHANCED_AVAILABLE = True
+except ImportError:
+    ENHANCED_AVAILABLE = False
+    EnhancedModulesManager = None
 
 # ============================================================
 # CONSTANTS
@@ -3186,12 +3251,12 @@ def main():
         lab.stop()
     elif args.status:
         status = lab.get_status()
-        print("\n" + "=" * 80)
-        print("SOC AUTOMATED LAB STATUS")
-        print("=" * 80)
+        safe_print_unicode("\n" + "=" * 80)
+        safe_print_unicode("SOC AUTOMATED LAB STATUS")
+        safe_print_unicode("=" * 80)
         for key, value in status.items():
-            print(f"{key}: {value}")
-        print("=" * 80 + "\n")
+            safe_print_unicode(f"{key}: {value}")
+        safe_print_unicode("=" * 80 + "\n")
     elif args.report:
         lab.generate_report()
     else:

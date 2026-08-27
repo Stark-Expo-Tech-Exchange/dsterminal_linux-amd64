@@ -1,4 +1,5 @@
-﻿# debug_dsterminal.py
+#!python
+# debug_dsterminal.py
 import sys
 import traceback
 import os

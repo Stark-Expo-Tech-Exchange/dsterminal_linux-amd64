@@ -1,7 +1,7 @@
-﻿; DSTerminal Installer Script - With License Key Validation
+; DSTerminal Installer Script - With Full Dependency Management
 ; Version: 4.0.0.113
 ; Date: 2026
-; FEATURE: License key validation during installation with 3-trial limit and rollback
+; FEATURES: License validation + Dependency checking + Auto-install + Documentation
 
 [Setup]
 ; Basic Setup Information
@@ -17,12 +17,15 @@ AppContact=support@starkexpotechexchange-mw.com
 AppComments=Security Operations Center Terminal
 AppCopyright=Copyright © 2024-2026 Stark Expo Tech Exchange
 
-; Installation Paths (User AppData - No Admin Required)
+; Installation Paths
 DefaultDirName={pf}\DSTerminal
 DefaultGroupName=DSTerminal
 LicenseFile=license.txt
-OutputDir=installer_output
+
+; ========== OUTPUT FOLDER ==========
+OutputDir=output
 OutputBaseFilename=DSTerminal_Installer_2026_v4.0.0.113
+
 Compression=lzma2/fast
 SolidCompression=no
 InternalCompressLevel=fast
@@ -57,6 +60,7 @@ UpdateUninstallLogAppName=yes
 ; ensure proper permissions
 DirExistsWarning=no
 DisableDirPage=no
+DisableReadyPage=yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -68,13 +72,12 @@ Name: "custom"; Description: "Custom Installation"; Flags: iscustom
 
 [Components]
 Name: "core"; Description: "Core DSTerminal Files"; Types: full compact custom; Flags: fixed
-Name: "docs"; Description: "Documentation & Help Files"; Types: full custom
+Name: "docs"; Description: "Documentation & Help Files"; Types: full custom; Flags: fixed
 Name: "tools"; Description: "Additional Security Tools"; Types: full custom
 Name: "templates"; Description: "Report Templates"; Types: full custom
-Name: "ffmpeg"; Description: "FFmpeg (Video Analysis)"; Types: full custom
 Name: "updatehelper"; Description: "Auto-Update Helper Script"; Types: full custom
-Name: "vtmodule"; Description: "VirusTotal Threat Intelligence Module"; Types: full custom
 
+; ========== BUNDLED DEPENDENCIES ==========
 Name: "bundles"; Description: "Bundled Security Tools & Dependencies"; Types: full custom
 Name: "bundles\nmap"; Description: "Nmap Network Scanner"; Types: full
 Name: "bundles\npcap"; Description: "Npcap Packet Capture Library"; Types: full
@@ -82,6 +85,7 @@ Name: "bundles\sqlmap"; Description: "SQLMap (SQL Injection Tool)"; Types: full
 Name: "bundles\nikto"; Description: "Nikto Web Vulnerability Scanner"; Types: full
 Name: "bundles\whois"; Description: "WHOIS Domain Lookup Tool"; Types: full
 
+; ========== DEPENDENCY INSTALLATION COMPONENTS ==========
 Name: "dependencies"; Description: "Install Required Dependencies"; Types: full custom
 Name: "dependencies\nmap"; Description: "Nmap Network Scanner"; Types: full
 Name: "dependencies\sqlmap"; Description: "SQLMap (SQL Injection Tool)"; Types: full
@@ -95,14 +99,14 @@ Name: "dependencies\nikto"; Description: "Nikto Web Vulnerability Scanner"; Type
 Name: "desktopicon"; Description: "Create a &desktop shortcut"; GroupDescription: "Additional icons:"; Components: core; Flags: checkedonce
 Name: "quicklaunchicon"; Description: "Create a &Quick Launch shortcut"; GroupDescription: "Additional icons:"; Components: core; Flags: unchecked
 Name: "autoupdate"; Description: "Automatically check for updates on startup"; GroupDescription: "Update settings:"; Components: core; Flags: checkedonce
-Name: "docshortcut"; Description: "Create Documentation shortcut on desktop"; GroupDescription: "Documentation:"; Components: docs; Flags: unchecked
+Name: "docshortcut"; Description: "Create Cyber-Ops Documentation shortcut on desktop"; GroupDescription: "Documentation:"; Components: docs; Flags: checkedonce
 Name: "startwithwindows"; Description: "Start DSTerminal with Windows (minimized)"; GroupDescription: "Startup options:"; Components: core; Flags: unchecked
 Name: "installdeps"; Description: "Install/Update missing dependencies on completion"; GroupDescription: "Dependency management:"; Components: dependencies; Flags: checkedonce
 
+; ========== MAIN FILES SECTION ==========
 [Files]
-; ========== CORE APPLICATION ==========
-Source: "dist\dsterminal_win-4.0.0.113_x64-amd64.exe"; DestDir: "{app}"; DestName: "dsterminal.exe"; Flags: ignoreversion; Components: core
-Source: "dist\dsterminal_console.exe"; DestDir: "{app}"; DestName: "dsterminal-console.exe"; Flags: ignoreversion skipifsourcedoesntexist; Components: core
+; ========== CORE APPLICATION - FROM auto-py-to-exe ==========
+Source: "dist\*"; DestDir: "{app}"; Flags: ignoreversion; Components: core
 
 ; ========== ICON FILES ==========
 Source: "installer_assets\3486-removebg-preview.ico"; DestDir: "{app}"; Flags: ignoreversion; Components: core
@@ -117,21 +121,6 @@ Source: "config\*"; DestDir: "{app}\config"; Flags: ignoreversion recursesubdirs
 Source: "config\settings.json"; DestDir: "{app}\config"; Flags: ignoreversion onlyifdoesntexist; Components: core
 Source: "config\default.profile"; DestDir: "{app}\config"; Flags: ignoreversion; Components: core
 Source: "requirements.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: core
-
-; ========== VT MODULE FILES ==========
-;Source: "vt_scan.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
-;Source: "web_security_analyzer.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
-;Source: "edu_typing_engine.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
-;Source: "recon.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
-;Source: "recon_full.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
-
-;Source: "soc_automated_lab.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
-;Source: "update.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
-;Source: "dsterminal_complete.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
-
-;Source: "dsterminal_dashboard.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
-;Source: "sqlmap_advanced.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
-;Source: "soc_enhanced_modules.py"; DestDir: "{app}"; Flags: ignoreversion; Components: vtmodule
 
 ; ========== BUNDLED PACKAGES ==========
 ; Nmap
@@ -153,11 +142,17 @@ Source: "bundled\whois\*"; DestDir: "{app}\bundled\whois"; Flags: ignoreversion 
 Source: "bundled\manifest.json"; DestDir: "{app}\bundled"; Flags: ignoreversion; Components: bundles
 
 ; ========== DOCUMENTATION ==========
+; Main documentation files
 Source: "docs\*"; DestDir: "{app}\docs"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: docs
 Source: "docs\index.html"; DestDir: "{app}\docs"; Flags: ignoreversion; Components: docs
 Source: "docs\user_guide.pdf"; DestDir: "{app}\docs"; Flags: ignoreversion skipifsourcedoesntexist; Components: docs
 Source: "docs\api_reference.md"; DestDir: "{app}\docs"; Flags: ignoreversion skipifsourcedoesntexist; Components: docs
 Source: "docs\quickstart.txt"; DestDir: "{app}"; DestName: "QUICKSTART.txt"; Flags: ignoreversion; Components: docs
+
+; Additional documentation files
+Source: "docs\index.html"; DestDir: "{app}\docs"; DestName: "Cyber-Ops_Documentation.html"; Flags: ignoreversion; Components: docs
+Source: "docs\Dsterminal_Manifest_v4.0.0.113.pdf"; DestDir: "{app}\docs"; DestName: "Dsterminal_Manifest_v4.0.0.113.pdf"; Flags: ignoreversion skipifsourcedoesntexist; Components: docs
+Source: "docs\DSTerminal_User_Guide_v4.0.0.113.pdf"; DestDir: "{app}\docs"; DestName: "DSTerminal_User_Guide_v3.1.113.pdf"; Flags: ignoreversion skipifsourcedoesntexist; Components: docs
 
 ; ========== TOOLS & UTILITIES ==========
 Source: "tools\*"; DestDir: "{app}\tools"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: tools
@@ -216,46 +211,78 @@ Name: "{app}\temp"; Flags: uninsalwaysuninstall
 Name: "{app}\config"; Flags: uninsalwaysuninstall
 Name: "{app}\bundled"; Flags: uninsalwaysuninstall
 
-[Icons]
-; Desktop shortcut
-Name: "{userdesktop}\DSTerminal CyberOps"; Filename: "{app}\launch_dsterminal.bat"; WorkingDir: "{app}"; IconFilename: "{app}\dsterminal.exe"; Tasks: desktopicon; Comment: "DSTerminal Security Terminal"
+; Documentation directory
+Name: "{app}\docs"; Flags: uninsalwaysuninstall
 
-; Start Menu shortcuts
-Name: "{group}\DSTerminal CyberOps"; Filename: "{app}\launch_dsterminal.bat"; WorkingDir: "{app}"; IconFilename: "{app}\dsterminal.exe"; Comment: "Launch DSTerminal Cyber Ops Platform"
+[Icons]
+; Desktop shortcut for DSTerminal
+Name: "{userdesktop}\DSTerminal CyberOps"; Filename: "{app}\dsterminal.exe"; WorkingDir: "{app}"; IconFilename: "{app}\dsterminal.exe"; Tasks: desktopicon; Comment: "DSTerminal Security Terminal"
+
+; ========== DOCUMENTATION DESKTOP SHORTCUT ==========
+; Cyber-Ops Documentation shortcut on Desktop (named "Cyber-Ops Documentation")
+Name: "{userdesktop}\Cyber-Ops Documentation"; Filename: "{app}\docs\Cyber-Ops_Documentation.html"; IconFilename: "{app}\dsterminal.exe"; Tasks: docshortcut; Comment: "DSTerminal Cyber-Ops Documentation"; Components: docs
+
+; Alternative documentation shortcut (if PDF exists)
+Name: "{userdesktop}\Cyber-Ops Documentation (PDF)"; Filename: "{app}\docs\Dsterminal_Manifest_v4.0.0.113.pdf"; IconFilename: "{app}\dsterminal.exe"; Tasks: docshortcut; Comment: "DSTerminal Cyber-Ops Documentation (PDF)"; Components: docs
+
+; ========== START MENU SHORTCUTS ==========
+Name: "{group}\DSTerminal CyberOps"; Filename: "{app}\dsterminal.exe"; WorkingDir: "{app}"; IconFilename: "{app}\dsterminal.exe"; Comment: "Launch DSTerminal Cyber Ops Platform"
 Name: "{group}\Uninstall DSTerminal"; Filename: "{uninstallexe}"; Comment: "Remove DSTerminal from your system"
-Name: "{group}\DSTerminal Documentation"; Filename: "{app}\docs\index.html"; IconFilename: "{app}\dsterminal.exe"; Components: docs
+
+; Start Menu documentation shortcuts
+Name: "{group}\Cyber-Ops Documentation"; Filename: "{app}\docs\Cyber-Ops_Documentation.html"; IconFilename: "{app}\dsterminal.exe"; Components: docs
+Name: "{group}\DSTerminal Quick Start"; Filename: "{app}\QUICKSTART.txt"; Components: docs
 
 [Run]
 ; Launch documentation after install
-Filename: "{app}\docs\index.html"; Description: "View DSTerminal Documentation"; Flags: postinstall shellexec skipifsilent; Components: docs
+Filename: "{app}\docs\Cyber-Ops_Documentation.html"; Description: "View Cyber-Ops Documentation"; Flags: postinstall shellexec skipifsilent; Components: docs
 
 ; Launch DSTerminal after install
-Filename: "{app}\launch_dsterminal.bat"; Description: "Launch DSTerminal"; Flags: nowait postinstall skipifsilent; Components: core
+Filename: "{app}\dsterminal.exe"; Description: "Launch DSTerminal"; Flags: nowait postinstall skipifsilent; Components: core
 
-; Run during installation
+; ========== DEPENDENCY INSTALLATION DURING SETUP ==========
+; Run dependency installation during installation
+Filename: "powershell.exe"; \
+    Parameters: "-ExecutionPolicy Bypass -File '{app}\tools\install_all_dependencies.ps1'"; \
+    Components: dependencies; \
+    Flags: runhidden; \
+    StatusMsg: "Checking and installing required dependencies... (This may take a few minutes)"
+
+; Install bundled dependencies
 Filename: "powershell.exe"; \
     Parameters: "-ExecutionPolicy Bypass -File '{app}\tools\install_bundled_deps.ps1'"; \
     Components: bundles; \
     Flags: runhidden; \
-    StatusMsg: "Installing dependencies... (GUI wizards will open)"
-    
+    StatusMsg: "Installing bundled security tools... (GUI wizards may open)"
+
 ; Launch dependency installation batch file
-;Filename: "{app}\tools\install_dependencies.bat"; \
-;   Description: "Install Nmap, Npcap and other security tools"; \
-;   Components: bundles; \
-;  Flags: postinstall nowait shellexec; \
-; StatusMsg: "Launching dependency installers..."; \
-;Tasks: installdeps
+Filename: "{app}\tools\install_dependencies.bat"; \
+    Description: "Install Nmap, Npcap and other security tools"; \
+    Components: bundles; \
+    Flags: postinstall nowait shellexec; \
+    StatusMsg: "Launching dependency installers..."; \
+    Tasks: installdeps
 
 [Registry]
 ; Add DSTerminal to user PATH
 Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "PATH"; \
 ValueData: "{olddata};{app}"; Flags: preservestringtype
-[Code]
-// ============================================================
-// LICENSE KEY VALIDATION WITH 3-TRIAL LIMIT AND ROLLBACK
-// ============================================================
 
+; Register DSTerminal as a security tool
+Root: HKCU; Subkey: "Software\DSTerminal"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\DSTerminal"; ValueType: string; ValueName: "Version"; ValueData: "4.0.0.113"
+Root: HKCU; Subkey: "Software\DSTerminal"; ValueType: string; ValueName: "LicenseKey"; ValueData: "{code:GetLicenseKey}"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\DSTerminal"; ValueType: string; ValueName: "DocPath"; ValueData: "{app}\docs"; Flags: uninsdeletekey
+
+; Register documentation path
+Root: HKCU; Subkey: "Software\DSTerminal\Documentation"; ValueType: string; ValueName: "DocsPath"; ValueData: "{app}\docs\Cyber-Ops_Documentation.html"
+Root: HKCU; Subkey: "Software\DSTerminal\Documentation"; ValueType: string; ValueName: "QuickStartPath"; ValueData: "{app}\QUICKSTART.txt"
+
+; ============================================================
+; LICENSE KEY VALIDATION WITH 3-TRIAL LIMIT AND ROLLBACK
+; ============================================================
+
+[Code]
 var
   LicensePage: TInputQueryWizardPage;
   LicenseKey: string;
@@ -263,12 +290,18 @@ var
   InstallAborted: Boolean;
 
 // ============================================================
-// GET CURRENT DATE TIME STRING (Uses Inno Setup Native Function)
+// GET LICENSE KEY FOR REGISTRY
+// ============================================================
+function GetLicenseKey(Param: string): string;
+begin
+  Result := LicenseKey;
+end;
+
+// ============================================================
+// GET CURRENT DATE TIME STRING
 // ============================================================
 function MyFormatDateTime: string;
 begin
-  // Use Inno Setup's native built-in function to format the date/time.
-  // (Custom function name changed so it doesn't conflict with Inno's internal one)
   Result := GetDateTimeString('yyyy-mm-dd hh:nn:ss', '-', ':');
 end;
 
@@ -386,11 +419,11 @@ begin
     'DSTerminal License Validation',
     'Enter your DSTerminal license key to activate and continue installation',
     'Please enter your DSTerminal license key from the official website.' + #13#10#13#10 +
-    'The license key format is: XXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX' + #13#10#13#10 +
-    'Example: XXXXXX-ACX1B2C3D4-E5FXX6G7H8-I9JXXX0K1L2' + #13#10#13#10 +
-    'You have 3 attempts to enter a valid license key, otherwise the installation will terminate naturally.' + #13#10#13#10 +
+    'The license key format is: XXXXXX-XXXXXCXXXX-XXXXXCCCXXX-XXXXXHHHSXXX' + #13#10#13#10 +
+    'Example: XXXXXX-XXXXXCXXXX-XXXXXCCCXXX-XXXXXHHHSXXX' + #13#10#13#10 +
+    'You have 3 attempts to enter a valid license key.' + #13#10#13#10 +
     'If you don''t have a license key, please visit:' + #13#10 +
-    'https://starkexpotechexchange.mw/license for licensing');
+    'https://starkexpotechexchange.mw/license');
   
   LicensePage.Add('License Key:', False);
   LicensePage.Values[0] := '';
@@ -431,7 +464,7 @@ begin
       if AttemptCount >= 3 then
       begin
         MsgBox('You have exceeded the maximum number of license validation attempts (3).' + #13#10#13#10 +
-               'Rolling back changes... Aborting installation.', mbError, MB_OK);
+               'Installation aborted.', mbError, MB_OK);
         Result := False;
         InstallAborted := True;
         WizardForm.Close;
@@ -439,8 +472,8 @@ begin
       end;
       
       MsgBox('Invalid license key format.' + #13#10#13#10 +
-             'Please use the format: XXXXXX-XXXXXXXCCXX-XXXXXBB87XXX-XXXXXXXX' + #13#10 +
-             'Example: XXXXXX-ACX1B2C3D4-E5FXX6G7H8-I9JXXX0K1L2' + #13#10#13#10 +
+             'Please use the format: XXXXXX-XXXXXCXXXX-XXXXXCCCXXX-XXXXXHHHSXXX' + #13#10 +
+             'Example: XXXXXX-XXXXXCXXXX-XXXXXCCCXXX-XXXXXHHHSXXX' + #13#10#13#10 +
              'Attempts remaining: ' + IntToStr(3 - AttemptCount), mbError, MB_OK);
       Result := False;
       Exit;
@@ -454,7 +487,7 @@ begin
       if AttemptCount >= 3 then
       begin
         MsgBox('You have exceeded the maximum number of license validation attempts (3).' + #13#10#13#10 +
-               'Rolling back changes... Aborting installation.', mbError, MB_OK);
+               'Installation aborted.', mbError, MB_OK);
         Result := False;
         InstallAborted := True;
         WizardForm.Close;
@@ -485,7 +518,8 @@ begin
     // Save the license key to the installation directory
     if FileExists(ExpandConstant('{tmp}\license.key')) then
     begin
-        CopyFile(ExpandConstant('{tmp}\license.key'), ExpandConstant('{app}\license.key'), False);    end;
+        CopyFile(ExpandConstant('{tmp}\license.key'), ExpandConstant('{app}\license.key'), False);
+    end;
   end;
 end;
 
@@ -496,12 +530,8 @@ procedure CancelButtonClick(CurPageID: Integer; var Cancel, Confirm: Boolean);
 begin
   if InstallAborted then
   begin
-    // Prevent the "Are you sure?" popup
     Confirm := False;
-    // Tell Inno Setup to cancel the installer naturally
     Cancel := True;
-    
-    // Wait a moment so the user sees the last message
     Sleep(500);
   end;
 end;
@@ -550,6 +580,30 @@ begin
             not FileExists(ExpandConstant('{sys}\Npcap\wpcap.dll')) and
             not FileExists(ExpandConstant('{sys}\npcap.dll')) and
             not FileExists(ExpandConstant('{pf}\Npcap\wpcap.dll'));
+end;
+
+function IsSqlmapMissing: Boolean;
+var
+  ResultCode: Integer;
+begin
+  Result := True;
+  if Exec(ExpandConstant('{cmd}'), '/c where sqlmap', '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then
+  begin
+    if ResultCode = 0 then
+      Result := False;
+  end;
+end;
+
+function IsNiktoMissing: Boolean;
+var
+  ResultCode: Integer;
+begin
+  Result := True;
+  if Exec(ExpandConstant('{cmd}'), '/c where nikto', '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then
+  begin
+    if ResultCode = 0 then
+      Result := False;
+  end;
 end;
 
 [Messages]

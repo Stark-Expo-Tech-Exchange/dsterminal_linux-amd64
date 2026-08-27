@@ -1,4 +1,4 @@
-﻿# dsterminal_smart_installer.py
+#!python
 import os
 import sys
 import platform

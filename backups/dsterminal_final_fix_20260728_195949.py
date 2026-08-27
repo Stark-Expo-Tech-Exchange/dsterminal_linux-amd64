@@ -1,3 +1,4 @@
+#!python
 ﻿# -*- coding: utf-8 -*-
 SOC_NMAP_AVAILABLE = False
 GLOBAL_SESSION = None

@@ -1,21 +1,77 @@
-﻿#!/usr/bin/env python3
+#!python
+import sys
 """
+
+# ============================================================
+# FIX: Handle OSError 22 on Windows
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(["chcp", "65001"], capture_output=True, shell=True)
+    except:
+        pass
+
+_original_stdout_write = sys.stdout.write
+
+def _safe_stdout_write(text):
+    try:
+        _original_stdout_write(text)
+    except OSError as e:
+        if e.errno == 22:
+            try:
+                clean = text.encode("ascii", "ignore").decode("ascii")
+                _original_stdout_write(clean)
+            except:
+                pass
+        else:
+            raise
+    except UnicodeEncodeError:
+        try:
+            clean = text.encode("ascii", "ignore").decode("ascii")
+            _original_stdout_write(clean)
+        except:
+            pass
+
+sys.stdout.write = _safe_stdout_write
+
+
+# ============================================================
+# FIX: Handle OSError 22 on Windows
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(["chcp", "65001"], capture_output=True, shell=True)
+    except:
+        pass
+
+
+    try:
+    except OSError as e:
+        if e.errno == 22:
+            try:
+                clean = text.encode("ascii", "ignore").decode("ascii")
+                _original_stdout_write(clean)
+            except:
+                pass
+        else:
+            raise
+    except UnicodeEncodeError:
+        try:
+            clean = text.encode("ascii", "ignore").decode("ascii")
+            _original_stdout_write(clean)
+        except:
+            pass
+
+sys.stdout.write = _safe_stdout_write
+
 DSTerminal Full Reconnaissance Module
 Usage: python recon_full.py <target>
        Or import as module: from recon_full import run_full_recon, full_recon_menu
 """
 import sys
-if sys.platform == 'win32':
-    import os
-    import msvcrt
-    # Ensure stdout is properly set
-    if hasattr(sys.stdout, 'buffer'):
-        sys.stdout = open(sys.stdout.fileno(), 'w', encoding='utf-8', errors='ignore')
-    if hasattr(sys.stderr, 'buffer'):
-        sys.stderr = open(sys.stderr.fileno(), 'w', encoding='utf-8', errors='ignore')
-        
 import os
-import sys
 import time
 import threading
 import itertools
@@ -23,8 +79,106 @@ import subprocess
 import shutil
 import random
 import socket
+import re
 from datetime import datetime
 from pathlib import Path
+
+# ============================================================
+# FIX WINDOWS CONSOLE ENCODING - MUST BE FIRST
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(['chcp', '65001'], capture_output=True, shell=True)
+    except:
+        pass
+    
+    # Fix stdout encoding
+    try:
+        if hasattr(sys.stdout, 'reconfigure'):
+            sys.stdout.reconfigure(encoding='utf-8', errors='ignore')
+        else:
+            import io
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
+    except:
+        pass
+
+# ============================================================
+# ANSI COLOR DEFINITIONS (ALWAYS AVAILABLE)
+# ============================================================
+class Colors:
+    """ANSI color codes for terminal output"""
+    HEADER = '\033[95m'
+    BLUE = '\033[94m'
+    CYAN = '\033[96m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    END = '\033[0m'
+    BLACK = '\033[90m'
+    MAGENTA = '\033[95m'
+    WHITE = '\033[97m'
+    DIM = '\033[2m'
+    BLINK = '\033[5m'
+    REVERSE = '\033[7m'
+    HIDDEN = '\033[8m'
+    BRIGHT_GREEN = '\033[92;1m'
+    BRIGHT_RED = '\033[91;1m'
+    BRIGHT_YELLOW = '\033[93;1m'
+    BRIGHT_CYAN = '\033[96;1m'
+    BRIGHT_MAGENTA = '\033[95;1m'
+    
+    @staticmethod
+    def strip(text):
+        ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+        return ansi_escape.sub('', text)
+
+# ============================================================
+# TRY TO IMPORT COLORAMA WITH PROPER ERROR HANDLING
+# ============================================================
+try:
+    from colorama import init, Fore, Back, Style
+    init(autoreset=True, convert=True, strip=False)
+    COLORS_AVAILABLE = True
+    # Force color support
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
+    os.environ['PYTHONUTF8'] = '1'
+except ImportError:
+    COLORS_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m'
+    })
+    Back = type('Back', (), {'RESET': '\033[49m'})
+except Exception as e:
+    COLORS_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m'
+    })
+    Back = type('Back', (), {'RESET': '\033[49m'})
+
+# ============================================================
+# SETUP COLORS (using colorama or fallback)
+# ============================================================
+RESET = Colors.END
+BOLD = Colors.BOLD
+CYAN = Colors.CYAN
+YELLOW = Colors.YELLOW
+GREEN = Colors.GREEN
+RED = Colors.RED
+BLUE = Colors.BLUE
+MAGENTA = Colors.MAGENTA
+DIM = Colors.DIM
+BLINK = Colors.BLINK
 
 # -------------------------------
 # WORKSPACE DIRECTORY SETUP
@@ -35,7 +189,6 @@ def get_workspace_dir() -> Path:
     home = Path.home()
     workspace = home / "dsterminal_workspace"
     workspace.mkdir(exist_ok=True)
-    
     return workspace
 
 WORKSPACE = get_workspace_dir()
@@ -58,6 +211,19 @@ def get_target_from_args():
     return sys.argv[1]
 
 # -------------------------------
+# TERMINAL SETUP
+# -------------------------------
+
+def get_terminal_width() -> int:
+    try:
+        width = shutil.get_terminal_size().columns
+        return min(max(width, 80), 120)
+    except:
+        return 80
+
+width = get_terminal_width()
+
+# -------------------------------
 # SCAN DIRECTORY STRUCTURE
 # -------------------------------
 
@@ -77,29 +243,73 @@ def init_scan_directories(target):
     
     return SESSION_DIR, timestamp, safe_target
 
-# -------------------------------
-# TERMINAL SETUP
-# -------------------------------
+# ============================================================
+# COLORFUL CENTERED DASHBOARD FUNCTIONS
+# ============================================================
 
-try:
-    width = shutil.get_terminal_size((120, 20)).columns
-except:
-    width = 120
+def center_text(text: str) -> str:
+    """Center text with color support"""
+    clean_text = re.sub(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', '', text)
+    padding = max(0, (width - len(clean_text)) // 2)
+    return " " * padding + text
 
-# -------------------------------
-# COLORS
-# -------------------------------
+def center_print(text: str):
+    """Print centered text"""
+    print(center_text(text))
 
-RED = "\033[91m"
-GREEN = "\033[92m"
-YELLOW = "\033[93m"
-CYAN = "\033[96m"
-MAGENTA = "\033[95m"
-BLUE = "\033[94m"
-RESET = "\033[0m"
-BOLD = "\033[1m"
-DIM = "\033[2m"
-BLINK = "\033[5m"
+def clear_screen():
+    os.system("cls" if os.name == "nt" else "clear")
+
+def draw_glowing_box(title, content_lines, title_color=CYAN, border_color=CYAN, 
+                     content_color=GREEN, blink_title=False, glow_border=True):
+    """Draw a glowing neon hacker-styled centered box with ASCII characters"""
+    box_width = min(width - 4, 80)
+    left_margin = max(0, (width - box_width) // 2)
+    inner = box_width - 4
+    
+    import textwrap
+    wrapped = []
+    for line in content_lines:
+        if not line.strip():
+            wrapped.append("")
+            continue
+        line = line.rstrip()
+        wrapped.extend(textwrap.wrap(line, inner, break_long_words=False, replace_whitespace=False))
+    
+    glow_prefix = BOLD if glow_border else ""
+    title_prefix = BOLD
+    if blink_title:
+        title_prefix += BLINK
+    
+    top = glow_prefix + border_color + "+" + "-" * (box_width - 2) + RESET
+    mid = glow_prefix + border_color + "+" + "-" * (box_width - 2) + RESET
+    bot = glow_prefix + border_color + "+" + "-" * (box_width - 2) + RESET
+    
+    title_text = f" {title} ".center(box_width - 2)
+    title_line = title_prefix + title_color + "|" + title_text + "|" + RESET
+    if blink_title:
+        title_line += RESET
+    
+    lines = [top, title_line, mid]
+    
+    for line in wrapped:
+        padded_line = line.ljust(inner)
+        lines.append(glow_prefix + border_color + "| " + RESET + content_color + padded_line + RESET + glow_prefix + border_color + " |" + RESET)
+    
+    lines.append(bot)
+    
+    return [(" " * left_margin) + line for line in lines]
+
+def check_command_exists(command):
+    """Check if a command exists on the system"""
+    try:
+        if os.name == "nt":
+            result = subprocess.run(["where", command], capture_output=True, text=True, timeout=5)
+        else:
+            result = subprocess.run(["which", command], capture_output=True, text=True, timeout=5)
+        return result.returncode == 0
+    except Exception:
+        return False
 
 # -------------------------------
 # ANIMATION FRAMES
@@ -138,106 +348,6 @@ scan_findings = {
     "dns": 0,
     "msf": 0
 }
-
-# ============================================================
-# COLORFUL CENTERED DASHBOARD FUNCTIONS
-# ============================================================
-
-def center(text):
-    """Center text with color support"""
-    clean_text = text
-    for code in [RESET, BOLD, CYAN, YELLOW, GREEN, RED, BLUE, MAGENTA, DIM, BLINK]:
-        clean_text = clean_text.replace(code, '')
-    
-    padding = max(0, (width - len(clean_text)) // 2)
-    return " " * padding + text
-
-def clear():
-    os.system("cls" if os.name == "nt" else "clear")
-
-def draw_glowing_box(title, content_lines, title_color=CYAN, border_color=CYAN, 
-                     content_color=GREEN, blink_title=False, glow_border=True):
-    """Draw a glowing neon hacker-styled centered box with ASCII characters"""
-    box_width = min(width - 4, 80)
-    left_margin = max(0, (width - box_width) // 2)
-    inner = box_width - 4
-    
-    import textwrap
-    wrapped = []
-    for line in content_lines:
-        if not line.strip():
-            wrapped.append("")
-            continue
-        line = line.rstrip()
-        wrapped.extend(textwrap.wrap(line, inner, break_long_words=False, replace_whitespace=False))
-    
-    glow_prefix = BOLD if glow_border else ""
-    title_prefix = BOLD
-    if blink_title:
-        title_prefix += BLINK
-    
-    top = glow_prefix + border_color + "+" + "-" * (box_width - 2) + "+" + RESET
-    mid = glow_prefix + border_color + "+" + "-" * (box_width - 2) + "+" + RESET
-    bot = glow_prefix + border_color + "+" + "-" * (box_width - 2) + "+" + RESET
-    
-    title_text = f" {title} ".center(box_width - 2)
-    title_line = title_prefix + title_color + "|" + title_text + "|" + RESET
-    if blink_title:
-        title_line += RESET
-    
-    lines = [top, title_line, mid]
-    
-    for line in wrapped:
-        padded_line = line.ljust(inner)
-        lines.append(glow_prefix + border_color + "| " + RESET + content_color + padded_line + RESET + glow_prefix + border_color + " |" + RESET)
-    
-    lines.append(bot)
-    
-    return [(" " * left_margin) + line for line in lines]
-
-def check_command_exists(command):
-    """Check if a command exists on the system"""
-    try:
-        if os.name == "nt":
-            result = subprocess.run(["where", command], capture_output=True, text=True, timeout=5)
-        else:
-            result = subprocess.run(["which", command], capture_output=True, text=True, timeout=5)
-        return result.returncode == 0
-    except Exception:
-        return False
-
-def save_summary(session_dir, timestamp, target):
-    """Save scan summary to workspace"""
-    summary_file = session_dir / f"summary_{timestamp}.txt"
-    with open(summary_file, 'w', encoding='utf-8') as f:
-        f.write("="*60 + "\n")
-        f.write("DSTERMINAL FULL RECONNAISSANCE SUMMARY\n")
-        f.write("="*60 + "\n\n")
-        f.write(f"Target: {target}\n")
-        f.write(f"Scan Time: {datetime.now().isoformat()}\n")
-        f.write(f"Workspace: {WORKSPACE}\n")
-        f.write(f"Session Directory: {session_dir}\n\n")
-        f.write("-"*60 + "\n")
-        f.write("SCAN RESULTS SUMMARY\n")
-        f.write("-"*60 + "\n\n")
-        
-        for scan_name in ['port', 'dns', 'msf']:
-            f.write(f"{scan_name.upper()} SCAN:\n")
-            f.write(f"  Status: {'COMPLETE' if stop_flags.get(scan_name, False) else 'INTERRUPTED'}\n")
-            f.write(f"  Findings: {scan_findings.get(scan_name, 0)}\n")
-            f.write(f"  Risk Score: {risk_scores.get(scan_name, 0)}%\n")
-            f.write("\n")
-        
-        f.write("-"*60 + "\n")
-        f.write("ALERT FEED\n")
-        f.write("-"*60 + "\n\n")
-        for alert in alert_feed:
-            clean_alert = alert
-            for code in [RED, GREEN, YELLOW, CYAN, MAGENTA, BLUE, RESET, BOLD, DIM, BLINK]:
-                clean_alert = clean_alert.replace(code, '')
-            f.write(f"{clean_alert}\n")
-    
-    return summary_file
 
 # -------------------------------
 # ALERT SYSTEM
@@ -425,11 +535,11 @@ def display_boxes():
 
 def alert_panel():
     while not all(stop_flags.values()):
-        print(center(f"{YELLOW}{'-' * 40}{RESET}"))
-        print(center(f"{YELLOW}[+] LIVE ALERT FEED [+]{RESET}"))
-        print(center(f"{YELLOW}{'-' * 40}{RESET}"))
+        print(center_text(f"{YELLOW}{'-' * 40}{RESET}"))
+        print(center_text(f"{YELLOW}[+] LIVE ALERT FEED [+]{RESET}"))
+        print(center_text(f"{YELLOW}{'-' * 40}{RESET}"))
         for a in alert_feed[-5:]:
-            print(center(a))
+            print(center_text(a))
         time.sleep(1.5)
         print("\033[{}A".format(len(alert_feed[-5:]) + 3), end="")
 
@@ -443,7 +553,7 @@ def radar_animation():
         r = radar_frames[i % len(radar_frames)]
         timestamp_str = datetime.now().strftime("%H:%M:%S")
         radar_text = f"{MAGENTA}[*] THREAT RADAR {r} [{timestamp_str}]{RESET}"
-        print(center(radar_text))
+        print(center_text(radar_text))
         i += 1
         time.sleep(0.5)
         print("\033[1A", end="")
@@ -451,6 +561,37 @@ def radar_animation():
 # -------------------------------
 # LIVE SCAN ENGINE
 # -------------------------------
+
+def save_summary(session_dir, timestamp, target):
+    """Save scan summary to workspace"""
+    summary_file = session_dir / f"summary_{timestamp}.txt"
+    with open(summary_file, 'w', encoding='utf-8') as f:
+        f.write("="*60 + "\n")
+        f.write("DSTERMINAL FULL RECONNAISSANCE SUMMARY\n")
+        f.write("="*60 + "\n\n")
+        f.write(f"Target: {target}\n")
+        f.write(f"Scan Time: {datetime.now().isoformat()}\n")
+        f.write(f"Workspace: {WORKSPACE}\n")
+        f.write(f"Session Directory: {session_dir}\n\n")
+        f.write("-"*60 + "\n")
+        f.write("SCAN RESULTS SUMMARY\n")
+        f.write("-"*60 + "\n\n")
+        
+        for scan_name in ['port', 'dns', 'msf']:
+            f.write(f"{scan_name.upper()} SCAN:\n")
+            f.write(f"  Status: {'COMPLETE' if stop_flags.get(scan_name, False) else 'INTERRUPTED'}\n")
+            f.write(f"  Findings: {scan_findings.get(scan_name, 0)}\n")
+            f.write(f"  Risk Score: {risk_scores.get(scan_name, 0)}%\n")
+            f.write("\n")
+        
+        f.write("-"*60 + "\n")
+        f.write("ALERT FEED\n")
+        f.write("-"*60 + "\n\n")
+        for alert in alert_feed:
+            clean_alert = re.sub(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', '', alert)
+            f.write(f"{clean_alert}\n")
+    
+    return summary_file
 
 def run_scan(label, command, flag, outfile, session_dir, timestamp, target):
     spinner = threading.Thread(target=spinner_panel, args=(label, flag))
@@ -541,14 +682,14 @@ def run_scan(label, command, flag, outfile, session_dir, timestamp, target):
 # -------------------------------
 
 def soc_header(target):
-    clear()
-    print(center(f"{BOLD}{CYAN}{'=' * 60}{RESET}"))
-    print(center(f"{BOLD}{CYAN}[+] DSTERMINAL CYBER DEFENSE OPERATIONS CENTER [+]{RESET}"))
-    print(center(f"{BOLD}{CYAN}{'=' * 60}{RESET}"))
-    print(center(f"{BOLD}{YELLOW}[+] TARGET -> {target}{RESET}"))
-    print(center(f"{CYAN}[+] Full Reconnaissance | Threat Intelligence | Vulnerability Discovery{RESET}"))
-    print(center(f"{CYAN}[+] Workspace: {WORKSPACE}{RESET}"))
-    print(center(f"{CYAN}{'-' * 60}{RESET}"))
+    clear_screen()
+    print(center_text(f"{BOLD}{CYAN}{'=' * 60}{RESET}"))
+    print(center_text(f"{BOLD}{CYAN}[+] DSTERMINAL CYBER DEFENSE OPERATIONS CENTER [+]{RESET}"))
+    print(center_text(f"{BOLD}{CYAN}{'=' * 60}{RESET}"))
+    print(center_text(f"{BOLD}{YELLOW}[+] TARGET -> {target}{RESET}"))
+    print(center_text(f"{CYAN}[+] Full Reconnaissance | Threat Intelligence | Vulnerability Discovery{RESET}"))
+    print(center_text(f"{CYAN}[+] Workspace: {WORKSPACE}{RESET}"))
+    print(center_text(f"{CYAN}{'-' * 60}{RESET}"))
     print()
 
 # ============================================================
@@ -557,13 +698,14 @@ def soc_header(target):
 
 def run_full_recon(target=None):
     """Main full reconnaissance function - can be called from other modules"""
-    global current_target, current_session_dir, stop_flags, scan_outputs, risk_scores, scan_findings, alert_feed
+    global current_target, current_session_dir, stop_flags, scan_outputs, risk_scores, scan_findings, alert_feed, width
     
     alert_feed = []
     stop_flags = {k: False for k in stop_flags}
     scan_outputs = {k: [] for k in scan_outputs}
     risk_scores = {k: 0 for k in risk_scores}
     scan_findings = {k: 0 for k in scan_findings}
+    width = get_terminal_width()
     
     if target is None:
         target = get_target_from_args()
@@ -711,10 +853,10 @@ def run_full_recon(target=None):
         print(p + d + m)
     
     print()
-    print(center(f"{BOLD}{GREEN}{'=' * 60}{RESET}"))
-    print(center(f"{BOLD}{GREEN}[+] ALL SCANS COMPLETE [+]{RESET}"))
-    print(center(f"{BOLD}{CYAN}[+] Results stored in: {session_dir}{RESET}"))
-    print(center(f"{BOLD}{CYAN}[+] Summary report: {summary_file}{RESET}"))
+    print(center_text(f"{BOLD}{GREEN}{'=' * 60}{RESET}"))
+    print(center_text(f"{BOLD}{GREEN}[+] ALL SCANS COMPLETE [+]{RESET}"))
+    print(center_text(f"{BOLD}{CYAN}[+] Results stored in: {session_dir}{RESET}"))
+    print(center_text(f"{BOLD}{CYAN}[+] Summary report: {summary_file}{RESET}"))
     
     # Final risk assessment
     risk_values = [r for r in risk_scores.values() if r > 0]
@@ -729,8 +871,8 @@ def run_full_recon(target=None):
     else:
         risk_level = f"{YELLOW}UNKNOWN{RESET}"
     
-    print(center(f"{BOLD}Overall Risk Assessment: {risk_level}{RESET}"))
-    print(center(f"{BOLD}{GREEN}{'=' * 60}{RESET}"))
+    print(center_text(f"{BOLD}Overall Risk Assessment: {risk_level}{RESET}"))
+    print(center_text(f"{BOLD}{GREEN}{'=' * 60}{RESET}"))
     print()
     
     return True

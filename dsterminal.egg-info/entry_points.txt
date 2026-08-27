@@ -1,2 +1,2 @@
-﻿[console_scripts]
+[console_scripts]
 dsterminal = dsterminal:main

@@ -1,4 +1,4 @@
-﻿# install_npcap.ps1 - Modified to show GUI installation
+# install_npcap.ps1 - Modified to show GUI installation
 # Npcap Installation Script for DSTerminal
 
 param(

@@ -1,4 +1,4 @@
-﻿# Convert DSTERMINAL icon to BMP for Inno Setup
+# Convert DSTERMINAL icon to BMP for Inno Setup
 Add-Type -AssemblyName System.Drawing
 
  = "installer_assets\3486-removebg-preview.ico"

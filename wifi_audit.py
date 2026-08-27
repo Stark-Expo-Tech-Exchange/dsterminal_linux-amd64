@@ -1,21 +1,78 @@
-﻿#!/usr/bin/env python3
+#!python
+import sys
 """
+
+# ============================================================
+# FIX: Handle OSError 22 on Windows
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(["chcp", "65001"], capture_output=True, shell=True)
+    except:
+        pass
+
+_original_stdout_write = sys.stdout.write
+
+def _safe_stdout_write(text):
+    try:
+        _original_stdout_write(text)
+    except OSError as e:
+        if e.errno == 22:
+            try:
+                clean = text.encode("ascii", "ignore").decode("ascii")
+                _original_stdout_write(clean)
+            except:
+                pass
+        else:
+            raise
+    except UnicodeEncodeError:
+        try:
+            clean = text.encode("ascii", "ignore").decode("ascii")
+            _original_stdout_write(clean)
+        except:
+            pass
+
+sys.stdout.write = _safe_stdout_write
+
+
+# ============================================================
+# FIX: Handle OSError 22 on Windows
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(["chcp", "65001"], capture_output=True, shell=True)
+    except:
+        pass
+
+
+    try:
+    except OSError as e:
+        if e.errno == 22:
+            try:
+                clean = text.encode("ascii", "ignore").decode("ascii")
+                _original_stdout_write(clean)
+            except:
+                pass
+        else:
+            raise
+    except UnicodeEncodeError:
+        try:
+            clean = text.encode("ascii", "ignore").decode("ascii")
+            _original_stdout_write(clean)
+        except:
+            pass
+
+sys.stdout.write = _safe_stdout_write
+
 DSTerminal Network Security Audit Module
 Comprehensive network security assessment with WiFi + Ethernet support
 Glowing neon hacker colors, PDF/HTML reports, live monitoring
+AUTO-DETECTS interface type and generates appropriate recommendations
 """
 import sys
-if sys.platform == 'win32':
-    import os
-    import msvcrt
-    # Ensure stdout is properly set
-    if hasattr(sys.stdout, 'buffer'):
-        sys.stdout = open(sys.stdout.fileno(), 'w', encoding='utf-8', errors='ignore')
-    if hasattr(sys.stderr, 'buffer'):
-        sys.stderr = open(sys.stderr.fileno(), 'w', encoding='utf-8', errors='ignore')
-        
 import os
-import sys
 import platform
 import subprocess
 import re
@@ -29,44 +86,128 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any
 import hashlib
 
-# Colorama for cross-platform colors
+# ============================================================
+# FIX WINDOWS CONSOLE ENCODING - MUST BE FIRST
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(['chcp', '65001'], capture_output=True, shell=True)
+    except:
+        pass
+    
+    # Fix stdout encoding
+    try:
+        if hasattr(sys.stdout, 'reconfigure'):
+            sys.stdout.reconfigure(encoding='utf-8', errors='ignore')
+        else:
+            import io
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
+    except:
+        pass
+
+# ============================================================
+# DEFINE COLORS CLASS FIRST (ALWAYS AVAILABLE)
+# ============================================================
+class Colors:
+    """Cross-platform color support"""
+    BLACK = '\033[30m'
+    RED = '\033[31m'
+    GREEN = '\033[32m'
+    YELLOW = '\033[33m'
+    BLUE = '\033[34m'
+    MAGENTA = '\033[35m'
+    CYAN = '\033[36m'
+    WHITE = '\033[37m'
+    RESET = '\033[0m'
+    LIGHTRED_EX = '\033[91m'
+    LIGHTGREEN_EX = '\033[92m'
+    LIGHTYELLOW_EX = '\033[93m'
+    LIGHTCYAN_EX = '\033[96m'
+    LIGHTMAGENTA_EX = '\033[95m'
+    LIGHTBLUE_EX = '\033[94m'
+    LIGHTWHITE_EX = '\033[97m'
+    
+    # Background colors
+    BG_BLACK = '\033[40m'
+    BG_RED = '\033[41m'
+    BG_GREEN = '\033[42m'
+    BG_YELLOW = '\033[43m'
+    BG_BLUE = '\033[44m'
+    BG_MAGENTA = '\033[45m'
+    BG_CYAN = '\033[46m'
+    BG_WHITE = '\033[47m'
+
+# ============================================================
+# IMPORT COLORAMA WITH PROPER ERROR HANDLING
+# ============================================================
 try:
-    from colorama import init, Fore, Back, Style
+    from colorama import init, Fore, Style
     init(autoreset=True)
     COLORS_AVAILABLE = True
+    
+    # If Fore doesn't have all attributes, use Colors as fallback
+    if not hasattr(Fore, 'LIGHTRED_EX'):
+        Fore.LIGHTRED_EX = Colors.LIGHTRED_EX
+    if not hasattr(Fore, 'LIGHTGREEN_EX'):
+        Fore.LIGHTGREEN_EX = Colors.LIGHTGREEN_EX
+    if not hasattr(Fore, 'LIGHTYELLOW_EX'):
+        Fore.LIGHTYELLOW_EX = Colors.LIGHTYELLOW_EX
+    if not hasattr(Fore, 'LIGHTCYAN_EX'):
+        Fore.LIGHTCYAN_EX = Colors.LIGHTCYAN_EX
+    if not hasattr(Fore, 'LIGHTMAGENTA_EX'):
+        Fore.LIGHTMAGENTA_EX = Colors.LIGHTMAGENTA_EX
+    if not hasattr(Fore, 'LIGHTBLUE_EX'):
+        Fore.LIGHTBLUE_EX = Colors.LIGHTBLUE_EX
+    if not hasattr(Fore, 'LIGHTWHITE_EX'):
+        Fore.LIGHTWHITE_EX = Colors.LIGHTWHITE_EX
+    if not hasattr(Fore, 'RESET'):
+        Fore.RESET = Colors.RESET
+        
 except ImportError:
-    # Fallback color codes
-    class Fore:
-        BLACK = '\033[30m'
-        RED = '\033[31m'
-        GREEN = '\033[32m'
-        YELLOW = '\033[33m'
-        BLUE = '\033[34m'
-        MAGENTA = '\033[35m'
-        CYAN = '\033[36m'
-        WHITE = '\033[37m'
-        RESET = '\033[0m'
-        LIGHTRED_EX = '\033[91m'
-        LIGHTGREEN_EX = '\033[92m'
-        LIGHTYELLOW_EX = '\033[93m'
-        LIGHTCYAN_EX = '\033[96m'
-        LIGHTMAGENTA_EX = '\033[95m'
-        LIGHTBLUE_EX = '\033[94m'
-        LIGHTWHITE_EX = '\033[97m'
-    
-    class Style:
-        RESET_ALL = '\033[0m'
-        BRIGHT = '\033[1m'
-        DIM = '\033[2m'
-    
     COLORS_AVAILABLE = False
+    # Use Colors class as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m'
+    })
+except Exception as e:
+    COLORS_AVAILABLE = False
+    # Use Colors class as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m'
+    })
+
+# ============================================================
+# REMOVE THE DUPLICATE PATCHING CODE - It's causing issues
+# ============================================================
+# The patched_write function below was causing OSError 22
+# Instead, we'll use the Colors class directly
+
+def safe_print_unicode(message):
+    """Safely print unicode/emoji characters on Windows"""
+    try:
+        print(message)
+    except UnicodeEncodeError:
+        clean_message = message.encode('ascii', 'ignore').decode('ascii')
+        print(clean_message)
+    except Exception:
+        try:
+            print(str(message))
+        except:
+            pass
 
 # Check for PDF library
 try:
     from reportlab.lib.pagesizes import letter, landscape, A4
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, Image
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.lib import colors
+    from reportlab.lib import colors as reportlab_colors
     from reportlab.lib.units import inch
     from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
     from reportlab.pdfgen import canvas
@@ -74,7 +215,6 @@ try:
     PDF_AVAILABLE = True
 except ImportError:
     PDF_AVAILABLE = False
-    print("[!] ReportLab not installed. PDF export disabled. Install with: pip install reportlab")
 
 # Check for psutil for network stats
 try:
@@ -83,25 +223,8 @@ try:
 except ImportError:
     PSUTIL_AVAILABLE = False
 
-
 class NetworkAudit:
     """Comprehensive Network Security Audit Engine - WiFi + Ethernet"""
-    
-    # Glowing neon color schemes
-    NEON_COLORS = {
-        'green': Fore.LIGHTGREEN_EX,
-        'red': Fore.LIGHTRED_EX,
-        'cyan': Fore.LIGHTCYAN_EX,
-        'magenta': Fore.LIGHTMAGENTA_EX,
-        'yellow': Fore.LIGHTYELLOW_EX,
-        'blue': Fore.LIGHTBLUE_EX,
-        'white': Fore.LIGHTWHITE_EX,
-    }
-    
-    # Blinking effect (using ANSI)
-    BLINK_ON = '\033[5m'
-    BLINK_OFF = '\033[25m'
-    BOLD = '\033[1m'
     
     VERSION = "4.0.0.113"
     APP_NAME = "DSTerminal Network Security Audit"
@@ -113,8 +236,11 @@ class NetworkAudit:
         self.hostname = socket.gethostname()
         self.report_id = self._generate_report_id()
         self.timestamp = datetime.now()
+        self.active_interface = None
+        self.interface_type = None  # 'WiFi' or 'Ethernet'
+        self.connected_network = None
+        self.is_admin = False
         
-        # Extended results structure - WiFi + Ethernet
         self.results = {
             'report_id': self.report_id,
             'version': self.VERSION,
@@ -122,7 +248,9 @@ class NetworkAudit:
             'system': self.system,
             'hostname': self.hostname,
             'interface': interface,
+            'interface_type': None,
             'network_type': None,
+            'is_admin': False,
             'interfaces': [],
             'wifi_networks': [],
             'ethernet_networks': [],
@@ -145,19 +273,18 @@ class NetworkAudit:
                 'wpa2_aps': 0,
                 'wpa3_aps': 0,
                 'highest_signal': 0,
-                'high_risk': 0
+                'high_risk': 0,
+                'primary_interface': None,
+                'primary_interface_type': None,
+                'security_score': 0
             }
         }
-        self._last_export_key = None
-        self._last_export_path = None
         
-        # Pen typing settings
         self.pen_speed = 0.035
         self.pen_variance = 0.008
         self.auto_break_chars = 80
         self.current_line_length = 0
         
-        # Get terminal width
         try:
             self.term_width = shutil.get_terminal_size().columns
             if self.term_width < 80:
@@ -166,135 +293,138 @@ class NetworkAudit:
                 self.term_width = 120
         except:
             self.term_width = 80
+        
+        # Check admin privileges
+        self._check_admin()
+    
+    def _check_admin(self):
+        """Check if running with admin privileges"""
+        try:
+            if self.system == 'windows':
+                try:
+                    import ctypes
+                    self.is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
+                except:
+                    self.is_admin = False
+            else:
+                self.is_admin = os.geteuid() == 0
+        except:
+            self.is_admin = False
+        self.results['is_admin'] = self.is_admin
     
     def _generate_report_id(self) -> str:
-        """Generate a unique report ID."""
         timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
         random_suffix = ''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', k=6))
         return f"NET-{timestamp}-{random_suffix}"
     
-    # ========================================================================
-    # GLOWING NEON COLOR HELPERS
-    # ========================================================================
-    
-    def _glow(self, text: str, color: str, blink: bool = False, bold: bool = True) -> str:
-        """Apply glowing neon effect to text."""
-        result = ""
-        if bold:
-            result += self.BOLD
-        if blink:
-            result += self.BLINK_ON
-        result += color
-        result += text
-        result += Style.RESET_ALL
-        if blink:
-            result += self.BLINK_OFF
-        return result
-    
-    def _colorize(self, text: str, color: str) -> str:
-        """Simple colorize without glow."""
-        return color + text + Style.RESET_ALL
-    
-    # ========================================================================
-    # HUMAN-LIKE PEN TYPING ENGINE
-    # ========================================================================
-    
     def pen_type(self, text: str, color: Optional[str] = None, 
                  speed: Optional[float] = None, auto_break: bool = True,
-                 indent: int = 0, newline: bool = True, glow: bool = False,
-                 blink: bool = False, bold: bool = False):
-        """Human-like pen typing with glowing neon effects."""
+                 indent: int = 0, newline: bool = True):
+        """Human-like pen typing."""
         import sys
         import time
         import random
         
         delay = speed if speed is not None else self.pen_speed
         
-        if indent > 0:
-            sys.stdout.write(" " * indent)
-            sys.stdout.flush()
-            self.current_line_length += indent
+        try:
+            if indent > 0:
+                sys.stdout.write(" " * indent)
+                sys.stdout.flush()
+                self.current_line_length += indent
+        except:
+            pass
         
-        if color:
-            if glow:
-                sys.stdout.write(self.BOLD)
-            if blink:
-                sys.stdout.write(self.BLINK_ON)
-            sys.stdout.write(color)
-            sys.stdout.flush()
+        try:
+            if color:
+                sys.stdout.write(color)
+                sys.stdout.flush()
+        except:
+            pass
         
-        if auto_break and len(text) > self.auto_break_chars:
-            words = text.split()
-            current_line = ""
-            for word in words:
-                if len(current_line) + len(word) + 1 > self.auto_break_chars:
-                    self._type_line(current_line.rstrip(), delay)
-                    sys.stdout.write("\n")
-                    sys.stdout.flush()
-                    if indent > 0:
-                        sys.stdout.write(" " * indent)
+        try:
+            if auto_break and len(text) > self.auto_break_chars:
+                words = text.split()
+                current_line = ""
+                for word in words:
+                    if len(current_line) + len(word) + 1 > self.auto_break_chars:
+                        self._type_line(current_line.rstrip(), delay)
+                        sys.stdout.write("\n")
                         sys.stdout.flush()
-                    current_line = word + " "
-                else:
-                    current_line += word + " "
-            if current_line:
-                self._type_line(current_line.rstrip(), delay)
-        else:
-            self._type_line(text, delay)
+                        if indent > 0:
+                            sys.stdout.write(" " * indent)
+                            sys.stdout.flush()
+                        current_line = word + " "
+                    else:
+                        current_line += word + " "
+                if current_line:
+                    self._type_line(current_line.rstrip(), delay)
+            else:
+                self._type_line(text, delay)
+        except:
+            pass
         
-        if color:
-            if blink:
-                sys.stdout.write(self.BLINK_OFF)
-            sys.stdout.write(Style.RESET_ALL)
-            sys.stdout.flush()
+        try:
+            if color:
+                sys.stdout.write(Style.RESET_ALL)
+                sys.stdout.flush()
+        except:
+            pass
         
         if newline:
-            sys.stdout.write("\n")
-            sys.stdout.flush()
+            try:
+                sys.stdout.write("\n")
+                sys.stdout.flush()
+            except:
+                pass
             self.current_line_length = 0
     
     def _type_line(self, text: str, delay: float):
-        """Type a single line with human-like rhythm."""
         import sys
         import time
         import random
         
         for char in text:
-            sys.stdout.write(char)
-            sys.stdout.flush()
-            self.current_line_length += 1
+            try:
+                sys.stdout.write(char)
+                sys.stdout.flush()
+                self.current_line_length += 1
+            except:
+                pass
             
-            if char in ".!?,":
-                time.sleep(delay * 1.8)
-            elif char in ";:":
-                time.sleep(delay * 1.3)
-            elif char == " ":
-                time.sleep(delay * 0.6)
-            elif char in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
-                time.sleep(delay * 1.15)
-            else:
-                time.sleep(delay + (random.random() - 0.5) * self.pen_variance)
-    
-    # ========================================================================
-    # GLOWING NEON BOX DRAWING - FIXED UTF-8
-    # ========================================================================
+            try:
+                if char in ".!?,":
+                    time.sleep(delay * 1.8)
+                elif char in ";:":
+                    time.sleep(delay * 1.3)
+                elif char == " ":
+                    time.sleep(delay * 0.6)
+                elif char in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+                    time.sleep(delay * 1.15)
+                else:
+                    time.sleep(delay + (random.random() - 0.5) * self.pen_variance)
+            except:
+                time.sleep(delay)
     
     def _draw_glow_box(self, title: str, content_lines: List[str], 
                        title_color: str, border_color: str,
                        content_color: Optional[str] = None,
-                       width: Optional[int] = None,
-                       blink_title: bool = False,
-                       glow_border: bool = True):
+                       width: Optional[int] = None):
         """Draw a glowing neon hacker-styled centered box."""
         import textwrap
         
         content_color = content_color or Fore.LIGHTGREEN_EX
-        term = shutil.get_terminal_size((100, 30))
+        
+        try:
+            term = shutil.get_terminal_size((100, 30))
+            term_width = term.columns
+        except:
+            term_width = 80
         
         if width is None:
-            width = min(term.columns - 6, 110)
+            width = min(term_width - 6, 110)
         width = max(width, 60)
-        left_margin = max(0, (term.columns - width) // 2)
+        left_margin = max(0, (term_width - width) // 2)
         inner = width - 4
         
         wrapped = []
@@ -302,101 +432,110 @@ class NetworkAudit:
             if not line.strip():
                 wrapped.append("")
                 continue
-            line = line.rstrip()
-            wrapped.extend(textwrap.wrap(line, inner, break_long_words=False, replace_whitespace=False))
+            try:
+                line = line.rstrip()
+                wrapped.extend(textwrap.wrap(line, inner, break_long_words=False, replace_whitespace=False))
+            except:
+                wrapped.append(line[:inner] if len(line) > inner else line)
         
-        glow_prefix = self.BOLD if glow_border else ""
-        
-        # Use simple ASCII box characters
-        top = glow_prefix + border_color + "+" + "-" * (width - 2) + "+" + Style.RESET_ALL
-        mid = glow_prefix + border_color + "+" + "-" * (width - 2) + "+" + Style.RESET_ALL
-        bot = glow_prefix + border_color + "+" + "-" * (width - 2) + "+" + Style.RESET_ALL
+        top = border_color + "+" + "-" * (width - 2) + "+" + Style.RESET_ALL
+        mid = border_color + "+" + "-" * (width - 2) + "+" + Style.RESET_ALL
+        bot = border_color + "+" + "-" * (width - 2) + "+" + Style.RESET_ALL
         
         title_text = f" {title} ".center(width - 2)
-        title_prefix = self.BOLD
-        if blink_title:
-            title_prefix += self.BLINK_ON
-        title_line = title_prefix + title_color + "|" + title_text + "|" + Style.RESET_ALL
-        if blink_title:
-            title_line += self.BLINK_OFF
+        title_line = title_color + "|" + title_text + "|" + Style.RESET_ALL
         
-        print()
-        print(" " * left_margin + top)
-        print(" " * left_margin + title_line)
-        print(" " * left_margin + mid)
+        try:
+            print()
+            print(" " * left_margin + top)
+            print(" " * left_margin + title_line)
+            print(" " * left_margin + mid)
+        except:
+            pass
         
         for line in wrapped:
-            border_prefix = glow_prefix if glow_border else ""
-            print(" " * left_margin + border_prefix + border_color + "| " + Style.RESET_ALL, end="")
-            padded_line = line.ljust(inner)
-            self.pen_type(padded_line, color=content_color, speed=self.pen_speed, newline=False, glow=True)
-            print(" " * left_margin + border_prefix + border_color + "|" + Style.RESET_ALL)
-            time.sleep(self.pen_speed * 0.5)
+            try:
+                print(" " * left_margin + border_color + "| " + Style.RESET_ALL, end="")
+                padded_line = line.ljust(inner)
+                self.pen_type(padded_line, color=content_color, speed=self.pen_speed, newline=False)
+                print(" " * left_margin + border_color + "|" + Style.RESET_ALL)
+                time.sleep(self.pen_speed * 0.5)
+            except:
+                pass
         
-        print(" " * left_margin + bot)
-        print()
-        time.sleep(self.pen_speed * 1.5)
-    
-    # ========================================================================
-    # BANNER - NETWORK + WIFI FOCUSED - FIXED UTF-8
-    # ========================================================================
+        try:
+            print(" " * left_margin + bot)
+            print()
+            time.sleep(self.pen_speed * 1.5)
+        except:
+            pass
     
     def show_banner(self):
         """Display the Network + WiFi audit banner."""
-        import shutil
+        try:
+            term = shutil.get_terminal_size((100, 30))
+            width = min(term.columns - 6, 110)
+            width = max(width, 60)
+            left_margin = max(0, (term.columns - width) // 2)
+        except:
+            width = 80
+            left_margin = 0
         
-        term = shutil.get_terminal_size((100, 30))
-        width = min(term.columns - 6, 110)
-        width = max(width, 60)
-        left_margin = max(0, (term.columns - width) // 2)
-        
-        print()
-        print(" " * left_margin + Fore.CYAN + "+" + "-" * (width - 2) + "+" + Style.RESET_ALL)
-        print(" " * left_margin + Fore.CYAN + "|" + Style.RESET_ALL + " " * (width - 2) + Fore.CYAN + "|" + Style.RESET_ALL)
-        
-        # ASCII Art - Network + WiFi (simplified)
-        ascii_art = [
-            "    [++]   [==] [=======] [========] [==]    [==] [=======] [========] [==]  [==]",
-            "    [++]  [==] [=======] [========] [==]    [==] [=======] [========] [==] [==] ",
-            "    [==] [==] [=======]     [==]   [==] [=] [==] [==]   [==] [========] [=======] ",
-            "    [==] [==] [=======]     [==]   [==] [=] [==] [==]   [==] [========] [=======] ",
-            "    [==] [==] [=======]   [==]   [=] [=] [=] [=] [=]   [=] [========] [==]  [==]",
-            "    [==]  [==] [=======] [========] [==]    [==] [==]   [==] [========] [==]  [==]"
-        ]
-        
-        max_len = max(len(line) for line in ascii_art)
-        for line in ascii_art:
-            padding = (width - max_len - 10) // 2
+        try:
+            print()
+            print(" " * left_margin + Fore.CYAN + "+" + "-" * (width - 2) + "+" + Style.RESET_ALL)
+            print(" " * left_margin + Fore.CYAN + "|" + Style.RESET_ALL + " " * (width - 2) + Fore.CYAN + "|" + Style.RESET_ALL)
+            
+            ascii_art = [
+                "    [++]   [==] [=======] [========] [==]    [==] [=======] [========] [==]  [==]",
+                "    [++]  [==] [=======] [========] [==]    [==] [=======] [========] [==] [==] ",
+                "    [==] [==] [=======]     [==]   [==] [=] [==] [==]   [==] [========] [=======] ",
+                "    [==] [==] [=======]     [==]   [==] [=] [==] [==]   [==] [========] [=======] ",
+                "    [==] [==] [=======]   [==]   [=] [=] [=] [=] [=]   [=] [========] [==]  [==]",
+                "    [==]  [==] [=======] [========] [==]    [==] [==]   [==] [========] [==]  [==]"
+            ]
+            
+            max_len = max(len(line) for line in ascii_art)
+            for line in ascii_art:
+                padding = (width - max_len - 10) // 2
+                print(" " * left_margin + Fore.CYAN + "|" + Style.RESET_ALL + 
+                      " " * padding + Fore.LIGHTGREEN_EX + line + Style.RESET_ALL + 
+                      " " * (width - max_len - padding - 10) + Fore.CYAN + "|" + Style.RESET_ALL)
+            
+            title = f"[!] Network & WiFi Security Audit Engine v{self.VERSION}"
             print(" " * left_margin + Fore.CYAN + "|" + Style.RESET_ALL + 
-                  " " * padding + Fore.LIGHTGREEN_EX + line + Style.RESET_ALL + 
-                  " " * (width - max_len - padding - 10) + Fore.CYAN + "|" + Style.RESET_ALL)
-        
-        # Title - Network + WiFi Security Audit
-        title = f"[!] Network & WiFi Security Audit Engine v{self.VERSION}"
-        print(" " * left_margin + Fore.CYAN + "|" + Style.RESET_ALL + 
-              " " * ((width - 2 - len(title)) // 2) + 
-              Fore.LIGHTCYAN_EX + title + Style.RESET_ALL + 
-              " " * ((width - 2 - len(title)) // 2) + Fore.CYAN + "|" + Style.RESET_ALL)
-        
-        # Subtitle - WiFi + Ethernet
-        subtitle = "[+] WiFi + Ethernet Network Security Assessment & Analysis"
-        print(" " * left_margin + Fore.CYAN + "|" + Style.RESET_ALL + 
-              " " * ((width - 2 - len(subtitle)) // 2) + 
-              Fore.LIGHTMAGENTA_EX + subtitle + Style.RESET_ALL + 
-              " " * ((width - 2 - len(subtitle)) // 2) + Fore.CYAN + "|" + Style.RESET_ALL)
-        
-        # Bottom border
-        print(" " * left_margin + Fore.CYAN + "|" + Style.RESET_ALL + " " * (width - 2) + Fore.CYAN + "|" + Style.RESET_ALL)
-        print(" " * left_margin + Fore.CYAN + "+" + "-" * (width - 2) + "+" + Style.RESET_ALL)
-        print()
-        time.sleep(0.5)
+                  " " * ((width - 2 - len(title)) // 2) + 
+                  Fore.LIGHTCYAN_EX + title + Style.RESET_ALL + 
+                  " " * ((width - 2 - len(title)) // 2) + Fore.CYAN + "|" + Style.RESET_ALL)
+            
+            subtitle = "[+] WiFi + Ethernet Network Security Assessment & Analysis"
+            print(" " * left_margin + Fore.CYAN + "|" + Style.RESET_ALL + 
+                  " " * ((width - 2 - len(subtitle)) // 2) + 
+                  Fore.LIGHTMAGENTA_EX + subtitle + Style.RESET_ALL + 
+                  " " * ((width - 2 - len(subtitle)) // 2) + Fore.CYAN + "|" + Style.RESET_ALL)
+            
+            # Admin status
+            admin_status = "[+] Admin: YES" if self.is_admin else "[-] Admin: NO (Limited WiFi scan)"
+            admin_color = Fore.LIGHTGREEN_EX if self.is_admin else Fore.LIGHTYELLOW_EX
+            print(" " * left_margin + Fore.CYAN + "|" + Style.RESET_ALL + 
+                  " " * ((width - 2 - len(admin_status)) // 2) + 
+                  admin_color + admin_status + Style.RESET_ALL + 
+                  " " * ((width - 2 - len(admin_status)) // 2) + Fore.CYAN + "|" + Style.RESET_ALL)
+            
+            print(" " * left_margin + Fore.CYAN + "|" + Style.RESET_ALL + " " * (width - 2) + Fore.CYAN + "|" + Style.RESET_ALL)
+            print(" " * left_margin + Fore.CYAN + "+" + "-" * (width - 2) + "+" + Style.RESET_ALL)
+            print()
+            time.sleep(0.5)
+        except:
+            print("\n=== DSTERMINAL Network & WiFi Security Audit ===")
+            print(f"Version: {self.VERSION}")
+            print()
     
     # ========================================================================
-    # NETWORK INTERFACE DETECTION (WiFi + Ethernet)
+    # NETWORK INTERFACE DETECTION
     # ========================================================================
     
     def _detect_all_interfaces(self) -> List[Dict]:
-        """Detect all network interfaces (WiFi + Ethernet)."""
         interfaces = []
         
         try:
@@ -405,10 +544,13 @@ class NetworkAudit:
                     ip = None
                     mac = None
                     for addr in addrs:
-                        if addr.family == socket.AF_INET:
-                            ip = addr.address
-                        elif addr.family == psutil.AF_LINK:
-                            mac = addr.address
+                        try:
+                            if addr.family == socket.AF_INET:
+                                ip = addr.address
+                            elif hasattr(psutil, 'AF_LINK') and addr.family == psutil.AF_LINK:
+                                mac = addr.address
+                        except:
+                            pass
                     if ip and ip not in ['127.0.0.1', '0.0.0.0']:
                         interfaces.append({
                             'name': iface,
@@ -419,19 +561,20 @@ class NetworkAudit:
         except:
             pass
         
-        # Fallback: use OS commands
         if not interfaces:
-            if self.system == 'windows':
-                interfaces = self._detect_windows_interfaces()
-            elif self.system == 'linux':
-                interfaces = self._detect_linux_interfaces()
-            elif self.system == 'darwin':
-                interfaces = self._detect_macos_interfaces()
+            try:
+                if self.system == 'windows':
+                    interfaces = self._detect_windows_interfaces()
+                elif self.system == 'linux':
+                    interfaces = self._detect_linux_interfaces()
+                elif self.system == 'darwin':
+                    interfaces = self._detect_macos_interfaces()
+            except:
+                pass
         
         return interfaces
     
     def _detect_windows_interfaces(self) -> List[Dict]:
-        """Detect interfaces on Windows."""
         interfaces = []
         try:
             result = subprocess.run(['ipconfig', '/all'], capture_output=True, text=True, timeout=10)
@@ -449,7 +592,7 @@ class NetworkAudit:
                             'mac': current_mac or 'Unknown',
                             'type': self._detect_interface_type(current_iface)
                         })
-                    name_match = re.search(r'adapter\s+(.+?):', line)
+                    name_match = re.search(r'adapter\s+(.+?):', line, re.IGNORECASE)
                     current_iface = name_match.group(1).strip() if name_match else None
                     current_mac = None
                     current_ip = None
@@ -473,7 +616,6 @@ class NetworkAudit:
         return interfaces
     
     def _detect_linux_interfaces(self) -> List[Dict]:
-        """Detect interfaces on Linux."""
         interfaces = []
         try:
             result = subprocess.run(['ip', 'addr', 'show'], capture_output=True, text=True, timeout=10)
@@ -506,7 +648,6 @@ class NetworkAudit:
         return interfaces
     
     def _detect_macos_interfaces(self) -> List[Dict]:
-        """Detect interfaces on macOS."""
         interfaces = []
         try:
             result = subprocess.run(['ifconfig'], capture_output=True, text=True, timeout=10)
@@ -550,31 +691,58 @@ class NetworkAudit:
         return interfaces
     
     def _detect_interface_type(self, iface_name: str) -> str:
-        """Detect if interface is WiFi, Ethernet, or other."""
         iface_lower = iface_name.lower()
         
-        wifi_patterns = ['wifi', 'wireless', 'wlan', 'wlp', 'wlx', 'wi-fi', '802.11']
+        wifi_patterns = ['wifi', 'wireless', 'wlan', 'wlp', 'wlx', 'wi-fi', '802.11', 'airport']
         for pattern in wifi_patterns:
             if pattern in iface_lower:
                 return 'WiFi'
         
-        ethernet_patterns = ['eth', 'enp', 'enx', 'en', 'ethernet', 'lan', 'gigabit']
+        ethernet_patterns = ['eth', 'enp', 'enx', 'en', 'ethernet', 'lan', 'gigabit', 'e1000', 'rtl']
         for pattern in ethernet_patterns:
             if pattern in iface_lower:
                 return 'Ethernet'
         
         if 'bluetooth' in iface_lower:
             return 'Bluetooth'
-        elif 'vmnet' in iface_lower or 'virtual' in iface_lower:
+        elif 'vmnet' in iface_lower or 'virtual' in iface_lower or 'hyper-v' in iface_lower:
             return 'Virtual'
         
         return 'Unknown'
     
-    def _get_connected_network(self) -> Dict:
-        """Get currently connected network info."""
-        connected = {'type': 'None'}
+    def _detect_active_interface(self) -> Tuple[Optional[str], Optional[str]]:
+        """Detect the active interface and its type."""
+        connected = self._get_connected_network()
         
-        # Check WiFi connection
+        if connected.get('type') == 'WiFi':
+            self.interface_type = 'WiFi'
+            self.results['interface_type'] = 'WiFi'
+            self.results['network_type'] = 'WiFi'
+            self.results['summary']['primary_interface_type'] = 'WiFi'
+            return connected.get('interface'), 'WiFi'
+        elif connected.get('type') == 'Ethernet':
+            self.interface_type = 'Ethernet'
+            self.results['interface_type'] = 'Ethernet'
+            self.results['network_type'] = 'Ethernet'
+            self.results['summary']['primary_interface_type'] = 'Ethernet'
+            return connected.get('interface'), 'Ethernet'
+        else:
+            # Try to find any active interface
+            interfaces = self._detect_all_interfaces()
+            for iface in interfaces:
+                if iface.get('ip') and iface.get('ip') not in ['127.0.0.1', '0.0.0.0']:
+                    iface_type = iface.get('type', 'Unknown')
+                    self.interface_type = iface_type
+                    self.results['interface_type'] = iface_type
+                    self.results['network_type'] = iface_type
+                    self.results['summary']['primary_interface_type'] = iface_type
+                    return iface.get('name'), iface_type
+            return None, None
+    
+    def _get_connected_network(self) -> Dict:
+        connected = {'type': 'None', 'interface': None}
+        
+        # First check for WiFi
         if self.system == 'windows':
             try:
                 result = subprocess.run(
@@ -583,7 +751,11 @@ class NetworkAudit:
                 )
                 for line in result.stdout.splitlines():
                     line = line.strip()
-                    if line.startswith("SSID") and "BSSID" not in line and ":" in line:
+                    if line.startswith("Name") and ":" in line:
+                        parts = line.split(":", 1)
+                        if len(parts) >= 2:
+                            connected['interface'] = parts[1].strip()
+                    elif line.startswith("SSID") and "BSSID" not in line and ":" in line:
                         parts = line.split(":", 1)
                         if len(parts) >= 2:
                             ssid = parts[1].strip()
@@ -605,23 +777,37 @@ class NetworkAudit:
             except:
                 pass
         
-        # Check Ethernet connection
-        try:
-            interfaces = self._detect_all_interfaces()
-            eth_interfaces = [i for i in interfaces if i.get('type') == 'Ethernet']
-            for eth in eth_interfaces:
-                if eth.get('ip'):
-                    connected['type'] = 'Ethernet'
-                    connected['ip'] = eth.get('ip')
-                    connected['mac'] = eth.get('mac')
-                    break
-        except:
-            pass
+        # If no WiFi connected, check for Ethernet
+        if connected.get('type') == 'None':
+            try:
+                interfaces = self._detect_all_interfaces()
+                eth_interfaces = [i for i in interfaces if i.get('type') == 'Ethernet' and i.get('ip')]
+                for eth in eth_interfaces:
+                    if eth.get('ip'):
+                        connected['type'] = 'Ethernet'
+                        connected['interface'] = eth.get('name')
+                        connected['ip'] = eth.get('ip')
+                        connected['mac'] = eth.get('mac')
+                        break
+            except:
+                pass
+        
+        # If still None, check for any active interface
+        if connected.get('type') == 'None':
+            try:
+                interfaces = self._detect_all_interfaces()
+                for iface in interfaces:
+                    if iface.get('ip') and iface.get('ip') not in ['127.0.0.1', '0.0.0.0']:
+                        connected['type'] = iface.get('type', 'Unknown')
+                        connected['interface'] = iface.get('name')
+                        connected['ip'] = iface.get('ip')
+                        break
+            except:
+                pass
         
         return connected
     
     def _detect_windows_interface(self) -> Optional[str]:
-        """Detect Windows WiFi interface."""
         try:
             result = subprocess.run(['netsh', 'wlan', 'show', 'interfaces'], 
                                 capture_output=True, text=True, timeout=10)
@@ -662,81 +848,36 @@ class NetworkAudit:
         return None
     
     def normalize_bssid(self, bssid: str) -> str:
-        """Normalize BSSID format."""
         if not bssid:
             return ""
         return bssid.upper().replace("-", ":").strip()
-    
-    # ========================================================================
-    # TYPING HELPERS
-    # ========================================================================
-    
-    def pen_status(self, text: str, color: str = Fore.LIGHTCYAN_EX, glow: bool = True):
-        self.pen_type(f"[*] {text}", color=color, glow=glow)
-    
-    def pen_success(self, text: str, color: str = Fore.LIGHTGREEN_EX, glow: bool = True):
-        self.pen_type(f"[+] {text}", color=color, glow=glow)
-    
-    def pen_error(self, text: str, color: str = Fore.LIGHTRED_EX, glow: bool = True):
-        self.pen_type(f"[!] {text}", color=color, glow=glow)
-    
-    def pen_warning(self, text: str, color: str = Fore.LIGHTYELLOW_EX, glow: bool = True):
-        self.pen_type(f"[?] {text}", color=color, glow=glow)
-    
-    def pen_finding(self, text: str, severity: str = "INFO"):
-        severity_colors = {
-            "CRITICAL": Fore.LIGHTRED_EX,
-            "HIGH": Fore.LIGHTYELLOW_EX,
-            "MEDIUM": Fore.LIGHTCYAN_EX,
-            "LOW": Fore.LIGHTGREEN_EX,
-            "INFO": Fore.LIGHTWHITE_EX
-        }
-        severity_prefix = {
-            "CRITICAL": "[!]",
-            "HIGH": "[-]",
-            "MEDIUM": "[*]",
-            "LOW": "[.]",
-            "INFO": "[+]"
-        }
-        color = severity_colors.get(severity, Fore.LIGHTWHITE_EX)
-        prefix = severity_prefix.get(severity, "")
-        self.pen_type(f"{prefix} {text}", color=color, glow=True)
     
     # ========================================================================
     # WINDOWS WIFI AUDIT
     # ========================================================================
     
     def _wifi_audit_windows(self):
-        """Windows WiFi audit implementation."""
-        import ctypes
-        
-        try:
-            is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
-        except:
-            is_admin = False
-        
-        if not is_admin:
+        if not self.is_admin:
             self._draw_glow_box(
-                "[-] Warning",
-                ["Running without admin privileges - scan results may be limited"],
+                "[-] Admin Required",
+                [
+                    "WiFi scan requires administrator privileges.",
+                    "Running with limited information - scan results may be incomplete.",
+                    "To get full WiFi scan results, run as Administrator.",
+                    "Current detections will be based on connected network only."
+                ],
                 title_color=Fore.LIGHTYELLOW_EX,
                 border_color=Fore.LIGHTYELLOW_EX,
-                content_color=Fore.LIGHTYELLOW_EX,
-                width=None,
-                blink_title=True,
-                glow_border=True
+                content_color=Fore.LIGHTYELLOW_EX
             )
-            time.sleep(0.3)
+            time.sleep(1)
         
         self._draw_glow_box(
-            "[+] Scanning",
-            ["Scanning for WiFi networks..."],
+            "[+] Scanning WiFi",
+            ["Scanning for WiFi networks..." + (" (Admin required for full scan)" if not self.is_admin else "")],
             title_color=Fore.LIGHTYELLOW_EX,
             border_color=Fore.LIGHTYELLOW_EX,
-            content_color=Fore.LIGHTYELLOW_EX,
-            width=None,
-            blink_title=True,
-            glow_border=True
+            content_color=Fore.LIGHTYELLOW_EX
         )
         time.sleep(0.5)
         
@@ -744,71 +885,89 @@ class NetworkAudit:
         connected_bssid = self.normalize_bssid(connected_network.get('bssid', ''))
         connected_signal = connected_network.get('signal', 0)
         connected_ssid = connected_network.get('ssid', '')
+        connected_auth = connected_network.get('authentication', '')
         
-        try:
-            result = subprocess.run(
-                ['netsh', 'wlan', 'show', 'networks', 'mode=bssid'], 
-                capture_output=True, text=True, timeout=30
-            )
-            
-            if result.returncode != 0 or not result.stdout.strip():
-                result = subprocess.run(
-                    ['netsh', 'wlan', 'show', 'networks'], 
-                    capture_output=True, text=True, timeout=30
-                )
-            
-            if result.stdout.strip():
-                self._parse_windows_output(result.stdout, connected_network)
-            else:
-                self._draw_glow_box(
-                    "[-] No Networks Found",
-                    ["No network data received. Check your WiFi adapter."],
-                    title_color=Fore.LIGHTYELLOW_EX,
-                    border_color=Fore.LIGHTYELLOW_EX,
-                    content_color=Fore.LIGHTYELLOW_EX,
-                    width=None,
-                    blink_title=True,
-                    glow_border=True
-                )
-                
-        except subprocess.TimeoutExpired:
-            self._draw_glow_box(
-                "[!] Timeout",
-                ["Scan timed out"],
-                title_color=Fore.LIGHTRED_EX,
-                border_color=Fore.LIGHTRED_EX,
-                content_color=Fore.LIGHTRED_EX,
-                width=None,
-                blink_title=True,
-                glow_border=True
-            )
-        except Exception as e:
-            self._draw_glow_box(
-                "[!] Error",
-                [f"Error during scan: {str(e)}"],
-                title_color=Fore.LIGHTRED_EX,
-                border_color=Fore.LIGHTRED_EX,
-                content_color=Fore.LIGHTRED_EX,
-                width=None,
-                blink_title=True,
-                glow_border=True
-            )
-        
-        if not self.results['wifi_networks'] and connected_ssid:
+        # Always add the connected network if available
+        if connected_ssid:
             ap = {
                 'ssid': connected_ssid,
-                'bssid': connected_bssid if connected_bssid else 'Unknown',
+                'bssid': connected_bssid if connected_bssid else 'Connected',
                 'signal': connected_signal,
-                'security': connected_network.get('security', 'Unknown'),
+                'security': self._detect_security(connected_auth) if connected_auth else 'Unknown',
                 'connected': True,
-                'authentication': connected_network.get('authentication', ''),
+                'authentication': connected_auth,
                 'channel': connected_network.get('channel', ''),
                 'radio_type': connected_network.get('radio_type', '')
             }
             self.results['wifi_networks'].append(ap)
+        
+        # Only do full scan if admin
+        if self.is_admin:
+            try:
+                result = subprocess.run(
+                    ['netsh', 'wlan', 'show', 'networks', 'mode=bssid'], 
+                    capture_output=True, text=True, timeout=30
+                )
+                
+                if result.returncode != 0 or not result.stdout.strip():
+                    result = subprocess.run(
+                        ['netsh', 'wlan', 'show', 'networks'], 
+                        capture_output=True, text=True, timeout=30
+                    )
+                
+                if result.stdout.strip():
+                    self._parse_windows_output(result.stdout, connected_network)
+                else:
+                    self._draw_glow_box(
+                        "[-] No Networks Found",
+                        ["No network data received. Check your WiFi adapter."],
+                        title_color=Fore.LIGHTYELLOW_EX,
+                        border_color=Fore.LIGHTYELLOW_EX,
+                        content_color=Fore.LIGHTYELLOW_EX
+                    )
+                    
+            except subprocess.TimeoutExpired:
+                self._draw_glow_box(
+                    "[!] Timeout",
+                    ["Scan timed out"],
+                    title_color=Fore.LIGHTRED_EX,
+                    border_color=Fore.LIGHTRED_EX,
+                    content_color=Fore.LIGHTRED_EX
+                )
+            except Exception as e:
+                self._draw_glow_box(
+                    "[!] Error",
+                    [f"Error during scan: {str(e)}"],
+                    title_color=Fore.LIGHTRED_EX,
+                    border_color=Fore.LIGHTRED_EX,
+                    content_color=Fore.LIGHTRED_EX
+                )
+        else:
+            # Not admin - just show the connected network
+            if connected_ssid:
+                self._draw_glow_box(
+                    "[+] Connected Network",
+                    [
+                        f"SSID: {connected_ssid}",
+                        f"Signal: {connected_signal}%",
+                        f"Authentication: {connected_auth}",
+                        f"Security: {self._detect_security(connected_auth)}",
+                        "Note: Full WiFi scan requires Administrator privileges"
+                    ],
+                    title_color=Fore.LIGHTCYAN_EX,
+                    border_color=Fore.LIGHTCYAN_EX,
+                    content_color=Fore.LIGHTGREEN_EX
+                )
+            else:
+                self._draw_glow_box(
+                    "[.] No WiFi Connection",
+                    ["No WiFi network detected. Please check your connection."],
+                    title_color=Fore.LIGHTCYAN_EX,
+                    border_color=Fore.LIGHTCYAN_EX,
+                    content_color=Fore.LIGHTCYAN_EX
+                )
     
     def _parse_windows_output(self, output: str, connected_network: Dict):
-        """Parse Windows netsh output."""
         connected_bssid = self.normalize_bssid(connected_network.get('bssid', ''))
         connected_signal = connected_network.get('signal', 0)
         connected_ssid = connected_network.get('ssid', '')
@@ -817,7 +976,6 @@ class NetworkAudit:
         
         current_ssid = None
         current_auth = None
-        current_encryption = None
         current_bssid = None
         current_signal = None
         current_channel = None
@@ -888,7 +1046,20 @@ class NetworkAudit:
                 'channel': current_channel
             })
         
-        # Deduplicate
+        # If no networks found but connected, add connected network
+        if not self.results['wifi_networks'] and connected_ssid:
+            ap = {
+                'ssid': connected_ssid,
+                'bssid': connected_bssid if connected_bssid else 'Connected',
+                'signal': connected_signal,
+                'security': self._detect_security(connected_network.get('authentication', '')),
+                'connected': True,
+                'authentication': connected_network.get('authentication', ''),
+                'channel': connected_network.get('channel', ''),
+                'radio_type': connected_network.get('radio_type', '')
+            }
+            self.results['wifi_networks'].append(ap)
+        
         unique_aps = {}
         for ap in self.results['wifi_networks']:
             bssid = ap.get('bssid', '')
@@ -901,63 +1072,70 @@ class NetworkAudit:
                     unique_aps[bssid] = ap
         
         self.results['wifi_networks'] = list(unique_aps.values())
-        
-        # Sort by signal strength
         self.results['wifi_networks'].sort(key=lambda x: x.get('signal', 0), reverse=True)
     
     def _detect_security(self, auth: str) -> str:
-        """Detect security type from authentication string."""
         if not auth:
             return 'Unknown'
-        if 'WPA3' in auth:
+        auth_upper = auth.upper()
+        if 'WPA3' in auth_upper:
             return 'WPA3'
-        if 'WPA2' in auth:
+        if 'WPA2' in auth_upper:
             return 'WPA2'
-        if 'WPA' in auth:
+        if 'WPA' in auth_upper:
             return 'WPA'
-        if 'WEP' in auth:
+        if 'WEP' in auth_upper:
             return 'WEP'
-        if 'Open' in auth or 'None' in auth:
+        if 'OPEN' in auth_upper or 'NONE' in auth_upper:
             return 'Open'
         return 'Unknown'
     
     def _wifi_audit_linux(self):
-        """Linux WiFi audit implementation."""
         self._draw_glow_box(
-            "[+] Scanning",
-            ["Scanning for WiFi networks..."],
+            "[+] Scanning WiFi",
+            ["Scanning for WiFi networks on Linux..."],
             title_color=Fore.LIGHTYELLOW_EX,
             border_color=Fore.LIGHTYELLOW_EX,
-            content_color=Fore.LIGHTYELLOW_EX,
-            width=None,
-            blink_title=True,
-            glow_border=True
+            content_color=Fore.LIGHTYELLOW_EX
         )
         time.sleep(0.5)
         pass
     
     def _wifi_audit_macos(self):
-        """macOS WiFi audit implementation."""
         self._draw_glow_box(
-            "[+] Scanning",
-            ["Scanning for WiFi networks..."],
+            "[+] Scanning WiFi",
+            ["Scanning for WiFi networks on macOS..."],
             title_color=Fore.LIGHTYELLOW_EX,
             border_color=Fore.LIGHTYELLOW_EX,
-            content_color=Fore.LIGHTYELLOW_EX,
-            width=None,
-            blink_title=True,
-            glow_border=True
+            content_color=Fore.LIGHTYELLOW_EX
         )
         time.sleep(0.5)
         pass
     
     # ========================================================================
-    # ANALYSIS
+    # ANALYSIS WITH INTERFACE TYPE DETECTION
     # ========================================================================
     
     def _analyze_findings(self):
-        """Analyze network findings (WiFi + Ethernet)."""
         summary = self.results['summary']
+        
+        # Detect active interface type
+        iface, iface_type = self._detect_active_interface()
+        if iface:
+            summary['primary_interface'] = iface
+            summary['primary_interface_type'] = iface_type
+            self.results['interface'] = iface
+            self.results['interface_type'] = iface_type
+            self.results['network_type'] = iface_type
+            
+            self._draw_glow_box(
+                "[+] Active Interface Detected",
+                [f"Interface: {iface}", f"Type: {iface_type}"],
+                title_color=Fore.LIGHTGREEN_EX,
+                border_color=Fore.LIGHTGREEN_EX,
+                content_color=Fore.LIGHTGREEN_EX
+            )
+            time.sleep(0.3)
         
         wifi_networks = self.results.get('wifi_networks', [])
         summary['total_aps'] = len(wifi_networks)
@@ -975,7 +1153,10 @@ class NetworkAudit:
                     'ap': ap.get('ssid', 'Unknown'),
                     'bssid': ap.get('bssid', 'Unknown'),
                     'finding': 'Open network - No encryption',
-                    'severity': 'CRITICAL'
+                    'severity': 'CRITICAL',
+                    'recommendation': 'Disable open networks immediately. Implement WPA3-Enterprise with 802.1X authentication.',
+                    'action': 'Immediate: Disable open SSID broadcast. Configure WPA3-Enterprise.',
+                    'timeline': 'Immediate (24-48 hours)'
                 })
             elif sec_type == 'WEP':
                 summary['wep_aps'] += 1
@@ -984,7 +1165,10 @@ class NetworkAudit:
                     'ap': ap.get('ssid', 'Unknown'),
                     'bssid': ap.get('bssid', 'Unknown'),
                     'finding': 'WEP encryption - Vulnerable to attacks',
-                    'severity': 'HIGH'
+                    'severity': 'HIGH',
+                    'recommendation': 'WEP is deprecated. Upgrade to WPA3 or WPA2-AES immediately.',
+                    'action': 'Immediate: Identify all WEP devices. Upgrade firmware or replace hardware.',
+                    'timeline': 'Immediate (72 hours)'
                 })
             elif sec_type == 'WPA':
                 summary['wpa_aps'] += 1
@@ -993,11 +1177,24 @@ class NetworkAudit:
                     'ap': ap.get('ssid', 'Unknown'),
                     'bssid': ap.get('bssid', 'Unknown'),
                     'finding': 'WPA encryption - Deprecated, vulnerable to KRACK',
-                    'severity': 'MEDIUM'
+                    'severity': 'MEDIUM',
+                    'recommendation': 'WPA (TKIP) is deprecated. Upgrade to WPA2-AES or WPA3.',
+                    'action': 'Upgrade: Configure WPA2-AES on all APs. Remove TKIP support.',
+                    'timeline': 'Within 30 days'
                 })
             elif sec_type == 'WPA2':
                 summary['wpa2_aps'] += 1
                 summary['secured_aps'] += 1
+                self.results['security_findings'].append({
+                    'type': 'WPA2 WiFi',
+                    'ap': ap.get('ssid', 'Unknown'),
+                    'bssid': ap.get('bssid', 'Unknown'),
+                    'finding': 'WPA2 encryption - Consider upgrading to WPA3',
+                    'severity': 'LOW',
+                    'recommendation': 'WPA2 is secure but WPA3 offers enhanced protection.',
+                    'action': 'Plan: Assess WPA3 compatibility. Upgrade firmware.',
+                    'timeline': 'Within 90 days'
+                })
             elif sec_type == 'WPA3':
                 summary['wpa3_aps'] += 1
                 summary['secured_aps'] += 1
@@ -1015,11 +1212,47 @@ class NetworkAudit:
         summary['ethernet_interfaces'] = len(eth_interfaces)
         
         for eth in eth_interfaces:
+            # Check if Ethernet is actually connected by checking if it has a default gateway
+            # or if the IP is not a link-local address (169.254.x.x)
+            ip = eth.get('ip', 'N/A')
+            is_connected = False
+            
+            # Check if IP is valid and not a link-local address
+            if ip and ip != 'N/A' and not ip.startswith('169.254.'):
+                # Check if this interface has a default gateway (true connection)
+                try:
+                    if self.system == 'windows':
+                        result = subprocess.run(
+                            ['route', 'print', '-4'], 
+                            capture_output=True, text=True, timeout=5
+                        )
+                        # Check if this interface's IP appears in the route table with a gateway
+                        if ip in result.stdout:
+                            # Check if there's a default gateway (0.0.0.0) for this interface
+                            lines = result.stdout.split('\n')
+                            for line in lines:
+                                if '0.0.0.0' in line and ip in line:
+                                    is_connected = True
+                                    break
+                    else:
+                        # For non-Windows, check if interface has a gateway
+                        result = subprocess.run(
+                            ['ip', 'route', 'show', 'default'], 
+                            capture_output=True, text=True, timeout=5
+                        )
+                        if eth.get('name', '') in result.stdout:
+                            is_connected = True
+                except:
+                    # If we can't check, assume connected if IP is valid
+                    is_connected = True
+            else:
+                is_connected = False
+            
             self.results['ethernet_networks'].append({
                 'name': eth.get('name', 'Unknown'),
-                'ip': eth.get('ip', 'N/A'),
+                'ip': ip,
                 'mac': eth.get('mac', 'Unknown'),
-                'status': 'Connected' if eth.get('ip') and eth.get('ip') != 'N/A' else 'Disconnected'
+                'status': 'Connected' if is_connected else 'Disconnected'
             })
         
         summary['total_interfaces'] = len(interfaces)
@@ -1031,91 +1264,164 @@ class NetworkAudit:
         elif connected.get('type') == 'Ethernet':
             summary['connected_ethernet'] = 1
         
-        # Generate comprehensive recommendations
+        # Generate recommendations based on interface type
         recommendations = []
+        interface_type = self.results.get('interface_type', 'Unknown')
         
-        if summary.get('open_aps', 0) > 0:
+        # Check admin status
+        if not self.is_admin and interface_type == 'WiFi':
             recommendations.append({
-                'type': 'WiFi Security',
-                'title': '[!] Open WiFi networks detected - Disable open networks or implement WPA3',
-                'explanation': 'Open WiFi networks have NO encryption. All traffic is transmitted in plaintext, making it easy for attackers to sniff passwords, emails, and sensitive data.',
-                'action': 'Disable open networks immediately and implement WPA3-Enterprise encryption. If WPA3 is not available, use WPA2-AES with a strong passphrase.',
-                'timeline': 'Immediate (CRITICAL)',
-                'severity': 'CRITICAL'
+                'type': 'Admin Privileges',
+                'title': 'INFO: Run as Administrator for Full WiFi Scan',
+                'severity': 'LOW',
+                'finding': 'Running without admin privileges - WiFi scan limited',
+                'explanation': 'Full WiFi scanning requires administrator privileges. Without admin, only the currently connected network is detected.',
+                'action': '1. Run the program as Administrator\n2. Right-click and select "Run as Administrator"\n3. Or run from an elevated command prompt',
+                'timeline': 'Optional - For full scan results'
             })
         
-        if summary.get('wep_aps', 0) > 0:
-            recommendations.append({
-                'type': 'WiFi Security',
-                'title': '[!] WEP encryption detected - Upgrade to WPA3 immediately',
-                'explanation': 'WEP is a 20+ year old encryption standard that has been COMPROMISED. Attackers can crack WEP keys in minutes using tools like Aircrack-ng.',
-                'action': 'Upgrade all WEP networks to WPA3 or at minimum WPA2-AES immediately.',
-                'timeline': 'Immediate (CRITICAL)',
-                'severity': 'CRITICAL'
-            })
+        # WiFi-specific recommendations
+        if interface_type == 'WiFi' or interface_type == 'Unknown':
+            if summary.get('open_aps', 0) > 0:
+                recommendations.append({
+                    'type': 'WiFi Security',
+                    'title': 'CRITICAL: Open WiFi Networks Detected',
+                    'severity': 'CRITICAL',
+                    'finding': f'{summary.get("open_aps", 0)} open network(s) found with NO encryption',
+                    'explanation': 'Open WiFi networks transmit all data in plaintext. Attackers can easily sniff passwords, emails, and sensitive data.',
+                    'action': '1. Immediately disable open SSID broadcast\n2. Implement WPA3-Enterprise with 802.1X authentication\n3. If WPA3 unavailable, use WPA2-AES with strong PSK (16+ chars)',
+                    'timeline': 'Immediate (24-48 hours)'
+                })
+            
+            if summary.get('wep_aps', 0) > 0:
+                recommendations.append({
+                    'type': 'WiFi Security',
+                    'title': 'HIGH: WEP Encryption Detected',
+                    'severity': 'HIGH',
+                    'finding': f'{summary.get("wep_aps", 0)} WEP-encrypted network(s) found',
+                    'explanation': 'WEP is a deprecated encryption standard that can be cracked in minutes.',
+                    'action': '1. Identify all WEP devices immediately\n2. Upgrade firmware to support WPA2/WPA3\n3. If upgrade not possible, REPLACE HARDWARE',
+                    'timeline': 'Immediate (72 hours)'
+                })
+            
+            if summary.get('wpa_aps', 0) > 0:
+                recommendations.append({
+                    'type': 'WiFi Security',
+                    'title': 'MEDIUM: WPA (TKIP) Networks Detected',
+                    'severity': 'MEDIUM',
+                    'finding': f'{summary.get("wpa_aps", 0)} WPA network(s) using TKIP',
+                    'explanation': 'WPA with TKIP is deprecated and vulnerable to KRACK attacks.',
+                    'action': '1. Configure all APs to use WPA2-AES (not TKIP)\n2. Remove TKIP compatibility\n3. Update client device drivers',
+                    'timeline': 'Within 30 days'
+                })
+            
+            if summary.get('wpa2_aps', 0) > 0 and summary.get('wpa3_aps', 0) == 0:
+                recommendations.append({
+                    'type': 'WiFi Security',
+                    'title': 'LOW: WPA2 Networks - Consider Upgrade',
+                    'severity': 'LOW',
+                    'finding': f'{summary.get("wpa2_aps", 0)} WPA2 network(s) without WPA3',
+                    'explanation': 'While WPA2 is still secure, WPA3 provides enhanced security.',
+                    'action': '1. Assess WPA3 compatibility\n2. Upgrade AP firmware\n3. Update client devices',
+                    'timeline': 'Within 90 days'
+                })
         
-        if summary.get('wpa_aps', 0) > 0:
-            recommendations.append({
-                'type': 'WiFi Security',
-                'title': '[-] WPA encryption detected - Upgrade to WPA2/WPA3',
-                'explanation': 'WPA is vulnerable to KRACK attacks and has known security weaknesses.',
-                'action': 'Upgrade to WPA2 or WPA3. Use AES encryption instead of TKIP.',
-                'timeline': 'Within 30 days (HIGH)',
-                'severity': 'HIGH'
-            })
+        # Ethernet-specific recommendations
+        if interface_type == 'Ethernet' or interface_type == 'Unknown':
+            if summary.get('ethernet_interfaces', 0) > 0:
+                recommendations.append({
+                    'type': 'Ethernet Security',
+                    'title': 'MEDIUM: Ethernet Networks - Physical Security',
+                    'severity': 'MEDIUM',
+                    'finding': f'{summary.get("ethernet_interfaces", 0)} Ethernet interface(s) detected',
+                    'explanation': 'Ethernet ports are physical access points. Anyone with cable access can connect unauthorized devices.',
+                    'action': '1. Implement 802.1X authentication for wired networks\n2. Enable port security (MAC limiting)\n3. Disable unused switch ports\n4. Monitor for unauthorized connections',
+                    'timeline': 'Within 30 days'
+                })
         
-        if summary.get('wpa2_aps', 0) > 0 and summary.get('wpa3_aps', 0) == 0:
-            recommendations.append({
-                'type': 'WiFi Security',
-                'title': '[.] WPA2 detected - Consider upgrading to WPA3',
-                'explanation': 'While WPA2 is still considered secure, WPA3 offers enhanced protection against dictionary attacks.',
-                'action': 'Upgrade to WPA3 on compatible devices. Ensure WPA2-AES with strong passwords.',
-                'timeline': 'Within 90 days (MEDIUM)',
-                'severity': 'MEDIUM'
-            })
-        
-        if summary.get('ethernet_interfaces', 0) > 0:
-            recommendations.append({
-                'type': 'Ethernet Security',
-                'title': '[.] Ethernet networks detected - Ensure physical security',
-                'explanation': 'Ethernet ports are PHYSICAL access points. Anyone with cable access can connect unauthorized devices.',
-                'action': 'Implement 802.1X authentication, enable port security, disable unused ports.',
-                'timeline': 'Within 30 days (HIGH)',
-                'severity': 'HIGH'
-            })
-        
-        if summary.get('rogue_aps', 0) > 0:
-            recommendations.append({
-                'type': 'WiFi Security',
-                'title': '[!] Rogue Access Points detected - Investigate and remove unauthorized APs',
-                'explanation': 'Rogue APs are UNAUTHORIZED access points that bypass security controls.',
-                'action': 'Identify rogue APs using WiFi scanning tools, physically locate them, and remove them immediately.',
-                'timeline': 'Immediate (CRITICAL)',
-                'severity': 'CRITICAL'
-            })
+        # Security score
+        total_aps = summary.get('total_aps', 0)
+        if total_aps > 0:
+            secured = summary.get('secured_aps', 0)
+            security_score = int((secured / total_aps) * 100)
+            summary['security_score'] = security_score
+            
+            if security_score < 50:
+                recommendations.append({
+                    'type': 'General Security',
+                    'title': 'CRITICAL: Poor Security Score - Urgent Action Required',
+                    'severity': 'CRITICAL',
+                    'finding': f'Security score: {security_score}/100',
+                    'explanation': 'Your network has a low security score, indicating significant vulnerabilities.',
+                    'action': '1. Review all security findings above\n2. Prioritize CRITICAL and HIGH severity issues\n3. Create an action plan with deadlines',
+                    'timeline': 'Immediate (48 hours)'
+                })
+            elif security_score < 70:
+                recommendations.append({
+                    'type': 'General Security',
+                    'title': 'HIGH: Security Score Needs Improvement',
+                    'severity': 'HIGH',
+                    'finding': f'Security score: {security_score}/100',
+                    'explanation': 'Your network has moderate security but significant improvements are needed.',
+                    'action': '1. Address MEDIUM and HIGH severity findings\n2. Develop a security roadmap\n3. Implement security best practices',
+                    'timeline': 'Within 14 days'
+                })
+        else:
+            # No APs detected - could be Ethernet only or no WiFi scan
+            if interface_type == 'Ethernet':
+                summary['security_score'] = 70  # Default for Ethernet-only
+                recommendations.append({
+                    'type': 'General Security',
+                    'title': 'INFO: Ethernet Network - Security Best Practices',
+                    'severity': 'LOW',
+                    'finding': 'Ethernet network detected - no WiFi APs found',
+                    'explanation': 'Your network uses Ethernet connection. Ensure physical security measures are in place.',
+                    'action': '1. Enable port security on switches\n2. Implement 802.1X authentication\n3. Monitor for unauthorized devices\n4. Regular security audits',
+                    'timeline': 'Ongoing'
+                })
+            else:
+                summary['security_score'] = 0
+                recommendations.append({
+                    'type': 'General Security',
+                    'title': 'INFO: No Networks Detected',
+                    'severity': 'LOW',
+                    'finding': 'No WiFi or Ethernet networks detected',
+                    'explanation': 'The audit did not detect any networks. This could be due to no active connection or permission issues.',
+                    'action': '1. Check network connection\n2. Run as Administrator for WiFi scan\n3. Verify network adapter is enabled',
+                    'timeline': 'Immediate'
+                })
         
         if not recommendations:
             recommendations.append({
-                'type': 'General',
-                'title': '[+] No critical security issues found - Continue monitoring',
-                'explanation': 'Your network appears to be properly secured. Continue regular security audits.',
-                'action': 'Continue monitoring, conduct regular security audits.',
-                'timeline': 'Ongoing (LOW)',
-                'severity': 'LOW'
+                'type': 'General Security',
+                'title': 'INFO: Network Appears Secure',
+                'severity': 'LOW',
+                'finding': 'No critical security issues found',
+                'explanation': 'Your network appears to be properly secured. Continue maintaining security best practices.',
+                'action': '1. Continue regular security audits\n2. Update firmware regularly\n3. Monitor for new threats\n4. Maintain security awareness',
+                'timeline': 'Ongoing'
             })
         
         self.results['recommendations'] = recommendations
     
     # ========================================================================
-    # DISPLAY RESULTS - FIXED UTF-8
+    # DISPLAY RESULTS
     # ========================================================================
     
     def _display_results(self):
-        """Display audit results with glowing neon effects."""
         summary = self.results.get('summary', {})
-    
-        # Network Interfaces Summary
+        
+        # Show active interface
+        iface_type = self.results.get('interface_type', 'Unknown')
+        iface_name = self.results.get('interface', 'Unknown')
+        
+        admin_status = "[+] Admin: YES" if self.is_admin else "[-] Admin: NO"
+        admin_color = Fore.LIGHTGREEN_EX if self.is_admin else Fore.LIGHTYELLOW_EX
+        
         interface_lines = [
+            f"Active Interface: {iface_name}",
+            f"Interface Type: {iface_type}",
+            f"Admin Status: {admin_status}",
             f"Total Interfaces: {summary.get('total_interfaces', 0)}",
             f"WiFi Interfaces: {summary.get('wifi_interfaces', 0)}",
             f"Ethernet Interfaces: {summary.get('ethernet_interfaces', 0)}",
@@ -1128,14 +1434,10 @@ class NetworkAudit:
             interface_lines,
             title_color=Fore.LIGHTCYAN_EX,
             border_color=Fore.LIGHTCYAN_EX,
-            content_color=Fore.LIGHTWHITE_EX,
-            width=None,
-            blink_title=True,
-            glow_border=True
+            content_color=Fore.LIGHTWHITE_EX
         )
         time.sleep(0.3)
     
-        # WiFi Summary
         wifi_lines = [
             f"Total Access Points: {summary.get('total_aps', 0)}",
             f"Secured Networks: {summary.get('secured_aps', 0)}",
@@ -1152,14 +1454,10 @@ class NetworkAudit:
             wifi_lines,
             title_color=Fore.LIGHTMAGENTA_EX,
             border_color=Fore.LIGHTMAGENTA_EX,
-            content_color=Fore.LIGHTGREEN_EX,
-            width=None,
-            blink_title=True,
-            glow_border=True
+            content_color=Fore.LIGHTGREEN_EX
         )
         time.sleep(0.3)
     
-        # Ethernet Networks
         eth_networks = self.results.get('ethernet_networks', [])
         if eth_networks:
             eth_lines = []
@@ -1171,19 +1469,14 @@ class NetworkAudit:
                 eth_lines if eth_lines else ["No Ethernet networks detected"],
                 title_color=Fore.LIGHTCYAN_EX,
                 border_color=Fore.LIGHTCYAN_EX,
-                content_color=Fore.LIGHTWHITE_EX,
-                width=None,
-                blink_title=True,
-                glow_border=True
+                content_color=Fore.LIGHTWHITE_EX
             )
             time.sleep(0.3)
     
-        # Security Score
         total_aps = summary.get('total_aps', 0)
-        if total_aps > 0:
-            secured = summary.get('secured_aps', 0)
-            security_score = int((secured / total_aps) * 100)
+        security_score = summary.get('security_score', 0)
         
+        if total_aps > 0 or security_score > 0:
             if security_score >= 90:
                 score_color = Fore.LIGHTGREEN_EX
                 status_text = "EXCELLENT"
@@ -1198,7 +1491,7 @@ class NetworkAudit:
                 status_text = "POOR"
         
             bar_length = 30
-            filled = int((security_score / 100) * bar_length)
+            filled = int((security_score / 100) * bar_length) if security_score > 0 else 0
             bar = "#" * filled + "." * (bar_length - filled)
         
             score_lines = [
@@ -1212,14 +1505,10 @@ class NetworkAudit:
                 score_lines,
                 title_color=Fore.LIGHTYELLOW_EX,
                 border_color=Fore.LIGHTYELLOW_EX,
-                content_color=score_color,
-                width=None,
-                blink_title=True,
-                glow_border=True
+                content_color=score_color
             )
             time.sleep(0.3)
     
-        # Security Findings
         findings = self.results.get('security_findings', [])
         if findings:
             finding_lines = []
@@ -1238,33 +1527,34 @@ class NetworkAudit:
                 finding_lines,
                 title_color=Fore.LIGHTRED_EX,
                 border_color=Fore.LIGHTRED_EX,
-                content_color=Fore.LIGHTRED_EX,
-                width=None,
-                blink_title=True,
-                glow_border=True
+                content_color=Fore.LIGHTRED_EX
             )
             time.sleep(0.3)
     
-        # Recommendations with Full Explanations
         recommendations = self.results.get('recommendations', [])
         if recommendations:
             rec_lines = []
             for rec in recommendations[:5]:
                 title = rec.get('title', '')
+                severity = rec.get('severity', 'INFO')
+                finding = rec.get('finding', '')
                 explanation = rec.get('explanation', '')
                 action = rec.get('action', '')
                 timeline = rec.get('timeline', '')
+                sev_emoji = {"CRITICAL": "[!]", "HIGH": "[-]", "MEDIUM": "[*]", "LOW": "[.]"}.get(severity, "[+]")
             
-                rec_lines.append(f"{title}")
-                rec_lines.append("  +-- Explanation:")
-                explanation_lines = self._wrap_text(explanation, 72)
+                rec_lines.append(f"{sev_emoji} {title}")
+                rec_lines.append(f"   Severity: {severity}")
+                rec_lines.append(f"   Finding: {finding}")
+                rec_lines.append("   Explanation:")
+                explanation_lines = self._wrap_text(explanation, 68)
                 for line in explanation_lines:
-                    rec_lines.append(f"     {line}")
-                rec_lines.append("     -> Action:")
-                action_lines = self._wrap_text(action, 72)
+                    rec_lines.append(f"      {line}")
+                rec_lines.append("   Action:")
+                action_lines = self._wrap_text(action, 68)
                 for line in action_lines:
-                    rec_lines.append(f"       {line}")
-                rec_lines.append(f"     -> Timeline: {timeline}")
+                    rec_lines.append(f"      {line}")
+                rec_lines.append(f"   Timeline: {timeline}")
                 rec_lines.append("")
         
             if len(recommendations) > 5:
@@ -1275,14 +1565,10 @@ class NetworkAudit:
                 rec_lines,
                 title_color=Fore.LIGHTBLUE_EX,
                 border_color=Fore.LIGHTBLUE_EX,
-                content_color=Fore.LIGHTYELLOW_EX,
-                width=None,
-                blink_title=True,
-                glow_border=True
+                content_color=Fore.LIGHTYELLOW_EX
             )
             time.sleep(0.3)
     
-        # Access Points
         wifi_networks = self.results.get('wifi_networks', [])
         if wifi_networks:
             ap_lines = []
@@ -1304,77 +1590,242 @@ class NetworkAudit:
                 ap_lines,
                 title_color=Fore.LIGHTCYAN_EX,
                 border_color=Fore.LIGHTCYAN_EX,
-                content_color=Fore.LIGHTWHITE_EX,
-                width=None,
-                blink_title=True,
-                glow_border=True
+                content_color=Fore.LIGHTWHITE_EX
             )
             time.sleep(0.3)
 
     def _wrap_text(self, text: str, max_width: int = 75) -> List[str]:
-        """Wrap text to fit within a specified width."""
         import textwrap
-    
         if not text:
             return [""]
-    
         paragraphs = text.split('\n')
         wrapped_lines = []
-    
         for para in paragraphs:
             if not para.strip():
                 wrapped_lines.append("")
                 continue
-        
-            lines = textwrap.wrap(para, width=max_width, break_long_words=False, replace_whitespace=True)
-            wrapped_lines.extend(lines)
-    
+            try:
+                lines = textwrap.wrap(para, width=max_width, break_long_words=False, replace_whitespace=True)
+                wrapped_lines.extend(lines)
+            except:
+                wrapped_lines.append(para[:max_width] if len(para) > max_width else para)
         return wrapped_lines
 
     # ========================================================================
-    # EXPORT - FIXED UTF-8
+    # PDF GENERATION (simplified)
+    # ========================================================================
+    
+    def _generate_pdf_report(self, filename: str) -> bool:
+        if not PDF_AVAILABLE:
+            safe_print_unicode("[!] PDF generation requires reportlab. Install: pip install reportlab")
+            return False
+        
+        try:
+            from reportlab.lib.pagesizes import A4
+            from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+            from reportlab.lib import colors
+            from reportlab.lib.enums import TA_CENTER, TA_LEFT
+
+            doc = SimpleDocTemplate(filename, pagesize=A4, rightMargin=72, leftMargin=72, topMargin=72, bottomMargin=72)
+            styles = getSampleStyleSheet()
+            story = []
+
+            # Title
+            title_style = ParagraphStyle('CustomTitle', parent=styles['Heading1'], fontSize=28, 
+                                        textColor=colors.HexColor('#00ff00'), alignment=TA_CENTER, spaceAfter=20)
+            story.append(Paragraph("DSTERMINAL Network Security Audit Report", title_style))
+            story.append(Spacer(1, 15))
+
+            # Summary
+            summary = self.results.get('summary', {})
+            iface_type = self.results.get('interface_type', 'Unknown')
+            
+            metadata = [
+                ["Report ID:", self.results.get('report_id', 'N/A')],
+                ["Scan Date:", datetime.now().strftime('%Y-%m-%d %H:%M:%S')],
+                ["System:", self.system.upper()],
+                ["Hostname:", self.hostname],
+                ["Active Interface:", self.results.get('interface', 'Unknown')],
+                ["Interface Type:", iface_type],
+                ["Security Score:", f"{summary.get('security_score', 0)}/100"],
+                ["Total APs:", str(summary.get('total_aps', 0))],
+            ]
+
+            table = Table(metadata, colWidths=[140, 330])
+            table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#1a1a2e')),
+                ('TEXTCOLOR', (0, 0), (0, -1), colors.HexColor('#00ffff')),
+                ('BACKGROUND', (1, 0), (1, -1), colors.HexColor('#0d1117')),
+                ('TEXTCOLOR', (1, 0), (1, -1), colors.HexColor('#33ff33')),
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#333333')),
+            ]))
+            story.append(table)
+            story.append(Spacer(1, 20))
+
+            # Recommendations
+            recommendations = self.results.get('recommendations', [])
+            if recommendations:
+                heading_style = ParagraphStyle('Heading', parent=styles['Heading2'], fontSize=16, 
+                                              textColor=colors.HexColor('#00ffff'), spaceAfter=12)
+                story.append(Paragraph("Detailed Recommendations", heading_style))
+                story.append(Spacer(1, 6))
+                
+                body_style = ParagraphStyle('Body', parent=styles['Normal'], fontSize=9, 
+                                            textColor=colors.HexColor('#ffffff'), spaceAfter=6)
+                
+                for rec in recommendations[:10]:
+                    story.append(Paragraph(f"<b>{rec.get('title', '')}</b>", body_style))
+                    story.append(Paragraph(f"Severity: {rec.get('severity', 'Unknown')}", body_style))
+                    story.append(Paragraph(f"Finding: {rec.get('finding', '')}", body_style))
+                    story.append(Paragraph(f"Action: {rec.get('action', '')}", body_style))
+                    story.append(Paragraph(f"Timeline: {rec.get('timeline', '')}", body_style))
+                    story.append(Spacer(1, 8))
+
+            doc.build(story)
+            return True
+        except Exception as e:
+            safe_print_unicode(f"[!] PDF generation failed: {str(e)}")
+            return False
+
+    # ========================================================================
+    # HTML GENERATION (simplified)
+    # ========================================================================
+    def _generate_html_report(self, filename: str) -> bool:
+        try:
+            summary = self.results.get('summary', {})
+            recommendations = self.results.get('recommendations', [])
+            iface_type = self.results.get('interface_type', 'Unknown')
+            security_score = summary.get('security_score', 0)
+
+            # Build recommendations HTML safely
+            recs_html = ""
+            for rec in recommendations[:10]:
+                severity = rec.get('severity', 'low').lower()
+                recs_html += f'''<div class="recommendation rec-{severity}">
+                    <b>{rec.get('title', '')}</b><br>
+                    Severity: {rec.get('severity', 'Unknown')}<br>
+                    Finding: {rec.get('finding', '')}<br>
+                    Action: {rec.get('action', '')}<br>
+                    Timeline: {rec.get('timeline', '')}
+                </div>
+                '''
+
+            # Build score text safely
+            if security_score >= 90:
+                score_text = "EXCELLENT"
+            elif security_score >= 70:
+                score_text = "GOOD"
+            elif security_score >= 50:
+                score_text = "FAIR"
+            else:
+                score_text = "POOR"
+
+            # Build the HTML with proper f-string escaping
+            html_content = f'''<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Network Security Audit - {self.report_id}</title>
+    <style>
+        body {{ font-family: 'Courier New', monospace; background: #0a0a0a; color: #00ff00; padding: 20px; }}
+        .container {{ max-width: 1000px; margin: 0 auto; background: #1a1a2e; padding: 30px; border-radius: 15px; border: 1px solid #00ff00; }}
+        .header {{ text-align: center; border-bottom: 2px solid #00ff00; padding-bottom: 20px; margin-bottom: 30px; }}
+        h1 {{ color: #00ff00; font-size: 2em; text-shadow: 0 0 20px rgba(0,255,0,0.3); }}
+        .score {{ font-size: 48px; text-align: center; color: {'#00ff00' if security_score >= 70 else '#ffcc00' if security_score >= 50 else '#ff0000'}; }}
+        .section {{ background: #0d1117; padding: 20px; margin-bottom: 20px; border-radius: 10px; border-left: 3px solid #00ff00; }}
+        .section h2 {{ color: #00ffff; margin-bottom: 15px; }}
+        .recommendation {{ padding: 10px; margin: 5px 0; border-left: 4px solid #00ff00; background: rgba(0,255,0,0.02); }}
+        .rec-critical {{ border-left-color: #ff0000; }}
+        .rec-high {{ border-left-color: #ff6600; }}
+        .rec-medium {{ border-left-color: #ffcc00; }}
+        .rec-low {{ border-left-color: #00ccff; }}
+        .footer {{ text-align: center; margin-top: 40px; color: #444; font-size: 11px; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>DSTERMINAL Network Security Audit</h1>
+            <p>Report ID: {self.report_id}</p>
+            <p>Active Interface: {self.results.get('interface', 'Unknown')} ({iface_type})</p>
+            <p>Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+        </div>
+        
+        <div class="section">
+            <h2>Summary</h2>
+            <p>Total APs: {summary.get('total_aps', 0)}</p>
+            <p>Secured: {summary.get('secured_aps', 0)}</p>
+            <p>Open: {summary.get('open_aps', 0)}</p>
+            <p>WPA3: {summary.get('wpa3_aps', 0)}</p>
+            <p>WPA2: {summary.get('wpa2_aps', 0)}</p>
+            <p>WPA: {summary.get('wpa_aps', 0)}</p>
+            <p>WEP: {summary.get('wep_aps', 0)}</p>
+        </div>
+        
+        <div class="section">
+            <h2>Security Score</h2>
+            <div class="score">{security_score}/100</div>
+            <div style="text-align: center;">{score_text}</div>
+        </div>
+        
+        <div class="section">
+            <h2>Recommendations</h2>
+            {recs_html}
+        </div>
+        
+        <div class="footer">
+            DSTERMINAL v{self.VERSION} | Report ID: {self.report_id}
+        </div>
+    </div>
+</body>
+</html>'''
+
+            with open(filename, 'w', encoding='utf-8') as f:
+                f.write(html_content)
+            return True
+        except Exception as e:
+            safe_print_unicode(f"[!] HTML generation failed: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return False
+
+    # ========================================================================
+    # EXPORT
     # ========================================================================
     
     def _export_results(self) -> Optional[str]:
-        """Export results to multiple formats with proper formatting."""
         try:
             export_dir = Path.home() / "DSTerminal" / "reports"
             export_dir.mkdir(parents=True, exist_ok=True)
             
             base_filename = export_dir / f"network_audit_{self.report_id}"
             
-            # JSON Export
             json_filename = base_filename.with_suffix('.json')
             with open(json_filename, 'w', encoding='utf-8') as f:
                 json.dump(self.results, f, indent=2, default=str, ensure_ascii=False)
             
-            # PDF Export
             pdf_filename = base_filename.with_suffix('.pdf')
             if PDF_AVAILABLE:
                 self._generate_pdf_report(str(pdf_filename))
             
-            # HTML Export
             html_filename = base_filename.with_suffix('.html')
             self._generate_html_report(str(html_filename))
             
             def format_path(path_str: str, max_width: int = 80) -> List[str]:
                 if len(path_str) <= max_width:
                     return [path_str]
-                
                 parts = path_str.split('\\')
                 lines = []
                 current_line = parts[0] if parts else ""
-                
                 for part in parts[1:]:
                     if len(current_line) + len(part) + 1 <= max_width:
                         current_line += "\\" + part
                     else:
                         lines.append(current_line)
                         current_line = part
-                
                 if current_line:
                     lines.append(current_line)
-                
                 return lines
             
             export_messages = []
@@ -1390,7 +1841,7 @@ class NetworkAudit:
                 export_messages.append("[+] PDF Report:")
                 export_messages.extend([f"   {line}" for line in pdf_lines])
             else:
-                export_messages.append("[-] PDF export skipped")
+                export_messages.append("[-] PDF export skipped (install reportlab)")
             
             html_path = str(html_filename)
             html_lines = format_path(html_path)
@@ -1409,903 +1860,32 @@ class NetworkAudit:
                 export_messages,
                 title_color=Fore.LIGHTGREEN_EX,
                 border_color=Fore.LIGHTGREEN_EX,
-                content_color=Fore.LIGHTWHITE_EX,
-                width=None,
-                blink_title=True,
-                glow_border=True
+                content_color=Fore.LIGHTWHITE_EX
             )
             
             return str(json_filename)
             
         except Exception as e:
-            print(f"{Fore.LIGHTYELLOW_EX}[-] Failed to export results: {str(e)}{Style.RESET_ALL}")
+            safe_print_unicode(f"[-] Failed to export results: {str(e)}")
             return None
 
-    def _generate_pdf_report(self, filename: str) -> bool:
-        """Generate PDF report with both WiFi and Ethernet findings."""
-        if not PDF_AVAILABLE:
-            print(f"{Fore.LIGHTYELLOW_EX}[-] PDF generation requires reportlab. Install: pip install reportlab{Style.RESET_ALL}")
-            return False
-
-        try:
-            from reportlab.lib.pagesizes import A4, landscape
-            from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
-            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-            from reportlab.lib import colors
-            from reportlab.lib.units import inch
-            from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
-
-            class WatermarkedDocTemplate(SimpleDocTemplate):
-                def __init__(self, filename, **kwargs):
-                    super().__init__(filename, **kwargs)
-                    self.report_id = self._generate_report_id()
-        
-                def _generate_report_id(self):
-                    ts = datetime.now().strftime("%Y%m%d%H%M%S")
-                    return f"NET-PDF-{ts}"
-
-            def add_watermark(canvas_obj, doc_obj):
-                canvas_obj.saveState()
-                canvas_obj.setFont('Helvetica-Bold', 60)
-                canvas_obj.setFillColor(colors.HexColor('#1a1a2e'))
-                canvas_obj.setFillAlpha(0.08)
-                canvas_obj.saveState()
-                page_width, page_height = A4
-                canvas_obj.translate(page_width / 2, page_height / 2)
-                canvas_obj.rotate(45)
-                canvas_obj.drawCentredString(0, 0, "DSTERMINAL")
-                canvas_obj.restoreState()
-                canvas_obj.setFont('Helvetica', 25)
-                canvas_obj.setFillAlpha(0.06)
-                canvas_obj.drawCentredString(page_width / 2, 50, f"v{self.VERSION}")
-                canvas_obj.restoreState()
-
-            doc = WatermarkedDocTemplate(
-                filename,
-                pagesize=A4,
-                rightMargin=72,
-                leftMargin=72,
-                topMargin=72,
-                bottomMargin=72
-            )
-
-            styles = getSampleStyleSheet()
-            story = []
-
-            # ============================================================
-            # CUSTOM STYLES - BRIGHT AND VISIBLE
-            # ============================================================
-        
-            title_style = ParagraphStyle(
-                'CustomTitle',
-                parent=styles['Heading1'],
-                fontSize=28,
-                textColor=colors.HexColor('#00ff00'),
-                alignment=TA_CENTER,
-                spaceAfter=20,
-                fontName='Helvetica-Bold'
-            )
-
-            subtitle_style = ParagraphStyle(
-                'Subtitle',
-                parent=styles['Normal'],
-                fontSize=14,
-                textColor=colors.HexColor('#cccccc'),
-                alignment=TA_CENTER,
-                spaceAfter=20,
-                fontName='Helvetica'
-            )
-
-            heading_style = ParagraphStyle(
-                'CustomHeading',
-                parent=styles['Heading2'],
-                fontSize=16,
-                textColor=colors.HexColor('#00ffff'),
-                spaceAfter=12,
-                spaceBefore=12,
-                fontName='Helvetica-Bold'
-            )
-
-            body_style = ParagraphStyle(
-                'Body',
-                parent=styles['Normal'],
-                fontSize=10,
-                textColor=colors.HexColor('#ffffff'),
-                alignment=TA_LEFT,
-                spaceAfter=6,
-                fontName='Helvetica'
-            )
-
-            rec_title_style = ParagraphStyle(
-                'RecTitle',
-                parent=styles['Normal'],
-                fontSize=12,
-                textColor=colors.HexColor('#ffcc00'),
-                alignment=TA_LEFT,
-                spaceAfter=4,
-                fontName='Helvetica-Bold'
-            )
-
-            rec_label_style = ParagraphStyle(
-                'RecLabel',
-                parent=styles['Normal'],
-                fontSize=10,
-                textColor=colors.HexColor('#00ffff'),
-                alignment=TA_LEFT,
-                spaceAfter=2,
-                fontName='Helvetica-Bold'
-            )
-
-            rec_text_style = ParagraphStyle(
-                'RecText',
-                parent=styles['Normal'],
-                fontSize=9,
-                textColor=colors.HexColor('#ffffff'),
-                alignment=TA_LEFT,
-                spaceAfter=8,
-                fontName='Helvetica',
-                leftIndent=20
-            )
-
-            critical_style = ParagraphStyle(
-                'Critical',
-                parent=styles['Normal'],
-                fontSize=11,
-                textColor=colors.HexColor('#ff0000'),
-                alignment=TA_LEFT,
-                spaceAfter=4,
-                fontName='Helvetica-Bold'
-            )
-
-            high_style = ParagraphStyle(
-                'High',
-                parent=styles['Normal'],
-                fontSize=11,
-                textColor=colors.HexColor('#ff6600'),
-                alignment=TA_LEFT,
-                spaceAfter=4,
-                fontName='Helvetica-Bold'
-            )
-
-            medium_style = ParagraphStyle(
-                'Medium',
-                parent=styles['Normal'],
-                fontSize=11,
-                textColor=colors.HexColor('#ffcc00'),
-                alignment=TA_LEFT,
-                spaceAfter=4,
-                fontName='Helvetica-Bold'
-            )
-
-            low_style = ParagraphStyle(
-                'Low',
-                parent=styles['Normal'],
-                fontSize=11,
-                textColor=colors.HexColor('#00ff00'),
-                alignment=TA_LEFT,
-                spaceAfter=4,
-                fontName='Helvetica-Bold'
-            )
-
-            story.append(Paragraph("DSTERMINAL Cyber-Ops Platform", title_style))
-            story.append(Paragraph("Network & WiFi Security Audit Report", subtitle_style))
-            story.append(Spacer(1, 15))
-
-            summary = self.results.get('summary', {})
-            metadata_data = [
-                ["Report ID:", self.results.get('report_id', 'N/A')],
-                ["Generated By:", f"DSTERMINAL Cyber-Ops Platform v{self.VERSION}"],
-                ["Scan Date:", datetime.now().strftime('%Y-%m-%d %H:%M:%S')],
-                ["System:", self.system.upper()],
-                ["Hostname:", self.hostname],
-                ["Interface:", self.interface or "Auto-detected"],
-                ["Total APs:", str(summary.get('total_aps', 0))],
-                ["WiFi Interfaces:", str(summary.get('wifi_interfaces', 0))],
-                ["Ethernet Interfaces:", str(summary.get('ethernet_interfaces', 0))],
-            ]
-
-            metadata_table = Table(metadata_data, colWidths=[140, 330])
-            metadata_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#1a1a2e')),
-                ('TEXTCOLOR', (0, 0), (0, -1), colors.HexColor('#00ffff')),
-                ('BACKGROUND', (1, 0), (1, -1), colors.HexColor('#0d1117')),
-                ('TEXTCOLOR', (1, 0), (1, -1), colors.HexColor('#33ff33')),
-                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-                ('FONTSIZE', (0, 0), (-1, -1), 9),
-                ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#333333')),
-            ]))
-            story.append(metadata_table)
-            story.append(Spacer(1, 20))
-
-            story.append(Paragraph("Audit Summary", heading_style))
-
-            summary_data = [
-                ['Metric', 'Value'],
-                ['Total Access Points', str(summary.get('total_aps', 0))],
-                ['Secured Networks', str(summary.get('secured_aps', 0))],
-                ['Open Networks', str(summary.get('open_aps', 0))],
-                ['WEP Networks', str(summary.get('wep_aps', 0))],
-                ['WPA Networks', str(summary.get('wpa_aps', 0))],
-                ['WPA2 Networks', str(summary.get('wpa2_aps', 0))],
-                ['WPA3 Networks', str(summary.get('wpa3_aps', 0))],
-                ['Connected WiFi', 'Yes' if summary.get('connected_wifi', 0) > 0 else 'No'],
-                ['Connected Ethernet', 'Yes' if summary.get('connected_ethernet', 0) > 0 else 'No'],
-                ['Rogue APs', str(summary.get('rogue_aps', 0))],
-            ]
-
-            summary_table = Table(summary_data, colWidths=[200, 100])
-            summary_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#00ff00')),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 11),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#1a1a2e')),
-                ('TEXTCOLOR', (0, 1), (-1, -1), colors.HexColor('#ffffff')),
-                ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#333333')),
-            ]))
-            story.append(summary_table)
-            story.append(Spacer(1, 20))
-
-            eth_networks = self.results.get('ethernet_networks', [])
-            if eth_networks:
-                story.append(Paragraph("Ethernet Networks", heading_style))
-                eth_data = [['Interface', 'IP Address', 'MAC Address', 'Status']]
-                for eth in eth_networks[:20]:
-                    eth_data.append([
-                        eth.get('name', 'Unknown'),
-                        eth.get('ip', 'N/A'),
-                        eth.get('mac', 'Unknown'),
-                        eth.get('status', 'Unknown')
-                    ])
-            
-                eth_table = Table(eth_data, colWidths=[100, 120, 130, 80])
-                eth_table.setStyle(TableStyle([
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#00ffff')),
-                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                    ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#0d1117')),
-                    ('TEXTCOLOR', (0, 1), (-1, -1), colors.HexColor('#ffffff')),
-                    ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#333333')),
-                ]))
-                story.append(eth_table)
-                story.append(Spacer(1, 20))
-
-            recommendations = self.results.get('recommendations', [])
-            if recommendations:
-                story.append(Paragraph("Recommendations", heading_style))
-                story.append(Spacer(1, 6))
-            
-                for rec in recommendations:
-                    title = rec.get('title', '')
-                    explanation = rec.get('explanation', '')
-                    action = rec.get('action', '')
-                    timeline = rec.get('timeline', '')
-                    severity = rec.get('severity', 'MEDIUM')
-                
-                    if severity == 'CRITICAL':
-                        sev_style = critical_style
-                        sev_label = "[!] CRITICAL"
-                    elif severity == 'HIGH':
-                        sev_style = high_style
-                        sev_label = "[-] HIGH"
-                    elif severity == 'MEDIUM':
-                        sev_style = medium_style
-                        sev_label = "[*] MEDIUM"
-                    else:
-                        sev_style = low_style
-                        sev_label = "[+] LOW"
-                
-                    story.append(Paragraph(f"[{sev_label}]", sev_style))
-                
-                    clean_title = title.replace('[!]', '').replace('[-]', '').replace('[*]', '').replace('[+]', '').strip()
-                    story.append(Paragraph(f"<b>{clean_title}</b>", rec_title_style))
-                
-                    story.append(Paragraph("<b>Explanation:</b>", rec_label_style))
-                    for line in self._wrap_text(explanation, 90):
-                        story.append(Paragraph(line, rec_text_style))
-                
-                    story.append(Paragraph("<b>Action:</b>", rec_label_style))
-                    for line in self._wrap_text(action, 90):
-                        story.append(Paragraph(line, rec_text_style))
-                
-                    story.append(Paragraph(f"<b>Timeline:</b> {timeline}", rec_label_style))
-                    story.append(Spacer(1, 10))
-                    story.append(Paragraph("-" * 80, body_style))
-                    story.append(Spacer(1, 6))
-
-            findings = self.results.get('security_findings', [])
-            if findings:
-                story.append(PageBreak())
-                story.append(Paragraph("Security Findings", heading_style))
-                story.append(Spacer(1, 6))
-            
-                for finding in findings[:20]:
-                    severity = finding.get('severity', 'UNKNOWN')
-                    color_map = {
-                        'CRITICAL': colors.red,
-                        'HIGH': colors.orange,
-                        'MEDIUM': colors.blue,
-                        'LOW': colors.green
-                    }
-                    sev_color = color_map.get(severity, colors.grey)
-                
-                    finding_style = ParagraphStyle(
-                        f'Finding_{severity}',
-                        parent=styles['Normal'],
-                        textColor=sev_color,
-                        fontName='Helvetica-Bold',
-                        fontSize=10,
-                        alignment=TA_LEFT,
-                        spaceAfter=4
-                    )
-                
-                    finding_text = f"<b>[{severity}]</b> {finding.get('finding', '')} <i>({finding.get('ap', 'Unknown')})</i>"
-                    story.append(Paragraph(finding_text, finding_style))
-                    story.append(Spacer(1, 2))
-
-            aps = self.results.get('wifi_networks', [])
-            if aps:
-                story.append(Spacer(1, 10))
-                story.append(Paragraph("WiFi Access Points", heading_style))
-                ap_data = [['SSID', 'BSSID', 'Signal', 'Security', 'Channel']]
-                for ap in aps[:30]:
-                    ap_data.append([
-                        ap.get('ssid', 'Unknown')[:25],
-                        ap.get('bssid', 'Unknown')[:17],
-                        f"{ap.get('signal', 0)}%",
-                        ap.get('security_type', ap.get('security', 'Unknown'))[:10],
-                        str(ap.get('channel', 'N/A'))
-                    ])
-        
-                ap_table = Table(ap_data, colWidths=[120, 90, 50, 60, 50])
-                ap_table.setStyle(TableStyle([
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#00ff00')),
-                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                    ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#0d1117')),
-                    ('TEXTCOLOR', (0, 1), (-1, -1), colors.HexColor('#ffffff')),
-                    ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#333333')),
-                ]))
-                story.append(ap_table)
-
-            total_aps = summary.get('total_aps', 0)
-            if total_aps > 0:
-                story.append(Spacer(1, 20))
-                story.append(PageBreak())
-                story.append(Paragraph("Security Score Dashboard", heading_style))
-                story.append(Spacer(1, 6))
-            
-                secured = summary.get('secured_aps', 0)
-                security_score = int((secured / total_aps) * 100) if total_aps > 0 else 0
-            
-                score_style = ParagraphStyle(
-                    'ScoreStyle',
-                    parent=styles['Normal'],
-                    fontSize=48,
-                    alignment=TA_CENTER,
-                    textColor=colors.HexColor('#00ff00'),
-                    fontName='Helvetica-Bold'
-                )
-            
-                score_status = "EXCELLENT" if security_score >= 90 else "GOOD" if security_score >= 70 else "FAIR" if security_score >= 50 else "POOR"
-                status_color = colors.green if security_score >= 90 else colors.orange if security_score >= 70 else colors.red
-            
-                status_style = ParagraphStyle(
-                    'StatusStyle',
-                    parent=styles['Normal'],
-                    fontSize=24,
-                    alignment=TA_CENTER,
-                    textColor=status_color,
-                    fontName='Helvetica-Bold'
-                )
-            
-                story.append(Paragraph(f"{security_score} / 100", score_style))
-                story.append(Spacer(1, 6))
-                story.append(Paragraph(score_status, status_style))
-                story.append(Spacer(1, 10))
-            
-                from reportlab.platypus import Table, TableStyle
-                bar_data = [[f"{security_score}%"]]
-                bar_table = Table(bar_data, colWidths=[security_score * 3], rowHeights=[20])
-                bar_table.setStyle(TableStyle([
-                    ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#00ff00')),
-                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                    ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
-                    ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
-                    ('FONTSIZE', (0, 0), (-1, -1), 10),
-                ]))
-                story.append(bar_table)
-
-            current_year = datetime.now().year
-        
-            footer_style = ParagraphStyle(
-                'Footer',
-                parent=styles['Normal'],
-                fontSize=8,
-                textColor=colors.HexColor('#666666'),
-                alignment=TA_CENTER,
-                spaceAfter=4
-            )
-        
-            footer_bold_style = ParagraphStyle(
-                'FooterBold',
-                parent=styles['Normal'],
-                fontSize=9,
-                textColor=colors.HexColor('#888888'),
-                alignment=TA_CENTER,
-                spaceAfter=2,
-                fontName='Helvetica-Bold'
-            )
-        
-            footer_divider_style = ParagraphStyle(
-                'FooterDivider',
-                parent=styles['Normal'],
-                fontSize=8,
-                textColor=colors.HexColor('#444444'),
-                alignment=TA_CENTER,
-                spaceAfter=6
-            )
-        
-            story.append(Spacer(1, 30))
-            story.append(Paragraph("-" * 80, footer_divider_style))
-        
-            story.append(Paragraph(
-                f"<b>STARK EXPO TECH EXCHANGE LTD</b>",
-                footer_bold_style
-            ))
-        
-            story.append(Paragraph(
-                f"DSTerminal v{self.VERSION}  |  (c) {current_year} Stark Expo Tech Exchange LTD  |  All Rights Reserved",
-                footer_style
-            ))
-        
-            story.append(Paragraph(
-                f"Report ID: {doc.report_id}  |  Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-                footer_style
-            ))
-        
-            story.append(Paragraph(
-                f"Powered by DSTERMINAL Cyber-Ops Platform",
-                footer_style
-            ))
-
-            doc.build(story, onFirstPage=add_watermark, onLaterPages=add_watermark)
-            return True
-
-        except Exception as e:
-            print(f"{Fore.LIGHTRED_EX}[!] PDF generation failed: {str(e)}{Style.RESET_ALL}")
-            import traceback
-            traceback.print_exc()
-            return False
-
-    def _generate_html_report(self, filename: str) -> bool:
-        """Generate HTML report with both WiFi and Ethernet findings."""
-        try:
-            summary = self.results.get('summary', {})
-            findings = self.results.get('security_findings', [])
-            recommendations = self.results.get('recommendations', [])
-            aps = self.results.get('wifi_networks', [])
-            eth_networks = self.results.get('ethernet_networks', [])
-
-            total_aps = summary.get('total_aps', 0)
-            secured = summary.get('secured_aps', 0)
-            security_score = int((secured / total_aps) * 100) if total_aps > 0 else 0
-
-            # Build findings HTML
-            findings_html = ""
-            if findings:
-                findings_html = '<div class="section">\n<h2>[!] Security Findings</h2>\n'
-                for finding in findings[:20]:
-                    severity = finding.get('severity', 'UNKNOWN').lower()
-                    findings_html += f'''
-                <div class="finding {severity}">
-                    <span class="severity severity-{severity}">{finding.get('severity', 'UNKNOWN')}</span>
-                    {finding.get('finding', '')}
-                    <span style="color: #666; font-size: 0.9em;">({finding.get('ap', 'Unknown')})</span>
-                </div>
-                '''
-                if len(findings) > 20:
-                    findings_html += f'<div style="color: #666; font-style: italic; margin-top: 10px;">... and {len(findings) - 20} more findings</div>'
-                findings_html += '</div>\n'
-
-            # Build recommendations HTML with full details
-            recs_html = ""
-            if recommendations:
-                recs_html = '<div class="section">\n<h2>[+] Recommendations</h2>\n'
-                for rec in recommendations:
-                    recs_html += f'''
-                <div class="recommendation">
-                    <div class="rec-title">{rec.get('title', '')}</div>
-                    <div class="rec-explanation"><strong>Explanation:</strong> {rec.get('explanation', '')}</div>
-                    <div class="rec-action"><strong>Action:</strong> {rec.get('action', '')}</div>
-                    <div class="rec-timeline"><strong>Timeline:</strong> {rec.get('timeline', '')}</div>
-                </div>
-                '''
-                recs_html += '</div>\n'
-
-            # Build Ethernet networks HTML
-            eth_html = ""
-            if eth_networks:
-                eth_html = f'<div class="section">\n<h2>[*] Ethernet Networks ({len(eth_networks)})</h2>\n'
-                eth_html += '''
-                <table class="ap-table">
-                    <thead>
-                        <tr>
-                            <th>Interface</th>
-                            <th>IP Address</th>
-                            <th>MAC Address</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                '''
-                for eth in eth_networks[:20]:
-                    eth_html += f'''
-                    <tr>
-                        <td>{eth.get('name', 'Unknown')}</td>
-                        <td>{eth.get('ip', 'N/A')}</td>
-                        <td style="font-family: monospace;">{eth.get('mac', 'Unknown')}</td>
-                        <td><span class="status-badge { 'status-secure' if eth.get('status') == 'Connected' else 'status-warning' }">{eth.get('status', 'Unknown')}</span></td>
-                    </tr>
-                '''
-                eth_html += '''
-                    </tbody>
-                </table>
-            </div>
-            '''
-
-            # Build WiFi access points HTML
-            aps_html = ""
-            if aps:
-                aps_html = f'<div class="section">\n<h2>[+] WiFi Access Points ({len(aps)})</h2>\n'
-                aps_html += '''
-                <table class="ap-table">
-                    <thead>
-                        <tr>
-                            <th>SSID</th>
-                            <th>BSSID</th>
-                            <th>Signal</th>
-                            <th>Security</th>
-                            <th>Channel</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                '''
-                for ap in aps[:50]:
-                    ssid = ap.get('ssid', 'Unknown')[:30]
-                    bssid = ap.get('bssid', 'Unknown')
-                    signal = ap.get('signal', 0)
-                    security_type = ap.get('security_type', ap.get('security', 'Unknown'))
-                    channel = ap.get('channel', 'N/A')
-            
-                    badge_class = 'status-secure' if security_type in ['WPA2', 'WPA3'] else 'status-warning' if security_type == 'WPA' else 'status-open'
-            
-                    aps_html += f'''
-                    <tr>
-                        <td>{ssid}</td>
-                        <td style="font-family: monospace;">{bssid}</td>
-                        <td>{signal}%</td>
-                        <td><span class="status-badge {badge_class}">{security_type}</span></td>
-                        <td>{channel}</td>
-                    </tr>
-                '''
-                if len(aps) > 50:
-                    aps_html += f'<tr><td colspan="5" style="text-align: center; color: #666;">... and {len(aps) - 50} more access points</td></tr>'
-                aps_html += '''
-                    </tbody>
-                </table>
-            </div>
-            '''
-
-            html_content = '''<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Network & WiFi Security Audit Report - ''' + self.report_id + '''</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', 'Courier New', monospace;
-            background: #0a0a0a;
-            color: #00ff00;
-            padding: 20px;
-            min-height: 100vh;
-        }
-        .watermark {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 120px;
-            opacity: 0.04;
-            color: #00ff00;
-            pointer-events: none;
-            z-index: 0;
-            font-weight: bold;
-            letter-spacing: 15px;
-            white-space: nowrap;
-            user-select: none;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: rgba(26, 26, 46, 0.95);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 0 40px rgba(0, 255, 0, 0.08);
-            position: relative;
-            z-index: 1;
-            border: 1px solid rgba(0, 255, 0, 0.15);
-        }
-        .header {
-            text-align: center;
-            border-bottom: 2px solid rgba(0, 255, 0, 0.2);
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-        }
-        .header h1 {
-            color: #00ff00;
-            font-size: 2.5em;
-            text-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
-            letter-spacing: 3px;
-        }
-        .header .report-id {
-            color: #666;
-            font-size: 0.9em;
-            margin-top: 10px;
-            padding: 5px 15px;
-            display: inline-block;
-            border: 1px solid rgba(0, 255, 0, 0.1);
-            border-radius: 20px;
-        }
-        .section {
-            background: rgba(13, 17, 23, 0.8);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-left: 3px solid #00ff00;
-        }
-        .section h2 {
-            color: #00ffff;
-            font-size: 1.4em;
-            margin-bottom: 15px;
-            letter-spacing: 2px;
-        }
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
-            margin: 15px 0;
-        }
-        .summary-card {
-            background: rgba(0, 255, 0, 0.05);
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            border: 1px solid rgba(0, 255, 0, 0.08);
-        }
-        .summary-card .value {
-            font-size: 28px;
-            font-weight: bold;
-            color: #00ff00;
-        }
-        .summary-card .label {
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
-        }
-        .finding {
-            padding: 12px 15px;
-            margin: 8px 0;
-            border-radius: 5px;
-            border-left: 4px solid #666;
-            background: rgba(255, 255, 255, 0.02);
-        }
-        .finding.critical { border-left-color: #ff0000; }
-        .finding.high { border-left-color: #ff6600; }
-        .finding.medium { border-left-color: #ffcc00; }
-        .finding.low { border-left-color: #00ccff; }
-        .finding .severity {
-            display: inline-block;
-            padding: 2px 10px;
-            border-radius: 3px;
-            font-size: 11px;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-right: 10px;
-        }
-        .severity-critical { background: #ff0000; color: white; }
-        .severity-high { background: #ff6600; color: white; }
-        .severity-medium { background: #ffcc00; color: black; }
-        .severity-low { background: #00ccff; color: black; }
-        .recommendation {
-            padding: 15px;
-            margin: 8px 0;
-            border-radius: 5px;
-            background: rgba(0, 255, 0, 0.03);
-            border-left: 3px solid #00ff00;
-        }
-        .recommendation .rec-title {
-            font-weight: bold;
-            color: #f0f6fc;
-            font-size: 1.05em;
-            margin-bottom: 5px;
-        }
-        .recommendation .rec-explanation {
-            color: #8b949e;
-            font-size: 0.9em;
-            margin: 3px 0;
-        }
-        .recommendation .rec-action {
-            color: #58a6ff;
-            font-size: 0.9em;
-            margin: 3px 0;
-        }
-        .recommendation .rec-timeline {
-            color: #d29922;
-            font-size: 0.85em;
-            margin-top: 3px;
-            font-weight: 500;
-        }
-        .score-bar {
-            width: 100%;
-            height: 35px;
-            background: #1a1a2e;
-            border-radius: 17px;
-            overflow: hidden;
-            margin: 15px 0;
-            border: 1px solid rgba(0, 255, 0, 0.1);
-        }
-        .score-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ff0000, #ffcc00, #00ff00);
-            transition: width 1s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
-        }
-        .ap-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-            font-size: 13px;
-        }
-        .ap-table th {
-            background: rgba(0, 255, 0, 0.1);
-            color: #00ff00;
-            padding: 12px;
-            text-align: left;
-            border-bottom: 2px solid rgba(0, 255, 0, 0.2);
-        }
-        .ap-table td {
-            padding: 10px 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-        }
-        .status-badge {
-            display: inline-block;
-            padding: 2px 12px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-        .status-secure { background: rgba(0, 255, 0, 0.2); color: #00ff00; }
-        .status-open { background: rgba(255, 0, 0, 0.2); color: #ff0000; }
-        .status-warning { background: rgba(255, 204, 0, 0.2); color: #ffcc00; }
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(0, 255, 0, 0.1);
-            color: #444;
-            font-size: 11px;
-        }
-    </style>
-</head>
-<body>
-    <div class="watermark">DSTERMINAL</div>
-
-    <div class="container">
-        <div class="header">
-            <h1>[+] Network & WiFi Security Audit</h1>
-            <div class="report-id">[+] Report ID: ''' + self.report_id + '''</div>
-            <div style="color: #444; font-size: 0.85em; margin-top: 8px;">
-                Generated: ''' + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '''
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>[+] Audit Summary</h2>
-            <div class="summary-grid">
-                <div class="summary-card">
-                    <div class="value">''' + str(summary.get('total_aps', 0)) + '''</div>
-                    <div class="label">Total Access Points</div>
-                </div>
-                <div class="summary-card">
-                    <div class="value" style="color: #00ff00;">''' + str(summary.get('secured_aps', 0)) + '''</div>
-                    <div class="label">Secured Networks</div>
-                </div>
-                <div class="summary-card">
-                    <div class="value" style="color: #ff0000;">''' + str(summary.get('open_aps', 0)) + '''</div>
-                    <div class="label">Open Networks</div>
-                </div>
-                <div class="summary-card">
-                    <div class="value" style="color: #58a6ff;">''' + str(summary.get('wifi_interfaces', 0)) + '''</div>
-                    <div class="label">WiFi Interfaces</div>
-                </div>
-                <div class="summary-card">
-                    <div class="value" style="color: #3fb950;">''' + str(summary.get('ethernet_interfaces', 0)) + '''</div>
-                    <div class="label">Ethernet Interfaces</div>
-                </div>
-                <div class="summary-card">
-                    <div class="value" style="color: #d29922;">''' + str(summary.get('rogue_aps', 0)) + '''</div>
-                    <div class="label">Rogue APs</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>[+] Security Distribution</h2>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div>WPA3: <span style="color: #00ff00;">''' + str(summary.get('wpa3_aps', 0)) + '''</span></div>
-                <div>WPA2: <span style="color: #33ff33;">''' + str(summary.get('wpa2_aps', 0)) + '''</span></div>
-                <div>WPA: <span style="color: #ffcc00;">''' + str(summary.get('wpa_aps', 0)) + '''</span></div>
-                <div>WEP: <span style="color: #ff6600;">''' + str(summary.get('wep_aps', 0)) + '''</span></div>
-                <div>Open: <span style="color: #ff0000;">''' + str(summary.get('open_aps', 0)) + '''</span></div>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>[+] Security Score</h2>
-            <div style="font-size: 48px; text-align: center; color: ''' + ('#00ff00' if security_score >= 70 else '#ffcc00' if security_score >= 50 else '#ff0000') + ''';">
-                ''' + str(security_score) + '''%
-            </div>
-            <div class="score-bar">
-                <div class="score-fill" style="width: ''' + str(security_score) + '''%;">
-                    ''' + str(security_score) + '''%
-                </div>
-            </div>
-            <div style="text-align: center; color: ''' + ('#00ff00' if security_score >= 70 else '#ffcc00' if security_score >= 50 else '#ff0000') + ''';">
-                ''' + ('EXCELLENT' if security_score >= 90 else 'GOOD' if security_score >= 70 else 'FAIR' if security_score >= 50 else 'POOR') + '''
-            </div>
-        </div>
-
-        ''' + eth_html + aps_html + findings_html + recs_html + '''
-
-        <div class="footer">
-            <p>Generated by <strong>DSTERMINAL v''' + self.VERSION + '''</strong> Network & WiFi Security Audit Engine</p>
-            <p>Report ID: ''' + self.report_id + '''</p>
-        </div>
-    </div>
-</body>
-</html>'''
-
-            with open(filename, 'w', encoding='utf-8') as f:
-                f.write(html_content)
-            return True
-
-        except Exception as e:
-            print(f"{Fore.LIGHTRED_EX}[!] HTML generation failed: {str(e)}{Style.RESET_ALL}")
-            import traceback
-            traceback.print_exc()
-            return False
-
     # ========================================================================
-    # MAIN RUN - FIXED UTF-8
+    # MAIN RUN
     # ========================================================================
     
     def run(self):
         """Main execution method."""
-        os.system('cls' if platform.system() == 'Windows' else 'clear')
-        self.show_banner()
+        try:
+            os.system('cls' if platform.system() == 'Windows' else 'clear')
+        except:
+            pass
         
-        # Network Security Impact Assessment
+        try:
+            self.show_banner()
+        except:
+            print("\n=== DSTERMINAL Network Security Audit ===")
+            print(f"Version: {self.VERSION}\n")
+        
         self._draw_glow_box(
             "[+] Network Security Impact Assessment",
             [
@@ -2318,18 +1898,25 @@ class NetworkAudit:
             ],
             title_color=Fore.LIGHTMAGENTA_EX,
             border_color=Fore.LIGHTMAGENTA_EX,
-            content_color=Fore.LIGHTCYAN_EX,
-            width=None,
-            blink_title=True,
-            glow_border=True
+            content_color=Fore.LIGHTCYAN_EX
         )
         time.sleep(0.3)
         
-        # Initialization
+        # Detect active interface first
+        iface, iface_type = self._detect_active_interface()
+        if iface:
+            self.interface = iface
+            self.interface_type = iface_type
+        
+        admin_status = "YES" if self.is_admin else "NO (Limited WiFi scan)"
+        admin_color = Fore.LIGHTGREEN_EX if self.is_admin else Fore.LIGHTYELLOW_EX
+        
         init_lines = [
             f"Platform: {self.system.upper()}",
             f"Host: {self.hostname}",
-            f"Interface: {self.interface if self.interface else 'Auto-detecting...'}",
+            f"Active Interface: {iface if iface else 'Auto-detecting...'}",
+            f"Interface Type: {iface_type if iface_type else 'Auto-detecting...'}",
+            f"Admin: {admin_status}",
             f"Mode: WiFi + Ethernet Network Audit"
         ]
         
@@ -2338,141 +1925,123 @@ class NetworkAudit:
             init_lines,
             title_color=Fore.LIGHTYELLOW_EX,
             border_color=Fore.LIGHTYELLOW_EX,
-            content_color=Fore.LIGHTCYAN_EX,
-            width=None,
-            blink_title=True,
-            glow_border=True
+            content_color=Fore.LIGHTCYAN_EX
         )
         time.sleep(0.3)
         
-        # Detect all interfaces
         self._draw_glow_box(
             "[+] Detecting Interfaces",
             ["Scanning for all network interfaces..."],
             title_color=Fore.LIGHTCYAN_EX,
             border_color=Fore.LIGHTCYAN_EX,
-            content_color=Fore.LIGHTGREEN_EX,
-            width=None,
-            blink_title=True,
-            glow_border=True
+            content_color=Fore.LIGHTGREEN_EX
         )
         time.sleep(0.3)
         
-        # Detect interfaces
         interfaces = self._detect_all_interfaces()
         self.results['interfaces'] = interfaces
         
-        # Display detected interfaces
         if interfaces:
             interface_lines = []
-            for iface in interfaces:
-                iface_type = iface.get('type', 'Unknown')
-                icon = "[+]" if iface_type == 'WiFi' else "[*]" if iface_type == 'Ethernet' else "[?]"
-                interface_lines.append(f"{icon} {iface.get('name', 'Unknown'):<15} {iface_type:<10} {iface.get('ip', 'N/A')}")
+            for iface_info in interfaces:
+                iface_type_detected = iface_info.get('type', 'Unknown')
+                icon = "[+]" if iface_type_detected == 'WiFi' else "[*]" if iface_type_detected == 'Ethernet' else "[?]"
+                interface_lines.append(f"{icon} {iface_info.get('name', 'Unknown'):<15} {iface_type_detected:<10} {iface_info.get('ip', 'N/A')}")
             
             self._draw_glow_box(
                 "Detected Interfaces",
                 interface_lines,
                 title_color=Fore.LIGHTCYAN_EX,
                 border_color=Fore.LIGHTCYAN_EX,
-                content_color=Fore.LIGHTGREEN_EX,
-                width=None,
-                blink_title=True,
-                glow_border=True
+                content_color=Fore.LIGHTGREEN_EX
             )
             time.sleep(0.3)
         
-        # Auto-detect WiFi interface if not provided
-        if not self.interface:
-            if self.system == "windows":
-                self.interface = self._detect_windows_interface()
-            elif self.system == "linux":
-                self.interface = self._detect_linux_interface()
-            elif self.system == "darwin":
-                self.interface = self._detect_macos_interface()
+        # Use detected interface if not specified
+        if not self.interface and iface:
+            self.interface = iface
         
-        # WiFi scan
+        # WiFi scan - only if WiFi interface exists or type is WiFi
         wifi_interfaces = [i for i in interfaces if i.get('type') == 'WiFi']
         if wifi_interfaces:
             if not self.interface:
                 self.interface = wifi_interfaces[0].get('name')
+                self.interface_type = 'WiFi'
             
             self._draw_glow_box(
                 "[+] Scanning WiFi",
-                [f"Using interface: {self.interface}"],
+                [f"Using interface: {self.interface}", f"Interface Type: {self.interface_type}"],
                 title_color=Fore.LIGHTCYAN_EX,
                 border_color=Fore.LIGHTCYAN_EX,
-                content_color=Fore.LIGHTGREEN_EX,
-                width=None,
-                blink_title=True,
-                glow_border=True
+                content_color=Fore.LIGHTGREEN_EX
             )
             time.sleep(0.3)
             
-            if self.system == 'windows':
-                self._wifi_audit_windows()
-            elif self.system == 'linux':
-                self._wifi_audit_linux()
-            elif self.system == 'darwin':
-                self._wifi_audit_macos()
+            try:
+                if self.system == 'windows':
+                    self._wifi_audit_windows()
+                elif self.system == 'linux':
+                    self._wifi_audit_linux()
+                elif self.system == 'darwin':
+                    self._wifi_audit_macos()
+            except Exception as e:
+                self._draw_glow_box(
+                    "[!] Error",
+                    [f"WiFi scan error: {str(e)}"],
+                    title_color=Fore.LIGHTRED_EX,
+                    border_color=Fore.LIGHTRED_EX,
+                    content_color=Fore.LIGHTRED_EX
+                )
         else:
             self._draw_glow_box(
                 "[.] Info",
                 ["No WiFi interfaces detected - scanning Ethernet only"],
                 title_color=Fore.LIGHTCYAN_EX,
                 border_color=Fore.LIGHTCYAN_EX,
-                content_color=Fore.LIGHTCYAN_EX,
-                width=None,
-                blink_title=True,
-                glow_border=True
+                content_color=Fore.LIGHTCYAN_EX
             )
             time.sleep(0.3)
         
-        # Analyze findings
         self._draw_glow_box(
             "[*] Analyzing Findings",
             [
-                "Processing WiFi network data...",
+                f"Processing data for {self.interface_type if self.interface_type else 'network'} interface...",
                 "Analyzing Ethernet interfaces...",
                 "Evaluating security configurations...",
-                "Detecting vulnerabilities..."
+                "Detecting vulnerabilities...",
+                "Generating detailed recommendations..."
             ],
             title_color=Fore.LIGHTMAGENTA_EX,
             border_color=Fore.LIGHTMAGENTA_EX,
-            content_color=Fore.LIGHTCYAN_EX,
-            width=None,
-            blink_title=True,
-            glow_border=True
+            content_color=Fore.LIGHTCYAN_EX
         )
         time.sleep(0.3)
         
         self._analyze_findings()
-        
-        # Display results
         self._display_results()
-        
-        # Export
         self._export_results()
         
-        # Footer
         self._draw_glow_box(
             "[+] Network Audit Complete",
             [
                 f"Report ID: {self.report_id}",
                 f"Scan Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
                 f"Version: DSTerminal v{self.VERSION}",
-                f"Status: [+] WiFi + Ethernet Audit Completed"
+                f"Active Interface: {self.interface} ({self.interface_type})",
+                f"Security Score: {self.results['summary'].get('security_score', 0)}/100",
+                f"Status: [+] Audit Completed Successfully",
+                f"PDF Report: Generated with detailed recommendations"
             ],
             title_color=Fore.LIGHTCYAN_EX,
             border_color=Fore.LIGHTCYAN_EX,
-            content_color=Fore.LIGHTCYAN_EX,
-            width=None,
-            blink_title=True,
-            glow_border=True
+            content_color=Fore.LIGHTCYAN_EX
         )
         
         print()
-        input(f"{Fore.LIGHTYELLOW_EX}Press Enter to continue...{Style.RESET_ALL}")
+        try:
+            input(f"{Fore.LIGHTYELLOW_EX}Press Enter to continue...{Style.RESET_ALL}")
+        except:
+            input("Press Enter to continue...")
 
 
 # ========================================================================
@@ -2480,7 +2049,6 @@ class NetworkAudit:
 # ========================================================================
 
 def main():
-    """Main entry point."""
     import argparse
     
     parser = argparse.ArgumentParser(description='Network Security Audit Tool - WiFi + Ethernet')
@@ -2514,16 +2082,25 @@ def main():
     auditor.pen_speed = args.speed
     
     if args.live:
-        print(f"{Fore.LIGHTCYAN_EX}Live monitoring mode - Press Ctrl+C to stop{Style.RESET_ALL}")
+        try:
+            print(f"{Fore.LIGHTCYAN_EX}Live monitoring mode - Press Ctrl+C to stop{Style.RESET_ALL}")
+        except:
+            print("Live monitoring mode - Press Ctrl+C to stop")
         try:
             while True:
                 auditor.results['wifi_networks'] = []
                 auditor.results['interfaces'] = []
                 auditor.run()
                 time.sleep(2)
-                os.system('cls' if platform.system() == 'Windows' else 'clear')
+                try:
+                    os.system('cls' if platform.system() == 'Windows' else 'clear')
+                except:
+                    pass
         except KeyboardInterrupt:
-            print(f"\n{Fore.LIGHTYELLOW_EX}Live monitoring stopped{Style.RESET_ALL}")
+            try:
+                print(f"\n{Fore.LIGHTYELLOW_EX}Live monitoring stopped{Style.RESET_ALL}")
+            except:
+                print("\nLive monitoring stopped")
     else:
         auditor.run()
 

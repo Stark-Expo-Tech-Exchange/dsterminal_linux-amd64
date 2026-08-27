@@ -1,3 +1,4 @@
+#!python
 """A parser for SGML, using the derived class as a static DTD."""
 
 # Note: missing in Python3

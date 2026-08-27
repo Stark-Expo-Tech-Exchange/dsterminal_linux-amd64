@@ -1,17 +1,75 @@
-﻿"""
+#!python
+import sys
+"""
+
+# ============================================================
+# FIX: Handle OSError 22 on Windows
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(["chcp", "65001"], capture_output=True, shell=True)
+    except:
+        pass
+
+_original_stdout_write = sys.stdout.write
+
+def _safe_stdout_write(text):
+    try:
+        _original_stdout_write(text)
+    except OSError as e:
+        if e.errno == 22:
+            try:
+                clean = text.encode("ascii", "ignore").decode("ascii")
+                _original_stdout_write(clean)
+            except:
+                pass
+        else:
+            raise
+    except UnicodeEncodeError:
+        try:
+            clean = text.encode("ascii", "ignore").decode("ascii")
+            _original_stdout_write(clean)
+        except:
+            pass
+
+sys.stdout.write = _safe_stdout_write
+
+
+# ============================================================
+# FIX: Handle OSError 22 on Windows
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(["chcp", "65001"], capture_output=True, shell=True)
+    except:
+        pass
+
+
+    try:
+    except OSError as e:
+        if e.errno == 22:
+            try:
+                clean = text.encode("ascii", "ignore").decode("ascii")
+                _original_stdout_write(clean)
+            except:
+                pass
+        else:
+            raise
+    except UnicodeEncodeError:
+        try:
+            clean = text.encode("ascii", "ignore").decode("ascii")
+            _original_stdout_write(clean)
+        except:
+            pass
+
+sys.stdout.write = _safe_stdout_write
+
 DSTerminal Security Dashboard - COMPLETE v4.0.0.113
 Includes: Reports section, Quarantine, Ransomware detection
 """
 import sys
-if sys.platform == 'win32':
-    import os
-    import msvcrt
-    # Ensure stdout is properly set
-    if hasattr(sys.stdout, 'buffer'):
-        sys.stdout = open(sys.stdout.fileno(), 'w', encoding='utf-8', errors='ignore')
-    if hasattr(sys.stderr, 'buffer'):
-        sys.stderr = open(sys.stderr.fileno(), 'w', encoding='utf-8', errors='ignore')
-        
 import os
 import json
 import time
@@ -20,11 +78,131 @@ import random
 import webbrowser
 import shutil
 import subprocess
+import re
 from datetime import datetime, timedelta
 from flask import Flask, render_template_string, jsonify, request, send_file
 from flask_socketio import SocketIO, emit
 import psutil
 import platform
+
+# ============================================================
+# FIX WINDOWS CONSOLE ENCODING - MUST BE FIRST
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(['chcp', '65001'], capture_output=True, shell=True)
+    except:
+        pass
+    
+    # Fix stdout encoding
+    try:
+        if hasattr(sys.stdout, 'reconfigure'):
+            sys.stdout.reconfigure(encoding='utf-8', errors='ignore')
+        else:
+            import io
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
+    except:
+        pass
+
+# ============================================================
+# ANSI COLOR DEFINITIONS (ALWAYS AVAILABLE)
+# ============================================================
+class Colors:
+    """ANSI color codes for terminal output"""
+    RED = '\033[91m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    BLUE = '\033[94m'
+    MAGENTA = '\033[95m'
+    CYAN = '\033[96m'
+    WHITE = '\033[97m'
+    RESET = '\033[0m'
+    DIM = '\033[2m'
+    BRIGHT = '\033[1m'
+    LIGHTRED_EX = '\033[91m'
+    LIGHTGREEN_EX = '\033[92m'
+    LIGHTYELLOW_EX = '\033[93m'
+    LIGHTCYAN_EX = '\033[96m'
+    LIGHTMAGENTA_EX = '\033[95m'
+    LIGHTBLUE_EX = '\033[94m'
+    LIGHTWHITE_EX = '\033[97m'
+    
+    @staticmethod
+    def strip(text):
+        ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+        return ansi_escape.sub('', text)
+
+# ============================================================
+# TRY TO IMPORT COLORAMA WITH PROPER ERROR HANDLING
+# ============================================================
+try:
+    from colorama import init, Fore, Back, Style
+    init(autoreset=True, convert=True, strip=False)
+    COLORS_AVAILABLE = True
+    # Force color support
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
+    os.environ['PYTHONUTF8'] = '1'
+except ImportError:
+    COLORS_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m'
+    })
+    Back = type('Back', (), {
+        'RESET': '\033[49m',
+        'BLACK': '\033[40m',
+        'RED': '\033[41m',
+        'GREEN': '\033[42m',
+        'YELLOW': '\033[43m',
+        'BLUE': '\033[44m',
+        'MAGENTA': '\033[45m',
+        'CYAN': '\033[46m',
+        'WHITE': '\033[47m'
+    })
+except Exception as e:
+    COLORS_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m'
+    })
+    Back = type('Back', (), {
+        'RESET': '\033[49m',
+        'BLACK': '\033[40m',
+        'RED': '\033[41m',
+        'GREEN': '\033[42m',
+        'YELLOW': '\033[43m',
+        'BLUE': '\033[44m',
+        'MAGENTA': '\033[45m',
+        'CYAN': '\033[46m',
+        'WHITE': '\033[47m'
+    })
+
+# ============================================================
+# SIMPLE SAFE PRINT FUNCTION
+# ============================================================
+def safe_print_unicode(message):
+    """Safely print unicode/emoji characters on Windows"""
+    try:
+        print(message)
+    except UnicodeEncodeError:
+        clean_message = message.encode('ascii', 'ignore').decode('ascii')
+        print(clean_message)
+    except Exception:
+        try:
+            print(str(message))
+        except:
+            pass
+
+# ============================================================
+# CONTINUE WITH THE REST OF YOUR CODE
+# ============================================================
 
 # Import security core
 try:
@@ -163,7 +341,7 @@ def detect_threat_actors():
     
     if suspicious_processes:
         threats.append({
-            'name': 'ðŸš¨ Suspicious Process Detected',
+            'name': '🚨 Suspicious Process Detected',
             'risk': 'High',
             'activities': len(suspicious_processes),
             'trend': 'up'
@@ -184,16 +362,16 @@ def detect_active_mitre_techniques():
 def get_recommendations(threat_level, file_path=None):
     if threat_level == 'RANSOMWARE_DETECTED':
         return [
-            f'ðŸ”´ IMMEDIATE: Quarantine the infected file: {os.path.basename(file_path) if file_path else "unknown"}',
-            'ðŸ”´ IMMEDIATE: Do not pay the ransom',
-            'ðŸŸ¡ Identify the ransomware variant',
-            'ðŸŸ¡ Restore files from backups',
-            'ðŸŸ¢ Report to IT Security team'
+            f'🔴 IMMEDIATE: Quarantine the infected file: {os.path.basename(file_path) if file_path else "unknown"}',
+            '🔴 IMMEDIATE: Do not pay the ransom',
+            '🟡 Identify the ransomware variant',
+            '🟡 Restore files from backups',
+            '🟢 Report to IT Security team'
         ]
     elif threat_level == 'SUSPICIOUS':
-        return ['ðŸŸ¡ Investigate suspicious processes', 'ðŸŸ¡ Run full antivirus scan']
+        return ['🟡 Investigate suspicious processes', '🟡 Run full antivirus scan']
     else:
-        return ['âœ… No action required', 'âœ… Continue monitoring']
+        return ['✅ No action required', '✅ Continue monitoring']
 
 # ============================================================
 # REPORT GENERATOR - FIXED PDF
@@ -216,7 +394,7 @@ def generate_report(incident_data):
             'hostname': platform.node(),
             'os': platform.platform(),
             'cpu': psutil.cpu_percent(),
-            'memory': psutil.virtual_memory().percent,
+            'memory': psutil.virtual_memory().percent(),
             'disk': psutil.disk_usage('/').percent
         }
     }
@@ -242,13 +420,13 @@ body {{ font-family: 'Segoe UI', sans-serif; background: #0a0e17; color: #00ff88
 <div class="header"><h1>DSTERMINAL CYBER OPS - INCIDENT REPORT</h1>
 <p>Report ID: {report_id} | Version: 4.0.0.113 | Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p></div>
 <div class="incident">
-<h2>ðŸš¨ {incident_data.get('threat_level', 'INCIDENT')}</h2>
+<h2>🚨 {incident_data.get('threat_level', 'INCIDENT')}</h2>
 <p><b>File:</b> {incident_data.get('file_path', 'Unknown')}</p>
 <p>{incident_data.get('description', 'Security incident detected and contained')}</p>
 </div>
-<h3>ðŸ“‹ Recommendations</h3>
-{''.join([f'<div class="recommendation">âœ… {r}</div>' for r in incident_data.get('recommendations', ['Run full system scan', 'Update security patches', 'Review access logs'])])}
-<h3>ðŸ“Š System Metrics</h3>
+<h3>📋 Recommendations</h3>
+{''.join([f'<div class="recommendation">✅ {r}</div>' for r in incident_data.get('recommendations', ['Run full system scan', 'Update security patches', 'Review access logs'])])}
+<h3>📊 System Metrics</h3>
 <div><span class="metric">CPU: {psutil.cpu_percent()}%</span>
 <span class="metric">RAM: {psutil.virtual_memory().percent}%</span>
 <span class="metric">DISK: {psutil.disk_usage('/').percent}%</span></div>
@@ -263,26 +441,26 @@ body {{ font-family: 'Segoe UI', sans-serif; background: #0a0e17; color: #00ff88
     # PDF Report - Proper text-based PDF
     pdf_path = os.path.join(REPORTS_DIR, f'{report_id}.pdf')
     pdf_content = f"""
-    â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
-    â•‘              DSTERMINAL CYBER OPS                           â•‘
-    â•‘                   INCIDENT REPORT                           â•‘
-    â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    ╔═══════════════════════════════════════════════════════════════════════════════╗
+    ║              DSTERMINAL CYBER OPS                           ║
+    ║                   INCIDENT REPORT                           ║
+    ╚═══════════════════════════════════════════════════════════════════════════════╝
     
     Report ID: {report_id}
     Version: 4.0.0.113
     Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
     
-    â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
-    â•‘                    INCIDENT DETAILS                         â•‘
-    â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    ╔═══════════════════════════════════════════════════════════════════════════════╗
+    ║                    INCIDENT DETAILS                         ║
+    ╚═══════════════════════════════════════════════════════════════════════════════╝
     
     Threat Level: {incident_data.get('threat_level', 'INCIDENT')}
     File: {incident_data.get('file_path', 'Unknown')}
     Description: {incident_data.get('description', 'Security incident detected')}
     
-    â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
-    â•‘                  SYSTEM INFORMATION                         â•‘
-    â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    ╔═══════════════════════════════════════════════════════════════════════════════╗
+    ║                  SYSTEM INFORMATION                         ║
+    ╚═══════════════════════════════════════════════════════════════════════════════╝
     
     Hostname: {platform.node()}
     OS: {platform.platform()}
@@ -290,16 +468,16 @@ body {{ font-family: 'Segoe UI', sans-serif; background: #0a0e17; color: #00ff88
     Memory: {psutil.virtual_memory().percent}%
     Disk: {psutil.disk_usage('/').percent}%
     
-    â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
-    â•‘                  RECOMMENDATIONS                            â•‘
-    â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    ╔═══════════════════════════════════════════════════════════════════════════════╗
+    ║                  RECOMMENDATIONS                            ║
+    ╚═══════════════════════════════════════════════════════════════════════════════╝
     
-    {chr(10).join(['â€¢ ' + r for r in incident_data.get('recommendations', ['Run full system scan', 'Update security patches'])])}
+    {chr(10).join(['• ' + r for r in incident_data.get('recommendations', ['Run full system scan', 'Update security patches'])])}
     
-    â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
-    â•‘              {watermark}                                    â•‘
-    â•‘              Classified - Confidential                      â•‘
-    â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    ╔═══════════════════════════════════════════════════════════════════════════════╗
+    ║              {watermark}                                    ║
+    ║              Classified - Confidential                      ║
+    ╚═══════════════════════════════════════════════════════════════════════════════╝
     """
     with open(pdf_path, 'w', encoding='utf-8') as f:
         f.write(pdf_content)
@@ -629,10 +807,10 @@ HTML_TEMPLATE = """
 </head>
 <body>
 
-<div class="attack-banner" id="attackBanner">ðŸš¨ RANSOMWARE DETECTED - QUARANTINE FILE IMMEDIATELY ðŸš¨</div>
+<div class="attack-banner" id="attackBanner">🚨 RANSOMWARE DETECTED - QUARANTINE FILE IMMEDIATELY 🚨</div>
 
 <header class="header">
-    <h1>ðŸ”® DSTERMINAL SECURITY</h1>
+    <h1>🔮 DSTERMINAL SECURITY</h1>
     <div><span id="statusText">PROTECTED</span> <span id="headerTime" style="color:#2a5a4a;font-size:12px;"></span></div>
 </header>
 
@@ -654,7 +832,7 @@ HTML_TEMPLATE = """
         <div class="mitre-grid" id="mitreGrid"><div class="text-muted text-center">Loading...</div></div>
     </div>
     <div class="card col-span-4">
-        <div class="card-title">ðŸ”’ Quarantine</div>
+        <div class="card-title">🔒 Quarantine</div>
         <div id="quarantineList"><div class="text-muted text-center">No files pending</div></div>
     </div>
     <div class="card col-span-4">
@@ -665,28 +843,28 @@ HTML_TEMPLATE = """
 
 <div class="grid">
     <div class="card col-span-6">
-        <div class="card-title">ðŸ“‹ Event Log</div>
+        <div class="card-title">📋 Event Log</div>
         <div class="event-log" id="eventLog"><div class="text-muted text-center">Monitoring...</div></div>
     </div>
     <div class="card col-span-6">
-        <div class="card-title">ðŸ“„ Incident Reports</div>
+        <div class="card-title">📄 Incident Reports</div>
         <div id="reportList"><div class="text-muted text-center">No reports generated</div></div>
     </div>
 </div>
 
 <div class="grid">
     <div class="card col-span-6">
-        <div class="card-title">ðŸš¨ Detected Ransomware Files</div>
+        <div class="card-title">🚨 Detected Ransomware Files</div>
         <div id="ransomwareFiles"><div class="text-muted text-center">No ransomware detected</div></div>
     </div>
     <div class="card col-span-6">
-        <div class="card-title">ðŸ”“ Vulnerabilities</div>
+        <div class="card-title">🔍 Vulnerabilities</div>
         <div id="vulnList"><div class="text-muted text-center">Scanning...</div></div>
     </div>
 </div>
 
 <div style="text-align:center;margin-top:15px;color:#2a5a4a;font-size:9px;border-top:1px solid rgba(0,255,136,0.05);padding-top:10px;">
-    DSTERMINAL CYBER OPS v4.0.0.113 â€¢ <span id="footerTime"></span>
+    DSTERMINAL CYBER OPS v4.0.0.113 • <span id="footerTime"></span>
 </div>
 
 <script>
@@ -718,10 +896,10 @@ HTML_TEMPLATE = """
             body: JSON.stringify({ file_path: path, threat_type: 'Ransomware' })
         }).then(r => r.json()).then(data => {
             if (data.success) {
-                console.log('âœ… Quarantined');
+                console.log('✅ Quarantined');
                 fetch('/api/status').then(r => r.json()).then(updateStatus);
             } else {
-                alert('âŒ Failed: ' + (data.error || 'Unknown'));
+                alert('❌ Failed: ' + (data.error || 'Unknown'));
             }
         }).catch(err => console.error(err));
     }
@@ -729,14 +907,14 @@ HTML_TEMPLATE = """
     function updateStatus(data) {
         const maps = { 
             'CLEAN': { class: 'badge-clean', text: 'CLEAN' }, 
-            'RANSOMWARE_DETECTED': { class: 'badge-ransomware', text: 'ðŸš¨ RANSOMWARE!' }, 
+            'RANSOMWARE_DETECTED': { class: 'badge-ransomware', text: '🚨 RANSOMWARE!' }, 
             'SUSPICIOUS': { class: 'badge-suspicious', text: 'SUSPICIOUS' }, 
             'HIGH_RISK': { class: 'badge-high', text: 'HIGH RISK' } 
         };
         const t = maps[data.threat_level] || maps['CLEAN'];
         document.getElementById('threatDisplay').innerHTML = `<span class="threat-badge ${t.class}">${t.text}</span>`;
         document.getElementById('attackBanner').className = `attack-banner${data.threat_level === 'RANSOMWARE_DETECTED' ? ' show' : ''}`;
-        document.getElementById('statusText').textContent = data.threat_level === 'RANSOMWARE_DETECTED' ? 'ðŸ”´ ATTACK' : 'ðŸŸ¢ PROTECTED';
+        document.getElementById('statusText').textContent = data.threat_level === 'RANSOMWARE_DETECTED' ? '🔴 ATTACK' : '🟢 PROTECTED';
         
         document.getElementById('riskScore').textContent = Math.round(data.risk_score || 0);
         document.getElementById('riskTrend').textContent = `Trend: ${data.risk_trend || 'stable'}`;
@@ -780,12 +958,12 @@ HTML_TEMPLATE = """
 
     function updateQuarantine(pending) {
         if (!pending || pending.length === 0) {
-            document.getElementById('quarantineList').innerHTML = '<div class="text-muted text-center">âœ… No files pending</div>';
+            document.getElementById('quarantineList').innerHTML = '<div class="text-muted text-center">✅ No files pending</div>';
             return;
         }
         document.getElementById('quarantineList').innerHTML = pending.map(item => `
             <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,255,136,0.04);font-size:11px;">
-                <span style="color:#ff0033;">ðŸ”´ ${item.path.split('\\\\').pop()}</span>
+                <span style="color:#ff0033;">🔴 ${item.path.split('\\\\').pop()}</span>
                 <button class="quarantine-btn" onclick="quarantineFile('${item.path}')">QUARANTINE</button>
             </div>
         `).join('');
@@ -793,7 +971,7 @@ HTML_TEMPLATE = """
 
     function updateRecommendations(recs) {
         if (!recs || recs.length === 0) {
-            document.getElementById('recommendationList').innerHTML = '<div class="text-muted text-center">âœ… No recommendations</div>';
+            document.getElementById('recommendationList').innerHTML = '<div class="text-muted text-center">✅ No recommendations</div>';
             return;
         }
         document.getElementById('recommendationList').innerHTML = recs.map(r => `<div class="recommendation-box">${r}</div>`).join('');
@@ -806,7 +984,7 @@ HTML_TEMPLATE = """
         }
         document.getElementById('reportList').innerHTML = reports.map(r => `
             <div class="report-item">
-                <span class="report-id">ðŸ“„ ${r.id}</span>
+                <span class="report-id">📄 ${r.id}</span>
                 <span style="color:#2a5a4a;font-size:9px;">${r.type}</span>
                 <span class="report-links">
                     <a href="#" onclick="downloadReport('${r.id}','json')">JSON</a>
@@ -819,12 +997,12 @@ HTML_TEMPLATE = """
 
     function updateRansomware(files) {
         if (!files || files.length === 0) {
-            document.getElementById('ransomwareFiles').innerHTML = '<div class="text-muted text-center">âœ… No ransomware detected</div>';
+            document.getElementById('ransomwareFiles').innerHTML = '<div class="text-muted text-center">✅ No ransomware detected</div>';
             return;
         }
         document.getElementById('ransomwareFiles').innerHTML = files.map(f => `
             <div class="ransomware-file">
-                <span class="file-path">ðŸ“ ${f.path.split('\\\\').pop()}</span>
+                <span class="file-path">📁 ${f.path.split('\\\\').pop()}</span>
                 <span style="color:#2a5a4a;font-size:9px;">${f.process}</span>
                 <span style="color:#2a5a4a;font-size:9px;">${new Date(f.timestamp).toLocaleTimeString()}</span>
             </div>
@@ -833,7 +1011,7 @@ HTML_TEMPLATE = """
 
     function updateVulns(vulns) {
         if (!vulns || vulns.length === 0) {
-            document.getElementById('vulnList').innerHTML = '<div class="text-muted text-center">âœ… No vulnerabilities</div>';
+            document.getElementById('vulnList').innerHTML = '<div class="text-muted text-center">✅ No vulnerabilities</div>';
             return;
         }
         document.getElementById('vulnList').innerHTML = vulns.map(v => `
@@ -893,14 +1071,14 @@ def open_browser():
 
 if __name__ == '__main__':
     print("=" * 70)
-    print("ðŸ”® DSTERMINAL SECURITY DASHBOARD (COMPLETE)")
+    print("🔮 DSTERMINAL SECURITY DASHBOARD (COMPLETE)")
     print("=" * 70)
-    print(f"ðŸ“ Reports: {REPORTS_DIR}")
-    print(f"ðŸ“ Quarantine: {QUARANTINE_DIR}")
-    print("ðŸ“ http://localhost:5000")
-    print("âœ… Reports section with JSON/HTML/PDF download")
-    print("âœ… Quarantine button for infected files")
-    print("âœ… Detected ransomware files shown")
+    print(f"📁 Reports: {REPORTS_DIR}")
+    print(f"📁 Quarantine: {QUARANTINE_DIR}")
+    print("📍 http://localhost:5000")
+    print("✅ Reports section with JSON/HTML/PDF download")
+    print("✅ Quarantine button for infected files")
+    print("✅ Detected ransomware files shown")
     print("=" * 70)
     
     threading.Thread(target=open_browser, daemon=True).start()

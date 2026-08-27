@@ -1,4 +1,5 @@
-﻿#!/usr/bin/env python3
+#!python
+#!/usr/bin/env python3
 """
 DSTerminal Dynamic SOC Dashboard
 Multiple chart types with real-time WebSocket updates

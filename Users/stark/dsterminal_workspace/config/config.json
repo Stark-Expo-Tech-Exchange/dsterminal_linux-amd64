@@ -1,0 +1,10 @@
+{
+  "scan_interval": 30,
+  "monitoring_enabled": true,
+  "honeypot_enabled": true,
+  "sensitivity": "medium",
+  "auto_quarantine": false,
+  "network_isolation": false,
+  "sound_alerts": true,
+  "notifications": true
+}

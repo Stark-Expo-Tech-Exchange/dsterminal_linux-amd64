@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!python
 # -*- coding: utf-8 -*-
 
 """
@@ -13,9 +13,8 @@ Complete security lab environment with:
 - Automated Reporting with DSTERMINAL v4.0.0.113 Watermark
 - Cross-platform Support
 """
-
-import os
 import sys
+import os
 import time
 import json
 import hashlib
@@ -29,7 +28,6 @@ import queue
 import signal
 import atexit
 import random
-import codecs
 from datetime import datetime, timedelta
 from collections import defaultdict, deque
 from typing import Dict, List, Optional, Any, Tuple, Callable
@@ -37,35 +35,123 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 # ============================================================
-# FIX CONSOLE ENCODING FOR WINDOWS
+# FIX WINDOWS CONSOLE ENCODING - MUST BE FIRST
 # ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(['chcp', '65001'], capture_output=True, shell=True)
+    except:
+        pass
+    
+    # Fix stdout encoding
+    try:
+        if hasattr(sys.stdout, 'reconfigure'):
+            sys.stdout.reconfigure(encoding='utf-8', errors='ignore')
+        else:
+            import io
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
+    except:
+        pass
 
-def fix_console_encoding():
-    """Fix console encoding for Windows to display UTF-8 box drawing characters"""
-    if platform.system() == 'Windows':
+# ============================================================
+# ANSI COLOR DEFINITIONS (ALWAYS AVAILABLE)
+# ============================================================
+class Colors:
+    """ANSI color codes for terminal output"""
+    HEADER = '\033[95m'
+    BLUE = '\033[94m'
+    CYAN = '\033[96m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    END = '\033[0m'
+    BLACK = '\033[90m'
+    MAGENTA = '\033[95m'
+    WHITE = '\033[97m'
+    DIM = '\033[2m'
+    
+    @staticmethod
+    def init_colors():
+        if platform.system() == 'Windows':
+            try:
+                import ctypes
+                kernel32 = ctypes.windll.kernel32
+                kernel32.SetConsoleMode(kernel32.GetStdHandle(-11), 7)
+            except:
+                pass
+
+Colors.init_colors()
+
+# ============================================================
+# TRY TO IMPORT COLORAMA WITH PROPER ERROR HANDLING
+# ============================================================
+try:
+    from colorama import init, Fore, Back, Style
+    init(autoreset=True)
+    COLORS_AVAILABLE = True
+except ImportError:
+    COLORS_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m'
+    })
+    Back = type('Back', (), {
+        'RESET': '\033[49m',
+        'BLACK': '\033[40m',
+        'RED': '\033[41m',
+        'GREEN': '\033[42m',
+        'YELLOW': '\033[43m',
+        'BLUE': '\033[44m',
+        'MAGENTA': '\033[45m',
+        'CYAN': '\033[46m',
+        'WHITE': '\033[47m'
+    })
+except Exception as e:
+    COLORS_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m'
+    })
+    Back = type('Back', (), {
+        'RESET': '\033[49m',
+        'BLACK': '\033[40m',
+        'RED': '\033[41m',
+        'GREEN': '\033[42m',
+        'YELLOW': '\033[43m',
+        'BLUE': '\033[44m',
+        'MAGENTA': '\033[45m',
+        'CYAN': '\033[46m',
+        'WHITE': '\033[47m'
+    })
+
+# ============================================================
+# SIMPLE SAFE PRINT FUNCTION
+# ============================================================
+def safe_print_unicode(message):
+    """Safely print unicode/emoji characters on Windows"""
+    try:
+        print(message)
+    except UnicodeEncodeError:
+        clean_message = message.encode('ascii', 'ignore').decode('ascii')
+        print(clean_message)
+    except Exception:
         try:
-            import ctypes
-            kernel32 = ctypes.windll.kernel32
-            kernel32.SetConsoleCP(65001)
-            kernel32.SetConsoleOutputCP(65001)
-            
-            handle = kernel32.GetStdHandle(-11)
-            mode = ctypes.c_ulong()
-            if kernel32.GetConsoleMode(handle, ctypes.byref(mode)):
-                ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
-                if not (mode.value & ENABLE_VIRTUAL_TERMINAL_PROCESSING):
-                    kernel32.SetConsoleMode(handle, mode.value | ENABLE_VIRTUAL_TERMINAL_PROCESSING)
-            
-            if sys.stdout.encoding != 'utf-8':
-                sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
-                sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
+            print(str(message))
         except:
             pass
 
-# Apply encoding fix
-fix_console_encoding()
-
-# Try imports with fallbacks
+# ============================================================
+# TRY TO IMPORT OPTIONAL DEPENDENCIES
+# ============================================================
 try:
     import psutil
     PSUTIL_AVAILABLE = True
@@ -103,7 +189,7 @@ except ImportError:
     WATCHDOG_AVAILABLE = False
 
 try:
-    from reportlab.lib import colors
+    from reportlab.lib import colors as reportlab_colors
     from reportlab.lib.pagesizes import A4, landscape
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table as PDFTable, TableStyle, PageBreak
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -122,16 +208,22 @@ try:
 except ImportError:
     JINJA_AVAILABLE = False
 
-from soc_enhanced_modules import EnhancedModulesManager
+# Try to import enhanced modules
+try:
+    from soc_enhanced_modules import EnhancedModulesManager
+    ENHANCED_AVAILABLE = True
+except ImportError:
+    ENHANCED_AVAILABLE = False
+    EnhancedModulesManager = None
 
 # ============================================================
 # CONSTANTS
 # ============================================================
-
 VERSION = "v4.0.0.113"
 PLATFORM = "DSTERMINAL Cyber Ops Platform"
 WATERMARK_TEXT = f"{PLATFORM} {VERSION}"
 
+ 
 # ============================================================
 # COLOR SUPPORT DETECTION
 # ============================================================
@@ -2164,22 +2256,452 @@ class SOCLabDashboard:
             print("   No processes detected")
             print("")
             print("   Possible reasons:")
-            print("   2. Process monitoring is not running")
-            print("   3. Permission issues on your system")
-            print("   4. The lab is not fully started")
+            print("   1. Process monitoring is not running")
+            print("   2. Permission issues on your system")
         
         print("")
         print("─" * 80)
         input("\nPress Enter to continue...")
-    
+    # =============================================
+    # =============================================
+    # Added these methods to the SOCLabDashboard class
+
     def _cmd_enhanced(self):
+        """Launch enhanced modules directly"""
         self._clear_screen()
         self._show_centered_banner()
-        print("\n🔧 ENHANCED MODULES")
+        
+        # Check if enhanced modules are available
+        if not self.lab.enhanced:
+            print("\n🔧 ENHANCED MODULES")
+            print("─" * 80)
+            print("❌ Enhanced modules are not available.")
+            print("   Please check that 'soc_enhanced_modules.py' exists.")
+            input("\nPress Enter to continue...")
+            return
+        
+        # Show enhanced modules menu
+        while True:
+            self._clear_screen()
+            self._show_centered_banner()
+            
+            # Get status
+            try:
+                enhanced_status = self.lab.get_enhanced_status()
+                status_text = f"🟢 {'ACTIVE' if enhanced_status.get('running', False) else 'INACTIVE'}"
+                version = enhanced_status.get('mitre', {}).get('techniques', 'N/A')
+            except:
+                status_text = "🔄 LOADING"
+                version = "N/A"
+            
+            print(f"""
+    {Colors.CYAN}┌── ENHANCED MODULES ─────────────────────────────────────┐
+    │                                                          │
+    │  {Colors.GREEN}🔧 Enhanced Modules v{VERSION}{Colors.END}                         │
+    │                                                          │
+    │  {Colors.CYAN}1.{Colors.END} 📊 View Enhanced Dashboard                        │
+    │  {Colors.CYAN}2.{Colors.END} 🔍 Run Advanced Threat Scan                      │
+    │  {Colors.CYAN}3.{Colors.END} 🚨 View Threat Intelligence                      │
+    │  {Colors.CYAN}4.{Colors.END} 📄 Generate Enhanced Report                     │
+    │  {Colors.CYAN}5.{Colors.END} 🎯 Add IOC (Indicator of Compromise)            │
+    │  {Colors.CYAN}6.{Colors.END} 📈 View IOC Status                             │
+    │  {Colors.CYAN}7.{Colors.END} 🔄 Refresh Enhanced Modules                     │
+    │  {Colors.CYAN}8.{Colors.END} ℹ️  About Enhanced Modules                      │
+    │                                                          │
+    │  {Colors.YELLOW}e.{Colors.END} Back to Main Menu                              │
+    │                                                          │
+    │  Status: {Colors.GREEN}{status_text}{Colors.END}                                │
+    │  MITRE Techniques: {version}                              │
+    └──────────────────────────────────────────────────────────┘{Colors.END}
+    """)
+            
+            choice = input(f"\n{Colors.CYAN}┌── Enhanced Module Option ──►{Colors.END} ").strip().lower()
+            
+            if choice == 'e':
+                break
+            elif choice == '1':
+                self._enhanced_dashboard()
+            elif choice == '2':
+                self._enhanced_scan()
+            elif choice == '3':
+                self._enhanced_threats()
+            elif choice == '4':
+                self._enhanced_report()
+            elif choice == '5':
+                self._enhanced_add_ioc()
+            elif choice == '6':
+                self._enhanced_status()
+            elif choice == '7':
+                self._enhanced_refresh()
+            elif choice == '8':
+                self._enhanced_about()
+            else:
+                print(f"\n{Colors.RED}❌ Invalid option. Press Enter to continue...{Colors.END}")
+                input()
+
+    def _enhanced_dashboard(self):
+        """Show enhanced dashboard"""
+        self._clear_screen()
+        self._show_centered_banner()
+        
+        try:
+            # Get status from enhanced modules
+            status = self.lab.get_enhanced_status()
+            threats = self.lab.get_threats()
+            
+            print(f"""
+    {Colors.CYAN}┌── ENHANCED DASHBOARD ─────────────────────────────────┐
+    │                                                          │
+    │  {Colors.GREEN}🔧 Enhanced Modules Status{Colors.END}                           │
+    │  ──────────────────────────────────────────────────────  │
+    │  Status:         {Colors.GREEN}{'🟢 RUNNING' if status.get('running', False) else '🔴 STOPPED'}{Colors.END}     │
+    │  MITRE Techniques: {status.get('mitre', {}).get('techniques', 0)}                              │
+    │  MITRE Tactics:   {status.get('mitre', {}).get('tactics', 0)}                              │
+    │  Alert Dashboard: {'🟢 Active' if status.get('alert_dashboard', {}).get('running', False) else '🔴 Inactive'}  │
+    │  Total IOCs:      {status.get('threat_intel', {}).get('total_iocs', 0)}                              │
+    │                                                          │
+    │  {Colors.CYAN}📊 Alert Statistics:{Colors.END}                                     │
+    │  ──────────────────────────────────────────────────────  │
+    │  Total Alerts:    {status.get('alert_dashboard', {}).get('alerts', 0)}                     │
+    │  Critical:        {status.get('alert_dashboard', {}).get('critical', 0)}                     │
+    │  High:            {status.get('alert_dashboard', {}).get('high', 0)}                     │
+    │  Medium:          {status.get('alert_dashboard', {}).get('medium', 0)}                     │
+    │                                                          │
+    │  {Colors.CYAN}📁 Threat Summary:{Colors.END}                                     │
+    │  ──────────────────────────────────────────────────────  │
+    │  Active Threats:  {len(threats)}                              │
+    │  Files Scanned:   {self.lab.monitor.stats.get('files_scanned', 0)}                  │
+    │                                                          │
+    │  {Colors.YELLOW}💡 Tip: Use option 3 to view detailed threat intelligence{Colors.END} │
+    └──────────────────────────────────────────────────────────┘{Colors.END}
+    """)
+        except Exception as e:
+            print(f"\n{Colors.RED}❌ Error loading enhanced dashboard: {e}{Colors.END}")
+        
+        input(f"\n{Colors.CYAN}Press Enter to continue...{Colors.END}")
+
+    def _enhanced_scan(self):
+        """Run advanced threat scan"""
+        self._clear_screen()
+        self._show_centered_banner()
+        
+        print(f"\n{Colors.YELLOW}🔍 Running Advanced Threat Scan...{Colors.END}")
         print("─" * 80)
-        print("Enhanced modules are available through the main menu.")
-        print("Use the main menu options to access enhanced features.")
-        input("\nPress Enter to continue...")
+        
+        try:
+            # Add MITRE ATT&CK mapping to the scan
+            print(f"{Colors.CYAN}📊 MITRE ATT&CK Mapping enabled{Colors.END}")
+            print(f"{Colors.CYAN}🔍 Scanning system...{Colors.END}")
+            
+            # Run the scan using the lab's enhanced modules
+            results = self.lab.run_system_scan()
+            
+            print(f"\n{Colors.GREEN}✅ Scan Complete!{Colors.END}")
+            print(f"Found {len(results)} threats")
+            print("─" * 80)
+            
+            if results:
+                # Group by severity
+                critical = [r for r in results if r.get('severity') == 'CRITICAL']
+                high = [r for r in results if r.get('severity') == 'HIGH']
+                medium = [r for r in results if r.get('severity') == 'MEDIUM']
+                low = [r for r in results if r.get('severity') == 'LOW']
+                
+                if critical:
+                    print(f"\n{Colors.RED}🔴 CRITICAL: {len(critical)}{Colors.END}")
+                    for r in critical[:3]:
+                        print(f"    - {r.get('description', '')[:60]}")
+                        if r.get('source'):
+                            print(f"      📁 {r.get('source', '')[:50]}")
+                
+                if high:
+                    print(f"\n{Colors.YELLOW}🟡 HIGH: {len(high)}{Colors.END}")
+                    for r in high[:3]:
+                        print(f"    - {r.get('description', '')[:60]}")
+                        if r.get('source'):
+                            print(f"      📁 {r.get('source', '')[:50]}")
+                
+                if medium:
+                    print(f"\n{Colors.CYAN}🔵 MEDIUM: {len(medium)}{Colors.END}")
+                
+                if low:
+                    print(f"\n{Colors.GREEN}🟢 LOW: {len(low)}{Colors.END}")
+                
+                if len(results) > 10:
+                    print(f"\n  ... and {len(results) - 10} more threats")
+            else:
+                print(f"\n{Colors.GREEN}✅ No threats detected! System appears clean.{Colors.END}")
+            
+        except Exception as e:
+            print(f"\n{Colors.RED}❌ Scan failed: {e}{Colors.END}")
+        
+        input(f"\n{Colors.CYAN}Press Enter to continue...{Colors.END}")
+
+    def _enhanced_threats(self):
+        """View threat intelligence"""
+        self._clear_screen()
+        self._show_centered_banner()
+        
+        threats = self.lab.get_threats()
+        
+        print(f"""
+    {Colors.CYAN}┌── THREAT INTELLIGENCE ───────────────────────────────┐
+    │                                                          │
+    │  {Colors.GREEN}🚨 Detected Threats: {len(threats)}{Colors.END}                             │
+    │  ──────────────────────────────────────────────────────  │
+    """)
+        
+        if threats:
+            # Show MITRE mapping summary
+            try:
+                mitre_summary = self.lab.enhanced.mitre.generate_attack_summary(threats)
+                if mitre_summary.get('high_priority'):
+                    print(f"  {Colors.YELLOW}🎯 High Priority Techniques:{Colors.END}")
+                    for tech in mitre_summary['high_priority'][:3]:
+                        print(f"    - {tech['name']} (used {tech['count']} times)")
+                    print("")
+            except:
+                pass
+            
+            # Show threats
+            for i, t in enumerate(threats[:10], 1):
+                severity = t.get('severity', 'INFO')
+                color = Colors.RED if severity == 'CRITICAL' else Colors.YELLOW if severity == 'HIGH' else Colors.CYAN
+                print(f"  {i}. {color}{severity}{Colors.END} - {t.get('description', '')[:50]}")
+                print(f"     ID: {t.get('event_id', '')[:12]}")
+                print(f"     Category: {t.get('category', 'unknown')}")
+                print(f"     Status: {t.get('status', 'active')}")
+                print("")
+            
+            if len(threats) > 10:
+                print(f"  ... and {len(threats) - 10} more threats")
+        else:
+            print(f"  {Colors.GREEN}✅ No threats detected{Colors.END}")
+        
+        print(f"└──────────────────────────────────────────────────────────┘{Colors.END}")
+        input(f"\n{Colors.CYAN}Press Enter to continue...{Colors.END}")
+
+    def _enhanced_report(self):
+        """Generate enhanced report with visual analytics"""
+        self._clear_screen()
+        self._show_centered_banner()
+        
+        print(f"\n{Colors.YELLOW}📄 Generating Enhanced Report...{Colors.END}")
+        print("─" * 80)
+        
+        try:
+            # Get data for report
+            threats = self.lab.get_threats()
+            stats = self.lab.monitor.get_statistics()
+            process_stats = self.lab.get_process_stats()
+            
+            print(f"{Colors.CYAN}📊 Data collected:{Colors.END}")
+            print(f"   - {len(threats)} threats")
+            print(f"   - {stats.get('files_scanned', 0)} files scanned")
+            print(f"   - {process_stats.get('total_processes', 0)} processes")
+            print("")
+            
+            # Generate report using enhanced modules
+            report_path = self.lab.generate_enhanced_report()
+            
+            if report_path and os.path.exists(report_path):
+                print(f"\n{Colors.GREEN}✅ Enhanced report generated!{Colors.END}")
+                print(f"📁 Location: {report_path}")
+                file_size = os.path.getsize(report_path) // 1024
+                print(f"📊 Size: {file_size} KB")
+            else:
+                # Fallback to basic report
+                print(f"{Colors.YELLOW}⚠️ Enhanced report not available, generating basic report...{Colors.END}")
+                basic_report = self.lab.generate_report('html')
+                if basic_report:
+                    print(f"\n{Colors.GREEN}✅ Basic report generated!{Colors.END}")
+                    print(f"📁 Location: {basic_report}")
+                else:
+                    print(f"\n{Colors.RED}❌ Failed to generate report{Colors.END}")
+        except Exception as e:
+            print(f"\n{Colors.RED}❌ Error generating report: {e}{Colors.END}")
+        
+        input(f"\n{Colors.CYAN}Press Enter to continue...{Colors.END}")
+
+    def _enhanced_add_ioc(self):
+        """Add an IOC (Indicator of Compromise)"""
+        self._clear_screen()
+        self._show_centered_banner()
+        
+        print(f"""
+    {Colors.CYAN}┌── ADD IOC (Indicator of Compromise) ──────────────────┐
+    │                                                          │
+    │  {Colors.YELLOW}📋 Enter IOC details:{Colors.END}                                      │
+    │  ──────────────────────────────────────────────────────  │
+    """)
+        
+        # Get IOC type
+        print(f"{Colors.CYAN}  IOC Types:{Colors.END}")
+        print("    1. File Hash (MD5/SHA1/SHA256)")
+        print("    2. Domain")
+        print("    3. IP Address")
+        print("    4. URL")
+        print("    5. File Path")
+        print("    6. Registry Key")
+        
+        type_choice = input(f"\n{Colors.CYAN}  Select type (1-6): {Colors.END}").strip()
+        type_map = {'1': 'hash', '2': 'domain', '3': 'ip', '4': 'url', '5': 'file', '6': 'registry'}
+        ioc_type = type_map.get(type_choice, 'hash')
+        
+        # Get IOC value
+        value = input(f"{Colors.CYAN}  Enter IOC value: {Colors.END}").strip()
+        if not value:
+            print(f"\n{Colors.RED}❌ IOC value cannot be empty{Colors.END}")
+            input(f"\n{Colors.CYAN}Press Enter to continue...{Colors.END}")
+            return
+        
+        # Get category
+        print(f"\n{Colors.CYAN}  Categories:{Colors.END}")
+        print("    1. Malicious")
+        print("    2. Suspicious")
+        print("    3. Clean (whitelist)")
+        
+        cat_choice = input(f"{Colors.CYAN}  Select category (1-3): {Colors.END}").strip()
+        cat_map = {'1': 'malicious', '2': 'suspicious', '3': 'clean'}
+        category = cat_map.get(cat_choice, 'malicious')
+        
+        # Add the IOC
+        try:
+            success = self.lab.add_ioc(ioc_type, value, category)
+            if success:
+                print(f"\n{Colors.GREEN}✅ IOC added successfully!{Colors.END}")
+                print(f"   Type: {ioc_type}")
+                print(f"   Value: {value}")
+                print(f"   Category: {category}")
+                print(f"\n{Colors.YELLOW}💡 This IOC will be used in future threat detections{Colors.END}")
+            else:
+                print(f"\n{Colors.RED}❌ Failed to add IOC{Colors.END}")
+        except Exception as e:
+            print(f"\n{Colors.RED}❌ Error: {e}{Colors.END}")
+        
+        input(f"\n{Colors.CYAN}Press Enter to continue...{Colors.END}")
+
+    def _enhanced_status(self):
+        """View IOC and module status"""
+        self._clear_screen()
+        self._show_centered_banner()
+        
+        try:
+            status = self.lab.get_enhanced_status()
+            ioc_stats = self.lab.enhanced.threat_intel.get_ioc_stats() if self.lab.enhanced else {}
+            
+            print(f"""
+    {Colors.CYAN}┌── ENHANCED MODULES STATUS ───────────────────────────┐
+    │                                                          │
+    │  {Colors.GREEN}📊 System Status{Colors.END}                                        │
+    │  ──────────────────────────────────────────────────────  │
+    │  Enhanced Modules:  {Colors.GREEN}{'🟢 RUNNING' if status.get('running', False) else '🔴 STOPPED'}{Colors.END}    │
+    │  MITRE Techniques:  {status.get('mitre', {}).get('techniques', 0)}                              │
+    │  MITRE Tactics:     {status.get('mitre', {}).get('tactics', 0)}                              │
+    │  Alert Dashboard:   {'🟢 Active' if status.get('alert_dashboard', {}).get('running', False) else '🔴 Inactive'}  │
+    │                                                          │
+    │  {Colors.CYAN}📊 IOC Statistics{Colors.END}                                       │
+    │  ──────────────────────────────────────────────────────  │
+    """)
+            if ioc_stats:
+                for ioc_type, categories in ioc_stats.items():
+                    print(f"  {ioc_type.upper()}:")
+                    for category, count in categories.items():
+                        if count > 0:
+                            color = Colors.RED if category == 'malicious' else Colors.YELLOW if category == 'suspicious' else Colors.GREEN
+                            print(f"    {color}{category}: {count}{Colors.END}")
+            else:
+                print(f"  {Colors.YELLOW}No IOCs loaded yet{Colors.END}")
+            
+            print(f"""
+    │  {Colors.CYAN}📈 Alert Statistics{Colors.END}                                     │
+    │  ──────────────────────────────────────────────────────  │
+    │  Total Alerts:  {status.get('alert_dashboard', {}).get('alerts', 0)}                     │
+    │  Critical:      {status.get('alert_dashboard', {}).get('critical', 0)}                     │
+    │  High:          {status.get('alert_dashboard', {}).get('high', 0)}                     │
+    │  Medium:        {status.get('alert_dashboard', {}).get('medium', 0)}                     │
+    └──────────────────────────────────────────────────────────┘{Colors.END}
+    """)
+        except Exception as e:
+            print(f"\n{Colors.RED}❌ Error loading status: {e}{Colors.END}")
+        
+        input(f"\n{Colors.CYAN}Press Enter to continue...{Colors.END}")
+
+    def _enhanced_refresh(self):
+        """Refresh enhanced modules"""
+        self._clear_screen()
+        self._show_centered_banner()
+        
+        print(f"\n{Colors.YELLOW}🔄 Refreshing Enhanced Modules...{Colors.END}")
+        print("─" * 80)
+        
+        try:
+            if self.lab.enhanced:
+                # Re-initialize the enhanced modules
+                self.lab.enhanced.stop()
+                time.sleep(1)
+                self.lab.enhanced.start()
+                print(f"\n{Colors.GREEN}✅ Enhanced modules refreshed successfully!{Colors.END}")
+                print(f"{Colors.CYAN}📊 All modules reloaded{Colors.END}")
+            else:
+                print(f"\n{Colors.RED}❌ Enhanced modules not available{Colors.END}")
+        except Exception as e:
+            print(f"\n{Colors.RED}❌ Error refreshing: {e}{Colors.END}")
+        
+        input(f"\n{Colors.CYAN}Press Enter to continue...{Colors.END}")
+
+    def _enhanced_about(self):
+        """Show about enhanced modules"""
+        self._clear_screen()
+        self._show_centered_banner()
+        
+        print(f"""
+    {Colors.CYAN}┌── ABOUT ENHANCED MODULES ─────────────────────────────┐
+    │                                                          │
+    │  {Colors.GREEN}🔧 Enhanced Modules - DSTerminal v{VERSION}{Colors.END}               │
+    │                                                          │
+    │  These modules provide advanced security features:      │
+    │                                                          │
+    │  {Colors.CYAN}📊 Enhanced Dashboard{Colors.END}                                    │
+    │     Real-time monitoring with detailed statistics       │
+    │     MITRE ATT&CK technique mapping                     │
+    │                                                          │
+    │  {Colors.CYAN}🔍 Advanced Threat Scan{Colors.END}                                 │
+    │     Deep system scan with AI-powered detection          │
+    │     Automated IOC matching and analysis                │
+    │                                                          │
+    │  {Colors.CYAN}🚨 Threat Intelligence{Colors.END}                                  │
+    │     Comprehensive view of detected threats              │
+    │     MITRE ATT&CK framework integration                  │
+    │     Mitigation recommendations                         │
+    │                                                          │
+    │  {Colors.CYAN}📄 Enhanced Reports{Colors.END}                                    │
+    │     Detailed reports with visual analytics              │
+    │     Charts and trend analysis                          │
+    │     Executive summary and risk assessment              │
+    │                                                          │
+    │  {Colors.CYAN}🎯 IOC Management{Colors.END}                                      │
+    │     Add, view, and manage Indicators of Compromise      │
+    │     Categorize IOCs (malicious/suspicious/clean)        │
+    │     Automatic threat matching                          │
+    │                                                          │
+    │  {Colors.CYAN}📊 Alert Dashboard{Colors.END}                                      │
+    │     Real-time alert monitoring                          │
+    │     Severity-based filtering                           │
+    │     Export capabilities                                │
+    │                                                          │
+    │  {Colors.YELLOW}⚡ Powered by DSTerminal SOC Lab{Colors.END}                       │
+    │  {Colors.DIM}For Educational & Authorized Security Testing{Colors.END}            │
+    │                                                          │
+    │  {Colors.CYAN}📚 Included Modules:{Colors.END}                                      │
+    │     • MITRE ATT&CK Integration                         │
+    │     • Threat Intelligence Feeds                        │
+    │     • Enhanced Report Generator                        │
+    │     • Real-time Alert Dashboard                        │
+    └──────────────────────────────────────────────────────────┘{Colors.END}
+    """)
+        input(f"\n{Colors.CYAN}Press Enter to continue...{Colors.END}")
+        
     
     def _show_help(self):
         self._clear_screen()
@@ -2745,12 +3267,12 @@ def main():
         lab.stop()
     elif args.status:
         status = lab.get_status()
-        print("\n" + "=" * 80)
-        print("SOC AUTOMATED LAB STATUS")
-        print("=" * 80)
+        safe_print_unicode("\n" + "=" * 80)
+        safe_print_unicode("SOC AUTOMATED LAB STATUS")
+        safe_print_unicode("=" * 80)
         for key, value in status.items():
-            print(f"{key}: {value}")
-        print("=" * 80 + "\n")
+            safe_print_unicode(f"{key}: {value}")
+        safe_print_unicode("=" * 80 + "\n")
     elif args.report:
         lab.generate_report()
     else:

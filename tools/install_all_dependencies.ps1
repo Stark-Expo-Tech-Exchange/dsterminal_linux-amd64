@@ -1,4 +1,4 @@
-﻿# install_all_dependencies.ps1 - SIMPLIFIED VERSION
+# install_all_dependencies.ps1 - SIMPLIFIED VERSION
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "  DSTERMINAL - Dependency Installer" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Cyan

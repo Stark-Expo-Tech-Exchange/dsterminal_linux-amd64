@@ -1,4 +1,4 @@
-﻿# create_test_release.ps1
+# create_test_release.ps1
 Write-Host "Creating test release files for DSTerminal update feature..." -ForegroundColor Cyan
 
 # Create test installer batch file

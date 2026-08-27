@@ -1,4 +1,5 @@
-﻿#     def check_ssl(self, domain=None):
+#!python
+import sys
 #         """Comprehensive SSL certificate analyzer with export options"""
 #         try:
            

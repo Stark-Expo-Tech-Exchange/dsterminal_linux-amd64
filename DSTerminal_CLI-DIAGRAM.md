@@ -1,4 +1,4 @@
-﻿
+
 ðŸ“ Defensive Security Terminal â€“ Modular Architecture >>Arquitectura del Terminal de Seguridad
 
 +-----------------------------------------------------------+

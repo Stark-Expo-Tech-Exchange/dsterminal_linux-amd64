@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python
+#!python
 """Debug script to test dashboard commands"""
 
 import sys

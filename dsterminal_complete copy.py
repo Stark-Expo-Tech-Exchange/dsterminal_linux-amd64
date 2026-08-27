@@ -1,10 +1,66 @@
-﻿"""
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
 DSTerminal Complete Security Suite v4.0.0.113
 Enhanced with Automatic Ransomware Detection Anywhere in System
 Full Dashboard Controls Implementation with Auto-Quarantine Progress
 """
-import os
+
+# ============================================================
+# FIX: aiohttp compatibility with Python 3.11+
+# ============================================================
 import sys
+import asyncio
+
+# Patch 1: Add coroutine decorator if missing (for older aiohttp)
+if not hasattr(asyncio, 'coroutine'):
+    def _coroutine_decorator(func):
+        """Replacement for asyncio.coroutine decorator"""
+        return func
+    asyncio.coroutine = _coroutine_decorator
+
+# Patch 2: Add _DEBUG to coroutines if missing
+try:
+    import asyncio.coroutines
+    if not hasattr(asyncio.coroutines, '_DEBUG'):
+        asyncio.coroutines._DEBUG = False
+except (ImportError, AttributeError):
+    pass
+
+# Patch 3: Monkey patch aiohttp helpers
+try:
+    import aiohttp.helpers
+    if not hasattr(aiohttp.helpers, 'old_debug'):
+        aiohttp.helpers.old_debug = False
+    # Add the missing coroutine attribute to aiohttp.helpers
+    if not hasattr(aiohttp.helpers, 'coroutine'):
+        aiohttp.helpers.coroutine = asyncio.coroutine
+except (ImportError, AttributeError):
+    pass
+
+# ============================================================
+# FIX: Windows console encoding and OSError 22
+# ============================================================
+import platform
+import os
+
+if platform.system() == "Windows":
+    try:
+        import subprocess as sp
+        sp.run(['chcp', '65001'], capture_output=True, shell=True)
+    except:
+        pass
+    
+    try:
+        if hasattr(sys.stdout, 'reconfigure'):
+            sys.stdout.reconfigure(encoding='utf-8', errors='ignore')
+        elif hasattr(sys.stdout, 'buffer'):
+            import io
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
+    except:
+        pass
+
+# Now continue with the rest of your imports...
 import time
 import threading
 import webbrowser
@@ -72,7 +128,7 @@ print(f"[WORKSPACE] Static: {STATIC_DIR}")
 DEFAULT_CONFIG = {
     'scan_interval': 30,
     'monitoring_enabled': True,
-    'honeypot_enabled': True,
+    'honeypot_enabled': False,
     'sensitivity': 'medium',
     'auto_quarantine': True,  # Changed to True by default
     'network_isolation': False,
@@ -229,8 +285,7 @@ shield.start_monitoring()
 # ============================================================
 # SOCKET IO
 # ============================================================
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
-
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 # ============================================================
 # DATA STORES
 # ============================================================
@@ -415,7 +470,7 @@ class AdvancedRansomwareDetector:
                 b'BTC',
                 b'XMR',
                 b'RANSOMWARE',
-                b'HONEYPOT',
+                # b'HONEYPOT',
                 b'ENCRYPTED_BY_'
             ]
             

@@ -1,4 +1,4 @@
-﻿# QR Code wrapper using segno (no DLL issues)
+#!python
 try:
     import segno
     from PIL import Image

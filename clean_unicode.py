@@ -1,3 +1,4 @@
+#!python
 # clean_unicode.py - Run this on your dsterminal_complete.py
 import re
 

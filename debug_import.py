@@ -1,4 +1,5 @@
-﻿# debug_import.py
+#!python
+# debug_import.py
 import sys
 import traceback
 

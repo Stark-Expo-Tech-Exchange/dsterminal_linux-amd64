@@ -1,3 +1,4 @@
+#!python
 ######################## BEGIN LICENSE BLOCK ########################
 # Contributor(s):
 #   Dan Blanchard

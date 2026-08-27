@@ -1,4 +1,4 @@
-﻿# Install Remaining Dependencies for DSTERMINAL
+# Install Remaining Dependencies for DSTERMINAL
 # This installs sqlmap and whois
 
 Write-Host "========================================" -ForegroundColor Cyan

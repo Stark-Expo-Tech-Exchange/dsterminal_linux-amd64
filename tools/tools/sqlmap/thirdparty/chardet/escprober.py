@@ -1,3 +1,4 @@
+#!python
 ######################## BEGIN LICENSE BLOCK ########################
 # The Original Code is mozilla.org code.
 #

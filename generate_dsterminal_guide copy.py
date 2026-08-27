@@ -1,3 +1,4 @@
+#!python
 ﻿#!/usr/bin/env python3
 """
 DSTerminal Cyber-Ops Platform - Complete User Guide PDF Generator

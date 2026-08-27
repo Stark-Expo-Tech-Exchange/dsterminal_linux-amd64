@@ -1,3 +1,4 @@
+#!python
 """HTML form handling for web clients.
 
 ClientForm is a Python module for handling HTML forms on the client

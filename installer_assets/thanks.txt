@@ -1,4 +1,4 @@
-﻿DSTerminal has been successfully installed!
+DSTerminal has been successfully installed!
 
 You can launch DSTerminal from the Start Menu or your Desktop shortcut.
 

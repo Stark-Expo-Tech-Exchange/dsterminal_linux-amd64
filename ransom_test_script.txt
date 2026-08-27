@@ -1,0 +1,20 @@
+# Create test files that will be detected
+python -c "
+import os
+desktop = os.path.expanduser('~/Desktop')
+files = [
+    ('RANSOM_ALERT.docx', 'YOUR FILES ARE ENCRYPTED - PAY 0.5 BTC TO DECRYPT'),
+    ('DECRYPT_KEY.txt', 'DECRYPTION KEY: 1234-5678-9012-3456'),
+    ('READ_ME_RANSOM.pdf', 'READ THIS FILE - YOUR DATA IS LOCKED'),
+    ('payment_required.encrypted', 'PAYMENT REQUIRED IN BITCOIN'),
+    ('HOW_TO_DECRYPT.txt', 'HOW TO DECRYPT YOUR FILES - FOLLOW INSTRUCTIONS'),
+    ('RECOVER_FILES.docx', 'RECOVER YOUR FILES - PAYMENT REQUIRED'),
+    ('encrypted_data.crypto', 'ENCRYPTED DATA - DECRYPTION REQUIRED'),
+    ('ransom_note.locked', 'RANSOM NOTE - CONTACT FOR DECRYPTION'),
+]
+for fname, content in files:
+    path = os.path.join(desktop, fname)
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(content)
+    print(f'Created: {path}')
+"

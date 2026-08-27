@@ -1,30 +1,203 @@
-﻿"""
+#!python
+import sys
+"""
+
+# ============================================================
+# FIX: Handle OSError 22 on Windows
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(["chcp", "65001"], capture_output=True, shell=True)
+    except:
+        pass
+
+_original_stdout_write = sys.stdout.write
+
+def _safe_stdout_write(text):
+    try:
+        _original_stdout_write(text)
+    except OSError as e:
+        if e.errno == 22:
+            try:
+                clean = text.encode("ascii", "ignore").decode("ascii")
+                _original_stdout_write(clean)
+            except:
+                pass
+        else:
+            raise
+    except UnicodeEncodeError:
+        try:
+            clean = text.encode("ascii", "ignore").decode("ascii")
+            _original_stdout_write(clean)
+        except:
+            pass
+
+sys.stdout.write = _safe_stdout_write
+
+
+# ============================================================
+# FIX: Handle OSError 22 on Windows
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(["chcp", "65001"], capture_output=True, shell=True)
+    except:
+        pass
+
+
+    try:
+    except OSError as e:
+        if e.errno == 22:
+            try:
+                clean = text.encode("ascii", "ignore").decode("ascii")
+                _original_stdout_write(clean)
+            except:
+                pass
+        else:
+            raise
+    except UnicodeEncodeError:
+        try:
+            clean = text.encode("ascii", "ignore").decode("ascii")
+            _original_stdout_write(clean)
+        except:
+            pass
+
+sys.stdout.write = _safe_stdout_write
+
 DSTerminal Dashboard Integration Module
 Integrates the security dashboard into the main DSTerminal class
 """
 import sys
-if sys.platform == 'win32':
-    import os
-    import msvcrt
-    # Ensure stdout is properly set
-    if hasattr(sys.stdout, 'buffer'):
-        sys.stdout = open(sys.stdout.fileno(), 'w', encoding='utf-8', errors='ignore')
-    if hasattr(sys.stderr, 'buffer'):
-        sys.stderr = open(sys.stderr.fileno(), 'w', encoding='utf-8', errors='ignore')
-        
 import os
-import sys
 import threading
 import webbrowser
 import time
+import re
 from datetime import datetime
+
+# ============================================================
+# FIX WINDOWS CONSOLE ENCODING - MUST BE FIRST
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(['chcp', '65001'], capture_output=True, shell=True)
+    except:
+        pass
+    
+    # Fix stdout encoding
+    try:
+        if hasattr(sys.stdout, 'reconfigure'):
+            sys.stdout.reconfigure(encoding='utf-8', errors='ignore')
+        else:
+            import io
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
+    except:
+        pass
+
+# ============================================================
+# ANSI COLOR DEFINITIONS (ALWAYS AVAILABLE)
+# ============================================================
+class Colors:
+    """ANSI color codes for terminal output"""
+    RED = '\033[91m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    BLUE = '\033[94m'
+    MAGENTA = '\033[95m'
+    CYAN = '\033[96m'
+    WHITE = '\033[97m'
+    RESET = '\033[0m'
+    DIM = '\033[2m'
+    BRIGHT = '\033[1m'
+    LIGHTRED_EX = '\033[91m'
+    LIGHTGREEN_EX = '\033[92m'
+    LIGHTYELLOW_EX = '\033[93m'
+    LIGHTCYAN_EX = '\033[96m'
+    LIGHTMAGENTA_EX = '\033[95m'
+    LIGHTBLUE_EX = '\033[94m'
+    LIGHTWHITE_EX = '\033[97m'
+    
+    @staticmethod
+    def strip(text):
+        ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+        return ansi_escape.sub('', text)
+
+# ============================================================
+# TRY TO IMPORT COLORAMA WITH PROPER ERROR HANDLING
+# ============================================================
+try:
+    from colorama import init, Fore, Back, Style
+    init(autoreset=True, convert=True, strip=False)
+    COLORS_AVAILABLE = True
+    # Force color support
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
+    os.environ['PYTHONUTF8'] = '1'
+except ImportError:
+    COLORS_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m'
+    })
+    Back = type('Back', (), {
+        'RESET': '\033[49m',
+        'BLACK': '\033[40m',
+        'RED': '\033[41m',
+        'GREEN': '\033[42m',
+        'YELLOW': '\033[43m',
+        'BLUE': '\033[44m',
+        'MAGENTA': '\033[45m',
+        'CYAN': '\033[46m',
+        'WHITE': '\033[47m'
+    })
+except Exception as e:
+    COLORS_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m'
+    })
+    Back = type('Back', (), {
+        'RESET': '\033[49m',
+        'BLACK': '\033[40m',
+        'RED': '\033[41m',
+        'GREEN': '\033[42m',
+        'YELLOW': '\033[43m',
+        'BLUE': '\033[44m',
+        'MAGENTA': '\033[45m',
+        'CYAN': '\033[46m',
+        'WHITE': '\033[47m'
+    })
+
+# ============================================================
+# SIMPLE SAFE PRINT FUNCTION
+# ============================================================
+def safe_print_unicode(message):
+    """Safely print unicode/emoji characters on Windows"""
+    try:
+        print(message)
+    except UnicodeEncodeError:
+        clean_message = message.encode('ascii', 'ignore').decode('ascii')
+        print(clean_message)
+    except Exception:
+        try:
+            print(str(message))
+        except:
+            pass
 
 # ============================================================
 # SILENCE FLASK, SOCKETIO, AND WERKZEUG LOGS COMPLETELY
 # ============================================================
 import logging
 import contextlib
-import io
+import io as io_lib
 
 # Silence standard logs
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
@@ -35,14 +208,14 @@ logging.getLogger('engineio').setLevel(logging.ERROR)
 class SilenceFlaskStartup:
     def __enter__(self):
         self._original_stdout = sys.stdout
-        sys.stdout = io.StringIO()
+        sys.stdout = io_lib.StringIO()
         return self
     def __exit__(self, exc_type, exc_val, exc_tb):
         sys.stdout = self._original_stdout
 
 # ============================================================
-
-# Try to import the dashboard
+# TRY TO IMPORT THE DASHBOARD
+# ============================================================
 DASHBOARD_AVAILABLE = False
 dashboard_app = None
 dashboard_socketio = None
@@ -51,7 +224,15 @@ try:
     from dsterminal_complete import app as dashboard_app, socketio as dashboard_socketio
     DASHBOARD_AVAILABLE = True
 except ImportError as e:
-    print(f"[!] Dashboard import error: {e}")
+    # Silent import - don't print errors during import
+    pass
+except Exception as e:
+    # Silent import - don't print errors during import
+    pass
+
+# ============================================================
+# DASHBOARD INTEGRATION CLASS
+# ============================================================
 
 class DashboardIntegration:
     """
@@ -69,27 +250,31 @@ class DashboardIntegration:
     def start_dashboard(self):
         """Start the Flask dashboard in a background thread"""
         if not self.dashboard_available:
-            return "[!] Dashboard module not available. Make sure dsterminal_complete.py exists."
+            return f"{Fore.RED}[!] Dashboard module not available. Make sure dsterminal_complete.py exists.{Fore.RESET}"
             
         if self.is_running:
-            return f"[!] Dashboard is already running at {self.dashboard_url}"
+            return f"{Fore.YELLOW}[!] Dashboard is already running at {self.dashboard_url}{Fore.RESET}"
             
         def run_dashboard():
             try:
-                print("\n" + "=" * 60)
-                print("🔮 DSTERMINAL SECURITY DASHBOARD")
-                print("=" * 60)
-                print(f"📍 Dashboard URL: {self.dashboard_url}")
-                print(f"📊 Real-time monitoring active")
-                print(f"🔄 Press Ctrl+C in this window to stop")
-                print("=" * 60 + "\n")
+                safe_print_unicode("\n" + "=" * 60)
+                safe_print_unicode(f"{Fore.CYAN}🔮 DSTERMINAL SECURITY DASHBOARD{Fore.RESET}")
+                safe_print_unicode("=" * 60)
+                safe_print_unicode(f"{Fore.GREEN}📍 Dashboard URL: {self.dashboard_url}{Fore.RESET}")
+                safe_print_unicode(f"{Fore.CYAN}📊 Real-time monitoring active{Fore.RESET}")
+                safe_print_unicode(f"{Fore.YELLOW}🔄 Press Ctrl+C in this window to stop{Fore.RESET}")
+                safe_print_unicode("=" * 60 + "\n")
                 
                 # SILENTLY START DASHBOARD (No logs printed to terminal)
                 with SilenceFlaskStartup():
-                    dashboard_socketio.run(dashboard_app, debug=False, host='0.0.0.0', port=self.port, allow_unsafe_werkzeug=True)
+                    if dashboard_socketio is not None:
+                        dashboard_socketio.run(dashboard_app, debug=False, host='0.0.0.0', port=self.port, allow_unsafe_werkzeug=True)
+                    else:
+                        # Fallback: run without socketio
+                        dashboard_app.run(debug=False, host='0.0.0.0', port=self.port)
                     
             except Exception as e:
-                print(f"[!] Dashboard error: {e}")
+                safe_print_unicode(f"{Fore.RED}[!] Dashboard error: {e}{Fore.RESET}")
                 
         self.dashboard_thread = threading.Thread(target=run_dashboard, daemon=True)
         self.dashboard_thread.start()
@@ -101,46 +286,48 @@ class DashboardIntegration:
         # Open browser
         try:
             webbrowser.open(self.dashboard_url)
-            return f"[+] Dashboard started at {self.dashboard_url} (opened in browser)"
+            return f"{Fore.GREEN}[+] Dashboard started at {self.dashboard_url} (opened in browser){Fore.RESET}"
         except:
-            return f"[+] Dashboard started at {self.dashboard_url} (open manually at that URL)"
+            return f"{Fore.GREEN}[+] Dashboard started at {self.dashboard_url} (open manually at that URL){Fore.RESET}"
             
     def stop_dashboard(self):
         """Stop the dashboard"""
         if not self.is_running:
-            return "[!] Dashboard is not running"
+            return f"{Fore.YELLOW}[!] Dashboard is not running{Fore.RESET}"
         
         self.is_running = False
-        return "[+] Dashboard stopped (thread terminated)"
+        # Note: The thread will continue running until the server stops
+        # This is a limitation of Flask's built-in server
+        return f"{Fore.GREEN}[+] Dashboard stop requested (server will terminate when thread ends){Fore.RESET}"
         
     def status(self):
         """Get dashboard status"""
         if self.is_running:
-            return f"[+] Dashboard is RUNNING at {self.dashboard_url}"
-        return "[!] Dashboard is NOT running"
+            return f"{Fore.GREEN}[+] Dashboard is RUNNING at {self.dashboard_url}{Fore.RESET}"
+        return f"{Fore.RED}[!] Dashboard is NOT running{Fore.RESET}"
         
     def open_browser(self):
         """Open dashboard in browser"""
         if not self.is_running:
-            return "[!] Dashboard is not running. Start it with 'dashboard'"
+            return f"{Fore.RED}[!] Dashboard is not running. Start it with 'dashboard'{Fore.RESET}"
         try:
             webbrowser.open(self.dashboard_url)
-            return f"[+] Opened browser at {self.dashboard_url}"
+            return f"{Fore.GREEN}[+] Opened browser at {self.dashboard_url}{Fore.RESET}"
         except Exception as e:
-            return f"[!] Failed to open browser: {e}"
+            return f"{Fore.RED}[!] Failed to open browser: {e}{Fore.RESET}"
         
     def help(self):
         """Show dashboard commands help"""
-        return """
-╔═══════════════════════════════════════════════════════════════════╗
+        return f"""
+{Fore.CYAN}╔═══════════════════════════════════════════════════════════════════╗
 ║              DSTERMINAL DASHBOARD COMMANDS                   ║
 ╠═══════════════════════════════════════════════════════════════════╣
-║  dashboard           - Start the security dashboard          ║
-║  dashboard stop      - Stop the dashboard                    ║
-║  dashboard status    - Check dashboard status                ║
-║  dashboard browser   - Open dashboard in browser             ║
-║  dashboard help      - Show this help                       ║
-╚═══════════════════════════════════════════════════════════════════╝
+║  {Fore.GREEN}dashboard{Fore.CYAN}           - Start the security dashboard          ║
+║  {Fore.GREEN}dashboard stop{Fore.CYAN}      - Stop the dashboard                    ║
+║  {Fore.GREEN}dashboard status{Fore.CYAN}    - Check dashboard status                ║
+║  {Fore.GREEN}dashboard browser{Fore.CYAN}   - Open dashboard in browser             ║
+║  {Fore.GREEN}dashboard help{Fore.CYAN}      - Show this help                       ║
+╚═══════════════════════════════════════════════════════════════════╝{Fore.RESET}
 """
 
 # Create singleton instance
@@ -182,7 +369,7 @@ def register_dashboard_commands(terminal_instance):
     Call this from your SecurityTerminal __init__ or register_commands method
     """
     if not DASHBOARD_AVAILABLE:
-        print("[!] Dashboard not available. Commands will not be registered.")
+        safe_print_unicode(f"{Fore.RED}[!] Dashboard not available. Commands will not be registered.{Fore.RESET}")
         return False
     
     # Register commands
@@ -197,7 +384,7 @@ def register_dashboard_commands(terminal_instance):
     terminal_instance.commands['dash-stop'] = cmd_dashboard_stop
     terminal_instance.commands['dash-status'] = cmd_dashboard_status
     
-    print("[+] Dashboard commands registered!")
+    safe_print_unicode(f"{Fore.GREEN}[+] Dashboard commands registered!{Fore.RESET}")
     return True
 
 
@@ -206,16 +393,16 @@ def register_dashboard_commands(terminal_instance):
 # ============================================================
 
 if __name__ == "__main__":
-    print("=" * 60)
-    print("🧪 DSTERMINAL DASHBOARD INTEGRATION TEST")
-    print("=" * 60)
-    print("Available commands:")
-    print("  dashboard        - Start the dashboard")
-    print("  dashboard stop   - Stop the dashboard")
-    print("  dashboard status - Check status")
-    print("  dashboard browser - Open in browser")
-    print("  dashboard help   - Show help")
-    print("=" * 60)
+    safe_print_unicode("=" * 60)
+    safe_print_unicode(f"{Fore.CYAN}🧪 DSTERMINAL DASHBOARD INTEGRATION TEST{Fore.RESET}")
+    safe_print_unicode("=" * 60)
+    safe_print_unicode(f"{Fore.YELLOW}Available commands:{Fore.RESET}")
+    safe_print_unicode(f"  {Fore.GREEN}dashboard{Fore.RESET}        - Start the dashboard")
+    safe_print_unicode(f"  {Fore.GREEN}dashboard stop{Fore.RESET}   - Stop the dashboard")
+    safe_print_unicode(f"  {Fore.GREEN}dashboard status{Fore.RESET} - Check status")
+    safe_print_unicode(f"  {Fore.GREEN}dashboard browser{Fore.RESET} - Open in browser")
+    safe_print_unicode(f"  {Fore.GREEN}dashboard help{Fore.RESET}   - Show help")
+    safe_print_unicode("=" * 60)
     
     while True:
         try:
@@ -223,17 +410,19 @@ if __name__ == "__main__":
             if cmd == "exit" or cmd == "quit":
                 break
             elif cmd == "dashboard":
-                print(cmd_dashboard(None))
+                safe_print_unicode(cmd_dashboard(None))
             elif cmd == "dashboard stop":
-                print(cmd_dashboard_stop(None))
+                safe_print_unicode(cmd_dashboard_stop(None))
             elif cmd == "dashboard status":
-                print(cmd_dashboard_status(None))
+                safe_print_unicode(cmd_dashboard_status(None))
             elif cmd == "dashboard browser":
-                print(cmd_dashboard_browser(None))
+                safe_print_unicode(cmd_dashboard_browser(None))
             elif cmd == "dashboard help":
-                print(cmd_dashboard_help(None))
+                safe_print_unicode(cmd_dashboard_help(None))
             else:
-                print("Unknown command. Try: dashboard, dashboard stop, dashboard status, dashboard browser, dashboard help")
+                safe_print_unicode(f"{Fore.YELLOW}Unknown command. Try: dashboard, dashboard stop, dashboard status, dashboard browser, dashboard help{Fore.RESET}")
         except KeyboardInterrupt:
-            print("\nExiting...")
+            safe_print_unicode(f"\n{Fore.YELLOW}Exiting...{Fore.RESET}")
             break
+        except Exception as e:
+            safe_print_unicode(f"{Fore.RED}[!] Error: {e}{Fore.RESET}")

@@ -1,4 +1,4 @@
-﻿# DSTerminal Update Helper Script
+# DSTerminal Update Helper Script
 param(
     [switch],
     [switch],

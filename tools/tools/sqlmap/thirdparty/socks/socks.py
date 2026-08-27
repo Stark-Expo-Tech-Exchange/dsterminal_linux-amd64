@@ -1,3 +1,4 @@
+#!python
 from base64 import b64encode
 try:
     from collections.abc import Callable

@@ -1,4 +1,4 @@
-﻿DSTerminal - Defensive Security Terminal v2.1.0
+DSTerminal - Defensive Security Terminal v2.1.0
 =================================================
 
 A comprehensive security analysis and monitoring tool.

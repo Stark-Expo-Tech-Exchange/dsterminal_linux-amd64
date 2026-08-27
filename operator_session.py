@@ -1,4 +1,5 @@
-﻿def __init__(self, workspace_root=None, interactive: bool = True):
+#!python
+def __init__(self, workspace_root=None, interactive: bool = True):
     """Initialize DSTerminal with integrated operator session management"""
     import platform
     import queue

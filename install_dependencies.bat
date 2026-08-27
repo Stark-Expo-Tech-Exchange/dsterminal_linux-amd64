@@ -1,4 +1,4 @@
-﻿@echo off
+@echo off
 title DSTERMINAL Dependency Installer
 color 0A
 

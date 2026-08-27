@@ -1,21 +1,77 @@
-﻿#!/usr/bin/env python3
+#!python
+import sys
 """
+
+# ============================================================
+# FIX: Handle OSError 22 on Windows
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(["chcp", "65001"], capture_output=True, shell=True)
+    except:
+        pass
+
+_original_stdout_write = sys.stdout.write
+
+def _safe_stdout_write(text):
+    try:
+        _original_stdout_write(text)
+    except OSError as e:
+        if e.errno == 22:
+            try:
+                clean = text.encode("ascii", "ignore").decode("ascii")
+                _original_stdout_write(clean)
+            except:
+                pass
+        else:
+            raise
+    except UnicodeEncodeError:
+        try:
+            clean = text.encode("ascii", "ignore").decode("ascii")
+            _original_stdout_write(clean)
+        except:
+            pass
+
+sys.stdout.write = _safe_stdout_write
+
+
+# ============================================================
+# FIX: Handle OSError 22 on Windows
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(["chcp", "65001"], capture_output=True, shell=True)
+    except:
+        pass
+
+
+    try:
+    except OSError as e:
+        if e.errno == 22:
+            try:
+                clean = text.encode("ascii", "ignore").decode("ascii")
+                _original_stdout_write(clean)
+            except:
+                pass
+        else:
+            raise
+    except UnicodeEncodeError:
+        try:
+            clean = text.encode("ascii", "ignore").decode("ascii")
+            _original_stdout_write(clean)
+        except:
+            pass
+
+sys.stdout.write = _safe_stdout_write
+
 DSTerminal Reconnaissance Module
 Usage: python recon.py <target>
        Or import as module: from recon import run_recon, recon_menu
 """
 import sys
-if sys.platform == 'win32':
-    import os
-    import msvcrt
-    # Ensure stdout is properly set
-    if hasattr(sys.stdout, 'buffer'):
-        sys.stdout = open(sys.stdout.fileno(), 'w', encoding='utf-8', errors='ignore')
-    if hasattr(sys.stderr, 'buffer'):
-        sys.stderr = open(sys.stderr.fileno(), 'w', encoding='utf-8', errors='ignore')
-        
 import os
-import sys
 import threading
 import itertools
 import time
@@ -23,12 +79,111 @@ import shutil
 import subprocess
 import random
 import math
+import re
 from datetime import datetime
 from pathlib import Path
 
-# -------------------------------
+# ============================================================
+# FIX WINDOWS CONSOLE ENCODING - MUST BE FIRST
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(['chcp', '65001'], capture_output=True, shell=True)
+    except:
+        pass
+    
+    # Fix stdout encoding
+    try:
+        if hasattr(sys.stdout, 'reconfigure'):
+            sys.stdout.reconfigure(encoding='utf-8', errors='ignore')
+        else:
+            import io
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
+    except:
+        pass
+
+# ============================================================
+# ANSI COLOR DEFINITIONS (ALWAYS AVAILABLE)
+# ============================================================
+class Colors:
+    """ANSI color codes for terminal output"""
+    HEADER = '\033[95m'
+    BLUE = '\033[94m'
+    CYAN = '\033[96m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    END = '\033[0m'
+    BLACK = '\033[90m'
+    MAGENTA = '\033[95m'
+    WHITE = '\033[97m'
+    DIM = '\033[2m'
+    BLINK = '\033[5m'
+    REVERSE = '\033[7m'
+    HIDDEN = '\033[8m'
+    BRIGHT_GREEN = '\033[92;1m'
+    BRIGHT_RED = '\033[91;1m'
+    BRIGHT_YELLOW = '\033[93;1m'
+    BRIGHT_CYAN = '\033[96;1m'
+    BRIGHT_MAGENTA = '\033[95;1m'
+    
+    @staticmethod
+    def strip(text):
+        ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+        return ansi_escape.sub('', text)
+
+# ============================================================
+# TRY TO IMPORT COLORAMA WITH PROPER ERROR HANDLING
+# ============================================================
+try:
+    from colorama import init, Fore, Back, Style
+    init(autoreset=True, convert=True, strip=False)
+    COLORS_AVAILABLE = True
+    # Force color support
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
+    os.environ['PYTHONUTF8'] = '1'
+except ImportError:
+    COLORS_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m'
+    })
+    Back = type('Back', (), {'RESET': '\033[49m'})
+except Exception as e:
+    COLORS_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m'
+    })
+    Back = type('Back', (), {'RESET': '\033[49m'})
+
+# ============================================================
+# SETUP COLORS (using colorama or fallback)
+# ============================================================
+RESET = Colors.END
+BOLD = Colors.BOLD
+CYAN = Colors.CYAN
+YELLOW = Colors.YELLOW
+GREEN = Colors.GREEN
+RED = Colors.RED
+BLUE = Colors.BLUE
+MAGENTA = Colors.MAGENTA
+DIM = Colors.DIM
+BLINK = Colors.BLINK
+MATRIX_COLORS = [Colors.GREEN, Colors.YELLOW, Colors.BLUE, Colors.MAGENTA, Colors.CYAN, Colors.RED]
+
+# ============================================================
 # WORKSPACE DIRECTORY SETUP
-# -------------------------------
+# ============================================================
 
 def get_workspace_dir() -> Path:
     """Get the DSTerminal workspace directory"""
@@ -38,22 +193,6 @@ def get_workspace_dir() -> Path:
     return workspace
 
 WORKSPACE = get_workspace_dir()
-
-# -------------------------------
-# COLORS
-# -------------------------------
-
-MATRIX_COLORS = ['\033[92m', '\033[93m', '\033[94m', '\033[95m', '\033[96m', '\033[91m']
-RESET = '\033[0m'
-BOLD = '\033[1m'
-CYAN = '\033[96m'
-YELLOW = '\033[93m'
-GREEN = '\033[92m'
-RED = '\033[91m'
-BLUE = '\033[94m'
-MAGENTA = '\033[95m'
-DIM = '\033[2m'
-BLINK = '\033[5m'
 
 # -------------------------------
 # GLOBAL VARIABLES FOR MODULE EXPORT
@@ -72,9 +211,46 @@ def get_target_from_args():
         return None
     return sys.argv[1]
 
-# -------------------------------
+# ============================================================
+# TERMINAL UTILITIES - CENTERED LAYOUT
+# ============================================================
+
+def get_terminal_width() -> int:
+    """Get terminal width for centering"""
+    try:
+        width = shutil.get_terminal_size().columns
+        return min(max(width, 80), 120)
+    except:
+        return 80
+
+def center_text(text: str, width: int = None) -> str:
+    """Center text within terminal width"""
+    if width is None:
+        width = get_terminal_width()
+    # Strip ANSI codes for length calculation
+    clean_text = re.sub(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', '', text)
+    padding = max(0, (width - len(clean_text)) // 2)
+    return ' ' * padding + text
+
+def center_print(text: str, color: str = "", width: int = None):
+    """Print centered colored text"""
+    if width is None:
+        width = get_terminal_width()
+    if color:
+        print(center_text(f"{color}{text}{RESET}", width))
+    else:
+        print(center_text(text, width))
+
+def print_colored(text: str, color: str = ""):
+    """Print colored text without centering"""
+    if color:
+        print(f"{color}{text}{RESET}")
+    else:
+        print(text)
+
+# ============================================================
 # SCAN DIRECTORY STRUCTURE
-# -------------------------------
+# ============================================================
 
 def init_scan_directories(target):
     """Initialize scan directories for a specific target"""
@@ -91,45 +267,25 @@ def init_scan_directories(target):
     
     return SESSION_DIR, timestamp
 
-# -------------------------------
-# TERMINAL UTILITIES
-# -------------------------------
-
-try:
-    width = shutil.get_terminal_size((120, 20)).columns
-except:
-    width = 120
-
-def center(text):
-    """Center text with color support"""
-    clean_text = text
-    for code in [RESET, BOLD, CYAN, YELLOW, GREEN, RED, BLUE, MAGENTA, DIM, BLINK] + MATRIX_COLORS:
-        clean_text = clean_text.replace(code, '')
-    
-    padding = max(0, (width - len(clean_text)) // 2)
-    return " " * padding + text
-
-def center_print(text):
-    """Print centered text"""
-    print(center(text))
-
-def clear():
+def clear_screen():
     os.system("cls" if os.name == "nt" else "clear")
 
 def matrix_rain_effect(lines=3):
     """Create a Matrix-style digital rain effect"""
     chars = "01"
+    width = get_terminal_width()
     for _ in range(lines):
         line = ""
         for _ in range(min(width // 4, 30)):
             color = random.choice(MATRIX_COLORS)
             line += color + random.choice(chars) + RESET
-        print(center(line))
+        print(center_text(line))
         time.sleep(0.03)
 
 def draw_glowing_box(title, content_lines, title_color=CYAN, border_color=CYAN, 
                      content_color=GREEN, blink_title=False, glow_border=True):
     """Draw a glowing neon hacker-styled centered box with ASCII characters"""
+    width = get_terminal_width()
     box_width = min(width - 4, 70)
     left_margin = max(0, (width - box_width) // 2)
     inner = box_width - 4
@@ -148,9 +304,9 @@ def draw_glowing_box(title, content_lines, title_color=CYAN, border_color=CYAN,
     if blink_title:
         title_prefix += BLINK
     
-    top = glow_prefix + border_color + "+" + "-" * (box_width - 2) + "+" + RESET
-    mid = glow_prefix + border_color + "+" + "-" * (box_width - 2) + "+" + RESET
-    bot = glow_prefix + border_color + "+" + "-" * (box_width - 2) + "+" + RESET
+    top = glow_prefix + border_color + "+" + "-" * (box_width - 2) + RESET
+    mid = glow_prefix + border_color + "+" + "-" * (box_width - 2) + RESET
+    bot = glow_prefix + border_color + "+" + "-" * (box_width - 2) + RESET
     
     title_text = f" {title} ".center(box_width - 2)
     title_line = title_prefix + title_color + "|" + title_text + "|" + RESET
@@ -206,6 +362,7 @@ class SOCDashboard:
         self.lock = threading.Lock()
         self.spinner_frames = ["[+]", "[*]", "[-]", "[.]"]
         self.progress_chars = ["#", "=", "*", "+"]
+        self.term_width = get_terminal_width()
         
     def update_metric(self, scan_name, progress=None, status=None, findings=None, output_line=None):
         """Update a specific metric"""
@@ -251,6 +408,7 @@ class SOCDashboard:
     def render_three_column_panels(self):
         """Render three centered column panels with real-time progress"""
         with self.lock:
+            width = get_terminal_width()
             col_width = width // 3
             
             # Column 1: Port Scan
@@ -295,15 +453,9 @@ class SOCDashboard:
                 line3 = col3[i] if i < len(col3) else ""
                 
                 # Pad each line to column width
-                clean1 = line1
-                for code in [RESET, BOLD, CYAN, YELLOW, GREEN, RED, BLUE, MAGENTA, DIM, BLINK]:
-                    clean1 = clean1.replace(code, '')
-                clean2 = line2
-                for code in [RESET, BOLD, CYAN, YELLOW, GREEN, RED, BLUE, MAGENTA, DIM, BLINK]:
-                    clean2 = clean2.replace(code, '')
-                clean3 = line3
-                for code in [RESET, BOLD, CYAN, YELLOW, GREEN, RED, BLUE, MAGENTA, DIM, BLINK]:
-                    clean3 = clean3.replace(code, '')
+                clean1 = re.sub(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', '', line1)
+                clean2 = re.sub(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', '', line2)
+                clean3 = re.sub(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', '', line3)
                 
                 padded1 = line1 + " " * (col_width - len(clean1)) if len(clean1) < col_width else line1[:col_width]
                 padded2 = line2 + " " * (col_width - len(clean2)) if len(clean2) < col_width else line2[:col_width]
@@ -481,12 +633,12 @@ def run_recon(target=None):
         target = get_target_from_args()
     
     if target is None:
-        print(f"{RED}[!] No target specified. Usage: run_recon('<target>'){RESET}")
+        print_colored("[!] No target specified. Usage: run_recon('<target>')", RED)
         return False
     
     current_target = target
     
-    clear()
+    clear_screen()
     
     # Matrix rain intro
     matrix_rain_effect(3)
@@ -665,14 +817,14 @@ def recon_menu():
         if target:
             run_recon(target)
         else:
-            print(f"{RED}[!] No target specified{RESET}")
+            print_colored("[!] No target specified", RED)
     
     elif choice == "0":
-        print(f"{YELLOW}[*] Exiting recon menu{RESET}")
+        print_colored("[*] Exiting recon menu", YELLOW)
         return
     
     else:
-        print(f"{RED}[!] Invalid option{RESET}")
+        print_colored("[!] Invalid option", RED)
 
 # -------------------------------
 # MAIN EXECUTION

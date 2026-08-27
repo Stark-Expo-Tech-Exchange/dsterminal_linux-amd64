@@ -1,4 +1,5 @@
-﻿"""
+#!python
+"""
 DSTerminal Security Integration Module
 Integrates the security dashboard into the main DSTerminal class
 """

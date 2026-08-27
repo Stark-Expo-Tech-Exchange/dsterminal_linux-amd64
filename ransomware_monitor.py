@@ -1,5 +1,6 @@
-﻿#!/usr/bin/env python3
+#!python
 # -*- coding: utf-8 -*-
+
 
 """
 Ransomware Detection & Monitoring System with Backup Recovery
@@ -8,26 +9,59 @@ Author: Spark Wilson Spink
 Description: Real-time ransomware detection with automatic backup, recovery, and reporting
 """
 import sys
-if sys.platform == 'win32':
-    import os
-    import msvcrt
-    # Ensure stdout is properly set
-    if hasattr(sys.stdout, 'buffer'):
-        sys.stdout = open(sys.stdout.fileno(), 'w', encoding='utf-8', errors='ignore')
-    if hasattr(sys.stderr, 'buffer'):
-        sys.stderr = open(sys.stderr.fileno(), 'w', encoding='utf-8', errors='ignore')
-        
-import os
+# ============================================================
+# FIX: Handle OSError 22 on Windows
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(["chcp", "65001"], capture_output=True, shell=True)
+    except:
+        pass
+
+_original_stdout_write = sys.stdout.write
+
+def _safe_stdout_write(text):
+    try:
+        _original_stdout_write(text)
+    except OSError as e:
+        if e.errno == 22:
+            try:
+                clean = text.encode("ascii", "ignore").decode("ascii")
+                _original_stdout_write(clean)
+            except:
+                pass
+        else:
+            raise
+    except UnicodeEncodeError:
+        try:
+            clean = text.encode("ascii", "ignore").decode("ascii")
+            _original_stdout_write(clean)
+        except:
+            pass
+
+sys.stdout.write = _safe_stdout_write
+
+ 
+
+"""
+Ransomware Detection & Monitoring System with Backup Recovery
+Version: 4.0.0.113
+Author: Spark Wilson Spink
+Description: Real-time ransomware detection with automatic backup, recovery, and reporting
+"""
+
 import sys
+import os
 import time
 import threading
 import platform
-import psutil
 import hashlib
 import json
 import socket
 import subprocess
 import shutil
+import re
 from datetime import datetime
 from pathlib import Path
 from collections import deque
@@ -35,7 +69,155 @@ from typing import Dict, List, Set, Tuple, Optional
 from dataclasses import dataclass, field
 from enum import Enum
 
-# Try to import rich for beautiful dashboard
+# ============================================================
+# FIX WINDOWS CONSOLE ENCODING - MUST BE FIRST
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(['chcp', '65001'], capture_output=True, shell=True)
+    except:
+        pass
+    
+    # Fix stdout encoding
+    try:
+        if hasattr(sys.stdout, 'reconfigure'):
+            sys.stdout.reconfigure(encoding='utf-8', errors='ignore')
+        else:
+            import io
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
+    except:
+        pass
+
+
+import sys
+import os
+import time
+import threading
+import platform
+import hashlib
+import json
+import socket
+import subprocess
+import shutil
+import re
+from datetime import datetime
+from pathlib import Path
+from collections import deque
+from typing import Dict, List, Set, Tuple, Optional
+from dataclasses import dataclass, field
+from enum import Enum
+
+# ============================================================
+# FIX WINDOWS CONSOLE ENCODING - MUST BE FIRST
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(['chcp', '65001'], capture_output=True, shell=True)
+    except:
+        pass
+    
+    # Fix stdout encoding
+    try:
+        if hasattr(sys.stdout, 'reconfigure'):
+            sys.stdout.reconfigure(encoding='utf-8', errors='ignore')
+        else:
+            import io
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
+    except:
+        pass
+
+# ============================================================
+# ANSI COLOR DEFINITIONS (ALWAYS AVAILABLE)
+# ============================================================
+class Colors:
+    """ANSI color codes for terminal output"""
+    HEADER = '\033[95m'
+    BLUE = '\033[94m'
+    CYAN = '\033[96m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    END = '\033[0m'
+    BLACK = '\033[90m'
+    MAGENTA = '\033[95m'
+    WHITE = '\033[97m'
+    DIM = '\033[2m'
+    BLINK = '\033[5m'
+    REVERSE = '\033[7m'
+    HIDDEN = '\033[8m'
+    BRIGHT_GREEN = '\033[92;1m'
+    BRIGHT_RED = '\033[91;1m'
+    BRIGHT_YELLOW = '\033[93;1m'
+    BRIGHT_CYAN = '\033[96;1m'
+    BRIGHT_MAGENTA = '\033[95;1m'
+    
+    @staticmethod
+    def strip(text):
+        ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+        return ansi_escape.sub('', text)
+
+# ============================================================
+# TRY TO IMPORT COLORAMA WITH PROPER ERROR HANDLING
+# ============================================================
+try:
+    from colorama import init, Fore, Back, Style
+    init(autoreset=True, convert=True, strip=False)
+    COLORS_AVAILABLE = True
+    # Force color support
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
+    os.environ['PYTHONUTF8'] = '1'
+except ImportError:
+    COLORS_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m'
+    })
+    Back = type('Back', (), {'RESET': '\033[49m'})
+except Exception as e:
+    COLORS_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m'
+    })
+    Back = type('Back', (), {'RESET': '\033[49m'})
+
+# ============================================================
+# SETUP COLORS (using colorama or fallback)
+# ============================================================
+RESET = Colors.END
+BOLD = Colors.BOLD
+CYAN = Colors.CYAN
+YELLOW = Colors.YELLOW
+GREEN = Colors.GREEN
+RED = Colors.RED
+BLUE = Colors.BLUE
+MAGENTA = Colors.MAGENTA
+DIM = Colors.DIM
+BLINK = Colors.BLINK
+
+# ============================================================
+# TRY TO IMPORT PSUTIL
+# ============================================================
+try:
+    import psutil
+    PSUTIL_AVAILABLE = True
+except ImportError:
+    PSUTIL_AVAILABLE = False
+    print(f"{YELLOW}⚠️ psutil not installed. Install with: pip install psutil{RESET}")
+
+# ============================================================
+# TRY TO IMPORT RICH
+# ============================================================
 try:
     from rich.console import Console
     from rich.panel import Panel
@@ -47,63 +229,67 @@ try:
     from rich.align import Align
     from rich import box
     from rich.text import Text
-    from rich.style import Style
+    from rich.style import Style as RichStyle
     RICH_AVAILABLE = True
 except ImportError:
     RICH_AVAILABLE = False
+    Console = None
+
+# ============================================================
+# TRY TO IMPORT WATCHDOG
+# ============================================================
+WATCHDOG_AVAILABLE = False
+Observer = None
+PollingObserver = None
+FileSystemEventHandler = None
 
 try:
-    from watchdog.observers import Observer
+    from watchdog.observers import Observer, PollingObserver
     from watchdog.events import FileSystemEventHandler
-    from watchdog.observers.polling import PollingObserver
     WATCHDOG_AVAILABLE = True
 except ImportError:
-    WATCHDOG_AVAILABLE = False
+    # dummy classes for when watchdog is not available
+    class Observer:
+        def start(self): pass
+        def stop(self): pass
+        def join(self): pass
+        def schedule(self, *args, **kwargs): pass
+    class PollingObserver(Observer): pass
+    class FileSystemEventHandler:
+        def on_created(self, event): pass
+        def on_modified(self, event): pass
+        def on_deleted(self, event): pass
+        def on_moved(self, event): pass
 
-# Try to import reportlab for PDF generation
+# ============================================================
+# TRY TO IMPORT REPORTLAB
+# ============================================================
 try:
     from reportlab.lib.pagesizes import letter
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.lib import colors
+    from reportlab.lib import colors as reportlab_colors
     from reportlab.lib.units import inch
     from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
     REPORTLAB_AVAILABLE = True
 except ImportError:
     REPORTLAB_AVAILABLE = False
 
-# Colorama fallback
-try:
-    from colorama import Fore, Style, init
-    init()
-except ImportError:
-    class Fore:
-        RED = '\033[91m'
-        GREEN = '\033[92m'
-        YELLOW = '\033[93m'
-        BLUE = '\033[94m'
-        MAGENTA = '\033[95m'
-        CYAN = '\033[96m'
-        WHITE = '\033[97m'
-        RESET = '\033[0m'
-    class Style:
-        RESET_ALL = '\033[0m'
-
 
 class ThreatLevel(Enum):
     """Threat level enumeration"""
-    NORMAL = ("NORMAL", Fore.GREEN)
-    LOW = ("LOW", Fore.GREEN)
-    MEDIUM = ("MEDIUM", Fore.YELLOW)
-    HIGH = ("HIGH", Fore.RED)
-    CRITICAL = ("CRITICAL", Fore.RED)
+    NORMAL = ("NORMAL", GREEN)
+    LOW = ("LOW", GREEN)
+    MEDIUM = ("MEDIUM", YELLOW)
+    HIGH = ("HIGH", RED)
+    CRITICAL = ("CRITICAL", RED)
     
     def __init__(self, label, color):
         self.label = label
         self.color = color
     
     def __str__(self):
-        return f"{self.color}{self.label}{Style.RESET_ALL}"
+        return f"{self.color}{self.label}{RESET}"
 
 
 @dataclass
@@ -128,6 +314,7 @@ class SuspiciousProcess:
     cpu: float
     detected_at: str = field(default_factory=lambda: datetime.now().isoformat())
 
+ 
 
 class RansomwareMonitor:
     """
@@ -314,6 +501,14 @@ class RansomwareMonitor:
         """Configure file extension monitoring - empty set = monitor all"""
         return set()
     
+    def _should_monitor_file(self, file_path: Path) -> bool:
+        """Check if a file should be monitored"""
+        # If no extensions specified, monitor all
+        if not self.watched_extensions:
+            return True
+        
+        return file_path.suffix.lower() in self.watched_extensions
+
     def _get_suspicious_extensions(self) -> Set[str]:
         """Load suspicious file extensions commonly associated with ransomware"""
         return {
@@ -378,7 +573,7 @@ class RansomwareMonitor:
         test_dir = Path.home() / "Documents"
         test_dir.mkdir(parents=True, exist_ok=True)
         test_file = test_dir / f"test_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
-        
+
         try:
             with open(test_file, 'w') as f:
                 f.write(f"Test file for backup demonstration\n")
@@ -387,7 +582,6 @@ class RansomwareMonitor:
                 f.write("=" * 50 + "\n")
                 f.write("Ransomware Monitor Test File\n")
                 f.write("Delete this file to test backup and restore functionality.\n")
-            
             self._log_message(f"✅ Created test file: {test_file.name}", "SUCCESS")
             print(f"\n{Fore.GREEN}✅ Test file created: {test_file}{Style.RESET_ALL}")
             print(f"{Fore.CYAN}📝 Delete this file to test backup and restore.{Style.RESET_ALL}")
@@ -400,18 +594,18 @@ class RansomwareMonitor:
         """Create a backup of a file before deletion or modification"""
         if not self.backup_enabled:
             return None
-        
+
         try:
             if not file_path.exists():
                 self._log_message(f"⚠️ File not found for backup: {file_path.name}", "DEBUG")
                 return None
-            
+
             file_size = file_path.stat().st_size
             file_name = file_path.name
-            
+
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
             backup_name = f"{file_path.stem}_{timestamp}{file_path.suffix}"
-            
+
             try:
                 if event_type == "deleted":
                     backup_dir = self.recycle_dir / file_path.parent.relative_to(file_path.parent.anchor)
@@ -423,27 +617,27 @@ class RansomwareMonitor:
                     backup_dir = self.recycle_dir / sanitized_parent
                 else:
                     backup_dir = self.backup_dir / sanitized_parent
-            
+
             backup_dir.mkdir(parents=True, exist_ok=True)
             backup_path = backup_dir / backup_name
-            
+
             shutil.copy2(file_path, backup_path)
             file_hash = self._calculate_hash(file_path)
-            
+
             self.backup_stats['files_backed_up'] += 1
             self.backup_stats['backup_size_bytes'] += file_size
             self.backup_stats['last_backup'] = datetime.now()
             self.backup_stats['total_backups'] += 1
-            
+
             if event_type == "deleted":
                 self.backup_stats['recycle_bin_size'] += file_size
-            
+
             self._log_message(f"💾 Backed up: {file_name} ({file_size} bytes)", "BACKUP")
             return backup_path
-            
+
         except Exception as e:
             self._log_message(f"⚠️ Backup failed for {file_path.name}: {str(e)}", "WARNING")
-            return None  
+            return None
     
     def _calculate_hash(self, file_path: Path) -> str:
         """Calculate SHA-256 hash of a file"""
@@ -461,38 +655,38 @@ class RansomwareMonitor:
         try:
             if not backup_path.exists():
                 return False
-            
+
             parts = backup_path.stem.rsplit('_', 1)
             if len(parts) == 2:
                 original_name = parts[0] + backup_path.suffix
             else:
                 original_name = backup_path.name
-            
+
             if self.recycle_dir in backup_path.parents:
                 relative = backup_path.relative_to(self.recycle_dir)
                 restore_path = Path.home() / relative.parent / original_name
             else:
                 relative = backup_path.relative_to(self.backup_dir)
                 restore_path = Path.home() / relative.parent / original_name
-            
+
             restore_path.parent.mkdir(parents=True, exist_ok=True)
-            
+
             shutil.copy2(backup_path, restore_path)
-            
+
             self.backup_stats['files_restored'] += 1
             self._log_message(f"🔄 Restored: {backup_path.name} -> {restore_path}", "SUCCESS")
-            
+
             try:
                 backup_path.unlink()
             except:
                 pass
-            
+
             return True
-            
+
         except Exception as e:
             self._log_message(f"⚠️ Restore failed: {str(e)}", "WARNING")
             return False
-
+    
     def _quarantine_file(self, file_path: Path) -> Optional[Path]:
         """Quarantine a suspicious file"""
         try:
@@ -511,7 +705,7 @@ class RansomwareMonitor:
         except Exception as e:
             self._log_message(f"⚠️ Quarantine failed: {str(e)}", "WARNING")
             return None
-
+    
     def start_monitoring(self) -> bool:
         """Start real-time ransomware monitoring"""
         if self.is_running:
@@ -542,6 +736,10 @@ class RansomwareMonitor:
 
     def _start_watchdog(self):
         """Start watchdog file system observer with backup support"""
+        if not WATCHDOG_AVAILABLE:
+            self._log_message("⚠️ Watchdog not available - using polling mode", "WARNING")
+            return
+        
         try:
             class RansomwareFileHandler(FileSystemEventHandler):
                 def __init__(self, monitor):
@@ -569,9 +767,11 @@ class RansomwareMonitor:
                         if self.monitor.backup_enabled:
                             backup_path = None
                             
+                            # Try to backup if file still exists
                             if file_path.exists():
                                 backup_path = self.monitor._backup_file(file_path, "deleted")
                             
+                            # Try to recover from seen files
                             if not backup_path:
                                 dir_key = str(file_path.parent)
                                 if dir_key in self.monitor.seen_files:
@@ -591,12 +791,8 @@ class RansomwareMonitor:
                         self.monitor._handle_file_event('moved', event.src_path, event.dest_path)
                         self.monitor._log_message(f"↔️ Moved: {Path(event.src_path).name} -> {Path(event.dest_path).name}", "EVENT")
             
-            try:
-                self.observer = PollingObserver()
-                self._log_message("Using PollingObserver for file system monitoring", "INFO")
-            except:
-                self.observer = Observer()
-                self._log_message("Using Observer for file system monitoring", "INFO")
+            self.observer = PollingObserver()  # More reliable on Windows
+            self._log_message("Using PollingObserver for file system monitoring", "INFO")
             
             success_count = 0
             handler = RansomwareFileHandler(self)
@@ -619,7 +815,7 @@ class RansomwareMonitor:
         except Exception as e:
             self._log_message(f"⚠️ Failed to start watchdog: {str(e)}", "WARNING")
             self.observer = None
-    
+            
     def _polling_loop(self):
         """Additional polling loop for detecting file changes with backup support"""
         self._log_message("Starting polling loop for extra reliability", "DEBUG")
@@ -669,7 +865,7 @@ class RansomwareMonitor:
                         
                         self.seen_files[dir_key] = current_files
                         
-                    except Exception as e:
+                    except Exception:
                         pass
                 
                 time.sleep(self.poll_interval)
@@ -682,44 +878,46 @@ class RansomwareMonitor:
         """Backup a file detected as deleted by polling"""
         if not self.backup_enabled:
             return None
-        
+
         try:
             if file_path.exists():
                 return self._backup_file(file_path, "deleted")
-            
+
+            # Try to recover from Recycle Bin on Windows
             if platform.system() == 'Windows':
                 try:
                     recycle_path = Path(os.environ.get('SystemDrive', 'C:')) / '$Recycle.Bin'
                     if recycle_path.exists():
                         for item in recycle_path.rglob(f'*{file_name}*'):
-                            if item.is_file():
+                            if item.is_file() and item.stat().st_size > 0:
                                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
                                 backup_name = f"{file_path.stem}_{timestamp}{file_path.suffix}"
                                 backup_dir = self.recycle_dir / "recovered_from_recycle"
                                 backup_dir.mkdir(parents=True, exist_ok=True)
                                 backup_path = backup_dir / backup_name
-                                
+
                                 shutil.copy2(item, backup_path)
-                                
                                 self.backup_stats['files_backed_up'] += 1
                                 self.backup_stats['backup_size_bytes'] += item.stat().st_size
                                 self.backup_stats['recycle_bin_size'] += item.stat().st_size
                                 self.backup_stats['total_backups'] += 1
-                                
+
                                 self._log_message(f"💾 Recovered from Recycle Bin: {file_name}", "BACKUP")
                                 return backup_path
-                except:
+                except Exception:
                     pass
-            
-            if file_path.suffix.lower() in ['.tmp', '.temp', '.log']:
+
+            # Skip temporary files
+            if file_path.suffix.lower() in ['.tmp', '.temp', '.log', '.cache']:
                 self._log_message(f"⏭️ Skipping temp file: {file_name}", "DEBUG")
                 return None
-            
+
+            # Create deletion record
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
             backup_dir = self.recycle_dir / "deleted_file_records"
             backup_dir.mkdir(parents=True, exist_ok=True)
-            backup_path = backup_dir / f"{file_path.stem}_{timestamp}.txt"
-            
+            backup_path = backup_dir / f"{file_path.stem}_{timestamp}_deleted.txt"
+
             with open(backup_path, 'w') as f:
                 f.write("=" * 60 + "\n")
                 f.write("DELETED FILE RECORD\n")
@@ -733,17 +931,16 @@ class RansomwareMonitor:
                 f.write("Note: The original file could not be recovered.\n")
                 f.write("This is a record of the deleted file for forensic purposes.\n")
                 f.write("=" * 60 + "\n")
-            
+
             self.backup_stats['files_backed_up'] += 1
             self.backup_stats['total_backups'] += 1
-            
-            self._log_message(f"📝 Created deletion record for: {file_name}", "INFO")
+
             return backup_path
-            
+
         except Exception as e:
             self._log_message(f"⚠️ Backup failed for {file_name}: {str(e)}", "WARNING")
             return None
-    
+
     def _handle_file_event(self, event_type: str, path: str, dest_path: str = None):
         """Handle file system events with backup integration"""
         try:
@@ -843,7 +1040,7 @@ class RansomwareMonitor:
                     self.threat_level = ThreatLevel.CRITICAL
                     self._log_message("🚨 CRITICAL: Ransomware activity detected!", "ERROR")
                     
-        except Exception as e:
+        except Exception:
             pass
 
     def _check_file_rates(self):
@@ -939,7 +1136,7 @@ class RansomwareMonitor:
         if self.polling_thread is not None and self.polling_thread.is_alive():
             try:
                 self.polling_thread.join(timeout=2)
-            except Exception as e:
+            except Exception:
                 pass
         
         self._log_message("Ransomware monitoring stopped", "INFO")
@@ -1026,7 +1223,7 @@ class RansomwareMonitor:
                     if len(found) > 50:
                         break
                     
-            except Exception as e:
+            except Exception:
                 continue
         
         self.stats['last_scan'] = datetime.now()
@@ -1085,7 +1282,7 @@ class RansomwareMonitor:
                         item.unlink()
                     elif item.is_dir():
                         shutil.rmtree(item)
-                except:
+                except Exception:
                     pass
             
             for item in self.backup_dir.iterdir():
@@ -1094,7 +1291,7 @@ class RansomwareMonitor:
                         item.unlink()
                     elif item.is_dir():
                         shutil.rmtree(item)
-                except:
+                except Exception:
                     pass
             
             for item in self.quarantine_dir.iterdir():
@@ -1103,7 +1300,7 @@ class RansomwareMonitor:
                         item.unlink()
                     elif item.is_dir():
                         shutil.rmtree(item)
-                except:
+                except Exception:
                     pass
             
             self.backup_stats = {
@@ -1185,7 +1382,6 @@ class RansomwareMonitor:
             return
 
         from rich.align import Align
-        from rich.console import Group
         from rich.live import Live
         from rich.table import Table
         from rich.text import Text
@@ -2025,7 +2221,7 @@ def main():
         try:
             subprocess.run([sys.executable, '-m', 'pip', 'install', 'watchdog'], capture_output=True)
             print(f"{Fore.GREEN}✅ Watchdog installed. Please restart.{Style.RESET_ALL}")
-        except:
+        except Exception:
             print(f"{Fore.YELLOW}⚠️ Could not install watchdog. Using polling mode.{Style.RESET_ALL}")
     
     if not REPORTLAB_AVAILABLE:

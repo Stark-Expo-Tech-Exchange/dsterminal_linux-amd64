@@ -1,4 +1,5 @@
-﻿"""
+#!python
+"""
 SQLMap Scanner & Learning Lab - DSTERMINAL Enterprise Edition
 Complete SQL Injection Learning Lab with PDF Notes Generation
 """

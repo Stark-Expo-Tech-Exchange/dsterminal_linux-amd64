@@ -1,4 +1,5 @@
-﻿# add_websec_to_process_command.py
+#!python
+# add_websec_to_process_command.py
 """
 Add web security commands to process_command in dsterminal.py
 """

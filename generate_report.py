@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!python
 """
 DSTERMINAL Report Generator
 Generates a well-formatted DOC file for the NCST Technical Progress Report

@@ -1,4 +1,4 @@
-﻿<<<<<<< HEAD
+<<<<<<< HEAD
 # install_nmap.ps1 - Fixed version
 # Nmap Installer Script with GUI Prompt
 

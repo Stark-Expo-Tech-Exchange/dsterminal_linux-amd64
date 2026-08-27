@@ -1,4 +1,4 @@
-﻿# post_install.ps1 - DSTERMINAL Post-Installation Script
+# post_install.ps1 - DSTERMINAL Post-Installation Script
 # Runs after installer completes to install missing dependencies
 
 Write-Host ""

@@ -1,16 +1,42 @@
-﻿# update.py - COMPLETE FIXED VERSION WITH HACKER INTERFACE & SIMULATED UPDATES
+#!python
 import sys
-if sys.platform == 'win32':
-    import os
-    import msvcrt
-    # Ensure stdout is properly set
-    if hasattr(sys.stdout, 'buffer'):
-        sys.stdout = open(sys.stdout.fileno(), 'w', encoding='utf-8', errors='ignore')
-    if hasattr(sys.stderr, 'buffer'):
-        sys.stderr = open(sys.stderr.fileno(), 'w', encoding='utf-8', errors='ignore')
-        
+# -*- coding: utf-8 -*-
+
+# ============================================================
+# FIX: Handle OSError 22 on Windows
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(["chcp", "65001"], capture_output=True, shell=True)
+    except:
+        pass
+
+_original_stdout_write = sys.stdout.write
+
+def _safe_stdout_write(text):
+    try:
+        _original_stdout_write(text)
+    except OSError as e:
+        if e.errno == 22:
+            try:
+                clean = text.encode("ascii", "ignore").decode("ascii")
+                _original_stdout_write(clean)
+            except:
+                pass
+        else:
+            raise
+    except UnicodeEncodeError:
+        try:
+            clean = text.encode("ascii", "ignore").decode("ascii")
+            _original_stdout_write(clean)
+        except:
+            pass
+
+sys.stdout.write = _safe_stdout_write
+
+# update.py - COMPLETE FIXED VERSION WITH PROPER COLORS AND EXIT PAUSE
 import os
-import sys
 import time
 import random
 import platform
@@ -20,31 +46,161 @@ from datetime import datetime
 from pathlib import Path
 import requests
 
+# ============================================================
+# FIX WINDOWS CONSOLE ENCODING - MUST BE FIRST
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(['chcp', '65001'], capture_output=True, shell=True)
+    except:
+        pass
+    
+    # Fix stdout encoding
+    try:
+        if hasattr(sys.stdout, 'reconfigure'):
+            sys.stdout.reconfigure(encoding='utf-8', errors='ignore')
+        else:
+            import io
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
+    except:
+        pass
+
+# ============================================================
+# DEFINE COLORS CLASS FIRST (ALWAYS AVAILABLE)
+# ============================================================
+class Colors:
+    """Cross-platform color support"""
+    RESET = '\033[0m'
+    BOLD = '\033[1m'
+    DIM = '\033[2m'
+    BLINK = '\033[5m'
+    
+    CYAN = '\033[96m'
+    YELLOW = '\033[93m'
+    GREEN = '\033[92m'
+    RED = '\033[91m'
+    BLUE = '\033[94m'
+    MAGENTA = '\033[95m'
+    WHITE = '\033[97m'
+    
+    BRIGHT_CYAN = '\033[96;1m'
+    BRIGHT_GREEN = '\033[92;1m'
+    BRIGHT_RED = '\033[91;1m'
+    BRIGHT_YELLOW = '\033[93;1m'
+    BRIGHT_MAGENTA = '\033[95;1m'
+    BRIGHT_BLUE = '\033[94;1m'
+
+# ============================================================
+# IMPORT COLORAMA WITH PROPER ERROR HANDLING
+# ============================================================
+try:
+    from colorama import init, Fore, Style, Back
+    init(autoreset=True)
+    COLORAMA_AVAILABLE = True
+except ImportError:
+    COLORAMA_AVAILABLE = False
+    # Use Colors class as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m'
+    })
+except Exception as e:
+    COLORAMA_AVAILABLE = False
+    # Use Colors class as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m'
+    })
+
+# ============================================================
+# COLOR FUNCTIONS
+# ============================================================
+RESET = Colors.RESET
+BOLD = Colors.BOLD
+DIM = Colors.DIM
+BLINK = Colors.BLINK
+
+CYAN = Colors.CYAN
+YELLOW = Colors.YELLOW
+GREEN = Colors.GREEN
+RED = Colors.RED
+BLUE = Colors.BLUE
+MAGENTA = Colors.MAGENTA
+WHITE = Colors.WHITE
+
+BRIGHT_CYAN = Colors.BRIGHT_CYAN
+BRIGHT_GREEN = Colors.BRIGHT_GREEN
+BRIGHT_RED = Colors.BRIGHT_RED
+BRIGHT_YELLOW = Colors.BRIGHT_YELLOW
+BRIGHT_MAGENTA = Colors.BRIGHT_MAGENTA
+BRIGHT_BLUE = Colors.BRIGHT_BLUE
+
+def colorize(text, color=BRIGHT_GREEN):
+    """Simple colorize function without Rich"""
+    return f"{color}{text}{RESET}"
+
+def strip_rich_markup(text):
+    """Strip Rich markup from text"""
+    import re
+    # Remove [bold], [cyan], [dim], etc.
+    text = re.sub(r'\[/?[a-z_]+\]', '', text)
+    return text
+
+def safe_print_unicode(message):
+    """Safely print unicode/emoji characters on Windows"""
+    try:
+        print(message)
+    except UnicodeEncodeError:
+        clean_message = message.encode('ascii', 'ignore').decode('ascii')
+        print(clean_message)
+    except Exception:
+        try:
+            print(str(message))
+        except:
+            pass
+
+# ============================================================
+# RICH IMPORTS WITH PROPER INITIALIZATION
+# ============================================================
+try:
+    from rich.console import Console
+    from rich.panel import Panel
+    from rich.progress import (
+        Progress, SpinnerColumn, TextColumn, BarColumn, 
+        DownloadColumn, TransferSpeedColumn
+    )
+    from rich.live import Live
+    from rich.align import Align
+    from rich.table import Table
+    from rich import box
+    from rich.markdown import Markdown
+    from rich.layout import Layout
+    from rich.columns import Columns
+    from rich.text import Text
+    from rich.style import Style as RichStyle
+    RICH_AVAILABLE = True
+    
+    # Force color support
+    console = Console(color_system="auto", force_terminal=True)
+except ImportError:
+    RICH_AVAILABLE = False
+    console = None
+
 try:
     from dotenv import load_dotenv
     load_dotenv()
 except ImportError:
     pass
-
-from rich.console import Console
-from rich.panel import Panel
-from rich.progress import (
-    Progress, SpinnerColumn, TextColumn, BarColumn, 
-    DownloadColumn, TransferSpeedColumn
-)
-from rich.live import Live
-from rich.align import Align
-from rich.table import Table
-from rich import box
-from rich.markdown import Markdown
-from rich.layout import Layout
-from rich.columns import Columns
-from rich.text import Text
-
+ 
 class UpdateManager:
     def __init__(self, config):
         self.config = config
-        self.console = Console()
+        self.console = console if RICH_AVAILABLE else None
         
         # ============================================================
         # REPOSITORY CONFIGURATION
@@ -180,7 +336,7 @@ class UpdateManager:
         
         if self.github_token:
             headers['Authorization'] = f'token {self.github_token}'
-            self.console.print("[dim]Using Generated DSTERMINAL token for authentication[/dim]")
+            safe_print_unicode(colorize("Using Generated DSTERMINAL token for authentication", BRIGHT_GREEN))
         
         return headers
         
@@ -194,28 +350,28 @@ class UpdateManager:
             
             headers = self._get_headers()
             
-            self.console.print(f"[dim]Connecting to UPDATE MODULE API for {self.github_repo}...[/dim]")
+            safe_print_unicode(colorize(f"Connecting to UPDATE MODULE API for {self.github_repo}...", BRIGHT_CYAN))
             
             tags_url = f"https://api.github.com/repos/{self.github_repo}/tags"
-            self.console.print("[dim]Fetching tags...[/dim]")
+            safe_print_unicode(colorize("Fetching tags...", BRIGHT_CYAN))
             tags_response = requests.get(tags_url, timeout=15, headers=headers)
             
             if tags_response.status_code == 200:
                 tags_data = tags_response.json()
                 if tags_data:
                     latest_tag = tags_data[0].get("name", "")
-                    self.console.print(f"[green]✓ Found latest tag: {latest_tag}[/green]")
+                    safe_print_unicode(colorize(f"✓ Found latest tag: {latest_tag}", BRIGHT_GREEN))
                     
                     release_url = f"https://api.github.com/repos/{self.github_repo}/releases/tags/{latest_tag}"
-                    self.console.print(f"[dim]Fetching release for tag: {latest_tag}...[/dim]")
+                    safe_print_unicode(colorize(f"Fetching release for tag: {latest_tag}...", BRIGHT_CYAN))
                     release_response = requests.get(release_url, timeout=15, headers=headers)
                     
                     if release_response.status_code == 200:
                         release_data = release_response.json()
-                        self.console.print(f"[green]✓ Found release: {release_data.get('tag_name')}[/green]")
+                        safe_print_unicode(colorize(f"✓ Found release: {release_data.get('tag_name')}", BRIGHT_GREEN))
                         return self._process_release_data(release_data)
                     else:
-                        self.console.print(f"[yellow]No release found for tag {latest_tag}, using tag info[/yellow]")
+                        safe_print_unicode(colorize(f"No release found for tag {latest_tag}, using tag info", BRIGHT_YELLOW))
                         return {
                             "version": latest_tag.lstrip("v"),
                             "url": f"https://github.com/{self.github_repo}/tree/{latest_tag}",
@@ -228,17 +384,17 @@ class UpdateManager:
                             "from_fallback": True
                         }
                 else:
-                    self.console.print("[red]✗ No tags found in repository[/red]")
+                    safe_print_unicode(colorize("✗ No tags found in repository", BRIGHT_RED))
                     raise Exception("No tags found in repository")
             else:
-                self.console.print(f"[red]✗ Failed to get tags: {tags_response.status_code}[/red]")
+                safe_print_unicode(colorize(f"✗ Failed to get tags: {tags_response.status_code}", BRIGHT_RED))
                 raise Exception(f"UPDATE MODULE API returned {tags_response.status_code} for tags endpoint")
              
         except requests.RequestException as e:
-            self.console.print(f"[red]⚠️ Connection error: {e}[/red]")
+            safe_print_unicode(colorize(f"⚠️ Connection error: {e}", BRIGHT_RED))
             raise Exception(f"Network error while checking for updates: {e}")
         except Exception as e:
-            self.console.print(f"[red]⚠️ Error: {e}[/red]")
+            safe_print_unicode(colorize(f"⚠️ Error: {e}", BRIGHT_RED))
             raise
 
     def _process_release_data(self, release):
@@ -271,7 +427,7 @@ class UpdateManager:
                 asset_api_url = selected_asset.get("url")
                 asset_name = selected_asset.get("name")
                 asset_size = selected_asset.get("size", 0)
-                self.console.print(f"[dim]Found asset: {asset_name} ({asset_size:,} bytes)[/dim]")
+                safe_print_unicode(colorize(f"Found asset: {asset_name} ({asset_size:,} bytes)", BRIGHT_CYAN))
             
             return {
                 "version": version,
@@ -294,20 +450,23 @@ class UpdateManager:
             import requests
             import os
             
-            self.console.print(f"\n[cyan][+] Downloading update from DSTerminal Update Module...[/cyan]")
-            self.console.print(f"[dim]File: {filename}[/dim]")
+            safe_print_unicode(colorize(f"\n[+] Downloading update from DSTerminal Update Module...", BRIGHT_CYAN))
+            safe_print_unicode(colorize(f"File: {filename}", BRIGHT_CYAN))
             
             if not url:
-                self.console.print("[red]No download URL available[/red]")
+                safe_print_unicode(colorize("No download URL available", BRIGHT_RED))
                 return False
             
             os.makedirs(self.download_dir, exist_ok=True)
             full_path = os.path.join(self.download_dir, filename)
             
             if os.path.exists(full_path):
-                overwrite = self.console.input(f"[yellow]File already exists. Overwrite? (y/N): [/]").strip().lower()
+                try:
+                    overwrite = input(colorize("File already exists. Overwrite? (y/N): ", BRIGHT_YELLOW)).strip().lower()
+                except:
+                    overwrite = 'n'
                 if overwrite != 'y':
-                    self.console.print("[yellow]Download cancelled[/yellow]")
+                    safe_print_unicode(colorize("Download cancelled", BRIGHT_YELLOW))
                     return False
                 os.remove(full_path)
             
@@ -318,13 +477,13 @@ class UpdateManager:
             }
             
             if hasattr(self, 'asset_api_url') and self.asset_api_url:
-                self.console.print("[dim]Using asset API URL for download...[/dim]")
+                safe_print_unicode(colorize("Using asset API URL for download...", BRIGHT_CYAN))
                 download_url = self.asset_api_url
                 if self.github_token:
                     headers['Authorization'] = f'Bearer {self.github_token}'
-                    self.console.print("[dim]Using authentication token[/dim]")
+                    safe_print_unicode(colorize("Using authentication token", BRIGHT_CYAN))
             
-            self.console.print("[dim]Connecting to server...[/dim]")
+            safe_print_unicode(colorize("Connecting to server...", BRIGHT_CYAN))
             response = requests.get(
                 download_url,
                 headers=headers,
@@ -334,7 +493,7 @@ class UpdateManager:
             )
             
             if response.status_code == 404 and download_url != url:
-                self.console.print("[dim]Asset API failed, trying browser download URL...[/dim]")
+                safe_print_unicode(colorize("Asset API failed, trying browser download URL...", BRIGHT_YELLOW))
                 headers = {
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
                     'Accept': 'application/octet-stream'
@@ -348,14 +507,14 @@ class UpdateManager:
                 )
             
             if response.status_code != 200:
-                self.console.print(f"[dim]Status: {response.status_code}[/dim]")
-                self.console.print(f"[dim]Content-Type: {response.headers.get('Content-Type', 'Unknown')}[/dim]")
+                safe_print_unicode(colorize(f"Status: {response.status_code}", BRIGHT_YELLOW))
+                safe_print_unicode(colorize(f"Content-Type: {response.headers.get('Content-Type', 'Unknown')}", BRIGHT_YELLOW))
                 
                 if response.status_code == 404:
-                    self.console.print("[yellow]File not found. The update might be locked.[/yellow]")
+                    safe_print_unicode(colorize("File not found. The update might be locked.", BRIGHT_YELLOW))
                     return False
                 elif response.status_code == 401 or response.status_code == 403:
-                    self.console.print("[yellow]Authentication failed. Check your Update token.[/yellow]")
+                    safe_print_unicode(colorize("Authentication failed. Check your Update token.", BRIGHT_YELLOW))
                     return False
             
             response.raise_for_status()
@@ -363,52 +522,65 @@ class UpdateManager:
             total_size = int(response.headers.get('content-length', 0))
             
             with open(full_path, 'wb') as f:
-                with Progress(
-                    DownloadColumn(),
-                    BarColumn(),
-                    TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-                    TransferSpeedColumn(),
-                    console=self.console,
-                    transient=False
-                ) as progress:
-                    task = progress.add_task("[green]Downloading...[/green]", total=total_size if total_size > 0 else None)
-                    
+                if RICH_AVAILABLE and self.console:
+                    with Progress(
+                        DownloadColumn(),
+                        BarColumn(),
+                        TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+                        TransferSpeedColumn(),
+                        console=self.console,
+                        transient=False
+                    ) as progress:
+                        task = progress.add_task("Downloading...", total=total_size if total_size > 0 else None)
+                        
+                        downloaded = 0
+                        for chunk in response.iter_content(chunk_size=8192):
+                            if chunk:
+                                f.write(chunk)
+                                downloaded += len(chunk)
+                                if total_size > 0:
+                                    progress.update(task, advance=len(chunk))
+                                else:
+                                    progress.update(task, description=f"Downloading... {downloaded//1024}KB")
+                else:
+                    # Fallback download without rich
                     downloaded = 0
                     for chunk in response.iter_content(chunk_size=8192):
                         if chunk:
                             f.write(chunk)
                             downloaded += len(chunk)
                             if total_size > 0:
-                                progress.update(task, advance=len(chunk))
-                            else:
-                                progress.update(task, description=f"[green]Downloading... {downloaded//1024}KB[/green]")
+                                percent = int((downloaded / total_size) * 100)
+                                sys.stdout.write(f"\rDownloading: {percent}%")
+                                sys.stdout.flush()
+                    sys.stdout.write("\n")
             
             if os.path.exists(full_path) and os.path.getsize(full_path) > 0:
                 file_size = os.path.getsize(full_path)
-                self.console.print(f"[green]✓ Download complete![/green]")
-                self.console.print(f"[dim]Saved to: {full_path}[/dim]")
-                self.console.print(f"[dim]Size: {file_size:,} bytes ({file_size/(1024*1024):.1f} MB)[/dim]")
+                safe_print_unicode(colorize(f"✓ Download complete!", BRIGHT_GREEN))
+                safe_print_unicode(colorize(f"Saved to: {full_path}", BRIGHT_CYAN))
+                safe_print_unicode(colorize(f"Size: {file_size:,} bytes ({file_size/(1024*1024):.1f} MB)", BRIGHT_CYAN))
                 return full_path
             else:
-                self.console.print("[red]Download failed - file is empty or not created[/red]")
+                safe_print_unicode(colorize("Download failed - file is empty or not created", BRIGHT_RED))
                 return False
                 
         except requests.exceptions.HTTPError as e:
-            self.console.print(f"[red]✗ HTTP Error: {e.response.status_code}[/red]")
+            safe_print_unicode(colorize(f"✗ HTTP Error: {e.response.status_code}", BRIGHT_RED))
             if e.response.status_code == 404:
-                self.console.print("[yellow]File not found. The URL might be incorrect.[/yellow]")
-                self.console.print("[dim]Or try downloading manually from Stark Expo Tech Exchange Platform [/dim]")
+                safe_print_unicode(colorize("File not found. The URL might be incorrect.", BRIGHT_YELLOW))
+                safe_print_unicode(colorize("Or try downloading manually from Stark Expo Tech Exchange Platform", BRIGHT_YELLOW))
             elif e.response.status_code == 401 or e.response.status_code == 403:
-                self.console.print("[yellow]Authentication failed. Check your Update token.[/yellow]")
+                safe_print_unicode(colorize("Authentication failed. Check your Update token.", BRIGHT_YELLOW))
             return False
         except requests.exceptions.Timeout:
-            self.console.print("[red]✗ Download timeout - Connection took too long[/red]")
+            safe_print_unicode(colorize("✗ Download timeout - Connection took too long", BRIGHT_RED))
             return False
         except requests.exceptions.ConnectionError:
-            self.console.print("[red]✗ Connection error - Check your internet connection[/red]")
+            safe_print_unicode(colorize("✗ Connection error - Check your internet connection", BRIGHT_RED))
             return False
         except Exception as e:
-            self.console.print(f"[red]✗ Download failed: {e}[/red]")
+            safe_print_unicode(colorize(f"✗ Download failed: {e}", BRIGHT_RED))
             return False
         
     def perform_update(self, latest):
@@ -416,38 +588,51 @@ class UpdateManager:
         
         console = self.console
         
-        details_table = Table(box=box.HEAVY_EDGE, border_style="cyan")
-        details_table.add_column("Item", style="cyan")
-        details_table.add_column("Details", style="white")
-        details_table.add_row("New Version", f"[green]v{latest['version']}[/green]")
-        details_table.add_row("Installer", latest.get('asset_name', 'Unknown'))
-        if latest.get('asset_size'):
-            size_mb = latest['asset_size'] / (1024 * 1024)
-            details_table.add_row("Size", f"{size_mb:.1f} MB")
-        details_table.add_row("Release", latest.get('published_at', 'Unknown'))
+        if RICH_AVAILABLE and console:
+            details_table = Table(box=box.HEAVY_EDGE, border_style="cyan")
+            details_table.add_column("Item", style="cyan")
+            details_table.add_column("Details", style="white")
+            details_table.add_row("New Version", f"[green]v{latest['version']}[/green]")
+            details_table.add_row("Installer", latest.get('asset_name', 'Unknown'))
+            if latest.get('asset_size'):
+                size_mb = latest['asset_size'] / (1024 * 1024)
+                details_table.add_row("Size", f"{size_mb:.1f} MB")
+            details_table.add_row("Release", latest.get('published_at', 'Unknown'))
+            
+            console.print(Panel(details_table, title="[bold yellow][+] UPDATE DETAILS[/bold yellow]", border_style="yellow"))
+        else:
+            safe_print_unicode(colorize("\n=== UPDATE DETAILS ===", BRIGHT_CYAN))
+            safe_print_unicode(colorize(f"New Version: v{latest['version']}", BRIGHT_GREEN))
+            safe_print_unicode(colorize(f"Installer: {latest.get('asset_name', 'Unknown')}", BRIGHT_CYAN))
+            if latest.get('asset_size'):
+                size_mb = latest['asset_size'] / (1024 * 1024)
+                safe_print_unicode(colorize(f"Size: {size_mb:.1f} MB", BRIGHT_CYAN))
+            safe_print_unicode(colorize(f"Release: {latest.get('published_at', 'Unknown')}", BRIGHT_CYAN))
         
-        console.print(Panel(details_table, title="[bold yellow][+] UPDATE DETAILS[/bold yellow]", border_style="yellow"))
+        safe_print_unicode(colorize("\n⚠️ SECURITY NOTICE", BRIGHT_RED))
+        safe_print_unicode(colorize("- The installer will be downloaded from DSTerminal Update Module", BRIGHT_YELLOW))
+        safe_print_unicode(colorize("- Verify the digital signature before running", BRIGHT_YELLOW))
+        safe_print_unicode(colorize("- The installer may requires you access to License Key to activate the product and ready for installation process,", BRIGHT_YELLOW))
+        safe_print_unicode(colorize("- Administrator privileges may be required", BRIGHT_YELLOW))
+        safe_print_unicode(colorize("- If the file is very large (>=243.9 MB), the download will take some time", BRIGHT_YELLOW))
+        safe_print_unicode(colorize("- Make sure you have enough disk space and a stable internet connection", BRIGHT_YELLOW))
         
-        console.print("\n[bold red]⚠️ SECURITY NOTICE[/bold red]")
-        console.print("[dim]- The installer will be downloaded from DSTerminal Update Module\n"
-                    "- Verify the digital signature before running\n"
-                    "- The installer may requires you access to License Key to activate the product and ready for installation process,\n"
-                    "- Administrator privileges may be required\n"
-                    "- If the file is very large (>=243.9 MB), the download will take some time\n"
-                    "- Make sure you have enough disk space and a stable internet connection[/dim]\n")
-        
-        confirm = console.input("[bold red]Type 'INSTALL' to download and run the installer: [/]").strip()
+        try:
+            confirm = input(colorize("Type 'INSTALL' to download and run the installer: ", BRIGHT_RED)).strip()
+        except:
+            confirm = ""
         
         if confirm != "INSTALL":
-            console.print("[yellow]Update cancelled[/yellow]")
+            safe_print_unicode(colorize("Update cancelled", BRIGHT_YELLOW))
             return False
         
         if not latest.get('download_url'):
-            console.print(Panel(
-                "[yellow]No automatic download available[/]\n\n"
-                f"Please download manually from Stark Expo Tech Exchange",
-                border_style="yellow"
-            ))
+            safe_print_unicode(
+                colorize("No automatic download available", BRIGHT_YELLOW)
+            )
+            safe_print_unicode(
+                colorize("Please download manually from Stark Expo Tech Exchange", BRIGHT_YELLOW)
+            )
             return False
         
         self.asset_api_url = latest.get('asset_api_url')
@@ -456,22 +641,25 @@ class UpdateManager:
         download_result = self.download_update(latest['download_url'], installer_name)
         
         if not download_result:
-            console.print("[red]Download failed[/red]")
+            safe_print_unicode(colorize("Download failed", BRIGHT_RED))
             return False
         
         installer_path = download_result if isinstance(download_result, str) else None
         
         if not installer_path or not os.path.exists(installer_path) or os.path.getsize(installer_path) == 0:
-            console.print("[red]Download verification failed[/red]")
+            safe_print_unicode(colorize("Download verification failed", BRIGHT_RED))
             return False
         
-        console.print("\n[green]✓ Download verified successfully[/green]")
+        safe_print_unicode(colorize("\n✓ Download verified successfully", BRIGHT_GREEN))
         
-        console.print("\n[cyan][+] Ready to install update...[/cyan]")
-        run_installer = console.input("[bold yellow]Run the installer now? (Y/n): [/]").strip().lower()
+        safe_print_unicode(colorize("\n[+] Ready to install update...", BRIGHT_CYAN))
+        try:
+            run_installer = input(colorize("Run the installer now? (Y/n): ", BRIGHT_YELLOW)).strip().lower()
+        except:
+            run_installer = 'y'
         
         if run_installer != 'n':
-            console.print("[cyan]Launching installer...[/cyan]")
+            safe_print_unicode(colorize("Launching installer...", BRIGHT_CYAN))
             time.sleep(1)
             
             try:
@@ -482,21 +670,18 @@ class UpdateManager:
                         os.chmod(installer_path, 0o755)
                     subprocess.Popen([installer_path], shell=True)
                 
-                console.print(Panel(
-                    f"[bold green]✓ INSTALLER LAUNCHED![/bold green]\n\n"
-                    f"[yellow]Please complete the installation wizard[/yellow]\n"
-                    f"[dim]Installer location: {installer_path}[/dim]\n\n"
-                    f"[cyan]After installation, restart DSTerminal[/cyan]",
-                    border_style="green"
-                ))
+                safe_print_unicode(colorize(f"\n✓ INSTALLER LAUNCHED!", BRIGHT_GREEN))
+                safe_print_unicode(colorize("Please complete the installation wizard", BRIGHT_YELLOW))
+                safe_print_unicode(colorize(f"Installer location: {installer_path}", BRIGHT_CYAN))
+                safe_print_unicode(colorize("After installation, restart DSTerminal", BRIGHT_CYAN))
                 return True
                 
             except Exception as e:
-                console.print(f"[red]Failed to launch installer: {e}[/red]")
-                console.print(f"[yellow]Please run manually: {installer_path}[/yellow]")
+                safe_print_unicode(colorize(f"Failed to launch installer: {e}", BRIGHT_RED))
+                safe_print_unicode(colorize(f"Please run manually: {installer_path}", BRIGHT_YELLOW))
                 return False
         else:
-            console.print(f"[yellow]Installer saved to: {installer_path}[/yellow]")
+            safe_print_unicode(colorize(f"Installer saved to: {installer_path}", BRIGHT_YELLOW))
             return True
 
     def display_hacker_interface(self, current_version, latest_version=None):
@@ -504,105 +689,157 @@ class UpdateManager:
         
         console = self.console
         
-        console.clear()
+        try:
+            if RICH_AVAILABLE and console:
+                console.clear()
+            else:
+                os.system('cls' if os.name == 'nt' else 'clear')
+        except:
+            pass
         
-        layout = Layout()
-        layout.split(
-            Layout(name="header", size=6),
-            Layout(name="main", size=30),
-            Layout(name="footer", size=4)
-        )
-        
-        # ===================== HEADER SECTION =====================
-        header_content = Panel(
-            Align.center(
-                f"""[bold cyan]### DSTERMINAL UPDATE MODULE v4.0 ###[/bold cyan]
+        if RICH_AVAILABLE and console:
+            layout = Layout()
+            layout.split(
+                Layout(name="header", size=6),
+                Layout(name="main", size=30),
+                Layout(name="footer", size=4)
+            )
+            
+            # ===================== HEADER SECTION =====================
+            header_content = Panel(
+                Align.center(
+                    f"""[bold cyan]### DSTERMINAL UPDATE MODULE v4.0 ###[/bold cyan]
 [dim]System: {platform.system()} {platform.machine()}
 Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 Current Version: v{current_version}[/dim]"""
-            ),
-            border_style="cyan",
-            box=box.DOUBLE_EDGE,
-            height=6
-        )
-        layout["header"].update(header_content)
-        
-        # ===================== MAIN CONTENT =====================
-        update_table = Table(box=box.SIMPLE, border_style="green", show_header=True)
-        update_table.add_column(">>", style="green", width=3)
-        update_table.add_column("UPDATE STATUS", style="cyan", width=35)
-        update_table.add_column("PROGRESS", style="yellow", width=20)
-        update_table.add_column("TIME", style="dim", width=10)
-        
-        for i in range(min(20, len(self.update_messages))):
-            progress = random.randint(0, 100)
-            bar = "#" * (progress // 5) + "." * (20 - (progress // 5))
-            update_table.add_row(
-                "o",
-                self.update_messages[i][:35],
-                f"{bar} {progress:3d}%",
-                datetime.now().strftime("%H:%M:%S")
+                ),
+                border_style="cyan",
+                box=box.DOUBLE_EDGE,
+                height=6
             )
-        
-        layout["main"].update(Panel(
-            update_table,
-            title="[bold green][*] CHECKING REQUIRED PACKAGES AND SECURITY MODULES[/bold green]",
-            border_style="green",
-            box=box.HEAVY_EDGE,
-            height=30
-        ))
-        
-        # ===================== FOOTER SECTION =====================
-        footer_text = """
-[dim]Press [yellow]Ctrl+C[/yellow] to cancel updates - [yellow]Security Protocol Active[/yellow] - [green]Update Engine Ready[/green][/dim]"""
-        layout["footer"].update(Panel(
-            Align.center(footer_text),
-            border_style="dim",
-            height=4
-        ))
-        
-        console.print(layout)
-        
-        console.print("\n[bold cyan][+] INITIALIZING UPDATE PROCESS...[/bold cyan]\n")
-        
-        with Live(refresh_per_second=4, console=console, transient=False) as live:
+            layout["header"].update(header_content)
             
-            for i in range(100):
-                message = self.update_messages[i % len(self.update_messages)]
-                
+            # ===================== MAIN CONTENT =====================
+            update_table = Table(box=box.SIMPLE, border_style="green", show_header=True)
+            update_table.add_column(">>", style="green", width=3)
+            update_table.add_column("UPDATE STATUS", style="cyan", width=35)
+            update_table.add_column("PROGRESS", style="yellow", width=20)
+            update_table.add_column("TIME", style="dim", width=10)
+            
+            for i in range(min(20, len(self.update_messages))):
                 progress = random.randint(0, 100)
                 bar = "#" * (progress // 5) + "." * (20 - (progress // 5))
+                update_table.add_row(
+                    "o",
+                    self.update_messages[i][:35],
+                    f"{bar} {progress:3d}%",
+                    datetime.now().strftime("%H:%M:%S")
+                )
+            
+            layout["main"].update(Panel(
+                update_table,
+                title="[bold green][*] CHECKING REQUIRED PACKAGES AND SECURITY MODULES[/bold green]",
+                border_style="green",
+                box=box.HEAVY_EDGE,
+                height=30
+            ))
+            
+            # ===================== FOOTER SECTION =====================
+            footer_text = """
+Press [yellow]Ctrl+C[/yellow] to cancel updates - [yellow]Security Protocol Active[/yellow] - [green]Update Engine Ready[/green]"""
+            layout["footer"].update(Panel(
+                Align.center(footer_text),
+                border_style="dim",
+                height=4
+            ))
+            
+            console.print(layout)
+            
+            safe_print_unicode(colorize("\n[+] INITIALIZING UPDATE PROCESS...", BRIGHT_CYAN))
+            
+            with Live(refresh_per_second=4, console=console, transient=False) as live:
                 
-                new_table = Table(box=box.SIMPLE, border_style="green", show_header=True)
-                new_table.add_column(">>", style="green", width=3)
-                new_table.add_column("UPDATE STATUS", style="cyan", width=35)
-                new_table.add_column("PROGRESS", style="yellow", width=20)
-                new_table.add_column("TIME", style="dim", width=10)
+                for i in range(100):
+                    message = self.update_messages[i % len(self.update_messages)]
+                    
+                    progress = random.randint(0, 100)
+                    bar = "#" * (progress // 5) + "." * (20 - (progress // 5))
+                    
+                    new_table = Table(box=box.SIMPLE, border_style="green", show_header=True)
+                    new_table.add_column(">>", style="green", width=3)
+                    new_table.add_column("UPDATE STATUS", style="cyan", width=35)
+                    new_table.add_column("PROGRESS", style="yellow", width=20)
+                    new_table.add_column("TIME", style="dim", width=10)
+                    
+                    start_idx = max(0, i - 14)
+                    for j in range(start_idx, i + 1):
+                        if j < len(self.update_messages):
+                            msg = self.update_messages[j % len(self.update_messages)]
+                            p = random.randint(0, 100)
+                            b = "#" * (p // 5) + "." * (20 - (p // 5))
+                            if j == i:
+                                new_table.add_row(
+                                    ">>",
+                                    f"[bold green]{msg[:35]}[/bold green]",
+                                    f"[bold yellow]{b} {p:3d}%[/bold yellow]",
+                                    datetime.now().strftime("%H:%M:%S")
+                                )
+                            else:
+                                new_table.add_row(
+                                    "o",
+                                    msg[:35],
+                                    f"{b} {p:3d}%",
+                                    datetime.now().strftime("%H:%M:%S")
+                                )
+                    
+                    layout["main"].update(Panel(
+                        new_table,
+                        title=f"[bold green][*] CHECKING REQUIRED PACKAGES AND SECURITY MODULES ({i+1}/100)[/bold green]",
+                        border_style="green",
+                        box=box.HEAVY_EDGE,
+                        height=30
+                    ))
+                    
+                    layout["footer"].update(Panel(
+                        Align.center(
+                            f"Processing update {i+1}/100 - [yellow]{progress}%[/yellow] complete - Press [yellow]Ctrl+C[/yellow] to cancel"
+                        ),
+                        border_style="dim",
+                        height=4
+                    ))
+                    
+                    live.update(layout)
+                    
+                    if i < 20:
+                        time.sleep(0.15)
+                    elif i < 50:
+                        time.sleep(0.25)
+                    elif i < 80:
+                        time.sleep(0.35)
+                    else:
+                        time.sleep(0.20)
+                    
+                    if random.random() < 0.1:
+                        time.sleep(0.1)
                 
-                start_idx = max(0, i - 14)
-                for j in range(start_idx, i + 1):
-                    if j < len(self.update_messages):
-                        msg = self.update_messages[j % len(self.update_messages)]
-                        p = random.randint(0, 100)
-                        b = "#" * (p // 5) + "." * (20 - (p // 5))
-                        if j == i:
-                            new_table.add_row(
-                                ">>",
-                                f"[bold green]{msg[:35]}[/bold green]",
-                                f"[bold yellow]{b} {p:3d}%[/bold yellow]",
-                                datetime.now().strftime("%H:%M:%S")
-                            )
-                        else:
-                            new_table.add_row(
-                                "o",
-                                msg[:35],
-                                f"{b} {p:3d}%",
-                                datetime.now().strftime("%H:%M:%S")
-                            )
+                completion_table = Table(box=box.SIMPLE, border_style="green", show_header=True)
+                completion_table.add_column(">>", style="green", width=3)
+                completion_table.add_column("UPDATE STATUS", style="cyan", width=35)
+                completion_table.add_column("PROGRESS", style="yellow", width=20)
+                completion_table.add_column("TIME", style="dim", width=10)
+                
+                for j in range(max(0, len(self.update_messages) - 15), len(self.update_messages)):
+                    msg = self.update_messages[j]
+                    completion_table.add_row(
+                        "✓",
+                        f"[green]{msg[:35]}[/green]",
+                        "[green]#################### 100%[/green]",
+                        datetime.now().strftime("%H:%M:%S")
+                    )
                 
                 layout["main"].update(Panel(
-                    new_table,
-                    title=f"[bold green][*] CHECKING REQUIRED PACKAGES AND SECURITY MODULES ({i+1}/100)[/bold green]",
+                    completion_table,
+                    title="[bold green]✓ UPDATE SCAN COMPLETE[/bold green]",
                     border_style="green",
                     box=box.HEAVY_EDGE,
                     height=30
@@ -610,59 +847,29 @@ Current Version: v{current_version}[/dim]"""
                 
                 layout["footer"].update(Panel(
                     Align.center(
-                        f"[dim]Processing update {i+1}/100 - [yellow]{progress}%[/yellow] complete - Press [yellow]Ctrl+C[/yellow] to cancel[/dim]"
+                        f"[bold green]✓ SCAN COMPLETED SUCCESSFULLY! Checking for available updates...[/bold green]"
                     ),
-                    border_style="dim",
+                    border_style="green",
                     height=4
                 ))
                 
                 live.update(layout)
-                
-                if i < 20:
-                    time.sleep(0.15)
-                elif i < 50:
-                    time.sleep(0.25)
-                elif i < 80:
-                    time.sleep(0.35)
-                else:
-                    time.sleep(0.20)
-                
-                if random.random() < 0.1:
-                    time.sleep(0.1)
+                time.sleep(2)
+        else:
+            # Fallback for when rich is not available
+            safe_print_unicode(colorize("\n=== DSTERMINAL UPDATE MODULE v4.0 ===", BRIGHT_CYAN))
+            safe_print_unicode(colorize(f"System: {platform.system()} {platform.machine()}", BRIGHT_CYAN))
+            safe_print_unicode(colorize(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", BRIGHT_CYAN))
+            safe_print_unicode(colorize(f"Current Version: v{current_version}", BRIGHT_GREEN))
+            safe_print_unicode(colorize("\n[+] INITIALIZING UPDATE PROCESS...", BRIGHT_CYAN))
             
-            completion_table = Table(box=box.SIMPLE, border_style="green", show_header=True)
-            completion_table.add_column(">>", style="green", width=3)
-            completion_table.add_column("UPDATE STATUS", style="cyan", width=35)
-            completion_table.add_column("PROGRESS", style="yellow", width=20)
-            completion_table.add_column("TIME", style="dim", width=10)
-            
-            for j in range(max(0, len(self.update_messages) - 15), len(self.update_messages)):
-                msg = self.update_messages[j]
-                completion_table.add_row(
-                    "✓",
-                    f"[green]{msg[:35]}[/green]",
-                    "[green]#################### 100%[/green]",
-                    datetime.now().strftime("%H:%M:%S")
-                )
-            
-            layout["main"].update(Panel(
-                completion_table,
-                title="[bold green]✓ UPDATE SCAN COMPLETE[/bold green]",
-                border_style="green",
-                box=box.HEAVY_EDGE,
-                height=30
-            ))
-            
-            layout["footer"].update(Panel(
-                Align.center(
-                    f"[bold green]✓ SCAN COMPLETED SUCCESSFULLY! [dim]Checking for available updates...[/dim][/bold green]"
-                ),
-                border_style="green",
-                height=4
-            ))
-            
-            live.update(layout)
-            time.sleep(2)
+            for i in range(50):
+                msg = self.update_messages[i % len(self.update_messages)]
+                progress = random.randint(0, 100)
+                bar = "#" * (progress // 5) + "." * (20 - (progress // 5))
+                safe_print_unicode(f"\r{msg[:40]} [{bar}] {progress}%")
+                time.sleep(0.2)
+            safe_print_unicode(colorize("\n✓ UPDATE SCAN COMPLETE!", BRIGHT_GREEN))
 
     def check_updates(self):
         """Cinematic update check with real GitHub API integration"""
@@ -680,44 +887,63 @@ Current Version: v{current_version}[/dim]"""
         # ===================== ANIMATIONS =====================
         def hacker_animation():
             symbols = "###++++--..  "
-            width = min(console.size.width, 1500)
-            with console.status("[bold red][*] ACCESSING UPDATE MODULE...[/]", spinner="dots"):
-                for _ in range(3):
-                    console.print(
-                        "".join(random.choice(symbols) for _ in range(width)),
-                        style="bold green"
-                    )
+            try:
+                width = min(console.size.width if hasattr(console, 'size') else 80, 1500)
+            except:
+                width = 80
+            for _ in range(3):
+                try:
+                    line = "".join(random.choice(symbols) for _ in range(min(width, 80)))
+                    safe_print_unicode(colorize(line, BRIGHT_GREEN))
+                    time.sleep(1.05)
+                except:
                     time.sleep(1.05)
 
         def satellite_scan():
             frames = ["[+]", "[*]", "[-]", "[+]", "[*]", "[-]"]
-            with Progress(
-                SpinnerColumn(style="cyan"),
-                TextColumn("[bold blue]{task.description}"),
-                transient=True,
-                console=console
-            ) as progress:
-                task = progress.add_task("Establishing secure connection...", total=100)
-                for i in range(100):
-                    progress.update(task, advance=1,
-                                    description=f"{frames[i % len(frames)]} Retrieving files {i}%")
-                    time.sleep(0.07)
+            if RICH_AVAILABLE and console:
+                with Progress(
+                    SpinnerColumn(style="cyan"),
+                    TextColumn("[bold blue]{task.description}"),
+                    transient=True,
+                    console=console
+                ) as progress:
+                    task = progress.add_task("Establishing secure connection...", total=100)
+                    for i in range(100):
+                        progress.update(task, advance=1,
+                                        description=f"{frames[i % len(frames)]} Retrieving files {i}%")
+                        time.sleep(0.07)
+            else:
+                for i in range(20):
+                    safe_print_unicode(f"\r{frames[i % len(frames)]} Retrieving files {i*5}%")
+                    time.sleep(0.1)
+                safe_print_unicode("")
 
         def version_comparison_animation(current_ver, latest_ver):
-            with Live(refresh_per_second=10, console=console, transient=True) as live:
+            if RICH_AVAILABLE and console:
+                with Live(refresh_per_second=10, console=console, transient=True) as live:
+                    for i in range(1, 4):
+                        bar = "#" * (i * 8)
+                        live.update(
+                            Panel(
+                                f"[bold cyan]Comparing Versions[/]\n\n"
+                                f"[yellow]Current:[/] v{current_ver}\n"
+                                f"[white]{bar:30}[/]\n\n"
+                                f"[green]Latest:[/] v{latest_ver}\n"
+                                f"[white]{bar:30}[/]",
+                                border_style="cyan",
+                                width=50
+                            )
+                        )
+                        time.sleep(1.05)
+            else:
                 for i in range(1, 4):
                     bar = "#" * (i * 8)
-                    live.update(
-                        Panel(
-                            f"[bold cyan]Comparing Versions[/]\n\n"
-                            f"[yellow]Current:[/] v{current_ver}\n"
-                            f"[white]{bar:30}[/]\n\n"
-                            f"[green]Latest:[/] v{latest_ver}\n"
-                            f"[white]{bar:30}[/]",
-                            border_style="cyan",
-                            width=50
-                        )
-                    )
+                    safe_print_unicode(colorize("\nComparing Versions", BRIGHT_CYAN))
+                    safe_print_unicode(colorize(f"Current: v{current_ver}", BRIGHT_YELLOW))
+                    safe_print_unicode(f"{bar:30}")
+                    safe_print_unicode(colorize(f"Latest: v{latest_ver}", BRIGHT_GREEN))
+                    safe_print_unicode(f"{bar:30}")
                     time.sleep(1.05)
 
         # ===================== UPDATE LOGIC =====================
@@ -734,42 +960,57 @@ Current Version: v{current_version}[/dim]"""
             # ===================== HACKER INTERFACE =====================
             self.display_hacker_interface(current_version)
             
-            console.print(Panel(
-                Align.center("[bold cyan][*] DSTERMINAL UPDATE PROTOCOL [*][/bold cyan]"),
-                border_style="cyan"
-            ))
+            if RICH_AVAILABLE and console:
+                console.print(Panel(
+                    Align.center("[bold cyan][*] DSTERMINAL UPDATE PROTOCOL [*][/bold cyan]"),
+                    border_style="cyan"
+                ))
+            else:
+                safe_print_unicode(colorize("\n=== DSTERMINAL UPDATE PROTOCOL ===", BRIGHT_CYAN))
             
             hacker_animation()
             satellite_scan()
             
-            version_table = Table(box=box.SIMPLE, border_style="blue")
-            version_table.add_column("Component", style="cyan")
-            version_table.add_column("Version", style="green")
-            version_table.add_row("Current Installation", f"v{current_version}")
-            version_table.add_row("System", platform.system())
-            version_table.add_row("Architecture", platform.machine())
+            if RICH_AVAILABLE and console:
+                version_table = Table(box=box.SIMPLE, border_style="blue")
+                version_table.add_column("Component", style="cyan")
+                version_table.add_column("Version", style="green")
+                version_table.add_row("Current Installation", f"v{current_version}")
+                version_table.add_row("System", platform.system())
+                version_table.add_row("Architecture", platform.machine())
+                
+                console.print(Panel(version_table, title="[bold][+] SYSTEM STATUS[/bold]", border_style="blue"))
+            else:
+                safe_print_unicode(colorize("\n=== SYSTEM STATUS ===", BRIGHT_CYAN))
+                safe_print_unicode(colorize(f"Current Installation: v{current_version}", BRIGHT_GREEN))
+                safe_print_unicode(colorize(f"System: {platform.system()}", BRIGHT_CYAN))
+                safe_print_unicode(colorize(f"Architecture: {platform.machine()}", BRIGHT_CYAN))
             
-            console.print(Panel(version_table, title="[bold][+] SYSTEM STATUS[/bold]", border_style="blue"))
-            
-            console.print("\n[cyan][*] Checking Modules for available updates...[/cyan]")
+            safe_print_unicode(colorize("\n[*] Checking Modules for available updates...", BRIGHT_CYAN))
             
             try:
                 latest = self._check_github_release()
             except Exception as e:
-                console.print(Panel(
-                    f"[bold red]UPDATE CHECK FAILED[/]\n\n"
-                    f"[yellow]{str(e)}[/yellow]\n\n"
-                    f"[dim]- Please check your internet connection\n"
-                    f"- Verify that you're already using Updated version or if Update Module exists[/dim]\n",
-                    border_style="red",
-                ))
+                if RICH_AVAILABLE and console:
+                    console.print(Panel(
+                        f"[bold red]UPDATE CHECK FAILED[/]\n\n"
+                        f"[yellow]{str(e)}[/yellow]\n\n"
+                        f"[dim]- Please check your internet connection\n"
+                        f"- Verify that you're already using Updated version or if Update Module exists[/dim]\n",
+                        border_style="red",
+                    ))
+                else:
+                    safe_print_unicode(colorize(f"UPDATE CHECK FAILED: {str(e)}", BRIGHT_RED))
                 return False
             
             if not latest:
-                console.print(Panel(
-                    "[yellow]⚠️ No update information available[/yellow]",
-                    border_style="yellow"
-                ))
+                if RICH_AVAILABLE and console:
+                    console.print(Panel(
+                        "[yellow]⚠️ No update information available[/yellow]",
+                        border_style="yellow"
+                    ))
+                else:
+                    safe_print_unicode(colorize("No update information available", BRIGHT_YELLOW))
                 return False
             
             version_comparison_animation(current_version, latest['version'])
@@ -778,53 +1019,102 @@ Current Version: v{current_version}[/dim]"""
             latest_tuple = parse_version(latest['version'])
             
             if latest_tuple > current_tuple:
-                console.print(Panel(
-                    f"[bold red][!] UPDATES ARE AVAILABLE! [!][/bold red]\n\n"
-                    f"[yellow]Current:[/yellow] v{current_version}\n"
-                    f"[green]Latest:[/green] v{latest['version']}\n"
-                    f"[cyan]Released:[/cyan] {latest.get('published_at', 'Unknown')}\n\n",
-                    border_style="red",
-                    width=90,
-                    padding=(1, 2)
-                ))
-                
-                console.print("[bold cyan]Release Notes:[/bold cyan]")
-                if latest.get('notes'):
-                    md = Markdown(latest['notes'])
-                    console.print(md)
-                else:
-                    console.print("[dim]No release notes available[/dim]")
+                if RICH_AVAILABLE and console:
+                    console.print(Panel(
+                        f"[bold red][!] UPDATES ARE AVAILABLE! [!][/bold red]\n\n"
+                        f"[yellow]Current:[/yellow] v{current_version}\n"
+                        f"[green]Latest:[/green] v{latest['version']}\n"
+                        f"[cyan]Released:[/cyan] {latest.get('published_at', 'Unknown')}\n\n",
+                        border_style="red",
+                        width=90,
+                        padding=(1, 2)
+                    ))
                     
-                choice = console.input("\n[bold cyan]Download and install update now? (y/N): [/]").lower()
-                
-                if choice == 'y':
-                    return self.perform_update(latest)
+                    safe_print_unicode(colorize("Release Notes:", BRIGHT_CYAN))
+                    if latest.get('notes'):
+                        if RICH_AVAILABLE and console:
+                            md = Markdown(latest['notes'])
+                            console.print(md)
+                        else:
+                            safe_print_unicode(latest['notes'])
+                    else:
+                        safe_print_unicode(colorize("No release notes available", BRIGHT_YELLOW))
+                        
+                    try:
+                        choice = input(colorize("\nDownload and install update now? (y/N): ", BRIGHT_CYAN)).lower()
+                    except:
+                        choice = 'n'
+                    
+                    if choice == 'y':
+                        return self.perform_update(latest)
+                    else:
+                        safe_print_unicode(colorize("Update postponed", BRIGHT_YELLOW))
+                        return False
                 else:
-                    console.print("[yellow]Update postponed[/yellow]")
-                    return False
+                    safe_print_unicode(colorize(f"\n[!] UPDATES ARE AVAILABLE!", BRIGHT_RED))
+                    safe_print_unicode(colorize(f"Current: v{current_version}", BRIGHT_YELLOW))
+                    safe_print_unicode(colorize(f"Latest: v{latest['version']}", BRIGHT_GREEN))
+                    safe_print_unicode(colorize(f"Released: {latest.get('published_at', 'Unknown')}", BRIGHT_CYAN))
+                    
+                    try:
+                        choice = input(colorize("\nDownload and install update now? (y/N): ", BRIGHT_CYAN)).lower()
+                    except:
+                        choice = 'n'
+                    
+                    if choice == 'y':
+                        return self.perform_update(latest)
+                    else:
+                        safe_print_unicode(colorize("Update postponed", BRIGHT_YELLOW))
+                        return False
             
             else:
-                console.print(Panel(
-                    Align.center(
-                        f"[bold green]✓ DSTERMINAL IS UP TO DATE![/bold green]\n\n"
-                        f"[dim]Version: v{current_version}\n"
-                        f"Checked: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}[/dim]"
-                    ),
-                    border_style="green",
-                    width=60
-                ))
+                if RICH_AVAILABLE and console:
+                    console.print(Panel(
+                        Align.center(
+                            f"[bold green]✓ DSTERMINAL IS UP TO DATE![/bold green]\n\n"
+                            f"[dim]Version: v{current_version}\n"
+                            f"Checked: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}[/dim]"
+                        ),
+                        border_style="green",
+                        width=60
+                    ))
+                else:
+                    safe_print_unicode(colorize("\n✓ DSTERMINAL IS UP TO DATE!", BRIGHT_GREEN))
+                    safe_print_unicode(colorize(f"Version: v{current_version}", BRIGHT_CYAN))
+                    safe_print_unicode(colorize(f"Checked: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", BRIGHT_CYAN))
+                
+                # ============================================================
+                # FIX: ADD PAUSE BEFORE EXITING
+                # ============================================================
+                safe_print_unicode("\n" + colorize("Press Enter to exit...", BRIGHT_YELLOW))
+                try:
+                    input()
+                except:
+                    pass
                 return True
             
         except KeyboardInterrupt:
-            console.print("\n[yellow]Update cancelled by user[/yellow]")
+            safe_print_unicode(colorize("\nUpdate cancelled by user", BRIGHT_YELLOW))
             return True
         except Exception as e:
-            console.print(Panel(
-                f"[bold red]UPDATE ERROR[/]\n\n{str(e)}",
-                border_style="red"
-            ))
+            if RICH_AVAILABLE and console:
+                console.print(Panel(
+                    f"[bold red]UPDATE ERROR[/]\n\n{str(e)}",
+                    border_style="red"
+                ))
+            else:
+                safe_print_unicode(colorize(f"UPDATE ERROR: {str(e)}", BRIGHT_RED))
             import traceback
             traceback.print_exc()
+            
+            # ============================================================
+            # FIX: ADD PAUSE ON ERROR TOO
+            # ============================================================
+            safe_print_unicode("\n" + colorize("Press Enter to exit...", BRIGHT_YELLOW))
+            try:
+                input()
+            except:
+                pass
             return False
 
 

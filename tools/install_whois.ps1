@@ -1,4 +1,4 @@
-﻿<<<<<<< HEAD
+<<<<<<< HEAD
 # install_whois.ps1 - Uses bundled whois.exe (offline)
 # WHOIS Installation Script for DSTerminal
 

@@ -1,4 +1,5 @@
-﻿from setuptools import setup, find_packages
+#!python
+from setuptools import setup, find_packages
 import os
 
 # Read requirements from requirements.txt

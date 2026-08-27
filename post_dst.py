@@ -1,4 +1,4 @@
-﻿# dsterminal.py - Complete DSTerminal with Bundled Package Support
+#!python
 import os
 import sys
 import platform

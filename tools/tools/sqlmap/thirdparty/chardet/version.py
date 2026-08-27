@@ -1,3 +1,4 @@
+#!python
 """
 This module exists only to simplify retrieving the version number of chardet
 from within setup.py and from chardet subpackages.

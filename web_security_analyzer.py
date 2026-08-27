@@ -1,237 +1,94 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 """
 Web Security Analyzer - DSTERMINAL Enterprise Edition v4.0.0.113
 Enhanced with Platform-Specific Remediation Configurations
 """
-import sys
-if sys.platform == 'win32':
-    import os
-    import msvcrt
-    # Ensure stdout is properly set
-    if hasattr(sys.stdout, 'buffer'):
-        sys.stdout = open(sys.stdout.fileno(), 'w', encoding='utf-8', errors='ignore')
-    if hasattr(sys.stderr, 'buffer'):
-        sys.stderr = open(sys.stderr.fileno(), 'w', encoding='utf-8', errors='ignore')
-        
-# ============================================================
-# FIX UNICODE ENCODING ISSUES FOR WINDOWS CONSOLE
-# ============================================================
-import sys
-import io
-import os
 
-# Safe stdout/stderr handling for GUI executables
-if sys.platform == 'win32':
+# ============================================================
+# FIX: Handle stdout being None in frozen executables
+# ============================================================
+import sys
+import os
+import io
+import platform
+
+# Ensure stdout exists
+if sys.stdout is None:
     try:
-        # Set console code page to UTF-8 (only if console exists)
-        if sys.stdout is not None:
-            os.system('chcp 65001 > nul')
+        import io
+        sys.stdout = io.TextIOWrapper(io.BytesIO(), encoding='utf-8', errors='ignore')
+    except:
+        pass
+
+# Also handle stderr
+if sys.stderr is None:
+    try:
+        import io
+        sys.stderr = io.TextIOWrapper(io.BytesIO(), encoding='utf-8', errors='ignore')
+    except:
+        pass
+
+# Set environment variables for console
+if platform.system() == "Windows":
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
+    os.environ['PYTHONUTF8'] = '1'
+
+# Safe stdout write function
+_original_stdout_write = sys.stdout.write if sys.stdout is not None else None
+
+def _safe_stdout_write(text):
+    try:
+        if _original_stdout_write is not None:
+            _original_stdout_write(text)
+    except OSError as e:
+        if e.errno == 22:
+            try:
+                clean = ''.join(c for c in text if ord(c) < 128 or c in '\n\r\t')
+                if _original_stdout_write is not None:
+                    _original_stdout_write(clean)
+            except:
+                pass
+        else:
+            raise
+    except UnicodeEncodeError:
+        try:
+            clean = text.encode('ascii', 'ignore').decode('ascii')
+            if _original_stdout_write is not None:
+                _original_stdout_write(clean)
+        except:
+            pass
+    except Exception:
+        pass
+
+if sys.stdout is not None:
+    sys.stdout.write = _safe_stdout_write
+
+# ============================================================
+# FIX: Handle OSError 22 on Windows
+# ============================================================
+if platform.system() == "Windows":
+    try:
+        import subprocess as sp
+        sp.run(["chcp", "65001"], capture_output=True, shell=True)
     except:
         pass
     
-    # Replace stdout/stderr with UTF-8 wrappers (only if they exist)
-    if sys.stdout is not None and hasattr(sys.stdout, 'buffer'):
-        try:
-            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
-        except:
-            pass
-    if sys.stderr is not None and hasattr(sys.stderr, 'buffer'):
-        try:
-            sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='ignore')
-        except:
-            pass
-
-def safe_print_unicode(message):
-    """Safely print unicode/emoji characters on Windows"""
+    # Fix stdout encoding
     try:
-        # Check if stdout exists before printing
-        if sys.stdout is not None:
-            print(message)
-        # If stdout is None (windowed mode), log to file instead
-        else:
-            try:
-                log_path = os.path.join(os.path.dirname(sys.executable), 'dsterminal.log')
-                with open(log_path, 'a', encoding='utf-8') as f:
-                    f.write(message + '\n')
-            except:
-                pass
-    except UnicodeEncodeError:
-        clean_message = message.encode('ascii', 'ignore').decode('ascii')
-        if sys.stdout is not None:
-            print(clean_message)
-        else:
-            try:
-                log_path = os.path.join(os.path.dirname(sys.executable), 'dsterminal.log')
-                with open(log_path, 'a', encoding='utf-8') as f:
-                    f.write(clean_message + '\n')
-            except:
-                pass
+        if hasattr(sys.stdout, 'reconfigure'):
+            sys.stdout.reconfigure(encoding='utf-8', errors='ignore')
+        elif hasattr(sys.stdout, 'buffer'):
+            import io
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
     except:
-        pass  # Silent fail for GUI mode
-
-import platform
+        pass
 
 # ============================================================
-# ENCODING FIX - MUST BE AT THE TOP
+# ANSI COLOR DEFINITIONS (ALWAYS AVAILABLE)
 # ============================================================
-
-def fix_encoding():
-    """Fix encoding issues for all platforms, especially Windows"""
-    # Set UTF-8 as default encoding
-    if sys.stdout.encoding != 'utf-8':
-        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
-        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
-    
-    # Windows-specific fixes
-    if platform.system() == 'Windows':
-        try:
-            import ctypes
-            kernel32 = ctypes.windll.kernel32
-            # Set console code page to UTF-8
-            kernel32.SetConsoleCP(65001)
-            kernel32.SetConsoleOutputCP(65001)
-            # Enable ANSI escape sequences
-            handle = kernel32.GetStdHandle(-11)  # STD_OUTPUT_HANDLE
-            mode = ctypes.c_ulong()
-            if kernel32.GetConsoleMode(handle, ctypes.byref(mode)):
-                ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
-                if not (mode.value & ENABLE_VIRTUAL_TERMINAL_PROCESSING):
-                    kernel32.SetConsoleMode(handle, mode.value | ENABLE_VIRTUAL_TERMINAL_PROCESSING)
-        except:
-            pass
-
-# Apply encoding fix immediately
-fix_encoding()
-
-# Now the rest of your imports
-import re
-import json
-import time
-import socket
-import threading
-import webbrowser
-import subprocess
-from datetime import datetime
-from typing import Dict, List, Optional, Any, Tuple
-from dataclasses import dataclass, field
-from urllib.parse import urlparse, urljoin, parse_qs, quote
-from io import BytesIO
-import queue
-import random
-
-# Rich imports for advanced UI
-try:
-    from rich.console import Console
-    from rich.table import Table
-    from rich.panel import Panel
-    from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TimeElapsedColumn
-    from rich.syntax import Syntax
-    from rich import box
-    from rich.prompt import Prompt, Confirm
-    from rich.layout import Layout
-    from rich.align import Align
-    from rich.live import Live
-    from rich.tree import Tree
-    from rich.markdown import Markdown
-    from rich.text import Text
-    from rich.columns import Columns
-    from rich.console import Group
-    from rich.padding import Padding
-    RICH_AVAILABLE = True
-except ImportError:
-    RICH_AVAILABLE = False
-    Console = None
-
-try:
-    import requests
-    from requests.packages.urllib3.exceptions import InsecureRequestWarning
-    requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-    REQUESTS_AVAILABLE = True
-except ImportError:
-    REQUESTS_AVAILABLE = False
-
-try:
-    from bs4 import BeautifulSoup
-    BS4_AVAILABLE = True
-except ImportError:
-    BS4_AVAILABLE = False
-
-try:
-    from reportlab.lib import colors
-    from reportlab.lib.pagesizes import A4, letter
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table as PDFTable, TableStyle, PageBreak, KeepTogether
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT, TA_JUSTIFY
-    from reportlab.pdfgen import canvas
-    from reportlab.lib.units import inch, cm
-    from reportlab.pdfbase import pdfmetrics
-    from reportlab.pdfbase.ttfonts import TTFont
-    REPORTLAB_AVAILABLE = True
-except ImportError:
-    REPORTLAB_AVAILABLE = False
-
-# ============================================================
-# COLOR SUPPORT DETECTION
-# ============================================================
-
-def should_use_colors():
-    """Determine if we should use ANSI colors"""
-    # Check if NO_COLOR environment variable is set
-    if os.environ.get('NO_COLOR'):
-        return False
-    
-    # Check if we're in a terminal
-    if not sys.stdout.isatty():
-        return False
-    
-    # Check for Windows
-    if platform.system() == 'Windows':
-        try:
-            import ctypes
-            kernel32 = ctypes.windll.kernel32
-            handle = kernel32.GetStdHandle(-11)
-            mode = ctypes.c_ulong()
-            if kernel32.GetConsoleMode(handle, ctypes.byref(mode)):
-                # Check if ENABLE_VIRTUAL_TERMINAL_PROCESSING is set
-                return bool(mode.value & 0x4)
-            return False
-        except:
-            return False
-    
-    return True
-
-# Set global flag
-USE_COLORS = should_use_colors()
-
-# ============================================================
-# CONSTANTS
-# ============================================================
-
-VERSION = "v4.0.0.113"
-PLATFORM = "DSTERMINAL Cyber Ops Platform"
-WATERMARK_TEXT = f"{PLATFORM} {VERSION}"
-
-# XSS Payloads
-XSS_PAYLOADS = [
-    '<script>alert("XSS")</script>',
-    '<script>alert(document.cookie)</script>',
-    '<img src=x onerror=alert("XSS")>',
-    '<svg/onload=alert("XSS")>',
-    '<body onload=alert("XSS")>',
-    '"><script>alert("XSS")</script>',
-    'javascript:alert("XSS")',
-]
-
-# ============================================================
-# COLORS CLASS - MUST BE DEFINED BEFORE TypeWriter
-# ============================================================
-
 class Colors:
-    """ANSI color codes for terminal output with Windows support"""
-    
-    # Foreground colors
+    """ANSI color codes for terminal output"""
     HEADER = '\033[95m'
     BLUE = '\033[94m'
     CYAN = '\033[96m'
@@ -279,9 +136,185 @@ class Colors:
 Colors.init_colors()
 
 # ============================================================
-# TYPEWRITER CLASS - DEFINED AFTER Colors
+# TRY TO IMPORT COLORAMA WITH PROPER ERROR HANDLING
+# ============================================================
+try:
+    from colorama import init, Fore, Style
+    init(autoreset=True, convert=False, strip=False, wrap=False)
+    COLORS_AVAILABLE = True
+    # Force color support
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
+    os.environ['PYTHONUTF8'] = '1'
+    
+    # Add DIM to Fore if it doesn't exist
+    if not hasattr(Fore, 'DIM'):
+        Fore.DIM = '\033[2m'
+    if not hasattr(Style, 'DIM'):
+        Style.DIM = '\033[2m'
+except ImportError:
+    COLORS_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m',
+        'NORMAL': '\033[22m'
+    })
+except Exception as e:
+    COLORS_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m',
+        'NORMAL': '\033[22m'
+    })
+
+# ============================================================
+# SIMPLE SAFE PRINT FUNCTION
+# ============================================================
+def safe_print_unicode(message):
+    """Safely print unicode/emoji characters on Windows"""
+    try:
+        print(message)
+    except UnicodeEncodeError:
+        clean_message = message.encode('ascii', 'ignore').decode('ascii')
+        print(clean_message)
+    except Exception:
+        try:
+            print(str(message))
+        except:
+            pass
+ 
+import re
+import json
+import time
+import socket
+import threading
+import webbrowser
+import subprocess
+from datetime import datetime
+from typing import Dict, List, Optional, Any, Tuple
+from dataclasses import dataclass, field
+from urllib.parse import urlparse, urljoin, parse_qs, quote
+from io import BytesIO
+import queue
+import random
+ 
 # ============================================================
 
+# ============================================================
+# IMPORT RICH (Optional)
+# ============================================================
+try:
+    from rich.console import Console
+    from rich.table import Table
+    from rich.panel import Panel
+    from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TimeElapsedColumn
+    from rich.syntax import Syntax
+    from rich import box
+    from rich.prompt import Prompt, Confirm
+    from rich.layout import Layout
+    from rich.align import Align
+    from rich.live import Live
+    from rich.tree import Tree
+    from rich.markdown import Markdown
+    from rich.text import Text as RichText
+    from rich.columns import Columns
+    from rich.console import Group
+    from rich.padding import Padding
+    RICH_AVAILABLE = True
+except ImportError:
+    RICH_AVAILABLE = False
+    Console = None
+
+# ============================================================
+# IMPORT OTHER DEPENDENCIES
+# ============================================================
+try:
+    import requests
+    from requests.packages.urllib3.exceptions import InsecureRequestWarning
+    requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+    REQUESTS_AVAILABLE = True
+except ImportError:
+    REQUESTS_AVAILABLE = False
+
+try:
+    from bs4 import BeautifulSoup
+    BS4_AVAILABLE = True
+except ImportError:
+    BS4_AVAILABLE = False
+
+try:
+    from reportlab.lib import colors as reportlab_colors
+    from reportlab.lib.pagesizes import A4, letter
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table as PDFTable, TableStyle, PageBreak, KeepTogether
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT, TA_JUSTIFY
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.units import inch, cm
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+    REPORTLAB_AVAILABLE = True
+except ImportError:
+    REPORTLAB_AVAILABLE = False
+# COLOR SUPPORT DETECTION - MUST BE BEFORE TypeWriter
+# ============================================================
+
+def should_use_colors():
+    """Determine if we should use ANSI colors"""
+    # Check if NO_COLOR environment variable is set
+    if os.environ.get('NO_COLOR'):
+        return False
+    
+    # Check if we're in a terminal
+    if not sys.stdout.isatty():
+        return False
+    
+    # Check for Windows
+    if platform.system() == 'Windows':
+        try:
+            import ctypes
+            kernel32 = ctypes.windll.kernel32
+            handle = kernel32.GetStdHandle(-11)
+            mode = ctypes.c_ulong()
+            if kernel32.GetConsoleMode(handle, ctypes.byref(mode)):
+                # Check if ENABLE_VIRTUAL_TERMINAL_PROCESSING is set
+                return bool(mode.value & 0x4)
+            return False
+        except:
+            return False
+    
+    return True
+
+# Set global flag
+USE_COLORS = should_use_colors()
+
+# ============================================================
+# CONSTANTS
+# ============================================================
+
+VERSION = "v4.0.0.113"
+PLATFORM = "DSTERMINAL Cyber Ops Platform"
+WATERMARK_TEXT = f"{PLATFORM} {VERSION}"
+
+
+# XSS Payloads
+XSS_PAYLOADS = [
+    '<script>alert("XSS")</script>',
+    '<script>alert(document.cookie)</script>',
+    '<img src=x onerror=alert("XSS")>',
+    '<svg/onload=alert("XSS")>',
+    '<body onload=alert("XSS")>',
+    '"><script>alert("XSS")</script>',
+    'javascript:alert("XSS")',
+]
+
+# ============================================================
+# TYPEWRITER CLASS - DEFINED AFTER Colors
+# ============================================================
 class TypeWriter:
     """Human-like typing simulation with pen writing effects"""
     
@@ -313,7 +346,6 @@ class TypeWriter:
             print(f"{text}", end='\n' if newline else '')
             return
         
-        # Split text into lines if line_by_line mode
         if line_by_line:
             lines = text.split('\n')
             for line in lines:
@@ -340,7 +372,6 @@ class TypeWriter:
                 print()
                 continue
             else:
-                # Use self.use_colors instead of global USE_COLORS
                 if self.use_colors and color and pen_effect and (i == 0 or text[i-1] == ' '):
                     sys.stdout.write(f"{Colors.BOLD}{color}{char}{Colors.END}")
                 elif self.use_colors and color:
@@ -352,22 +383,17 @@ class TypeWriter:
             if self.min_delay == 0 and self.max_delay == 0:
                 delay = 0
             else:
-                # Base delay with some randomness
                 delay = random.uniform(self.min_delay, self.max_delay) / 1000.0
                 
-                # Pen effect: slightly longer after punctuation
                 if char in pause_chars and pause_between_chars:
                     delay *= self.punctuation_delay
                 
-                # Random hesitation (like thinking)
                 if random.random() < 0.03:
                     delay += random.uniform(50, 200) / 1000.0
                 
-                # Faster typing after spaces (like natural rhythm)
                 if char == ' ':
                     delay *= 0.7
                 
-                # Slower on numbers/symbols (like thinking)
                 if char.isdigit() or char in ['@', '#', '$', '%', '^', '&', '*']:
                     delay *= 1.3
             
@@ -387,7 +413,7 @@ class TypeWriter:
     def type_banner(self, lines, color=Colors.CYAN, delay_between=0.1):
         """Type banner with faster typing speed"""
         original_speed = self.min_delay, self.max_delay
-        self.min_delay, self.max_delay = 2, 5  # Fast for banners
+        self.min_delay, self.max_delay = 2, 5
         
         for line in lines:
             self.type_text(line, color, newline=True, pen_effect=False)
@@ -404,14 +430,14 @@ class TypeWriter:
         cursor_chars = ['|', '/', '-', '\\']
         cursor_idx = 0
         
-        display_text = text if USE_COLORS else Colors.strip(text)
+        display_text = text if self.use_colors else Colors.strip(text)
         
         for i in range(len(display_text) + 1):
             if self._stop_typing:
                 break
             
             sys.stdout.write('\r')
-            if USE_COLORS and color:
+            if self.use_colors and color:
                 sys.stdout.write(f"{color}{display_text[:i]}{Colors.DIM}{cursor_chars[cursor_idx % len(cursor_chars)]}{Colors.END}")
             else:
                 sys.stdout.write(f"{display_text[:i]}{cursor_chars[cursor_idx % len(cursor_chars)]}")
@@ -421,7 +447,7 @@ class TypeWriter:
             time.sleep(duration / (len(display_text) + 1))
         
         sys.stdout.write('\r')
-        if USE_COLORS and color:
+        if self.use_colors and color:
             sys.stdout.write(f"{color}{display_text}{Colors.END}")
         else:
             sys.stdout.write(display_text)

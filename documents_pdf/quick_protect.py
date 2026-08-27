@@ -1,4 +1,5 @@
-﻿# quick_protect.py
+#!python
+# quick_protect.py
 import os
 from pypdf import PdfReader, PdfWriter
 import io

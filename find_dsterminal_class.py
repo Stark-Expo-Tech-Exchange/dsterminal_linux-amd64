@@ -1,4 +1,4 @@
-﻿# find_dsterminal_class.py
+#!python
 import dsterminal
 import inspect
 

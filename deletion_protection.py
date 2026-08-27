@@ -1,4 +1,5 @@
-﻿# deletion_protection.py
+#!python
+import sys
 """
 DSTerminal - Deletion Protection Module
 Import this into the main DSTerminal class.

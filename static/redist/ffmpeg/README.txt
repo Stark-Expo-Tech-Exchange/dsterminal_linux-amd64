@@ -1,1 +1,1 @@
-﻿FFmpeg placeholder directory
+FFmpeg placeholder directory

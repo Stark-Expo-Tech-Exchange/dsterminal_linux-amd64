@@ -1,4 +1,5 @@
-﻿#!/usr/bin/env python3
+#!python
+#!/usr/bin/env python3
 """
 DSTERMINAL Dependency Checker & Auto-Installer
 """

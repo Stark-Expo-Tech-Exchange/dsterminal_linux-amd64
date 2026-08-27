@@ -1,4 +1,4 @@
-﻿# patch_version.ps1
+# patch_version.ps1
 # Run this script to update version 4.0.0.113 to 4.0.0.113 across the project.
 
 $OldVersion = "4.0.0.113"

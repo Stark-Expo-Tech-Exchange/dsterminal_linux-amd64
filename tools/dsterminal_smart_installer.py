@@ -1,3 +1,4 @@
+#!python
 ﻿# dsterminal_smart_installer.py
 import os
 import sys

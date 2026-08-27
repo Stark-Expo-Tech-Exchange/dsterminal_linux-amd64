@@ -1,4 +1,4 @@
-﻿# download_whois.ps1
+# download_whois.ps1
 # Download WHOIS from Microsoft Sysinternals and bundle it for offline installation
 
 param(

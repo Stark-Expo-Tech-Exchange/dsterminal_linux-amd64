@@ -1,3 +1,4 @@
+#!python
 # launch_unicode_fix.py
 import sys
 import os

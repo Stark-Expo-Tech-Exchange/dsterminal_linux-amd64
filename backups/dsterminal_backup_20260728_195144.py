@@ -1,3 +1,4 @@
+#!python
 ﻿# -*- coding: utf-8 -*-
 # ============================================================================
 # GLOBAL VARIABLES - Single source of truth

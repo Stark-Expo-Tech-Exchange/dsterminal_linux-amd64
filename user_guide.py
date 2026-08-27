@@ -1,4 +1,4 @@
-﻿# generate_user_guide.py
+#!python
 # Run this script to create user_guide.pdf in the docs folder
 
 import os

@@ -1,22 +1,46 @@
-﻿#!/usr/bin/env python3
+#!python
 # -*- coding: utf-8 -*-
-
+ 
 """
 DSTERMINAL SOC-GRADE NMAP SCAN DASHBOARD - COMPLETE EDITION
 Hacker-style 3-Panel Layout | Real-time Scan Monitoring | AI Vulnerability Scoring
 """
 import sys
-if sys.platform == 'win32':
-    import os
-    import msvcrt
-    # Ensure stdout is properly set
-    if hasattr(sys.stdout, 'buffer'):
-        sys.stdout = open(sys.stdout.fileno(), 'w', encoding='utf-8', errors='ignore')
-    if hasattr(sys.stderr, 'buffer'):
-        sys.stderr = open(sys.stderr.fileno(), 'w', encoding='utf-8', errors='ignore')
-        
+# ============================================================
+# FIX: Handle OSError 22 on Windows
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(["chcp", "65001"], capture_output=True, shell=True)
+    except:
+        pass
+
+_original_stdout_write = sys.stdout.write
+
+def _safe_stdout_write(text):
+    try:
+        _original_stdout_write(text)
+    except OSError as e:
+        if e.errno == 22:
+            try:
+                clean = text.encode("ascii", "ignore").decode("ascii")
+                _original_stdout_write(clean)
+            except:
+                pass
+        else:
+            raise
+    except UnicodeEncodeError:
+        try:
+            clean = text.encode("ascii", "ignore").decode("ascii")
+            _original_stdout_write(clean)
+        except:
+            pass
+
+sys.stdout.write = _safe_stdout_write
+
+ 
 import os
-import sys
 import time
 import json
 import re
@@ -32,10 +56,10 @@ from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass, field
 
 # ============================================================
-# ANSI COLORS - HACKER THEME
+# ANSI COLOR DEFINITIONS (ALWAYS AVAILABLE)
 # ============================================================
-
 class Colors:
+    """ANSI color codes for terminal output"""
     GREEN = '\033[92m'
     DARK_GREEN = '\033[32m'
     BRIGHT_GREEN = '\033[92m'
@@ -60,9 +84,56 @@ class Colors:
     LIGHT_GRAY = '\033[37m'
 
 # ============================================================
-# Required Imports
+# TRY TO IMPORT COLORAMA WITH PROPER ERROR HANDLING
 # ============================================================
+try:
+    from colorama import init, Fore, Back, Style
+    init(autoreset=True)
+    COLORS_AVAILABLE = True
+except ImportError:
+    COLORS_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m'
+    })
+    Back = type('Back', (), {'RESET': '\033[49m', 'BLACK': '\033[40m', 'RED': '\033[41m', 
+                             'GREEN': '\033[42m', 'YELLOW': '\033[43m', 'BLUE': '\033[44m',
+                             'MAGENTA': '\033[45m', 'CYAN': '\033[46m', 'WHITE': '\033[47m'})
+except Exception as e:
+    COLORS_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m'
+    })
+    Back = type('Back', (), {'RESET': '\033[49m', 'BLACK': '\033[40m', 'RED': '\033[41m', 
+                             'GREEN': '\033[42m', 'YELLOW': '\033[43m', 'BLUE': '\033[44m',
+                             'MAGENTA': '\033[45m', 'CYAN': '\033[46m', 'WHITE': '\033[47m'})
 
+# ============================================================
+# SIMPLE SAFE PRINT FUNCTION
+# ============================================================
+def safe_print_unicode(message):
+    """Safely print unicode/emoji characters on Windows"""
+    try:
+        print(message)
+    except UnicodeEncodeError:
+        clean_message = message.encode('ascii', 'ignore').decode('ascii')
+        print(clean_message)
+    except Exception:
+        try:
+            print(str(message))
+        except:
+            pass
+
+# ============================================================
+# TRY TO IMPORT OPTIONAL DEPENDENCIES
+# ============================================================
 try:
     import folium
     from folium.plugins import HeatMap
@@ -81,7 +152,6 @@ try:
     REQUESTS_AVAILABLE = True
 except ImportError:
     REQUESTS_AVAILABLE = False
-
 
 # ============================================================
 # Domain to IP Resolution Helper
@@ -104,7 +174,6 @@ def resolve_domain_to_ip(domain: str) -> Optional[str]:
         return None
     except Exception:
         return None
-
 
 # ============================================================
 # GeoIP Functions - FIXED
@@ -2572,8 +2641,8 @@ class SOCNmapIntegration:
 # ============================================================
 
 if __name__ == "__main__":
-    print(f"\n{'='*60}")
-    print(f"{' '*15}DSTERMINAL SOC NMAP DASHBOARD")
-    print(f"{'='*60}\n")
+    safe_print_unicode(f"\n{'='*60}")
+    safe_print_unicode(f"{' '*15}DSTERMINAL RECON+G DASHBOARD")
+    safe_print_unicode(f"{'='*60}\n")
     soc = SOCNmapIntegration()
     soc.start_interactive_dashboard()

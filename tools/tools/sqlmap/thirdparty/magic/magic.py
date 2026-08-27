@@ -1,3 +1,4 @@
+#!python
 """
 magic is a wrapper around the libmagic file identification library.
 

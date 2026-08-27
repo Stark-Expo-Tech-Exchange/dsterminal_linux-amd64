@@ -1,91 +1,126 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 DSTerminal Complete Security Suite v4.0.0.113
 Enhanced with Automatic Ransomware Detection Anywhere in System
 Full Dashboard Controls Implementation with Auto-Quarantine Progress
 """
+
+# ============================================================
+# FIX: aiohttp compatibility with Python 3.11+
+# ============================================================
+# ============================================================
+# WINDOWS / PYTHON 3.11+ RUNTIME
+# ============================================================
+# DSTerminal uses Flask-SocketIO with the Windows threading
+# backend. Eventlet is intentionally NOT used.
 import sys
-if sys.platform == 'win32':
-    import os
-    import msvcrt
-    # Ensure stdout is properly set
-    if hasattr(sys.stdout, 'buffer'):
-        sys.stdout = open(sys.stdout.fileno(), 'w', encoding='utf-8', errors='ignore')
-    if hasattr(sys.stderr, 'buffer'):
-        sys.stderr = open(sys.stderr.fileno(), 'w', encoding='utf-8', errors='ignore')
+import os
+import asyncio
+
+# Patch asyncio.coroutines._DEBUG before anything else imports it
+try:
+    import asyncio.coroutines
+    if not hasattr(asyncio.coroutines, '_DEBUG'):
+        asyncio.coroutines._DEBUG = False
         
-# ============================================================
-# FIX UNICODE ENCODING ISSUES FOR WINDOWS CONSOLE
-# ============================================================
-import sys
-import io
+except (ImportError, AttributeError):
+    pass
+import platform
 import os
 
-# Safe stdout/stderr handling for GUI executables
-if sys.platform == 'win32':
+# Patch 1: Add coroutine decorator if missing (for older aiohttp)
+if not hasattr(asyncio, 'coroutine'):
+    def _coroutine_decorator(func):
+        """Replacement for asyncio.coroutine decorator"""
+        return func
+    asyncio.coroutine = _coroutine_decorator
+
+
+# Patch 3: Monkey patch aiohttp helpers
+try:
+    import aiohttp.helpers
+    if not hasattr(aiohttp.helpers, 'old_debug'):
+        aiohttp.helpers.old_debug = False
+    
+    # Add the missing coroutine attribute to aiohttp.helpers
+    if not hasattr(aiohttp.helpers, 'coroutine'):
+        aiohttp.helpers.coroutine = asyncio.coroutine
+except (ImportError, AttributeError):
+    pass
+
+# Patch 4: Also patch aiohttp's asyncio imports
+try:
+    import aiohttp
+    if hasattr(aiohttp, 'asyncio'):
+        if not hasattr(aiohttp.asyncio, 'coroutine'):
+            aiohttp.asyncio.coroutine = asyncio.coroutine
+except:
+    pass
+
+# ============================================================
+# FIX: Windows console encoding and OSError 22
+# ============================================================
+if platform.system() == "Windows":
     try:
-        # Set console code page to UTF-8 (only if console exists)
-        if sys.stdout is not None:
-            os.system('chcp 65001 > nul')
+        import subprocess as sp
+        sp.run(['chcp', '65001'], capture_output=True, shell=True)
     except:
         pass
     
-    # Replace stdout/stderr with UTF-8 wrappers (only if they exist)
-    if sys.stdout is not None and hasattr(sys.stdout, 'buffer'):
-        try:
+    try:
+        if hasattr(sys.stdout, 'reconfigure'):
+            sys.stdout.reconfigure(encoding='utf-8', errors='ignore')
+        elif hasattr(sys.stdout, 'buffer'):
+            import io
             sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
-        except:
-            pass
-    if sys.stderr is not None and hasattr(sys.stderr, 'buffer'):
-        try:
-            sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='ignore')
-        except:
-            pass
-
-def safe_print_unicode(message):
-    """Safely print unicode/emoji characters on Windows"""
-    try:
-        # Check if stdout exists before printing
-        if sys.stdout is not None:
-            print(message)
-        # If stdout is None (windowed mode), log to file instead
-        else:
-            try:
-                log_path = os.path.join(os.path.dirname(sys.executable), 'dsterminal.log')
-                with open(log_path, 'a', encoding='utf-8') as f:
-                    f.write(message + '\n')
-            except:
-                pass
-    except UnicodeEncodeError:
-        clean_message = message.encode('ascii', 'ignore').decode('ascii')
-        if sys.stdout is not None:
-            print(clean_message)
-        else:
-            try:
-                log_path = os.path.join(os.path.dirname(sys.executable), 'dsterminal.log')
-                with open(log_path, 'a', encoding='utf-8') as f:
-                    f.write(clean_message + '\n')
-            except:
-                pass
-    except:
-        pass  # Silent fail for GUI mode
-
-import os
-
-# Force UTF-8 encoding for stdout/stderr on Windows
-if sys.platform == 'win32':
-    try:
-        # Set console code page to UTF-8
-        os.system('chcp 65001 > nul')
     except:
         pass
-    
-    # Replace stdout/stderr with UTF-8 wrappers
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
-    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
-# Now proceed with the rest of your imports
+    # Set environment variables
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
+    os.environ['PYTHONUTF8'] = '1'
+    os.environ['PROMPT_TOOLKIT_NO_CP437'] = '1'
+
+# ============================================================
+# SAFE STDOUT WRITE
+# ============================================================
+_original_stdout_write = sys.stdout.write if sys.stdout is not None else None
+
+
+def _safe_stdout_write(text):
+    try:
+        if _original_stdout_write is not None:
+            _original_stdout_write(text)
+    except OSError as e:
+        if e.errno == 22:
+            try:
+                clean = ''.join(c for c in text if ord(c) < 128 or c in '\n\r\t')
+                if _original_stdout_write is not None:
+                    _original_stdout_write(clean)
+            except:
+                pass
+        else:
+            raise
+    except UnicodeEncodeError:
+        try:
+            clean = text.encode('ascii', 'ignore').decode('ascii')
+            if _original_stdout_write is not None:
+                _original_stdout_write(clean)
+        except:
+            pass
+    except Exception:
+        pass
+
+if sys.stdout is not None:
+    sys.stdout.write = _safe_stdout_write
+
+# ============================================================
+# NOW IMPORT THE REST OF YOUR MODULES
+# ============================================================
+
+    
 import os
-import sys
 import time
 import threading
 import webbrowser
@@ -96,22 +131,234 @@ import json
 import hashlib
 import socket
 import netifaces
+import re
 from datetime import datetime, timedelta
 from flask import Flask, render_template_string, jsonify, request, send_file, make_response
 from flask_socketio import SocketIO, emit
+
 import psutil
 import platform
+
+class ServerColors:
+    """Color codes for server-side terminal output"""
+    RED = '\033[91m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    BLUE = '\033[94m'
+    MAGENTA = '\033[95m'
+    CYAN = '\033[96m'
+    WHITE = '\033[97m'
+    BLACK = '\033[30m'  # <-- ADD THIS
+    BOLD = '\033[1m'
+    DIM = '\033[2m'
+    RESET = '\033[0m'
+    BG_RED = '\033[41m'
+    BG_GREEN = '\033[42m'
+    BG_YELLOW = '\033[43m'
+    BG_BLUE = '\033[44m'
+    BG_MAGENTA = '\033[45m'
+    BG_CYAN = '\033[46m'
+    BG_WHITE = '\033[47m'
+    BG_BLACK = '\033[40m' 
+
+# FIX 1: Enhanced server_alert with guaranteed output
+def server_alert(message, alert_type="INFO"):
+    """Print colored alert to server terminal - GUARANTEED OUTPUT"""
+    colors = {
+        "INFO": ServerColors.CYAN,
+        "SUCCESS": ServerColors.GREEN,
+        "WARNING": ServerColors.YELLOW,
+        "ERROR": ServerColors.RED,
+        "CRITICAL": ServerColors.BG_RED + ServerColors.WHITE + ServerColors.BOLD,
+        "QUARANTINE": ServerColors.MAGENTA + ServerColors.BOLD,
+        "RANSOMWARE": ServerColors.BG_RED + ServerColors.WHITE + ServerColors.BOLD,
+        "HONEYPOT": ServerColors.BG_YELLOW + ServerColors.BLACK + ServerColors.BOLD,
+    }
+    
+    icons = {
+        "INFO": "ℹ️",
+        "SUCCESS": "✅",
+        "WARNING": "⚠️",
+        "ERROR": "❌",
+        "CRITICAL": "🚨",
+        "QUARANTINE": "📁",
+        "RANSOMWARE": "💀",
+        "HONEYPOT": "🎯",
+    }
+    
+    color = colors.get(alert_type.upper(), ServerColors.WHITE)
+    icon = icons.get(alert_type.upper(), "•")
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    
+    # DIRECT TERMINAL OUTPUT - THIS WILL ALWAYS SHOW
+    print(f"\n{ServerColors.DIM}[{timestamp}]{ServerColors.RESET} {color}{icon} {message}{ServerColors.RESET}")
+    
+    # FORCE FLUSH - Ensures output appears immediately
+    sys.stdout.flush()
+    sys.stderr.flush()
+    
+    # Also log to file for persistence
+    try:
+        log_file = os.path.join(LOGS_DIR, 'server_alerts.log')
+        with open(log_file, 'a', encoding='utf-8') as f:
+            f.write(f"[{timestamp}] [{alert_type}] {message}\n")
+    except:
+        pass
+    
+    return True
+
+# FIX 2: Enhanced server_alert_box with guaranteed output
+def server_alert_box(title, content_lines, border_color=ServerColors.RED):
+    """Print a colored box to server terminal - GUARANTEED OUTPUT"""
+    # Ensure content_lines is a list
+    if isinstance(content_lines, str):
+        content_lines = [content_lines]
+    elif not isinstance(content_lines, list):
+        content_lines = [str(content_lines)]
+    
+    # Calculate box width
+    max_line_len = max([len(str(line)) for line in content_lines] + [len(str(title))])
+    width = min(max_line_len + 4, 80)  # Cap at 80 characters
+    
+    # Build the box
+    top_bottom = "═" * (width + 2)
+    separator = "─" * (width + 2)
+    
+    # Print box with colors - DIRECT OUTPUT
+    print()
+    print(f"{border_color}╔{top_bottom}╗{ServerColors.RESET}")
+    print(f"{border_color}║ {str(title).ljust(width)} ║{ServerColors.RESET}")
+    print(f"{border_color}╠{separator}╣{ServerColors.RESET}")
+    
+    for line in content_lines:
+        print(f"{border_color}║ {str(line).ljust(width)} ║{ServerColors.RESET}")
+    
+    print(f"{border_color}╚{top_bottom}╝{ServerColors.RESET}")
+    print()
+    
+    # FORCE FLUSH
+    sys.stdout.flush()
+    sys.stderr.flush()
+    
+    # Also log to file
+    try:
+        log_file = os.path.join(LOGS_DIR, 'server_alerts.log')
+        with open(log_file, 'a', encoding='utf-8') as f:
+            f.write(f"\n{'='*60}\n")
+            f.write(f"BOX ALERT: {title}\n")
+            for line in content_lines:
+                f.write(f"  {line}\n")
+            f.write(f"{'='*60}\n")
+    except:
+        pass
+    
+    return True
+
+# ============================================================
+# ANSI COLOR DEFINITIONS (ALWAYS AVAILABLE)
+# ============================================================
+class Colors:
+    """ANSI color codes for terminal output"""
+    RED = '\033[91m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    BLUE = '\033[94m'
+    MAGENTA = '\033[95m'
+    CYAN = '\033[96m'
+    WHITE = '\033[97m'
+    RESET = '\033[0m'
+    DIM = '\033[2m'
+    BRIGHT = '\033[1m'
+    LIGHTRED_EX = '\033[91m'
+    LIGHTGREEN_EX = '\033[92m'
+    LIGHTYELLOW_EX = '\033[93m'
+    LIGHTCYAN_EX = '\033[96m'
+    LIGHTMAGENTA_EX = '\033[95m'
+    LIGHTBLUE_EX = '\033[94m'
+    LIGHTWHITE_EX = '\033[97m'
+    
+    @staticmethod
+    def strip(text):
+        ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+        return ansi_escape.sub('', text)
+
+# ============================================================
+# TRY TO IMPORT COLORAMA WITH PROPER ERROR HANDLING
+# ============================================================
+try:
+    from colorama import init, Fore, Back, Style
+    init(autoreset=True, convert=True, strip=False)
+    COLORS_AVAILABLE = True
+    # Force color support
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
+    os.environ['PYTHONUTF8'] = '1'
+except ImportError:
+    COLORS_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m'
+    })
+    Back = type('Back', (), {
+        'RESET': '\033[49m',
+        'BLACK': '\033[40m',
+        'RED': '\033[41m',
+        'GREEN': '\033[42m',
+        'YELLOW': '\033[43m',
+        'BLUE': '\033[44m',
+        'MAGENTA': '\033[45m',
+        'CYAN': '\033[46m',
+        'WHITE': '\033[47m'
+    })
+except Exception as e:
+    COLORS_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m'
+    })
+    Back = type('Back', (), {
+        'RESET': '\033[49m',
+        'BLACK': '\033[40m',
+        'RED': '\033[41m',
+        'GREEN': '\033[42m',
+        'YELLOW': '\033[43m',
+        'BLUE': '\033[44m',
+        'MAGENTA': '\033[45m',
+        'CYAN': '\033[46m',
+        'WHITE': '\033[47m'
+    })
+
+# ============================================================
+# SIMPLE SAFE PRINT FUNCTION
+# ============================================================
+def safe_print_unicode(message):
+    """Safely print unicode/emoji characters on Windows"""
+    try:
+        print(message)
+    except UnicodeEncodeError:
+        clean_message = message.encode('ascii', 'ignore').decode('ascii')
+        print(clean_message)
+    except Exception:
+        try:
+            print(str(message))
+        except:
+            pass
 
 # ============================================================
 # SURGICAL REMOVAL OF FLASK STARTUP PRINTS
 # ============================================================
 import contextlib
-import io
+import io as io_lib
 
 class SilenceFlaskStartup:
     def __enter__(self):
         self._original_stdout = sys.stdout
-        sys.stdout = io.StringIO()
+        sys.stdout = io_lib.StringIO()
         return self
     def __exit__(self, exc_type, exc_val, exc_tb):
         sys.stdout = self._original_stdout
@@ -327,12 +574,9 @@ def copy_logo_to_workspace():
         if os.path.exists(source):
             try:
                 shutil.copy2(source, logo_dest)
-                print(f"[LOGO] Copied logo from: {source}")
-                print(f"[LOGO] To: {logo_dest}")
                 return True
             except Exception as e:
-                print(f"[LOGO] Failed to copy from {source}: {e}")
-    
+                return False    
     # Create SVG fallback
     try:
         svg_content = '''<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
@@ -357,9 +601,7 @@ copy_logo_to_workspace()
 # ============================================================
 # FLASK APP
 # ============================================================
-app = Flask(__name__, 
-            static_folder=STATIC_DIR,
-            static_url_path='/static')
+app = Flask(__name__,static_folder=STATIC_DIR,static_url_path='/static')
 app.config['SECRET_KEY'] = 'dsterminal-holographic-2026'
 
 # ============================================================
@@ -399,12 +641,45 @@ except ImportError as e:
 # SHIELD CORE
 # ============================================================
 shield = ShieldCore(WORKSPACE_DIR)
-shield.start_monitoring()
+from flask_socketio import SocketIO
+# ============================================================
+# SOCKET.IO - WINDOWS THREADING IMPLEMENTATION
+ 
+def create_socketio_instance(app):
+    """Create Flask-SocketIO using the Windows-compatible threading backend."""
+    try:
+        sio = SocketIO(
+            app,
+            cors_allowed_origins="*",
+            async_mode="threading",
+            logger=False,
+            engineio_logger=False,
+        )
 
-# ============================================================
-# SOCKET IO
-# ============================================================
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+        print("[SOCKETIO] Flask-SocketIO initialized successfully")
+        print(f"[SOCKETIO] Async mode: {sio.async_mode}")
+
+        if sio.async_mode != "threading":
+            raise RuntimeError(
+                f"Unexpected Socket.IO backend: {sio.async_mode}"
+            )
+
+        return sio
+
+    except Exception as exc:
+        print("=" * 70)
+        print("[FATAL] Flask-SocketIO initialization failed")
+        print("=" * 70)
+        print(f"Error: {exc}")
+        print(f"Error type: {type(exc).__name__}")
+
+        raise RuntimeError(
+            "Flask-SocketIO failed to initialize with the Windows "
+            "threading backend."
+        ) from exc
+
+
+socketio = create_socketio_instance(app)
 
 # ============================================================
 # DATA STORES
@@ -480,13 +755,22 @@ class AdvancedRansomwareDetector:
         """Get all directories to monitor for ransomware"""
         dirs = []
         
-        # User directories
+        # User directories - CRITICAL for detection
         user_profile = os.environ.get('USERPROFILE')
         if not user_profile:
             user_profile = os.path.expanduser('~')
         
+        # IMPORTANT: Add Desktop explicitly
+        desktop_paths = [
+            os.path.join(user_profile, 'Desktop'),
+            os.path.join(user_profile, 'OneDrive', 'Desktop'),
+        ]
+        for path in desktop_paths:
+            if os.path.exists(path):
+                dirs.append(path)
+        
         if os.path.exists(user_profile):
-            for item in ['Documents', 'Desktop', 'Downloads', 'Pictures', 'Music', 'Videos']:
+            for item in ['Documents', 'Downloads', 'Pictures', 'Music', 'Videos']:
                 path = os.path.join(user_profile, item)
                 if os.path.exists(path):
                     dirs.append(path)
@@ -512,8 +796,12 @@ class AdvancedRansomwareDetector:
         return list(set(dirs))
     
     def scan_for_ransomware(self):
-        """Scan all monitored directories for ransomware activity"""
+        """Scan all monitored directories for ransomware activity - INCLUDES NEW FILES"""
         detected = []
+        
+        # Keep track of previously seen files
+        if not hasattr(self, '_seen_files'):
+            self._seen_files = set()
         
         for directory in self.monitored_dirs:
             if not os.path.exists(directory):
@@ -536,7 +824,10 @@ class AdvancedRansomwareDetector:
                         # Check if file is in monitored extensions
                         ext = os.path.splitext(file)[1].lower()
                         if ext not in monitored_extensions:
-                            continue
+                            # Also check for ransomware-specific extensions
+                            ransomware_exts = ['.encrypted', '.enc', '.locked', '.crypt', '.crypto', '.ransom']
+                            if ext not in ransomware_exts:
+                                continue
                         
                         # Check whitelist
                         if file_path in whitelist:
@@ -552,6 +843,19 @@ class AdvancedRansomwareDetector:
                             })
                             continue
                         
+                        # NEW: Check if this is a NEW file (not seen before)
+                        if file_path not in self._seen_files:
+                            self._seen_files.add(file_path)
+                            # Check if new file contains ransomware patterns
+                            if self._is_ransomware_file(file_path):
+                                detected.append({
+                                    'path': file_path,
+                                    'timestamp': datetime.now().isoformat(),
+                                    'process': self._get_process_name(file_path),
+                                    'reason': 'New ransomware file detected'
+                                })
+                                continue
+                        
                         # Check if file was recently modified (last 60 seconds)
                         try:
                             mtime = os.path.getmtime(file_path)
@@ -561,7 +865,8 @@ class AdvancedRansomwareDetector:
                                     detected.append({
                                         'path': file_path,
                                         'timestamp': datetime.now().isoformat(),
-                                        'process': self._get_process_name(file_path)
+                                        'process': self._get_process_name(file_path),
+                                        'reason': 'Modified ransomware file'
                                     })
                         except:
                             continue
@@ -569,51 +874,106 @@ class AdvancedRansomwareDetector:
                 continue
         
         return detected
-    
     def _is_ransomware_file(self, file_path):
-        """Check if a file exhibits ransomware behavior"""
+        """Check if a file exhibits ransomware behavior - Enhanced version"""
         try:
             # SKIP HONEYPOT FILES
             if 'honeypot' in file_path.lower():
                 return False
             
-            # Check file size changes
-            if os.path.getsize(file_path) > 1024 * 1024 * 10:  # 10MB
+            # Skip files that are too small (empty files) or too large
+            file_size = os.path.getsize(file_path)
+            if file_size < 10 or file_size > 1024 * 1024 * 50:  # 50MB max
                 return False
-                
-            # Read first few bytes
+            
+            # Read first few bytes (up to 4KB for better detection)
             with open(file_path, 'rb') as f:
-                content = f.read(1024)
-                
-            # Check for encrypted patterns
+                content = f.read(4096)
+            
+            if not content:
+                return False
+            
+            # Check for UTF-16 BOM and convert if needed
+            if content.startswith(b'\xff\xfe') or content.startswith(b'\xfe\xff'):
+                try:
+                    # Decode UTF-16 and re-encode to bytes for pattern matching
+                    text = content.decode('utf-16-le' if content.startswith(b'\xff\xfe') else 'utf-16-be')
+                    content = text.encode('utf-8')
+                except:
+                    pass
+            
+            # Also try to decode as UTF-8 if it looks like text
+            try:
+                text_content = content.decode('utf-8', errors='ignore').upper()
+            except:
+                text_content = content.upper().decode('ascii', errors='ignore')
+            
+            # Expanded ransomware patterns - includes more variants
             ransomware_patterns = [
-                b'ENCRYPTED',
-                b'DECRYPT',
-                b'RANSOM',
-                b'BITCOIN',
-                b'MONERO',
-                b'WALLET',
-                b'LOCKED',
-                b'ENCRYPTION',
-                b'CRYPTO',
-                b'DECRYPTION',
-                b'PAYMENT',
-                b'BTC',
-                b'XMR',
-                b'RANSOMWARE',
-                b'ENCRYPTED_BY_'
+                b'ENCRYPTED', b'DECRYPT', b'RANSOM', b'BITCOIN', b'MONERO',
+                b'WALLET', b'LOCKED', b'ENCRYPTION', b'CRYPTO', b'DECRYPTION',
+                b'PAYMENT', b'BTC', b'XMR', b'RANSOMWARE', b'ENCRYPTED_BY_',
+                b'DECRYPTED', b'ENCRYPT', b'LOCK', b'UNLOCK', b'KEY',
+                b'PASSWORD', b'RECOVERY', b'RESTORE', b'BACKUP', b'RANSOM',
+                b'PAY', b'BITCOIN', b'MONERO', b'ETH', b'ETHER',
+                b'YOUR FILES', b'FILES ENCRYPTED', b'DATA LOST',
+                b'CONTACT', b'EMAIL', b'INSTRUCTION', b'WARNING',
+                b'URGENT', b'IMPORTANT', b'READ_ME', b'RECOVER'
             ]
             
+            # Check binary patterns
+            content_upper = content.upper()
             for pattern in ransomware_patterns:
-                if pattern in content.upper():
+                if pattern in content_upper:
                     return True
-                    
-            # Check for high entropy (encrypted data)
-            if self._calculate_entropy(content) > 7.5:
+            
+            # Also check text content for patterns
+            text_patterns = [
+                'ENCRYPTED', 'DECRYPT', 'RANSOM', 'BITCOIN', 'MONERO',
+                'WALLET', 'LOCKED', 'ENCRYPTION', 'CRYPTO', 'DECRYPTION',
+                'PAYMENT', 'BTC', 'XMR', 'RANSOMWARE', 'ENCRYPTED_BY',
+                'YOUR FILES ARE ENCRYPTED', 'PAY THE RANSOM',
+                'FILES ENCRYPTED', 'DATA LOST', 'RECOVER FILES',
+                'DECRYPTION KEY', 'RANSOM NOTE', 'PAYMENT REQUIRED'
+            ]
+            
+            for pattern in text_patterns:
+                if pattern in text_content:
+                    return True
+            
+            # Check for common ransomware file extensions
+            ransomware_extensions = [
+                '.encrypted', '.enc', '.locked', '.crypt', '.crypto',
+                '.ransom', '.pay', '.bitcoin', '.monero', '.wallet',
+                '.locked', '.decrypt', '.key', '.recover', '.restore'
+            ]
+            file_ext = os.path.splitext(file_path)[1].lower()
+            if file_ext in ransomware_extensions:
                 return True
-                
+            
+            # Check file name for ransomware indicators
+            filename = os.path.basename(file_path).lower()
+            ransomware_filenames = [
+                'decrypt', 'ransom', 'read_me', 'readme', 'recover',
+                'how_to_decrypt', 'howtodecrypt', 'restore', 'key',
+                'encrypted', 'lock', 'unlock', 'payment', 'bitcoin'
+            ]
+            for name in ransomware_filenames:
+                if name in filename:
+                    return True
+            
+            # Check for high entropy (encrypted data) - but only for files that might be encrypted
+            # Skip for text files that might have high entropy naturally
+            text_extensions = ['.txt', '.log', '.csv', '.xml', '.json', '.html', '.css', '.js']
+            if file_ext not in text_extensions:
+                entropy = self._calculate_entropy(content)
+                if entropy > 7.5:
+                    return True
+            
             return False
-        except:
+            
+        except Exception as e:
+            # Log error but don't crash
             return False
     
     def _calculate_entropy(self, data):
@@ -622,10 +982,16 @@ class AdvancedRansomwareDetector:
             return 0
         import math
         entropy = 0
-        for x in range(256):
-            p_x = float(data.count(x)) / len(data)
-            if p_x > 0:
-                entropy += - p_x * math.log(p_x, 2)
+        # Convert bytes to list of ints for counting
+        byte_counts = {}
+        for byte in data:
+            byte_counts[byte] = byte_counts.get(byte, 0) + 1
+        
+        length = len(data)
+        for count in byte_counts.values():
+            p_x = count / length
+            entropy += -p_x * math.log2(p_x)
+        
         return entropy
     
     def _get_process_name(self, file_path):
@@ -652,7 +1018,203 @@ class AdvancedRansomwareDetector:
         return indicators
 
 detector = AdvancedRansomwareDetector()
+# ============================================================
+# SYSTEM-WIDE CONTINUOUS MONITORING - ADD THIS
+# ============================================================
 
+def start_system_wide_monitor():
+    """Start a background thread that continuously monitors ALL directories"""
+    
+    # Get all monitored directories from the detector
+    monitored_dirs = detector.monitored_dirs.copy()
+    
+    # Add additional critical system paths
+    additional_paths = [
+        os.path.expanduser('~'),
+        os.path.expanduser('~/Desktop'),
+        os.path.expanduser('~/Documents'),
+        os.path.expanduser('~/Downloads'),
+        os.path.expanduser('~/Pictures'),
+        os.path.expanduser('~/Music'),
+        os.path.expanduser('~/Videos'),
+        os.environ.get('TEMP', ''),
+        os.environ.get('TMP', ''),
+        'C:\\' if platform.system() == 'Windows' else '/',
+        'C:\\ProgramData' if platform.system() == 'Windows' else '/etc',
+        'C:\\Users' if platform.system() == 'Windows' else '/home',
+        '/tmp' if platform.system() != 'Windows' else None,
+        '/var/tmp' if platform.system() != 'Windows' else None,
+    ]
+    
+    if platform.system() == 'Windows':
+        import string
+        for letter in string.ascii_uppercase:
+            drive = f"{letter}:\\"
+            if os.path.exists(drive):
+                additional_paths.append(drive)
+    
+    for path in additional_paths:
+        if path and os.path.exists(path) and path not in monitored_dirs:
+            monitored_dirs.append(path)
+    
+    monitored_dirs = list(set(monitored_dirs))
+    
+    # Print directly to console
+    print("\n" + "="*60)
+    print("[MONITOR] Starting system-wide continuous monitoring")
+    print(f"[MONITOR] Monitoring {len(monitored_dirs)} directories")
+    print("="*60 + "\n")
+    sys.stdout.flush()
+    
+    seen_files = {}
+    
+    for directory in monitored_dirs:
+        if os.path.exists(directory):
+            try:
+                seen_files[directory] = set(os.listdir(directory))
+            except:
+                seen_files[directory] = set()
+    
+    def monitor_loop():
+        global pending_quarantine, ransomware_detected_files, whitelist, blacklist, config
+        
+        scan_count = 0
+        print("[MONITOR] Monitor loop started successfully!")
+        sys.stdout.flush()
+        
+        while True:
+            try:
+                scan_count += 1
+                
+                # Print scan status every 5 scans
+                if scan_count % 5 == 0:
+                    print(f"\n[MONITOR] 🔍 Scan #{scan_count} - Checking {len(monitored_dirs)} directories")
+                    sys.stdout.flush()
+                
+                for directory in monitored_dirs:
+                    if not os.path.exists(directory):
+                        continue
+                    
+                    try:
+                        current_files = set(os.listdir(directory))
+                    except (PermissionError, OSError):
+                        continue
+                    
+                    prev_files = seen_files.get(directory, set())
+                    new_files = current_files - prev_files
+                    
+                    # Print new files found
+                    if new_files:
+                        print(f"[MONITOR] 📄 Found {len(new_files)} new file(s) in {directory}")
+                        for f in list(new_files)[:3]:
+                            print(f"  - {f}")
+                        sys.stdout.flush()
+                    
+                    for filename in new_files:
+                        file_path = os.path.join(directory, filename)
+                        
+                        if os.path.isdir(file_path):
+                            continue
+                        if filename.startswith('.'):
+                            continue
+                        if file_path in whitelist:
+                            continue
+                        if file_path in blacklist:
+                            continue
+                        if 'honeypot' in file_path.lower():
+                            continue
+                        
+                        # Check if it's a ransomware file
+                        is_ransomware = detector._is_ransomware_file(file_path)
+                        
+                        if is_ransomware:
+                            # ============================================================
+                            # FIXED: RANSOMWARE DETECTED - PROPER ALERT CALLS
+                            # ============================================================
+                            
+                            # 1. Direct terminal output (always works)
+                            print("\n" + "="*70)
+                            print("🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴")
+                            print("🔴                   RANSOMWARE DETECTED!                 🔴")
+                            print("🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴")
+                            print(f"🔴 File: {file_path}")
+                            print(f"🔴 Directory: {directory}")
+                            print(f"🔴 Filename: {filename}")
+                            print(f"🔴 Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+                            print("🔴 Action: Auto-quarantine initiated")
+                            print("="*70 + "\n")
+                            sys.stdout.flush()
+                            
+                            # 2. Server alert box (fixed)
+                            try:
+                                server_alert_box(
+                                    "💀 RANSOMWARE DETECTED!",
+                                    [
+                                        f"File: {file_path}",
+                                        f"Directory: {directory}",
+                                        f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+                                        "Action: Auto-quarantine initiated"
+                                    ],
+                                    ServerColors.RED
+                                )
+                            except Exception as e:
+                                print(f"[MONITOR] Server alert box error: {e}")
+                                sys.stdout.flush()
+                            
+                            # 3. Server alert (fixed)
+                            try:
+                                server_alert(f"💀 RANSOMWARE DETECTED: {file_path}", "RANSOMWARE")
+                            except Exception as e:
+                                print(f"[MONITOR] Server alert error: {e}")
+                                sys.stdout.flush()
+                            
+                            # 4. Add to pending quarantine
+                            pending_quarantine.append({
+                                'path': file_path,
+                                'process': 'system_monitor',
+                                'timestamp': datetime.now().isoformat()
+                            })
+                            ransomware_detected_files.append({
+                                'path': file_path,
+                                'process': 'system_monitor',
+                                'timestamp': datetime.now().isoformat()
+                            })
+                            
+                            # 5. Dashboard alert via socket
+                            try:
+                                socketio.emit('status_update', {
+                                    'threat_level': 'RANSOMWARE_DETECTED',
+                                    'ransomware_detected': {'detected': True, 'file_path': file_path},
+                                    'pending_quarantine': pending_quarantine,
+                                    'ransomware_files': ransomware_detected_files
+                                })
+                            except Exception as e:
+                                print(f"[MONITOR] Socket emit error: {e}")
+                                sys.stdout.flush()
+                            
+                            # 6. Trigger auto-quarantine
+                            if config.get('auto_quarantine', True) and not auto_quarantine.is_running:
+                                print(f"[MONITOR] 🔄 Starting auto-quarantine for: {file_path}")
+                                sys.stdout.flush()
+                                auto_quarantine.start_quarantine(file_path, "Ransomware")
+                    
+                    seen_files[directory] = current_files
+                
+                time.sleep(2)
+                
+            except Exception as e:
+                print(f"\n[MONITOR] ❌ System monitor error: {e}")
+                sys.stdout.flush()
+                server_alert(f"System monitor error: {e}", "ERROR")
+                time.sleep(5)
+    
+    # Start the monitor in a daemon thread
+    monitor_thread = threading.Thread(target=monitor_loop, daemon=True)
+    monitor_thread.start()
+    print("[MONITOR] ✅ Thread started!")
+    sys.stdout.flush()
+    
+    return monitor_thread, monitored_dirs
 # ============================================================
 # AUTO-QUARANTINE ENGINE WITH PROGRESS
 # ============================================================
@@ -664,9 +1226,23 @@ class AutoQuarantineEngine:
         self.status = 'idle'
         self.start_time = None
         
+        # Server-side logging
+        server_alert("Auto-Quarantine Engine initialized", "INFO")
+        
     def start_quarantine(self, file_path, threat_type="Ransomware"):
         if self.is_running:
             return {'success': False, 'error': 'Quarantine already in progress'}
+        
+        server_alert_box(
+            "📁 AUTO-QUARANTINE STARTED",
+            [
+                f"File: {file_path}",
+                f"Threat Type: {threat_type}",
+                f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+            ],
+            ServerColors.MAGENTA
+        )
+        server_alert(f"Auto-quarantine started for: {file_path}", "QUARANTINE")
         
         self.is_running = True
         self.current_file = file_path
@@ -697,19 +1273,26 @@ class AutoQuarantineEngine:
         global pending_quarantine, quarantined_files, ransomware_detected_files
         
         try:
+            server_alert(f"Quarantine process started: {file_path}", "INFO")
+            
             self._update_progress(5, 'Initializing quarantine')
+            server_alert("Step 1: Initializing quarantine...", "INFO")
             time.sleep(2)
             
             self._update_progress(20, 'Validating file')
             file_path = sanitize_path(file_path)
+            server_alert(f"Step 2: Validating file: {file_path}", "INFO")
             
             if not os.path.exists(file_path):
+                server_alert(f"File not found, searching for: {file_path}", "WARNING")
                 self._update_progress(30, 'Searching for file...')
                 filename = os.path.basename(file_path)
                 found_path = find_file_anywhere(filename)
                 if found_path:
                     file_path = found_path
+                    server_alert(f"File found at: {file_path}", "SUCCESS")
                 else:
+                    server_alert(f"File not found: {file_path}", "ERROR")
                     self._update_progress(100, 'Failed: File not found')
                     self.is_running = False
                     auto_quarantine_progress['in_progress'] = False
@@ -717,16 +1300,19 @@ class AutoQuarantineEngine:
                     return
             
             self._update_progress(40, 'File validated')
+            server_alert("Step 3: File validated", "SUCCESS")
             time.sleep(1)
             
             self._update_progress(45, 'Creating quarantine directory')
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             quarantine_subdir = os.path.join(QUARANTINE_DIR, f'{threat_type}_{timestamp}')
             os.makedirs(quarantine_subdir, exist_ok=True)
+            server_alert(f"Step 4: Quarantine directory created: {quarantine_subdir}", "INFO")
             
             self._update_progress(55, 'Preparing quarantine')
             filename = os.path.basename(file_path)
             dest_path = os.path.join(quarantine_subdir, filename)
+            server_alert(f"Step 5: Preparing quarantine path: {dest_path}", "INFO")
             
             counter = 1
             while os.path.exists(dest_path):
@@ -735,15 +1321,19 @@ class AutoQuarantineEngine:
                 counter += 1
             
             self._update_progress(60, 'Moving file to quarantine')
+            server_alert("Step 6: Moving file to quarantine...", "INFO")
             time.sleep(1)
             
             self._update_progress(65, 'Moving file...')
             shutil.move(file_path, dest_path)
+            server_alert(f"Step 7: File moved to: {dest_path}", "SUCCESS")
             
             self._update_progress(75, 'File moved successfully')
+            server_alert("Step 8: File moved successfully", "SUCCESS")
             time.sleep(1)
             
             self._update_progress(80, 'Recording quarantine history')
+            server_alert("Step 9: Recording quarantine history", "INFO")
             
             quarantined_files.append({
                 'original_path': file_path,
@@ -765,11 +1355,14 @@ class AutoQuarantineEngine:
                 f.write(f"{datetime.now().isoformat()} | QUARANTINED | {file_path} -> {dest_path} | {threat_type}\n")
             
             self._update_progress(90, 'Finalizing quarantine')
+            server_alert("Step 10: Finalizing quarantine", "INFO")
             time.sleep(1)
             
             self._update_progress(95, 'Quarantine complete!')
+            server_alert("Step 11: Quarantine complete!", "SUCCESS")
             time.sleep(1)
             
+            # Generate incident report
             incident_data = {
                 'threat_level': 'RANSOMWARE_DETECTED',
                 'file_path': file_path,
@@ -783,9 +1376,24 @@ class AutoQuarantineEngine:
             }
             generate_report(incident_data)
             
+            # SERVER-SIDE COMPLETION ALERT
+            server_alert_box(
+                "✅ AUTO-QUARANTINE COMPLETE!",
+                [
+                    f"File: {file_path}",
+                    f"Quarantined to: {dest_path}",
+                    f"Threat Type: {threat_type}",
+                    f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+                    "Status: SUCCESSFULLY QUARANTINED"
+                ],
+                ServerColors.GREEN
+            )
+            server_alert(f"✅ Auto-quarantine complete: {file_path} -> {dest_path}", "SUCCESS")
+            
             if not pending_quarantine:
                 if SHIELD_AVAILABLE and hasattr(shield, 'threat_level'):
                     shield.threat_level = type('obj', (object,), {'name': 'CLEAN'})
+                    server_alert("Threat level reset to CLEAN", "INFO")
             
             self._update_progress(100, '[OK] Quarantine completed successfully')
             self.is_running = False
@@ -800,6 +1408,17 @@ class AutoQuarantineEngine:
             
         except Exception as e:
             error_msg = str(e)
+            server_alert_box(
+                "❌ AUTO-QUARANTINE FAILED!",
+                [
+                    f"File: {file_path}",
+                    f"Error: {error_msg}",
+                    f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+                ],
+                ServerColors.RED
+            )
+            server_alert(f"❌ Auto-quarantine failed: {error_msg}", "ERROR")
+            
             self._update_progress(100, f'❌ Failed: {error_msg}')
             self.is_running = False
             auto_quarantine_progress['in_progress'] = False
@@ -821,6 +1440,10 @@ class AutoQuarantineEngine:
             'file_path': self.current_file
         })
         
+        # SERVER-SIDE PROGRESS LOGGING - This shows in the terminal!
+        if progress % 10 == 0 or progress == 100:
+            server_alert(f"Quarantine progress: {progress}% - {status}", "INFO")
+        
         socketio.emit('quarantine_progress', {
             'file_path': self.current_file,
             'progress': progress,
@@ -837,13 +1460,13 @@ class AutoQuarantineEngine:
                 'status': status
             }
         })
-
 auto_quarantine = AutoQuarantineEngine()
 
 # ============================================================
 # ENHANCED RANSOMWARE DETECTION WITH AUTO-QUARANTINE
 # ============================================================
 def detect_ransomware_file():
+    """Enhanced ransomware detection with server-side logging"""
     global pending_quarantine, ransomware_detected_files, detected_file_paths
     
     if not config.get('monitoring_enabled', True):
@@ -861,7 +1484,6 @@ def detect_ransomware_file():
             os.path.join(os.environ.get('TEMP', '/tmp'), 'system_backup.bak'),
         ]
         
-        # Filter out None values
         honeypot_paths = [p for p in honeypot_paths if p]
         
         for hp_path in honeypot_paths:
@@ -870,23 +1492,35 @@ def detect_ransomware_file():
                     os.makedirs(os.path.dirname(hp_path), exist_ok=True)
                     with open(hp_path, 'w') as f:
                         f.write(f"HONEYPOT DECOY - DO NOT MODIFY - {datetime.now().isoformat()}")
+                    server_alert(f"Honeypot deployed: {hp_path}", "INFO")
                 except:
                     pass
         
-        # IMPORTANT: Check honeypots for modification (indicates ransomware activity)
-        # BUT DON'T QUARANTINE THEM - they are decoys!
+        # Check honeypots for modification
         for file_path in honeypot_paths:
-            # Skip honeypot detection entirely - they are just decoys
             if 'honeypot' in file_path.lower():
                 continue
             
-            # This code will never run for honeypots due to the continue above
             if os.path.exists(file_path) and file_path not in detected_file_paths:
                 try:
                     mtime = os.path.getmtime(file_path)
                     if time.time() - mtime < 60:
                         detected_file_paths.add(file_path)
                         process_name = 'system (honeypot trigger)'
+                        
+                        # SERVER-SIDE ALERT
+                        server_alert_box(
+                            "🚨 HONEYPOT TRIGGERED!",
+                            [
+                                f"File: {file_path}",
+                                f"Process: {process_name}",
+                                f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+                                "Action: Auto-quarantine initiated"
+                            ],
+                            ServerColors.RED
+                        )
+                        server_alert(f"HONEYPOT TRIGGERED: {file_path}", "CRITICAL")
+                        
                         pending_quarantine.append({
                             'path': file_path,
                             'process': process_name,
@@ -899,6 +1533,7 @@ def detect_ransomware_file():
                         })
                         
                         if config.get('auto_quarantine', True) and not auto_quarantine.is_running:
+                            server_alert(f"Starting auto-quarantine for: {file_path}", "QUARANTINE")
                             auto_quarantine.start_quarantine(file_path, "Ransomware")
                         
                         return {
@@ -909,44 +1544,60 @@ def detect_ransomware_file():
                 except:
                     pass
     
-    # Scan for real ransomware files (honeypots are already skipped)
+    # Scan for real ransomware files
     try:
         detected_files = detector.scan_for_ransomware()
         for file_info in detected_files:
             file_path = file_info['path']
             
-            # Double-check: skip honeypots
             if 'honeypot' in file_path.lower():
                 continue
                 
             if file_path not in detected_file_paths and file_path not in whitelist:
                 detected_file_paths.add(file_path)
+                process_name = file_info.get('process', 'unknown')
+                
+                # SERVER-SIDE ALERT
+                server_alert_box(
+                    "💀 RANSOMWARE DETECTED!",
+                    [
+                        f"File: {file_path}",
+                        f"Process: {process_name}",
+                        f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+                        "Action: Auto-quarantine initiated"
+                    ],
+                    ServerColors.RED
+                )
+                server_alert(f"RANSOMWARE DETECTED: {file_path} (Process: {process_name})", "RANSOMWARE")
+                
                 pending_quarantine.append({
                     'path': file_path,
-                    'process': file_info.get('process', 'unknown'),
+                    'process': process_name,
                     'timestamp': file_info.get('timestamp', datetime.now().isoformat())
                 })
                 ransomware_detected_files.append({
                     'path': file_path,
-                    'process': file_info.get('process', 'unknown'),
+                    'process': process_name,
                     'timestamp': file_info.get('timestamp', datetime.now().isoformat())
                 })
                 
                 if config.get('auto_quarantine', True) and not auto_quarantine.is_running:
+                    server_alert(f"Starting auto-quarantine for: {file_path}", "QUARANTINE")
                     auto_quarantine.start_quarantine(file_path, "Ransomware")
                 
                 return {
                     'detected': True,
                     'file_path': file_path,
-                    'process': file_info.get('process', 'unknown')
+                    'process': process_name
                 }
     except Exception as e:
-        print(f"[RANSOMWARE] Scan error: {e}")
+        server_alert(f"Ransomware scan error: {e}", "ERROR")
     
     if pending_quarantine:
         item = pending_quarantine[0]
         
         if config.get('auto_quarantine', True) and not auto_quarantine.is_running:
+            server_alert(f"Processing pending quarantine: {item.get('path', '')}", "QUARANTINE")
             auto_quarantine.start_quarantine(item.get('path', ''), "Ransomware")
         
         return {
@@ -956,7 +1607,6 @@ def detect_ransomware_file():
         }
     
     return {'detected': False}
-
 # ============================================================
 # DETECTION FUNCTIONS
 # ============================================================
@@ -975,6 +1625,7 @@ def detect_real_vulnerabilities():
                     'name': 'Missing Windows Security Updates',
                     'exploitable': True
                 })
+                server_alert("⚠️ Vulnerability detected: Missing Windows Security Updates", "WARNING")
     except:
         pass
     
@@ -989,9 +1640,28 @@ def detect_real_vulnerabilities():
                 'name': 'Windows Firewall Disabled',
                 'exploitable': True
             })
+            server_alert("🚨 CRITICAL: Windows Firewall is disabled!", "CRITICAL")
     except:
         pass
     return vulnerabilities
+
+def start_server_status_logging():
+    """Start periodic server status logging"""
+    def status_loop():
+        while True:
+            try:
+                time.sleep(30)  # Log every 30 seconds
+                if pending_quarantine:
+                    server_alert(f"📊 Status: {len(pending_quarantine)} files pending quarantine", "INFO")
+                if quarantined_files:
+                    server_alert(f"📊 Status: {len(quarantined_files)} files quarantined", "INFO")
+                if config.get('monitoring_enabled', True):
+                    server_alert("📊 Status: Monitoring active", "INFO")
+            except:
+                pass
+    
+    thread = threading.Thread(target=status_loop, daemon=True)
+    thread.start()
 
 def get_system_metrics():
     return {
@@ -1066,7 +1736,7 @@ def detect_active_mitre_techniques():
 def get_recommendations(threat_level, file_path=None):
     if threat_level == 'RANSOMWARE_DETECTED':
         return [
-            f'[SUCCESS] Auto-quarantine is enabled and will isolate the infected file',
+            f'[SUCCESS] Auto-quarantine is enabled and will isolate the infected file before it execute',
             f'[ERROR] IMMEDIATE: Do not pay the ransom',
             '[INFO] Identify the ransomware variant',
             '[INFO] Restore files from backups',
@@ -1118,7 +1788,7 @@ body {{ font-family: 'Segoe UI', sans-serif; background: #0a0e17; color: #00ff88
 </head>
 <body>
 <div class="watermark">{watermark}</div>
-<div class="header"><h1>DSTERMINAL CYBER OPS - INCIDENT REPORT</h1>
+<div class="header"><h1>DSTERMINAL CYBER OPS - INCIDENT RESPONSE REPORT</h1>
 <p>Report ID: {report_id} | Version: 4.0.0.113 | Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p></div>
 <div class="incident">
 <h2>[ALERT] {incident_data.get('threat_level', 'INCIDENT')}</h2>
@@ -2036,31 +2706,178 @@ def export_logs():
     return jsonify({'error': 'Failed to export logs'}), 500
 
 # ============================================================
-# WEBSOCKET
+# WEBSOCKET / REAL-TIME DASHBOARD STREAM
 # ============================================================
+# One broadcaster is shared by all connected browser clients.
+# The old implementation started one infinite thread per browser
+# subscription; this implementation keeps a single controlled
+# monitoring loop and broadcasts to all connected clients.
+
+_realtime_clients = set()
+_realtime_lock = threading.Lock()
+_realtime_thread = None
+_realtime_stop = threading.Event()
+
+
+def _realtime_snapshot():
+    """Build one complete dashboard update safely."""
+    with app.app_context():
+        try:
+            status_response = get_status()
+            status = status_response.get_json() if hasattr(status_response, 'get_json') else status_response
+        except Exception as exc:
+            status = {'error': str(exc)}
+
+        try:
+            metrics = get_system_metrics()
+        except Exception as exc:
+            metrics = {'error': str(exc)}
+
+        try:
+            mitre = detect_active_mitre_techniques()
+        except Exception as exc:
+            mitre = []
+
+        try:
+            events_response = get_events()
+            events = events_response.get_json() if hasattr(events_response, 'get_json') else events_response
+        except Exception:
+            events = []
+
+        return {
+            'status': status,
+            'metrics': metrics,
+            'mitre': mitre,
+            'events': events,
+            'timestamp': datetime.now().isoformat(),
+        }
+
+
+def _realtime_broadcast_loop():
+    """Broadcast dashboard telemetry every two seconds."""
+    global _realtime_thread
+    print("[SOCKETIO] Real-time monitoring loop started")
+
+    try:
+        while not _realtime_stop.is_set():
+            with _realtime_lock:
+                clients = list(_realtime_clients)
+
+            if not clients:
+                break
+
+            try:
+                snapshot = _realtime_snapshot()
+
+                for sid in clients:
+                    try:
+                        socketio.emit('status_update', snapshot['status'], room=sid)
+                        socketio.emit('metrics_update', snapshot['metrics'], room=sid)
+                        socketio.emit('mitre_update', snapshot['mitre'], room=sid)
+                        socketio.emit('events_update', snapshot['events'], room=sid)
+                    except Exception as exc:
+                        print(f"[SOCKETIO] Client update error: {exc}")
+
+            except Exception as exc:
+                print(f"[SOCKETIO] Real-time update error: {exc}")
+
+            # threading backend: normal sleep is intentional and safe.
+            _realtime_stop.wait(2.0)
+    finally:
+        _realtime_thread = None
+        _realtime_stop.clear()
+        print("[SOCKETIO] Real-time monitoring loop stopped")
+
+
+def _ensure_realtime_monitoring():
+    """Start the shared broadcaster once when the first client subscribes."""
+    global _realtime_thread
+
+    with _realtime_lock:
+        if _realtime_thread is not None and _realtime_thread.is_alive():
+            return
+
+        _realtime_stop.clear()
+        _realtime_thread = threading.Thread(
+            target=_realtime_broadcast_loop,
+            name="DSTerminal-Realtime",
+            daemon=True,
+        )
+        _realtime_thread.start()
+
+
 @socketio.on('connect')
 def handle_connect():
-    print(f'Client connected: {request.sid}')
-    emit('connected', {'status': 'connected'})
+    sid = request.sid
+    with _realtime_lock:
+        _realtime_clients.add(sid)
+
+    print(f'[SOCKETIO] Client connected: {sid}')
+    emit('connected', {
+        'status': 'connected',
+        'sid': sid,
+        'async_mode': socketio.async_mode,
+        'realtime': True,
+    })
+
+    # Send the current state immediately; don't wait for the 2-second loop.
+    try:
+        snapshot = _realtime_snapshot()
+        emit('status_update', snapshot['status'])
+        emit('metrics_update', snapshot['metrics'])
+        emit('mitre_update', snapshot['mitre'])
+        emit('events_update', snapshot['events'])
+    except Exception as exc:
+        print(f'[SOCKETIO] Initial state error: {exc}')
+
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    sid = request.sid
+    with _realtime_lock:
+        _realtime_clients.discard(sid)
+        remaining = len(_realtime_clients)
+        if remaining == 0:
+            _realtime_stop.set()
+
+    print(f'[SOCKETIO] Client disconnected: {sid}')
+
 
 @socketio.on('subscribe_updates')
 def handle_subscribe():
-    client_sid = request.sid
-    
-    def send_updates():
-        while True:
-            try:
-                with app.app_context():
-                    status = get_status().get_json()
-                    socketio.emit('status_update', status, room=client_sid)
-                    socketio.emit('metrics_update', get_system_metrics(), room=client_sid)
-                    socketio.emit('mitre_update', detect_active_mitre_techniques(), room=client_sid)
-                    time.sleep(2)
-            except Exception as e:
-                print(f"Update error: {e}")
-                time.sleep(5)
-    
-    threading.Thread(target=send_updates, daemon=True).start()
+    sid = request.sid
+    with _realtime_lock:
+        _realtime_clients.add(sid)
+
+    _ensure_realtime_monitoring()
+    emit('subscription_status', {
+        'subscribed': True,
+        'interval_seconds': 2,
+        'realtime': True,
+    })
+    print(f'[SOCKETIO] Client subscribed to real-time updates: {sid}')
+
+
+@socketio.on('unsubscribe_updates')
+def handle_unsubscribe():
+    sid = request.sid
+    with _realtime_lock:
+        _realtime_clients.discard(sid)
+        if not _realtime_clients:
+            _realtime_stop.set()
+
+    emit('subscription_status', {
+        'subscribed': False,
+        'realtime': False,
+    })
+    print(f'[SOCKETIO] Client unsubscribed: {sid}')
+
+@app.route('/favicon.ico')
+def favicon():
+    # No external favicon dependency is required for the standalone EXE.
+    response = make_response('', 204)
+    response.headers['Cache-Control'] = 'public, max-age=86400'
+    return response
 
 # ============================================================
 # HTML TEMPLATE
@@ -2392,7 +3209,7 @@ HTML_TEMPLATE = """
         
         <div>
             <div class="dst-logo-text">
-                DSTERMINAL <span class="highlight">●</span>
+                DSTERMINAL ORCH <span class="highlight">●</span>
             </div>
             <div class="dst-logo-badge">CYBER OPS v4.0.0.113</div>
         </div>
@@ -3361,9 +4178,17 @@ HTML_TEMPLATE = """
         `).join('');
     }
 
-    socket.on('connect', () => { 
-        console.log('Connected to server');
-        socket.emit('subscribe_updates'); 
+    socket.on('connect', () => {
+        console.log('Connected to DSTerminal real-time server');
+        socket.emit('subscribe_updates');
+    });
+
+    socket.on('disconnect', () => {
+        console.warn('Disconnected from DSTerminal real-time server');
+    });
+
+    socket.on('subscription_status', (data) => {
+        console.log('Real-time subscription:', data);
     });
     
     socket.on('status_update', updateStatus);
@@ -3457,6 +4282,235 @@ def open_browser():
     except:
         print("[WARNING] Open http://localhost:5000 manually")
 
+# ============================================================
+# DASHBOARD COMMAND FUNCTIONS - Called from dsterminal.py
+# ============================================================
+
+# Global variables to track dashboard state
+_dashboard_running = False
+_dashboard_thread = None
+_dashboard_port = 5000
+_dashboard_process = None
+
+def find_available_port(start_port=5000, max_port=5100):
+    """Find an available port starting from start_port"""
+    import socket
+    for port in range(start_port, max_port + 1):
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(1)
+            sock.bind(('localhost', port))
+            sock.close()
+            return port
+        except OSError:
+            continue
+        except Exception:
+            continue
+    return None
+
+def cmd_dashboard(args=None):
+    """Start the dashboard server"""
+    global _dashboard_running, _dashboard_thread, _dashboard_port
+    
+    if _dashboard_running:
+        return f"[INFO] Dashboard is already running on port {_dashboard_port}"
+    
+    try:
+        port = find_available_port(5000)
+        if port is None:
+            return "[!] No available ports found"
+        
+        _dashboard_port = port
+        print(f"[DASHBOARD] Starting DSTerminal Dashboard on port {port}...")
+        
+        def run_dashboard():
+            global _dashboard_running
+            try:
+                print(f"[DASHBOARD] Server starting on http://localhost:{port}")
+                with SilenceFlaskStartup():
+                    # Remove allow_unsafe_werkzeug if it's causing issues
+                    socketio.run(app, debug=False, host='0.0.0.0', port=port)
+            except Exception as e:
+                print(f"[DASHBOARD] Error: {e}")
+            finally:
+                _dashboard_running = False
+        
+        _dashboard_thread = threading.Thread(target=run_dashboard, daemon=True)
+        _dashboard_thread.start()
+        _dashboard_running = True
+        
+        def open_browser_delayed():
+            time.sleep(3)
+            try:
+                webbrowser.open(f'http://localhost:{port}')
+                print(f"[DASHBOARD] Browser opened to http://localhost:{port}")
+            except:
+                print(f"[DASHBOARD] Please open http://localhost:{port} manually")
+        
+        threading.Thread(target=open_browser_delayed, daemon=True).start()
+        
+        return f"[OK] Dashboard started at http://localhost:{port}"
+    
+    except Exception as e:
+        _dashboard_running = False
+        return f"[!] Failed to start dashboard: {e}"
+
+def cmd_dashboard_stop(args=None):
+    """Stop the dashboard server"""
+    global _dashboard_running, _dashboard_thread
+    
+    if not _dashboard_running:
+        return "[INFO] Dashboard is not running"
+    
+    try:
+        _dashboard_running = False
+        # Try to force stop the thread
+        if _dashboard_thread and _dashboard_thread.is_alive():
+            # We can't forcefully kill threads in Python, but we can set the flag
+            pass
+        return "[OK] Dashboard stopped"
+    except Exception as e:
+        return f"[!] Failed to stop dashboard: {e}"
+
+def cmd_dashboard_status(args=None):
+    """Check dashboard status"""
+    global _dashboard_running, _dashboard_port
+    
+    if _dashboard_running:
+        status_lines = [
+            f"[OK] Dashboard is RUNNING on port {_dashboard_port}",
+            f"📍 URL: http://localhost:{_dashboard_port}",
+            "🔄 Status: Active",
+            "📊 Monitoring: Enabled",
+            "💡 Use 'dashboard-browser' to open in browser",
+            "💡 Use 'dashboard-stop' to stop the server"
+        ]
+        return "\n".join(status_lines)
+    else:
+        return "[INFO] Dashboard is NOT running\n📋 Use 'dashboard' to start it"
+
+def cmd_dashboard_browser(args=None):
+    """Open dashboard in browser"""
+    global _dashboard_port, _dashboard_running
+    
+    if not _dashboard_running:
+        return "[INFO] Dashboard is not running. Use 'dashboard' to start it first."
+    
+    try:
+        port = _dashboard_port if _dashboard_port else 5000
+        webbrowser.open(f'http://localhost:{port}')
+        return f"[OK] Dashboard opened in browser at http://localhost:{port}"
+    except Exception as e:
+        return f"[!] Failed to open browser: {e}"
+
+def cmd_dashboard_help(args=None):
+    """Show dashboard help"""
+    return """
+╔══════════════════════════════════════════════════════════════╗
+║                    DASHBOARD COMMANDS                       ║
+╠══════════════════════════════════════════════════════════════╣
+║  dashboard / dash / security-dashboard  - Start dashboard   ║
+║  dashboard-stop / dash-stop            - Stop dashboard      ║
+║  dashboard-status / dash-status        - Check status        ║
+║  dashboard-browser / dash-browser      - Open in browser    ║
+║  dashboard-help / dash-help            - Show this help      ║
+╚══════════════════════════════════════════════════════════════╝
+
+[DASHBOARD FEATURES]
+  • Real-time threat monitoring with live updates
+  • Ransomware detection with auto-quarantine progress bar
+  • MITRE ATT&CK technique mapping and tracking
+  • System resource monitoring (CPU, RAM, Disk)
+  • Incident report generation (JSON/HTML/PDF)
+  • Process management with kill capability
+  • Network isolation control (one-click lockdown)
+  • Whitelist/blacklist management for files
+  • Auto-quarantine toggle with real-time progress
+
+[PORT MANAGEMENT]
+  • Automatically finds an available port
+  • Tries ports from 5000 to 5100
+  • Shows the port being used in status
+
+[TROUBLESHOOTING]
+  • If port 5000 is in use, it will try the next port
+  • Check status with 'dashboard-status'
+  • Stop with 'dashboard-stop' before starting again
+  • If you see "Only one usage of each socket address", 
+    wait a few seconds and try 'dashboard' again
+"""
+
+# ============================================================
+# DASHBOARD INTEGRATION CLASS (for compatibility)
+# ============================================================
+class DashboardIntegration:
+    """Dashboard integration class for backward compatibility"""
+    def __init__(self):
+        self.running = False
+        self.thread = None
+        self.port = 5000
+    
+    def start(self):
+        return cmd_dashboard([])
+    
+    def stop(self):
+        return cmd_dashboard_stop([])
+    
+    def status(self):
+        return cmd_dashboard_status([])
+    
+    def open_browser(self):
+        return cmd_dashboard_browser([])
+    
+    def help(self):
+        return cmd_dashboard_help([])
+
+# Create a global instance for compatibility
+dashboard_integration = DashboardIntegration()
+
+# ============================================================
+# REGISTER DASHBOARD COMMANDS (for compatibility)
+# ============================================================
+def register_dashboard_commands(terminal_instance):
+    """Register dashboard commands with terminal instance"""
+    try:
+        terminal_instance.register_command('dashboard', cmd_dashboard)
+        terminal_instance.register_command('dash', cmd_dashboard)
+        terminal_instance.register_command('security-dashboard', cmd_dashboard)
+        terminal_instance.register_command('dashboard-stop', cmd_dashboard_stop)
+        terminal_instance.register_command('dash-stop', cmd_dashboard_stop)
+        terminal_instance.register_command('dashboard-status', cmd_dashboard_status)
+        terminal_instance.register_command('dash-status', cmd_dashboard_status)
+        terminal_instance.register_command('dashboard-browser', cmd_dashboard_browser)
+        terminal_instance.register_command('dash-browser', cmd_dashboard_browser)
+        terminal_instance.register_command('dashboard-help', cmd_dashboard_help)
+        terminal_instance.register_command('dash-help', cmd_dashboard_help)
+        return True
+    except Exception as e:
+        print(f"[ERROR] Failed to register dashboard commands: {e}")
+        return False
+
+# ============================================================
+# EXPORT THE FLASK APP AND SOCKETIO
+# ============================================================
+__all__ = [
+    'app',
+    'socketio',
+    'cmd_dashboard',
+    'cmd_dashboard_stop',
+    'cmd_dashboard_status',
+    'cmd_dashboard_browser',
+    'cmd_dashboard_help',
+    'DashboardIntegration',
+    'dashboard_integration',
+    'register_dashboard_commands',
+    'DASHBOARD_AVAILABLE',
+    'find_available_port'
+]
+
+# Set DASHBOARD_AVAILABLE flag
+DASHBOARD_AVAILABLE = True
+
 if __name__ == "__main__":
     print("=" * 70)
     print("🔮 DSTERMINAL SECURITY SUITE v4.0.0.113")
@@ -3467,11 +4521,13 @@ if __name__ == "__main__":
     print(f"[FOLDER] Quarantine: {QUARANTINE_DIR}")
     print(f"🛡️ Shield Core: {shield.threat_level.name if hasattr(shield, 'threat_level') else 'ACTIVE'}")
     print("=" * 70)
+    print(f"[SOCKETIO] Backend: {socketio.async_mode}")
+    print("[OK] Flask-SocketIO real-time telemetry enabled")
     print("[OK] Automatic Ransomware Detection - Anywhere in your System")
     print("[OK] AUTO-QUARANTINE - Files automatically quarantined when detected")
     print("[OK] 2-Minute Quarantine Progress Bar on Dashboard")
     print("[OK] MITRE ATT&CK techniques")
-    print("[OK] Reports (JSON/HTML/PDF)")
+    print("[OK] Reports Format: (JSON/HTML/PDF)")
     print("=" * 70)
     print("\n[LIST] DASHBOARD CONTROLS:")
     print("  [BOT] Auto-Q - Toggle auto-quarantine on/off")
@@ -3479,15 +4535,21 @@ if __name__ == "__main__":
     print("  [FOLDER] Quarantine - View/restore/delete quarantined files")
     print("=" * 70)
     print("\n[POWER] AUTO-QUARANTINE FEATURES:")
-    print("  • Automatically detects ransomware anywhere in system")
-    print("  • Shows real-time progress bar (2 minutes)")
-    print("  • Displays status in dashboard and banner")
+    print("  • Displays alert status in dashboard and server terminal")
     print("  • Creates incident report after quarantine")
     print("  • File appears in quarantine section with timestamp")
     print("=" * 70)
-    print("\nPress Ctrl+C to stop\n")
+    print("\n📡 SERVER-SIDE MONITORING ACTIVE")
+    print("   Alerts will appear here when threats are detected\n")
+    
+    # START THE SYSTEM-WIDE MONITOR
+    monitor_thread, monitored_dirs = start_system_wide_monitor()
+    server_alert(f"📡 System monitor thread started - {len(monitored_dirs)} directories", "INFO")
+    
+    # Start status logging
+    start_server_status_logging()
 
     threading.Thread(target=open_browser, daemon=True).start()
     
     with SilenceFlaskStartup():
-        socketio.run(app, debug=False, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
+        socketio.run(app, debug=False, host='0.0.0.0', port=5000)

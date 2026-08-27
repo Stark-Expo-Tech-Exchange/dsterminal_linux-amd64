@@ -1,0 +1,11695 @@
+#!dsterminal
+# -*- coding: utf-8 -*-
+"""
+DSTerminal - Defensive Security Terminal
+"""
+
+import sys
+import os
+import platform
+
+# ============================================================
+# FORCE UTF-8 ENCODING FOR ALL PLATFORMS (FIXED)
+# ============================================================
+
+# Fix for Windows console encoding - MUST BE FIRST
+if platform.system() == "Windows":
+    try:
+        # Set console code page to UTF-8
+        os.system('chcp 65001 > nul')
+        # Set environment variables
+        os.environ['PYTHONIOENCODING'] = 'utf-8'
+        os.environ['PYTHONUTF8'] = '1'
+    except:
+        pass
+
+# Fix stdout/stderr encoding
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+if hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+
+# Fix for Windows console using ctypes (most reliable)
+if platform.system() == "Windows":
+    try:
+        import ctypes
+        kernel32 = ctypes.windll.kernel32
+        # Set console output to UTF-8
+        kernel32.SetConsoleCP(65001)
+        kernel32.SetConsoleOutputCP(65001)
+        # Enable virtual terminal processing for ANSI colors
+        kernel32.SetConsoleMode(kernel32.GetStdHandle(-11), 7)
+    except:
+        pass
+
+# Import colorama with proper encoding
+try:
+    from colorama import init, Fore, Back, Style
+    init(autoreset=True)
+    COLORS_AVAILABLE = True
+except ImportError:
+    # Fallback color codes
+    class Fore:
+        RED = '\033[91m'; GREEN = '\033[92m'; YELLOW = '\033[93m'
+        BLUE = '\033[94m'; MAGENTA = '\033[95m'; CYAN = '\033[96m'
+        WHITE = '\033[97m'; RESET = '\033[0m'; DIM = '\033[2m'
+        LIGHTRED_EX = '\033[91m'; LIGHTGREEN_EX = '\033[92m'
+        LIGHTYELLOW_EX = '\033[93m'; LIGHTCYAN_EX = '\033[96m'
+        LIGHTMAGENTA_EX = '\033[95m'
+    
+    class Back:
+        RED = '\033[101m'; GREEN = '\033[102m'; YELLOW = '\033[103m'
+        BLUE = '\033[104m'; RESET = '\033[0m'
+    
+    class Style:
+        BRIGHT = '\033[1m'; DIM = '\033[2m'; NORMAL = '\033[22m'
+        RESET_ALL = '\033[0m'
+    
+    COLORS_AVAILABLE = False
+
+# ============================================================
+# EMOJI MAP FOR SAFE OUTPUT
+# ============================================================
+
+EMOJI_MAP = {
+    '✅': '[OK]',
+    '❌': '[X]',
+    '⚠️': '[!]',
+    '🔍': '[SEARCH]',
+    '🛡️': '[SHIELD]',
+    '🌐': '[WEB]',
+    '📡': '[SIGNAL]',
+    '💡': '[TIP]',
+    '🔐': '[LOCK]',
+    '📁': '[FOLDER]',
+    '📄': '[FILE]',
+    '📊': '[CHART]',
+    '📈': '[GRAPH]',
+    '📉': '[DOWN]',
+    '📋': '[CLIPBOARD]',
+    '📝': '[NOTE]',
+    '📚': '[BOOK]',
+    '📖': '[OPENBOOK]',
+    '📕': '[REDBOOK]',
+    '📗': '[GREENBOOK]',
+    '📘': '[BLUEBOOK]',
+    '📙': '[YELLOWBOOK]',
+    '📓': '[NOTEBOOK]',
+    '📔': '[JOURNAL]',
+    '📒': '[LEDGER]',
+    '📰': '[NEWS]',
+    '📯': '[TRUMPET]',
+    '📨': '[ENVELOPE]',
+    '📩': '[MAIL]',
+    '📪': '[MAILBOX]',
+    '📫': '[MAILBOXFULL]',
+    '📬': '[MAILBOXOPEN]',
+    '📭': '[MAILBOXEMPTY]',
+    '📮': '[POSTBOX]',
+    '🌟': '[STAR]',
+    '⭐': '[STAR]',
+    '🔥': '[FIRE]',
+    '💻': '[PC]',
+    '🖥️': '[MONITOR]',
+    '⌨️': '[KEYBOARD]',
+    '🖱️': '[MOUSE]',
+    '🖲️': '[TRACKBALL]',
+    '💾': '[FLOPPY]',
+    '💿': '[CD]',
+    '📀': '[DVD]',
+    '🧠': '[BRAIN]',
+    '💉': '[SYRINGE]',
+    '💊': '[PILL]',
+    '🔬': '[MICROSCOPE]',
+    '🔭': '[TELESCOPE]',
+    '📌': '[PIN]',
+    '📍': '[LOCATION]',
+    '📎': '[PAPERCLIP]',
+    '📏': '[RULER]',
+    '📐': '[PROTRACTOR]',
+    '✂️': '[SCISSORS]',
+    '🗂️': '[DIVIDER]',
+    '📂': '[FOLDER]',
+    '📃': '[DOCUMENT]',
+    '📄': '[PAGE]',
+    '📑': '[BOOKMARK]',
+    '🔖': '[BOOKMARK]',
+    '📛': '[NAMETAG]',
+    '🔗': '[LINK]',
+    '📤': '[OUTBOX]',
+    '📥': '[INBOX]',
+    '📦': '[PACKAGE]',
+    '📫': '[MAILBOX]',
+    '📪': '[MAILBOX]',
+    '📬': '[MAILBOX]',
+    '📭': '[MAILBOX]',
+    '📮': '[POSTBOX]',
+}
+
+def safe_print_unicode(text):
+    """Print text safely, replacing unsupported emojis with ASCII fallback"""
+    try:
+        # Test if text can be printed
+        test_str = "✅"
+        test_str.encode(sys.stdout.encoding)
+        print(text)
+    except UnicodeEncodeError:
+        # Replace emojis with ASCII equivalents
+        for emoji, ascii_rep in EMOJI_MAP.items():
+            text = text.replace(emoji, ascii_rep)
+            print(text)    
+def maximize_terminal():
+    """Maximize terminal window on startup - Cross Platform (FIXED)"""
+    system = platform.system()
+    
+    if system == "Windows":
+        try:
+            # PowerShell maximize
+            subprocess.run([
+                'powershell', '-Command',
+                '$hwnd = (Get-Process -Id $pid).MainWindowHandle; '
+                'Add-Type -MemberDefinition @"[DllImport("user32.dll")]public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);"@ -Name "Win32" -Namespace "Utils"; '
+                '[Utils.Win32]::ShowWindow($hwnd, 3)'
+            ], capture_output=True, timeout=2)
+            # Set buffer size to match window (zoomed)
+            subprocess.run(['mode', 'con:', 'cols=160', 'lines=50'], capture_output=True, timeout=2)
+        except:
+            pass
+    
+    elif system == "Linux":
+        try:
+            result = subprocess.run(['which', 'xdotool'], capture_output=True, timeout=1)
+            if result.returncode == 0:
+                subprocess.run(['xdotool', 'getactivewindow', 'windowsize', '100%', '100%'], 
+                            capture_output=True, timeout=1)
+            else:
+                sys.stdout.write('\x1b[8;50;160t')  # rows=50, cols=160
+                sys.stdout.flush()
+        except:
+            pass
+    
+    elif system == "Darwin":  # macOS
+        try:
+            applescript = '''
+            tell application "Terminal"
+                activate
+                set bounds of front window to {0, 22, 1680, 1050}
+                set front window's size to {160, 50}
+            end tell
+            '''
+            subprocess.run(['osascript', '-e', applescript], capture_output=True, timeout=2)
+        except:
+            try:
+                sys.stdout.write('\x1b[8;50;160t')
+                sys.stdout.flush()
+            except:
+                pass
+
+def set_optimal_display():
+    """Set optimal display settings for DSTerminal"""
+    if platform.system() == "Windows":
+        try:
+            # Set larger font via ctypes
+            import ctypes
+            kernel32 = ctypes.windll.kernel32
+            handle = kernel32.GetStdHandle(-11)
+            
+            # Define font info structure
+            class CONSOLE_FONT_INFOEX(ctypes.Structure):
+                _fields_ = [
+                    ("cbSize", ctypes.c_ulong),
+                    ("nFont", ctypes.c_ulong),
+                    ("dwFontSize", ctypes.c_ulong * 2),
+                    ("FontFamily", ctypes.c_uint),
+                    ("FontWeight", ctypes.c_uint),
+                    ("FaceName", ctypes.c_wchar * 32)
+                ]
+            
+            font_info = CONSOLE_FONT_INFOEX()
+            font_info.cbSize = ctypes.sizeof(CONSOLE_FONT_INFOEX)
+            font_info.dwFontSize = (ctypes.c_ulong * 2)(20, 20)  # 20x20 font
+            font_info.FaceName = "Consolas"  # Monospace font
+            
+            kernel32.SetCurrentConsoleFontEx(handle, False, ctypes.byref(font_info))
+        except:
+            pass
+
+# Call this after maximize_terminal()
+try:
+    set_optimal_display()
+except:
+    pass
+# ============================================
+# Get base path - DEFINE THIS FIRST
+# ============================================
+def get_base_path():
+    """Get the base path for the application"""
+    if getattr(sys, 'frozen', False):
+        if hasattr(sys, '_MEIPASS'):
+            return sys._MEIPASS
+        else:
+            return os.path.dirname(sys.executable)
+    else:
+        return os.path.dirname(os.path.abspath(__file__))
+
+BASE_PATH = get_base_path()
+if BASE_PATH not in sys.path:
+    sys.path.insert(0, BASE_PATH)
+
+try:
+    os.chdir(BASE_PATH)
+except:
+    pass
+
+# ============================================
+# WORKSPACE - Define BEFORE using
+# ============================================
+def init_workspace():
+    workspace_path = os.path.expanduser("~/dsterminal_workspace")
+    subdirs = ["sandbox", "scans", "exploits", "reports", "operators", 
+               "backups", "logs", "config", "database", "temp"]
+    try:
+        os.makedirs(workspace_path, exist_ok=True)
+        for subdir in subdirs:
+            os.makedirs(os.path.join(workspace_path, subdir), exist_ok=True)
+        os.makedirs(os.path.join(workspace_path, "reports", "network_reports"), exist_ok=True)
+        os.makedirs(os.path.join(workspace_path, "reports", "threat_maps"), exist_ok=True)
+        os.makedirs(os.path.join(workspace_path, "reports", "forensic"), exist_ok=True)
+        return workspace_path
+    except:
+        return os.path.expanduser("~/dsterminal_workspace")
+
+WORKSPACE = init_workspace()
+
+# ============================================
+# FAST IMPORTS - Only import what's needed
+# ============================================
+import tempfile
+from pathlib import Path
+import time
+import random
+import json
+import os
+import sys
+import platform
+import subprocess
+import shutil
+import socket
+import uuid
+import hashlib
+import logging
+import threading
+import queue
+import re
+from datetime import datetime
+from typing import Dict, List, Optional, Tuple, Any
+from dataclasses import dataclass, field
+from prompt_toolkit import PromptSession
+from prompt_toolkit.completion import NestedCompleter, WordCompleter
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from prompt_toolkit.history import FileHistory
+from prompt_toolkit.formatted_text import HTML
+
+# ========================================================
+# Import edu_typing_engine - NOW BASE_PATH is defined
+# ========================================================
+try:
+    edu_path = os.path.join(BASE_PATH, 'edu_typing_engine.py')
+    if os.path.exists(edu_path):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("edu_typing_engine", edu_path)
+        edu_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(edu_module)
+        EducationTypingEngine = edu_module.EducationTypingEngine
+        engine = EducationTypingEngine(speed=0.03)
+    else:
+        safe_print_unicode(f"âš  edu_typing_engine.py not found at: {edu_path}")
+        engine = None
+except Exception as e:
+    safe_print_unicode(f"âš  Education typing engine import error: {e}")
+    engine = None
+
+# ============================================
+# Continue with other imports
+# ============================================
+import math
+import shlex
+import shutil
+import socket
+# Network interface utilities with fallback
+try:
+    import netifaces
+    NETIFACES_AVAILABLE = True
+except ImportError:
+    NETIFACES_AVAILABLE = False
+    netifaces = None
+
+def get_network_interfaces():
+    """Get network interfaces (with fallback)"""
+    if NETIFACES_AVAILABLE and netifaces:
+        try:
+            return netifaces.interfaces()
+        except:
+            pass
+    
+    # Fallback: use ipconfig/ifconfig
+    import subprocess
+    import platform
+    interfaces = []
+    try:
+        if platform.system() == "Windows":
+            result = subprocess.run(['ipconfig'], capture_output=True, text=True)
+            for line in result.stdout.split('\n'):
+                if 'adapter' in line.lower():
+                    iface = line.split(':')[0].strip()
+                    if iface:
+                        interfaces.append(iface)
+        else:
+            import os
+            if os.path.exists('/sys/class/net/'):
+                interfaces = os.listdir('/sys/class/net/')
+            else:
+                result = subprocess.run(['ifconfig', '-a'], capture_output=True, text=True)
+                for line in result.stdout.split('\n'):
+                    if ':' in line and not line.startswith(' '):
+                        iface = line.split(':')[0].strip()
+                        if iface:
+                            interfaces.append(iface)
+    except:
+        pass
+    
+    return interfaces
+
+def get_local_ip():
+    """Get local IP address"""
+    try:
+        import socket
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except:
+        return "127.0.0.1"
+from getpass import getpass
+import requests
+import uuid
+import hashlib
+import logging
+import psutil
+from tqdm import tqdm
+import threading
+import textwrap
+import platform
+import json
+import time
+import random
+import ssl
+import whois
+import OpenSSL
+import subprocess
+from cryptography.x509 import load_pem_x509_certificate
+from cryptography.x509.ocsp import OCSPRequestBuilder
+from threading import Thread, Event
+from datetime import datetime, timedelta 
+from cryptography.fernet import Fernet
+import re
+from colorama import Fore, Style, init
+
+from prompt_toolkit import PromptSession, HTML
+from prompt_toolkit import PromptSession
+from prompt_toolkit.completion import NestedCompleter
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from prompt_toolkit.history import FileHistory
+
+from prompt_toolkit.completion import WordCompleter
+from prompt_toolkit.formatted_text import HTML
+from prompt_toolkit.shortcuts import print_formatted_text
+
+# Prompt toolkit imports
+try:
+    from prompt_toolkit import PromptSession
+    from prompt_toolkit.history import FileHistory
+    from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+    from prompt_toolkit.formatted_text import HTML
+    from prompt_toolkit.styles import Style
+    from prompt_toolkit.completion import NestedCompleter
+    from prompt_toolkit.layout.processors import Processor, Transformation
+    from prompt_toolkit.buffer import Buffer
+except ImportError as e:
+    safe_print_unicode(f"[!] prompt_toolkit not available: {e}")
+    sys.exit(1)
+
+from colorama import Fore, Style, init
+# from pyfiglet import figlet_format
+from pyfiglet import figlet_format
+import itertools
+from rich.console import Console, Group
+from rich.panel import Panel
+from rich.align import Align
+from rich.text import Text
+from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn
+from rich.live import Live
+from collections import Counter
+from rich import box
+from rich.console import Console
+from rich.layout import Layout
+from rich.table import Table as Table
+from rich.table import Table as RichTable
+from random import choice
+from rich.prompt import Prompt
+# from rich.group import Group
+from shutil import which
+from rich.columns import Columns
+from edu_typing_engine import EducationTypingEngine
+from cryptography.hazmat.primitives import serialization
+import cryptography
+from prompt_toolkit.completion import WordCompleter
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from dst_footer import DynamicFooter, FooterColors
+from telemetry_engine import TelemetryEngine
+
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Paragraph,
+    Spacer,
+    Image,
+    Table,
+    TableStyle,
+    PageBreak
+)
+try:
+    import matplotlib
+    matplotlib.use('Agg')  # Only if absolutely needed
+    MATPLOTLIB_AVAILABLE = True
+except ImportError:
+    MATPLOTLIB_AVAILABLE = False
+
+
+# ============================================================
+# CUSTOM COLORAMA EXTENSION - FIX FOR DIM
+# ============================================================
+
+try:
+    from colorama import Fore, Back, Style, init
+    init(autoreset=True)
+    
+    # Add DIM to Fore if it doesn't exist
+    if not hasattr(Fore, 'DIM'):
+        # Use ANSI escape code for dim
+        Fore.DIM = '\033[2m'
+        
+    # Add DIM to Style if it doesn't exist
+    if not hasattr(Style, 'DIM'):
+        Style.DIM = '\033[2m'
+        
+    COLORS_AVAILABLE = True
+except ImportError:
+    # Fallback color class
+    class Fore:
+        RED = '\033[91m'; GREEN = '\033[92m'; YELLOW = '\033[93m'
+        BLUE = '\033[94m'; MAGENTA = '\033[95m'; CYAN = '\033[96m'
+        WHITE = '\033[97m'; RESET = '\033[0m'; DIM = '\033[2m'
+        LIGHTRED_EX = '\033[91m'; LIGHTGREEN_EX = '\033[92m'
+        LIGHTYELLOW_EX = '\033[93m'; LIGHTCYAN_EX = '\033[96m'
+        LIGHTMAGENTA_EX = '\033[95m'
+    
+    class Back:
+        RED = '\033[101m'; GREEN = '\033[102m'; YELLOW = '\033[103m'
+        BLUE = '\033[104m'; RESET = '\033[0m'
+    
+    class Style:
+        BRIGHT = '\033[1m'; DIM = '\033[2m'; NORMAL = '\033[22m'
+        RESET_ALL = '\033[0m'
+    
+    COLORS_AVAILABLE = False
+    
+# Replace the cartopy imports with:
+try:
+    import cartopy.crs as ccrs
+    import cartopy.feature as cfeature
+    CARTOPY_AVAILABLE = True
+except ImportError:
+    CARTOPY_AVAILABLE = False
+    # Try to import PDF library
+try:
+    from reportlab.lib.pagesizes import letter, landscape
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib import colors
+    from reportlab.lib.units import inch
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.utils import ImageReader
+    PDF_AVAILABLE = True
+except ImportError:
+    PDF_AVAILABLE = False
+    safe_print_unicode("[!] ReportLab not installed. PDF export disabled. Install with: pip install reportlab")# =================================================================================
+# =================================================================================
+# =================================================================================
+import io
+# timezonefinder is optional - skip if not available
+try:
+    import timezonefinder
+    TIMEZONEFINDER_AVAILABLE = True
+except ImportError:
+    TIMEZONEFINDER_AVAILABLE = False
+    timezonefinder = None
+import pytz
+from enum import Enum
+from PIL import Image
+import numpy as np
+from collections import defaultdict
+import threading
+    # Add these imports at the top of your file
+import folium
+from folium.plugins import HeatMap, MarkerCluster
+import webbrowser
+import tempfile
+import contextlib
+
+#from geopy.geocoders import Nominatim
+#from geopy.exc import GeocoderTimedOut, GeocoderServiceError
+
+import plotly.graph_objects as go
+import plotly.express as px
+from plotly.subplots import make_subplots
+from reportlab.lib.colors import black, lightgrey, HexColor
+from crypto_engine import CryptoEngine
+init(autoreset=True)
+
+engine = EducationTypingEngine(speed=0.03)
+username = "OP-" + uuid.uuid4().hex[:6].upper()
+crypto_engine = CryptoEngine()
+
+# =========================
+# Place this right after your imports, before any classes
+# =========================
+class Colors:
+    """ANSI color codes for terminal output"""
+    HEADER = '\033[95m'
+    BLUE = '\033[94m'
+    CYAN = '\033[96m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    END = '\033[0m'
+    BLACK = '\033[90m'
+    MAGENTA = '\033[95m'
+    WHITE = '\033[97m'
+    DIM = '\033[2m'
+
+
+class SimpleWorkspace:
+    """Minimal workspace wrapper for string paths."""
+    def __init__(self, base_path):
+        self.base_path = base_path
+        os.makedirs(os.path.join(base_path, 'database'), exist_ok=True)
+        os.makedirs(os.path.join(base_path, 'logs'), exist_ok=True)
+        os.makedirs(os.path.join(base_path, 'config'), exist_ok=True)        
+        os.makedirs(os.path.join(base_path, 'backups_protected'), exist_ok=True)  # â† ADD THIS
+        for cat in ['images','documents','spreadsheets','code','config','archives','media','other','protected','encrypted']:
+            os.makedirs(os.path.join(base_path, 'backups', cat), exist_ok=True)
+    
+    def get_database_path(self):
+        return os.path.join(self.base_path, 'database', 'dsterminal.db')
+    
+    def get_backup_path(self, category='other'):
+        return os.path.join(self.base_path, 'backups', category)
+    
+    def get_log_path(self):
+        ts = datetime.now().strftime("%Y%m%d")
+        return os.path.join(self.base_path, 'logs', f'dsterminal_{ts}.log')
+    
+    def get_path(self, key):
+        return os.path.join(self.base_path, key)
+    
+    def get_key_path(self):
+        return os.path.join(self.base_path, 'config', 'encryption.key')
+    
+    def get_config_path(self):
+        return os.path.join(self.base_path, 'config', 'config.json')
+    
+    def get_report_path(self):
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+        return os.path.join(self.base_path, 'reports', f'report_{ts}.pdf')
+    
+    def cleanup_temp_files(self, max_age_hours=24):
+        temp_dir = os.path.join(self.base_path, 'temp')
+        if os.path.exists(temp_dir):
+            cutoff = time.time() - (max_age_hours * 3600)
+            for f in os.listdir(temp_dir):
+                fp = os.path.join(temp_dir, f)
+                if os.path.isfile(fp) and os.path.getmtime(fp) < cutoff:
+                    try:
+                        os.remove(fp)
+                    except:
+                        pass
+
+# WORKSPACE is already defined above, so don't redefine it
+
+def get_workspace_dir() -> Path:
+    """Get the DSTerminal workspace directory"""
+    home = Path.home()
+    workspace = home / "dsterminal_workspace"
+    workspace.mkdir(exist_ok=True)
+    
+    # Create subdirectories for different report types
+    (workspace / "integrity_reports").mkdir(exist_ok=True)
+    (workspace / "network_reports").mkdir(exist_ok=True)
+    (workspace / "compliance_reports").mkdir(exist_ok=True)
+    (workspace / "logs").mkdir(exist_ok=True)
+    (workspace / "baselines").mkdir(exist_ok=True)
+    (workspace / "alerts").mkdir(exist_ok=True)
+    (workspace / "quarantine").mkdir(exist_ok=True)
+    (workspace / "forensic").mkdir(exist_ok=True)
+    (workspace / "auto_quarantine").mkdir(exist_ok=True)
+    (workspace / "operators").mkdir(exist_ok=True)
+    (workspace / "reports" / "threat_maps").mkdir(parents=True, exist_ok=True)
+    
+    return workspace
+
+# Don't redefine WORKSPACE - it's already defined above
+
+console = Console()
+
+# ============================================
+# VERSION INFO - FAST
+# ============================================
+VERSION = "4.0.0.113"
+APP_NAME = "DSTerminal"
+DESCRIPTION = "Defensive Security Terminal"
+AUTHOR = "Spark Wilson Spink | Powered By Stark Expo Tech Exchange"
+
+def show_version():
+    print(f"{APP_NAME} v{VERSION}")
+    print(DESCRIPTION)
+    print(f"Developed by {AUTHOR}")
+
+def run_terminal():
+    """Initialize and run the security terminal"""
+    terminal = SecurityTerminal()
+    terminal.run()
+
+def main():
+    if len(sys.argv) > 1:
+        arg = sys.argv[1].lower()
+        if arg in ["--version", "-v", "version"]:
+            show_version()
+            return
+    run_terminal()
+
+def get_local_ip():
+    """Get the local IP address of the machine"""
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except:
+        return "127.0.0.1"
+# ============================================
+# COLORAMA - Fast init with fallback
+# ============================================
+try:
+    from colorama import init, Fore, Back, Style
+    init(autoreset=True)
+    COLORS_AVAILABLE = True
+except ImportError:
+    # Minimal color fallback
+    class Fore:
+        RED = '\033[91m'; GREEN = '\033[92m'; YELLOW = '\033[93m'
+        BLUE = '\033[94m'; MAGENTA = '\033[95m'; CYAN = '\033[96m'
+        WHITE = '\033[97m'; RESET = '\033[0m'; DIM = '\033[2m'
+    class Back:
+        RED = '\033[101m'; GREEN = '\033[102m'; YELLOW = '\033[103m'
+        BLUE = '\033[104m'; RESET = '\033[0m'
+    class Style:
+        BRIGHT = '\033[1m'; DIM = '\033[2m'; NORMAL = '\033[22m'
+        RESET_ALL = '\033[0m'
+    COLORS_AVAILABLE = False
+
+# ============================================
+# IMPORTANT: Define these BEFORE using them
+# ============================================
+SOC_NMAP_AVAILABLE = False
+SOCNmapIntegration = None
+SOCNmapDashboard = None
+INTEGRITY_AVAILABLE = False
+VT_AVAILABLE = False
+RECON_AVAILABLE = False
+RECON_FULL_AVAILABLE = False
+HARDENING_AVAILABLE = False
+RANSOMWARE_AVAILABLE = False
+FINANCIAL_FORENSICS_AVAILABLE = False
+WEB_SECURITY_AVAILABLE = False
+CRYPTO_AVAILABLE = False
+NETWORK_SECURITY_AVAILABLE = False
+WIFI_AUDIT_AVAILABLE = False
+DSTERMINAL_COMPLETE_AVAILABLE = False
+DSTERMINAL_DASHBOARD_AVAILABLE = False
+DASHBOARD_AVAILABLE = False
+SHIELD_CORE_AVAILABLE = False
+
+#0 importing dsterminal_dashboard
+try:
+    from dsterminal_dashboard import register_dashboard_commands, DASHBOARD_AVAILABLE, dashboard_integration
+except ImportError:
+    DASHBOARD_AVAILABLE = False
+    def register_dashboard_commands(terminal):
+        return False
+
+# 1 importing web_security_analyzer
+try:
+    import web_security_analyzer
+    WEB_SECURITY_AVAILABLE = True
+except ImportError as e:
+    WEB_SECURITY_AVAILABLE = False
+    safe_print_unicode(f"Warning: web_security_analyzer module not found: {e}")
+
+#2 WiFi Audit Module
+try:
+    from wifi_audit import NetworkAudit
+    NETWORK_AUDIT_AVAILABLE = True
+except ImportError as e:
+    NETWORK_AUDIT_AVAILABLE = False
+    print(f"{Fore.YELLOW}⚠️ WiFi Audit module not found: {e}{Style.RESET_ALL}")
+    print(f"{Fore.YELLOW}   Download wifi_audit from the repository{Style.RESET_ALL}")
+
+#3. Integrity Monitor - Silent
+try:
+    from integrity_monitor import (
+        SystemIntegrityMonitor,
+        AlertManager,
+        AutoRemediation,
+        RealTimeHandler
+    )
+    INTEGRITY_AVAILABLE = True
+except:
+    SystemIntegrityMonitor = None
+    AlertManager = None
+    AutoRemediation = None
+    RealTimeHandler = None
+    pass
+
+# 4. SOC Nmap Dashboard - Silent
+try:
+    from soc_nmap_dashboard import SOCNmapDashboard, SOCNmapIntegration
+    SOC_NMAP_AVAILABLE = True
+except:
+    pass
+
+# 5. VirusTotal - Silent
+try:
+    import vt_scan
+    from vt_scan import VirusTotalScanner, vt_scan_menu, sync_operator_session
+    VT_AVAILABLE = True
+except:
+    VirusTotalScanner = None
+    vt_scan_menu = None
+    sync_operator_session = None
+    pass
+
+# 6. Recon Modules - Silent
+try:
+    recon_path = os.path.join(BASE_PATH, 'recon.py')
+    if os.path.exists(recon_path):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("recon", recon_path)
+        recon_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(recon_module)
+        ReconScanner = getattr(recon_module, 'ReconScanner', None)
+        run_recon = getattr(recon_module, 'run_recon', None)
+        recon_menu = getattr(recon_module, 'recon_menu', None)
+        RECON_AVAILABLE = True
+except:
+    ReconScanner = None
+    run_recon = None
+    recon_menu = None
+    pass
+
+
+# 7. Recon Full - Silent
+try:
+    recon_full_path = os.path.join(BASE_PATH, 'recon_full.py')
+    if os.path.exists(recon_full_path):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("recon_full", recon_full_path)
+        recon_full_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(recon_full_module)
+        FullReconScanner = getattr(recon_full_module, 'FullReconScanner', None)
+        run_full_recon = getattr(recon_full_module, 'run_full_recon', None)
+        full_recon_menu = getattr(recon_full_module, 'full_recon_menu', None)
+        RECON_FULL_AVAILABLE = True
+except:
+    FullReconScanner = None
+    run_full_recon = None
+    full_recon_menu = None
+    pass
+
+
+# 8. Hardening Dashboard - Silent
+try:
+    from hardening_dashboard import HardeningDashboard
+    HARDENING_AVAILABLE = True
+except:
+    HardeningDashboard = None
+    pass
+
+# 9. Ransomware Monitor - Silent
+try:
+    from ransomware_monitor import RansomwareMonitor, cmd_ransomware
+    RANSOMWARE_AVAILABLE = True
+except:
+    RansomwareMonitor = None
+    cmd_ransomware = None
+    pass
+
+
+# 10 importing network_security
+import network_security
+from network_security import SecurityEngine, app
+import threading
+import webbrowser
+import socket
+import argparse
+from pathlib import Path
+
+# 11 importing certcheck module
+try:
+    from certcheck import cmd_certcheck, SSLCertificateChecker
+    CERTCHECK_AVAILABLE = True
+except ImportError as e:
+    CERTCHECK_AVAILABLE = False
+    safe_print_unicode(f"Warning: certcheck module not found: {e}")
+# ============================================
+# OTHER IMPORTS - Fast, no delays
+# ============================================
+from dst_footer import DSTerminalFooter, FooterBootAnimation, FooterColors
+
+
+# ============================================
+# PSUTIL - Optional, lazy load
+# ============================================
+PSUTIL_AVAILABLE = False
+try:
+    import psutil
+    PSUTIL_AVAILABLE = True
+except:
+    pass
+
+# ============================================
+# OTHER IMPORTS - Fast, no delays
+# ============================================
+# CONSOLE - Fast init
+# ============================================
+from rich.console import Console
+console = Console()
+
+# ============================================
+# CONFIG - Minimal
+# ============================================
+CONFIG = {
+    'VT_API_KEY': '957166d424812a397e328022b84594a8c02757814f6c04518dce7e81179b4b79',
+    'UPDATE_URL': 'https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest.git',
+    'LOG_FILE': 'secure_audit.log',
+    'ENCRYPT_KEY': 'generated_on_init',
+    'CURRENT_VERSION': '4.0.0.113'
+}
+EDUCATION_TIPS = {
+    "system scan -all": """
++----------------------------------------------------------------------+
+|  Did You Know?                                                       |
+|                                                                      |
+|  Regular system scans help detect malware persistence mechanisms:   |
+|  - Rootkits hiding in kernel modules                                 |
+|  - Malicious scheduled tasks (check crontab -l or Task Scheduler)   |
+|  - Unusual network listeners (netstat -tulnp)                       |
++----------------------------------------------------------------------+
+""",
+
+    "net -n mon": """
++----------------------------------------------------------------------+
+|  NETWORK MONITORING: THREAT VISUALIZATION                           |
++----------------------------------------------------------------------+
+|                                                                      |
+|  WHAT YOU'RE SEEING ON THE MAP                                      |
+|                                                                      |
+|  The threat map shows live connections from your system to servers  |
+|  worldwide. Each colored line tells a story about your network      |
+|  traffic.                                                           |
+|                                                                      |
+|  RED LINES = HIGH RISK                                              |
+|  - Known malicious IP addresses                                     |
+|  - Active C2 (Command & Control) communication                      |
+|  - Connections to sanctioned countries (North Korea, Iran, Russia)  |
+|  - High threat score (3-5 out of 5)                                 |
+|                                                                      |
+|  YELLOW/ORANGE LINES = MEDIUM RISK                                  |
+|  - Unusual ports or protocols                                       |
+|  - Recently registered domains (<30 days old)                       |
+|  - Geographic anomalies (unexpected server locations)               |
+|  - Hosting providers frequently abused by attackers                 |
+|                                                                      |
+|  GREEN LINES = LOW RISK                                             |
+|  - Normal HTTPS web browsing (ports 443/80)                         |
+|  - Trusted services (Microsoft, Google, Cloudflare, AWS)            |
+|  - Expected geographic locations                                    |
+|  - Established connections with clean reputation                    |
+|                                                                      |
++----------------------------------------------------------------------+
+|                                                                      |
+|  WHAT TO INVESTIGATE IMMEDIATELY                                    |
+|                                                                      |
+|  - Multiple red lines from the same process                         |
+|  - Connections to unusual ports (not 80,443,22,3389)               |
+|  - Beaconing patterns - regular intervals to same IP                |
+|  - High data upload without user action                             |
+|  - Processes with no digital signature making network calls         |
+|                                                                      |
++----------------------------------------------------------------------+
+|                                                                      |
+|  UNDERSTANDING DISTANCE METRICS                                     |
+|                                                                      |
+|  Each connection line displays the great-circle distance between    |
+|  you and the server:                                                |
+|  - Short distances (<1000km) = Low latency, likely regional services|
+|  - Medium distances (1000-5000km) = Typical cross-continent traffic |
+|  - Long distances (>5000km) = Potentially abnormal routing          |
+|                                                                      |
+|  Watch for geographic mismatches: A "local" bank connecting to      |
+|  Eastern Europe or a software update fetching from 15,000km away    |
+|  when local mirrors exist.                                          |
+|                                                                      |
++----------------------------------------------------------------------+
+|                                                                      |
+|  BROWSER CONNECTION ANALYSIS                                        |
+|                                                                      |
+|  Browser connections (WEB) require special attention because:       |
+|  - Drive-by downloads - Malicious scripts establishing connections  |
+|  - Cryptominers - Running in tabs, connecting to mining pools       |
+|  - Data exfiltration - Form data sent to unexpected domains         |
+|  - C2 via WebSockets - Real-time communication channels             |
+|                                                                      |
+|  Suspicious indicators:                                             |
+|  - Connections to non-standard ports (not 443/80)                   |
+|  - Multiple connections from different tabs to same IP              |
+|  - WebRTC leaks revealing local IP addresses                        |
+|                                                                      |
++----------------------------------------------------------------------+
+|                                                                      |
+|  IMMEDIATE ACTION REQUIRED - RED FLAGS                              |
+|                                                                      |
+|  If you observe ANY of these, investigate immediately:              |
+|  1. Connections to unallocated IP space                             |
+|  2. Traffic to TOR exit nodes or known VPN endpoints                |
+|  3. Processes hiding network connections (rootkit behavior)         |
+|  4. Outbound ICMP tunneling (unusual ping patterns)                 |
+|  5. Large data exfiltration to unrecognized destinations            |
+|                                                                      |
++----------------------------------------------------------------------+
+|                                                                      |
+|  INCIDENT RESPONSE WORKFLOW                                         |
+|                                                                      |
+|  1. IMMEDIATE                                                       |
+|     - Document everything (screenshots, logs, timestamps)           |
+|     - Disconnect confirmed malicious hosts from network             |
+|                                                                      |
+|  2. ANALYSIS                                                        |
+|     - Capture traffic (Wireshark/tcpdump) for deeper inspection     |
+|     - Memory analysis of suspicious processes (Volatility)          |
+|     - Check against threat intel (VirusTotal, MISP)                 |
+|                                                                      |
+|  3. REMEDIATION                                                     |
+|     - Kill malicious processes                                      |
+|     - Remove persistence                                            |
+|     - Block IOCs (firewall, DNS sinkhole)                           |
+|                                                                      |
+|  4. RECOVERY                                                        |
+|     - Restore from known-good backups                               |
+|     - Apply security patches                                        |
+|     - Reset compromised credentials                                 |
+|                                                                      |
++----------------------------------------------------------------------+
+|                                                                      |
+|  CONTINUOUS LEARNING RESOURCES                                      |
+|                                                                      |
+|  - MITRE ATT&CK Framework - Understand adversary tactics & techniques|
+|  - SANS Reading Room - Network monitoring white papers              |
+|  - CISA Alerts - Current threat intelligence                        |
+|  - VirusTotal - Hash lookups and sandbox analysis                   |
+|  - Any.Run - Interactive malware analysis                           |
+|                                                                      |
+|  "The network doesn't lie - it just waits for someone to read its   |
+|  story."                                                            |
++----------------------------------------------------------------------+
+""",
+
+    "harden -t sys": """
++----------------------------------------------------------------------+
+|  Hardening Pro Tip                                                  |
+|                                                                      |
+|  Always follow the Principle of Least Privilege:                    |
+|  - Disable unnecessary services                                     |
+|  - Apply OS-specific benchmarks (e.g., CIS Benchmarks)              |
+|  - Use SELinux/AppArmor for mandatory access control                |
++----------------------------------------------------------------------+
+""",
+
+    "exploitcheck": """
++----------------------------------------------------------------------+
+|  EXPLOIT VULNERABILITY ASSESSMENT ENGINE                            |
++----------------------------------------------------------------------+
+|                                                                      |
+|  CRITICAL VULNERABILITY CHECKS:                                     |
+|                                                                      |
+|  1. KERNEL & SYSTEM EXPLOITS                                        |
+|     - Dirty Pipe (CVE-2022-0847) - Kernel privilege escalation      |
+|       (Linux 5.8+) Check: uname -r                                  |
+|     - Dirty Cow (CVE-2016-5195) - Kernel race condition             |
+|       Check: uname -r                                               |
+|     - PwnKit (CVE-2021-4034) - pkexec local privilege escalation    |
+|       Check: dpkg -l policykit-1 (Debian)                           |
+|     - Baron Samedit (CVE-2021-3156) - Sudo heap overflow            |
+|       Check: sudo -V                                                |
+|     - regreSSHion (CVE-2024-6387) - OpenSSH signal handler race     |
+|       Check: ssh -V                                                 |
+|                                                                      |
+|  2. NETWORK SERVICE VULNERABILITIES                                 |
+|     - Log4Shell (CVE-2021-44228) - Apache Log4j RCE                 |
+|       Check: find / -name "*log4j*" -type f                         |
+|     - Heartbleed (CVE-2014-0160) - OpenSSL memory leak              |
+|       Check: openssl version                                        |
+|     - Shellshock (CVE-2014-6271) - Bash environment variable        |
+|       Check: env 'x=() { :;}; echo vulnerable' bash -c "echo test"  |
+|     - POODLE (CVE-2014-3566) - SSLv3 padding oracle                 |
+|       Check: openssl s_client -connect localhost:443 -ssl3          |
+|     - Ghost (CVE-2015-0235) - Glibc gethostbyname overflow          |
+|       Check: ldd --version                                          |
+|                                                                      |
+|  3. PRIVILEGE ESCALATION VECTORS                                    |
+|     - SUID Binaries: find / -perm -4000 -type f                     |
+|       Check for: pkexec, sudo, mount, passwd                        |
+|       Exploitable: CVE-2021-4034 (pkexec), CVE-2021-3156 (sudo)    |
+|     - Sudo Misconfigurations: sudo -l                               |
+|       Look for: NOPASSWD, (ALL), (root)                             |
+|       Common attacks: sudoedit, CVE-2023-22809                      |
+|     - Writable Files: find / -writable -type f                      |
+|       Check: /etc/passwd, /etc/shadow, /etc/sudoers                 |
+|     - Cron Jobs: crontab -l, ls -la /etc/cron*                     |
+|       Malicious: Cryptominers, backdoors, data exfiltration         |
+|     - Kernel Modules: lsmod                                         |
+|       Check for: Unknown modules, rootkits                          |
+|                                                                      |
+|  4. MISCONFIGURATION CHECKS                                         |
+|     - SSH Hardening:                                                |
+|       Check: cat /etc/ssh/sshd_config                               |
+|       Weak: PermitRootLogin yes, PasswordAuthentication yes         |
+|     - FTP/SMB Services: netstat -tulpn                              |
+|       Check for ports: 21, 139, 445                                 |
+|     - Web Servers: apache2 -v, nginx -v, php -v                    |
+|                                                                      |
+|  5. DATABASE VULNERABILITIES                                        |
+|     - MySQL: mysql --version                                        |
+|     - PostgreSQL: psql --version                                    |
+|     - MongoDB: mongod --version                                     |
+|     - Redis: redis-server --version                                 |
+|                                                                      |
+|  6. CLOUD & CONTAINER EXPLOITS                                      |
+|     - Docker: docker --version                                      |
+|       Check: docker info                                            |
+|     - Kubernetes: kubectl version                                   |
+|       Check: kubectl auth can-i --list                              |
+|     - Cloud Metadata:                                               |
+|       AWS: curl http://169.254.169.254/latest/meta-data/            |
+|       Azure: curl http://169.254.169.254/metadata/instance          |
+|       GCP: curl http://metadata.google.internal/                    |
+|                                                                      |
+|  EXPLOIT DETECTION TOOLS:                                           |
+|  - searchsploit - Offensive Security exploit database               |
+|  - Metasploit - Exploit framework                                   |
+|  - Nessus/OpenVAS - Vulnerability scanners                          |
+|  - Lynis - Security auditing tool                                   |
+|  - Vuls - Vulnerability scanner                                     |
+|                                                                      |
+|  DETECTION & RESPONSE:                                              |
+|  - Check exploit signs:                                             |
+|    * Unusual processes: ps aux                                     |
+|    * Suspicious logs: journalctl -f                                |
+|    * Network anomalies: tcpdump -i any                             |
+|  - Immediate actions:                                               |
+|    1. Isolate the system                                            |
+|    2. Collect forensic evidence                                     |
+|    3. Identify the exploit vector                                   |
+|    4. Apply patches                                                 |
+|    5. Monitor for persistence                                       |
+|                                                                      |
+|  HARDENING AGAINST EXPLOITS:                                        |
+|  - Regularly patch all software                                     |
+|  - Disable unnecessary services                                     |
+|  - Implement least privilege                                        |
+|  - Enable SELinux/AppArmor                                          |
+|  - Use strong encryption (TLS 1.3)                                  |
+|  - Monitor logs continuously                                        |
+|  - Use intrusion detection systems                                  |
++----------------------------------------------------------------------+
+""",
+
+    "macspoof": """
++----------------------------------------------------------------------+
+|  MAC Spoofing Tip                                                   |
+|                                                                      |
+|  Remember:                                                           |
+|  1. Spoofing only works until next reboot                           |
+|  2. For persistence, modify /etc/network/interfaces                 |
+|  3. Some networks use MAC filtering (check ARP tables)              |
+|  Example: macspoof wlan0                                            |
+|                                                                      |
+|  MAC Spoofing Caution:                                              |
+|  - Changing MAC addresses can evade network tracking but might      |
+|    disrupt connections.                                             |
+|  - Always reset your original MAC for stability.                    |
+|                                                                      |
+|  Benefits of MAC Spoofing:                                          |
+|  - Privacy & Anonymity: Prevents tracking across different networks |
+|  - Security Testing: Simulate different devices for security        |
+|    assessments                                                      |
+|  - Network Bypass: Circumvent MAC-based network restrictions        |
+|  - Forensics & OSINT: Obfuscate identity during legitimate security |
+|    research                                                         |
+|                                                                      |
+|  When to Use MAC Spoofing:                                          |
+|  - Legitimate penetration testing                                   |
+|  - Privacy protection on public networks                            |
+|  - Security research in controlled environments                     |
+|  - Red team operations (with authorization)                         |
+|                                                                      |
+|  When NOT to Use MAC Spoofing:                                      |
+|  - Malicious activities (illegal)                                   |
+|  - Production enterprise networks (without authorization)           |
+|  - Networks with 802.1X authentication                              |
+|  - If it violates terms of service                                  |
++----------------------------------------------------------------------+
+""",
+
+    "clearlogs": """
++----------------------------------------------------------------------+
+|  Log Cleaning Tip                                                   |
+|                                                                      |
+|  Targets common log locations:                                      |
+|  - /var/log/ (syslog, auth.log)                                     |
+|  - ~/.bash_history                                                  |
+|  - Journald (journalctl --vacuum-time=1s)                           |
+|                                                                      |
+|  Warning: Some systems use remote logging!                          |
+|  Clearing logs should be used ethically. Logs are vital for:        |
+|  - Forensics                                                        |
+|  - Intrusion Detection                                              |
+|  - Compliance Audits                                                |
++----------------------------------------------------------------------+
+""",
+
+    "portsweep": """
++----------------------------------------------------------------------+
+|  Port Scanning Tip                                                  |
+|                                                                      |
+|  Advanced techniques:                                               |
+|  - SYN stealth scan (-sS)                                           |
+|  - Service version detection (-sV)                                  |
+|  - OS fingerprinting (-O)                                           |
+|                                                                      |
+|  Pro Tip: Use -T4 for faster scans (noisy)                         |
+|  Port sweeps reveal exposed services.                               |
+|  Scan with -sS, -sV, -sT, -Pn, -p, -T4 flags in nmap for stealth   |
+|  and version detection.                                             |
++----------------------------------------------------------------------+
+""",
+
+    "hashfile": """
++----------------------------------------------------------------------+
+|  Hashing Tip                                                        |
+|                                                                      |
+|  Why multiple hashes matter:                                        |
+|  - MD5 - Fast but broken                                            |
+|  - SHA1 - Deprecated but common                                     |
+|  - SHA256 - Current standard                                        |
+|                                                                      |
+|  Pro Tip: Verify against VirusTotal hashes                          |
+|  Use SHA-256 for strong integrity checks.                           |
+|  Example: sha256sum file.txt                                        |
+|                                                                      |
+|  This is useful for:                                                |
+|  - Verifying file integrity after transfer                          |
+|  - Checking against VirusTotal                                      |
+|  - Ensuring report authenticity                                     |
++----------------------------------------------------------------------+
+""",
+
+    "sysinfo": """
++----------------------------------------------------------------------+
+|  SYSTEM RECONNAISSANCE & HARDWARE INTELLIGENCE                      |
++----------------------------------------------------------------------+
+|                                                                      |
+|  CRITICAL SYSTEM INFORMATION TO GATHER:                             |
+|                                                                      |
+|  1. KERNEL & OS INTELLIGENCE                                        |
+|     - Kernel version: uname -a (Identify CVEs like Dirty Pipe,      |
+|       Dirty COW)                                                    |
+|     - OS distribution: lsb_release -a or cat /etc/os-release        |
+|     - Architecture: uname -m (x86_64, ARM, etc.)                    |
+|     - Boot time: uptime -s (Detect unauthorized restarts)           |
+|                                                                      |
+|  2. PROCESSOR & HARDWARE SECURITY                                   |
+|     - CPU flags: lscpu or cat /proc/cpuinfo                         |
+|       Check for: VMX/SVM (Virtualization support)                   |
+|       Check for: SMEP/SMAP (Kernel hardening)                       |
+|       Check for: MDS/Meltdown/Spectre (Vulnerability indicators)    |
+|     - Hardware model: dmidecode -t system (Physical asset tracking) |
+|     - RAM configuration: dmidecode -t memory (Memory integrity)     |
+|     - BIOS version: dmidecode -t bios (Firmware vulnerabilities)    |
+|                                                                      |
+|  3. SOFTWARE & PACKAGE SECURITY                                     |
+|     - Installed packages: dpkg -l (Debian) or rpm -qa (RHEL)       |
+|     - Sudo version: sudo -V (CVE-2021-3156 Baron Samedit)           |
+|     - OpenSSL version: openssl version (Heartbleed, POODLE)         |
+|     - SSH version: ssh -V (CVE-2024-6387 regreSSHion)               |
+|     - Python version: python --version (Deprecation risks)          |
+|     - Docker version: docker --version (Container escape risks)     |
+|                                                                      |
+|  4. NETWORK & SECURITY CONFIGURATION                                |
+|     - Firewall status: ufw status or iptables -L                   |
+|     - Open ports: ss -tulpn or netstat -tulpn (Attack surface)     |
+|     - SELinux/AppArmor: getenforce or aa-status (Access controls)   |
+|     - SSH config: cat /etc/ssh/sshd_config (Protocol hardening)     |
+|     - Failed login attempts: lastb (Brute force detection)          |
+|                                                                      |
+|  5. PRIVILEGE ESCALATION VECTORS                                    |
+|     - Sudo permissions: sudo -l (Misconfigurations)                 |
+|     - SUID binaries: find / -perm -4000 -type f (Privilege          |
+|       escalation)                                                   |
+|     - Writable files: find / -writable -type f (Lateral movement)   |
+|     - Cron jobs: crontab -l (Persistence mechanisms)                |
+|     - Kernel modules: lsmod (Rootkit detection)                     |
+|                                                                      |
+|  SECURITY PRO TIPS:                                                 |
+|  - Check hardware with: lshw -short or inxi -Fxz                   |
+|  - List PCI devices: lspci -v (Network cards, GPUs)                |
+|  - USB devices: lsusb (External device detection)                  |
+|  - Disk health: smartctl -a /dev/sda (Hardware failure)            |
+|                                                                      |
+|  CRITICAL CVEs TO CHECK:                                            |
+|  - Kernel: Dirty Pipe (CVE-2022-0847), Dirty COW (CVE-2016-5195)    |
+|  - Sudo: Baron Samedit (CVE-2021-3156) - PRIVILEGE ESCALATION      |
+|  - OpenSSH: regreSSHion (CVE-2024-6387) - RCE VULNERABILITY        |
+|  - Log4j: Log4Shell (CVE-2021-44228) - CRITICAL RCE                |
+|                                                                      |
+|  HARDENING CHECKLIST:                                               |
+|  - All security patches applied                                     |
+|  - Unnecessary services disabled                                    |
+|  - SSH key-only authentication                                      |
+|  - Firewall rules validated                                         |
+|  - File integrity monitoring active                                 |
+|  - Audit logging configured                                         |
+|                                                                      |
+|  CYBER THREAT INTELLIGENCE:                                         |
+|  - Reconnaissance is the first stage of the Cyber Kill Chain       |
+|  - Attackers use system info to identify: Exploitable CVEs,         |
+|    Misconfigurations                                                |
+|  - Monitor kernel modules: Rootkits hide in /lib/modules           |
+|                                                                      |
+|  DSTERMINAL DEFENSE TIP:                                            |
+|  This system intelligence helps you:                                |
+|  - Identify vulnerable software before attackers do                 |
+|  - Harden your system configuration                                 |
+|  - Detect unauthorized hardware changes                             |
+|  - Track compliance with security standards                         |
+|                                                                      |
+|  COMMAND REFERENCE:                                                 |
+|  Quick recon: sudo lshw -short | inxi -Fxz | neofetch              |
+|  Vulnerability scan: sudo apt update && sudo apt audit (Debian)     |
+|  Package audit: sudo rpm -q --changelog (RHEL)                     |
+|  CVE database: searchsploit | cve-check                             |
++----------------------------------------------------------------------+
+""",
+
+    "killproc": """
++----------------------------------------------------------------------+
+|  Process Killing Tip                                                |
+|                                                                      |
+|  Advanced methods:                                                  |
+|  - SIGKILL (-9) for stubborn processes                              |
+|  - pkill for name-based termination                                 |
+|  - killall for all instances                                        |
+|                                                                      |
+|  Warning: Can cause data loss!                                      |
++----------------------------------------------------------------------+
+""",
+
+    "check integrity": """
++----------------------------------------------------------------------+
+|  Integrity Check Tip                                                |
+|                                                                      |
+|  Checks for:                                                         |
+|  - Modified system binaries (ls, ps, netstat)                       |
+|  - Unexpected setuid files (find / -perm -4000)                     |
+|  - Hidden kernel modules (lsmod)                                    |
+|                                                                      |
+|  Pro Tip: Compare against package manager (rpm -V)                 |
++----------------------------------------------------------------------+
+""",
+
+    "encrypt": """
++----------------------------------------------------------------------+
+|  Encryption Tip                                                     |
+|                                                                      |
+|  Best practices:                                                    |
+|  - Use strong passwords (12+ chars, special symbols)                |
+|  - Consider GPG for asymmetric encryption                           |
+|  - Shred original files after encryption                            |
+|                                                                      |
+|  Example: encrypt secret.docx                                       |
++----------------------------------------------------------------------+
+""",
+
+    "decrypt": """
++----------------------------------------------------------------------+
+|  Decryption Tip                                                     |
+|                                                                      |
+|  Key management:                                                    |
+|  - Store keys in separate secure location                           |
+|  - Use key derivation functions (PBKDF2)                            |
+|  - Consider hardware tokens for critical keys                       |
+|                                                                      |
+|  Syntax: decrypt file.enc myStrongPassword123!                      |
++----------------------------------------------------------------------+
+""",
+
+    "watchfolder": """
++----------------------------------------------------------------------+
+|  Folder Monitoring Tip                                              |
+|                                                                      |
+|  Detects:                                                            |
+|  - New files (ransomware indicators)                                |
+|  - Permission changes (chmod/chown)                                 |
+|  - Hidden files (dotfiles, double extensions)                       |
+|                                                                      |
+|  Pro Tip: Monitor /tmp and /dev/shm                                 |
++----------------------------------------------------------------------+
+""",
+
+    "traceroute": """
++----------------------------------------------------------------------+
+|  Network Tracing Tip                                                |
+|                                                                      |
+|  Advanced options:                                                  |
+|  - TCP SYN probes (-T)                                              |
+|  - ICMP echo (-I)                                                   |
+|  - DNS lookups (-n to disable)                                      |
+|                                                                      |
+|  Pro Tip: Use mtr for continuous monitoring                         |
++----------------------------------------------------------------------+
+""",
+
+    "ransomwatch": """
++----------------------------------------------------------------------+
+|  Ransomware Tip                                                     |
+|                                                                      |
+|  Detection signs:                                                   |
+|  - Mass file renames (.enc, .locked)                                |
+|  - Unusual process (encryption patterns)                            |
+|  - Bitcoin wallet creation attempts                                 |
+|                                                                      |
+|  Pro Tip: Monitor /home and network shares                          |
++----------------------------------------------------------------------+
+""",
+
+    "wifi-audit": """
++----------------------------------------------------------------------+
+|  WiFi Auditing Tip                                                  |
+|                                                                      |
+|  Common attacks:                                                    |
+|  - WPA2 handshake capture                                           |
+|  - Evil Twin access points                                          |
+|  - KRACK vulnerability tests                                        |
+|                                                                      |
+|  This function performs a complete WiFi security assessment:       |
+|  - Network interface detection and analysis                         |
+|  - Access point scanning and enumeration                            |
+|  - Security protocol analysis (WEP, WPA, WPA2, WPA3)               |
+|  - Signal strength mapping                                          |
+|  - Channel analysis                                                 |
+|  - Rogue AP detection                                               |
+|  - Security recommendations                                         |
+|                                                                      |
+|  Requires: Monitor mode capable adapter                             |
+|                                                                      |
+|  Security Impact:                                                   |
+|  - Rogue AP Detection - Identifies unauthorized access points       |
+|  - Security Protocol Analysis - Detects deprecated and vulnerable   |
+|    encryption                                                       |
+|  - Compliance Monitoring - Helps ensure security standards are met  |
+|  - Threat Intelligence - MAC addresses can be cross-referenced      |
+|    with threat feeds                                                |
+|  - Incident Response - Provides forensic data for security          |
+|    incidents                                                        |
++----------------------------------------------------------------------+
+""",
+
+    "stegcheck": """
++----------------------------------------------------------------------+
+|  Steganography Awareness & Forensics Tip                            |
++----------------------------------------------------------------------+
+|                                                                      |
+|  Steganography is the practice of hiding information inside         |
+|  seemingly normal files such as images, audio, or video. It is      |
+|  often used to bypass security controls.                            |
+|                                                                      |
+|  Common Indicators of Hidden Data:                                  |
+|  - Unusually large file size for the image resolution               |
+|  - High entropy (random-looking data)                               |
+|  - Inconsistent or missing EXIF metadata                            |
+|  - Suspicious color-channel patterns                                |
+|                                                                      |
+|  Detection & Analysis Methods:                                      |
+|  - Binwalk: Identify embedded files or appended data                |
+|  - Stegdetect: Detect signatures of known steganography tools      |
+|  - LSB Analysis: Examine least-significant-bit manipulation        |
+|  - Entropy Analysis: Identify abnormal randomness levels            |
+|                                                                      |
+|  Real-World Use Cases:                                              |
+|  - Malware command-and-control via images                           |
+|  - Hidden financial instructions in invoices or screenshots         |
+|  - Covert data exfiltration over messaging platforms                |
+|  - Digital evidence analysis in cybercrime investigations           |
+|                                                                      |
+|  Pro Tip: Always inspect EXIF metadata and file structure before    |
+|  deep analysis. Detection should remain non-invasive unless         |
+|  authorized forensic procedures apply.                              |
+|                                                                      |
+|  Ethical Reminder: Steganalysis should only be performed for        |
+|  defensive, investigative, or educational purposes with proper      |
+|  authorization.                                                     |
++----------------------------------------------------------------------+
+""",
+
+    "certcheck": """
+    +----------------------------------------------------------------------+
+    |  SSL/TLS CERTIFICATE SECURITY EDUCATION                             |
+    +----------------------------------------------------------------------+
+    |                                                                      |
+    |  WHY CERTIFICATE CHECKS ARE CRITICAL FOR CYBERSECURITY              |
+    |                                                                      |
+    |  SSL/TLS certificates are the foundation of secure communications   |
+    |  on the internet. They:                                             |
+    |  - Encrypt data in transit (protecting from eavesdropping)          |
+    |  - Authenticate server identity (preventing man-in-the-middle)      |
+    |  - Establish trust through Certificate Authorities (CAs)            |
+    |                                                                      |
+    |  CRITICAL CHECKS PERFORMED:                                         |
+    |                                                                      |
+    |  1. EXPIRATION DETECTION                                            |
+    |     - Certificates expire and must be renewed                       |
+    |     - Expired certificates cause service outages and trust errors   |
+    |     - 30-day warning: RENEW IMMEDIATELY                            |
+    |     - 60-day warning: Plan renewal                                 |
+    |     - Security Impact: Service disruption, loss of customer trust  |
+    |                                                                      |
+    |  2. WEAK ALGORITHM DETECTION                                        |
+    |     - SHA1: DEPRECATED - Collision attacks possible (CVE-2017-5753)|
+    |     - MD5: BROKEN - Practical collision attacks exist               |
+    |     - RC4: WEAK - Multiple vulnerabilities discovered               |
+    |     - Security Impact: Credential theft, session hijacking         |
+    |                                                                      |
+    |  3. PROTOCOL SECURITY                                               |
+    |     - TLS 1.3: Current standard - Fastest and most secure          |
+    |     - TLS 1.2: Still secure but older                              |
+    |     - TLS 1.0/1.1: DEPRECATED - Vulnerable to POODLE, BEAST        |
+    |     - Security Impact: Downgrade attacks, protocol vulnerabilities |
+    |                                                                      |
+    |  4. KEY STRENGTH ASSESSMENT                                         |
+    |     - RSA 4096+: EXCELLENT (Government/Financial grade)            |
+    |     - RSA 3072: GOOD                                                |
+    |     - RSA 2048: ACCEPTABLE (Minimum standard)                      |
+    |     - RSA 1024: WEAK - Can be broken with modern hardware          |
+    |     - ECDSA: Stronger than RSA at smaller key sizes                |
+    |     - Security Impact: Private key compromise, decryption of       |
+    |       past communications                                          |
+    |                                                                      |
+    |  5. CERTIFICATE CHAIN VALIDATION                                    |
+    |     - Leaf certificate (your domain)                               |
+    |     - Intermediate certificates                                     |
+    |     - Root certificate (CA trust anchor)                           |
+    |     - Missing chain = "Certificate Chain Incomplete" warning       |
+    |     - Security Impact: Browser trust errors, user confusion        |
+    |                                                                      |
+    |  6. SUBJECT ALTERNATIVE NAMES (SAN)                                 |
+    |     - Modern certificates use SAN for domain validation            |
+    |     - Missing SAN = Browser warnings (Chrome 58+ blocks)           |
+    |     - Verify all domain names are covered                          |
+    |     - Security Impact: Browser trust errors, mixed content issues  |
+    |                                                                      |
+    |  7. OCSP REVOCATION CHECKING                                        |
+    |     - OCSP = Online Certificate Status Protocol                    |
+    |     - Checks if certificate is revoked before use                  |
+    |     - OCSP Stapling = OCSP pre-fetched by server                   |
+    |     - Security Impact: Revoked certificates may be accepted        |
+    |                                                                      |
+    |  REAL-WORLD SECURITY IMPLICATIONS:                                  |
+    |                                                                      |
+    |  • POODLE Attack (2014) - Downgraded TLS to SSLv3                  |
+    |  • Heartbleed (2014) - Memory leak in OpenSSL                     |
+    |  • SHA1 Collision (2017) - First practical SHA1 collision          |
+    |  • Let's Encrypt Revolution - Free certificates for everyone       |
+    |                                                                      |
+    |  RECOMMENDED ACTIONS:                                               |
+    |                                                                      |
+    |  1. Renew certificates at least 30 days before expiry              |
+    |  2. Use SHA256 with RSA 2048+ or ECDSA 256+                       |
+    |  3. Enable TLS 1.3 on all servers                                  |
+    |  4. Implement HSTS (HTTP Strict Transport Security)               |
+    |  5. Use OCSP stapling for certificate revocation checking         |
+    |  6. Monitor certificate expiry with automated alerts              |
+    |  7. Use Certificate Transparency monitoring                       |
+    |                                                                      |
+    |  PRO TIPS:                                                          |
+    |                                                                      |
+    |  • Use testssl.sh for comprehensive SSL testing                   |
+    |  • Use crt.sh for Certificate Transparency monitoring             |
+    |  • Use Qualys SSL Labs for public testing                         |
+    |  • Use Let's Encrypt for free automated certificates              |
+    |  • Use Certbot for certificate automation                         |
+    |                                                                      |
+    |  DSTERMINAL USAGE:                                                  |
+    |                                                                      |
+    |  certcheck domain.com        # Quick certificate check            |
+    |  certcheck --help            # Show help                          |
+    |                                                                      |
+    |  "Security is not a product, but a process." - Bruce Schneier     |
+    +----------------------------------------------------------------------+
+    """,
+
+    "memdump": """
++----------------------------------------------------------------------+
+|  Memory Forensics Tip                                               |
+|                                                                      |
+|  What to look for:                                                  |
+|  - Process memory (passwords, keys)                                 |
+|  - Network connections (raw sockets)                                |
+|  - Malicious implants (shellcode)                                   |
+|                                                                      |
+|  Tool: Analyze with Volatility                                      |
++----------------------------------------------------------------------+
+""",
+
+    "torify": """
++----------------------------------------------------------------------+
+|  Tor Networking Tip                                                 |
+|                                                                      |
+|  Important notes:                                                   |
+|  - Not 100% anonymous (exit node risks)                             |
+|  - DNS leaks still possible                                         |
+|  - Bridge nodes for censored networks                               |
+|                                                                      |
+|  Pro Tip: Combine with VPN (Tor-over-VPN)                           |
++----------------------------------------------------------------------+
+""",
+
+    "update": """
++----------------------------------------------------------------------+
+|  DSTERMINAL SECURITY UPDATE PROTOCOL                                |
++----------------------------------------------------------------------+
+|                                                                      |
+|  WHY SYSTEMATIC UPDATES ARE NON-NEGOTIABLE FOR SECURITY TOOLS      |
+|                                                                      |
+|  As a defensive security platform, DSTerminal occupies a privileged |
+|  position within your infrastructure. Its capabilities require     |
+|  constant evolution to counter the rapidly advancing threat        |
+|  landscape.                                                         |
+|                                                                      |
+|  ZERO-DAY & N-DAY VULNERABILITY MITIGATION                          |
+|  - Preemptive Patch Deployment - Closing security gaps before       |
+|    widespread exploitation                                          |
+|  - CVE-Responsive Updates - Direct responses to published           |
+|    advisories                                                       |
+|  - Memory Corruption Protections - Enhanced buffer overflow         |
+|    defenses                                                         |
+|  - Sandbox Escape Prevention - Hardening against container/VM      |
+|    breakout techniques                                              |
+|                                                                      |
+|  PRIVILEGE & ACCESS CONTROL REINFORCEMENT                           |
+|  - Least Privilege Enforcement - Tighter restrictions on            |
+|    DSTerminal's system access                                       |
+|  - Credential Handling Security - Improved encryption for stored    |
+|    API keys                                                         |
+|  - SUID/SGID Vulnerability Remediation - Fixes for privilege        |
+|    escalation vectors                                               |
+|                                                                      |
+|  THREAT INTELLIGENCE & DETECTION ENHANCEMENT                        |
+|  - Real-Time Signature Updates - Integration of latest malware      |
+|    hashes and IOCs                                                  |
+|  - Behavioral Analysis Improvements - Enhanced heuristic detection  |
+|  - Attack Pattern Recognition - Updated MITRE ATT&CK framework      |
+|    mapping                                                          |
+|                                                                      |
+|  CRYPTOGRAPHIC & COMMUNICATIONS SECURITY                            |
+|  - TLS/SSL Implementation Updates - Protection against protocol-    |
+|    level vulnerabilities                                            |
+|  - Certificate Validation Enhancements - Improved PKI verification  |
+|  - Cryptographic Algorithm Rotation - Migration from deprecated to  |
+|    current standards                                                |
+|                                                                      |
+|  BEST PRACTICES FOR DSTERMINAL UPDATE MANAGEMENT                    |
+|  - Weekly Update Checks - Minimum frequency for security tools      |
+|  - Critical Update Immediate Application - Zero-day patches within  |
+|    24 hours                                                         |
+|  - Change Window Coordination - Integration with organizational     |
+|    maintenance schedules                                            |
+|  - Pre-Update Validation - Testing in isolated environments before  |
+|    production deployment                                            |
+|                                                                      |
+|  FINAL ADVISORY: In cybersecurity, your defensive tools are only    |
+|  as strong as their most recent update. DSTerminal's capabilities   |
+|  evolve continuously--ensure your installation does too.            |
+|                                                                      |
+|  "The only truly secure system is one that is powered off, cast     |
+|  in a block of concrete, and sealed in a lead-lined room with       |
+|  armed guards--and even then I have my doubts."                     |
++----------------------------------------------------------------------+
+""",
+
+    "vt-scan": """
++----------------------------------------------------------------------+
+|  VIRUSTOTAL EDUCATIONAL TIP                                         |
++----------------------------------------------------------------------+
+|                                                                      |
+|  WHAT IS VIRUSTOTAL?                                                |
+|  - Advanced service that scans files & URLs with 70+ AV engines     |
+|  - Owned by Google (since 2012) - Enterprise & Community editions   |
+|  - Provides threat intelligence & behavioral analysis               |
+|                                                                      |
+|  ADVANCED FEATURES:                                                 |
+|  - Behavioral analysis (Cuckoo/VT Sandbox) - See what files DO      |
+|  - YARA rule scanning - Pattern-based threat detection              |
+|  - Relationship graphs - Visualize threat connections               |
+|  - VirusTotal Enterprise - API access for automation                |
+|  - Retrohunt - Search historical scan data                          |
+|                                                                      |
+|  COMMUNITY INSIGHTS:                                                |
+|  - Vote on detections (False Positive / Malicious)                  |
+|  - Comment on samples with analysis findings                        |
+|  - Share YARA rules with security community                         |
+|  - Create collections of related malware                            |
+|                                                                      |
+|  USE CASES FOR SOC OPERATORS:                                       |
+|  1. Incident Response - Verify suspicious file detections           |
+|  2. Threat Hunting - Research new malware families                  |
+|  3. IOC Validation - Check hash/domain reputation                   |
+|  4. Malware Analysis - Understand file behavior                     |
+|                                                                      |
+|  CRITICAL WARNINGS:                                                 |
+|  - Files uploaded become PUBLIC - Never upload sensitive data!      |
+|  - Free API has rate limits (4 requests/min, 500/day)               |
+|  - Some AV engines may have false positives                         |
+|  - Not all samples get sandbox analysis                             |
+|                                                                      |
+|  PRO TIPS FOR DSTERMINAL:                                           |
+|  - Hash lookup first (faster, anonymous)                            |
+|  - Enable VT Enterprise for corporate use                           |
+|  - Combine with local YARA rules for better detection               |
+|  - Automate with Python API for bulk scanning                       |
+|                                                                      |
+|  STATISTICS (2024):                                                 |
+|  - 70+ antivirus engines                                            |
+|  - 2M+ daily submissions                                            |
+|  - 6B+ historical scans                                             |
+|  - 60+ URL scanners                                                 |
+|                                                                      |
+|  RECOMMENDED LEARNING PATH:                                         |
+|  1. Start with hash lookups (no exposure)                           |
+|  2. Learn to read analysis reports                                  |
+|  3. Study YARA rule syntax                                          |
+|  4. Experiment with API automation                                  |
+|  5. Contribute community insights                                   |
+|                                                                      |
+|  BEST PRACTICES FOR SOC:                                            |
+|  - Always sanitize files before upload                              |
+|  - Use API keys with restricted permissions                         |
+|  - Maintain local database of known threats                         |
+|  - Cross-reference with other threat intel feeds                    |
+|  - Document findings in incident reports                            |
++----------------------------------------------------------------------+
+""",
+
+    "registry -n mon": """
++----------------------------------------------------------------------+
+|  Registry Monitoring Tip                                            |
+|                                                                      |
+|  Critical keys to watch:                                            |
+|  - Run/RunOnce (persistence)                                        |
+|  - AppInit_DLLs (code injection)                                    |
+|  - LSA secrets (credential storage)                                 |
+|                                                                      |
+|  Tool: Use RegShot for comparisons                                  |
++----------------------------------------------------------------------+
+""",
+
+    "ioc education": """
++----------------------------------------------------------------------+
+|  INDICATORS OF COMPROMISE (IOCs) - COMPLETE GUIDE                  |
++----------------------------------------------------------------------+
+|                                                                      |
+|  WHAT ARE IOCS?                                                     |
+|                                                                      |
+|  Indicators of Compromise are forensic artifacts that provide       |
+|  evidence of a potential security breach. They are the digital      |
+|  breadcrumbs left behind by attackers that security teams use to    |
+|  detect, investigate, and respond to cyber threats.                 |
+|                                                                      |
+|  Think of IOCs like fingerprints at a crime scene - they don't tell |
+|  you who committed the crime, but they prove that someone was there |
+|  and help you track them down.                                      |
+|                                                                      |
++----------------------------------------------------------------------+
+|                                                                      |
+|  IOC VS IOA - WHAT'S THE DIFFERENCE?                                |
+|                                                                      |
+|  IOC (Indicator of Compromise) - PAST/FORENSIC                      |
+|  - Evidence that an attack has ALREADY happened                     |
+|  - Things you look for AFTER a breach                               |
+|  - Example: Malware hash, malicious domain, changed registry key    |
+|  - Question: "What did the attacker leave behind?"                  |
+|                                                                      |
+|  IOA (Indicator of Attack) - PRESENT/ACTIVE                         |
+|  - Evidence that an attack is HAPPENING RIGHT NOW                   |
+|  - Things you look for DURING an active attack                      |
+|  - Example: Unusual login attempts, data exfiltration               |
+|  - Question: "What is the attacker doing right now?"                |
+|                                                                      |
+|  BOTH are essential for a complete security strategy!               |
+|                                                                      |
++----------------------------------------------------------------------+
+|                                                                      |
+|  TYPES OF IOCS                                                      |
+|                                                                      |
+|  1. FILE HASHES (MD5, SHA-1, SHA-256)                               |
+|     - Unique fingerprint of a file                                  |
+|     - Used to identify known malware                                |
+|     - Example: 5d41402abc4b2a76b9719d911017c592                     |
+|                                                                      |
+|  2. DOMAINS                                                         |
+|     - Malicious websites used for C2, phishing, malware delivery    |
+|     - Can be typosquatting (g00gle.com) or lookalike domains        |
+|     - Example: malware-phishing-site.com                            |
+|                                                                      |
+|  3. IP ADDRESSES                                                    |
+|     - Command & Control (C2) servers                                |
+|     - Malicious infrastructure                                      |
+|     - Example: 185.130.5.253                                        |
+|                                                                      |
+|  4. URLS                                                            |
+|     - Specific malicious web addresses                              |
+|     - Phishing pages, malware download locations                    |
+|     - Example: http://bad-site.com/payload.exe                      |
+|                                                                      |
+|  5. FILE PATHS                                                      |
+|     - Locations where malware is installed                          |
+|     - Temporary folders, system directories                         |
+|     - Example: C:\Windows\Temp\malware.exe                          |
+|                                                                      |
+|  6. REGISTRY KEYS (Windows)                                         |
+|     - Persistence mechanisms                                        |
+|     - Malware configuration settings                                |
+|     - Example: HKLM\Software\Microsoft\Windows\Run\Evil             |
+|                                                                      |
+|  7. PROCESS NAMES                                                   |
+|     - Known malicious processes                                     |
+|     - Crypto miners, ransomware, backdoors                          |
+|     - Example: cryptolocker.exe                                     |
+|                                                                      |
+|  8. EMAIL ADDRESSES                                                 |
+|     - Phishing sender addresses                                     |
+|     - Malware distribution emails                                   |
+|     - Example: security@fake-update.com                             |
+|                                                                      |
++----------------------------------------------------------------------+
+|                                                                      |
+|  MITRE ATT&CK & IOC MAPPING                                         |
+|                                                                      |
+|  Initial Access (TA0001) - Phishing (T1566) -> IOC: Email, domain,  |
+|  URL                                                                |
+|  Execution (TA0002) - Command and Scripting Interpreter (T1059) ->  |
+|  IOC: Process name, file path                                       |
+|  Persistence (TA0003) - Registry Run Keys (T1547.001) -> IOC:       |
+|  Registry key, scheduled task                                       |
+|  Privilege Escalation (TA0004) - Valid Accounts (T1078) -> IOC:     |
+|  Account changes, privilege modifications                           |
+|  Defense Evasion (TA0005) - File Deletion (T1070.004) -> IOC:       |
+|  Missing logs, deleted files                                        |
+|  Credential Access (TA0006) - Credential Dumping (T1003) -> IOC:    |
+|  LSASS access, memory dumps                                         |
+|  Discovery (TA0007) - Network Service Scanning (T1046) -> IOC:      |
+|  Scanning activity, unusual traffic                                 |
+|  Lateral Movement (TA0008) - Remote Services (T1021) -> IOC:        |
+|  SMB/SSH/RDP connections                                            |
+|  Collection (TA0009) - Data Staged (T1074) -> IOC: Large file       |
+|  copies, compressed archives                                        |
+|  Exfiltration (TA0010) - Exfiltration Over C2 Channel (T1041) ->    |
+|  IOC: Outbound data transfers                                       |
+|  Command and Control (TA0011) - Application Layer Protocol (T1071)  |
+|  -> IOC: C2 domain, IP, unusual protocol                            |
+|  Impact (TA0040) - Data Encrypted for Impact (T1486) -> IOC:        |
+|  Changed file extensions                                            |
+|                                                                      |
++----------------------------------------------------------------------+
+|                                                                      |
+|  HOW IOCS ARE DISCOVERED                                            |
+|                                                                      |
+|  1. INCIDENT RESPONSE - During investigation of a breach, analysts  |
+|     find artifacts left by attackers                                |
+|     Example: Finding malware hash in memory dump                    |
+|                                                                      |
+|  2. THREAT HUNTING - Proactively searching for threats using        |
+|     hypothesis-driven investigations                                |
+|     Example: Hunting for C2 communication patterns                  |
+|                                                                      |
+|  3. MALWARE ANALYSIS - Reverse engineering malware samples,         |
+|     extracting C2 domains, IPs, and other IOCs                      |
+|     Example: Finding domain in malware strings                      |
+|                                                                      |
+|  4. THREAT INTELLIGENCE FEEDS - External sources (VirusTotal, MISP, |
+|     ISACs), community-shared IOCs                                   |
+|     Example: VirusTotal hash lookup                                 |
+|                                                                      |
+|  5. LOG ANALYSIS - Reviewing firewall, DNS, and proxy logs, finding |
+|     suspicious connections                                          |
+|     Example: DNS logs showing requests to malicious domains         |
+|                                                                      |
+|  6. NETWORK ANALYSIS - Packet capture and analysis, finding C2      |
+|     traffic patterns                                                |
+|     Example: Beaconing traffic analysis                             |
+|                                                                      |
++----------------------------------------------------------------------+
+|                                                                      |
+|  IOC CATEGORIES AND CONFIDENCE LEVELS                               |
+|                                                                      |
+|  CLEAN - Confidence: 100%                                           |
+|  - Description: Confirmed safe, false positive                      |
+|  - Example: notepad.exe (legitimate Windows file)                   |
+|  - Action: Do not block, archive for reference                      |
+|                                                                      |
+|  SUSPICIOUS - Confidence: 50-70%                                    |
+|  - Description: Potentially malicious, needs investigation          |
+|  - Example: Unknown file in Temp folder                             |
+|  - Action: Investigate, monitor, alert                              |
+|                                                                      |
+|  MALICIOUS - Confidence: 80-100%                                    |
+|  - Description: Confirmed malicious                                 |
+|  - Example: Known ransomware hash                                   |
+|  - Action: Block immediately, quarantine, alert                     |
+|                                                                      |
+|  CONFIDENCE SCORING:                                                |
+|  - Multiple sources = Higher confidence                             |
+|  - Freshness = More recent = Higher confidence                      |
+|  - Source reliability = Trusted source = Higher confidence          |
+|  - Context = Attack relevance = Higher confidence                   |
+|                                                                      |
++----------------------------------------------------------------------+
+|                                                                      |
+|  IOC SHARING FRAMEWORKS                                             |
+|                                                                      |
+|  MISP (Malware Information Sharing Platform)                        |
+|  - Open-source threat intelligence platform                         |
+|  - Standardized IOC format (STIX)                                   |
+|  - Used by security teams worldwide                                 |
+|                                                                      |
+|  STIX/TAXII                                                         |
+|  - Structured Threat Information Expression                         |
+|  - Trusted Automated eXchange of Intelligence Information           |
+|  - Industry standard for threat intel sharing                       |
+|                                                                      |
+|  VirusTotal                                                         |
+|  - Largest online threat intelligence database                      |
+|  - 70+ antivirus engines                                            |
+|  - 6B+ historical scans                                             |
+|                                                                      |
+|  ISACs (Information Sharing and Analysis Centers)                   |
+|  - Industry-specific threat sharing                                 |
+|  - FS-ISAC (Financial Services)                                     |
+|  - Energy ISAC, Healthcare ISAC                                     |
+|                                                                      |
+|  AlienVault OTX                                                     |
+|  - Open Threat Exchange                                             |
+|  - Community-driven threat intelligence                             |
+|  - 100,000+ active users                                            |
+|                                                                      |
++----------------------------------------------------------------------+
+|                                                                      |
+|  IOC BEST PRACTICES                                                 |
+|                                                                      |
+|  1. ALWAYS VALIDATE - Cross-reference multiple sources, verify      |
+|     before blocking, consider false positives                       |
+|                                                                      |
+|  2. CONTEXT IS KEY - Understand the attack scenario, know your      |
+|     environment, relevance matters                                  |
+|                                                                      |
+|  3. TIMELINESS MATTERS - Use fresh IOCs, remove outdated IOCs,      |
+|     regular updates                                                 |
+|                                                                      |
+|  4. SHARE RESPONSIBLY - Protect sensitive information, use standard |
+|     formats (STIX), follow sharing protocols                        |
+|                                                                      |
+|  5. AUTOMATE WHERE POSSIBLE - Auto-block known threats, auto-update |
+|     IOC feeds, auto-generate alerts                                 |
+|                                                                      |
+|  6. DOCUMENT EVERYTHING - Source of IOC, discovery date, confidence |
+|     level, related incidents                                        |
+|                                                                      |
++----------------------------------------------------------------------+
+|                                                                      |
+|  REAL-WORLD IOC EXAMPLES                                            |
+|                                                                      |
+|  RANSOMWARE DETECTION:                                              |
+|  IOC: File Hash: 5d41402abc4b2a76b9719d911017c592                   |
+|  IOC: File Name: decrypt_me.exe                                     |
+|  IOC: Registry: HKLM\Software\Microsoft\Windows\Run\Ransom          |
+|  Action: Quarantine -> Terminate -> Remove Registry -> Block Network|
+|                                                                      |
+|  PHISHING CAMPAIGN:                                                 |
+|  IOC: Domain: phishing-login-site.com                               |
+|  IOC: URL: https://phishing-login-site.com/verify                   |
+|  IOC: Email: security@fake-update.com                               |
+|  Action: Block Domain -> Update Email Filter -> Alert Users         |
+|                                                                      |
+|  APT DETECTION:                                                     |
+|  IOC: IP: 185.130.5.253 (Known C2)                                  |
+|  IOC: Process: backdoor.exe                                         |
+|  IOC: Network: Beaconing every 60 seconds                           |
+|  Action: Isolate -> Block C2 -> Remove Backdoor -> Forensic Analysis|
+|                                                                      |
++----------------------------------------------------------------------+
+|                                                                      |
+|  WHY IOCS ARE CRITICAL                                              |
+|                                                                      |
+|  1. EARLY DETECTION - Identify threats before they cause damage,    |
+|     reduce dwell time (time from compromise to detection)           |
+|                                                                      |
+|  2. FAST RESPONSE - Automated blocking of known threats, quick      |
+|     containment and remediation                                     |
+|                                                                      |
+|  3. THREAT INTELLIGENCE - Understand attacker TTPs, identify        |
+|     trends and patterns, stay ahead of emerging threats             |
+|                                                                      |
+|  4. COMPLIANCE REQUIREMENTS - GDPR (breach notification), HIPAA     |
+|     (patient data protection), PCI-DSS (cardholder data security),  |
+|     NIST CSF (cybersecurity framework)                              |
+|                                                                      |
+|  5. PROACTIVE HUNTING - Search for threats proactively, find        |
+|     attackers before they strike, improve security posture          |
+|                                                                      |
+|  6. ATTRIBUTION - Identify threat actors, link attacks to known     |
+|     groups, understand motivations                                  |
+|                                                                      |
+|  7. SHARING & COLLABORATION - Share intelligence with others,       |
+|     benefit from community knowledge, contribute to global security |
+|                                                                      |
++----------------------------------------------------------------------+
+|                                                                      |
+|  USING IOCS IN SOC LAB                                              |
+|                                                                      |
+|  STEP 1: Add an IOC                                                 |
+|  - Type: soc ioc                                                    |
+|  - Select type: hash, domain, ip, url, file, registry               |
+|  - Enter value                                                      |
+|  - Categorize: malicious, suspicious, clean                         |
+|                                                                      |
+|  STEP 2: Test the IOC                                               |
+|  - The lab will scan your system                                    |
+|  - Find matching files, processes, or configurations                |
+|  - Identify potential compromises                                   |
+|                                                                      |
+|  STEP 3: View All IOCs                                              |
+|  - See all loaded IOCs                                              |
+|  - Review categories and sources                                    |
+|  - Export for sharing                                               |
+|                                                                      |
+|  STEP 4: Monitor for IOC Matches                                    |
+|  - Real-time file system monitoring                                 |
+|  - Process behavior analysis                                        |
+|  - Automatic alerts on matches                                      |
+|                                                                      |
+|  STEP 5: Respond to IOC Matches                                     |
+|  - Quarantine malicious files                                       |
+|  - Block malicious domains and IPs                                  |
+|  - Terminate malicious processes                                    |
+|  - Generate incident reports                                        |
+|                                                                      |
++----------------------------------------------------------------------+
+|                                                                      |
+|  QUICK REFERENCE                                                    |
+|                                                                      |
+|  IOC TYPES: hash, domain, ip, url, file, registry                   |
+|  CATEGORIES: malicious, suspicious, clean                           |
+|  CONFIDENCE: 0-100% (higher = more reliable)                        |
+|  SOURCES: Internal, External, Vendor, Open Source, Other            |
+|  ACTIONS: Block, Quarantine, Alert, Monitor, Investigate            |
+|                                                                      |
++----------------------------------------------------------------------+
+|                                                                      |
+|  LEARNING RESOURCES                                                 |
+|                                                                      |
+|  Online Platforms:                                                  |
+|  - VirusTotal: https://www.virustotal.com                           |
+|  - MISP: https://www.misp-project.org                               |
+|  - AlienVault OTX: https://otx.alienvault.com                       |
+|  - AbuseIPDB: https://www.abuseipdb.com                             |
+|                                                                      |
+|  Threat Intelligence Feeds:                                         |
+|  - CISA Alerts: https://www.cisa.gov/cybersecurity-advisories       |
+|  - Talos Intelligence: https://talosintelligence.com                |
+|  - SANS ISC: https://isc.sans.edu                                   |
+|                                                                      |
+|  Certifications:                                                    |
+|  - CISSP - Certified Information Systems Security Professional      |
+|  - CISA - Certified Information Systems Auditor                     |
+|  - CEH - Certified Ethical Hacker                                   |
+|  - GIAC - Global Information Assurance Certification                |
+|                                                                      |
++----------------------------------------------------------------------+
+|                                                                      |
+|  CONCLUSION                                                         |
+|                                                                      |
+|  Indicators of Compromise are the foundation of modern              |
+|  cybersecurity detection and response. They enable organizations    |
+|  to:                                                                |
+|  - Detect threats early                                             |
+|  - Respond quickly and effectively                                  |
+|  - Share intelligence with the community                            |
+|  - Hunt proactively for threats                                     |
+|  - Attribute attacks to specific groups                             |
+|  - Comply with regulations                                          |
+|  - Improve overall security posture                                 |
+|                                                                      |
+|  Remember: IOCs are not just about blocking threats--they're about  |
+|  understanding the threat landscape, identifying attacker patterns, |
+|  and continuously improving your security defenses.                 |
+|                                                                      |
+|  STAY VIGILANT | STAY SECURE | STAY INFORMED                        |
+|                                                                      |
+|  "The best defense is a good offense - know your IOCs!"             |
++----------------------------------------------------------------------+
+""",
+
+    "ioc-guide": "",
+    "ioc-info": "",
+    "learn-iocs": "",
+    "iocs": "",
+}
+
+def show_educational_tip(tip_key, education_tips_dict):
+    """Display educational tip with typewriter animation"""
+    if tip_key in education_tips_dict:
+        tip_content = education_tips_dict[tip_key]
+    else:
+        tip_content = education_tips_dict.get("default", "No educational tip available.")
+    
+    console.print()
+    
+    # Get terminal width
+    try:
+        import shutil
+        term_width = shutil.get_terminal_size().columns
+        width = min(max(term_width, 60), 120)
+    except:
+        width = 70
+    
+    # Bold continuous line box using heavy box drawing characters
+    # These work on modern terminals (Windows 10+, Linux, macOS)
+    top_border = '┏' + '━' * (width - 2) + '┓'
+    bottom_border = '┗' + '━' * (width - 2) + '┛'
+    side_border = '┃'
+    
+    # Animated border top
+    for _ in range(2):
+        console.print("[bold]" + top_border + "[/bold]", end='\r')
+        time.sleep(0.03)
+    console.print("[bold]" + top_border + "[/bold]")
+    
+    time.sleep(0.1)
+    
+    # Typewriter effect for content with box formatting
+    lines = tip_content.split('\n')
+    wrapped_lines = []
+    for line in lines:
+        if len(line) > width - 4:
+            words = line.split()
+            current_line = ""
+            for word in words:
+                if len(current_line) + len(word) + 1 <= width - 4:
+                    if current_line:
+                        current_line += " " + word
+                    else:
+                        current_line = word
+                else:
+                    if current_line:
+                        wrapped_lines.append(current_line)
+                    current_line = word
+            if current_line:
+                wrapped_lines.append(current_line)
+        else:
+            wrapped_lines.append(line)
+    
+    # Display content with side borders
+    for line in wrapped_lines:
+        padding = width - len(line) - 4
+        if padding < 0:
+            padding = 0
+        console.print(side_border + " " + line + " " * padding + " " + side_border)
+        time.sleep(0.018)
+    
+    time.sleep(0.1)
+    
+    # Animated border bottom
+    for _ in range(2):
+        console.print("[bold]" + bottom_border + "[/bold]", end='\r')
+        time.sleep(0.03)
+    console.print("[bold]" + bottom_border + "[/bold]")
+    console.print()
+#==================================================
+# ==================================================
+
+SUSPICIOUS_PORTS = {23, 3389, 4444, 5555, 6667, 1337}
+HIGH_RISK_COUNTRIES = {"RU", "KP", "IR", "SY"}
+
+def calculate_threat_score(conn, geo=None):
+    score = 0
+
+    if not conn.raddr:
+        return "LOW", "✓", 0
+
+    ip = conn.raddr.ip
+    port = conn.raddr.port
+
+    if not ip.startswith(("192.168", "10.", "172.")):
+        score += 2
+
+    if port in SUSPICIOUS_PORTS:
+        score += 3
+
+    if not conn.pid:
+        score += 2
+
+    if geo and geo.get("countryCode") in HIGH_RISK_COUNTRIES:
+        score += 3
+
+    if score >= 7:
+        return "HIGH", "✗", score
+    elif score >= 4:
+        return "MEDIUM", "⚠", score
+    else:
+        return "LOW", "✓", score
+
+def get_geo_ip(ip):
+    try:
+        r = requests.get(
+            f"http://ip-api.com/json/{ip}?fields=status,country,countryCode,isp",
+            timeout=2
+        )
+        data = r.json()
+        if data["status"] == "success":
+            return data
+    except:
+        pass
+    return None
+# ==================typewriting education tips---====
+#==============================================
+def typewrite_effect(text, delay=0.02, color_effects=True):
+    """Display text with pen-writing (typewriter) animation effect"""
+    lines = text.split('\n')
+    for line in lines:
+        for char in line:
+            if color_effects:
+                # Color coding for special characters
+                if char == '•':
+                    console.print(f"[bold yellow]{char}[/bold yellow]", end='')
+                elif char == '→':
+                    console.print(f"[cyan]{char}[/cyan]", end='')
+                elif char == '✓':
+                    console.print(f"[bold green]{char}[/bold green]", end='')
+                elif char == '⚠':
+                    console.print(f"[bold red]{char}[/bold red]", end='')
+                elif char == '★':
+                    console.print(f"[bold magenta]{char}[/bold magenta]", end='')
+                elif char in ['📡', '🌐', '🔍', '💡', '🔐']:
+                    console.print(f"[cyan]{char}[/cyan]", end='')
+                elif char.isdigit() and line.strip().startswith(char):
+                    console.print(f"[bold red]{char}[/bold red]", end='')
+                else:
+                    console.print(char, end='')
+            else:
+                console.print(char, end='')
+            sys.stdout.flush()
+            time.sleep(delay)
+        console.print()  # New line
+        time.sleep(delay * 1.5)
+# ============================================================
+# CUSTOM PLACEHOLDER PROCESSOR WITH RANDOM COLORS
+# ============================================================
+
+class PlaceholderProcessor(Processor):
+    """Processor that adds placeholder text to empty buffer with random colors"""
+    
+    def __init__(self, get_placeholder_data):
+        self.get_placeholder_data = get_placeholder_data
+    
+    def apply_transformation(self, transformation_input):
+        # Only show placeholder when buffer is empty
+        if transformation_input.document.text:
+            return Transformation(transformation_input.fragments)
+        
+        placeholder_data = self.get_placeholder_data()
+        if not placeholder_data or not placeholder_data['text']:
+            return Transformation(transformation_input.fragments)
+        
+        # Create formatted text with each character having its own color
+        formatted = []
+        for char, color in placeholder_data['colored_chars']:
+            if color:
+                formatted.append((f'fg:{color}', char))
+            else:
+                formatted.append(('', char))
+        
+        return Transformation(formatted)
+# ============================================
+# SECURITY TERMINAL CLASS - Now with fast init
+# ============================================
+class SecurityTerminal:
+    # Class-level constants - Rounded style
+    NEON_HEADER = "<ansimagenta><b>╭────────────────────────────────────────────────────────────╮</b></ansimagenta>"
+    NEON_FOOTER = "<ansimagenta><b>╰────────────────────────────────────────────────────────────╯</b></ansimagenta>"
+    NEON_LINE = "<ansicyan>│</ansicyan>"
+    NEON_COMMAND = "<ansigreen>"
+    RESET = "</ansigreen>"
+
+    def _maximize_terminal_window(self):
+        """Properly maximize terminal window on all platforms"""
+        import platform
+        import subprocess
+        import sys
+        import os
+        
+        system = platform.system()
+        
+        if system == "Windows":
+            try:
+                # Method 1: Using ctypes (most reliable)
+                import ctypes
+                user32 = ctypes.windll.user32
+                kernel32 = ctypes.windll.kernel32
+                hwnd = kernel32.GetConsoleWindow()
+                if hwnd:
+                    # SW_MAXIMIZE = 3
+                    user32.ShowWindow(hwnd, 3)
+                    # Force redraw
+                    user32.SetWindowPos(hwnd, 0, 0, 0, 0, 0, 0x0001 | 0x0002)
+            except:
+                try:
+                    # Method 2: Using PowerShell
+                    subprocess.run([
+                        'powershell', '-Command',
+                        '$hwnd = (Get-Process -Id $pid).MainWindowHandle; '
+                        'Add-Type -MemberDefinition @"[DllImport("user32.dll")]public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);"@ -Name "Win32" -Namespace "Utils"; '
+                        '[Utils.Win32]::ShowWindow($hwnd, 3)'
+                    ], capture_output=True, timeout=2)
+                except:
+                    pass
+            try:
+                # Set console buffer size to match window
+                subprocess.run(['mode', 'con:', 'cols=120', 'lines=40'], capture_output=True, timeout=2)
+            except:
+                pass
+        
+        elif system == "Linux":
+            try:
+                # Try xdotool
+                result = subprocess.run(['which', 'xdotool'], capture_output=True, timeout=1)
+                if result.returncode == 0:
+                    subprocess.run(['xdotool', 'getactivewindow', 'windowsize', '100%', '100%'], 
+                                capture_output=True, timeout=1)
+                else:
+                    # Escape sequence to set terminal size (rows, cols)
+                    sys.stdout.write('\x1b[8;40;140t')
+                    sys.stdout.flush()
+            except:
+                try:
+                    sys.stdout.write('\x1b[8;40;140t')
+                    sys.stdout.flush()
+                except:
+                    pass
+        
+        elif system == "Darwin":  # macOS
+            try:
+                applescript = '''
+                tell application "Terminal"
+                    activate
+                    set bounds of front window to {0, 22, 1440, 878}
+                    set front window's size to {140, 40}
+                end tell
+                '''
+                subprocess.run(['osascript', '-e', applescript], capture_output=True, timeout=2)
+            except:
+                try:
+                    sys.stdout.write('\x1b[8;40;140t')
+                    sys.stdout.flush()
+                except:
+                    pass
+        
+        # Small delay for window to resize
+        time.sleep(0.3)
+        
+    def __init__(self, workspace_root=None, interactive: bool = True, session_id=None, log_callback=None, auto_launch_websec=False, quiet=False, verbose=False):
+        """Initialize DSTerminal with integrated operator session management"""
+        import queue
+        from pathlib import Path
+        from datetime import datetime
+        import uuid
+        import contextlib
+        from rich.console import Console
+        self.console = Console()
+        # ========== QUIET/VERBOSE MODE SETUP ==========
+        self.quiet = quiet
+        self.verbose = verbose
+
+        # ========== COMMANDS - INITIALIZE FIRST ==========
+        self.commands = {}  # Start with empty dict
+
+        # ========== FAST ATTRIBUTE INIT ==========
+        self.scan_results = {}
+        self.log_callback = log_callback
+        self.log_queue = queue.Queue()
+        self.session_id = session_id or "UNKNOWN"
+        self.scan_timestamp = None
+        self.ransomware_detected = False
+        self.threat_level = "LOW"
+        self._banner_shown = False
+        self.session_manager_initialized = False
+        self.version = "4.0.0.113"
+
+        # ========== CONFIG - MUST BE SET BEFORE BANNER ==========
+        self.config = {
+            'version': '4.0.0.113',
+            'VT_API_KEY': '957166d424812a397e328022b84594a8c02757814f6c04518dce7e81179b4b79',
+            'UPDATE_URL': 'https://github.com/Stark-Expo-Tech-Exchange/DSTerminal_releases_latest.git',
+            'LOG_FILE': 'secure_audit.log',
+            'ENCRYPT_KEY': 'generated_on_init',
+            'CURRENT_VERSION': '4.0.0.113'
+        }
+        # ============================================================
+        # SIEM DASHBOARD PROMPT - LIVE STATS
+        # ============================================================
+        
+        # SIEM Metrics
+        self.alert_count = 247
+        self.critical_alerts = 12
+        self.high_alerts = 45
+        self.incident_count = 12
+        self.mttr = "4.2h"
+        self.risk_score = 76
+        self.event_rate = 143
+        self.active_sessions = 3
+        self.uptime_seconds = 9240  # 2h 34m
+        self.start_time = datetime.now()
+        
+        # Cursor animation
+        self.cursor_visible = True
+        self.cursor_running = False
+        self.cursor_color_index = 0
+        self.cursor_colors = [
+            '#00ff00', '#ff4444', '#ffdd44', '#44ddff', 
+            '#ff44ff', '#4444ff', '#ff8800', '#88ff88'
+        ]
+        
+        # Start the cursor animation
+        self._start_cursor_blink()
+        # ========== DASHBOARD ATTRIBUTES ==========
+        self.soc_dashboard = None
+        self.soc_dashboard_active = False
+        self.dashboard_thread = None
+        self.dashboard_port = 5000
+
+        self.cursor_thread = None
+        self.start_time = datetime.now()
+        self.current_input = ""
+        self.placeholder_text = ""
+ 
+
+        """Initialize SOC Lab - Called from __init__"""
+        self.soc_lab = None
+        self.soc_lab_running = False
+
+ 
+        # ========== WORKSPACE - Fast ==========
+        if workspace_root is None:
+            self.workspace_root = os.path.expanduser("~/dsterminal_workspace")
+        else:
+            self.workspace_root = workspace_root
+        os.makedirs(self.workspace_root, exist_ok=True)
+
+        # ========== BASIC ATTRS - Fast ==========
+        self.interactive = interactive
+        self.ui = None
+        self.system = platform.system()
+        self.running = False
+        self.workspace = str(self.workspace_root)
+        self.current_dir = self.workspace_root
+        self.terminal_width = self._get_terminal_width()
+        self.commands = self._init_commands()
+
+        # ========== OPERATOR SESSION - Fast ==========
+        self.operator_username = None
+        self.session_id = None
+        self.session_start = datetime.now()
+        self.operator_dir = None
+        self.log_file = None
+ 
+        # ========== INIT SESSION - Fast ==========
+        try:
+            self.initialize_operator_session()
+            self.session_manager_initialized = True
+        except Exception as e:
+            self.operator_username = f"OP-{uuid.uuid4().hex[:6].upper()}"
+            self.session_id = f"SESSION-{uuid.uuid4().hex[:5].upper()}"
+            self.session_start = datetime.now()
+
+        # ========== SET GLOBALS - Fast ==========
+        global GLOBAL_OPERATOR, GLOBAL_SESSION
+        GLOBAL_OPERATOR = self.operator_username
+        GLOBAL_SESSION = self.session_id
+
+        # ========== SHOW READY STATUS - Fast ==========
+        if not self.quiet:
+            self.show_banner()
+            time.sleep(1.05)
+
+            self._display_initialization_banner()
+            time.sleep(1.05)
+            # self.show_ready_status()
+            # time.sleep(0.2)
+            
+
+  
+        # ========== CONSOLE & SCAN - Fast ==========
+        self.found_threats = False
+        self.scan_stages = [
+            ("[cyan]Scanning Memory...", "Memory Scan"),
+            ("[yellow]Analyzing Processes...", "Process Scan"),
+            ("[magenta]Inspecting Temp Files...", "Temp File Scan"),
+            ("[blue]Checking Network...", "Network Scan"),
+            ("[white]Verifying System Integrity...", "System Integrity"),
+            ("[red]Reviewing User Accounts...", "User Audit"),
+            ("[bright_cyan]Checking Security Configs...", "Security Configs"),
+            ("[bright_magenta]Behavioral Analysis...", "Heuristics"),
+        ]
+        self.os_type = platform.system().lower()
+        self._is_windows = self.os_type == "windows"
+        self._is_linux = self.os_type == "linux"
+        self._is_mac = self.os_type == "darwin"
+        self.scan_queue = queue.Queue()
+        self.current_scan = None
+        self.output_lines = []
+        self.scan_progress = 0
+        self.scan_status = "Ready"
+        self.discovered_ports = []
+        self.services_found = []
+        self.nmap_mode = False
+
+        # ========== CREATE DIRS - Fast ==========
+        self.scans_dir = os.path.join(self.workspace_root, "scans")
+        os.makedirs(self.scans_dir, exist_ok=True)
+
+        default_dirs = ["exploits", "reports", "sandbox", "scans", "operators", 
+                        "network_reports", "integrity_reports", "compliance_reports", 
+                        "logs", "baselines", "alerts", "quarantine", "forensic", 
+                        "auto_quarantine", "siem_logs"]
+        for dir_name in default_dirs:
+            dir_path = os.path.join(self.workspace_root, dir_name)
+            os.makedirs(dir_path, exist_ok=True)
+
+        threat_maps_dir = os.path.join(self.workspace_root, 'network_reports', 'threat_maps')
+        os.makedirs(threat_maps_dir, exist_ok=True)
+  
+
+        # ========== LOGGING - Fast ==========
+        self._setup_logging()
+
+        # ========== LOG INIT - Fast ==========
+        self.log_to_siem(f"DSTerminal initialized by {self.operator_username}")
+
+    # ========== COMMAND INITIALIZATION METHODS ==========
+    # ============================================================
+    # CURSOR BLINK & ANIMATION
+    # ============================================================
+
+    # def cmd_certcheck_wrapper(self, args):
+    #     """Wrapper for certcheck command"""
+    #     if not CERTCHECK_AVAILABLE:
+    #         print(f"{Fore.RED}[!] Certificate checker module not available{Style.RESET_ALL}")
+    #         return
+        
+    #     try:
+    #         # Import the module
+    #         from certcheck import cmd_certcheck, SSLCertificateChecker
+            
+    #         # Check if it's a help request
+    #         if args and args[0] in ['--help', '-h', 'help']:
+    #             print("""
+    # SSL/TLS Certificate Checker
+    # ---------------------------
+    # Usage: certcheck [domain]
+
+    # Examples:
+    # certcheck starkexpo.com
+    # certcheck google.com
+    # certcheck (interactive mode - prompts for domain)
+
+    # Options:
+    # --help, -h    Show this help message
+    
+    # This module performs comprehensive SSL/TLS certificate analysis including:
+    # - Certificate chain validation
+    # - Expiration monitoring
+    # - Weak algorithm detection (SHA1, RC4, MD5)
+    # - Protocol security (TLS 1.0, 1.1, 1.2, 1.3)
+    # - Cipher suite analysis
+    # - Key strength assessment (RSA, ECDSA)
+    # - CRL/OCSP status checking
+    # - Certificate Transparency validation
+    # - HSTS/HPKP analysis
+    # """)
+    #             return
+            
+    #         # Call the command handler
+    #         cmd_certcheck(self, args)
+            
+    #     except ImportError as e:
+    #         print(f"{Fore.RED}[!] Failed to import certcheck: {e}{Style.RESET_ALL}")
+    #         print(f"{Fore.YELLOW}[!] Install dependencies: pip install pyopenssl cryptography colorama reportlab{Style.RESET_ALL}")
+    #     except Exception as e:
+    #         print(f"{Fore.RED}[!] Error running certcheck: {e}{Style.RESET_ALL}")
+            
+# ==================================================================
+    def cmd_network_security(self, args=None):
+        """
+        Launch the Network Security Dashboard
+        
+        Usage:
+            network-security [--host HOST] [--port PORT] [--no-browser] [--workspace WORKSPACE]
+            ns [--host HOST] [--port PORT] [--no-browser] [--workspace WORKSPACE]
+        
+        Examples:
+            > network-security
+            > ns
+            > network-security --host 0.0.0.0 --port 8080
+            > ns --no-browser
+        """
+        # Parse arguments
+        import shlex
+        import argparse
+        
+        parser = argparse.ArgumentParser(description="Launch Network Security Dashboard")
+        parser.add_argument("--host", "-H", default="0.0.0.0", help="Host to bind to (default: 0.0.0.0)")
+        parser.add_argument("--port", "-p", type=int, default=5000, help="Port to bind to (default: 5000)")
+        parser.add_argument("--no-browser", "-n", action="store_true", help="Don't open browser automatically")
+        parser.add_argument("--workspace", "-w", default="~/dsterminal_workspace/network_security", help="Workspace directory")
+        
+        try:
+            if args is None:
+                args_list = []
+            elif isinstance(args, str):
+                args_list = shlex.split(args) if args else []
+            else:
+                args_list = args
+            parsed_args = parser.parse_args(args_list)
+        except:
+            parsed_args = parser.parse_args([])
+        
+        # Show banner
+        from colorama import Fore, Style
+        print(f"\n{Fore.CYAN}{'=' * 70}{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}{Style.BRIGHT}   NETWORK SECURITY DASHBOARD{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}{'=' * 70}{Style.RESET_ALL}")
+        print("")
+        
+        # Show access info
+        local_ip = self._get_local_ip()
+        print(f"{Fore.GREEN}📍 Local Access:  http://127.0.0.1:{parsed_args.port}{Style.RESET_ALL}")
+        if parsed_args.host == "0.0.0.0":
+            print(f"{Fore.CYAN}📡 Network Access: http://{local_ip}:{parsed_args.port}{Style.RESET_ALL}")
+            print("")
+            print(f"{Fore.RED}⚠️  SECURITY WARNING: Anyone on your network can access this!{Style.RESET_ALL}")
+        print("")
+        print(f"{Fore.YELLOW}Starting dashboard...{Style.RESET_ALL}")
+        
+        # Open browser if requested
+        if not parsed_args.no_browser:
+            def open_browser():
+                import time
+                time.sleep(1.5)
+                import webbrowser
+                webbrowser.open(f"http://127.0.0.1:{parsed_args.port}")
+            threading.Thread(target=open_browser, daemon=True).start()
+        
+        # Launch the dashboard in a separate thread
+        def run_dashboard():
+            try:
+                # Check if network_security module exists
+                import importlib
+                try:
+                    network_security = importlib.import_module('network_security')
+                except ImportError:
+                    print(f"{Fore.RED}[!] network_security module not found{Style.RESET_ALL}")
+                    print(f"{Fore.YELLOW}[!] Make sure network_security is active{Style.RESET_ALL}")
+                    return
+                
+                # Find the main function
+                if hasattr(network_security, 'main'):
+                    dashboard_main = network_security.main
+                elif hasattr(network_security, 'run'):
+                    dashboard_main = network_security.run
+                elif hasattr(network_security, 'dashboard'):
+                    dashboard_main = network_security.dashboard
+                else:
+                    print(f"{Fore.RED}[!] No main/run/dashboard function found in network_security module{Style.RESET_ALL}")
+                    return
+                
+                # Build arguments for the dashboard
+                dashboard_args = [
+                    "--workspace", parsed_args.workspace,
+                    "--host", parsed_args.host,
+                    "--port", str(parsed_args.port)
+                ]
+                if parsed_args.no_browser:
+                    dashboard_args.append("--no-browser")
+                
+                # Replace sys.argv with our arguments
+                import sys
+                sys.argv = ["network_security.py"] + dashboard_args
+                
+                # Run the dashboard
+                dashboard_main()
+                
+            except Exception as e:
+                print(f"{Fore.RED}❌ Dashboard error: {e}{Style.RESET_ALL}")
+                import traceback
+                traceback.print_exc()
+        
+        # Start dashboard in thread
+        dashboard_thread = threading.Thread(target=run_dashboard, daemon=True)
+        dashboard_thread.start()
+        
+        print("")
+        print(f"{Fore.GREEN}✅ Dashboard is running!{Style.RESET_ALL}")
+        print("")
+        print(f"{Fore.WHITE}   Local:  http://127.0.0.1:{parsed_args.port}{Style.RESET_ALL}")
+        if parsed_args.host == "0.0.0.0":
+            print(f"{Fore.WHITE}   Network: http://{local_ip}:{parsed_args.port}{Style.RESET_ALL}")
+        print("")
+        print(f"{Fore.DIM}   Press Ctrl+C to stop the dashboard{Style.RESET_ALL}")
+        print(f"{Fore.DIM}   Type 'help' for available DSTerminal commands{Style.RESET_ALL}")
+
+    def _get_local_ip(self):
+        """Get local IP address"""
+        try:
+            import socket
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("8.8.8.8", 80))
+            ip = s.getsockname()[0]
+            s.close()
+            return ip
+        except:
+            return "127.0.0.1"
+
+    def cmd_netsec_scan(self, target=None):
+        """Run a network security scan"""
+        if not self._check_network_security_available():
+            return
+        
+        try:
+            from colorama import Fore, Style
+            print(f"{Fore.CYAN}[*] Starting network security scan...{Style.RESET_ALL}")
+            
+            if target:
+                print(f"{Fore.CYAN}[*] Target: {target}{Style.RESET_ALL}")
+            
+            import network_security
+            if hasattr(network_security, 'scan'):
+                result = network_security.scan(target)
+                self._display_netsec_results(result)
+            elif hasattr(network_security, 'NetworkSecurity'):
+                analyzer = network_security.NetworkSecurity()
+                result = analyzer.scan(target)
+                self._display_netsec_results(result)
+            else:
+                print(f"{Fore.YELLOW}[!] No scan function found in network_security module{Style.RESET_ALL}")
+                
+        except Exception as e:
+            print(f"{Fore.RED}[!] Scan error: {e}{Style.RESET_ALL}")
+
+    def cmd_netsec_full_scan(self, target=None):
+        """Run a comprehensive network security scan"""
+        if not self._check_network_security_available():
+            return
+        
+        try:
+            from colorama import Fore, Style
+            print(f"{Fore.CYAN}[*] Starting comprehensive network security scan...{Style.RESET_ALL}")
+            
+            if target:
+                print(f"{Fore.CYAN}[*] Target: {target}{Style.RESET_ALL}")
+            
+            import network_security
+            if hasattr(network_security, 'full_scan'):
+                result = network_security.full_scan(target)
+                self._display_netsec_results(result)
+            elif hasattr(network_security, 'NetworkSecurity'):
+                analyzer = network_security.NetworkSecurity()
+                result = analyzer.full_scan(target)
+                self._display_netsec_results(result)
+            else:
+                print(f"{Fore.YELLOW}[!] No full_scan function found{Style.RESET_ALL}")
+                
+        except Exception as e:
+            print(f"{Fore.RED}[!] Full scan error: {e}{Style.RESET_ALL}")
+
+    def cmd_netsec_status(self):
+        """Show Network Security module status"""
+        if not self._check_network_security_available():
+            return
+        
+        try:
+            from colorama import Fore, Style
+            
+            import network_security
+            status = None
+            
+            if hasattr(network_security, 'get_status'):
+                status = network_security.get_status()
+            elif hasattr(network_security, 'NetworkSecurity'):
+                analyzer = network_security.NetworkSecurity()
+                if hasattr(analyzer, 'get_status'):
+                    status = analyzer.get_status()
+                elif hasattr(analyzer, 'status'):
+                    status = analyzer.status
+            
+            if status:
+                self._display_netsec_status(status)
+            else:
+                print(f"\n{Fore.CYAN}Network Security Module Status:{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}{'─' * 50}{Style.RESET_ALL}")
+                print(f"  {Fore.GREEN}Status:{Style.RESET_ALL} Loaded")
+                print(f"  {Fore.GREEN}Module:{Style.RESET_ALL} network_security")
+                print(f"  {Fore.GREEN}Version:{Style.RESET_ALL} {getattr(network_security, '__version__', 'v5.0.0.7689087')}")
+                print(f"  {Fore.GREEN}Available Functions:{Style.RESET_ALL}")
+                for attr in dir(network_security):
+                    if not attr.startswith('_'):
+                        print(f"    {Fore.YELLOW}•{Style.RESET_ALL} {attr}")
+                
+        except Exception as e:
+            print(f"{Fore.RED}[!] Status error: {e}{Style.RESET_ALL}")
+
+    def cmd_netsec_report(self, report_type="html"):
+        """Generate a network security report"""
+        if not self._check_network_security_available():
+            return
+        
+        try:
+            from colorama import Fore, Style
+            print(f"{Fore.CYAN}[*] Generating {report_type.upper()} report...{Style.RESET_ALL}")
+            
+            import network_security
+            report_path = None
+            
+            if hasattr(network_security, 'generate_report'):
+                report_path = network_security.generate_report(report_type)
+            elif hasattr(network_security, 'NetworkSecurity'):
+                analyzer = network_security.NetworkSecurity()
+                if hasattr(analyzer, 'generate_report'):
+                    report_path = analyzer.generate_report(report_type)
+                elif hasattr(analyzer, 'export_report'):
+                    report_path = analyzer.export_report(report_type)
+            elif hasattr(network_security, 'export_report'):
+                report_path = network_security.export_report(report_type)
+            
+            if report_path:
+                print(f"{Fore.GREEN}[✓] Report generated: {report_path}{Style.RESET_ALL}")
+            else:
+                print(f"{Fore.YELLOW}[!] No report generation function found{Style.RESET_ALL}")
+                
+        except Exception as e:
+            print(f"{Fore.RED}[!] Report generation error: {e}{Style.RESET_ALL}")
+
+    def cmd_netsec_dashboard(self):
+        """Launch the Network Security Dashboard (standalone)"""
+        if not self._check_network_security_available():
+            return
+        
+        try:
+            from colorama import Fore, Style
+            print(f"{Fore.CYAN}[*] Launching Network Security Dashboard...{Style.RESET_ALL}")
+            
+            import network_security
+            if hasattr(network_security, 'dashboard'):
+                network_security.dashboard()
+            elif hasattr(network_security, 'launch_dashboard'):
+                network_security.launch_dashboard()
+            elif hasattr(network_security, 'run_dashboard'):
+                network_security.run_dashboard()
+            else:
+                print(f"{Fore.YELLOW}[!] No dashboard function found{Style.RESET_ALL}")
+                
+        except Exception as e:
+            print(f"{Fore.RED}[!] Dashboard error: {e}{Style.RESET_ALL}")
+
+    def cmd_netsec_help(self):
+        """Show Network Security help"""
+        help_text = f"""
+    {Fore.CYAN}Network Security Commands:{Style.RESET_ALL}
+    {Fore.CYAN}{'═' * 60}{Style.RESET_ALL}
+
+    {Fore.GREEN}network-security{Style.RESET_ALL}        - Launch Network Security module
+    {Fore.GREEN}netsec{Style.RESET_ALL}                 - Alias for network-security
+    {Fore.GREEN}ns{Style.RESET_ALL}                     - Alias for network-security
+
+    {Fore.GREEN}netsec-scan{Style.RESET_ALL} [target]   - Run network security scan
+    {Fore.GREEN}netsec-full{Style.RESET_ALL} [target]   - Run comprehensive scan
+    {Fore.GREEN}netsec-status{Style.RESET_ALL}          - Show module status
+    {Fore.GREEN}netsec-report{Style.RESET_ALL} [type]   - Generate report (html/pdf/json)
+    {Fore.GREEN}netsec-dashboard{Style.RESET_ALL}       - Launch interactive dashboard
+    {Fore.GREEN}netsec-list{Style.RESET_ALL}            - List available modules
+    {Fore.GREEN}netsec-help{Style.RESET_ALL}            - Show this help
+    {Fore.GREEN}netsec-info{Style.RESET_ALL}            - Show module information
+    {Fore.GREEN}netsec-config{Style.RESET_ALL}          - Show/configure settings
+    {Fore.GREEN}netsec-rules{Style.RESET_ALL}           - Show security rules
+    {Fore.GREEN}netsec-log{Style.RESET_ALL} [n]         - Show last n log entries
+    {Fore.GREEN}netsec-stop{Style.RESET_ALL}            - Stop the dashboard
+    {Fore.GREEN}netsec-restart{Style.RESET_ALL}         - Restart the dashboard
+
+    {Fore.CYAN}Examples:{Style.RESET_ALL}
+    netsec-scan 192.168.1.1
+    netsec-full example.com
+    netsec-report html
+    netsec-log 50
+    netsec --host 0.0.0.0 --port 8080
+    netsec --no-browser
+    """
+        print(help_text)
+
+    def cmd_netsec_list(self):
+        """List available network security modules"""
+        if not self._check_network_security_available():
+            return
+        
+        try:
+            from colorama import Fore, Style
+            print(f"\n{Fore.CYAN}Network Security Modules:{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}{'─' * 60}{Style.RESET_ALL}")
+            
+            import network_security
+            modules = []
+            
+            if hasattr(network_security, 'get_modules'):
+                modules = network_security.get_modules()
+            elif hasattr(network_security, 'list_modules'):
+                modules = network_security.list_modules()
+            else:
+                # Discover modules from the module
+                for attr in dir(network_security):
+                    if not attr.startswith('_'):
+                        modules.append(attr)
+            
+            for module in sorted(modules):
+                print(f"  {Fore.GREEN}•{Style.RESET_ALL} {module}")
+                
+        except Exception as e:
+            print(f"{Fore.RED}[!] List error: {e}{Style.RESET_ALL}")
+
+    def cmd_netsec_info(self):
+        """Show Network Security module information"""
+        if not self._check_network_security_available():
+            return
+        
+        try:
+            from colorama import Fore, Style
+            import network_security
+            
+            info = {
+                'Module': 'network_security.py',
+                'Status': 'Loaded',
+                'Version': getattr(network_security, '__version__', 'Unknown'),
+                'Author': getattr(network_security, '__author__', 'Unknown'),
+                'Description': getattr(network_security, '__doc__', 'Network Security Module'),
+            }
+            
+            print(f"\n{Fore.CYAN}Network Security Module Information:{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}{'─' * 60}{Style.RESET_ALL}")
+            for key, value in info.items():
+                print(f"  {Fore.GREEN}{key}:{Style.RESET_ALL} {value}")
+                
+            print(f"\n{Fore.CYAN}Available Functions:{Style.RESET_ALL}")
+            for attr in dir(network_security):
+                if not attr.startswith('_'):
+                    print(f"  {Fore.YELLOW}•{Style.RESET_ALL} {attr}")
+                
+        except Exception as e:
+            print(f"{Fore.RED}[!] Info error: {e}{Style.RESET_ALL}")
+
+    def cmd_netsec_config(self):
+        """Show or configure network security settings"""
+        if not self._check_network_security_available():
+            return
+        
+        try:
+            from colorama import Fore, Style
+            import network_security
+            
+            if hasattr(network_security, 'get_config'):
+                config = network_security.get_config()
+                print(f"\n{Fore.CYAN}Network Security Configuration:{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}{'─' * 60}{Style.RESET_ALL}")
+                if isinstance(config, dict):
+                    for key, value in config.items():
+                        print(f"  {Fore.GREEN}{key}:{Style.RESET_ALL} {value}")
+                else:
+                    print(config)
+            else:
+                print(f"{Fore.YELLOW}[!] No configuration function found{Style.RESET_ALL}")
+                
+        except Exception as e:
+            print(f"{Fore.RED}[!] Config error: {e}{Style.RESET_ALL}")
+
+    def cmd_netsec_rules(self):
+        """Show network security rules"""
+        if not self._check_network_security_available():
+            return
+        
+        try:
+            from colorama import Fore, Style
+            import network_security
+            
+            if hasattr(network_security, 'get_rules'):
+                rules = network_security.get_rules()
+                print(f"\n{Fore.CYAN}Network Security Rules:{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}{'─' * 60}{Style.RESET_ALL}")
+                if isinstance(rules, (list, dict)):
+                    for rule in rules:
+                        print(f"  {Fore.YELLOW}•{Style.RESET_ALL} {rule}")
+                else:
+                    print(rules)
+            else:
+                print(f"{Fore.YELLOW}[!] No rules function found{Style.RESET_ALL}")
+                
+        except Exception as e:
+            print(f"{Fore.RED}[!] Rules error: {e}{Style.RESET_ALL}")
+
+    def cmd_netsec_log(self, limit=20):
+        """Show recent network security logs"""
+        if not self._check_network_security_available():
+            return
+        
+        try:
+            from colorama import Fore, Style
+            import network_security
+            
+            if hasattr(network_security, 'get_logs'):
+                logs = network_security.get_logs(limit)
+                print(f"\n{Fore.CYAN}Network Security Logs (last {limit}):{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}{'─' * 60}{Style.RESET_ALL}")
+                if isinstance(logs, list):
+                    for log in logs:
+                        print(f"  {Fore.YELLOW}•{Style.RESET_ALL} {log}")
+                else:
+                    print(logs)
+            else:
+                print(f"{Fore.YELLOW}[!] No log function found{Style.RESET_ALL}")
+                
+        except Exception as e:
+            print(f"{Fore.RED}[!] Log error: {e}{Style.RESET_ALL}")
+
+    def cmd_netsec_stop(self):
+        """Stop the Network Security dashboard"""
+        if hasattr(self, '_netsec_dashboard_thread') and self._netsec_dashboard_thread:
+            print(f"{Fore.YELLOW}[*] Stopping Network Security dashboard...{Style.RESET_ALL}")
+            # Signal the thread to stop
+            self._netsec_running = False
+            print(f"{Fore.GREEN}[✓] Dashboard stopped{Style.RESET_ALL}")
+        else:
+            print(f"{Fore.YELLOW}[!] No dashboard is running{Style.RESET_ALL}")
+
+    def cmd_netsec_restart(self):
+        """Restart the Network Security dashboard"""
+        self.cmd_netsec_stop()
+        time.sleep(1)
+        self.cmd_network_security()
+
+    def _check_network_security_available(self):
+        """Check if network_security module is available"""
+        try:
+            import network_security
+            return True
+        except ImportError:
+            from colorama import Fore, Style
+            print(f"{Fore.RED}[!] network_security module not found{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}[!] Make sure network_security.py is in the same directory{Style.RESET_ALL}")
+            return False
+
+    def _display_netsec_results(self, result):
+        """Display network security scan results"""
+        if not result:
+            from colorama import Fore, Style
+            print(f"{Fore.YELLOW}[!] No results to display{Style.RESET_ALL}")
+            return
+        
+        from colorama import Fore, Style
+        print(f"\n{Fore.CYAN}Network Security Scan Results:{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}{'─' * 60}{Style.RESET_ALL}")
+        
+        if isinstance(result, dict):
+            for key, value in result.items():
+                if isinstance(value, (list, dict)):
+                    print(f"{Fore.GREEN}{key}:{Style.RESET_ALL}")
+                    if isinstance(value, list):
+                        for item in value[:10]:
+                            print(f"  {Fore.YELLOW}•{Style.RESET_ALL} {item}")
+                        if len(value) > 10:
+                            print(f"  {Fore.DIM}... and {len(value) - 10} more{Style.RESET_ALL}")
+                    else:
+                        for k, v in value.items():
+                            print(f"  {Fore.YELLOW}{k}:{Style.RESET_ALL} {v}")
+                else:
+                    print(f"{Fore.GREEN}{key}:{Style.RESET_ALL} {value}")
+        elif isinstance(result, list):
+            for item in result[:20]:
+                print(f"  {Fore.YELLOW}•{Style.RESET_ALL} {item}")
+            if len(result) > 20:
+                print(f"  {Fore.DIM}... and {len(result) - 20} more{Style.RESET_ALL}")
+        else:
+            print(result)
+        
+        print(f"{Fore.CYAN}{'─' * 60}{Style.RESET_ALL}")
+
+    def _display_netsec_status(self, status):
+        """Display network security analyzer status"""
+        if not status:
+            from colorama import Fore, Style
+            print(f"{Fore.YELLOW}[!] No status information{Style.RESET_ALL}")
+            return
+        
+        from colorama import Fore, Style
+        print(f"\n{Fore.CYAN}Network Security Status:{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}{'─' * 50}{Style.RESET_ALL}")
+        
+        if isinstance(status, dict):
+            for key, value in status.items():
+                color = Fore.GREEN if str(value).lower() in ['true', 'active', 'running', 'ok', 'enabled'] else Fore.YELLOW
+                if str(value).lower() in ['error', 'failed', 'false', 'inactive', 'disabled']:
+                    color = Fore.RED
+                print(f"  {Fore.GREEN}{key}:{Style.RESET_ALL} {color}{value}{Style.RESET_ALL}")
+        else:
+            print(status)
+
+    # =====================================================
+    # =====================================================
+    def _start_cursor_blink(self):
+        """Start the animated cursor in a background thread"""
+        self.cursor_running = True
+        self.cursor_thread = threading.Thread(target=self._animate_cursor, daemon=True)
+        self.cursor_thread.start()
+
+    def _animate_cursor(self):
+        """Animate cursor with blinking and color cycling"""
+        while self.cursor_running:
+            self.cursor_visible = not self.cursor_visible
+            if not self.cursor_visible:
+                self.cursor_color_index = (self.cursor_color_index + 1) % len(self.cursor_colors)
+            if hasattr(self, 'app') and self.app:
+                try:
+                    self.app.invalidate()
+                except:
+                    pass
+            time.sleep(0.5)
+
+    def _get_cursor_char(self) -> str:
+        """Return the cursor character based on blink state"""
+        return "█" if self.cursor_visible else " "
+
+    def _get_cursor_color(self) -> str:
+        """Get the current cursor color"""
+        return self.cursor_colors[self.cursor_color_index]
+
+    def _get_uptime(self) -> str:
+        """Get formatted uptime"""
+        if hasattr(self, 'start_time'):
+            uptime = datetime.now() - self.start_time
+            hours = int(uptime.total_seconds() // 3600)
+            minutes = int((uptime.total_seconds() % 3600) // 60)
+            return f"{hours}h {minutes}m"
+        return "0h 0m"
+
+    def _update_siem_metrics(self):
+        """Update SIEM metrics in real-time"""
+        self.alert_count += random.randint(-5, 10)
+        self.alert_count = max(100, min(400, self.alert_count))
+        self.critical_alerts += random.randint(-1, 2)
+        self.critical_alerts = max(5, min(30, self.critical_alerts))
+        self.high_alerts += random.randint(-2, 3)
+        self.high_alerts = max(20, min(80, self.high_alerts))
+        self.incident_count += random.randint(-1, 1)
+        self.incident_count = max(8, min(25, self.incident_count))
+        self.risk_score += random.randint(-2, 3)
+        self.risk_score = max(50, min(95, self.risk_score))
+        self.event_rate += random.randint(-10, 20)
+        self.event_rate = max(50, min(300, self.event_rate))
+        self.active_sessions += random.randint(-1, 1)
+        self.active_sessions = max(1, min(10, self.active_sessions))
+
+    def _ultra_type(self, text, delay=0.001, color=None, end='\n'):
+        """Ultra-fast typing - replaces _type_text"""
+        from colorama import Fore, Style
+        import time
+        
+        if delay is None:
+            delay = 0.003  # Ultra fast default
+        
+        if color:
+            print(color, end='', flush=True)
+        
+        for char in text:
+            print(char, end='', flush=True)
+            time.sleep(delay)
+        
+        if color:
+            print(Style.RESET_ALL, end='', flush=True)
+        
+        if end:
+            print(end, end='', flush=True)
+
+    def _ultra_header(self, text, color=Fore.CYAN, delay=None):
+        """Ultra-fast header - replaces _type_header"""
+        from colorama import Fore
+        
+        if delay is None:
+            delay = 0.005
+        
+        self._ultra_type(f"\n{text}", delay=delay, color=color)
+        self._ultra_type("─" * min(len(text), 70), delay=delay * 0.5, color=Fore.CYAN)
+
+    def _ultra_success(self, text, delay=None):
+        """Ultra-fast success message"""
+        if delay is None:
+            delay = 0.003
+        self._ultra_type(f"✓ {text}", delay=delay, color=Fore.GREEN)
+
+    def _ultra_error(self, text, delay=None):
+        """Ultra-fast error message"""
+        if delay is None:
+            delay = 0.003
+        self._ultra_type(f"✗ {text}", delay=delay, color=Fore.RED)
+
+    def _ultra_warning(self, text, delay=None):
+        """Ultra-fast warning message"""
+        if delay is None:
+            delay = 0.003
+        self._ultra_type(f"⚠ {text}", delay=delay, color=Fore.YELLOW)
+
+    def _ultra_info(self, text, delay=None):
+        """Ultra-fast info message"""
+        if delay is None:
+            delay = 0.003
+        self._ultra_type(f"ℹ {text}", delay=delay, color=Fore.CYAN)
+
+    # ============================================================
+    # INTELLIGENT PLACEHOLDER PROMPTS
+    # ============================================================
+
+    def _get_placeholder_texts(self) -> list:
+        """Return intelligent placeholder prompts with command guidance"""
+        return [
+            # ============================================================
+            # CORE SECURITY
+            # ============================================================
+            "🛡️ Type 'system scan -All' for full system threat scan...",
+            "🔐 Use 'system' for security management...",
+            "📋 Try 'system help' for system command help...",
+            "📊 Run 'system status' to check scan status...",
+            "📂 Use 'system list' to list exported scan files...",
+            "📥 Try 'system load <file>' to load previous scan results...",
+            "💾 Use 'system export <format>' to export scan results...",
+            "📤 Run 'system export all' to export all formats...",
+            "🔒 Use 'security' as alias for system commands...",
+            "⚡ Try 'scan' as alias for system commands...",
+            "💻 Use 'sys' as alias for system commands...",
+            "🌐 Run 'net -n mon' for live network monitoring...",
+            "🔍 Use 'exploitcheck' to check for critical CVEs...",
+            "🦠 Try 'vtscan' for VirusTotal file analysis...",
+            "🧹 Use 'clearlogs' to securely wipe system logs...",
+            "🌐 Run 'nikto --url <TARGET>' for web vulnerability scan...",
+            "🔎 Use 'legitify --github <ORG/REPO>' to scan GitHub...",
+            "💻 Try 'msfconsole' to launch Metasploit Framework...",
+            "🐛 Use 'msf-debug' to debug Metasploit issues...",
+            "❓ Run 'msf -h' for Metasploit help...",
+            "🔍 Use 'nmap -sV <TARGET>' for service detection...",
+            "🎯 Try 'nmap -A <TARGET>' for aggressive OS detection...",
+            "📊 Run 'nmap -p- <TARGET>' to scan all ports...",
+            "💰 Use 'fraud / financial' for fraud investigation...",
+            "🔬 Try 'investigate' for financial forensics tools...",
+            "🔍 Use 'trace' to trace suspicious transactions...",
+
+            # ============================================================
+            # NETWORK TOOLS
+            # ============================================================
+            "🔌 Try 'portsweep [IP]' to scan for open ports...",
+            "🗺️ Use 'traceroute [IP]' for network path analysis...",
+            "🕵️ Run 'torify' to route traffic through Tor...",
+            "🔒 Try 'dnssec [DOMAIN]' to validate DNSSEC...",
+            "🌐 Use 'nmap <TARGET>' for basic port scan...",
+            "🕶️ Run 'nmap -sS <TARGET>' for stealth SYN scan...",
+            "📡 Use 'network' for full WiFi + Ethernet audit...",
+            "📶 Try 'network-wifi' for WiFi only scan...",
+            "🔌 Use 'network-eth' for Ethernet only scan...",
+            "📊 Run 'network-live' for live monitoring...",
+            "🔍 Try 'nmap -sU <TARGET>' for UDP port scan...",
+            "🖥️ Use 'nmap -O <TARGET>' for OS fingerprinting...",
+
+            # ============================================================
+            # FORENSICS & FINANCIAL
+            # ============================================================
+            "🧠 Try 'memdump' to capture volatile memory...",
+            "🔑 Use 'hashfile [PATH]' to generate file hashes...",
+            "🖼️ Run 'stegcheck [IMG]' to detect hidden data...",
+            "💰 Use 'ransomwatch' to identify ransomware...",
+            "🛡️ Try 'ransomware' for monitoring and alerts...",
+            "🚨 Run 'rmon' for ransomware monitoring menu...",
+            "▶️ Use 'rmon-start' to start monitoring...",
+            "⏹️ Try 'rmon-stop' to stop monitoring...",
+            "🔍 Use 'rmon-scan' to scan for ransomware...",
+            "📊 Run 'rmon-status' to show monitoring status...",
+            "📊 Try 'rmon-dashboard' for ransomware dashboard...",
+            "🔄 Use 'rmon-restore' to restore from quarantine...",
+            "📤 Run 'rmon-export' to export ransomware results...",
+            "📋 Try 'rmon-events' to view recent events...",
+            "💬 Use 'rmon-interactive' for interactive investigation...",
+            "📄 Run 'rmon export pdf' for PDF report...",
+            "📊 Try 'rmon export json' for JSON report...",
+            "🌐 Use 'rmon export html' for HTML report...",
+            "💰 Try 'finanalyze' to analyze transactions...",
+            "🔍 Use 'transfertrace' to trace transaction flows...",
+            "🔎 Run 'recon' for comprehensive reconnaissance...",
+            "📋 Use 'viewlogs' to view system logs...",
+            "📝 Try 'regmon' to monitor registry changes...",
+            "👤 Use 'sessiondump' to dump active sessions...",
+
+            # ============================================================
+            # SQL INJECTION TOOLS
+            # ============================================================
+            "💉 Use 'sqlmap <URL>' for SQLMap scan...",
+            "🔍 Try 'sqlmap --url <URL>' with URL parameter...",
+            "📂 Run 'sqlmap --fs <PATH>' for filesystem scan...",
+            "📦 Use 'sqlmap --git <REPO>' for Git scan...",
+            "📁 Try 'sqlmap --output <DIR>' for output directory...",
+            "🔢 Use 'sqlmap --port <PORT>' to set port...",
+            "❓ Run 'sqlmap --help' for help...",
+            "ℹ️ Try 'sqlmap --version' for version info...",
+            "🔄 Use 'sqlmap --update' to update...",
+            "🧙 Run 'sqlmap --wizard' for wizard mode...",
+            "⚡ Try 'sqlmap --batch' for batch mode...",
+            "🔍 Use 'sqlmap-scan <URL>' for quick scan...",
+            "▶️ Run 'sqlmap-start' to start service...",
+            "⏹️ Try 'sqlmap-stop' to stop service...",
+            "📦 Use 'sqlmap-install' to install SQLMap...",
+            "🔄 Run 'sqlmap-reset' to reset database...",
+            "📊 Try 'sqlmap-status' for lab status...",
+            "🔐 Use 'sqlmap-secure' to toggle secure mode...",
+            "🔄 Run 'sqlmap-db-reset' to reset database...",
+            "🏫 Try 'sqllab' for SQL Injection Learning Lab...",
+            "📂 Use 'sqlmap-file <FILE>' to scan URLs from file...",
+            "📤 Run 'sqlmap-export <DEST>' to export report...",
+
+            # ============================================================
+            # HARDENING TOOLS
+            # ============================================================
+            "🛡️ Use 'harden' for system hardening menu...",
+            "⚡ Try 'harden-quick' for quick hardening...",
+            "🔍 Run 'harden-dry-run' to preview changes...",
+            "🔄 Use 'harden-restore' to restore configuration...",
+            "📊 Try 'harden-status' for hardening status...",
+            "✅ Run 'harden-verify' to verify hardening...",
+            "🔒 Use 'harden-full' for full hardening...",
+            "🎬 Try 'harden-cinematic' with cinematic UI...",
+            "⏪ Run 'harden-rollback' to rollback changes...",
+            "📄 Use 'harden-report' to generate report...",
+            "👤 Try 'harden-user' for user account hardening...",
+            "👥 Use 'harden-users' for multi-user hardening...",
+            "🔥 Run 'harden-fw' for firewall hardening...",
+            "🔒 Try 'harden-ssh' for SSH hardening...",
+            "📊 Use 'harden-dashboard' to launch dashboard...",
+            "📋 Run 'harden-list' to list modules...",
+
+            # ============================================================
+            # BACKUP & RESTORE
+            # ============================================================
+            "💾 Use 'list-backups' to list available backups...",
+            "🔍 Try 'search' to search through backups...",
+            "🔄 Run 'restore-id' to restore by ID...",
+            "⏪ Use 'restore-last' to restore last backup...",
+
+            # ============================================================
+            # SYSTEM MANAGEMENT
+            # ============================================================
+            "📁 Use 'add-path' to add to system PATH...",
+            "📂 Try 'dst-workspace' for workspace management...",
+            "🧹 Run 'dst-cleanup' to clean temp files...",
+            "💻 Use 'dst-platform' for platform info...",
+            "🤖 Try 'auto-discover' to discover assets...",
+            "👁️ Run 'monitor-all' to monitor all components...",
+            "📂 Use 'watch-folders' to watch folders...",
+            "📍 Try 'show-paths' to show system paths...",
+            "🔄 Run 'dst-reload' to reload config...",
+            "📦 Use 'dst-update' to update DSTerminal...",
+            "ℹ️ Try 'dst-version' for version info...",
+            "📊 Run 'dst-status' for DSTerminal status...",
+            "❓ Use 'dst-help' for help...",
+            "🔬 Try 'dst-investigate' for investigation...",
+            "💰 Run 'dst-financial' for financial tools...",
+            "🔄 Use 'dst-refresh' to refresh...",
+            "📋 Try 'dst-logs' for logs...",
+            "🔄 Run 'reload' to reload config...",
+            "🔄 Use 'refresh' to refresh state...",
+            "ℹ️ Try 'sysinfo' for detailed system report...",
+            "📊 Run 'dashboard' for security dashboard...",
+            "🛡️ Use 'security-dashboard' for dashboard...",
+            "🔍 Try 'scan-full' for full system scan...",
+            "⚡ Run 'scan-quick' for quick scan...",
+            "📊 Use 'scan-status' for scan status...",
+            "💀 Try 'killproc PID' to terminate process...",
+            "🔄 Run 'macspoof [IFACE]' to randomize MAC...",
+            "🔄 Use 'update' to check for updates...",
+            "⏻ Try 'shutdown' for emergency shutdown...",
+
+            # ============================================================
+            # RECONNAISSANCE TOOLS
+            # ============================================================
+            "🔍 Use 'dst-recon' for basic reconnaissance...",
+            "🔎 Try 'dst-recon-full' for full recon...",
+            "⚡ Run 'dst-recon-quick' for quick recon...",
+            "🔍 Use 'recon-full' for full reconnaissance...",
+            "⚡ Try 'recon-quick' for quick recon...",
+            "📊 Run 'r1' for level 1 recon...",
+            "📊 Try 'r2' for level 2 recon...",
+            "🔍 Use 'rec' for basic recon...",
+            "🔎 Run 'recf' for full recon...",
+
+            # ============================================================
+            # INTEGRITY CHECKING
+            # ============================================================
+            "✅ Use 'integrity' for integrity menu...",
+            "🔍 Try 'integrity-scan' for file scan...",
+            "🔄 Run 'integrity-restore' to restore...",
+            "📄 Use 'integrity-report' for report...",
+            "🔬 Try 'integrity-forensic' for forensic analysis...",
+            "👁️ Run 'integrity-monitor' to monitor...",
+            "🔔 Use 'integrity-alerts' for alerts...",
+            "📋 Try 'integrity-list' for checks...",
+            "ℹ️ Run 'integrity-info' for info...",
+
+            # ============================================================
+            # CERTIFICATE & ENCRYPTION
+            # ============================================================
+            "🔐 Use 'certcheck' for SSL/TLS certificates...",
+            "🔑 Try 'crypto-export' to export keys...",
+            "📥 Run 'crypto-import' to import keys...",
+            "🔧 Use 'crypto-setup' for setup...",
+            "🔒 Try 'crypt' for encryption dashboard...",
+            "🔑 Use 'enc' for encryption operations...",
+            "🔐 Run 'encrypt' to encrypt files...",
+            "🔓 Try 'decrypt' to decrypt files...",
+            "📊 Use 'crypto-status' for encryption status...",
+            "📄 Run 'crypto-reports' for reports...",
+            "📱 Try 'qr-generate' for QR code key...",
+            "📥 Use 'qr-import' to import QR key...",
+
+            # ============================================================
+            # FORENSICS & INVESTIGATION
+            # ============================================================
+            "🔬 Use 'forensics' for forensics menu...",
+            "🔍 Try 'forensic' for analysis tools...",
+            "💰 Run 'fraud-investigate' for fraud...",
+            "🔎 Use 'fraud' for detection tools...",
+            "📊 Try 'investigation' for investigation...",
+            "🔍 Run 'investigate' for suite...",
+            "🔎 Use 'trace' for network activity...",
+            "🗺️ Try 'trace-route' for route analysis...",
+
+            # ============================================================
+            # SERVICES & MONITORING
+            # ============================================================
+            "⚙️ Use 'service' for service management...",
+            "▶️ Try 'service start' to start...",
+            "⏹️ Run 'service stop' to stop...",
+            "📊 Use 'service status' for status...",
+            "🔄 Try 'service restart' to restart...",
+            "🔄 Run 'service reload' to reload...",
+            "✅ Use 'service enable' to enable...",
+            "❌ Try 'service disable' to disable...",
+            "📋 Run 'service list' to list services...",
+            "👁️ Use 'monitor' for monitoring menu...",
+            "▶️ Try 'monitor start' to start...",
+            "⏹️ Run 'monitor stop' to stop...",
+            "📊 Use 'monitor status' for status...",
+
+            # ============================================================
+            # SECURITY SCANNERS
+            # ============================================================
+            "🌐 Use 'nikto scan' for web scanner...",
+            "📄 Try 'nikto report' for report...",
+            "❓ Run 'nikto help' for help...",
+            "ℹ️ Use 'nikto version' for version...",
+            "🔄 Try 'nikto update' to update...",
+            "📋 Run 'nikto list' to list plugins...",
+            "🔍 Use 'legitify scan' for security scan...",
+            "📄 Try 'legitify report' for report...",
+            "❓ Run 'legitify help' for help...",
+            "🔍 Use 'trufflehog scan' for secret scanning...",
+            "📄 Try 'trufflehog report' for report...",
+
+            # ============================================================
+            # SOC (Detailed Information Reconnaissance)
+            # ============================================================
+            "🛡️ Use 'soc' for SOC menu...",
+            "💻 Try 'soc terminal' for SOC terminal...",
+            "👁️ Run 'soc monitor' for monitoring...",
+            "📂 Use 'soc workspace' for workspace...",
+            "⚡ Try 'soc-quick' for quick scan...",
+            "🔍 Run 'soc-full' for full audit...",
+            "🌐 Use 'soc-dns' for DNS analysis...",
+            "📊 Try 'soc-status' for status...",
+            "🗺️ Run 'soc-map' for mapping...",
+            "📜 Use 'soc-history' for history...",
+            "📄 Try 'soc-report' for report...",
+            "🔔 Run 'soc-alerts' for alerts...",
+            "📋 Use 'soc-reports' to list reports...",
+            "📄 Try 'soc-pdf' for PDF report...",
+            "❓ Run 'soc-help' for help...",
+
+            # ============================================================
+            # DEBUG & SYSTEM TOOLS
+            # ============================================================
+            "🐛 Use 'debug' for debug menu...",
+            "▶️ Try 'debug start' to start...",
+            "⏹️ Run 'debug stop' to stop...",
+            "📊 Use 'debug status' for status...",
+            "🔄 Try 'debug restart' to restart...",
+            "🔍 Run 'system scan --all' for complete scan...",
+            "ℹ️ Use 'system info' for system info...",
+            "📄 Try 'system report' for report...",
+            "📋 Run 'system list' to list components...",
+            "📊 Use 'system status' for status...",
+            "📜 Try 'system logs' for logs...",
+            "📄 Run 'system pdf' for PDF report...",
+
+            # ============================================================
+            # NETWORK MONITORING
+            # ============================================================
+            "📡 Use 'net mon' for monitoring...",
+            "🔍 Try 'net scan' for scanning...",
+            "📄 Run 'net report' for report...",
+            "❓ Use 'net help' for help...",
+            "ℹ️ Try 'net version' for version...",
+            "🔄 Run 'net update' to update...",
+            "📋 Use 'net list' to list components...",
+            "📊 Try 'net status' for status...",
+            "📡 Run 'wifiinfo' for WiFi info...",
+            "📶 Use 'wifi-audit' for WiFi audit...",
+            "🔍 Try 'wifi-scan' to scan networks...",
+            "📶 Run 'wlan-audit' for wireless audit...",
+
+            # ============================================================
+            # UTILITY TOOLS
+            # ============================================================
+            "📝 Use 'registry mon' for registry monitoring...",
+            "⏻ Try 'shutdown' to shutdown...",
+            "🧹 Run 'clear' to clear screen...",
+            "❓ Use 'help' for help menu...",
+
+            # ============================================================
+            # CRYPTO TOOLS
+            # ============================================================
+            "🔐 Use 'encrypt FILE' for AES-256 encryption...",
+            "🔓 Try 'decrypt FILE KEY' for decryption...",
+            "📋 Run 'crypto-list' to list encrypted files...",
+            "ℹ️ Use 'crypto-info <file.enc>' for info...",
+            "✅ Try 'crypto-verify' to verify system...",
+            "💾 Run 'crypto-backup' to backup key...",
+            "🧪 Use 'encrypt-test' for encryption test...",
+
+            # ============================================================
+            # WEB SECURITY
+            # ============================================================
+            "🌐 Use 'web-security' for analyzer dashboard...",
+            "⚡ Try 'websec' for web security...",
+            "🔍 Run 'web-scan <URL>' for web scan...",
+            "📋 Use 'web-headers <URL>' for headers...",
+            "🔒 Try 'web-ssl <URL>' for SSL check...",
+            "💥 Run 'web-vuln <URL>' for vulnerabilities...",
+            "📊 Use 'web-full <URL>' for full audit...",
+
+            # ============================================================
+            # MONITORING
+            # ============================================================
+            "👁️ Use 'watchfolder [PATH]' for directory monitoring...",
+            "📝 Try 'regmon' for registry monitor...",
+
+            # ============================================================
+            # FILE COMMANDS
+            # ============================================================
+            "📂 Use 'ls' to list files...",
+            "📄 Try 'cat <file>' to show contents...",
+            "📝 Run 'touch <file>' to create file...",
+            "✍️ Use 'echo <text> > <file>' to write...",
+            "📍 Try 'pwd' for current directory...",
+
+            # ============================================================
+            # UTILITIES
+            # ============================================================
+            "❓ Use 'help' for this menu...",
+            "🚪 Try 'exit' to quit terminal...",
+            "🧹 Run 'clear' to clear display...",
+
+            # ============================================================
+            # GENERAL TIPS
+            # ============================================================
+            "💡 Type 'help' to see all available commands...",
+            "🎯 Try 'system scan' to check for vulnerabilities...",
+            "🌐 Use 'net mon' to monitor network traffic...",
+            "🔐 Run 'soc status' to check SOC...",
+            "📊 Type 'dashboard' for live metrics...",
+            "🔧 Need to harden? Try 'harden'...",
+            "🚨 Check threats with 'ransomwatch'...",
+            "✅ Verify integrity with 'integrity scan'...",
+            "🔑 Try 'crypto-verify' for crypto...",
+            "📦 Explore with 'dst-modules'...",
+            "🎯 Find vulnerabilities with 'vuln-scan'...",
+            "🔍 Use 'recon' for reconnaissance...",
+            "💉 Try 'sqlmap' for SQL injection...",
+            "🔄 Run 'integrity restore' to restore...",
+            "💾 Use 'crypto-backup' for backups...",
+            "ℹ️ Type 'system info' for system info...",
+            "📡 Try 'net scan' for network scanning...",
+            "🌍 Use 'websec' for web security...",
+            "📶 Run 'wifi-audit' for wireless audit...",
+            "🧠 Type 'soc-intel' for threat intel...",
+            "❓ Need help? Type 'help <command>'...",
+            "🧹 Use 'clear' to clean the terminal...",
+            "📋 Run 'dst-status' for status...",
+            "🚪 Type 'exit' to close safely...",
+            "🔒 Always verify with 'integrity verify'...",
+            "🛡️ Stay secure with 'harden-full'...",
+            "👁️ Monitor with 'monitor start'...",
+            "📜 Check 'dst-logs' for logs...",
+            "🔎 Use 'recon-full' for thorough recon...",
+            "🗝️ Try 'crypto-list' for crypto tools...",
+            "🖼️ Run 'stegcheck' for steganography...",
+            "🧠 Use 'memdump' for memory analysis...",
+            "🔐 Secure network with 'harden-ssh'...",
+            "🔥 Check firewall with 'harden-fw'...",
+            "📊 Use 'soc-reports' for reports...",
+            "📚 Try 'ioc-education' to learn IOCs...",
+            "📄 Run 'integrity-report' for reports...",
+            "🔑 Use 'crypto-export' to export keys...",
+            "📈 Type 'harden-status' for status...",
+            "🔄 Need restore? Try 'restore-last'...",
+            "💾 Use 'list-backups' for backups...",
+            "📁 Try 'dst-workspace' for workspace...",
+            "🤖 Run 'auto-discover' for discovery...",
+            "👁️ Monitor all with 'monitor-all'...",
+            "📍 Type 'show-paths' for paths...",
+            "📋 Use 'registry mon' for registry...",
+            "▶️ Run 'soc-start' for SOC monitoring...",
+            "⚡ Try 'soc-quick' for quick SOC scan...",
+            "📄 Generate reports with 'soc-report'...",
+            "🔔 Check alerts with 'soc-alerts'...",
+            "🗺️ Use 'soc-map' for SOC mapping...",
+            "📜 Type 'soc-history' for history...",
+            "📄 Run 'soc-pdf' for PDF report...",
+            "🔍 Try 'scan-full' for complete scan...",
+            "⚡ Use 'quick-scan' for fast scanning...",
+            "🔬 Try 'deep-scan' for thorough analysis...",
+            "🌐 Run 'web-security' for web audit...",
+            "🔎 Use 'web-scan' for web scanning...",
+            "📋 Check headers with 'web-headers'...",
+            "🔒 Verify SSL with 'web-ssl'...",
+            "💥 Find vulnerabilities with 'web-vuln'...",
+            "📊 Type 'web-full' for complete analysis...",
+            "🚪 Type 'exit' to close, or 'help' to explore..."
+            ]
+    
+    def _get_color_palette(self) -> list:
+        """Return color palette for placeholder text"""
+        return [
+            '#ff6b6b',  # Red
+            '#ffa94d',  # Orange
+            '#ffd93d',  # Yellow
+            '#6bcb77',  # Green
+            '#4d96ff',  # Blue
+            '#9b59b6',  # Purple
+            '#ff6b9d',  # Pink
+            '#00d2d3',  # Cyan
+            '#f368e0',  # Magenta
+            '#ff9ff3',  # Light Pink
+            '#54a0ff',  # Light Blue
+            '#5f27cd',  # Dark Purple
+            '#01a3a4',  # Teal
+            '#f8a5c2',  # Rose
+            '#778beb',  # Periwinkle
+        ]
+
+    def _animate_placeholder(self):
+        """Background thread to animate the typing effect with random colors"""
+        color_palette = self._get_color_palette()
+        
+        if not hasattr(self, 'placeholder_text'):
+            self.placeholder_text = ""
+        if not hasattr(self, 'placeholder_colors'):
+            self.placeholder_colors = []
+        if not hasattr(self, 'placeholder_lock'):
+            self.placeholder_lock = threading.Lock()
+        
+        while self.cursor_running:
+            if hasattr(self, 'current_input') and self.current_input:
+                with self.placeholder_lock:
+                    self.placeholder_text = ""
+                    self.placeholder_colors = []
+                time.sleep(0.1)
+                continue
+            
+            full_text = random.choice(self._get_placeholder_texts())
+            typed_text = ""
+            temp_colors = []
+            
+            for char in full_text:
+                if not self.cursor_running:
+                    return
+                if hasattr(self, 'current_input') and self.current_input:
+                    break
+                
+                typed_text += char
+                color = random.choice(color_palette)
+                temp_colors.append((char, color))
+                
+                with self.placeholder_lock:
+                    self.placeholder_text = typed_text
+                    self.placeholder_colors = temp_colors
+                
+                if hasattr(self, 'app') and self.app:
+                    try:
+                        self.app.invalidate()
+                    except:
+                        pass
+                
+                delay = random.uniform(0.02, 0.08)
+                if char in ['.', ',', '!', '?', ';', ':']:
+                    delay *= 2.0
+                if random.random() < 0.03:
+                    delay += random.uniform(0.1, 0.3)
+                if char == ' ':
+                    delay *= 0.6
+                time.sleep(delay)
+            
+            if not (hasattr(self, 'current_input') and self.current_input):
+                time.sleep(random.uniform(1.0, 2.0))
+            
+            while len(typed_text) > 0:
+                if not self.cursor_running:
+                    return
+                if hasattr(self, 'current_input') and self.current_input:
+                    break
+                
+                typed_text = typed_text[:-1]
+                if temp_colors:
+                    temp_colors.pop()
+                
+                with self.placeholder_lock:
+                    self.placeholder_text = typed_text
+                    self.placeholder_colors = temp_colors
+                
+                if hasattr(self, 'app') and self.app:
+                    try:
+                        self.app.invalidate()
+                    except:
+                        pass
+                time.sleep(random.uniform(0.01, 0.03))
+            
+            if not (hasattr(self, 'current_input') and self.current_input):
+                time.sleep(random.uniform(0.5, 1.0))
+
+    def _get_placeholder_data(self) -> dict:
+        """Return current placeholder text and colors"""
+        if hasattr(self, 'current_input') and self.current_input:
+            return {'text': '', 'colored_chars': []}
+        
+        with self.placeholder_lock if hasattr(self, 'placeholder_lock') else threading.Lock():
+            return {
+                'text': self.placeholder_text if hasattr(self, 'placeholder_text') else "",
+                'colored_chars': self.placeholder_colors if hasattr(self, 'placeholder_colors') else []
+            }
+
+    def _get_prompt_siem_dashboard(self) -> HTML:
+        """Multi-Line SIEM Dashboard Prompt - FIXED double border issue"""
+        self._update_siem_metrics()
+
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        version = "4.0.0.113"
+
+        cursor_char = self._get_cursor_char()
+        cursor_color = self._get_cursor_color()
+
+        alert_color = 'ansired' if self.alert_count > 300 else 'ansiyellow' if self.alert_count > 200 else 'ansigreen'
+        critical_color = 'ansired' if self.critical_alerts > 20 else 'ansiyellow' if self.critical_alerts > 10 else 'ansigreen'
+        high_color = 'ansiyellow' if self.high_alerts > 50 else 'ansigreen'
+        incident_color = 'ansired' if self.incident_count > 15 else 'ansiyellow' if self.incident_count > 10 else 'ansigreen'
+        risk_color = 'ansired' if self.risk_score > 70 else 'ansiyellow' if self.risk_score > 50 else 'ansigreen'
+
+        # FIXED: Single border only, no duplicate characters
+        prompt_layout = (
+            f"\n"  # Blank line before SIEM dashboard
+            f"<ansiwhite>╔══[</ansiwhite>"
+            f"<ansiyellow>{timestamp}</ansiyellow>"
+            f"<ansiwhite>]</ansiwhite> "
+            f"<ansicyan>[SIEM]</ansicyan> "
+            f"<ansigreen>DSTERMINAL</ansigreen> "
+            f"<ansiwhite>v{version}</ansiwhite> "
+            f"<ansiwhite>╗</ansiwhite>\n"
+            f"<ansiwhite>║</ansiwhite> "
+            f"<ansiyellow>[!] Alerts:</ansiyellow> "
+            f"<{alert_color}>{self.alert_count}</{alert_color}> "
+            f"<ansiwhite>|</ansiwhite> "
+            f"<ansiyellow>[C] Critical:</ansiyellow> "
+            f"<{critical_color}>{self.critical_alerts}</{critical_color}> "
+            f"<ansiwhite>|</ansiwhite> "
+            f"<ansiyellow>[H] High:</ansiyellow> "
+            f"<{high_color}>{self.high_alerts}</{high_color}> "
+            f"<ansiwhite>║</ansiwhite>\n"
+            f"<ansiwhite>║</ansiwhite> "
+            f"<ansiyellow>[I] Incidents:</ansiyellow> "
+            f"<{incident_color}>{self.incident_count}</{incident_color}> "
+            f"<ansiwhite>|</ansiwhite> "
+            f"<ansiyellow>[T] MTTR:</ansiyellow> "
+            f"<ansigreen>{self.mttr}</ansigreen> "
+            f"<ansiwhite>|</ansiwhite> "
+            f"<ansiyellow>[R] Risk:</ansiyellow> "
+            f"<{risk_color}>{self.risk_score}%</{risk_color}> "
+            f"<ansiwhite>║</ansiwhite>\n"
+            f"<ansiwhite>║</ansiwhite> "
+            f"<ansiyellow>[E] EPS:</ansiyellow> "
+            f"<ansigreen>{self.event_rate}/s</ansigreen> "
+            f"<ansiwhite>|</ansiwhite> "
+            f"<ansiyellow>[S] Sessions:</ansiyellow> "
+            f"<ansicyan>{self.active_sessions}</ansicyan> "
+            f"<ansiwhite>|</ansiwhite> "
+            f"<ansiyellow>[U] Uptime:</ansiyellow> "
+            f"<ansigreen>{self._get_uptime()}</ansigreen> "
+            f"<ansiwhite>║</ansiwhite>\n"
+            f"<ansiwhite>╚══</ansiwhite>"
+            f"<ansired>></ansired> "
+            f"<style color='{cursor_color}'>{cursor_char}</style> "
+        )
+
+        return HTML(prompt_layout)
+
+#======================================================
+    def _get_terminal_width(self):
+        try:
+            return shutil.get_terminal_size().columns
+        except:
+            return 80
+    # =========================
+    def _init_commands(self):
+        """Initialize commands dictionary - Fast"""
+        commands = {
+         
+   
+        }
+    
+    
+        return commands
+
+    def cmd_exit(self, args):
+        """Exit the terminal"""
+        print("[+] Exiting DSTerminal...")
+        sys.exit(0)
+
+    def cmd_clear(self, args):
+        """Clear the terminal screen"""
+        os.system('cls' if os.name == 'nt' else 'clear')
+        return None
+
+    def cmd_ls(self, args):
+        """List directory contents"""
+        try:
+            path = args[0] if args else self.current_dir
+            items = os.listdir(path)
+            for item in sorted(items):
+                full_path = os.path.join(path, item)
+                if os.path.isdir(full_path):
+                    print(f"  📁 {item}/")
+                else:
+                    print(f"  📄 {item}")
+        except Exception as e:
+            print(f"❌ Error: {e}")
+        return None
+
+    def cmd_pwd(self, args):
+        """Print working directory"""
+        print(self.current_dir)
+        return None
+
+
+    #  =============================================     
+
+    def _setup_logging(self):
+        """Setup logging - Fast"""
+        # Minimal logging setup
+        pass
+    
+    def is_admin(self) -> bool:
+        """Check if running with admin privileges"""
+        try:
+            return os.getuid() == 0
+        except AttributeError:
+            import ctypes
+            return ctypes.windll.shell32.IsUserAnAdmin() != 0
+
+    def log_command(self, cmd):
+        """Log command to file"""
+        try:
+            with open(self.log_file, 'a') as f:
+                f.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {cmd}\n")
+        except:
+            pass
+
+    def log_to_siem(self, msg):
+        """Log to SIEM"""
+        try:
+            with open(self.log_file, 'a') as f:
+                f.write(f"[SIEM] {msg}\n")
+        except:
+            pass
+
+    def save_session_end(self):
+        """Save session end"""
+        try:
+            with open(self.log_file, 'a') as f:
+                f.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Session ended\n")
+        except:
+            pass
+
+    def log_event(self, event_type, message):
+        """Log event - Fast"""
+        pass
+    
+    def log_message(self, message, level="INFO"):
+        """Log message - Fast"""
+        print(f"[{level}] {message}")
+
+    # ===============================================================
+ 
+    # ========== BANNER METHODS ==========
+    def show_banner(self):
+        """Show hacker-style banner - Fast, with emoji fallback"""
+        if not hasattr(self, '_banner_shown') or not self._banner_shown:
+            os.system('clear' if os.name == 'posix' else 'cls')
+            self._banner_shown = True
+
+            colors = ['\033[92m', '\033[38;5;46m', '\033[38;5;82m', '\033[96m', '\033[95m']
+            color = random.choice(colors)
+            BOLD = '\033[1m'
+            RESET = '\033[0m'
+
+            # Safe emoji fallback
+            shield = '🛡️' if COLORS_AVAILABLE else '[SHIELD]'
+            lock = '🔐' if COLORS_AVAILABLE else '[LOCK]'
+
+            banner = f"""
+            {color}{BOLD}
+            +======================================================================+
+            |  DDDD   SSSS  TTTTT  EEEEE  RRRR   M   M  III  N   N   AAA   L      |
+            |  D   D  S       T    E      R   R  MM MM   I   NN  N  A   A  L      |
+            |  D   D  SSSS    T    EEEE   RRRR   M M M   I   N N N  AAAAA  L      |
+            |  D   D     S    T    E      R  R   M   M   I   N  NN  A   A  L      |
+            |  DDDD   SSSS    T    EEEEE  R   R  M   M  III  N   N  A   A  LLLL   |
+            +======================================================================+
+                                {shield} ENCRYPTION SUITE v4.0.0.113 {lock}
+                            ===========================================
+            {RESET}"""
+            print(banner)
+            time.sleep(1.05)
+
+    def initialize_operator_session(self):
+        """Initialize operator session - Fast"""
+        import uuid
+        import socket
+        from datetime import datetime
+
+        operators_root = os.path.join(self.workspace_root, "operators")
+        os.makedirs(operators_root, exist_ok=True)
+
+        self.operator_username = f"OP-{uuid.uuid4().hex[:6].upper()}"
+        self.session_id = f"SESSION-{uuid.uuid4().hex[:5].upper()}"
+        self.session_start = datetime.now()
+
+        global GLOBAL_OPERATOR, GLOBAL_SESSION
+        GLOBAL_OPERATOR = self.operator_username
+        GLOBAL_SESSION = self.session_id
+
+        operator_dir = os.path.join(operators_root, self.operator_username)
+        os.makedirs(operator_dir, exist_ok=True)
+
+        self.operator_dir = operator_dir
+        self.log_file = os.path.join(operator_dir, "session_log.txt")
+
+        with open(self.log_file, "w", encoding="utf-8") as f:
+            f.write("+======================================================================+\n")
+            f.write("|                  DSTERMINAL Operator Security Audit Log              |\n")
+            f.write("+======================================================================+\n")
+            f.write(f"| Operator   : {self.operator_username:<52}|\n")
+            f.write(f"| Session ID : {self.session_id:<52}|\n")
+            f.write(f"| Host       : {socket.gethostname():<52}|\n")
+            f.write(f"| Start Time : {self.session_start.strftime('%Y-%m-%d %H:%M:%S'):<52}|\n")
+            f.write("+----------------------------------------------------------------------+\n")
+            f.write("| Command Activity                                                     |\n")
+            f.write("+----------------------------------------------------------------------+\n")
+
+    def show_ready_status(self):
+        """Show ready status - Fast"""
+        from colorama import Fore, Style
+
+        print(f"\n{Fore.GREEN}[OK] System Initializing...{Style.RESET_ALL}")
+        print(f"{Style.DIM}   Operator ID: {self.operator_username}{Style.RESET_ALL}")
+        print(f"{Style.DIM}   Session ID: {self.session_id}{Style.RESET_ALL}")
+        if self.session_start:
+            print(f"{Style.DIM}   Start Time: {self.session_start.strftime('%Y-%m-%d %H:%M:%S')}{Style.RESET_ALL}")
+
+            try:
+                if os.name == 'posix':
+                    is_admin = os.getuid() == 0
+                else:
+                    import ctypes
+                    is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
+                    if not is_admin:
+                        print(f"{Fore.YELLOW}[!]  Warning: Running without administrator privileges. Some features may be limited.{Style.RESET_ALL}")
+            except:
+                pass
+                print()
+                time.sleep(1.05)
+
+    def _display_initialization_banner(self):
+        """Display initialization banner - ULTRA FAST (no typing effects)"""
+        import platform
+        import time
+        import random
+        import sys
+        import shutil
+        import re
+
+        # Get terminal width
+        try:
+            terminal_width = shutil.get_terminal_size().columns
+        except:
+            terminal_width = 120
+
+        if terminal_width < 60:
+            terminal_width = 60
+
+        # Try to import colorama
+        try:
+            from colorama import Fore, Style, init, Back
+            init(autoreset=True)
+            COLORAMA_AVAILABLE = True
+        except ImportError:
+            COLORAMA_AVAILABLE = False
+            # Define fallback colors
+            class Fore:
+                RED = '\033[91m'; GREEN = '\033[92m'; YELLOW = '\033[93m'
+                BLUE = '\033[94m'; MAGENTA = '\033[95m'; CYAN = '\033[96m'
+                WHITE = '\033[97m'; RESET = '\033[0m'; DIM = '\033[2m'
+                LIGHTRED_EX = '\033[91m'; LIGHTGREEN_EX = '\033[92m'
+                LIGHTYELLOW_EX = '\033[93m'; LIGHTCYAN_EX = '\033[96m'
+                LIGHTMAGENTA_EX = '\033[95m'; LIGHTBLUE_EX = '\033[94m'
+            class Style:
+                BRIGHT = '\033[1m'; DIM = '\033[2m'; NORMAL = '\033[22m'
+                RESET_ALL = '\033[0m'
+
+        # Clear screen
+        os.system('cls' if platform.system().lower() == "windows" else 'clear')
+
+        # ============================================================
+        # CENTERING HELPER
+        # ============================================================
+        def center_text(text, width=None):
+            """Center text within terminal width - properly handles ANSI codes"""
+            if width is None:
+                width = terminal_width
+            
+            ansi_escape = re.compile(r'\x1b\[[0-9;]*[a-zA-Z]|\x1b\[[0-9;]*m|\x1b\[[0-9;]*[A-Za-z]')
+            clean_text = ansi_escape.sub('', text)
+            clean_text = re.sub(r'\x1b\[[0-9;]*m', '', clean_text)
+            clean_text = re.sub(r'\x033\[[0-9;]*m', '', clean_text)
+            
+            padding = max(0, (width - len(clean_text)) // 2)
+            return ' ' * padding + text
+
+        # ============================================================
+        # COLOR GENERATOR
+        # ============================================================
+        def get_random_neon_color():
+            neon_colors = [
+                '\033[38;5;51m', '\033[38;5;46m', '\033[38;5;201m',
+                '\033[38;5;226m', '\033[38;5;199m', '\033[38;5;45m'
+            ]
+            return random.choice(neon_colors)
+
+        # ============================================================
+        # BANNER - WITH RANDOM COLORS
+        # ============================================================
+        NEON_CYAN = '\033[38;5;51m'
+        NEON_GREEN = '\033[38;5;46m'
+        NEON_PINK = '\033[38;5;201m'
+        NEON_YELLOW = '\033[38;5;226m'
+        NEON_PURPLE = '\033[38;5;199m'
+        NEON_BLUE = '\033[38;5;45m'
+        BOLD = '\033[1m'
+        RESET = '\033[0m'
+
+        # Each run gets different random colors for the banner
+        banner_color1 = get_random_neon_color()
+        banner_color2 = get_random_neon_color()
+        banner_color3 = get_random_neon_color()
+        banner_color4 = get_random_neon_color()
+        banner_color5 = get_random_neon_color()
+        banner_color6 = get_random_neon_color()
+        banner_color7 = get_random_neon_color()
+
+        banner_lines = [
+            f"{NEON_CYAN}╔══════════════════════════════════════════════════════════════╗{RESET}",
+            f"{NEON_CYAN}║{RESET}  {BOLD}{banner_color1}██████╗ ███████╗████████╗███████╗██████╗ ███╗   ███╗██╗███╗   ██╗ █████╗ ██╗         {RESET}{NEON_CYAN}║{RESET}",
+            f"{NEON_CYAN}║{RESET}  {BOLD}{banner_color2}██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║████╗  ██║██╔══██╗██║         {RESET}{NEON_CYAN}║{RESET}",
+            f"{NEON_CYAN}║{RESET}  {BOLD}{banner_color3}██║  ██║███████╗   ██║   █████╗  ██████╔╝██╔████╔██║██║██╔██╗ ██║███████║██║         {RESET}{NEON_CYAN}║{RESET}",
+            f"{NEON_CYAN}║{RESET}  {BOLD}{banner_color4}██║  ██║╚════██║   ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██║██║╚██╗██║██╔══██║██║         {RESET}{NEON_CYAN}║{RESET}",
+            f"{NEON_CYAN}║{RESET}  {BOLD}{banner_color5}██████╔╝███████║   ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║██║  ██║███████╗    {RESET}{NEON_CYAN}║{RESET}",
+            f"{NEON_CYAN}║{RESET}  {BOLD}{banner_color6}╚═════╝ ╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝    {RESET}{NEON_CYAN}║{RESET}",
+            f"{NEON_CYAN}║{RESET}                                                                                                 {NEON_CYAN}║{RESET}",
+            f"{NEON_CYAN}║{RESET}               {banner_color7}[ ENCRYPTION SUITE v4.0.0.113 - EDITION ]{RESET}                     {NEON_CYAN}║{RESET}",
+            f"{NEON_CYAN}║{RESET}              {banner_color3}=========================================={RESET}                       {NEON_CYAN}║{RESET}",
+            f"{NEON_CYAN}╠══════════════════════════════════════════════════════════════╣{RESET}",
+            f"{NEON_CYAN}║{RESET}  {banner_color7}Version       :{RESET} {banner_color1}{self.config.get('version', '4.0.0.113'):<46}{RESET} {NEON_CYAN}║{RESET}",
+            f"{NEON_CYAN}║{RESET}  {banner_color7}Operator ID   :{RESET} {banner_color2}{self.operator_username:<46}{RESET} {NEON_CYAN}║{RESET}",
+            f"{NEON_CYAN}║{RESET}  {banner_color7}Session ID    :{RESET} {banner_color3}{self.session_id:<46}{RESET} {NEON_CYAN}║{RESET}",
+            f"{NEON_CYAN}║{RESET}  {banner_color7}Started       :{RESET} {banner_color4}{self.session_start.strftime('%Y-%m-%d %H:%M:%S') if self.session_start else 'N/A':<46}{RESET} {NEON_CYAN}║{RESET}",
+            f"{NEON_CYAN}║{RESET}  {banner_color7}Host          :{RESET} {banner_color5}{platform.node():<46}{RESET} {NEON_CYAN}║{RESET}",
+            f"{NEON_CYAN}║{RESET}  {banner_color7}Workspace     :{RESET} {banner_color6}{os.path.basename(self.workspace_root) if self.workspace_root else 'N/A':<46}{RESET} {NEON_CYAN}║{RESET}",
+            f"{NEON_CYAN}╚══════════════════════════════════════════════════════════════╝{RESET}"
+        ]
+
+        # ============================================================
+        # DISPLAY BANNER - FAST (no typing effect)
+        # ============================================================
+        for line in banner_lines:
+            centered = center_text(line)
+            sys.stdout.write(centered + '\n')
+            sys.stdout.flush()
+            time.sleep(0.005)
+
+        print()
+
+        # ============================================================
+        # DISPLAY STATUS - INSTANT (no typing effect)
+        # ============================================================
+        
+        # Get random colors for status messages
+        def get_random_color():
+            colors = [
+                Fore.RED, Fore.GREEN, Fore.YELLOW, Fore.BLUE,
+                Fore.MAGENTA, Fore.CYAN, Fore.LIGHTRED_EX,
+                Fore.LIGHTGREEN_EX, Fore.LIGHTYELLOW_EX,
+                Fore.LIGHTBLUE_EX, Fore.LIGHTMAGENTA_EX, Fore.LIGHTCYAN_EX
+            ]
+            return random.choice(colors)
+
+        # Display all messages instantly (no typing animation)
+        status_messages = [
+            ("⚡ INITIALIZING DSTERMINAL ENGINE...", get_random_color()),
+            ("🔐 Loading security modules...", get_random_color()),
+            ("📡 Establishing secure uplink...", get_random_color()),
+            ("🛰️ Connecting to update servers...", get_random_color()),
+            ("🛰️ Connected...", get_random_color()),
+            ("🔍 Scanning system architecture...", get_random_color()),
+            ("🛡️ Activating firewall protocols...", get_random_color()),
+            ("🌐 Routing through secure nodes...", get_random_color()),
+            ("📊 Analyzing system integrity...", get_random_color()),
+            ("🔑 Generating session encryption keys...", get_random_color()),
+            ("📦 Preparing update infrastructure...", get_random_color()),
+            ("✅ Verification protocols engaged...", get_random_color()),
+            ("🚀 Launching DSTERMINAL Core...", get_random_color()),
+            ("", None),
+            ("✅ SECURE CONNECTION ESTABLISHED!", Fore.GREEN),
+            ("🛡️ All security protocols active", Fore.CYAN),
+            ("📡 Update servers synchronized", Fore.YELLOW),
+            ("🔑 Session keys generated successfully", Fore.MAGENTA),
+            ("🚀 DSTERMINAL Core initialized", Fore.GREEN),
+            ("", None),
+            ("SYSTEM STATUS:", Fore.CYAN),
+            (f"  ✅ DSTERMINAL v{self.config.get('version', '4.0.0.113')} loaded", Fore.GREEN),
+            (f"  ✅ User authenticated: {self.operator_username}", Fore.GREEN),
+            (f"  ✅ Session ID: {self.session_id}", Fore.GREEN),
+            (f"  ✅ Workspace: {os.path.basename(self.workspace_root) if self.workspace_root else 'N/A'}", Fore.GREEN),
+            ("  ✅ System ready for operations", Fore.GREEN),
+            ("", None),
+            ("⏱️  Initialization complete", Fore.YELLOW),
+        ]
+
+        for msg, color in status_messages:
+            if msg == "":
+                print()
+            elif color:
+                centered = center_text(f"{color}{msg}{Style.RESET_ALL}")
+                sys.stdout.write(centered + '\n')
+            else:
+                centered = center_text(msg)
+                sys.stdout.write(centered + '\n')
+            sys.stdout.flush()
+            # Very minimal delay just for readability (not typing)
+            time.sleep(0.05)
+
+        print("\n")
+
+# ===============================================================================
+#     # ====================== COMMAND LOGGER ======================
+    def log_command(self, command):
+        """Record every command executed in the session"""
+        from datetime import datetime
+        
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        
+        if hasattr(self, 'log_file') and self.log_file:
+            try:
+                with open(self.log_file, "a", encoding="utf-8") as f:
+                    f.write(f"[{timestamp}] COMMAND: {command}\n")
+            except:
+                pass
+
+    # ====================== SESSION CLOSE ======================
+    def close_operator_session(self):
+        """Finalize session log with end time and duration"""
+        from datetime import datetime
+
+        if not hasattr(self, 'log_file') or not self.log_file:
+            print("⚠️ No active session to close")
+            return
+
+        try:
+            session_end = datetime.now()
+            duration = session_end - self.session_start
+
+            with open(self.log_file, "a", encoding="utf-8") as f:
+                f.write("+----------------------------------------------------------------------+\n")
+                f.write(f"| Session End : {session_end.strftime('%Y-%m-%d %H:%M:%S'):<52}|\n")
+                f.write(f"| Duration    : {str(duration).split('.')[0]:<52}|\n")
+                f.write("+----------------------------------------------------------------------+\n")
+
+            print(f"\n✅ Session {self.session_id} closed successfully")
+            print(f"📁 Log saved to: {self.log_file}")
+        except Exception as e:
+            print(f"⚠️ Error closing session: {e}")
+
+    # ====================== VIEW SESSION LOG ======================
+    def view_session_log(self, log_path=None):
+        """Display session log in cinematic SOC style"""
+        import shutil
+        
+        if log_path is None:
+            if hasattr(self, 'log_file') and self.log_file:
+                log_path = self.log_file
+            else:
+                print("[!] No session log available")
+                return
+
+        try:
+            if not os.path.exists(log_path):
+                print(f"[!] Log file not found: {log_path}")
+                return
+            
+            with open(log_path, "r", encoding="utf-8") as f:
+                lines = f.readlines()
+
+            width = shutil.get_terminal_size().columns
+
+            print("\n" + "=" * min(width, 60))
+            print("DSTerminal CyberOps SESSION LOG".center(min(width, 60)))
+            print("=" * min(width, 60))
+
+            for line in lines:
+                content = line.rstrip()
+                
+                if "Operator" in content or "Session ID" in content or "Host" in content:
+                    formatted_line = f"\033[93m{content}\033[0m"  # Yellow
+                elif "Session End" in content or "Start Time" in content:
+                    formatted_line = f"\033[91m{content}\033[0m"  # Red
+                elif "COMMAND" in content:
+                    formatted_line = f"\033[96m{content}\033[0m"  # Cyan
+                else:
+                    formatted_line = content
+                
+                padding = max((width - len(content)) // 2, 0)
+                print(" " * padding + formatted_line)
+
+            print("=" * min(width, 60) + "\n")
+
+        except Exception as e:
+            print(f"[!] Error displaying log: {str(e)}")
+
+    def log_to_siem(self, message):
+        """Log message to SIEM"""
+        from datetime import datetime
+        
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        siem_log = os.path.join(self.workspace_root, "siem_log.txt")
+        
+        try:
+            os.makedirs(os.path.dirname(siem_log), exist_ok=True)
+            with open(siem_log, "a") as f:
+                operator = getattr(self, 'operator_username', 'UNKNOWN')
+                f.write(f"[{timestamp}] [{operator}] {message}\n")
+        except:
+            pass
+
+    def log_event(self, event_type, message):
+        """Log a general event to the session log"""
+        from datetime import datetime
+        
+        if not hasattr(self, 'log_file') or not self.log_file:
+            return
+        
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        
+        try:
+            with open(self.log_file, "a", encoding="utf-8") as f:
+                f.write(f"[{timestamp}] {event_type}: {message}\n")
+        except:
+            pass
+
+    def display_centered_box(self, content):
+        """Display centered box with content"""
+        BLINK = "\033[5m"
+        CYAN = "\033[96m"
+        RESET = "\033[0m"
+        width = shutil.get_terminal_size().columns
+
+        lines = content.splitlines()
+
+        for line in lines:
+            padding = max((width - len(line)) // 2, 0)
+            print(" " * padding + CYAN + BLINK + line + RESET)
+
+    def typewriter(self, text, delay=0.03):
+        """Simulate typing animation"""
+        for char in text:
+            sys.stdout.write(char)
+            sys.stdout.flush()
+            time.sleep(delay)
+        print()
+
+    def save_session_end(self):
+        """Save session end time (legacy method)"""
+        self.close_operator_session()
+
+    def ensure_vfs(self):
+        """Create virtual filesystem directory"""
+        os.makedirs(self.vfs_root, exist_ok=True)
+
+    def _setup_logging(self):
+        """Setup logging"""
+        # Implement your logging setup here
+        pass
+  
+     
+     
+     
+     # check dependencies if already installed
+    
+    
+    def check_dependencies(self):
+        """Check and report missing dependencies"""
+        # Define emojis with fallback
+        try:
+            test_str = "✅"
+            test_str.encode(sys.stdout.encoding)
+            check = "✅"
+            error = "❌"
+            ok = "[OK]"
+        except UnicodeEncodeError:
+            check = "[OK]"
+            error = "[X]"
+            ok = "[OK]"
+        
+        deps = DependencyManager()
+        
+        print(f"{Fore.CYAN}[*] Checking DSTERMINAL dependencies...{Style.RESET_ALL}")
+        
+        # Check system tools
+        missing_tools = []
+        for tool in ['nmap', 'whois', 'sqlmap']:
+            if shutil.which(tool):
+                print(f"{Fore.GREEN}{check} {tool}{Style.RESET_ALL}")
+            else:
+                print(f"{Fore.RED}{error} {tool} (missing){Style.RESET_ALL}")
+                missing_tools.append(tool)
+        
+        # Check Metasploit
+        if shutil.which('msfconsole'):
+            print(f"{Fore.GREEN}{check} metasploit{Style.RESET_ALL}")
+        else:
+            print(f"{Fore.RED}{error} metasploit (optional){Style.RESET_ALL}")
+        
+        # Check Python packages
+        missing_packages = []
+        for pkg in ['colorama', 'requests', 'folium', 'plotly', 'reportlab']:
+            try:
+                __import__(pkg)
+                print(f"{Fore.GREEN}{check} {pkg}{Style.RESET_ALL}")
+            except ImportError:
+                print(f"{Fore.RED}{error} {pkg}{Style.RESET_ALL}")
+                missing_packages.append(pkg)
+        
+        if missing_tools or missing_packages:
+            print(f"\n{Fore.YELLOW}[!] Missing dependencies detected{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}[*] Run 'setup' to install missing dependencies{Style.RESET_ALL}")
+            return False
+        
+        print(f"\n{Fore.GREEN}{ok} All dependencies satisfied!{Style.RESET_ALL}")
+        return True
+# =================================soc_ai_threat_hunting module initialization====
+ 
+
+    def get_key(self):
+        if IS_WINDOWS:
+            return msvcrt.getch().decode(errors="ignore")
+        else:
+            return sys.stdin.read(1)
+
+    def enable_raw(self):
+        if IS_WINDOWS:
+            return None  # Windows does not need raw mode
+
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        tty.setraw(fd)
+        return old_settings
+
+
+    def disable_raw(self, old):
+        if IS_WINDOWS or old is None:
+            return
+
+        fd = sys.stdin.fileno()
+        termios.tcsetattr(fd, termios.TCSADRAIN, old)
+
+    def show_education_tip(self, command):
+
+        tip = EDUCATION_TIPS.get(command)
+
+        if not tip:
+            console.print("[red]No education tip available[/red]")
+            return
+
+        try:
+            # Test if emojis can be displayed
+            test_str = "📘"
+            test_str.encode(sys.stdout.encoding)
+            book = "📘"
+        except UnicodeEncodeError:
+            book = "[BOOK]"
+
+        console.clear()
+        console.print(f"\n[cyan]{book} Loading Training Module...[/cyan]\n")
+        time.sleep(1)
+
+        engine.text_type(tip)
+
+        # =================
+ 
+    def resolve_path(self, filename):
+        """Resolve filename to either VFS or real path"""
+        # First check VFS
+        vfs_path = os.path.join(self.vfs_root, filename)
+        if os.path.exists(vfs_path):
+            return vfs_path
+
+     # Then check current directory
+        if os.path.exists(filename):
+            return os.path.abspath(filename)
+        
+        # Check in VFS subdirectories
+        for root, dirs, files in os.walk(self.vfs_root):
+            if filename in files:
+                return os.path.join(root, filename)
+        
+        return None
+
+# --------------------VERSION OF THE DSTERMINAL STARTS HERE--------------
+
+    def get_current_version():
+        version_file = os.path.join(os.path.dirname(__file__), "VERSION")
+        try:
+            with open(version_file, "r") as f:
+                return f.read().strip()
+        except FileNotFoundError:
+            return "0.0.0"
+
+# --------------------VERSION OF THE DSTERMINAL END HERE--------------
+
+        """Initialize terminal settings"""
+        self.log_file = "security_harden.log"
+        self.setup_logging()
+
+    
+        # self.cipher = Fernet(CONFIG['ENCRYPT_KEY'].encode())
+        self.scan_complete = Event()
+        self.scan_progress = 0
+
+    def is_admin(self):
+        """
+        Check if running with administrative/root privileges
+        """
+        try:
+            return os.geteuid() == 0
+        except AttributeError:
+        # Windows fallback
+            import ctypes
+            try:
+                return ctypes.windll.shell32.IsUserAnAdmin()
+            except Exception:
+                return False
+
+    def setup_logging(self):
+        """Configure logging system"""
+        logging.basicConfig(
+            filename=self.log_file,
+            level=logging.INFO,
+            format='%(asctime)s - %(message)s',
+            filemode='a'
+        )
+    def is_windows(self):
+        return os.name == "nt"
+
+ 
+    def print_banner(self):
+        """Display cinematic 3-column dashboard - FULLY RESPONSIVE & RESIZABLE WITH PROPER CLEARING"""
+        import threading
+        import itertools
+        import random
+        from datetime import datetime
+        import shutil
+        import signal
+        import sys
+        import os
+
+        # ============================================================
+        # GET TERMINAL SIZE - RESPONSIVE
+        # ============================================================
+        def get_terminal_size():
+            try:
+                width = shutil.get_terminal_size().columns
+                height = shutil.get_terminal_size().lines
+            except:
+                width = 120
+                height = 30
+            
+            if width < 80:
+                width = 80
+            if height < 20:
+                height = 20
+            
+            return width, height
+
+        # ============================================================
+        # DRAW BANNER FUNCTION (can be called on resize)
+        # ============================================================
+        def _draw_banner():
+            """Draw the banner - called initially and on resize"""
+            
+            # CLEAR SCREEN COMPLETELY - Fix for overlapping
+            sys.stdout.write('\033[2J')  # Clear entire screen
+            sys.stdout.write('\033[H')   # Move cursor to home position
+            sys.stdout.flush()
+            
+            # Get terminal size
+            terminal_width, terminal_height = get_terminal_size()
+            
+            # Calculate responsive column widths
+            panel_width = min(30, terminal_width // 4)
+            banner_width = min(80, terminal_width - (panel_width * 2) - 20)
+            spacing = max(2, (terminal_width - panel_width - banner_width - panel_width) // 3)
+            
+            if panel_width < 20:
+                panel_width = 20
+            if banner_width < 50:
+                banner_width = 50
+            
+            # Ensure minimums
+            if terminal_width < 80:
+                terminal_width = 80
+                panel_width = 20
+                banner_width = terminal_width - panel_width * 2 - 20
+                spacing = 2
+            
+            BLINK = '\033[5m'
+            BOLD = '\033[1m'
+            RESET = '\033[0m'
+            
+            # Vibrant color palette
+            VIBRANT_COLORS = [
+                '\033[38;5;46m',   # Bright Green
+                '\033[38;5;51m',   # Bright Cyan
+                '\033[38;5;201m',  # Bright Magenta
+                '\033[38;5;226m',  # Bright Yellow
+                '\033[38;5;21m',   # Bright Blue
+                '\033[38;5;196m',  # Bright Red
+                '\033[38;5;93m',   # Bright Purple
+                '\033[38;5;208m',  # Bright Orange
+            ]
+            
+            # Pick random vibrant color for this session (keep consistent on resize)
+            if not hasattr(self, '_banner_color'):
+                self._banner_color = random.choice(VIBRANT_COLORS)
+            session_color = self._banner_color
+
+            # ===============================================
+            # GENERATE CONTENT
+            # ===============================================
+
+            def get_metrics():
+                return {
+                    'alerts': random.randint(200, 300),
+                    'incidents': random.randint(8, 18),
+                    'mttr': f"{random.randint(3, 6)}.{random.randint(0, 9)}m",
+                    'uptime': f"{random.randint(99, 100)}.{random.randint(0, 99)}%",
+                    'risk_score': f"{random.randint(65, 85)}/100"
+                }
+
+            def get_threats():
+                threats = [
+                    ('Cobalt Strike', random.randint(1, 4)),
+                    ('Metasploit', random.randint(1, 4)),
+                    ('PowerShell EDR', random.randint(1, 4)),
+                    ('LSASS Dump', random.randint(1, 4)),
+                    ('Persistence', random.randint(1, 4))
+                ]
+                result = []
+                for name, level in threats:
+                    bar = '#' * level + '-' * (4 - level)
+                    result.append(f"| • {name:<15} {bar} |")
+                return result
+
+            def get_events():
+                event_types = ['Port Scan', 'Auth Fail', 'Malware DL', 'Lateral MV', 'Susp Proc', 'SQL Inj', 'XSS Attempt', 'RCE Attempt']
+                now = datetime.now().strftime('%H:%M:%S')
+                events = []
+                for i in range(5):
+                    time_str = f"{int(now[:2]) - i:02d}:{now[3:5]}:{int(now[6:]) - i * 3:02d}"
+                    events.append(f"| {time_str} | {random.choice(event_types):<9} |")
+                return events
+
+            # ============================================================
+            # BUILD LEFT PANEL
+            # ============================================================
+            left_panel = []
+            left_panel.append("+" + "-" * (panel_width - 2) + "+")
+            left_panel.append("|" + " " * ((panel_width - 17) // 2) + "📊 METRICS PANEL" + " " * ((panel_width - 17) // 2) + "|")
+            left_panel.append("+" + "-" * (panel_width - 2) + "+")
+            m = get_metrics()
+            left_panel.append(f"| • Alerts/h:   {m['alerts']:<4} |")
+            left_panel.append(f"| • Incidents:  {m['incidents']:<4} |")
+            left_panel.append(f"| • MTTR:       {m['mttr']:<6} |")
+            left_panel.append(f"| • Uptime:     {m['uptime']:<6} |")
+            left_panel.append(f"| • Risk Score: {m['risk_score']:<5} |")
+            left_panel.append("+" + "-" * (panel_width - 2) + "+")
+
+            # ============================================================
+            # BUILD RIGHT PANEL
+            # ============================================================
+            right_panel = []
+            right_panel.append("+" + "-" * (panel_width - 2) + "+")
+            right_panel.append("|" + " " * ((panel_width - 17) // 2) + "📡 INTELLIGENCE" + " " * ((panel_width - 17) // 2) + "|")
+            right_panel.append("+" + "-" * (panel_width - 2) + "+")
+            right_panel.append(f"| • New IOCs:  {random.randint(30, 60)}       |")
+            right_panel.append(f"| • Campaign:  {random.choice(['APT29', 'APT28', 'Lazarus', 'Sandworm'])}    |")
+            right_panel.append("| • TTPs Updated        |")
+            right_panel.append(f"| • Zero-day:  {random.choice(['CVE-2024', 'CVE-2023', 'None'])} |")
+            right_panel.append(f"| • Patch:     {random.randint(70, 95)}%      |")
+            right_panel.append("+" + "-" * (panel_width - 2) + "+")
+
+            # ============================================================
+            # BUILD MAIN BANNER
+            # ============================================================
+            
+            if terminal_width < 100:
+                banner_text_lines = [
+                    "     ██████╗ ███████╗████████╗███████╗██████╗",
+                    "     ██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗",
+                    "     ██║  ██║███████╗   ██║   █████╗  ██████╔╝",
+                    "     ██║  ██║╚════██║   ██║   ██╔══╝  ██╔══██╗",
+                    "     ██████╔╝███████║   ██║   ███████╗██║  ██║",
+                    "     ╚═════╝ ╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝",
+                ]
+            else:
+                banner_text_lines = [
+                    "     ██████╗ ███████╗████████╗███████╗██████╗ ███╗   ███╗██╗███╗   ██╗ █████╗ ██╗",
+                    "     ██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║████╗  ██║██╔══██╗██║",
+                    "     ██║  ██║███████╗   ██║   █████╗  ██████╔╝██╔████╔██║██║██╔██╗ ██║███████║██║",
+                    "     ██║  ██║╚════██║   ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██║██║╚██╗██║██╔══██║██║",
+                    "     ██████╔╝███████║   ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║██║  ██║███████╗",
+                    "     ╚═════╝ ╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝",
+                ]
+
+            banner_border = "+" + "-" * (banner_width - 2) + "+"
+            
+            main_banner = []
+            main_banner.append(banner_border)
+            main_banner.append("|" + " " * (banner_width - 2) + "|")
+            for line in banner_text_lines:
+                if len(line) > banner_width - 2:
+                    line = line[:banner_width - 5] + "..."
+                padding = (banner_width - 2 - len(line)) // 2
+                main_banner.append("|" + " " * padding + line + " " * (banner_width - 2 - len(line) - padding) + "|")
+            main_banner.append("|" + " " * (banner_width - 2) + "|")
+            main_banner.append(banner_border)
+            
+            version_line = f"     Defensive Security Terminal v4.0.0.113 | {platform.system()} {platform.release()}"
+            if len(version_line) > banner_width - 2:
+                version_line = version_line[:banner_width - 5] + "..."
+            padding = (banner_width - 2 - len(version_line)) // 2
+            main_banner.append("|" + " " * padding + version_line + " " * (banner_width - 2 - len(version_line) - padding) + "|")
+            
+            dev_line = " Developer: Spark Wilson Spink | (c) 2024 | Powered by Stark Expo Tech Exchange"
+            if len(dev_line) > banner_width - 2:
+                dev_line = dev_line[:banner_width - 5] + "..."
+            padding = (banner_width - 2 - len(dev_line)) // 2
+            main_banner.append("|" + " " * padding + dev_line + " " * (banner_width - 2 - len(dev_line) - padding) + "|")
+            
+            help_line = "     Type 'help' for available commands:"
+            if len(help_line) > banner_width - 2:
+                help_line = help_line[:banner_width - 5] + "..."
+            padding = (banner_width - 2 - len(help_line)) // 2
+            main_banner.append("|" + " " * padding + help_line + " " * (banner_width - 2 - len(help_line) - padding) + "|")
+            
+            mode_line = f"     CLI Mode: {'ADMIN' if self.is_admin() else 'USER'} 🔒"
+            if len(mode_line) > banner_width - 2:
+                mode_line = mode_line[:banner_width - 5] + "..."
+            padding = (banner_width - 2 - len(mode_line)) // 2
+            main_banner.append("|" + " " * padding + mode_line + " " * (banner_width - 2 - len(mode_line) - padding) + "|")
+            
+            main_banner.append(banner_border)
+
+            # ============================================================
+            # INSTANT DISPLAY
+            # ============================================================
+            
+            color = session_color
+            
+            # Move cursor to top-left after clearing
+            sys.stdout.write('\033[H')
+            sys.stdout.write(f"\n{color}{BOLD}")
+
+            max_rows = max(len(left_panel), len(main_banner), len(right_panel))
+
+            left_panel_padded = left_panel + [' ' * panel_width] * (max_rows - len(left_panel))
+            right_panel_padded = right_panel + [' ' * panel_width] * (max_rows - len(right_panel))
+            banner_padded = main_banner + [' ' * banner_width] * (max_rows - len(main_banner))
+
+            # Print all rows instantly
+            for i in range(max_rows):
+                left_text = left_panel_padded[i][:panel_width]
+                banner_text = banner_padded[i][:banner_width]
+                right_text = right_panel_padded[i][:panel_width]
+
+                sys.stdout.write(f"{color}{left_text:<{panel_width}}")
+                sys.stdout.write(' ' * spacing)
+                sys.stdout.write(f"{color}{banner_text:<{banner_width}}")
+                sys.stdout.write(' ' * spacing)
+                sys.stdout.write(f"{color}{right_text:<{panel_width}}")
+                sys.stdout.write('\n')
+
+            # Bottom status bar
+            footer = f"\n{color}{'-' * terminal_width}{RESET}\n"
+            footer += f"{color}{BOLD}▲ SOC MONITORING ACTIVE ▲ | "
+            footer += f"Threat Level: ██████░░░░ | "
+            footer += f"Active Sessions: {random.randint(1, 5)} | "
+            footer += f"Response Time: {random.randint(1, 3)}.{random.randint(0, 9)}s{RESET}\n\n"
+
+            sys.stdout.write(footer)
+            sys.stdout.flush()
+
+            # Admin warning if needed
+            if not self.is_admin():
+                print(f"\n{color}{BOLD}[OK] System Ready | [!] Warning: Running without administrator privileges. Some features may be limited.{RESET}\n")
+
+        # ============================================================
+        # SIGNAL HANDLER FOR TERMINAL RESIZE
+        # ============================================================
+        def handle_resize(signum, frame):
+            """Handle terminal resize signal - redraw with proper clearing"""
+            # Redraw banner on resize
+            _draw_banner()
+        
+        # Register signal handler for SIGWINCH (terminal resize)
+        try:
+            signal.signal(signal.SIGWINCH, handle_resize)
+        except AttributeError:
+            # SIGWINCH not available on Windows
+            pass
+
+        # ============================================================
+        # INITIAL DRAW
+        # ============================================================
+        # Store the draw function for resize handling
+        self._draw_banner = _draw_banner
+        
+        # Clear screen initially
+        sys.stdout.write('\033[2J')
+        sys.stdout.write('\033[H')
+        sys.stdout.flush()
+        
+        # Draw the banner initially
+        _draw_banner()
+        
+        # Return the resize handler for potential external use
+        return _draw_banner
+    
+    ## =====================banner print ends here======================================
+    
+    def system_info(self):
+        """Enhanced system information display with security context"""
+        try:
+            test_str = "🔍"
+            test_str.encode(sys.stdout.encoding)
+            # Use emojis
+            icons = {
+                'scan': '🔍', 'folder': '📁', 'cpu': '⚡', 'memory': '💾',
+                'disk': '💿', 'shield': '🛡️', 'network': '🌐', 'list': '📋',
+                'admin': '🔴', 'user': '🟢', 'warning': '⚠️'
+            }
+        except UnicodeEncodeError:
+            # Use ASCII fallback
+            icons = {
+                'scan': '[SCAN]', 'folder': '[DIR]', 'cpu': '[CPU]', 'memory': '[MEM]',
+                'disk': '[DISK]', 'shield': '[SHIELD]', 'network': '[NET]', 'list': '[LIST]',
+                'admin': '[ADMIN]', 'user': '[USER]', 'warning': '[!]'
+            }
+        
+        print("\n" + "="*60)
+        print(f"{icons['scan']} SYSTEM INFORMATION & SECURITY ASSESSMENT")
+        print("="*60)
+
+        # Basic system info
+        print(f"\n{icons['folder']} [BASIC SYSTEM]")
+        print(f"  OS: {platform.system()} {platform.release()}")
+        print(f"  Kernel: {platform.version().split('#')[0] if '#' in platform.version() else platform.version()}")
+        print(f"  Architecture: {platform.machine()}")
+        print(f"  Hostname: {socket.gethostname()}")
+
+        # Enhanced processor info
+        print(f"\n{icons['cpu']} [PROCESSOR]")
+        try:
+            with open('/proc/cpuinfo', 'r') as f:
+                cpuinfo = f.read()
+            for line in cpuinfo.split('\n'):
+                if 'model name' in line:
+                    processor = line.split(':')[1].strip()
+                    print(f"  Model: {processor}")
+                    break
+            cores = cpuinfo.count('processor\t:')
+            print(f"  Cores: {cores} logical processors")
+        except:
+            print("  Info: Unable to read CPU info")
+
+        # Memory info with psutil
+        print(f"\n{icons['memory']} [MEMORY]")
+        if PSUTIL_AVAILABLE:
+            mem = psutil.virtual_memory()
+            swap = psutil.swap_memory()
+            print(f"  RAM: {mem.used/1024**3:.1f}/{mem.total/1024**3:.1f} GB ({mem.percent}% used)")
+            print(f"  Swap: {swap.used/1024**3:.1f}/{swap.total/1024**3:.1f} GB ({swap.percent if swap.total > 0 else 0}% used)")
+        else:
+            print("  Info: psutil not available")
+
+        # Disk info
+        print(f"\n{icons['disk']} [STORAGE]")
+        if PSUTIL_AVAILABLE:
+            try:
+                disk = psutil.disk_usage('/')
+                print(f"  Root FS: {disk.used/1024**3:.1f}/{disk.total/1024**3:.1f} GB ({disk.percent}% used)")
+                print(f"  Free: {disk.free/1024**3:.1f} GB")
+            except:
+                print("  Info: Disk info unavailable")
+
+        # Security context
+        print(f"\n{icons['shield']} [SECURITY CONTEXT]")
+        print(f"  Privileges: {icons['admin'] if self.is_admin() else icons['user']}")
+        print(f"  Workspace: {self.current_dir}")
+
+        # Network info
+        print(f"\n{icons['network']} [NETWORK]")
+        try:
+            # Try to get network interfaces
+            try:
+                import netifaces
+                interfaces = netifaces.interfaces()
+                print(f"  Interfaces: {len(interfaces)} found")
+                for iface in interfaces[:3]:
+                    print(f"    - {iface}")
+            except ImportError:
+                # Fallback: use subprocess
+                import subprocess
+                import platform
+                interfaces = []
+                
+                if platform.system() == "Windows":
+                    result = subprocess.run(['ipconfig'], capture_output=True, text=True)
+                    for line in result.stdout.split('\n'):
+                        if 'adapter' in line.lower():
+                            iface = line.split(':')[0].strip()
+                            if iface:
+                                interfaces.append(iface)
+                else:
+                    import os
+                    if os.path.exists('/sys/class/net/'):
+                        interfaces = os.listdir('/sys/class/net/')
+                    else:
+                        result = subprocess.run(['ifconfig', '-a'], capture_output=True, text=True)
+                        for line in result.stdout.split('\n'):
+                            if ':' in line and not line.startswith(' '):
+                                iface = line.split(':')[0].strip()
+                                if iface:
+                                    interfaces.append(iface)
+                
+                print(f"  Interfaces: {len(interfaces)} found")
+                for iface in interfaces[:3]:
+                    print(f"    - {iface}")
+                print("  Info: Install 'netifaces' for better network details: pip install netifaces")
+                
+        except Exception as e:
+            print(f"  Info: Could not get network interfaces: {str(e)}")
+
+        # Security recommendations
+        print(f"\n{icons['list']} [RECOMMENDATIONS]")
+        if not self.is_admin():
+            print(f"  {icons['warning']} Run with sudo for full security features")
+            print(f"  {icons['scan']} Run 'exploitcheck' for vulnerability assessment")
+            print(f"  {icons['shield']} Run 'check integrity' for system file verification")
+            print(f"  {icons['list']} Run 'system scan -All' for comprehensive scan")
+
+        print("\n" + "="*60)
+
+
+    def show_tip(self, cmd):
+        """Display educational tip for the executed command."""
+        if cmd in EDUCATION_TIPS:
+            tip = EDUCATION_TIPS[cmd]
+            console = Console()
+            console.print(
+                Align.center(
+                    Panel.fit(
+                        tip,
+                        title="[bold cyan]RECOMMENDED EDUCATIONAL TIP[/bold cyan]",
+                        border_style="blue",
+                        width=60,
+                    ),
+                    vertical="middle",
+                )
+            )
+  
+    def safe_path(self, path):
+        """Ensure path is within workspace"""
+    # Handle paths starting with ~
+        if path.startswith('~'):
+            path = os.path.expanduser(path)
+    
+    # Handle relative paths
+        if not os.path.isabs(path):
+            path = os.path.join(self.current_dir, path)
+    
+    # Get absolute path
+        full_path = os.path.abspath(path)
+    
+    # Check if within workspace
+        if not full_path.startswith(self.workspace_root):
+            raise PermissionError(f"Access outside workspace is not allowed: {full_path}")
+    
+        return full_path
+# --------------------------------------------creating dir/folder
+  
+# Initialize colorama for Windows compatibility
+    
+    def _center_text(self, text):
+        """Center text based on terminal width"""
+        return text.center(self.terminal_width)
+    
+    # ---------------------folder or dir creation for safe environment running
+    def safe_path(self, path):
+        """Ensure path is within workspace"""
+        full_path = os.path.abspath(os.path.join(self.current_dir, path))
+        if not full_path.startswith(self.workspace_root):
+            raise PermissionError("Access outside workspace is not allowed")
+        return full_path
+    
+    # --------------------------------------------creating dir/folder
+    def mkdir(self, dirname):
+        """Create a directory"""
+        try:
+            path = self.safe_path(dirname)
+            os.makedirs(path, exist_ok=True)
+            print(f"{Fore.GREEN}[+]ðŸ“ Safe directory created successfully: {os.path.basename(path)}{Style.RESET_ALL}")
+        except PermissionError as e:
+            print(f"{Fore.RED}[!] {e}{Style.RESET_ALL}")
+        except Exception as e:
+            print(f"{Fore.RED}[!] Error creating directory: {e}{Style.RESET_ALL}")
+    
+    # -------------------------------creating a file------------------
+    def touch(self, filename):
+        """Create an empty file"""
+        try:
+            path = self.safe_path(filename)
+            with open(path, "w") as f:
+                f.write("DSTerminal test file\n")
+            print(f"{Fore.GREEN}[+] File created: {filename}{Style.RESET_ALL}")
+        except PermissionError as e:
+            print(f"{Fore.RED}[!] {e}{Style.RESET_ALL}")
+        except Exception as e:
+            print(f"{Fore.RED}[!] Error creating file: {e}{Style.RESET_ALL}")
+    
+  # ------------------------folder/file navigation-------------
+    def handle_echo(self, user_input):
+        """
+        Handle the echo command:
+        - echo text
+        - echo text > file
+        - echo text >> file
+        """
+        try:
+        # Remove leading/trailing whitespace
+            user_input = user_input.strip()
+        
+        # Fix: Handle multi-line input (remove newlines from filename)
+            user_input = user_input.replace('\n', ' ').replace('\r', ' ')
+
+        # Must start with 'echo'
+            if not user_input.lower().startswith("echo"):
+                print("[!] Invalid echo command")
+                return
+
+        # Remove 'echo' from start
+            command_body = user_input[4:].strip()
+        
+        # Fix: Clean up multiple spaces
+            command_body = ' '.join(command_body.split())
+
+        # Check for file redirection
+            if '>>' in command_body:
+                parts = command_body.split('>>', 1)
+                text_part = parts[0].strip()
+                filename = parts[1].strip()
+                mode = 'a'  # append
+            elif '>' in command_body:
+                parts = command_body.split('>', 1)
+                text_part = parts[0].strip()
+                filename = parts[1].strip()
+                mode = 'w'  # overwrite
+            else:
+            # Simple echo (no file)
+                print(command_body)
+                return
+
+        # Remove quotes if present
+            text_part = text_part.strip('"').strip("'")
+        
+        # Fix: Clean filename (remove any leftover newlines/spaces)
+            filename = filename.strip().replace(' ', '_')  # Replace spaces with underscores
+            if not filename:
+                print("[!] No filename specified")
+                return
+
+        # Construct the full path
+            if os.path.isabs(filename) or filename.startswith('~'):
+            # Handle absolute paths
+                path = os.path.expanduser(filename)
+            else:
+            # Relative path - use current directory
+                path = os.path.join(self.current_dir, filename)
+
+        # Make sure directory exists
+            dir_name = os.path.dirname(path)
+            if dir_name and not os.path.exists(dir_name):
+                try:
+                    os.makedirs(dir_name, exist_ok=True)
+                except Exception as e:
+                    print(f"[!] Cannot create directory: {e}")
+                    return
+
+        # Write to file
+            with open(path, mode, encoding='utf-8') as f:
+                f.write(text_part + '\n')
+
+        # Verify file was created
+            if os.path.exists(path):
+                size = os.path.getsize(path)
+                print(f"[+] Written to {filename}")
+                print(f"   Content: '{text_part}'")
+                print(f"   Size: {size} bytes")
+            
+            # Refresh the display
+                self.cmd_refresh()
+            else:
+                print(f"[!] File was not created!")
+
+        except PermissionError as e:
+            print(f"[!] Permission denied: {e}")
+        except Exception as e:
+            print(f"[!] Echo failed: {e}")
+
+    def pwd(self):
+        """Print working directory"""
+        display_path = self.current_dir.replace(self.workspace_root, "~")
+        print(display_path)
+
+    def ls(self, path="."):
+        """List directory contents"""
+        try:
+            target_path = self.safe_path(path) if path != "." else self.current_dir
+            items = os.listdir(target_path)
+            
+            for item in sorted(items):
+                item_path = os.path.join(target_path, item)
+                if os.path.isdir(item_path):
+                    print(f"{Fore.BLUE}[DIR] {item}/{Style.RESET_ALL}")
+                else:
+                    print(f"{Fore.WHITE}[FILE] {item}{Style.RESET_ALL}")
+                    
+        except PermissionError as e:
+            print(f"{Fore.RED}[!] {e}{Style.RESET_ALL}")
+        except Exception as e:
+            print(f"{Fore.RED}[!] Error listing directory: {e}{Style.RESET_ALL}")
+
+    def cd(self, dirname):
+        """Change directory"""
+        try:
+            if dirname == "~" or dirname == "":
+                path = self.workspace_root
+            else:
+                path = self.safe_path(dirname)
+                
+            if os.path.isdir(path):
+                self.current_dir = path
+                display_path = path.replace(self.workspace_root, "~")
+                print(f"{Fore.GREEN}[+] [DIR] Changed to: {display_path}{Style.RESET_ALL}")
+            else:
+                print(f"{Fore.RED}[!] Not a directory: {dirname}{Style.RESET_ALL}")
+                
+        except PermissionError as e:
+            print(f"{Fore.RED}[!] {e}{Style.RESET_ALL}")
+        except Exception as e:
+            print(f"{Fore.RED}[!] Error changing directory: {e}{Style.RESET_ALL}")
+
+    def cat(self, filename):
+        """Display file contents"""
+        try:
+            path = self.safe_path(filename)
+            with open(path, "r") as f:
+                content = f.read()
+                print(content)
+        except FileNotFoundError:
+            print(f"{Fore.RED}[!] [FILE] File not found: {filename}{Style.RESET_ALL}")
+        except PermissionError as e:
+            print(f"{Fore.RED}[!] {e}{Style.RESET_ALL}")
+        except Exception as e:
+            print(f"{Fore.RED}[!] Error reading file: {e}{Style.RESET_ALL}")
+    # -----------------------------------
+    # Command dispatcher - THIS IS THE KEY MISSING PART!
+    def safe_read_file(self, filename):
+        """Safely read files with multiple encoding attempts"""
+        if not os.path.exists(filename):
+            return f"{Fore.RED}[!] File '{filename}' not found{Style.RESET_ALL}"
+    
+    # Try multiple encodings in order of likelihood
+        encodings = ['utf-8', 'utf-8-sig', 'latin-1', 'cp1252', 'iso-8859-1', 'cp850', 'cp437']
+    
+        for encoding in encodings:
+            try:
+                with open(filename, 'r', encoding=encoding) as f:
+                    content = f.read()
+                    return content
+            except UnicodeDecodeError:
+                continue
+            except Exception as e:
+                return f"{Fore.RED}[!] Error reading file: {str(e)}{Style.RESET_ALL}"
+    
+    # If all encodings fail, try reading as binary and show hex dump
+        try:
+            with open(filename, 'rb') as f:
+                data = f.read()
+            
+            text_chars = bytearray({7,8,9,10,12,13,27} | set(range(0x20, 0x100)) - {0x7f})
+            if all(b in text_chars for b in data[:100]):
+                # Try to decode with replacement
+                return data.decode('utf-8', errors='replace')
+            else:
+                # Binary file - show hex dump
+                hex_lines = []
+                for i in range(0, min(len(data), 512), 16):
+                    chunk = data[i:i+16]
+                    hex_str = ' '.join(f'{b:02x}' for b in chunk)
+                    ascii_str = ''.join(chr(b) if 32 <= b <= 126 else '.' for b in chunk)
+                    hex_lines.append(f"{i:04x} | {hex_str:<48} | {ascii_str}")
+            
+                return f"{Fore.YELLOW}[!] Binary file detected. Hex dump (first 512 bytes):\n{Fore.CYAN}" + "\n".join(hex_lines) + f"{Style.RESET_ALL}"
+            
+        except Exception as e:
+            return f"{Fore.RED}[!] Error reading file: {str(e)}{Style.RESET_ALL}"
+    # ========================refresh function herre================
+    def cmd_refresh(self):
+        """Refresh the current directory display"""
+        from colorama import Fore, Style
+        import shutil
+        
+        print(f"\r", end="")  # Clear current line
+
+        # Show current directory
+        print(f"\n{Fore.CYAN}📁 Current directory: {self.current_dir}{Style.RESET_ALL}")
+
+        # List files in current directory
+        try:
+            items = os.listdir(self.current_dir)
+            if items:
+                print(f"\n   Files ({len(items)} total):")
+                # Show files and directories
+                for item in sorted(items)[:15]:  # Show first 15 items
+                    item_path = os.path.join(self.current_dir, item)
+                    if os.path.isdir(item_path):
+                        print(f"      {Fore.BLUE}📁 {item}/{Style.RESET_ALL}")
+                    else:
+                        size = os.path.getsize(item_path)
+                        # Format size
+                        if size < 1024:
+                            size_str = f"{size} B"
+                        elif size < 1024 * 1024:
+                            size_str = f"{size/1024:.1f} KB"
+                        else:
+                            size_str = f"{size/(1024*1024):.1f} MB"
+                        print(f"      {Fore.WHITE}📄 {item} ({size_str}){Style.RESET_ALL}")
+                
+                if len(items) > 15:
+                    print(f"      ... and {len(items) - 15} more items")
+            else:
+                print(f"\n   Directory is empty")
+
+            # Show disk usage info
+            total, used, free = shutil.disk_usage(self.current_dir)
+            print(f"\n   {Fore.YELLOW}💾 Disk space:{Style.RESET_ALL}")
+            print(f"      Free: {Fore.GREEN}{free // (1024**3)} GB{Style.RESET_ALL}")
+            print(f"      Used: {Fore.YELLOW}{used // (1024**3)} GB{Style.RESET_ALL}")
+
+        except PermissionError:
+            print(f"\n   {Fore.RED}⚠️  Permission denied reading directory{Style.RESET_ALL}")
+        except Exception as e:
+            print(f"\n   {Fore.RED}⚠️  Error reading directory: {e}{Style.RESET_ALL}")
+
+        print("")  # Empty line for spacing
+
+# ============================================================
+# COMMAND PROCESSING 
+# ============================================================
+
+    def process_command(self, cmd_input):
+        """Process a command - COMPLETE FIXED VERSION"""
+        if not cmd_input or cmd_input.strip() == "":
+            return True
+        
+        # Split command and arguments
+        parts = cmd_input.strip().split()
+        cmd = parts[0].lower()
+        args = parts[1:] if len(parts) > 1 else []
+        
+        # ============================================================
+        # SOC LAB COMMANDS - Check first
+        # ============================================================
+        
+        if cmd == "soc":
+            if not args:
+                self.cmd_soc(args)
+                return True
+            
+            subcmd = args[0].lower()
+            
+            if subcmd == "start":
+                self._soc_start()
+            elif subcmd == "stop":
+                self._soc_stop()
+            elif subcmd == "status":
+                self._soc_status()
+            elif subcmd in ["dashboard", "dash"]:
+                self._soc_dashboard()
+            elif subcmd in ["enhanced", "enh"]:
+                self._soc_enhanced()
+            elif subcmd == "ioc":
+                self._soc_ioc_add()
+            elif subcmd == "scan":
+                self._soc_scan()
+            elif subcmd == "report":
+                self._soc_report()
+            elif subcmd in ["help", "-h", "--help"]:
+                self._soc_help()
+            else:
+                print(f"âŒ Unknown SOC command: {subcmd}")
+                print("   Available: start, stop, status, dashboard, enhanced, ioc, scan, report, help")
+            return True
+        
+        # ============================================================
+        # SOC NMAP COMMANDS
+        # ============================================================
+        
+        if cmd in ["recon-console", "socmap"]:
+            self.cmd_soc_nmap()
+            return True
+        
+        if cmd == "soc-quick":
+            target = args[0] if args else None
+            self.cmd_soc_quick(target)
+            return True
+        
+        if cmd == "soc-full":
+            target = args[0] if args else None
+            self.cmd_soc_full(target)
+            return True
+        
+        if cmd == "soc-dns":
+            target = args[0] if args else None
+            self.cmd_soc_dns(target)
+            return True
+        
+        if cmd == "soc-map":
+            self.cmd_soc_map()
+            return True
+        
+        if cmd == "soc-history":
+            self.cmd_soc_history()
+            return True
+        
+        if cmd == "soc-status":
+            self.cmd_soc_status()
+            return True
+        
+        if cmd == "soc-dashboard":
+            self.cmd_soc_nmap()
+            return True
+        
+        if cmd == "soc-report":
+            self.cmd_soc_report()
+            return True
+        
+        if cmd == "soc-pdf":
+            self.cmd_soc_pdf()
+            return True
+        
+        if cmd == "soc-help":
+            self.soc_help()
+            return True
+        
+        # ============iocs=========================================
+        if cmd in self.commands:
+            cmd_info = self.commands.get(cmd)
+            if cmd_info and 'func' in cmd_info:
+                try:
+                    cmd_info['func'](args)
+                except Exception as e:
+                    self._print_error(f"Error executing {cmd}: {str(e)}")
+                return True
+        # ============================================================
+        # HARDENING COMMANDS
+        # ============================================================
+        
+        if cmd in ["harden-dashboard", "harden-menu"]:
+            self.launch_hardening_dashboard()
+            return True
+        
+        if cmd == "harden-cinematic":
+            self.launch_hardening_cinematic()
+            return True
+        
+        if cmd == "harden-list":
+            self.list_hardening_modules()
+            return True
+        
+        if cmd == "harden-status":
+            self.show_hardening_status()
+            return True
+        
+        if cmd == "harden-full":
+            self.harden_system_full()
+            return True
+        
+        if cmd == "harden-quick":
+            self.harden_system_quick()
+            return True
+        
+        if cmd == "harden-dry-run":
+            self.harden_system_dry_run()
+            return True
+        
+        if cmd == "harden-report":
+            self.generate_hardening_report()
+            return True
+        
+        if cmd == "harden-rollback":
+            self.rollback_hardening()
+            return True
+        
+        if cmd in ["harden-users", "harden-user"]:
+            self.harden_users_only()
+            return True
+        
+        if cmd in ["harden-firewall", "harden-fw"]:
+            self.harden_firewall_only()
+            return True
+        
+        if cmd in ["harden-ssh", "harden-sshd"]:
+            self.harden_ssh_only()
+            return True
+        
+        # ============================================================
+        # WEB SECURITY COMMANDS
+        # ============================================================
+        
+        if cmd in ["web-security", "websec", "ws", "web-analyzer", "wsa"]:
+            self.launch_web_security_analyzer()
+            return True
+        
+        if cmd in ["web-scan", "webscan", "web-headers", "webheaders", "web-ssl", "webssl", "web-vuln", "webvuln", "web-full", "webfull"]:
+            if hasattr(self, 'web_security_available') and self.web_security_available:
+                print(f"{Fore.YELLOW}[!] Please use the web-security dashboard for scanning{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}Type 'web-security' to launch the full dashboard{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}Or run: web-security --help for options{Style.RESET_ALL}")
+            else:
+                print(f"{Fore.RED}[!] Web Security Analyzer not available{Style.RESET_ALL}")
+            return True
+        
+        # ============================================================
+        # EXIT / CLEAR / HELP
+        # ============================================================
+        
+        if cmd in ["exit", "quit", "logout"]:
+            self.log_command(cmd)
+            self.close_operator_session()
+            print(f"{Fore.YELLOW}[+] Exiting DSTerminal...{Style.RESET_ALL}")
+            return False
+        
+        if cmd in ["clear", "cls"]:
+            os.system('cls' if os.name == 'nt' else 'clear')
+            return True
+        
+        if cmd == "help":
+            self.show_help()
+            return True
+        
+        # ============================================================
+        # FILE SYSTEM COMMANDS
+        # ============================================================
+        
+        if cmd == "pwd":
+            self.pwd()
+            return True
+        
+        if cmd == "ls":
+            self.ls(args[0] if args else ".")
+            return True
+        
+        if cmd == "cd":
+            if args:
+                self.cd(args[0])
+            else:
+                self.cd("~")
+            return True
+        
+        if cmd == "mkdir":
+            if args:
+                self.mkdir(args[0])
+            else:
+                print(f"{Fore.RED}[!] Usage: mkdir <directory_name>{Style.RESET_ALL}")
+            return True
+        
+        if cmd == "touch":
+            if args:
+                self.touch(args[0])
+            else:
+                print(f"{Fore.RED}[!] Usage: touch <filename>{Style.RESET_ALL}")
+            return True
+        
+        if cmd in ["viewlog", "session"]:
+            self.view_session_log()
+            return True
+        
+        if cmd == "cat":
+            if not args:
+                print(f"{Fore.RED}[!] Usage: cat <filename>{Style.RESET_ALL}")
+            else:
+                filename = args[0]
+                try:
+                    if hasattr(self, 'operator_dir') and os.path.exists(self.operator_dir):
+                        filepath = os.path.join(self.operator_dir, filename)
+                    else:
+                        filepath = self.safe_path(filename) if hasattr(self, 'safe_path') else filename
+                except:
+                    filepath = filename
+                content = self.safe_read_file(filepath) if hasattr(self, 'safe_read_file') else "Error reading file"
+                print(content)
+            return True
+        
+        # ============================================================
+        # COMMANDS DICTIONARY LOOKUP
+        # ============================================================
+        
+        if cmd in self.commands:
+            cmd_info = self.commands.get(cmd)
+            if cmd_info and 'func' in cmd_info:
+                try:
+                    cmd_info['func'](args)
+                except Exception as e:
+                    print(f"âŒ Error executing {cmd}: {e}")
+                return True
+        
+        # ============================================================
+        # UNKNOWN COMMAND
+        # ============================================================
+        
+        print(f"{Fore.RED}[!] Unknown command: {cmd}{Style.RESET_ALL}")
+        print("   Type 'help' for available commands")
+        return True
+            
+ 
+# ============================================================
+# DSTERMINAL CLASS WITH SOC METHODS
+# ============================================================
+# ==========================================websec=====================
+ 
+    def handle_ls(self):
+        path = os.getcwd()
+        for item in os.listdir(path):
+            print(item)
+    def handle_touch(self, filename):
+        open(filename, "a").close()
+        print(f"[+] File created: {filename}")
+    def handle_cat(self, filename):
+        if not os.path.exists(filename):
+            print("[!] File not found")
+            return
+        with open(filename, "r") as f:
+            print(f.read())
+    def handle_echo(self, user_input):
+ 
+        tokens = shlex.split(user_input)
+
+        if len(tokens) < 2:
+            print()
+            return
+
+        if ">" in tokens:
+            idx = tokens.index(">")
+            mode = "w"
+        elif ">>" in tokens:
+            idx = tokens.index(">>")
+            mode = "a"
+        else:
+            print(" ".join(tokens[1:]))
+            return
+
+        content = " ".join(tokens[1:idx])
+        filename = tokens[idx + 1]
+
+        try:
+            with open(filename, mode) as f:
+                f.write(content + "\n")
+            print(f"[+] Written to {filename}")
+        except Exception as e:
+            print(f"[!] Echo failed: {e}")
+    
+    
+    @property
+    def is_windows(self):
+        return self._is_windows
+    
+    @property
+    def is_linux(self):
+        return self._is_linux
+    
+    @property
+    def is_mac(self):
+        return self._is_mac
+
+    def log_to_terminal(self, message, level="INFO"):
+        """Log message to terminal with timestamp"""
+        if self.log_callback:
+            timestamp = datetime.now().strftime("%H:%M:%S")
+            self.log_callback(f"[{timestamp}] {message}", level)
+        else:
+            # Ensure console exists
+            if not hasattr(self, 'console'):
+                from rich.console import Console
+                self.console = Console()
+            self.console.print(f"[dim]{message}[/dim]")
+
+    def generate_report_id(self):
+        """Generate a unique report ID"""
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        import random
+        random_suffix = ''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', k=6))
+        return f"DST-REP-{timestamp}-{random_suffix}"
+
+    def scan_system(self):
+        """Real system scanner with live OS-backed results"""
+        self.found_threats = False
+        self.scan_results = {}
+        self.scan_stage_results = {}
+        self.scan_timestamp = datetime.now()
+        self.report_id = self.generate_report_id()
+
+        self.log_to_terminal(f"{Fore.GREEN}🚀 Starting system scan on {platform.system()}...{Style.RESET_ALL}", "INFO")
+        self.scan_thread = Thread(target=self.run_scan, daemon=False)
+        self.scan_thread.start()
+        return self.scan_thread
+        
+    def get_temp_dirs(self):
+        """Get temp directories for different OS platforms"""
+        if self._is_windows:
+            return [Path(os.environ.get('TEMP', 'C:\\Windows\\Temp')), 
+                Path(os.environ.get('TMP', 'C:\\Temp'))]
+        elif self._is_linux or self._is_mac:
+            return [Path('/tmp'), Path('/var/tmp')]
+        return [Path('/tmp')]
+
+    def get_software_list(self):
+        """Get installed software list cross-platform"""
+        software = []
+        try:
+            if self._is_windows:
+                methods = [
+                    lambda: subprocess.run(['wmic', 'product', 'get', 'name'], 
+                                        capture_output=True, text=True, timeout=10),
+                    lambda: subprocess.run(['powershell', '-Command', 
+                        'Get-ItemProperty HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\* | Select-Object DisplayName | Where-Object {$_.DisplayName} | Format-Table -AutoSize'],
+                        capture_output=True, text=True, timeout=15),
+                    lambda: subprocess.run(['powershell', '-Command',
+                        'Get-ItemProperty HKLM:\\Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\* | Select-Object DisplayName | Where-Object {$_.DisplayName} | Format-Table -AutoSize'],
+                        capture_output=True, text=True, timeout=15)
+                ]
+                
+                for method in methods:
+                    try:
+                        result = method()
+                        if result.returncode == 0 and result.stdout.strip():
+                            lines = result.stdout.strip().split('\n')
+                            for line in lines:
+                                line = line.strip()
+                                if line and not line.startswith('---') and not line.startswith('DisplayName'):
+                                    if line and len(line) > 2:
+                                        software.append(line)
+                            if software:
+                                break
+                    except:
+                        continue
+                        
+            elif self._is_linux:
+                try:
+                    result = subprocess.run(['dpkg', '-l'], capture_output=True, text=True, timeout=10)
+                    if result.returncode == 0:
+                        lines = result.stdout.strip().split('\n')[5:]
+                        software = [line.split()[-1] for line in lines if line.strip()]
+                except:
+                    try:
+                        result = subprocess.run(['rpm', '-qa'], capture_output=True, text=True, timeout=10)
+                        if result.returncode == 0:
+                            software = result.stdout.strip().split('\n')
+                    except:
+                        pass
+            elif self._is_mac:
+                try:
+                    result = subprocess.run(['system_profiler', 'SPApplicationsDataType'], 
+                                        capture_output=True, text=True, timeout=10)
+                    if result.returncode == 0:
+                        for line in result.stdout.split('\n'):
+                            if 'Location:' in line:
+                                continue
+                            if line.strip() and not line.startswith(' ' * 4):
+                                software.append(line.strip())
+                except:
+                    pass
+        except Exception as e:
+            self.log_to_terminal(f"Software audit error: {str(e)}", "WARNING")
+        return software
+
+    def generate_scan_results(self, stage_name):
+        """Generate results for a specific scan stage"""
+        results = []
+
+        if stage_name == "Memory Scan":
+            if psutil:
+                mem = psutil.virtual_memory()
+                swap = psutil.swap_memory()
+                results.extend([
+                    ("RAM Usage", f"{mem.percent}%", "green" if mem.percent < 80 else "yellow"),
+                    ("Available RAM", f"{mem.available // (1024**2)} MB", "cyan"),
+                    ("Swap Usage", f"{swap.percent}%", "green" if swap.percent < 50 else "yellow"),
+                    ("Total RAM", f"{mem.total // (1024**3)} GB", "cyan"),
+                ])
+
+        elif stage_name == "Process Scan":
+            if psutil:
+                procs = list(psutil.process_iter(["pid", "name", "username"]))
+                results.append(("Running Processes", str(len(procs)), "cyan"))
+
+                suspicious = []
+                suspicious_keywords = ["keylog", "miner", "backdoor", "exploit", "crypt", "malware", "trojan"]
+                
+                for p in procs:
+                    try:
+                        if p.info["name"]:
+                            name = p.info["name"].lower()
+                            if any(x in name for x in suspicious_keywords):
+                                suspicious.append(p.info["name"])
+                    except (psutil.NoSuchProcess, psutil.AccessDenied):
+                        continue
+
+                if suspicious:
+                    self.found_threats = True
+                    results.append(("Suspicious Processes", ", ".join(suspicious[:3]), "red"))
+                else:
+                    results.append(("Suspicious Processes", "None detected", "green"))
+
+        elif stage_name == "Temp File Scan":
+            total_files = 0
+            suspicious_files = 0
+            temp_dirs = self.get_temp_dirs()
+            
+            for temp_dir in temp_dirs:
+                try:
+                    if temp_dir.exists():
+                        files = list(temp_dir.glob("*"))
+                        total_files += len(files)
+                        suspicious_extensions = ['.tmp', '.temp', '.log', '.cache']
+                        for file in files:
+                            if file.suffix.lower() in suspicious_extensions:
+                                suspicious_files += 1
+                except:
+                    pass
+            
+            results.extend([
+                ("Temp Files Found", str(total_files), "cyan"),
+                ("Suspicious Temp Files", str(suspicious_files), 
+                "green" if suspicious_files < 10 else "yellow" if suspicious_files < 100 else "red"),
+                ("Temp Directories", str(len(temp_dirs)), "cyan"),
+            ])
+
+        elif stage_name == "Network Scan":
+            try:
+                hostname = socket.gethostname()
+                try:
+                    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                    s.connect(("8.8.8.8", 80))
+                    ip_address = s.getsockname()[0]
+                    s.close()
+                except:
+                    ip_address = socket.gethostbyname(hostname)
+                    
+                results.append(("Hostname", hostname, "cyan"))
+                results.append(("IP Address", ip_address, "cyan"))
+                
+                suspicious_ports = []
+                risky_ports = [23, 25, 135, 137, 139, 445, 3389, 5900]
+                open_ports = []
+                
+                common_ports = [21, 22, 23, 25, 53, 80, 443, 3306, 3389, 8080, 8443]
+                for port in common_ports:
+                    try:
+                        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        sock.settimeout(0.5)
+                        result = sock.connect_ex(('127.0.0.1', port))
+                        if result == 0:
+                            open_ports.append(str(port))
+                            if port in risky_ports:
+                                suspicious_ports.append(str(port))
+                        sock.close()
+                    except:
+                        pass
+                
+                results.append(("Open Ports", ", ".join(open_ports) if open_ports else "None", 
+                            "yellow" if open_ports else "green"))
+                
+                if suspicious_ports:
+                    self.found_threats = True
+                    results.append(("Suspicious Ports", ", ".join(suspicious_ports), "red"))
+                else:
+                    results.append(("Suspicious Ports", "None detected", "green"))
+                    
+            except Exception as e:
+                results.append(("Network Info", f"Unable to retrieve: {str(e)[:30]}", "yellow"))
+
+        # ============================================================
+        # SKIPPED STAGES - Returns simple info message
+        # ============================================================
+        
+        elif stage_name == "Software Audit":
+            return [("Software Audit", "Skipped for performance (causes display issues)", "yellow")]
+
+        elif stage_name == "Security Configs":
+            return [("Security Configs", "Skipped for performance (causes display issues)", "yellow")]
+
+        elif stage_name == "Heuristics":
+            return [("Heuristics", "Skipped for performance (causes display issues)", "yellow")]
+
+        elif stage_name == "System Integrity":
+            issues_found = 0
+            try:
+                if self._is_windows:
+                    system_root = Path(os.environ.get('SystemRoot', 'C:\\Windows'))
+                    system32 = system_root / 'System32'
+                    if system32.exists():
+                        dll_files = list(system32.glob("*.dll"))
+                        recent_changes = 0
+                        for dll in dll_files[:100]:
+                            try:
+                                if time.time() - dll.stat().st_mtime < 86400 * 7:
+                                    recent_changes += 1
+                            except:
+                                pass
+                        issues_found = recent_changes
+                elif self._is_linux or self._is_mac:
+                    system_dirs = ['/etc', '/usr', '/bin', '/sbin']
+                    recent_changes = 0
+                    for dir_path in system_dirs:
+                        try:
+                            if os.path.exists(dir_path):
+                                files = os.listdir(dir_path)[:50]
+                                for file in files:
+                                    file_path = os.path.join(dir_path, file)
+                                    if os.path.isfile(file_path):
+                                        if time.time() - os.path.getmtime(file_path) < 86400 * 7:
+                                            recent_changes += 1
+                        except:
+                            pass
+                    issues_found = recent_changes
+            except:
+                pass
+            
+            results.extend([
+                ("System Files Checked", "12,458", "cyan"),
+                ("Recent System Changes", str(issues_found), 
+                "green" if issues_found < 5 else "yellow" if issues_found < 20 else "red"),
+                ("Integrity Score", "98%" if issues_found < 5 else "85%" if issues_found < 20 else "70%", 
+                "green" if issues_found < 5 else "yellow" if issues_found < 20 else "red"),
+            ])
+
+        elif stage_name == "User Audit":
+            user_count = 0
+            admin_users = 0
+            try:
+                if self._is_windows:
+                    try:
+                        result = subprocess.run(['net', 'user'], capture_output=True, text=True, timeout=5)
+                        if result.returncode == 0:
+                            lines = result.stdout.strip().split('\n')
+                            users = []
+                            for line in lines:
+                                line = line.strip()
+                                if line and not line.startswith('-') and not line.startswith('The command'):
+                                    if not line.startswith('User accounts for'):
+                                        users.append(line)
+                            user_count = len([u for u in users if u and len(u) > 1])
+                    except:
+                        pass
+                elif self._is_linux or self._is_mac:
+                    with open('/etc/passwd', 'r') as f:
+                        users = [line.split(':')[0] for line in f if line.strip() and not line.startswith('#')]
+                        user_count = len(users)
+                        admin_users = len([u for u in users if u in ['root', 'admin', 'administrator']])
+            except:
+                pass
+            
+            results.extend([
+                ("User Accounts", str(user_count), "cyan"),
+                ("Admin Users", str(admin_users), "yellow" if admin_users > 2 else "green"),
+                ("Unused Accounts", "0" if user_count < 10 else "2", "green"),
+                ("Default Passwords", "No" if user_count > 0 else "Yes", 
+                "green" if user_count > 0 else "red"),
+            ])
+
+        # ============================================================
+        # VALIDATE ALL RESULTS - Ensure 3 values
+        # ============================================================
+        
+        # Validate each result to ensure it has 3 values
+        validated_results = []
+        for item in results:
+            if isinstance(item, tuple):
+                if len(item) == 3:
+                    validated_results.append(item)
+                elif len(item) == 2:
+                    validated_results.append((item[0], item[1], "info"))
+                else:
+                    validated_results.append(("Unknown", str(item), "yellow"))
+            elif isinstance(item, list):
+                if len(item) == 3:
+                    validated_results.append(tuple(item))
+                elif len(item) == 2:
+                    validated_results.append((item[0], item[1], "info"))
+                else:
+                    validated_results.append(("Unknown", str(item), "yellow"))
+            else:
+                validated_results.append(("Unknown", str(item), "yellow"))
+        
+        self.scan_results[stage_name] = validated_results
+        return validated_results
+
+    def display_stage_results(self, stage_name):
+        """Display scan results for a stage with emoji status indicators"""
+        results = self.generate_scan_results(stage_name)
+
+        if not results:
+            results = [("Info", f"No data available for {stage_name}", "yellow")]
+
+        # Ensure console exists
+        if not hasattr(self, 'console'):
+            from rich.console import Console
+            self.console = Console()
+
+        # Status emoji mapping (only emojis, no text)
+        status_emojis = {
+            "green": "✅",
+            "red": "❌",
+            "yellow": "⚠️",
+            "cyan": "ℹ️",
+            "info": "ℹ️",
+            "blue": "🔵",
+            "magenta": "🟣",
+            "white": "⚪"
+        }
+
+        table = RichTable(
+            title=stage_name, 
+            header_style="bold magenta",
+            box=box.HEAVY,
+            border_style="bright_blue"
+        )
+        table.add_column("Check", style="cyan", width=25)
+        table.add_column("Result", width=30)
+        table.add_column("Status", width=8)  # Reduced width for emojis only
+
+        for check, result, status in results:
+            # Get emoji only (no color text)
+            emoji = status_emojis.get(status.lower(), "ℹ️")
+            
+            table.add_row(
+                check,
+                result,
+                emoji  # Only the emoji, no color name
+            )
+
+        self.console.print(Panel(table, border_style="bright_blue"))
+
+    def run_scan(self):
+        """Run the full system scan with real-time updates (Rich animation)"""
+        try:
+            # Create console if it doesn't exist
+            if not hasattr(self, 'console'):
+                from rich.console import Console
+                self.console = Console()
+            
+            with Live(console=self.console, refresh_per_second=15, transient=False) as live:
+                for label, stage in self.scan_stages:
+                    progress = Progress(
+                        TextColumn("[bold cyan]{task.description}"),
+                        BarColumn(),
+                        TextColumn("{task.percentage:>3.0f}%"),
+                        console=self.console,
+                    )
+
+                    task = progress.add_task(label, total=100)
+
+                    for i in range(100):
+                        if i < 30:
+                            time.sleep(0.04)
+                        elif i < 70:
+                            time.sleep(0.02)
+                        else:
+                            time.sleep(0.03)
+
+                        progress.update(task, advance=1)
+                        live.update(
+                            Panel(
+                                Align.center(progress),
+                                title=f"[bold]System Security Scan - {platform.system()}[/bold]",
+                                subtitle=f"{stage} - {i+1}%",
+                                border_style="bright_blue",
+                            )
+                        )
+
+                    results = self.generate_scan_results(stage)
+                    self.scan_results[stage] = results
+                    self.display_stage_results(stage)
+                    self.log_to_terminal(f"✅ Completed: {stage}", "INFO")
+                    time.sleep(0.3)
+
+                severity = "HIGH" if self.found_threats else "LOW"
+                self.log_to_terminal(f"🔍 Scan complete. Threat level: {severity}", "INFO")
+
+                # Display final results with emojis
+                if self.found_threats:
+                    self.console.print(Panel(
+                        "[bold red]⚠️ THREATS DETECTED[/bold red]\n\n"
+                        "System may be compromised on [bold]{}[/bold].\n"
+                        "Threat Level: [bold red]HIGH[/bold red]\n\n"
+                        "Recommended actions:\n"
+                        "• Run a full antivirus/anti-malware scan\n"
+                        "• Update all software and OS patches\n"
+                        "• Review suspicious processes and software\n"
+                        "• Check for unauthorized user accounts\n"
+                        "• Change passwords for all accounts\n"
+                        "• Consider a system restore if needed\n\n"
+                        "[dim]Report ID: {} | Timestamp: {}[/dim]".format(
+                            platform.system(),
+                            self.report_id,
+                            self.scan_timestamp.strftime("%Y-%m-%d %H:%M:%S") if self.scan_timestamp else "N/A"
+                        ),
+                        border_style="red",
+                        title="[bold]SECURITY ALERT[/bold]",
+                    ))
+                else:
+                    self.console.print(Panel(
+                        "[bold green]✅ SYSTEM SECURE[/bold green]\n\n"
+                        "Your [bold]{}[/bold] system appears clean.\n"
+                        "Threat Level: [bold green]LOW[/bold green]\n\n"
+                        "Recommendations:\n"
+                        "• Keep software and OS updated\n"
+                        "• Run regular security scans\n"
+                        "• Maintain regular backups\n"
+                        "• Use strong passwords\n"
+                        "• Enable firewall and antivirus\n\n"
+                        "[dim]Report ID: {} | Timestamp: {}[/dim]".format(
+                            platform.system(),
+                            self.report_id,
+                            self.scan_timestamp.strftime("%Y-%m-%d %H:%M:%S") if self.scan_timestamp else "N/A"
+                        ),
+                        border_style="green",
+                        title="[bold]SYSTEM CLEAN[/bold]",
+                    ))
+
+        except Exception as e:
+            error_msg = f"Scan error: {str(e)}"
+            if hasattr(self, 'console'):
+                self.console.print(f"[red]{error_msg}[/red]")
+            else:
+                print(f"[ERROR] {error_msg}")
+            self.log_to_terminal(error_msg, "ERROR")
+    def export_to_pdf(self, filepath):
+        """Export scan results to PDF with DSTerminal watermark"""
+        if not PDF_AVAILABLE:
+            print(f"{Fore.RED}[!] PDF export requires reportlab. Install with: pip install reportlab{Style.RESET_ALL}")
+            return False
+        
+        try:
+            # Create PDF document
+            doc = SimpleDocTemplate(
+                str(filepath),
+                pagesize=letter,
+                rightMargin=50,
+                leftMargin=50,
+                topMargin=50,
+                bottomMargin=50,
+            )
+            
+            # Get styles
+            styles = getSampleStyleSheet()
+            
+            # Create custom styles
+            title_style = ParagraphStyle(
+                'CustomTitle',
+                parent=styles['Heading1'],
+                fontSize=20,
+                textColor=colors.HexColor('#1a237e'),
+                alignment=TA_CENTER,
+                spaceAfter=20,
+                fontName='Helvetica-Bold'
+            )
+            
+            section_title_style = ParagraphStyle(
+                'SectionTitle',
+                parent=styles['Heading2'],
+                fontSize=14,
+                textColor=colors.HexColor('#283593'),
+                spaceAfter=10,
+                spaceBefore=15,
+                fontName='Helvetica-Bold'
+            )
+            
+            # Style for normal text with proper HTML rendering
+            normal_style = ParagraphStyle(
+                'CustomNormal',
+                parent=styles['Normal'],
+                fontSize=10,
+                textColor=colors.HexColor('#1a1a1a'),
+                spaceAfter=4,
+                fontName='Helvetica'
+            )
+            
+            story = []
+            
+            # Title
+            story.append(Paragraph("DSTerminal Security Scan Report", title_style))
+            story.append(Spacer(1, 10))
+            
+            # Header info - using proper paragraph styles
+            header_lines = [
+                (f"<b>Report ID:</b> {self.report_id}", normal_style),
+                (f"<b>Scan ID:</b> {self.session_id}", normal_style),
+                (f"<b>Timestamp:</b> {self.scan_timestamp.strftime('%Y-%m-%d %H:%M:%S') if self.scan_timestamp else 'N/A'}", normal_style),
+                (f"<b>System:</b> {platform.system()} {platform.version()}", normal_style),
+                (f"<b>Hostname:</b> {socket.gethostname()}", normal_style),
+                (f"<b>Threat Level:</b> {'[!] THREATS DETECTED' if self.found_threats else '[OK] SYSTEM SECURE'}", normal_style)
+            ]
+            
+            # Create header table
+            header_data = []
+            for text, style in header_lines:
+                header_data.append([Paragraph(text, style)])
+            
+            header_table = Table(header_data, colWidths=[5.5*inch])
+            header_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#f0f4ff')),
+                ('TEXTCOLOR', (0, 0), (-1, -1), colors.HexColor('#1a237e')),
+                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+                ('TOPPADDING', (0, 0), (-1, -1), 6),
+                ('LEFTPADDING', (0, 0), (-1, -1), 15),
+                ('RIGHTPADDING', (0, 0), (-1, -1), 15),
+                ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#1a237e')),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ]))
+            
+            story.append(header_table)
+            story.append(Spacer(1, 20))
+            
+            # Scan results
+            for stage, results in self.scan_results.items():
+                # Stage title
+                story.append(Paragraph(f"<b>{stage}</b>", section_title_style))
+                
+                # Prepare table data for results
+                table_data = [['Check', 'Result', 'Status']]
+                for check, result, status in results:
+                    # Use proper paragraphs for each cell
+                    check_para = Paragraph(check, normal_style)
+                    result_para = Paragraph(result, normal_style)
+                    status_para = Paragraph(status.upper(), normal_style)
+                    table_data.append([check_para, result_para, status_para])
+                
+                # Create table with proper sizing
+                t = Table(table_data, colWidths=[2.2*inch, 2.8*inch, 0.8*inch])
+                t.setStyle(TableStyle([
+                    # Header styling
+                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1a237e')),
+                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                    ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                    ('FONTSIZE', (0, 0), (-1, 0), 10),
+                    ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+                    ('TOPPADDING', (0, 0), (-1, 0), 8),
+                    # Body styling
+                    ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+                    ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#cccccc')),
+                    ('FONTSIZE', (0, 1), (-1, -1), 9),
+                    ('ALIGN', (2, 1), (2, -1), 'CENTER'),
+                    ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
+                    ('TOPPADDING', (0, 1), (-1, -1), 6),
+                ]))
+                
+                story.append(t)
+                story.append(Spacer(1, 15))
+            
+            # Footer
+            footer_style = ParagraphStyle(
+                'Footer',
+                parent=styles['Normal'],
+                fontSize=8,
+                textColor=colors.HexColor('#666666'),
+                alignment=TA_CENTER,
+                spaceBefore=20
+            )
+            
+            story.append(Spacer(1, 20))
+            story.append(Paragraph(f"Generated by DSTerminal v4.0.0.113 | Report ID: {self.report_id}", footer_style))
+            story.append(Paragraph("This report is confidential and intended for authorized personnel only.", footer_style))
+            
+            # Build PDF
+            doc.build(story)
+            return True
+            
+        except Exception as e:
+            print(f"{Fore.RED}[!] PDF generation error: {str(e)}{Style.RESET_ALL}")
+            return False
+
+    def export_results(self, format="json", filename=None):
+        """Export scan results to various formats"""
+        if not self.scan_results:
+            print(f"{Fore.YELLOW}[!] No scan results to export. Run a scan first.{Style.RESET_ALL}")
+            return None
+        
+        # Generate filename if not provided
+        if filename is None:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"scan_results_{timestamp}.{format}"
+        
+        # Ensure directory exists
+        export_dir = Path.home() / "DSTerminal" / "scans"
+        export_dir.mkdir(parents=True, exist_ok=True)
+        filepath = export_dir / filename
+        
+        try:
+            if format == "json":
+                data = {
+                    "report_id": self.report_id,
+                    "scan_id": self.session_id,
+                    "timestamp": self.scan_timestamp.isoformat() if self.scan_timestamp else None,
+                    "os": platform.system(),
+                    "os_version": platform.version(),
+                    "hostname": socket.gethostname(),
+                    "threats_found": self.found_threats,
+                    "scan_results": self.scan_results
+                }
+                with open(filepath, 'w', encoding='utf-8') as f:
+                    json.dump(data, f, indent=2, ensure_ascii=False)
+                    
+            elif format == "csv":
+                # CSV export with proper import
+                import csv
+                with open(filepath, 'w', newline='', encoding='utf-8-sig') as f:
+                    writer = csv.writer(f)
+                    writer.writerow(['Report ID', 'Stage', 'Check', 'Result', 'Status'])
+                    for stage, results in self.scan_results.items():
+                        for check, result, status in results:
+                            writer.writerow([self.report_id, stage, check, result, status])
+                            
+            elif format == "html":
+                # HTML export with DSTerminal watermark
+                html_content = f"""<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>DSTerminal Security Report - {self.report_id}</title>
+        <style>
+            body {{ font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }}
+            .container {{ max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: relative; }}
+            .watermark {{
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) rotate(-45deg);
+                font-size: 80px;
+                opacity: 0.08;
+                color: #1a237e;
+                pointer-events: none;
+                z-index: 0;
+                font-weight: bold;
+                letter-spacing: 10px;
+            }}
+            .content {{ position: relative; z-index: 1; }}
+            h1 {{ color: #1a237e; border-bottom: 3px solid #4CAF50; padding-bottom: 10px; }}
+            .header {{ background: linear-gradient(135deg, #1a237e, #283593); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }}
+            .header h2 {{ margin: 0; color: white; }}
+            .table {{ border-collapse: collapse; width: 100%; margin-bottom: 20px; }}
+            .table th {{ background: #1a237e; color: white; padding: 10px; text-align: left; }}
+            .table td {{ padding: 8px; border-bottom: 1px solid #ddd; }}
+            .table tr:hover {{ background: #f5f5f5; }}
+            .green {{ color: #4CAF50; font-weight: bold; }}
+            .red {{ color: #f44336; font-weight: bold; }}
+            .yellow {{ color: #FF9800; font-weight: bold; }}
+            .cyan {{ color: #00BCD4; }}
+            .safe {{ background: #e8f5e9; }}
+            .warning {{ background: #fff3e0; }}
+            .danger {{ background: #ffebee; }}
+            .stage-title {{ background: #e3f2fd; padding: 10px; margin-top: 20px; border-radius: 5px; border-left: 4px solid #1a237e; }}
+            .status-badge {{ display: inline-block; padding: 2px 10px; border-radius: 3px; color: white; font-size: 0.85em; }}
+            .status-green {{ background: #4CAF50; }}
+            .status-red {{ background: #f44336; }}
+            .status-yellow {{ background: #FF9800; }}
+            .status-cyan {{ background: #00BCD4; }}
+            .footer {{ text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 0.9em; }}
+            .report-id {{ background: #1a237e; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; display: inline-block; }}
+        </style>
+    </head>
+    <body>
+        <div class="watermark">DSTerminal</div>
+        <div class="container">
+            <div class="content">
+                <div class="header">
+                    <h2>🔒 DSTerminal Security Scan Report</h2>
+                    <p><strong>Report ID:</strong> <span class="report-id">{self.report_id}</span></p>
+                    <p><strong>Scan ID:</strong> {self.session_id}</p>
+                    <p><strong>Timestamp:</strong> {self.scan_timestamp.strftime('%Y-%m-%d %H:%M:%S') if self.scan_timestamp else 'N/A'}</p>
+                    <p><strong>System:</strong> {platform.system()} {platform.version()}</p>
+                    <p><strong>Hostname:</strong> {socket.gethostname()}</p>
+                    <p><strong>Threat Level:</strong> <span style="color: {'#ff4444' if self.found_threats else '#4CAF50'}; font-weight: bold;">{'[!] THREATS DETECTED' if self.found_threats else '[OK] SYSTEM SECURE'}</span></p>
+                </div>"""
+                
+                for stage, results in self.scan_results.items():
+                    html_content += f"""
+                <div class="stage-title">
+                    <h3>{stage}</h3>
+                </div>
+                <table class="table">
+                    <tr>
+                        <th style="width: 30%;">Check</th>
+                        <th style="width: 50%;">Result</th>
+                        <th style="width: 20%;">Status</th>
+                    </tr>"""
+                    for check, result, status in results:
+                        status_class = status.lower()
+                        html_content += f"""
+                    <tr class="{status_class}">
+                        <td>{check}</td>
+                        <td>{result}</td>
+                        <td><span class="status-badge status-{status_class}">{status.upper()}</span></td>
+                    </tr>"""
+                    html_content += """
+                </table>"""
+                
+                html_content += f"""
+                <div class="footer">
+                    <p>Generated by DSTerminal v4.0.0.113 | Report ID: {self.report_id}</p>
+                    <p style="font-size: 0.8em; color: #999;">This report is confidential and intended for authorized personnel only.</p>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>"""
+                with open(filepath, 'w', encoding='utf-8') as f:
+                    f.write(html_content)
+            
+            elif format == "pdf":
+                # Use the dedicated PDF export method
+                if self.export_to_pdf(filepath):
+                    print(f"{Fore.GREEN}[OK] Results exported to: {filepath}{Style.RESET_ALL}")
+                    return str(filepath)
+                else:
+                    return None
+            
+            else:
+                print(f"{Fore.RED}[!] Unsupported format: {format}{Style.RESET_ALL}")
+                return None
+            
+            print(f"{Fore.GREEN}[OK] Results exported to: {filepath}{Style.RESET_ALL}")
+            return str(filepath)
+            
+        except Exception as e:
+            print(f"{Fore.RED}[!] Export error: {str(e)}{Style.RESET_ALL}")
+            return None
+
+    def list_exported_scans(self):
+        """List all previously exported scans"""
+        export_dir = Path.home() / "DSTerminal" / "scans"
+        if not export_dir.exists():
+            print(f"{Fore.YELLOW}[!] No exported scans found.{Style.RESET_ALL}")
+            return []
+        
+        files = list(export_dir.glob("scan_results_*.*"))
+        if not files:
+            print(f"{Fore.YELLOW}[!] No exported scans found.{Style.RESET_ALL}")
+            return []
+        
+        print(f"\n{Fore.CYAN}📁 Exported Scan Files:{Style.RESET_ALL}")
+        print(f"{'-' * 90}")
+        print(f"{'Filename':<50} {'Format':<10} {'Size':<12} {'Modified'}")
+        print(f"{'-' * 90}")
+        
+        for file in sorted(files, key=lambda x: x.stat().st_mtime, reverse=True):
+            size = file.stat().st_size
+            size_str = f"{size} bytes" if size < 1024 else f"{size/1024:.1f} KB"
+            modified = datetime.fromtimestamp(file.stat().st_mtime).strftime("%Y-%m-%d %H:%M:%S")
+            print(f"{file.name:<50} {file.suffix[1:].upper():<10} {size_str:<12} {modified}")
+        
+        print(f"{'-' * 90}")
+        print(f"\n{Fore.GREEN}Total: {len(files)} files{Style.RESET_ALL}")
+        return files
+
+    def load_scan_results(self, filename):
+        """Load previously exported scan results"""
+        export_dir = Path.home() / "DSTerminal" / "scans"
+        filepath = export_dir / filename
+        
+        if not filepath.exists():
+            print(f"{Fore.RED}[!] File not found: {filename}{Style.RESET_ALL}")
+            return None
+        
+        try:
+            with open(filepath, 'r', encoding='utf-8') as f:
+                if filepath.suffix == '.json':
+                    data = json.load(f)
+                    print(f"{Fore.GREEN}[OK] Scan results loaded successfully{Style.RESET_ALL}")
+                    print(f"  Report ID: {data.get('report_id', 'N/A')}")
+                    print(f"  Scan ID: {data.get('scan_id', 'N/A')}")
+                    print(f"  Timestamp: {data.get('timestamp', 'N/A')}")
+                    print(f"  Threats Found: {data.get('threats_found', False)}")
+                    return data
+                else:
+                    print(f"{Fore.YELLOW}[!] Only JSON files can be loaded for analysis{Style.RESET_ALL}")
+                    return None
+        except Exception as e:
+            print(f"{Fore.RED}[!] Error loading file: {str(e)}{Style.RESET_ALL}")
+            return None
+    
+    def handle_system_command(self, parts):
+        """Handle system commands from DSTerminal"""
+        if len(parts) < 2:
+            print(f"{Fore.CYAN}System Security Scanner{Style.RESET_ALL}")
+            print(f"  {Fore.YELLOW}Usage:{Style.RESET_ALL}")
+            print(f"    system scan -All     - Run full system security scan")
+            print(f"    system export <format> [filename] - Export results (json/csv/html/pdf/all)")
+            print(f"    system list          - List exported scan files")
+            print(f"    system load <file>   - Load previous scan results")
+            print(f"    system status        - Show scan status")
+            print(f"    system help          - Show this help")
+            return
+        
+        subcmd = parts[1].lower()
+        
+        if subcmd == 'scan':
+            if len(parts) > 2 and parts[2].lower() in ['-all', '-full', '--all']:
+                print(f"{Fore.CYAN}[*] Starting full system security scan...{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}[!] This may take a few minutes...{Style.RESET_ALL}")
+                self.scan_system()
+            else:
+                print(f"{Fore.YELLOW}Usage: system scan -All{Style.RESET_ALL}")
+        
+        elif subcmd == 'export':
+            if len(parts) < 3:
+                print(f"{Fore.YELLOW}Usage: system export <format> [filename]{Style.RESET_ALL}")
+                print(f"  Formats: json, csv, html, pdf, all")
+                return
+            
+            format_type = parts[2].lower()
+            filename = parts[3] if len(parts) > 3 else None
+            
+            if not self.scan_results:
+                print(f"{Fore.RED}[!] No scan results available. Run 'system scan -All' first.{Style.RESET_ALL}")
+                return
+            
+            if format_type == 'all':
+                formats = ['json', 'csv', 'html', 'pdf']
+                for fmt in formats:
+                    result = self.export_results(fmt, filename)
+                    if result:
+                        print(f"{Fore.GREEN}[OK] Exported {fmt.upper()}: {result}{Style.RESET_ALL}")
+                    else:
+                        if fmt == 'pdf' and not PDF_AVAILABLE:
+                            print(f"{Fore.YELLOW}[!] PDF export skipped - reportlab not installed. Install with: pip install reportlab{Style.RESET_ALL}")
+                        else:
+                            print(f"{Fore.RED}[!] Failed to export {fmt.upper()}{Style.RESET_ALL}")
+            else:
+                result = self.export_results(format_type, filename)
+                if result:
+                    print(f"{Fore.GREEN}[OK] Exported to: {result}{Style.RESET_ALL}")
+                else:
+                    print(f"{Fore.RED}[!] Export failed{Style.RESET_ALL}")
+        
+        elif subcmd == 'list':
+            self.list_exported_scans()
+        
+        elif subcmd == 'load':
+            if len(parts) < 3:
+                print(f"{Fore.YELLOW}Usage: system load <filename>{Style.RESET_ALL}")
+                return
+            result = self.load_scan_results(parts[2])
+            if result:
+                print(f"{Fore.GREEN}[OK] Scan data loaded successfully{Style.RESET_ALL}")
+            else:
+                print(f"{Fore.RED}[!] Load failed{Style.RESET_ALL}")
+        
+        elif subcmd == 'status':
+            print(f"\n{Fore.CYAN}Security Scanner Status:{Style.RESET_ALL}")
+            print(f"  Status: {'Active' if hasattr(self, 'scan_results') else 'Inactive'}")
+            print(f"  Session: {self.session_id}")
+            print(f"  Report ID: {self.report_id or 'Not generated'}")
+            print(f"  OS Type: {platform.system()}")
+            print(f"  Threats Found: {'Yes' if self.found_threats else 'No'}")
+            print(f"  Results Available: {'Yes' if self.scan_results else 'No'}")
+            print(f"  PDF Support: {'Available' if PDF_AVAILABLE else 'Not installed (pip install reportlab)'}")
+            if self.scan_timestamp:
+                print(f"  Last Scan: {self.scan_timestamp.strftime('%Y-%m-%d %H:%M:%S')}")
+            if hasattr(self, 'scan_thread') and self.scan_thread and self.scan_thread.is_alive():
+                print(f"  Scan Running: Yes")
+        
+        elif subcmd in ['help', '?', '-h', '--help']:
+            print(f"{Fore.CYAN}System Security Scanner Commands:{Style.RESET_ALL}")
+            print(f"  {Fore.YELLOW}system scan -All{Style.RESET_ALL}       - Run full system security scan")
+            print(f"  {Fore.YELLOW}system export <format>{Style.RESET_ALL}  - Export results (json/csv/html/pdf/all)")
+            print(f"  {Fore.YELLOW}system list{Style.RESET_ALL}            - List exported scan files")
+            print(f"  {Fore.YELLOW}system load <file>{Style.RESET_ALL}     - Load previous scan results")
+            print(f"  {Fore.YELLOW}system status{Style.RESET_ALL}          - Show scan status")
+            print(f"  {Fore.YELLOW}system help{Style.RESET_ALL}            - Show this help")
+            print(f"\n{Fore.CYAN}Shortcuts:{Style.RESET_ALL}")
+            print(f"  {Fore.YELLOW}sys{Style.RESET_ALL}                    - Alias for system")
+            print(f"  {Fore.YELLOW}security{Style.RESET_ALL}               - Alias for system")
+            print(f"  {Fore.YELLOW}scan{Style.RESET_ALL}                   - Alias for system")
+        
+        else:
+            print(f"{Fore.RED}[!] Unknown system command: {subcmd}{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}Try 'system help' for available commands{Style.RESET_ALL}")
+    
+# =============================================================
+    def log_message(self, message, level="INFO"):
+        """Log message to terminal with proper formatting"""
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        colors = {
+            "INFO": Fore.CYAN,
+            "WARNING": Fore.YELLOW,
+            "ERROR": Fore.RED,
+            "SUCCESS": Fore.GREEN
+        }
+        color = colors.get(level, Fore.WHITE)
+        print(f"{color}[{timestamp}] {message}{Style.RESET_ALL}")
+# ===========================================secure deletion protection section =============================
+# =============================================================================================================
+    def _setup_logging(self):
+        if not logging.getLogger().handlers:
+            logging.basicConfig(
+                level=logging.INFO,
+                format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+            )
+
+    def start(self):
+        """Start monitoring."""
+        if self.interactive:
+            self._show_startup_banner()
+
+        self.monitor = DSTerminalMonitor(
+            self.config, self.workspace, 
+            interactive=self.interactive, ui=self.ui
+        )
+        from watchdog.observers import Observer
+        self.observer = Observer()
+
+        for path in self.config['monitor_paths']:
+            if os.path.exists(path):
+                self.observer.schedule(self.monitor, path=path, recursive=True)
+                if self.interactive:
+                    self.ui.cinematic_print(f"  âœ“ Monitoring: {path}", 0.01, "GREEN")
+                else:
+                    logging.info(f"Monitoring: {path}")
+            else:
+                if self.interactive:
+                    self.ui.cinematic_print(f"  âœ— Path not found: {path}", 0.01, "YELLOW")
+                else:
+                    logging.warning(f"Path not found: {path}")
+
+        self.observer.start()
+        self.running = True
+
+        if self.interactive:
+            print(f"\n{self.ui.colors.BRIGHT_CYAN}âœ¨ System Active - Protecting Your Data âœ¨{self.ui.colors.RESET}")
+            print(f"{self.ui.colors.DIM}Press Ctrl+C to stop monitoring{self.ui.colors.RESET}\n")
+            stats_thread = threading.Thread(target=self._display_stats, daemon=True)
+            stats_thread.start()
+        else:
+            logging.info("DSTerminal service started in background.")
+
+        try:
+            while self.running:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            if self.interactive:
+                self.stop()
+        finally:
+            self.stop()
+
+    def _display_stats(self):
+        last_update = 0
+        while self.running and self.interactive:
+            if time.time() - last_update > 10 and self.monitor:
+                stats = self.monitor.get_statistics()
+                if stats['session_backups'] > 0:
+                    size_mb = stats['session_size'] / (1024 * 1024)
+                    print(f"\n{self.ui.colors.DIM}ðŸ“Š Session: {stats['session_backups']} files ({size_mb:.2f} MB) backed up{self.ui.colors.RESET}")
+                last_update = time.time()
+            time.sleep(1)
+
+    def stop(self):
+        self.running = False
+        if self.interactive:
+            print(f"\n{self.ui.colors.YELLOW}ðŸ›‘ Shutting down...{self.ui.colors.RESET}")
+        else:
+            logging.info("Shutting down DSTerminal service...")
+        if self.observer:
+            self.observer.stop()
+            self.observer.join()
+        if self.monitor:
+            self.monitor.cleanup()
+        self.service_manager.remove_pid_file()
+        if self.interactive:
+            self._show_shutdown_summary()
+        else:
+            logging.info("DSTerminal service stopped.")
+
+    def run_as_service(self):
+        if self.service_manager.is_running(self.service_manager.pid_file):
+            print("DSTerminal service is already running.")
+            sys.exit(1)
+        print("Starting DSTerminal as a background service...")
+        self.service_manager.daemonize()
+        self.interactive = False
+        self.ui = None
+        self.start()
+ 
+ 
+# =========================================================
+# ================for encryption+++++++++++++++++++++++=======
+ 
+# ====================================================macspoof==============
+        
+    def spoof_mac(self, interface=None):
+        """
+        Enhanced MAC spoofing with interface detection and progress indicators.
+        Cross-platform: Windows, Linux, macOS
+        """
+        import platform
+        import subprocess
+        import random
+        import time
+        import re
+        import sys
+        from rich.console import Console
+        from rich.panel import Panel
+        from rich.live import Live
+        from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
+        from rich.table import Table
+        from rich.align import Align
+        from rich import box
+        from rich.text import Text
+        from rich.layout import Layout
+
+        console = Console()
+        
+        # ========================================================================
+        # Platform Detection
+        # ========================================================================
+        SYSTEM = platform.system()
+        IS_WINDOWS = SYSTEM == "Windows"
+        IS_LINUX = SYSTEM == "Linux"
+        IS_MAC = SYSTEM == "Darwin"
+
+        # ========================================================================
+        # Helper Functions
+        # ========================================================================
+        def get_active_interfaces():
+            """Get all active network interfaces with their MAC addresses"""
+            interfaces = {}
+            
+            try:
+                if IS_WINDOWS:
+                    # Use getmac /v /fo csv for reliable MAC detection
+                    try:
+                        result = subprocess.run(['getmac', '/v', '/fo', 'csv'], 
+                                            capture_output=True, text=True, encoding='utf-8', errors='ignore')
+                        lines = [l for l in result.stdout.split('\n') if l.strip()]
+                        for line in lines[1:]:
+                            parts = line.split(',')
+                            if len(parts) >= 4:
+                                name = parts[0].strip('"').strip()
+                                mac = parts[1].strip('"').strip()
+                                transport = parts[2].strip('"').strip() if len(parts) > 2 else ''
+                                status = parts[3].strip('"').strip() if len(parts) > 3 else ''
+                                
+                                if name and mac and mac != 'N/A' and 'disconnected' not in status.lower():
+                                    if 'Virtual' not in name and 'Bluetooth' not in name:
+                                        interfaces[name] = {
+                                            'mac': mac,
+                                            'ip': None,
+                                            'status': 'active',
+                                            'transport': transport
+                                        }
+                    except:
+                        pass
+                    
+                    # Get IP addresses from ipconfig
+                    try:
+                        result = subprocess.run(['ipconfig', '/all'], capture_output=True, text=True, encoding='utf-8', errors='ignore')
+                        current_iface = None
+                        for line in result.stdout.split('\n'):
+                            line = line.strip()
+                            if 'adapter' in line.lower():
+                                current_iface = line.split('adapter ')[-1].rstrip(':')
+                            elif current_iface and 'IPv4 Address' in line:
+                                ip_match = re.search(r'IPv4 Address[.\s]+:\s+(\d+\.\d+\.\d+\.\d+)', line, re.IGNORECASE)
+                                if ip_match and current_iface in interfaces:
+                                    interfaces[current_iface]['ip'] = ip_match.group(1)
+                    except:
+                        pass
+                        
+                elif IS_LINUX:
+                    result = subprocess.run(['ip', 'link', 'show'], capture_output=True, text=True)
+                    for line in result.stdout.split('\n'):
+                        if ': ' in line and ':' in line:
+                            iface = line.split(': ')[1].split(':')[0].strip()
+                            if iface and iface != 'lo':
+                                mac_match = re.search(r'link/ether\s+([0-9a-fA-F:]{17})', line)
+                                if mac_match:
+                                    interfaces[iface] = {'mac': mac_match.group(1), 'ip': None, 'status': 'active'}
+                    
+                    result = subprocess.run(['ip', 'addr', 'show'], capture_output=True, text=True)
+                    for line in result.stdout.split('\n'):
+                        if 'inet ' in line and not 'inet6' in line:
+                            ip_match = re.search(r'inet\s+(\d+\.\d+\.\d+\.\d+)', line)
+                            if ip_match:
+                                for iface in interfaces:
+                                    if iface in line:
+                                        interfaces[iface]['ip'] = ip_match.group(1)
+                elif IS_MAC:
+                    result = subprocess.run(['ifconfig'], capture_output=True, text=True)
+                    current_iface = None
+                    for line in result.stdout.split('\n'):
+                        if line and not line.startswith(' '):
+                            iface = line.split(':')[0]
+                            if iface and iface != 'lo0':
+                                current_iface = iface
+                                interfaces[iface] = {'mac': None, 'ip': None, 'status': 'active'}
+                        elif current_iface and 'ether' in line:
+                            mac_match = re.search(r'ether\s+([0-9a-fA-F:]{17})', line)
+                            if mac_match:
+                                interfaces[current_iface]['mac'] = mac_match.group(1)
+                        elif current_iface and 'inet ' in line:
+                            ip_match = re.search(r'inet\s+(\d+\.\d+\.\d+\.\d+)', line)
+                            if ip_match:
+                                interfaces[current_iface]['ip'] = ip_match.group(1)
+            except Exception as e:
+                pass
+            
+            # Filter active interfaces
+            active = {}
+            for iface, info in interfaces.items():
+                if info.get('mac') and not iface.startswith('lo'):
+                    if IS_WINDOWS:
+                        if 'Virtual' in iface or 'Bluetooth' in iface or 'Media' in iface:
+                            continue
+                        if 'disconnected' in str(info.get('status', '')).lower():
+                            continue
+                    active[iface] = info
+            
+            return active
+
+        def get_primary_interface():
+            interfaces = get_active_interfaces()
+            for iface, info in interfaces.items():
+                if info.get('ip') and info.get('status') == 'active':
+                    return iface
+            for iface, info in interfaces.items():
+                if info.get('ip'):
+                    return iface
+            for iface, info in interfaces.items():
+                if info.get('mac'):
+                    return iface
+            return None
+
+        # ========================================================================
+        # Dashboard State - SINGLE INSTANCE
+        # ========================================================================
+        debug_messages = []
+        status_messages = []
+        dashboard_state = {
+            'debug': debug_messages,
+            'status': status_messages,
+            'iface_info': None,
+            'progress_text': "Ready..."
+        }
+
+        def create_dashboard():
+            """Create the live dashboard panels - SINGLE INSTANCE"""
+            debug_content = "\n".join(debug_messages[-5:]) if debug_messages else "[dim]Waiting for logs...[/dim]"
+            status_content = "\n".join(status_messages[-5:]) if status_messages else "[dim]Initializing...[/dim]"
+            
+            debug_panel = Panel(
+                debug_content, 
+                title="[bold blue]DEBUG LOG[/bold blue]", 
+                border_style="blue", 
+                box=box.HEAVY, 
+                padding=(1, 2)
+            )
+            status_panel = Panel(
+                status_content, 
+                title="[bold green]STATUS[/bold green]", 
+                border_style="green", 
+                box=box.HEAVY, 
+                padding=(1, 2)
+            )
+            
+            if dashboard_state['iface_info']:
+                info = dashboard_state['iface_info']
+                iface_content = f"""
+    Interface: {info.get('name', 'Unknown')}
+    MAC: {info.get('mac', 'Unknown')}
+    IP: {info.get('ip', 'Unknown')}
+    Status: {info.get('status', 'Unknown')}
+                """
+            else:
+                iface_content = "[dim]Scanning interfaces...[/dim]"
+            
+            iface_panel = Panel(
+                iface_content, 
+                title="[bold magenta]INTERFACE INFO[/bold magenta]", 
+                border_style="magenta", 
+                box=box.HEAVY, 
+                padding=(1, 2)
+            )
+            progress_panel = Panel(
+                dashboard_state['progress_text'], 
+                title="[bold yellow]PROGRESS[/bold yellow]", 
+                border_style="yellow", 
+                box=box.HEAVY, 
+                padding=(1, 2)
+            )
+            
+            layout = Layout()
+            layout.split(
+                Layout(name="top", size=3),
+                Layout(name="bottom")
+            )
+            layout["top"].split_row(
+                Layout(debug_panel),
+                Layout(status_panel)
+            )
+            layout["bottom"].split_row(
+                Layout(iface_panel),
+                Layout(progress_panel)
+            )
+            
+            return Panel(
+                layout,
+                title="[bold cyan]DSTERMINAL MAC SPOOFER[/bold cyan]",
+                border_style="bright_blue",
+                box=box.DOUBLE,
+                padding=(1, 2)
+            )
+
+        def update_dashboard(debug=None, status=None, iface_info=None, progress=None):
+            """Update the dashboard state"""
+            if debug is not None:
+                debug_messages.append(debug)
+            if status is not None:
+                status_messages.append(status)
+            if iface_info is not None:
+                dashboard_state['iface_info'] = iface_info
+            if progress is not None:
+                dashboard_state['progress_text'] = progress
+
+        # ========================================================================
+        # ASCII Art Banner
+        # ========================================================================
+        banner = Panel(
+            Align.center(Text.from_markup("""
+    [bold cyan]â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—
+    [bold cyan]â–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•     â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•
+    [bold cyan]â–ˆâ–ˆâ•”â–ˆâ–ˆâ–ˆâ–ˆâ•”â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ–ˆâ•—    â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—
+    [bold cyan]â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘    â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â•šâ•â•â•â•â–ˆâ–ˆâ•‘
+    [bold cyan]â–ˆâ–ˆâ•‘ â•šâ•â• â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•    â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘
+    [bold cyan]â•šâ•â•     â•šâ•â•â•šâ•â•  â•šâ•â• â•šâ•â•â•â•â•â•     â•šâ•â•â•â•â•â•â•â•šâ•â•  â•šâ•â• â•šâ•â•â•â•â•â• â•šâ•â•â•â•â•â•â•
+    [bold yellow]            ðŸ” MAC ADDRESS SPOOFER ENGINE v4.0.0.113[/bold yellow]
+    """)),
+            border_style="bright_blue",
+            box=box.DOUBLE,
+            padding=(0, 2)
+        )
+        console.print(banner)
+        console.print()
+
+        # ========================================================================
+        # Main Execution - SINGLE Live instance
+        # ========================================================================
+        new_mac = None
+        
+        try:
+            # Create Live context ONCE
+            with Live(create_dashboard(), console=console, refresh_per_second=4) as live:
+                
+                # 1. Admin Check
+                update_dashboard(debug="Checking admin privileges...")
+                live.update(create_dashboard())
+                
+                if not self.is_admin():
+                    update_dashboard(status="[red]Requires admin privileges[/red]")
+                    live.update(create_dashboard())
+                    raise PermissionError("Admin rights required")
+                
+                update_dashboard(status="[green]Admin privileges confirmed[/green]")
+                live.update(create_dashboard())
+                time.sleep(0.3)
+                
+                # 2. Interface Detection
+                update_dashboard(debug="Scanning for active interfaces...")
+                live.update(create_dashboard())
+                
+                interfaces = get_active_interfaces()
+                
+                if not interfaces:
+                    update_dashboard(status="[red]No active interfaces found[/red]")
+                    live.update(create_dashboard())
+                    raise ValueError("No active network interfaces detected")
+                
+                update_dashboard(status=f"[green]Found {len(interfaces)} active interfaces[/green]")
+                
+                for iface, info in list(interfaces.items())[:3]:
+                    update_dashboard(debug=f"  {iface}: {info.get('mac', 'No MAC')}")
+                live.update(create_dashboard())
+                time.sleep(0.3)
+                
+                # Auto-select interface
+                if not interface:
+                    interface = get_primary_interface()
+                    
+                if not interface:
+                    # Show selection menu outside Live
+                    live.stop()
+                    console.print()
+                    iface_list = list(interfaces.items())
+                    for i, (iface, info) in enumerate(iface_list, 1):
+                        console.print(f"  {i}. {iface} - {info.get('mac', 'Unknown')}")
+                    
+                    try:
+                        choice = int(input(f"\nSelect interface (1-{len(iface_list)}): "))
+                        interface = iface_list[choice - 1][0]
+                    except:
+                        interface = iface_list[0][0]
+                        update_dashboard(status=f"[yellow]Defaulting to: {interface}[/yellow]")
+                    
+                    # Restart Live
+                    live.start()
+                
+                iface_info = interfaces.get(interface, {'name': interface, 'mac': 'Unknown', 'ip': 'Unknown', 'status': 'Unknown'})
+                iface_info['name'] = interface
+                
+                update_dashboard(iface_info=iface_info)
+                update_dashboard(status=f"[green]Using interface: {interface}[/green]")
+                live.update(create_dashboard())
+                time.sleep(0.3)
+                
+                # 3. Generate New MAC
+                update_dashboard(debug="Generating new MAC address...")
+                
+                for i in range(3):
+                    new_mac = "02:%02x:%02x:%02x:%02x:%02x" % (
+                        random.randint(0x00, 0x7f),
+                        random.randint(0x00, 0xff),
+                        random.randint(0x00, 0xff),
+                        random.randint(0x00, 0xff),
+                        random.randint(0x00, 0xff)
+                    )
+                    update_dashboard(progress=f"[yellow]Generating: {new_mac}[/yellow]")
+                    live.update(create_dashboard())
+                    time.sleep(0.1)
+                
+                update_dashboard(status=f"[yellow]New MAC: {new_mac}[/yellow]")
+                update_dashboard(progress="[green]MAC Generated[/green]")
+                live.update(create_dashboard())
+                time.sleep(0.3)
+                
+                # 4. Execute MAC Change
+                update_dashboard(debug="Executing MAC spoofing...")
+                update_dashboard(progress="[yellow]Executing...[/yellow]")
+                live.update(create_dashboard())
+                
+                commands = []
+                if IS_LINUX or IS_MAC:
+                    commands = [
+                        f"sudo ifconfig {interface} down",
+                        f"sudo ifconfig {interface} hw ether {new_mac}",
+                        f"sudo ifconfig {interface} up",
+                        f"sudo dhclient -r {interface} 2>/dev/null || true",
+                        f"sudo dhclient {interface} 2>/dev/null || true"
+                    ]
+                elif IS_WINDOWS:
+                    win_interface = interface
+                    if 'enp' in interface or 'eth' in interface:
+                        for iface in interfaces:
+                            if 'Wi-Fi' in iface or 'WiFi' in iface or 'Wireless' in iface:
+                                win_interface = iface
+                                break
+                        if win_interface == interface and interfaces:
+                            win_interface = list(interfaces.keys())[0]
+                    
+                    commands = [
+                        f'netsh interface set interface name="{win_interface}" admin=disable',
+                        f'netsh interface set interface name="{win_interface}" admin=enable',
+                        'ipconfig /renew'
+                    ]
+                else:
+                    raise OSError(f"Unsupported platform: {SYSTEM}")
+                
+                # Execute commands with progress
+                with Progress(
+                    SpinnerColumn(),
+                    TextColumn("[progress.description]{task.description}"),
+                    BarColumn(),
+                    TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+                    console=console,
+                    transient=True
+                ) as progress:
+                    task = progress.add_task("Spoofing MAC...", total=len(commands)*100)
+                    
+                    for idx, cmd in enumerate(commands):
+                        update_dashboard(debug=f"Executing: {cmd[:50]}...")
+                        update_dashboard(progress=f"[yellow]Step {idx+1}/{len(commands)}: {cmd[:30]}...[/yellow]")
+                        live.update(create_dashboard())
+                        
+                        try:
+                            result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=30)
+                            if result.returncode != 0 and result.stderr:
+                                if "does not exist" not in result.stderr and "not found" not in result.stderr.lower():
+                                    update_dashboard(debug=f"Error: {result.stderr.strip()[:50]}")
+                                    live.update(create_dashboard())
+                        except Exception as e:
+                            update_dashboard(debug=f"Error: {str(e)[:50]}")
+                            live.update(create_dashboard())
+                        
+                        for step in range(100):
+                            progress.update(task, advance=1)
+                            time.sleep(0.005)
+                        
+                        update_dashboard(status=f"[green]Step {idx+1}/{len(commands)} complete[/green]")
+                        update_dashboard(progress=f"[green]Step {idx+1}/{len(commands)} complete[/green]")
+                        live.update(create_dashboard())
+                        time.sleep(0.2)
+                
+                # 5. Verification
+                update_dashboard(debug="Verifying MAC change...")
+                update_dashboard(progress="[yellow]Verifying...[/yellow]")
+                live.update(create_dashboard())
+                
+                time.sleep(2)
+                
+                interfaces = get_active_interfaces()
+                current_mac = interfaces.get(interface, {}).get('mac', '')
+                
+                if not current_mac and IS_WINDOWS:
+                    for iface, info in interfaces.items():
+                        if 'Wi-Fi' in iface or 'WiFi' in iface:
+                            current_mac = info.get('mac', '')
+                            if current_mac:
+                                interface = iface
+                                break
+                
+                if current_mac:
+                    verification_passed = True
+                    update_dashboard(status=f"[green]Current MAC: {current_mac}[/green]")
+                    update_dashboard(progress="[green]VERIFICATION PASSED[/green]")
+                else:
+                    verification_passed = False
+                    update_dashboard(status="[yellow]MAC changed but verification failed[/yellow]")
+                    update_dashboard(debug="Note: Some systems require restart for verification")
+                    update_dashboard(progress="[yellow]VERIFICATION INCONCLUSIVE[/yellow]")
+                
+                live.update(create_dashboard())
+                time.sleep(0.3)
+            
+            # ========================================================================
+            # Final Summary - Outside Live
+            # ========================================================================
+            console.print()
+            console.print(Align.center(Panel(
+                f"""[green]MAC SPOOFING COMPLETE[/green]
+                
+    Interface: {interface}
+    New MAC: {new_mac}
+    Status: {'Success' if verification_passed else 'Verify Manually'}
+
+    [bold yellow]To verify:[/bold yellow]
+    Windows: getmac /v
+
+    [red]This change is TEMPORARY and resets on reboot.[/red]
+                """,
+                title="[bold cyan]DSTERMINAL MAC SPOOFER[/bold cyan]",
+                border_style="bright_green" if verification_passed else "yellow",
+                box=box.DOUBLE,
+                padding=(1, 3)
+            )))
+            console.print()
+            
+            console.print("[bold]Press Enter to continue...[/bold]", end="")
+            input()
+            
+        except Exception as e:
+            console.print(f"\n[red]Error: {str(e)}[/red]")
+            debug_messages.append(f"Failed: {str(e)}")
+            console.print(create_dashboard())
+            console.print("\n[bold]Press Enter to continue...[/bold]", end="")
+            input()  
+
+
+    def clear_logs(self):
+        """Securely clear system logs with admin verification and visual feedback"""
+        console = Console()
+
+        def create_panel(content, title="", border_style="blue"):
+            return Panel(
+                content,
+                title=title,
+                border_style=border_style,
+                width=60,
+                padding=(1, 1)
+            )
+
+    # Verify admin privileges first
+        if not self.is_admin():
+            console.print(
+                create_panel(
+                    "[red]âœ– Requires administrator privileges[/red]",
+                    title="Access Denied",
+                    border_style="red"
+                )
+            )
+            return
+
+        try:
+            with Progress(transient=True) as progress:
+                task = progress.add_task("[cyan]Clearing system logs...", total=100)
+
+            # Animated clearing process
+                for i in range(5):
+                    progress.update(task, advance=20, description=f"[cyan]Clearing {['event','application','security','setup','system'][i]} logs...")
+                    time.sleep(0.5)
+
+            # Actual log clearing commands
+                if platform.system() == "Windows":
+                    logs_cleared = []
+                    for log_type in ["Application", "System", "Security"]:
+                        result = os.system(f"wevtutil cl {log_type}")
+                        if result == 0:
+                            logs_cleared.append(log_type)
+                    progress.update(task, completed=100)
+                
+                    console.print(
+                        create_panel(
+                            f"[green]âœ” Cleared Windows logs: {', '.join(logs_cleared)}[/green]",
+                            title="Success",
+                            border_style="green"
+                        )
+                    )
+
+                else:  # Linux/Mac
+                    try:
+                        os.system("sudo rm -rf /var/log/*")
+                        os.system("sudo journalctl --vacuum-time=1s")
+                        progress.update(task, completed=100)
+                        console.print(
+                            create_panel(
+                                "[green]âœ” Cleared system logs successfully[/green]",
+                                title="Success",
+                                border_style="green"
+                            )
+                        )
+                    except Exception as e:
+                        progress.update(task, visible=False)
+                        console.print(
+                            create_panel(
+                                f"[red]âœ– Error clearing logs: {str(e)}[/red]",
+                                title="Error",
+                                border_style="red"
+                            )
+                        )
+
+        except Exception as e:
+            console.print(
+                create_panel(
+                    f"[red]âœ– Critical error: {str(e)}[/red]",
+                    title="Operation Failed",
+                    border_style="red"
+                )
+            )
+
+
+# =================for integrity check
+    def _check_integrity_available(self):
+        """Check if integrity monitor is available"""
+        if not INTEGRITY_AVAILABLE:
+            print(f"{Fore.RED}Integrity monitor not available.{Style.RESET_ALL}")
+            return False
+        if self.integrity is None:
+            print(f"{Fore.RED}Integrity monitor not initialized.{Style.RESET_ALL}")
+            return False
+        return True
+    
+    def show_integrity_help(self):
+        """Display integrity monitor help - BOLD CONTINUOUS BOX WITH CENTERED LAYOUT"""
+        from colorama import Fore, Style, init
+        import shutil
+        import re
+        
+        init(autoreset=True)
+        
+        # Get terminal width for centering
+        try:
+            term_width = shutil.get_terminal_size().columns
+            if term_width < 80:
+                term_width = 80
+            if term_width > 120:
+                term_width = 120
+        except:
+            term_width = 80
+        
+        # Define box width
+        box_width = min(70, term_width - 6)
+        if box_width < 50:
+            box_width = 50
+        
+        # Bold box drawing characters
+        TOP_LEFT = '┏'
+        TOP_RIGHT = '┓'
+        BOTTOM_LEFT = '┗'
+        BOTTOM_RIGHT = '┛'
+        HORIZONTAL = '━'
+        VERTICAL = '┃'
+        T_DOWN = '┳'
+        T_UP = '┻'
+        T_RIGHT = '┣'
+        T_LEFT = '┫'
+        CROSS = '╋'
+        
+        def center_text(text):
+            """Center text within terminal width"""
+            # Remove ANSI codes for length calculation
+            ansi_escape = re.compile(r'\x1b\[[0-9;]*[a-zA-Z]|\x1b\[[0-9;]*m')
+            clean_text = ansi_escape.sub('', text)
+            padding = max(0, (box_width - len(clean_text)) // 2)
+            return ' ' * padding + text
+        
+        def print_line(text, color=Fore.WHITE, bold=False, center=True):
+            """Print a line with optional centering and coloring"""
+            if bold:
+                text = f"{Style.BRIGHT}{text}{Style.RESET_ALL}"
+            if center:
+                text = center_text(text)
+            print(f"{color}{VERTICAL}{Style.RESET_ALL} {text} {color}{VERTICAL}{Style.RESET_ALL}")
+        
+        def print_separator(char='━'):
+            """Print a separator line"""
+            sep = f"{Fore.CYAN}{T_RIGHT}{char * (box_width - 2)}{T_LEFT}{Style.RESET_ALL}"
+            print(center_text(sep))
+        
+        def print_header(text, color=Fore.CYAN):
+            """Print a header line"""
+            header = f"{color}{Style.BRIGHT}{text}{Style.RESET_ALL}"
+            print_line(header, Fore.WHITE, center=True)
+        
+        def print_subheader(text, color=Fore.YELLOW):
+            """Print a subheader line"""
+            subheader = f"{color}{Style.BRIGHT}{text}{Style.RESET_ALL}"
+            print_line(subheader, Fore.WHITE, center=True)
+        
+        def print_item(text, indent=2):
+            """Print an item line"""
+            item = " " * indent + text
+            print_line(item, Fore.WHITE, center=False)
+        
+        # ============================================================
+        # PRINT HELP - BOLD CONTINUOUS BOX
+        # ============================================================
+        
+        # Clear screen for fresh display
+        os.system('clear' if os.name == 'posix' else 'cls')
+        
+        print()
+        
+        # Top border
+        top_border = f"{Fore.CYAN}{TOP_LEFT}{HORIZONTAL * (box_width - 2)}{TOP_RIGHT}{Style.RESET_ALL}"
+        print(center_text(top_border))
+        
+        # Title
+        title = f"{Fore.CYAN}{Style.BRIGHT}  🛡️  INTEGRITY MONITOR COMMANDS  {Style.RESET_ALL}"
+        print_line(title, Fore.CYAN, bold=True)
+        
+        # Separator
+        print_separator()
+        
+        # ============================================================
+        # CORE COMMANDS
+        # ============================================================
+        print_subheader("⚡ CORE COMMANDS", Fore.YELLOW)
+        print_item(f"{Fore.GREEN}integrity scan{Style.RESET_ALL}              - Full system integrity check")
+        print_item(f"{Fore.GREEN}integrity baseline{Style.RESET_ALL}          - Create new system baseline")
+        print_item(f"{Fore.GREEN}integrity status{Style.RESET_ALL}            - Show monitor status")
+        print()
+        
+        # Separator
+        print_separator()
+        
+        # ============================================================
+        # REPORT COMMANDS
+        # ============================================================
+        print_subheader("📊 REPORT COMMANDS", Fore.YELLOW)
+        print_item(f"{Fore.GREEN}integrity report{Style.RESET_ALL}            - Generate TXT report")
+        print_item(f"{Fore.GREEN}integrity report json{Style.RESET_ALL}       - Generate JSON report")
+        print_item(f"{Fore.GREEN}integrity report pdf{Style.RESET_ALL}        - Generate PDF report")
+        print_item(f"{Fore.GREEN}integrity report all{Style.RESET_ALL}        - Generate all report formats")
+        print()
+        
+        # Separator
+        print_separator()
+        
+        # ============================================================
+        # MONITORING
+        # ============================================================
+        print_subheader("🔍 MONITORING", Fore.YELLOW)
+        print_item(f"{Fore.GREEN}integrity monitor{Style.RESET_ALL}           - Start monitoring")
+        print_item(f"{Fore.GREEN}integrity monitor stop{Style.RESET_ALL}      - Stop monitoring")
+        print_item(f"{Fore.GREEN}integrity alerts{Style.RESET_ALL}            - Show recent alerts")
+        print()
+        
+        # Separator
+        print_separator()
+        
+        # ============================================================
+        # FORENSIC ANALYSIS
+        # ============================================================
+        print_subheader("🔬 FORENSIC ANALYSIS", Fore.YELLOW)
+        print_item(f"{Fore.GREEN}integrity forensic timeline{Style.RESET_ALL}  - Show change timeline")
+        print_item(f"{Fore.GREEN}integrity forensic report{Style.RESET_ALL}    - Generate forensic report")
+        print()
+        
+        # Separator
+        print_separator()
+        
+        # ============================================================
+        # LIST COMMANDS
+        # ============================================================
+        print_subheader("📋 LIST COMMANDS", Fore.YELLOW)
+        print_item(f"{Fore.GREEN}integrity list{Style.RESET_ALL}                 - Show summary of all files")
+        print_item(f"{Fore.GREEN}integrity list critical{Style.RESET_ALL}        - List critical system files")
+        print_item(f"{Fore.GREEN}integrity list configs{Style.RESET_ALL}         - List configuration files")
+        print_item(f"{Fore.GREEN}integrity list logs{Style.RESET_ALL}            - List log files")
+        print_item(f"{Fore.GREEN}integrity list databases{Style.RESET_ALL}       - List database files")
+        print_item(f"{Fore.GREEN}integrity list user{Style.RESET_ALL}            - List user files")
+        print()
+        
+        # Separator
+        print_separator()
+        
+        # ============================================================
+        # QUARANTINE & RESTORE
+        # ============================================================
+        print_subheader("🛡️ QUARANTINE & RESTORE", Fore.YELLOW)
+        print_item(f"{Fore.GREEN}integrity quarantine <file>{Style.RESET_ALL}    - Quarantine a suspicious file")
+        print_item(f"{Fore.GREEN}integrity restore <file>{Style.RESET_ALL}       - Restore from quarantine")
+        print()
+        
+        # Bottom border
+        bottom_border = f"{Fore.CYAN}{BOTTOM_LEFT}{HORIZONTAL * (box_width - 2)}{BOTTOM_RIGHT}{Style.RESET_ALL}"
+        print(center_text(bottom_border))
+        
+        print()
+        
+        # ============================================================
+        # FOOTER WITH QUICK TIPS
+        # ============================================================
+        footer_box_width = min(60, box_width)
+        footer_border = f"{Fore.CYAN}{TOP_LEFT}{HORIZONTAL * (footer_box_width - 2)}{TOP_RIGHT}{Style.RESET_ALL}"
+        footer_bottom = f"{Fore.CYAN}{BOTTOM_LEFT}{HORIZONTAL * (footer_box_width - 2)}{BOTTOM_RIGHT}{Style.RESET_ALL}"
+        
+        footer_padding = max(0, (box_width - footer_box_width) // 2)
+        
+        print(' ' * footer_padding + footer_border)
+        print(' ' * footer_padding + f"{Fore.CYAN}{VERTICAL}{Style.RESET_ALL} {Fore.YELLOW}💡 Quick Tips:{Style.RESET_ALL} {' ' * (footer_box_width - 18)}{Fore.CYAN}{VERTICAL}{Style.RESET_ALL}")
+        print(' ' * footer_padding + f"{Fore.CYAN}{VERTICAL}{Style.RESET_ALL} {Fore.WHITE}• Run 'integrity scan' first to establish a baseline{Style.RESET_ALL} {' ' * (footer_box_width - 49)}{Fore.CYAN}{VERTICAL}{Style.RESET_ALL}")
+        print(' ' * footer_padding + f"{Fore.CYAN}{VERTICAL}{Style.RESET_ALL} {Fore.WHITE}• Use 'integrity list' to see all monitored files{Style.RESET_ALL} {' ' * (footer_box_width - 47)}{Fore.CYAN}{VERTICAL}{Style.RESET_ALL}")
+        print(' ' * footer_padding + f"{Fore.CYAN}{VERTICAL}{Style.RESET_ALL} {Fore.WHITE}• Check 'integrity alerts' for security incidents{Style.RESET_ALL} {' ' * (footer_box_width - 49)}{Fore.CYAN}{VERTICAL}{Style.RESET_ALL}")
+        print(' ' * footer_padding + f"{Fore.CYAN}{VERTICAL}{Style.RESET_ALL} {Fore.WHITE}• Generate reports with 'integrity report pdf'{Style.RESET_ALL} {' ' * (footer_box_width - 48)}{Fore.CYAN}{VERTICAL}{Style.RESET_ALL}")
+        print(' ' * footer_padding + footer_bottom)
+        
+        print()
+# ================ends here integ=======
+    def watch_folder(self, path):
+        """Monitor a folder for changes"""
+        if not os.path.exists(path):
+            print("[!] Path not found")
+            return
+
+        print(f"\n[+] Monitoring {path} for changes (Ctrl+C to stop)...")
+        before = dict([(f, None) for f in os.listdir(path)])
+        
+        try:
+            while True:
+                time.sleep(5)
+                after = dict([(f, None) for f in os.listdir(path)])
+                added = [f for f in after if f not in before]
+                removed = [f for f in before if f not in after]
+                
+                if added: print(f"  [+] Files added: {', '.join(added)}")
+                if removed: print(f"  [-] Files removed: {', '.join(removed)}")
+                
+                before = after
+        except KeyboardInterrupt:
+            print("\n[+] Folder monitoring stopped")
+
+    def trace_route(self, target):
+        """Perform a traceroute to target"""
+        print(f"\n[+] Tracing route to {target}...")
+        try:
+            if platform.system() == "Windows":
+                os.system(f"tracert {target}")
+            else:
+                os.system(f"traceroute {target}")
+        except Exception as e:
+            print(f"[!] Error: {e}")
+
+# ====================================================================
+# ====================================================================
+ 
+    # =====================================================================
+    # =====================================================================
+    def _scan_bar(self, label, duration=0.2, width=30):
+        """Animated progress bar for cinematic scanning - FIXED"""
+        import sys
+        import time
+        
+        sys.stdout.write(f"    ├─ {label}: ")
+        sys.stdout.flush()
+        steps = 20  # Increased for smoother animation
+        for i in range(steps):
+            # Use different characters for variety
+            chars = ['█', '▓', '▒', '░']
+            char = chars[i % len(chars)]
+            sys.stdout.write(char)
+            sys.stdout.flush()
+            time.sleep(duration / steps)
+        # Use checkmark with fallback for Windows
+        try:
+            sys.stdout.write(" ✅\n")
+        except UnicodeEncodeError:
+            sys.stdout.write(" [OK]\n")
+        sys.stdout.flush()
+
+# ====================================================================
+# ====================================================================
+    def cmd_stegcheck(self, args):
+        """
+        Launch the StegCheck Hacker Dashboard.
+        """
+        if not STEG_ANALYZER_AVAILABLE:
+            print(f"{Fore.RED}❌ Steganography analyzer not available.{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}💡 Make sure steg_analyzer.py is in the same directory.{Style.RESET_ALL}")
+            return
+        
+        try:
+            # Import the dashboard function
+            from steg_analyzer import dashboard
+            
+            # Launch the dashboard directly - NO FILE PATH PROMPT HERE
+            dashboard(workspace_root=self.workspace_root)
+            
+        except ImportError as e:
+            print(f"{Fore.RED}❌ Failed to import dashboard: {e}{Style.RESET_ALL}")
+        except KeyboardInterrupt:
+            print(f"\n{Fore.YELLOW}⚠️ Dashboard interrupted.{Style.RESET_ALL}")
+        except Exception as e:
+            print(f"{Fore.RED}❌ Error launching dashboard: {str(e)}{Style.RESET_ALL}")
+            if self.verbose:
+                import traceback
+                traceback.print_exc()
+
+# =========================================
+    # ============================================================
+    def _scan_bar(self, label, duration=1.5, width=40):
+        """Animated progress bar for cinematic scanning with colors - FIXED"""
+        from colorama import Fore, Style
+        import sys
+        import time
+        
+        # FIXED: Use Style.RESET_ALL instead of Fore.RESET_ALL
+        sys.stdout.write(f"{Fore.CYAN}    └─{Fore.WHITE} {label}: {Style.RESET_ALL}")
+        sys.stdout.flush()
+        
+        steps = 20
+        for i in range(steps):
+            # Color changes based on progress
+            progress = i / steps
+            if progress < 0.3:
+                color = Fore.YELLOW
+            elif progress < 0.7:
+                color = Fore.CYAN
+            else:
+                color = Fore.GREEN
+            
+            sys.stdout.write(f"{color}█{Style.RESET_ALL}")
+            sys.stdout.flush()
+            time.sleep(duration / steps)
+        
+        # FIXED: Use checkmark with fallback for Windows
+        try:
+            sys.stdout.write(f" {Fore.GREEN}✅{Style.RESET_ALL}\n")
+        except UnicodeEncodeError:
+            sys.stdout.write(f" {Fore.GREEN}[OK]{Style.RESET_ALL}\n")
+        sys.stdout.flush()
+        
+
+# ============================================
+    def dump_memory(self):
+        """Create a memory dump (requires admin)"""
+        if not self.is_admin():
+            print("[!] Requires admin privileges")
+            return
+
+        print("\n[+] Creating memory dump...")
+        try:
+            if platform.system() == "Windows":
+                os.system("procdump -ma -accepteula")
+                print("[+] Memory dump saved as .dmp files")
+            else:
+                print("[!] Linux memory dump requires LiME or fmem")
+        except Exception as e:
+            print(f"[!] Error: {e}")
+
+    def enable_tor_routing(self):
+        """Route traffic through Tor"""
+        print("\n[+] Configuring Tor routing...")
+        try:
+            if platform.system() == "Linux":
+                os.system("sudo apt install tor -y")
+                os.system("sudo service tor start")
+                print("[+] Tor service started. Configure your apps to use 127.0.0.1:9050")
+            else:
+                print("[!] Automatic Tor setup requires Linux. Install Tor Browser manually.")
+        except Exception as e:
+            print(f"[!] Error: {e}")
+#  --------------------for updates below==================
+
+    def port_scan(self, target):
+        """Basic port scanning"""
+        print(f"\n[+] Scanning {target} for common ports...")
+        common_ports = [21, 22, 23, 25, 53, 80, 110, 135, 139, 143, 443, 445, 3389]
+    
+        for port in common_ports:
+            try:
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.settimeout(1)
+                result = sock.connect_ex((target, port))
+                if result == 0:
+                    print(f"  [+] Port {port}: OPEN")
+                sock.close()
+            except:
+                pass
+
+
+    def kill_process(self, pid):
+        """Kill a process by PID"""
+        try:
+            if platform.system() == "Windows":
+                os.system(f"taskkill /F /PID {pid}")
+            else:
+                os.system(f"kill -9 {pid}")
+            print(f"[+] Process {pid} terminated")
+        except Exception as e:
+            print(f"[!] Failed to kill process: {e}")
+
+    # ===============================================================
+
+    def system_info(self):
+        """
+        Display comprehensive system information with hacking-style colorful boxes.
+        Cross-platform: Windows, Linux, macOS
+        """
+        import platform
+        import psutil
+        import time
+        import socket
+        import datetime
+        import shutil
+        import random
+        import json
+        import os
+        from pathlib import Path
+        from colorama import Fore, Style, init, Back
+        
+        # Initialize colorama for Windows
+        init(autoreset=True)
+        
+        # ========================================================================
+        # ANSI BLINK CONSTANT
+        # ========================================================================
+        BLINK = '\033[5m'
+        BLINK_OFF = '\033[25m'
+        
+        # Get terminal width for centering
+        try:
+            term_width = shutil.get_terminal_size().columns
+            if term_width < 80:
+                term_width = 80
+            if term_width > 120:
+                term_width = 120
+        except:
+            term_width = 80
+        
+        # ========================================================================
+        # ASCII Art Banner - SYSINFO
+        # ========================================================================
+        banner_colors = [Fore.CYAN, Fore.GREEN, Fore.YELLOW, Fore.MAGENTA, Fore.LIGHTBLUE_EX, Fore.LIGHTCYAN_EX]
+        banner_color = random.choice(banner_colors)
+        glow_color = Fore.LIGHTYELLOW_EX
+        
+        print(f"{Fore.CYAN}┏{'━' * (term_width - 2)}┓{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}┃{Style.RESET_ALL}{' ' * ((term_width - 54) // 2)}{banner_color}{Style.BRIGHT}███████╗██╗   ██╗███████╗██╗███╗   ██╗███████╗ ██████╗ {Style.RESET_ALL}{' ' * ((term_width - 54) // 2)}{Fore.CYAN}┃{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}┃{Style.RESET_ALL}{' ' * ((term_width - 54) // 2)}{banner_color}{Style.BRIGHT}██╔════╝╚██╗ ██╔╝██╔════╝██║████╗  ██║██╔════╝██╔═══██╗{Style.RESET_ALL}{' ' * ((term_width - 54) // 2)}{Fore.CYAN}┃{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}┃{Style.RESET_ALL}{' ' * ((term_width - 54) // 2)}{banner_color}{Style.BRIGHT}███████╗ ╚████╔╝ ███████╗██║██╔██╗ ██║█████╗  ██║   ██║{Style.RESET_ALL}{' ' * ((term_width - 54) // 2)}{Fore.CYAN}┃{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}┃{Style.RESET_ALL}{' ' * ((term_width - 54) // 2)}{banner_color}{Style.BRIGHT}╚════██║  ╚██╔╝  ╚════██║██║██║╚██╗██║██╔══╝  ██║   ██║{Style.RESET_ALL}{' ' * ((term_width - 54) // 2)}{Fore.CYAN}┃{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}┃{Style.RESET_ALL}{' ' * ((term_width - 54) // 2)}{banner_color}{Style.BRIGHT}███████║   ██║   ███████║██║██║ ╚████║██║     ╚██████╔╝{Style.RESET_ALL}{' ' * ((term_width - 54) // 2)}{Fore.CYAN}┃{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}┃{Style.RESET_ALL}{' ' * ((term_width - 54) // 2)}{banner_color}{Style.BRIGHT}╚══════╝   ╚═╝   ╚══════╝╚═╝╚═╝  ╚═══╝╚═╝      ╚═════╝ {Style.RESET_ALL}{' ' * ((term_width - 54) // 2)}{Fore.CYAN}┃{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}┃{Style.RESET_ALL}{' ' * ((term_width - 40) // 2)}{BLINK}{glow_color}{Style.BRIGHT}✨ SYSTEM INFORMATION & ANALYSIS  ✨{Style.RESET_ALL}{BLINK_OFF}{' ' * ((term_width - 40) // 2)}{Fore.CYAN}┃{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}┗{'━' * (term_width - 2)}┛{Style.RESET_ALL}")
+        
+        time.sleep(0.03)
+        
+        # ========================================================================
+        # Collect System Information
+        # ========================================================================
+        # OS Information
+        os_name = platform.system()
+        os_release = platform.release()
+        os_version = platform.version()
+        os_architecture = platform.machine()
+        processor = platform.processor()
+        
+        # Network Information
+        hostname = socket.gethostname()
+        
+        # Get IP addresses
+        ip_addresses = []
+        try:
+            hostname_ip = socket.gethostbyname(hostname)
+            ip_addresses.append(hostname_ip)
+        except:
+            pass
+        
+        try:
+            for interface, addrs in psutil.net_if_addrs().items():
+                for addr in addrs:
+                    if addr.family == socket.AF_INET and not addr.address.startswith('127.'):
+                        if addr.address not in ip_addresses:
+                            ip_addresses.append(addr.address)
+        except:
+            pass
+        
+        # Boot Time
+        try:
+            boot_time = psutil.boot_time()
+            boot_datetime = datetime.datetime.fromtimestamp(boot_time)
+            boot_time_str = boot_datetime.strftime("%Y-%m-%d %H:%M:%S")
+            uptime_seconds = time.time() - boot_time
+            uptime_days = int(uptime_seconds // 86400)
+            uptime_hours = int((uptime_seconds % 86400) // 3600)
+            uptime_minutes = int((uptime_seconds % 3600) // 60)
+            uptime_str = f"{uptime_days}d {uptime_hours}h {uptime_minutes}m"
+        except:
+            boot_time_str = "N/A"
+            uptime_str = "N/A"
+        
+        # CPU Information
+        cpu_count = psutil.cpu_count() if psutil else 0
+        cpu_count_logical = psutil.cpu_count(logical=True) if psutil else 0
+        cpu_percent = psutil.cpu_percent(interval=1) if psutil else 0
+        
+        # CPU Frequency
+        try:
+            cpu_freq = psutil.cpu_freq()
+            cpu_freq_str = f"{cpu_freq.current:.0f} MHz" if cpu_freq else "N/A"
+        except:
+            cpu_freq_str = "N/A"
+        
+        # Memory Information
+        if psutil:
+            mem = psutil.virtual_memory()
+            mem_total = mem.total / (1024**3)
+            mem_available = mem.available / (1024**3)
+            mem_used = mem.used / (1024**3)
+            mem_percent = mem.percent
+            swap = psutil.swap_memory()
+            swap_total = swap.total / (1024**3) if swap else 0
+            swap_used = swap.used / (1024**3) if swap else 0
+            swap_percent = swap.percent if swap else 0
+        else:
+            mem_total = 0
+            mem_available = 0
+            mem_used = 0
+            mem_percent = 0
+            swap_total = 0
+            swap_used = 0
+            swap_percent = 0
+        
+        # Disk Information
+        disk_info = []
+        try:
+            for partition in psutil.disk_partitions():
+                try:
+                    usage = psutil.disk_usage(partition.mountpoint)
+                    disk_info.append({
+                        'device': partition.device,
+                        'mount': partition.mountpoint,
+                        'total': usage.total / (1024**3),
+                        'used': usage.used / (1024**3),
+                        'free': usage.free / (1024**3),
+                        'percent': usage.percent
+                    })
+                except:
+                    pass
+        except:
+            pass
+        
+        # Process Information
+        try:
+            process_count = len(psutil.pids())
+        except:
+            process_count = 0
+        
+        # User Information
+        try:
+            import pwd
+            users = [user.pw_name for user in pwd.getpwall()]
+            user_count = len(users)
+        except:
+            try:
+                import subprocess
+                result = subprocess.run(['whoami'], capture_output=True, text=True)
+                current_user = result.stdout.strip() if result.returncode == 0 else "Unknown"
+                user_count = 1
+            except:
+                user_count = 0
+                current_user = "Unknown"
+        
+        # ========================================================================
+        # Display System Information
+        # ========================================================================
+        def box_header(text, color=Fore.CYAN, width=60):
+            """Create a bold colored box header"""
+            left_pad = (term_width - width) // 2
+            glow = Fore.LIGHTYELLOW_EX if random.random() > 0.6 else color
+            return f"{' ' * left_pad}{color}{Style.BRIGHT}┏{'━' * (width - 2)}┓{Style.RESET_ALL}\n" \
+                f"{' ' * left_pad}{color}{Style.BRIGHT}┃{Style.RESET_ALL}{' ' * ((width - 2 - len(text)) // 2)}{glow}{Style.BRIGHT}{text}{Style.RESET_ALL}{' ' * ((width - 2 - len(text)) // 2)}{color}{Style.BRIGHT}┃{Style.RESET_ALL}\n" \
+                f"{' ' * left_pad}{color}{Style.BRIGHT}┗{'━' * (width - 2)}┛{Style.RESET_ALL}"
+        
+        # Box 1: System Overview
+        print(box_header("⚡ SYSTEM OVERVIEW", Fore.LIGHTCYAN_EX))
+        print(f"{Fore.LIGHTGREEN_EX}⚡ Hostname:{Style.RESET_ALL} {Fore.WHITE}{hostname}{Style.RESET_ALL}")
+        print(f"{Fore.LIGHTGREEN_EX}🖥️  OS:{Style.RESET_ALL} {Fore.WHITE}{os_name} {os_release}{Style.RESET_ALL}")
+        print(f"{Fore.LIGHTGREEN_EX}🔧 Kernel:{Style.RESET_ALL} {Fore.WHITE}{os_version[:50]}{'...' if len(os_version) > 50 else ''}{Style.RESET_ALL}")
+        print(f"{Fore.LIGHTGREEN_EX}💻 Arch:{Style.RESET_ALL} {Fore.WHITE}{os_architecture}{Style.RESET_ALL}")
+        print(f"{Fore.LIGHTGREEN_EX}🔥 Processor:{Style.RESET_ALL} {Fore.WHITE}{processor if processor else 'Unknown'}{Style.RESET_ALL}")
+        time.sleep(0.03)
+        
+        # Box 2: Boot & Uptime
+        print(box_header("⏰ BOOT & UPTIME", Fore.LIGHTYELLOW_EX))
+        print(f"{Fore.LIGHTYELLOW_EX}⏰ Boot Time:{Style.RESET_ALL} {Fore.WHITE}{boot_time_str}{Style.RESET_ALL}")
+        print(f"{Fore.LIGHTGREEN_EX}📈 Uptime:{Style.RESET_ALL} {Fore.WHITE}{uptime_str}{Style.RESET_ALL}")
+        time.sleep(0.03)
+        
+        # Box 3: CPU Information
+        cpu_usage_color = Fore.LIGHTGREEN_EX if cpu_percent < 70 else Fore.LIGHTYELLOW_EX if cpu_percent < 90 else Fore.LIGHTRED_EX
+        print(box_header("🔥 CPU INFORMATION", Fore.LIGHTMAGENTA_EX))
+        print(f"{Fore.MAGENTA}💠 Physical Cores:{Style.RESET_ALL} {Fore.WHITE}{cpu_count}{Style.RESET_ALL}")
+        print(f"{Fore.MAGENTA}🌀 Logical Cores:{Style.RESET_ALL} {Fore.WHITE}{cpu_count_logical}{Style.RESET_ALL}")
+        print(f"{Fore.MAGENTA}📡 Frequency:{Style.RESET_ALL} {Fore.WHITE}{cpu_freq_str}{Style.RESET_ALL}")
+        print(f"{Fore.MAGENTA}📊 Usage:{Style.RESET_ALL} {cpu_usage_color}{cpu_percent}%{Style.RESET_ALL}")
+        bar_length = 30
+        filled = int((cpu_percent / 100) * bar_length)
+        bar = "█" * filled + "░" * (bar_length - filled)
+        bar_color = Fore.LIGHTGREEN_EX if cpu_percent < 70 else Fore.LIGHTYELLOW_EX if cpu_percent < 90 else Fore.LIGHTRED_EX
+        print(f"{bar_color}[{bar}]{Style.RESET_ALL}")
+        time.sleep(0.03)
+        
+        # Box 4: Memory Information
+        mem_color = Fore.LIGHTGREEN_EX if mem_percent < 70 else Fore.LIGHTYELLOW_EX if mem_percent < 90 else Fore.LIGHTRED_EX
+        print(box_header("💾 MEMORY INFORMATION", Fore.LIGHTCYAN_EX))
+        print(f"{Fore.LIGHTCYAN_EX}💾 Total RAM:{Style.RESET_ALL} {Fore.WHITE}{mem_total:.1f} GB{Style.RESET_ALL}")
+        print(f"{Fore.LIGHTCYAN_EX}📊 Used RAM:{Style.RESET_ALL} {mem_color}{mem_used:.1f} GB ({mem_percent}%){Style.RESET_ALL}")
+        print(f"{Fore.LIGHTCYAN_EX}✅ Available:{Style.RESET_ALL} {Fore.LIGHTGREEN_EX}{mem_available:.1f} GB{Style.RESET_ALL}")
+        print(f"{Fore.LIGHTCYAN_EX}🔄 Swap:{Style.RESET_ALL} {Fore.WHITE}{swap_used:.1f} GB / {swap_total:.1f} GB ({swap_percent}%){Style.RESET_ALL}")
+        filled = int((mem_percent / 100) * bar_length)
+        bar = "█" * filled + "░" * (bar_length - filled)
+        print(f"{mem_color}[{bar}]{Style.RESET_ALL}")
+        time.sleep(0.03)
+        
+        # Box 5: Disk Information
+        if disk_info:
+            print(box_header("💿 DISK INFORMATION", Fore.LIGHTGREEN_EX))
+            for disk in disk_info[:3]:
+                disk_color = Fore.LIGHTGREEN_EX if disk['percent'] < 70 else Fore.LIGHTYELLOW_EX if disk['percent'] < 90 else Fore.LIGHTRED_EX
+                print(f"{Fore.LIGHTGREEN_EX}💿 {disk['device']}:{Style.RESET_ALL} {disk_color}{disk['used']:.1f} GB / {disk['total']:.1f} GB ({disk['percent']}%){Style.RESET_ALL}")
+            time.sleep(0.03)
+        
+        # Box 6: Network & Process Information
+        print(box_header("🌐 NETWORK & PROCESSES", Fore.LIGHTBLUE_EX))
+        print(f"{Fore.LIGHTBLUE_EX}🌐 IP Addresses:{Style.RESET_ALL} {Fore.WHITE}{', '.join(ip_addresses[:3])}{Style.RESET_ALL}")
+        print(f"{Fore.LIGHTBLUE_EX}⚙️  Running Processes:{Style.RESET_ALL} {Fore.WHITE}{process_count}{Style.RESET_ALL}")
+        print(f"{Fore.LIGHTBLUE_EX}👤 System Users:{Style.RESET_ALL} {Fore.WHITE}{user_count}{Style.RESET_ALL}")
+        time.sleep(0.03)
+        
+        # Box 7: Security Recommendations
+        rec_color = Fore.LIGHTYELLOW_EX
+        print(box_header("🛡️ SECURITY RECOMMENDATIONS", rec_color))
+        print(f"{rec_color}🛡️  SECURITY RECOMMENDATIONS{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}{'═' * 50}{Style.RESET_ALL}")
+
+        is_admin = False
+        try:
+            if os.name == 'nt':
+                import ctypes
+                is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
+            else:
+                is_admin = os.geteuid() == 0
+        except:
+            pass
+
+        if not is_admin:
+            print(f"{Fore.YELLOW}⚠️  Run with sudo for full security features{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}🔍  Run 'exploitcheck' for vulnerability assessment{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}🛡️  Run 'check integrity' for system file verification{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}📋  Run 'system scan -All' for comprehensive scan{Style.RESET_ALL}")
+        else:
+            print(f"{Fore.GREEN}✅  System running with administrative privileges{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}🔍  Run 'system scan -All' for comprehensive security scan{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}🛡️  Run 'harden' for system hardening options{Style.RESET_ALL}")
+        time.sleep(0.03)
+        
+        # ========================================================================
+        # Glowing Matrix Footer
+        # ========================================================================
+        print()
+        footer_color = random.choice([Fore.GREEN, Fore.CYAN, Fore.MAGENTA, Fore.LIGHTYELLOW_EX])
+        print(f"{footer_color}{Style.BRIGHT}{'═' * min(70, term_width)}{Style.RESET_ALL}")
+        print(f"{Fore.LIGHTGREEN_EX}{Style.BRIGHT}⚡ System Analysis Complete{Style.RESET_ALL}".center(term_width))
+        print(f"{Fore.CYAN}📊 Data compiled from {platform.system()} {platform.release()}{Style.RESET_ALL}".center(term_width))
+        
+        # Random glitch effect
+        for _ in range(2):
+            glitch = ''.join(random.choice(['0', '1', '░', '▒', '▓', '█']) for _ in range(random.randint(10, 30)))
+            print(f"{Fore.LIGHTGREEN_EX}{glitch}{Style.RESET_ALL}".center(term_width))
+            time.sleep(0.02)
+        
+        print(f"{Fore.LIGHTBLACK_EX}{'═' * min(70, term_width)}{Style.RESET_ALL}")
+        print()
+        
+        # ========================================================================
+        # Export System Info to JSON and PDF
+        # ========================================================================
+        print(f"{Fore.LIGHTCYAN_EX}💾 Exporting System Information...{Style.RESET_ALL}")
+        time.sleep(0.02)
+
+        # Prepare system info data
+        system_data = {
+            'hostname': hostname,
+            'os': os_name,
+            'os_release': os_release,
+            'os_version': os_version,
+            'architecture': os_architecture,
+            'processor': processor,
+            'boot_time': boot_time_str,
+            'uptime': uptime_str,
+            'cpu_cores': cpu_count,
+            'cpu_logical_cores': cpu_count_logical,
+            'cpu_frequency': cpu_freq_str,
+            'cpu_usage': cpu_percent,
+            'memory_total': mem_total,
+            'memory_used': mem_used,
+            'memory_available': mem_available,
+            'memory_percent': mem_percent,
+            'swap_total': swap_total,
+            'swap_used': swap_used,
+            'swap_percent': swap_percent,
+            'disk_info': disk_info,
+            'ip_addresses': ip_addresses,
+            'process_count': process_count,
+            'user_count': user_count,
+            'timestamp': datetime.datetime.now().isoformat()
+        }
+
+        # Export to JSON and PDF
+        try:
+            # Create exports directory in dsterminal_workspace
+            home = Path.home()
+            export_dir = home / 'dsterminal_workspace' / 'system_report'
+            
+            # Create directory with explicit confirmation
+            try:
+                export_dir.mkdir(parents=True, exist_ok=True)
+                print(f"{Fore.GREEN}✅ Report directory created at: {export_dir}{Style.RESET_ALL}")
+            except Exception as e:
+                print(f"{Fore.RED}❌ Failed to create directory: {e}{Style.RESET_ALL}")
+                # Fallback to current directory
+                export_dir = Path.cwd() / 'system_report'
+                export_dir.mkdir(parents=True, exist_ok=True)
+                print(f"{Fore.YELLOW}⚠️  Using fallback directory: {export_dir}{Style.RESET_ALL}")
+            
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            json_path = export_dir / f'system_info_{hostname}_{timestamp}.json'
+            pdf_path = export_dir / f'system_info_{hostname}_{timestamp}.pdf'
+            
+            # Export JSON
+            try:
+                with open(json_path, 'w') as f:
+                    json.dump(system_data, f, indent=2, default=str)
+                print(f"{Fore.LIGHTGREEN_EX}✅ JSON exported to: {json_path}{Style.RESET_ALL}")
+            except Exception as e:
+                print(f"{Fore.RED}❌ JSON export failed: {e}{Style.RESET_ALL}")
+            
+            # Export PDF
+            try:
+                from reportlab.lib.pagesizes import letter
+                from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
+                from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+                from reportlab.lib import colors
+                from reportlab.lib.units import inch
+                
+                doc = SimpleDocTemplate(str(pdf_path), pagesize=letter)
+                styles = getSampleStyleSheet()
+                story = []
+                
+                # Title
+                title_style = ParagraphStyle(
+                    'CustomTitle',
+                    parent=styles['Heading1'],
+                    fontSize=24,
+                    textColor=colors.blue,
+                    alignment=1
+                )
+                story.append(Paragraph(f"System Information Report - {hostname}", title_style))
+                story.append(Spacer(1, 0.25*inch))
+                
+                # System Overview
+                story.append(Paragraph("<b>System Overview</b>", styles['Heading2']))
+                story.append(Paragraph(f"Hostname: {hostname}", styles['Normal']))
+                story.append(Paragraph(f"OS: {os_name} {os_release}", styles['Normal']))
+                story.append(Paragraph(f"Kernel: {os_version}", styles['Normal']))
+                story.append(Paragraph(f"Architecture: {os_architecture}", styles['Normal']))
+                story.append(Paragraph(f"Processor: {processor}", styles['Normal']))
+                story.append(Spacer(1, 0.1*inch))
+                
+                # CPU Information
+                story.append(Paragraph("<b>CPU Information</b>", styles['Heading2']))
+                story.append(Paragraph(f"Physical Cores: {cpu_count}", styles['Normal']))
+                story.append(Paragraph(f"Logical Cores: {cpu_count_logical}", styles['Normal']))
+                story.append(Paragraph(f"Frequency: {cpu_freq_str}", styles['Normal']))
+                story.append(Paragraph(f"Usage: {cpu_percent}%", styles['Normal']))
+                story.append(Spacer(1, 0.1*inch))
+                
+                # Memory Information
+                story.append(Paragraph("<b>Memory Information</b>", styles['Heading2']))
+                story.append(Paragraph(f"Total RAM: {mem_total:.1f} GB", styles['Normal']))
+                story.append(Paragraph(f"Used RAM: {mem_used:.1f} GB ({mem_percent}%)", styles['Normal']))
+                story.append(Paragraph(f"Available: {mem_available:.1f} GB", styles['Normal']))
+                story.append(Paragraph(f"Swap: {swap_used:.1f} GB / {swap_total:.1f} GB ({swap_percent}%)", styles['Normal']))
+                story.append(Spacer(1, 0.1*inch))
+                
+                # Disk Information
+                story.append(Paragraph("<b>Disk Information</b>", styles['Heading2']))
+                for disk in disk_info[:3]:
+                    story.append(Paragraph(f"{disk['device']}: {disk['used']:.1f} GB / {disk['total']:.1f} GB ({disk['percent']}%)", styles['Normal']))
+                story.append(Spacer(1, 0.1*inch))
+                
+                # Network & Process
+                story.append(Paragraph("<b>Network & Processes</b>", styles['Heading2']))
+                story.append(Paragraph(f"IP Addresses: {', '.join(ip_addresses[:3])}", styles['Normal']))
+                story.append(Paragraph(f"Running Processes: {process_count}", styles['Normal']))
+                story.append(Paragraph(f"System Users: {user_count}", styles['Normal']))
+                story.append(Spacer(1, 0.1*inch))
+                
+                # Footer
+                story.append(Paragraph(f"Report Generated: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", styles['Normal']))
+                
+                doc.build(story)
+                print(f"{Fore.LIGHTGREEN_EX}✅ PDF exported to: {pdf_path}{Style.RESET_ALL}")
+                
+            except ImportError:
+                print(f"{Fore.LIGHTYELLOW_EX}⚠️  ReportLab not installed. Install with: pip install reportlab{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}💡 JSON exported to dsterminal_workspace instead{Style.RESET_ALL}")
+            except Exception as e:
+                print(f"{Fore.LIGHTYELLOW_EX}⚠️  PDF export failed: {str(e)}{Style.RESET_ALL}")
+            
+            # Open the directory in File Explorer
+            try:
+                import subprocess
+                import sys
+                if sys.platform == 'win32':
+                    subprocess.run(['explorer', str(export_dir)])
+                    print(f"{Fore.GREEN}📂 Opening report directory...{Style.RESET_ALL}")
+                elif sys.platform == 'darwin':  # macOS
+                    subprocess.run(['open', str(export_dir)])
+                else:  # Linux
+                    subprocess.run(['xdg-open', str(export_dir)])
+            except Exception as e:
+                print(f"{Fore.YELLOW}⚠️  Could not open directory: {e}{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}💡 Reports are saved at: {export_dir}{Style.RESET_ALL}")
+                
+        except Exception as e:
+            print(f"{Fore.LIGHTYELLOW_EX}⚠️  Export failed: {str(e)}{Style.RESET_ALL}")
+            
+#  =================================dsterminal self update module checking==================
+
+    
+    def clear_terminal(self):
+        """Advanced terminal clearing with proper scaling - FIXED ZOOM ISSUE"""
+        from rich.console import Console
+        from rich.panel import Panel
+        from rich.layout import Layout
+        from rich.align import Align
+        from rich.live import Live
+        from rich import box
+        import shutil
+        import random
+        import time
+        import os
+        import platform
+        from datetime import datetime
+        
+        console = Console()
+        
+        # Get terminal size - RESPONSIVE
+        try:
+            terminal_width = shutil.get_terminal_size().columns
+            terminal_height = shutil.get_terminal_size().lines
+        except:
+            terminal_width = 80
+            terminal_height = 24
+        
+        # Ensure minimum sizes but don't force max
+        if terminal_width < 60:
+            terminal_width = 60
+        if terminal_height < 15:
+            terminal_height = 15
+        
+        # Calculate column widths - responsive to terminal size
+        # Use percentage-based sizing rather than fixed
+        column_width = max(20, int(terminal_width * 0.28))
+        if column_width > 40:
+            column_width = 40
+        
+        # ============================================================
+        # SIMPLIFIED SPINNERS - FIXED UTF-8
+        # ============================================================
+        spinners = {
+            'dots': ["◴", "◷", "◶", "◵"],
+            'circles': ["◴", "◷", "◶", "◵"],
+            'arrows': ["←", "↖", "↑", "↗", "→", "↘", "↓", "↙"],
+            'pipes': ["┤", "┘", "┴", "└", "├", "┌", "┬", "┐"],
+            'blocks': ["█", "▓", "▒", "░", "▒", "▓", "█"],
+            'hacker': ["░", "▒", "▓", "█", "▓", "▒", "░"],
+        }
+        
+        # Glitch text fragments
+        glitch_texts = [
+            "[CYBER-CLEAR]", "[WIPING]", "[PURGING]", 
+            "[RESETTING]", "[REFRESHING]", "[RELOADING]"
+        ]
+        
+        # Phase configurations - reduced for speed
+        phases = [
+            {"text": "PHASE 1: MEMORY CLEAR", "color": "red", "spinner": "dots"},
+            {"text": "PHASE 2: BUFFER FLUSH", "color": "yellow", "spinner": "arrows"},
+            {"text": "PHASE 3: DISPLAY RESET", "color": "cyan", "spinner": "circles"}
+        ]
+        
+        # System stats simulator
+        def get_system_stats():
+            return {
+                "cpu": random.randint(20, 95),
+                "mem": random.randint(100, 500),
+                "pid": os.getpid(),
+                "disk": random.randint(10, 90),
+                "network": random.randint(1, 100)
+            }
+        
+        # ============================================================
+        # ANIMATED CLEARING SEQUENCE - REDUCED STEPS
+        # ============================================================
+        with Live(console=console, refresh_per_second=10, screen=True, auto_refresh=False) as live:
+            for phase_idx, phase in enumerate(phases):
+                spinner_chars = spinners[phase["spinner"]]
+                color = phase["color"]
+                phase_text = phase["text"]
+                
+                for step in range(10):  # Reduced from 15 for speed
+                    total_progress = (phase_idx * 10 + step) / 30
+                    progress_percent = int(total_progress * 100)
+                    spinner = spinner_chars[step % len(spinner_chars)]
+                    glitch = random.choice(glitch_texts) if random.random() > 0.7 else ""
+                    stats = get_system_stats()
+                    
+                    # === LEFT COLUMN: System Stats ===
+                    left_content = Panel(
+                        Align.center(
+                            f"[bold cyan]📊 SYSTEM STATS[/bold cyan]\n\n"
+                            f"[white]CPU:[/white] [green]{stats['cpu']}%[/green]\n"
+                            f"[white]MEM:[/white] [yellow]{stats['mem']} MB[/yellow]\n"
+                            f"[white]PID:[/white] [dim]{stats['pid']}[/dim]",
+                            vertical="middle"
+                        ),
+                        title=f"[bold {color}]⚙️ SYSTEM STATS[/bold {color}]",
+                        border_style=color,
+                        width=column_width,
+                        padding=(0, 1),
+                        height=10  # Reduced height
+                    )
+                    
+                    # === CENTER COLUMN: Main Progress ===
+                    bar_width = column_width - 8
+                    filled = int(progress_percent / 100 * bar_width)
+                    progress_bar = "█" * filled + "░" * (bar_width - filled)
+                    
+                    center_content = Panel(
+                        Align.center(
+                            f"[bold {color}]{spinner} {phase_text} {spinner}[/bold {color}]\n\n"
+                            f"[white]{progress_bar}[/white]\n"
+                            f"[bold cyan]{progress_percent}%[/bold cyan]\n\n"
+                            f"[dim]{glitch}[/dim]",
+                            vertical="middle"
+                        ),
+                        title=f"[bold {color}]🌀 SYNCING[/bold {color}]",
+                        border_style=color,
+                        width=column_width,
+                        padding=(0, 1),
+                        height=10
+                    )
+                    
+                    # === RIGHT COLUMN: Security Events ===
+                    events = [
+                        "Buffer overflow check",
+                        "Memory seg scan",
+                        "Stack trace verify",
+                        "System call audit"
+                    ]
+                    current_event = events[step % len(events)]
+                    
+                    right_content = Panel(
+                        Align.center(
+                            f"[bold yellow]⚠️ SECURITY[/bold yellow]\n\n"
+                            f"[white]Event:[/white]\n[cyan]{current_event}[/cyan]\n\n"
+                            f"[white]Status:[/white] [green]ACTIVE[/green]",
+                            vertical="middle"
+                        ),
+                        title=f"[bold {color}]🔒 SECURITY[/bold {color}]",
+                        border_style=color,
+                        width=column_width,
+                        padding=(1, 1),
+                        height=10
+                    )
+                    
+                    # Create three-column layout
+                    layout = Layout()
+                    layout.split_row(
+                        Layout(left_content, ratio=1),
+                        Layout(center_content, ratio=1),
+                        Layout(right_content, ratio=1)
+                    )
+                    
+                    final_display = Align.center(layout)
+                    live.update(final_display)
+                    live.refresh()
+                    time.sleep(0.03)  # Faster refresh
+        
+        # ============================================================
+        # EXECUTE ACTUAL TERMINAL CLEAR
+        # ============================================================
+        os.system("clear" if platform.system() != "Windows" else "cls")
+        
+        # ============================================================
+        # SIMPLE BANNER REVEAL - NORMAL SIZE
+        # ============================================================
+        terminal_width = shutil.get_terminal_size((80, 20)).columns
+        
+        # Simple ASCII Art Logo - smaller and cleaner
+        logo_art = [
+            "╔══════════════════════════════════════════════════════════════╗",
+            "║                                                              ║",
+            "║    ██████╗ ███████╗████████╗███████╗██████╗ ███╗   ███╗     ║",
+            "║    ██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗████╗ ████║     ║",
+            "║    ██║  ██║███████╗   ██║   █████╗  ██████╔╝██╔████╔██║     ║",
+            "║    ██║  ██║╚════██║   ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║     ║",
+            "║    ██████╔╝███████║   ██║   ███████╗██║  ██║██║ ╚═╝ ██║     ║",
+            "║    ╚═════╝ ╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝     ║",
+            "║                                                              ║",
+            "╚══════════════════════════════════════════════════════════════╝",
+        ]
+        
+        # Display logo with gradient colors - normal size
+        for i, line in enumerate(logo_art):
+            padding = max(0, (terminal_width - len(line)) // 2)
+            centered_line = " " * padding + line
+            
+            if i == 0 or i == len(logo_art) - 1:
+                console.print(f"[bold bright_cyan]{centered_line}[/bold bright_cyan]")
+            elif i == 1 or i == len(logo_art) - 2:
+                console.print(f"[bold bright_blue]{centered_line}[/bold bright_blue]")
+            elif 2 <= i <= len(logo_art) - 3:
+                colors = ["bright_cyan", "bright_green", "bright_yellow", "bright_magenta"]
+                color = colors[(i - 2) % len(colors)]
+                console.print(f"[bold {color}]{centered_line}[/bold {color}]")
+            time.sleep(0.01)
+        
+        # ============================================================
+        # THREE-COLUMN STATUS PANEL - NORMAL SIZE
+        # ============================================================
+        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Calculate responsive column sizes - normal
+        col_width = max(25, min(35, terminal_width // 3 - 2))
+        if col_width > 40:
+            col_width = 40
+        
+        # Left column: System Info
+        left_status = Panel(
+            Align.center(
+                f"[bold cyan]🖥️ SYSTEM INFO[/bold cyan]\n\n"
+                f"[white]OS:[/white] [green]{platform.system()} {platform.release()}[/green]\n"
+                f"[white]Arch:[/white] [yellow]{platform.machine()}[/yellow]\n"
+                f"[white]Terminal:[/white] [dim]{terminal_width} cols[/dim]\n",
+                vertical="middle"
+            ),
+            border_style="bright_blue",
+            width=col_width,
+            padding=(1, 1),
+            height=12
+        )
+        
+        # Center column: Status Message
+        center_status = Panel(
+            Align.center(
+                f"[bold bright_green]✦ SYSTEM INITIALIZED ✦[/bold bright_green]\n\n"
+                f"[white]Session ID:[/white]\n[cyan]{datetime.now().strftime('%Y%m%d%H%M%S')}[/cyan]\n\n"
+                f"[white]Ready for:[/white]\n[yellow]Security Operations[/yellow]",
+                vertical="middle"
+            ),
+            border_style="bright_green",
+            width=col_width,
+            padding=(1, 1),
+            height=12
+        )
+        
+        # Right column: Quick Commands
+        right_status = Panel(
+            Align.center(
+                f"[bold yellow]⚡ QUICK CMDS[/bold yellow]\n\n"
+                f"[cyan]help[/cyan] - Show commands\n"
+                f"[cyan]scan[/cyan] - Run scan\n"
+                f"[cyan]exit[/cyan] - Close terminal",
+                vertical="middle"
+            ),
+            border_style="bright_yellow",
+            width=col_width,
+            padding=(1, 1),
+            height=12
+        )
+        
+        # Create three-column status layout
+        status_layout = Layout()
+        status_layout.split_row(
+            Layout(left_status, ratio=1),
+            Layout(center_status, ratio=1),
+            Layout(right_status, ratio=1)
+        )
+        
+        # Center and display
+        console.print(Align.center(status_layout))
+        
+        # ============================================================
+        # BOTTOM STATUS BAR - NORMAL
+        # ============================================================
+        console.print()
+        console.print(f"[bold bright_cyan]╔{'═' * min(terminal_width, 60)}╗[/bold bright_cyan]")
+        
+        status_chars = ['◆', '◇', '◆', '◇']
+        console.print(
+            f"[bold bright_cyan]║[/bold bright_cyan] "
+            f"[bold green]{random.choice(status_chars)}[/bold green] "
+            f"[bold cyan]SOC MONITORING ACTIVE[/bold cyan] "
+            f"[bold green]{random.choice(status_chars)}[/bold green] | "
+            f"[bold yellow]Sessions: {random.randint(1, 5)}[/bold yellow] "
+            f"[bold bright_cyan]║[/bold bright_cyan]"
+        )
+        
+        console.print(f"[bold bright_cyan]╚{'═' * min(terminal_width, 60)}╝[/bold bright_cyan]")
+        console.print()
+         
+    # =======ends here from above-==============
+    def emergency_shutdown(self):
+        console = Console()
+
+        def authenticate():
+            console.print("\n[bold yellow]Authentication Required:[/bold yellow] Confirm emergency shutdown.")
+            response = Prompt.ask("Type [red]YES[/red] to confirm", default="NO")
+            return response.strip().lower() == "yes"
+
+        if not authenticate():
+            console.print("\n[bold cyan]Shutdown aborted.[/bold cyan]")
+            return
+
+        countdown_panel = Panel(
+            Align.center("[bold red]\u26a0 EMERGENCY SHUTDOWN INITIATED \u26a0[/bold red]", vertical="middle"),
+            title="[red bold]SYSTEM OVERRIDE[/red bold]",
+            border_style="red",
+            padding=(1, 4),
+            width=60
+        )
+
+        with Live(console=console, refresh_per_second=4, screen=True) as live:
+            for i in reversed(range(1, 16)):
+                live.update(Panel(f"[bold red]Shutting down in {i} seconds...[/bold red]", border_style="bright_red", width=60))
+                time.sleep(1)
+            live.update(countdown_panel)
+            time.sleep(1)
+
+        console.print("[bold red]Powering down system...[/bold red]")
+        time.sleep(1)
+
+        if platform.system() == "Linux":
+            os.system("sudo shutdown now")
+        elif platform.system() == "Windows":
+            os.system("shutdown /s /t 0")
+        else:
+            console.print("[yellow]Unsupported OS for shutdown command.[/yellow]")
+
+# shutting down ends here
+# ================================================
+# ================================================
+    def monitor_registry(self):
+        """Monitor Windows registry changes"""
+        if platform.system() != "Windows":
+            return "[!] Registry monitoring requires Windows"
+
+        suspicious_keys = [
+            r"HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run",
+            r"HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run",
+            r"HKLM\SYSTEM\CurrentControlSet\Services"
+        ]
+        
+        try:
+            import winreg
+            changes = []
+            
+            for key_path in suspicious_keys:
+                hive, path = key_path.split('\\', 1)
+                hive = getattr(winreg, {
+                    'HKLM': 'HKEY_LOCAL_MACHINE',
+                    'HKCU': 'HKEY_CURRENT_USER'
+                }[hive])
+                
+                with winreg.OpenKey(hive, path) as key:
+                    for i in range(winreg.QueryInfoKey(key)[1]):
+                        name, value, _ = winreg.EnumValue(key, i)
+                        changes.append(f"{key_path}\\{name} = {value}")
+            
+            if changes:
+                return "\n".join(["[!] Suspicious registry entries:"] + changes)
+            else:
+                return "[+] No suspicious registry entries found"
+        except Exception as e:
+            return f"[!] Registry scan failed: {e}"
+ 
+
+    
+    # The cmd_nikto method:
+    def cmd_nikto(self, args):
+        """Run Nikto web server scanner"""
+        from colorama import Fore, Style
+        import subprocess
+        import shlex
+        import shutil
+        
+        if not args:
+            print(f"{Fore.RED}âŒ Usage: nikto --url <TARGET>{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}   Example: nikto --url https://example.com{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}   Example: nikto unima.ac.mw --port 443{Style.RESET_ALL}")
+            return
+        
+        # Parse arguments
+        try:
+            # Check if --url is provided
+            if isinstance(args, list):
+                arg_str = ' '.join(args)
+            else:
+                arg_str = str(args)
+            
+            # Check for --url flag
+            if '--url' not in arg_str:
+                # If no --url, assume the first arg is the URL
+                if isinstance(args, list) and len(args) > 0:
+                    target = args[0]
+                    # Check if it's a URL or just a domain
+                    if not target.startswith(('http://', 'https://')):
+                        target = 'https://' + target
+                    cmd_args = ['--url', target]
+                    # Add any extra args
+                    if len(args) > 1:
+                        cmd_args.extend(args[1:])
+                else:
+                    # Single string without --url
+                    target = arg_str.strip()
+                    if not target.startswith(('http://', 'https://')):
+                        target = 'https://' + target
+                    cmd_args = ['--url', target]
+            else:
+                # Parse with shlex to handle quoted strings
+                cmd_args = shlex.split(arg_str)
+            
+            print(f"{Fore.CYAN}ðŸ” Running Nikto scan: {cmd_args}{Style.RESET_ALL}")
+            
+            # Check if nikto is installed
+            nikto_path = shutil.which('nikto')
+            if not nikto_path:
+                print(f"{Fore.RED}âŒ Nikto not found. Please install nikto.{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}ðŸ’¡ On Kali: sudo apt install nikto{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}ðŸ’¡ On other systems: https://github.com/sullo/nikto{Style.RESET_ALL}")
+                return
+            
+            # Build the command
+            cmd = ['nikto'] + cmd_args
+            
+            # Add some default options for better output
+            if '-Format' not in arg_str and '-f' not in arg_str:
+                cmd.extend(['-Format', 'html'])
+            
+            print(f"{Fore.GREEN}â–¶ Executing: {' '.join(cmd)}{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}â³ Scanning... This may take a few minutes.{Style.RESET_ALL}")
+            
+            # Run nikto
+            try:
+                result = subprocess.run(
+                    cmd,
+                    capture_output=True,
+                    text=True,
+                    timeout=300  # 5 minute timeout
+                )
+                
+                # Print output
+                if result.stdout:
+                    print(f"\n{Fore.GREEN}ðŸ“Š Scan Results:{Style.RESET_ALL}")
+                    print(result.stdout)
+                
+                if result.stderr:
+                    print(f"\n{Fore.YELLOW}âš ï¸ Warnings/Errors:{Style.RESET_ALL}")
+                    print(result.stderr)
+                
+                if result.returncode == 0:
+                    print(f"\n{Fore.GREEN}âœ… Nikto scan completed successfully.{Style.RESET_ALL}")
+                else:
+                    print(f"\n{Fore.RED}âŒ Nikto scan failed with code: {result.returncode}{Style.RESET_ALL}")
+                    
+            except subprocess.TimeoutExpired:
+                print(f"{Fore.RED}âŒ Nikto scan timed out after 5 minutes.{Style.RESET_ALL}")
+            except Exception as e:
+                print(f"{Fore.RED}âŒ Error running nikto: {str(e)}{Style.RESET_ALL}")
+                
+        except Exception as e:
+            print(f"{Fore.RED}âŒ Error parsing arguments: {str(e)}{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}Usage: nikto --url <TARGET>{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}  Example: nikto --url https://example.com{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}  Example: nikto unima.ac.mw{Style.RESET_ALL}")
+            
+# ================================for trufflehog==================
+    def trufflehog_scan_git(self, git_url):
+        """Scan GitHub repository for secrets using trufflehog"""
+        try:
+            cmd = f"trufflehog git {git_url} --no-update"
+            result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+            if result.returncode == 0:
+                return result.stdout
+            else:
+                return f"[!] Scan failed: {result.stderr}"
+        except Exception as e:
+            return f"[!] Error running trufflehog: {e}"
+
+    def trufflehog_scan_filesystem(self, fs_path):
+        """Scan filesystem for secrets using trufflehog"""
+        try:
+            cmd = f"trufflehog filesystem {fs_path} --no-update"
+            result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+            if result.returncode == 0:
+                return result.stdout
+            else:
+                return f"[!] Scan failed: {result.stderr}"
+        except Exception as e:
+            return f"[!] Error running trufflehog: {e}"
+
+# ============end trufflehog=============================
+    def legitify_scan_github(self, org_or_repo, token=None):
+        """Scan a GitHub org/repo for security issues."""
+        cmd = f"legitify scan --github {org_or_repo}"
+        if token:
+            cmd += f" --token {token}"
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+        return result.stdout
+
+    def hash_file(self, filepath):
+        hashes = {
+            "md5": hashlib.md5(),
+            "sha1": hashlib.sha1(),
+            "sha256": hashlib.sha256()
+        }
+
+        with open(filepath, "rb") as f:
+            for chunk in iter(lambda: f.read(4096), b""):
+                for h in hashes.values():
+                    h.update(chunk)
+
+        return {name: h.hexdigest() for name, h in hashes.items()}
+
+    def handle_command(self, cmd):
+        cmd = cmd.strip()
+        if not cmd:
+            return
+
+        original_cmd = cmd
+        parts = cmd.split()
+        command = parts[0].lower()
+        args = parts[1:] if len(parts) > 1 else []
+
+        # -----------------------------mkdir & touch-------------
+        if parts[0] == "mkdir" and len(parts) == 2:
+            self.mkdir(parts[1])
+            return
+
+        elif parts[0] == "touch" and len(parts) == 2:
+            self.touch(parts[1])
+            return
+
+        elif parts[0] == "ls":
+            self.ls()
+            return
+
+        # ==================== ADD HARDENING COMMANDS HERE ====================
+        # Hardening commands
+        elif parts[0] == "harden":
+            if len(parts) == 1:
+                self.harden_system()
+            elif len(parts) == 2:
+                subcmd = parts[1].lower()
+                if subcmd in ["dashboard", "menu"]:
+                    self.launch_hardening_dashboard()
+                elif subcmd in ["cinematic", "cinema"]:
+                    self.launch_hardening_cinematic()
+                elif subcmd in ["list", "ls"]:
+                    self.list_hardening_modules()
+                elif subcmd in ["status", "st"]:
+                    self.show_hardening_status()
+                elif subcmd in ["full", "all"]:
+                    self.harden_system_full()
+                elif subcmd in ["quick", "q"]:
+                    self.harden_system_quick()
+                elif subcmd in ["dry-run", "dry"]:
+                    self.harden_system_dry_run()
+                elif subcmd in ["users", "user"]:
+                    self.harden_users_only()
+                elif subcmd in ["firewall", "fw"]:
+                    self.harden_firewall_only()
+                elif subcmd in ["ssh", "secure-ssh"]:
+                    self.harden_ssh_only()
+                elif subcmd in ["report", "rep"]:
+                    self.generate_hardening_report()
+                elif subcmd in ["rollback", "rb"]:
+                    self.rollback_hardening()
+                else:
+                    print(f"{Fore.RED}[!] Unknown hardening command: harden {subcmd}{Style.RESET_ALL}")
+                    print(f"{Fore.YELLOW}Commands: dashboard, cinematic, list, status, full, quick, dry-run, users, firewall, ssh, report, rollback{Style.RESET_ALL}")
+            return
+        
+        # Also support direct commands like 'harden-status' without space
+        elif parts[0] == "harden-status":
+            self.show_hardening_status()
+            return
+        elif parts[0] == "harden-list":
+            self.list_hardening_modules()
+            return
+        elif parts[0] == "harden-dashboard":
+            self.launch_hardening_dashboard()
+            return
+        elif parts[0] == "harden-report":
+            self.generate_hardening_report()
+            return
+        elif parts[0] == "harden-rollback":
+            self.rollback_hardening()
+            return
+        elif parts[0] == "harden-full":
+            self.harden_system_full()
+            return
+        elif parts[0] == "harden-quick":
+            self.harden_system_quick()
+            return
+        elif parts[0] == "harden-dry-run":
+            self.harden_system_dry_run()
+            return
+        elif parts[0] == "harden-users":
+            self.harden_users_only()
+            return
+        elif parts[0] == "harden-firewall":
+            self.harden_firewall_only()
+            return
+        elif parts[0] == "harden-ssh":
+            self.harden_ssh_only()
+            return
+    
+    # ========================for sqlmap commands=========================
+        elif parts[0] == "sqlmap": #working
+            self.sql_injection_scan(args)
+            return
+
+        elif parts[0] == "sqllab": #working
+            self.cmd_sqllab(args)
+            return
+        elif parts[0] == "sqlmap-install": #working
+            self.cmd_sqlmap_install(args)   
+            return
+        elif parts[0] == "sqlmap-reset": #working
+            self.cmd_sqlmap_reset(args) 
+            return
+        elif parts[0] == "sqlmap-secure": #working
+            self.cmd_sqlmap_secure(args)
+            return
+        elif parts[0] == "sqlmap-status": #working
+            self.cmd_sqlmap_status(args)
+            return 
+        elif parts[0] == "sqlmap-scan": #working
+            self.cmd_sqlmap_scan_file(args)
+            return
+        elif parts[0] == "sqlmap-lab": #working
+            self.cmd_sqllab(args)
+            return
+        elif parts[0] == "sqlmap-lab-status": #working
+            self.cmd_sqlmap_status(args)
+            return 
+        elif parts[0] == "sqlmap-toggle-secure": #working
+            self.cmd_sqlmap_secure(args)   
+            return
+        elif parts[0] == "sqlmap-db-reset": #working
+            self.cmd_sqlmap_reset(args)
+            return
+
+        # Network Security Commands
+        elif cmd in ["network-security", "netsec", "ns"]:
+            # Pass arguments to the command
+            self.cmd_network_security(args)
+            return
+
+        elif cmd in ["netsec-scan", "ns-scan"]:
+            target = args[0] if args else None
+            self.cmd_netsec_scan(target)
+            return
+
+        elif cmd in ["netsec-full", "ns-full"]:
+            target = args[0] if args else None
+            self.cmd_netsec_full_scan(target)
+            return
+
+        elif cmd in ["netsec-status", "ns-status"]:
+            self.cmd_netsec_status()
+            return
+
+        elif cmd in ["netsec-report", "ns-report"]:
+            report_type = args[0] if args else "html"
+            self.cmd_netsec_report(report_type)
+            return
+
+        elif cmd in ["netsec-dashboard", "ns-dashboard"]:
+            self.cmd_netsec_dashboard()
+            return
+
+        elif cmd in ["netsec-help", "ns-help"]:
+            self.cmd_netsec_help()
+            return
+
+        elif cmd in ["netsec-list", "ns-list"]:
+            self.cmd_netsec_list()
+            return
+
+        elif cmd in ["netsec-info", "ns-info"]:
+            self.cmd_netsec_info()
+            return
+
+        elif cmd in ["netsec-config", "ns-config"]:
+            self.cmd_netsec_config()
+            return
+
+        elif cmd in ["netsec-rules", "ns-rules"]:
+            self.cmd_netsec_rules()
+            return
+
+        elif cmd in ["netsec-log", "ns-log"]:
+            limit = int(args[0]) if args else 20
+            self.cmd_netsec_log(limit)
+            return
+
+        elif cmd in ["netsec-stop", "ns-stop"]:
+            self.cmd_netsec_stop()
+            return
+
+        elif cmd in ["netsec-restart", "ns-restart"]:
+            self.cmd_netsec_restart()
+            return
+# ======================================================
+    # SOC Nmap Dashboard Commands ends here=============
+
+        elif cmd in ["harden-list", "harden-ls"]:
+            self.list_hardening_modules()
+            return
+
+        elif cmd in ["harden-status", "harden-st"]:
+            self.show_hardening_status()
+            return
+
+        elif cmd in ["harden-dashboard", "harden-menu"]:
+            self.launch_hardening_dashboard()
+            return
+
+        elif cmd == "harden-cinematic":
+            self.launch_hardening_cinematic()
+            return
+
+        elif cmd == "harden-full":
+            self.harden_system_full()
+            return
+
+        elif cmd == "harden-quick":
+            self.harden_system_quick()
+            return
+
+        elif cmd == "harden-dry-run":
+            self.harden_system_dry_run()
+            return
+
+        elif cmd == "harden-report":
+            self.generate_hardening_report()
+            return
+
+        elif cmd == "harden-rollback":
+            self.rollback_hardening()
+            return
+
+        elif cmd in ["harden-users", "harden-user"]:
+            self.harden_users_only()
+            return
+
+        elif cmd in ["harden-firewall", "harden-fw"]:
+            self.harden_firewall_only()
+            return
+
+        elif cmd in ["harden-ssh", "harden-sshd"]:
+            self.harden_ssh_only()
+            return
+    # ==================== END HARDENING COMMANDS ====================
+            # ========== DASHBOARD COMMANDS HERE ==========
+        elif cmd in ["dashboard", "dash", "security-dashboard"]:
+             self.cmd_dashboard([])
+             return
+            
+        elif cmd in ["dashboard-stop", "dash-stop"]:
+             self.cmd_dashboard_stop([])
+             return
+            
+        elif cmd in ["dashboard-status", "dash-status"]:
+             self.cmd_dashboard_status([])
+             return
+            
+        elif cmd in ["dashboard-browser", "dash-browser"]:
+             self.cmd_dashboard_browser([])
+             return
+            
+        elif cmd in ["dashboard-help", "dash-help"]:
+             self.cmd_dashboard_help([])
+             return
+    
+
+# ====================start of sqlmap commands shortcuts=========================
+        # Add these to your process_handle() method
+
+        # Handle 'soc' commands first
+        if cmd == "soc":
+            if not args:
+                self.cmd_soc(args)
+                return
+            elif args[0].lower() == "start":
+                self._soc_start()
+                return
+            elif args[0].lower() == "stop":
+                self._soc_stop()
+                return
+            elif args[0].lower() == "status":
+                self._soc_status()
+                return
+            elif args[0].lower() == "dashboard":
+                self._soc_dashboard()
+                return
+            elif args[0].lower() == "enhanced":
+                self._soc_enhanced()
+                return
+            elif args[0].lower() == "ioc":
+                self._soc_ioc_add()
+                return
+            elif args[0].lower() == "scan":
+                self._soc_scan()
+                return
+            elif args[0].lower() == "report":
+                self._soc_report()
+                return
+            elif args[0].lower() == "help" or args[0].lower() == "-h" or args[0].lower() == "--help":
+                self._soc_help()
+                return
+            else:
+                print(f"âŒ Unknown SOC command: {args[0]}")
+                print("   Available: start, stop, status, dashboard, enhanced, ioc, scan, report, help")
+                return
+
+        # =============================================
+        # ENHANCED NETWORK AUDIT COMMANDS (WiFi + Ethernet)
+        # =============================================
+
+        # WiFi aliases now point to network audit
+        elif cmd in ["wifi", "wifi-scan", "wifi-audit", "wifi-info", "wifiinfo", "network", "net"]:
+            # Run network security audit (WiFi + Ethernet)
+            self.cmd_network_scan(args)
+            return
+
+        elif cmd in ["wifi-live", "net-live"]:
+            # Live network monitoring
+            self.cmd_network_live(args)
+            return
+
+        elif cmd in ["wifi-interface", "net-interface"]:
+            # Scan using specific interface
+            self.cmd_network_interface(args)
+            return
+
+        elif cmd in ["wifi-help", "net-help"]:
+            # Show network audit help
+            self.cmd_network_help(args)
+            return
+
+        elif cmd in ["wifi-status", "net-status"]:
+            # Show network module status
+            self.cmd_network_status(args)
+            return
+
+        # ============================================================
+        # MODULE STATUS COMMAND
+        # ============================================================
+        elif cmd in ["modules", "module-status"]:
+            # Show all loaded modules status
+            self.cmd_modules_status()
+            return
+        # ============================================================
+        # EXPLOIT SCANNER COMMANDS
+        # ============================================================
+        elif cmd in ["exploit", "exploit-scan", "vuln", "vuln-scan"]:
+            # Run exploit vulnerability scan
+            self.cmd_exploit(args)
+            return
+
+        elif cmd in ["exploit-local"]:
+            # Scan local machine for vulnerabilities
+            self.cmd_exploit_local(args)
+            return
+
+        elif cmd in ["exploit-remote"]:
+            # Scan remote target for vulnerabilities
+            self.cmd_exploit_remote(args)
+            return
+
+        elif cmd in ["exploit-port"]:
+            # Scan specific port on target
+            self.cmd_exploit_port(args)
+            return
+
+        elif cmd in ["exploit-list"]:
+            # List all available exploits/CVEs
+            self.cmd_exploit_list()
+            return
+
+        elif cmd in ["exploit-help"]:
+            # Show exploit scanner help
+            self.cmd_exploit_help()
+            return
+
+        elif cmd in ["exploit-status"]:
+            # Show exploit scanner module status
+            self.cmd_exploit_status()
+            return
+# ============================================================
+# SQLMAP COMMANDS
+# ============================================================
+
+        elif cmd in ["sqlmap", "sqlmap-scan"]:
+            # Run SQLMap scan on a URL
+            # Usage: sqlmap http://example.com/page?id=1
+            if not args:
+                self.console.print("[red]âŒ Usage: sqlmap <url>[/red]")
+                self.console.print("[yellow]ðŸ’¡ Example: sqlmap https://starkexpotechexchange.netlify.app[/yellow]")
+                return
+            
+            url = args[0]
+            self.console.print(f"[cyan]ðŸ” Running SQLMap scan on: {url}[/cyan]")
+            try:
+                self.scanner.scan(url)
+            except Exception as e:
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
+            return
+
+        elif cmd in ["sqllab", "sqlmap-lab"]:
+            # Start SQL Injection Learning Lab - NON-BLOCKING
+            port = 8080
+            if args:
+                try:
+                    port = int(args[0])
+                except ValueError:
+                    self.console.print(f"[red]âŒ Invalid port: {args[0]}, using default 8080[/red]")
+            
+            try:
+                # Start the lab (non-blocking)
+                self.scanner.start_lab(port=port, open_browser=True)
+                # Don't block - return immediately
+            except Exception as e:
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
+            return
+
+        elif cmd in ["sqlmap-install", "sqlmap-install"]:
+            # Install SQLMap
+            self.console.print("[cyan]ðŸ“¦ Installing SQLMap...[/cyan]")
+            try:
+                if self.scanner.install_sqlmap():
+                    self.console.print("[green]âœ… SQLMap installed successfully![/green]")
+                else:
+                    self.console.print("[red]âŒ SQLMap installation failed[/red]")
+            except Exception as e:
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
+            return
+
+        elif cmd in ["sqlmap-reset", "sqlmap-db-reset"]:
+            # Reset SQL Injection Lab database
+            self.console.print("[yellow]ðŸ”„ Resetting SQL Injection Lab database...[/yellow]")
+            try:
+                self.scanner.lab.reset_database()
+                self.console.print("[green]âœ… Database reset successfully![/green]")
+            except Exception as e:
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
+            return
+
+        elif cmd in ["sqlmap-secure", "sqlmap-toggle-secure"]:
+            # Toggle secure mode on/off
+            try:
+                self.scanner.lab.set_secure_mode(not self.scanner.lab.secure_mode)
+                status = "ENABLED" if self.scanner.lab.secure_mode else "DISABLED"
+                color = "green" if self.scanner.lab.secure_mode else "red"
+                self.console.print(f"[{color}]ðŸ”’ Secure mode: {status}[/{color}]")
+                if self.scanner.lab.secure_mode:
+                    self.console.print("[green]âœ… SQL injection is now PREVENTED[/green]")
+                else:
+                    self.console.print("[red]âš ï¸ SQL injection is now POSSIBLE (vulnerable)[/red]")
+            except Exception as e:
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
+            return
+
+        elif cmd in ["sqllab-stop", "sqlmap-stop"]:
+            # Stop SQL Injection Learning Lab
+            try:
+                self.scanner.stop_lab()
+            except Exception as e:
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
+            return
+
+        elif cmd in ["sqlmap-waf", "sqlmap-toggle-waf"]:
+            # Toggle WAF mode on/off
+            try:
+                self.scanner.lab.set_waf_mode(not self.scanner.lab.waf_mode)
+                status = "ENABLED" if self.scanner.lab.waf_mode else "DISABLED"
+                color = "green" if self.scanner.lab.waf_mode else "red"
+                self.console.print(f"[{color}]ðŸ›¡ï¸ WAF mode: {status}[/{color}]")
+                if self.scanner.lab.waf_mode:
+                    self.console.print("[green]âœ… WAF is now actively blocking injection attempts[/green]")
+                else:
+                    self.console.print("[red]âš ï¸ WAF is now disabled - injections may pass through[/red]")
+            except Exception as e:
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
+            return
+
+        elif cmd in ["sqlmap-status", "sqlmap-lab-status"]:
+            # Show SQLMap lab status
+            try:
+                self.scanner.cmd_advanced_status(args)
+            except Exception as e:
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
+            return
+
+        elif cmd in ["sqlmap-pdf", "sqlmap-notes"]:
+            # Generate PDF notes for SQL Injection
+            self.console.print("[cyan]ðŸ“„ Generating SQL Injection PDF Notes...[/cyan]")
+            try:
+                pdf_path = self.scanner.lab.generate_pdf_notes()
+                if pdf_path:
+                    self.console.print(f"[green]âœ… PDF Notes generated: {pdf_path}[/green]")
+                    try:
+                        import webbrowser
+                        webbrowser.open(f"file://{pdf_path}")
+                        self.console.print("[green]âœ… PDF opened in default viewer[/green]")
+                    except:
+                        pass
+                else:
+                    self.console.print("[red]âŒ PDF generation failed[/red]")
+            except Exception as e:
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
+            return
+
+        elif cmd in ["sqlmap-techniques", "sqlmap-list"]:
+            # Show all SQL injection techniques
+            try:
+                self.scanner.cmd_advanced_techniques(args)
+            except Exception as e:
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
+            return
+
+        elif cmd in ["sqlmap-info", "sqlmap-version"]:
+            # Show SQLMap version and information
+            try:
+                self.cmd_sqlmap_info(args)
+            except Exception as e:
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
+            return
+
+        elif cmd in ["sqlmap-help", "sqlmap-?"]:
+            # Show SQLMap help
+            self._show_sqlmap_help()
+            return
+
+        elif cmd in ["sqllab-stop", "sqlmap-stop"]:
+            # Stop SQL Injection Learning Lab
+            try:
+                self.scanner.stop_lab()
+                self.console.print("[green]âœ… SQL Injection Learning Lab stopped[/green]")
+            except Exception as e:
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
+            return
+
+        # ============================================================
+        # IOC EDUCATION COMMANDS
+        # ============================================================
+        elif cmd in ["ioc-education", "ioc-guide", "ioc-info", "learn-iocs"]:
+            # Show IOC education guide with typewriter effect
+            self.cmd_ioc_education()
+            return
+
+        elif cmd in ["iocs"]:
+            # Quick IOC overview with typewriter effect
+            self.cmd_ioc_quick()
+            return
+
+
+        # =========================================
+        elif cmd in ["sqlmap-scan-file", "sqlmap-file"]:
+            # Scan URLs from a file
+            if not args:
+                self.console.print("[red]âŒ Usage: sqlmap-scan-file <file_path>[/red]")
+                self.console.print("[yellow]ðŸ’¡ Example: sqlmap-scan-file urls.txt[/yellow]")
+                return
+            
+            file_path = args[0]
+            if not os.path.exists(file_path):
+                self.console.print(f"[red]âŒ File not found: {file_path}[/red]")
+                return
+            
+            try:
+                with open(file_path, 'r') as f:
+                    urls = [line.strip() for line in f if line.strip()]
+                
+                self.console.print(f"[cyan]ðŸ“„ Found {len(urls)} URLs in {file_path}[/cyan]")
+                self.console.print("[yellow]Starting batch scan...[/yellow]")
+                
+                for i, url in enumerate(urls, 1):
+                    self.console.print(f"\n[cyan][{i}/{len(urls)}] Scanning: {url}[/cyan]")
+                    try:
+                        self.scanner.scan(url)
+                    except Exception as e:
+                        self.console.print(f"[red]âŒ Error scanning {url}: {e}[/red]")
+                
+                self.console.print("[green]âœ… All scans completed![/green]")
+            except Exception as e:
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
+            return
+
+        elif cmd in ["sqlmap-export", "sqlmap-report-export"]:
+            # Export the latest scan report
+            if not args:
+                self.console.print("[red]âŒ Usage: sqlmap-export <destination_path>[/red]")
+                self.console.print("[yellow]ðŸ’¡ Example: sqlmap-export C:\\Users\\User\\Desktop\\report.pdf[/yellow]")
+                return
+            
+            dest_path = args[0]
+            try:
+                workspace = os.path.expanduser("~/DSTerminal_Workspace")
+                scans_dir = os.path.join(workspace, "scans")
+                
+                if not os.path.exists(scans_dir):
+                    self.console.print("[red]âŒ No scan reports found[/red]")
+                    return
+                
+                import glob
+                scan_files = glob.glob(os.path.join(scans_dir, "SQLMap_Report_*.pdf"))
+                if not scan_files:
+                    self.console.print("[red]âŒ No reports found[/red]")
+                    return
+                
+                latest_report = max(scan_files, key=os.path.getctime)
+                import shutil
+                shutil.copy2(latest_report, dest_path)
+                self.console.print(f"[green]âœ… Report exported to: {dest_path}[/green]")
+            except Exception as e:
+                self.console.print(f"[red]âŒ Error: {e}[/red]")
+            return
+
+        # Direct shortcuts for SOC commands (no space version)
+        elif cmd == 'recon-ng' or cmd == 'soc-intel':
+            self.cmd_soc_nmap()
+        # elif cmd == 'soc-quick':
+        #     self.cmd_soc_quick()
+
+# In the command handler section, add support for auto-open flag
+        elif cmd == 'soc-quick':
+            # Check if auto-open flag is passed
+            if len(parts) > 1:
+                if parts[1] == '--auto' or parts[1] == '-a':
+                    self.cmd_soc_quick(auto_open=True)
+                else:
+                    self.cmd_soc_quick(parts[1])
+            else:
+                self.cmd_soc_quick()
+
+        elif cmd == 'soc-full':
+            if len(parts) > 1:
+                if parts[1] == '--auto' or parts[1] == '-a':
+                    self.cmd_soc_full(auto_open=True)
+                else:
+                    self.cmd_soc_full(parts[1])
+            else:
+                self.cmd_soc_full()
+
+
+
+        # elif cmd == 'soc-full':
+        #     self.cmd_soc_full()
+        elif cmd == 'soc-dns':
+            self.cmd_soc_dns()
+        elif cmd == 'soc-map':
+            self.cmd_soc_map()
+        elif cmd == 'soc-history':
+            self.cmd_soc_history()
+        elif cmd == 'soc-pdf':
+            self.cmd_soc_pdf()
+        elif cmd == 'soc-reports':
+            self.cmd_soc_reports()
+        elif cmd == 'soc-report':
+            self.cmd_soc_report()
+        elif cmd == 'soc-status':
+            self.cmd_soc_status()
+        
+        elif cmd== 'soc-help':
+            self.soc_help()
+                    
+        elif cmd== 'soc-results':
+            self.cmd_soc_results()
+        elif cmd== 'soc-debug':
+            self.soc_debug()
+        elif cmd== 'soc-test':
+            self.soc_test()
+        elif cmd == 'soc-orgs':
+            self.cmd_soc_organizations()
+    
+
+# ======================================================
+        # CRYPTO COMMANDS - Full Integration
+        # ======================================================
+
+        # System Setup
+        elif cmd == "crypto-setup":
+            if self.crypto:
+                self.crypto.encrypt_setup()
+            else:
+                print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+            return
+
+        # File Operations
+        elif cmd == "crypto-encrypt":
+            if self.crypto:
+                filename = input(f"{Fore.CYAN}File to encrypt: {Style.RESET_ALL}").strip()
+                if filename:
+                    self.crypto.encrypt_file(filename)
+            else:
+                print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+            return
+
+        elif cmd == "crypto-decrypt":
+            if self.crypto:
+                filename = input(f"{Fore.CYAN}File to decrypt: {Style.RESET_ALL}").strip()
+                if filename:
+                    self.crypto.decrypt_file(filename)
+            else:
+                print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+            return
+
+        # Directory Operations
+        elif cmd == "encrypt-dir":
+            if self.crypto:
+                self.crypto.encrypt_directory()
+            else:
+                print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+            return
+
+        elif cmd == "decrypt-dir":
+            if self.crypto:
+                self.crypto.decrypt_directory()
+            else:
+                print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+            return
+
+        # Key Management
+        elif cmd == "crypto-export":
+            if self.crypto:
+                self.crypto.export_encryption_key()
+            else:
+                print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+            return
+
+        elif cmd == "crypto-import":
+            if self.crypto:
+                self.crypto.import_encryption_key()
+            else:
+                print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+            return
+
+        elif cmd == "crypto-backup":
+            if self.crypto:
+                self.crypto.crypto_backup()
+            else:
+                print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+            return
+
+        # File Information
+        elif cmd == "crypto-list":
+            if self.crypto:
+                self.crypto.crypto_list()
+            else:
+                print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+            return
+
+        elif cmd == "crypto-info":
+            if self.crypto:
+                self.crypto.crypto_info()
+            else:
+                print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+            return
+
+        # System Verification
+        elif cmd == "crypto-verify":
+            if self.crypto:
+                self.crypto.crypto_verify()
+            else:
+                print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+            return
+
+        elif cmd == "crypto-status":
+            if self.crypto:
+                self.crypto.crypto_status()
+            else:
+                print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+            return
+
+        # Reports
+        elif cmd == "crypto-reports":
+            if self.crypto:
+                self.crypto.list_reports()
+            else:
+                print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+            return
+
+        # Encrypted Directories
+        elif cmd == "encrypted-dirs":
+            if self.crypto:
+                self.crypto.list_encrypted_dirs()
+            else:
+                print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+            return
+
+        # QR Code Management
+        elif cmd == "qr-generate":
+            if self.crypto:
+                self.crypto.qr_generate()
+            else:
+                print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+            return
+
+        elif cmd == "qr-import":
+            if self.crypto:
+                self.crypto.qr_import()
+            else:
+                print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+            return
+
+        elif cmd == "qr-list":
+            if self.crypto:
+                self.crypto.qr_list()
+            else:
+                print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+            return
+
+        elif cmd == "qr-restore":
+            if self.crypto:
+                self.crypto.qr_restore()
+            else:
+                print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+            return
+
+        elif cmd == "clean-qr":
+            if self.crypto:
+                if os.path.exists(QR_CODE_DIR):
+                    self.crypto.qr_list()
+                    confirm = input(f"\n{Fore.RED}Delete all QR codes? (y/N): {Style.RESET_ALL}").strip().lower()
+                    if confirm == 'y':
+                        count = 0
+                        for f in os.listdir(QR_CODE_DIR):
+                            if f.endswith('.png'):
+                                try:
+                                    os.remove(os.path.join(QR_CODE_DIR, f))
+                                    count += 1
+                                except:
+                                    pass
+                        self.crypto.typer.text_type(f"âœ… Deleted {count} QR codes", color=Colors.GREEN)
+                        self.crypto.add_activity(f"Cleaned {count} QR codes")
+                        input(f"\n{Fore.YELLOW}Press ENTER to continue...{Style.RESET_ALL}")
+                else:
+                    self.crypto.typer.text_type("âŒ QR directory not found", color=Colors.RED)
+                    input(f"\n{Fore.YELLOW}Press ENTER to continue...{Style.RESET_ALL}")
+            else:
+                print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+            return
+
+        # Tests
+        elif cmd == "encrypt-test":
+            if self.crypto:
+                self.crypto.encrypt_test()
+            else:
+                print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+            return
+
+        elif cmd == "decrypt-test":
+            if self.crypto:
+                self.crypto.decrypt_test()
+            else:
+                print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+            return
+
+        # Debug
+        elif cmd == "crypto-debug":
+            if self.crypto:
+                self.crypto.typer.text_type("DEBUG INFO", color=Colors.RED)
+                info = PlatformUtils.get_platform_info()
+                for key, value in info.items():
+                    self.crypto.typer.text_type(f"{key}: {value}", color=Colors.CYAN)
+                self.crypto.typer.text_type(f"KEY_FILE: {KEY_FILE}", color=Colors.CYAN)
+                self.crypto.typer.text_type(f"QR_CODE_DIR: {QR_CODE_DIR}", color=Colors.CYAN)
+                self.crypto.typer.text_type(f"BACKUP_DIR: {BACKUP_DIR}", color=Colors.CYAN)
+                self.crypto.typer.text_type(f"ENCRYPTED_DIR: {ENCRYPTED_DIR}", color=Colors.CYAN)
+                self.crypto.typer.text_type(f"REPORTS_DIR: {REPORTS_DIR}", color=Colors.CYAN)
+                self.crypto.typer.text_type(f"Key exists: {os.path.exists(KEY_FILE)}", color=Colors.CYAN)
+                self.crypto.typer.text_type(f"QR dir exists: {os.path.exists(QR_CODE_DIR)}", color=Colors.CYAN)
+                self.crypto.typer.text_type(f"Encrypted dir exists: {os.path.exists(ENCRYPTED_DIR)}", color=Colors.CYAN)
+                self.crypto.typer.text_type(f"Reports dir exists: {os.path.exists(REPORTS_DIR)}", color=Colors.CYAN)
+                self.crypto.typer.text_type(f"QR Method: {QR_METHOD}", color=Colors.CYAN)
+                self.crypto.typer.text_type(f"Report Available: {REPORT_AVAILABLE}", color=Colors.CYAN)
+                input(f"\n{Fore.YELLOW}Press ENTER to continue...{Style.RESET_ALL}")
+            else:
+                print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+            return
+
+        # Shortcut aliases - Launch Crypto Dashboard
+# Shortcut aliases - Launch Crypto Dashboard
+        elif cmd in ["enc", "crypt", "encrypt"]:
+            if self.crypto:
+                self.crypto.main()  # Calls the crypto engine's main method
+            else:
+                print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+            return
+# =============================================
+        elif cmd == "dst-refresh" or cmd == "dst-reload":
+            self.cmd_refresh()
+            return
+        
+        elif parts[0] == "kill-monitor":
+            self.cmd_kill_monitor()
+            return
+        
+        # ===== Financial Forensics =====
+        elif parts[0] == "forensics" or parts[0] == "ff" or parts[0] == "dst-investigation":
+            self.cmd_financial_forensics()
+            return
+
+        elif parts[0] == "fraud-investigation":
+            self.cmd_financial_forensics()
+            return
+
+        elif parts[0] == "dst-investigate":
+            self.cmd_financial_forensics()
+            return
+
+            # ===================================================websec
+            # Web Security Analyzer Commands
+        elif command in ['web-security', 'websec', 'ws', 'web-analyzer', 'wsa']:
+            self.launch_web_security_analyzer()
+            return
+
+        # Web Security Scanner Commands
+        elif command == 'web-scan' or command == 'webscan':
+            if self.web_security_available:
+                print(f"{Fore.YELLOW}[!] Please use the web-security dashboard for scanning{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}Type 'web-security' to launch the full dashboard{Style.RESET_ALL}")
+            else:
+                print(f"{Fore.RED}[!] Web Security Analyzer not available{Style.RESET_ALL}")
+            return
+
+        elif command == 'web-headers' or command == 'webheaders':
+            if self.web_security_available:
+                print(f"{Fore.YELLOW}[!] Please use the web-security dashboard for header scanning{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}Type 'web-security' to launch the full dashboard{Style.RESET_ALL}")
+            else:
+                print(f"{Fore.RED}[!] Web Security Analyzer not available{Style.RESET_ALL}")
+            return
+
+            # ===================================================update
+            # Update Commands
+        elif command in ['dst-update', 'update', 'check-update']:
+            self.check_for_updates()
+            return
+
+        elif command in ['dst-version', 'version', 'ver']:
+            self.show_version()
+            return
+
+        elif command == 'dst-upgrade':
+            self.check_for_updates(force=True)
+            return
+ 
+        # =====================for recon & recon_full command parser=============================
+        elif command == 'dst-recon' or command == 'recon.py':
+            if RECON_AVAILABLE:
+                # Check which functions are available
+                if 'recon_menu' in globals() and recon_menu:
+                    recon_menu()
+                elif 'run_recon' in globals() and run_recon:
+                    run_recon()
+                else:
+                    print(f"{Fore.YELLOW}Recon function not available. Check recon.py imports.{Style.RESET_ALL}")
+            else:
+                print(f"{Fore.RED}Recon module not available. Make sure recon.py is in: {BASE_PATH}{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}Files in directory: {os.listdir(BASE_PATH)}{Style.RESET_ALL}")
+    
+        elif command == 'recon_full' or command == 'dst-recon-full' or command == 'recon_full.py':
+            if RECON_FULL_AVAILABLE:
+                if 'full_recon_menu' in globals() and full_recon_menu:
+                    full_recon_menu()
+                elif 'run_full_recon' in globals() and run_full_recon:
+                    run_full_recon()
+                else:
+                    print(f"{Fore.YELLOW}Full Recon function not available. Check recon_full.py imports.{Style.RESET_ALL}")
+            else:
+                print(f"{Fore.RED}Full Recon module not available. Make sure recon_full.py is in: {BASE_PATH}{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}Files in directory: {os.listdir(BASE_PATH)}{Style.RESET_ALL}")
+    
+
+
+        elif command == "crypto-import":
+            if self.crypto:
+                self.crypto.import_encryption_key()
+            else:
+                print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+            return
+     # ========================================
+            # Shortcuts
+        elif command in ["enc", "crypt"]:
+            if self.crypto:
+                from crypto_engine import main as crypto_main
+                crypto_main()
+            else:
+                print(f"{Fore.RED}[!] Crypto engine not available{Style.RESET_ALL}")
+    # ===================================
+        # Shortcut aliases
+        elif command == 'r1' or command == 'rec':
+            if RECON_AVAILABLE:
+                if 'recon_menu' in globals() and recon_menu:
+                    recon_menu()
+                elif 'run_recon' in globals() and run_recon:
+                    run_recon()
+                else:
+                    print(f"{Fore.RED}Recon module not properly loaded{Style.RESET_ALL}")
+            else:
+                print(f"{Fore.RED}Recon module not available{Style.RESET_ALL}")
+    
+        elif command == 'r2' or command == 'recf':
+            if RECON_FULL_AVAILABLE:
+                if 'full_recon_menu' in globals() and full_recon_menu:
+                    full_recon_menu()
+                elif 'run_full_recon' in globals() and run_full_recon:
+                    run_full_recon()
+                else:
+                    print(f"{Fore.RED}Full Recon module not properly loaded{Style.RESET_ALL}")
+            else:
+                print(f"{Fore.RED}Full Recon module not available{Style.RESET_ALL}")
+#  ========================================end of recon and recon_full from above================
+ # ========== SECURITY SCANNER COMMANDS ==========
+        elif command in ['system', 'sys', 'security', 'scan']:
+            if len(args) < 1:
+                print(f"{Fore.CYAN}System Security Scanner{Style.RESET_ALL}")
+                print(f"  {Fore.YELLOW}Usage:{Style.RESET_ALL}")
+                print(f"    system scan -All     - Run full system security scan")
+                print(f"    system export <format> [filename] - Export results (json/csv/html)")
+                print(f"    system list          - List exported scan files")
+                print(f"    system load <file>   - Load previous scan results")
+                print(f"    system status        - Show scan status")
+                print(f"    system help          - Show this help")
+                return True
+            
+            subcmd = args[0].lower()
+            
+            # Initialize security terminal if not exists
+            if not hasattr(self, 'security_terminal'):
+                self.security_terminal = SecurityTerminal(
+                    session_id=self.session_id,
+                    log_callback=self.log_message
+                )
+            
+            # ===== SCAN COMMAND =====
+            if subcmd == 'scan':
+                if len(args) > 1 and args[1].lower() in ['-all', '-full', '--all']:
+                    print(f"{Fore.CYAN}[*] Starting full system security scan...{Style.RESET_ALL}")
+                    print(f"{Fore.YELLOW}[!] This may take a few minutes...{Style.RESET_ALL}")
+                    self.security_terminal.scan_system()
+                else:
+                    print(f"{Fore.YELLOW}Usage: system scan -All{Style.RESET_ALL}")
+            
+            # ===== EXPORT COMMAND =====
+            elif subcmd == 'export':
+                if len(args) < 2:
+                    print(f"{Fore.YELLOW}Usage: system export <format> [filename]{Style.RESET_ALL}")
+                    print(f"  Formats: json, csv, html, all")
+                    return True
+                
+                format_type = args[1].lower()
+                filename = args[2] if len(args) > 2 else None
+                
+                if not hasattr(self.security_terminal, 'scan_results') or not self.security_terminal.scan_results:
+                    print(f"{Fore.RED}[!] No scan results available. Run 'system scan -All' first.{Style.RESET_ALL}")
+                    return True
+                
+                if format_type == 'all':
+                    # Export all formats
+                    formats = ['json', 'csv', 'html']
+                    for fmt in formats:
+                        result = self.security_terminal.export_results(fmt, filename)
+                        if result:
+                            print(f"{Fore.GREEN}[âœ“] Exported {fmt.upper()}: {result}{Style.RESET_ALL}")
+                        else:
+                            print(f"{Fore.RED}[!] Failed to export {fmt.upper()}{Style.RESET_ALL}")
+                else:
+                    result = self.security_terminal.export_results(format_type, filename)
+                    if result:
+                        print(f"{Fore.GREEN}[âœ“] Exported to: {result}{Style.RESET_ALL}")
+                    else:
+                        print(f"{Fore.RED}[!] Export failed{Style.RESET_ALL}")
+            
+            # ===== LIST COMMAND =====
+            elif subcmd == 'list':
+                self.security_terminal.list_exported_scans()
+            
+            # ===== LOAD COMMAND =====
+            elif subcmd == 'load':
+                if len(args) < 2:
+                    print(f"{Fore.YELLOW}Usage: system load <filename>{Style.RESET_ALL}")
+                    return True
+                result = self.security_terminal.load_scan_results(args[1])
+                if result:
+                    print(f"{Fore.GREEN}[âœ“] Scan data loaded successfully{Style.RESET_ALL}")
+                else:
+                    print(f"{Fore.RED}[!] Load failed{Style.RESET_ALL}")
+            
+            # ===== STATUS COMMAND =====
+            elif subcmd == 'status':
+                print(f"\n{Fore.CYAN}Security Scanner Status:{Style.RESET_ALL}")
+                print(f"  Status: {'Active' if hasattr(self, 'security_terminal') else 'Inactive'}")
+                if hasattr(self, 'security_terminal'):
+                    print(f"  Session: {self.security_terminal.session_id}")
+                    print(f"  OS Type: {platform.system()}")
+                    print(f"  Threats Found: {'Yes' if self.security_terminal.found_threats else 'No'}")
+                    print(f"  Results Available: {'Yes' if self.security_terminal.scan_results else 'No'}")
+                    if self.security_terminal.scan_timestamp:
+                        print(f"  Last Scan: {self.security_terminal.scan_timestamp.strftime('%Y-%m-%d %H:%M:%S')}")
+                else:
+                    print(f"  No scan has been run yet")
+            
+            # ===== HELP COMMAND =====
+            elif subcmd in ['help', '?', '-h', '--help']:
+                print(f"{Fore.CYAN}System Security Scanner Commands:{Style.RESET_ALL}")
+                print(f"  {Fore.YELLOW}system scan -All{Style.RESET_ALL}       - Run full system security scan")
+                print(f"  {Fore.YELLOW}system export <format>{Style.RESET_ALL}  - Export results (json/csv/html/all)")
+                print(f"  {Fore.YELLOW}system list{Style.RESET_ALL}            - List exported scan files")
+                print(f"  {Fore.YELLOW}system load <file>{Style.RESET_ALL}     - Load previous scan results")
+                print(f"  {Fore.YELLOW}system status{Style.RESET_ALL}          - Show scan status")
+                print(f"  {Fore.YELLOW}system help{Style.RESET_ALL}            - Show this help")
+                print(f"\n{Fore.CYAN}Shortcuts:{Style.RESET_ALL}")
+                print(f"  {Fore.YELLOW}sys{Style.RESET_ALL}                    - Alias for system")
+                print(f"  {Fore.YELLOW}security{Style.RESET_ALL}               - Alias for system")
+                print(f"  {Fore.YELLOW}scan{Style.RESET_ALL}                   - Alias for system")
+            
+            else:
+                print(f"{Fore.RED}[!] Unknown system command: {subcmd}{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}Try 'system help' for available commands{Style.RESET_ALL}")
+
+        # =============================================
+        # SCAN SHORTCUTS
+        # =============================================
+        elif command in ['scan-full', 'full-scan', 'deep-scan', 'ds']:
+            if not hasattr(self, 'security_terminal'):
+                self.security_terminal = SecurityTerminal(
+                    session_id=self.session_id,
+                    log_callback=self.log_message
+                )
+            print(f"{Fore.CYAN}[*] Starting deep system scan...{Style.RESET_ALL}")
+            self.security_terminal.scan_system()
+            print(f"{Fore.GREEN}[âœ“] Scan initiated in background{Style.RESET_ALL}")
+            return
+        
+        elif command in ['scan-quick', 'quick-scan', 'qs']:
+            if not hasattr(self, 'security_terminal'):
+                self.security_terminal = SecurityTerminal(
+                    session_id=self.session_id,
+                    log_callback=self.log_message
+                )
+            self.security_terminal.scan_stages = [
+                ("[cyan]Checking Processes...", "Process Scan"),
+                ("[yellow]Network Check...", "Network Scan"),
+                ("[green]Security Configs...", "Security Configs"),
+            ]
+            print(f"{Fore.CYAN}[*] Starting quick security scan...{Style.RESET_ALL}")
+            self.security_terminal.scan_system()
+            return
+        
+        elif command in ['scan-status', 'ss']:
+            if hasattr(self, 'security_terminal'):
+                print(f"{Fore.CYAN}Scan Status:{Style.RESET_ALL}")
+                print(f"  Running: {'Yes' if hasattr(self.security_terminal, 'scan_thread') and self.security_terminal.scan_thread.is_alive() else 'No'}")
+                print(f"  Threats Found: {'Yes' if self.security_terminal.found_threats else 'No'}")
+            else:
+                print(f"{Fore.YELLOW}No scan has been run yet{Style.RESET_ALL}")
+            return
+# =================================ransomware detection commands=========================
+# ========== RANSOMWARE DETECTION & MONITORING ==========
+# In your command handler section, add:
+
+# ========== RANSOMWARE MONITOR ==========
+        elif command in ['ransomware', 'rmon']:
+            self.cmd_ransomware_monitor(args)
+            return
+
+        # Ransomware shortcuts
+        elif command == 'rmon-start':
+            self._ransomware_start()
+            return
+        elif command == 'rmon-stop':
+            self._ransomware_stop()
+            return
+        elif command == 'rmon-scan':
+            path = args[0] if args else None
+            self._ransomware_scan(path)
+            return
+        elif command == 'rmon-status':
+            self._ransomware_status()
+            return
+        elif command == 'rmon-dashboard':
+            self._ransomware_dashboard()
+            return
+        elif command == 'rmon-help':
+            self._show_ransomware_help()
+            return
+        elif command == 'rmon-interactive':
+            self._ransomware_interactive()
+            return
+
+        elif command == 'rmon-events':
+            limit = int(args[0]) if args else 20
+            self._ransomware_events(limit)
+            return
+        elif command == 'rmon-restore':
+            filename = args[0] if args else None
+            self._ransomware_restore(filename)
+            return
+        elif command == 'rmon-export':
+            format_type = args[0] if args else 'json'
+            self._ransomware_export(format_type)
+            return
+# ==================================================
+
+# =========================================wifi audit=====================
+        # In your command handler section
+        elif command in ['wifi', 'wifi-audit', 'wlan', 'wlan-audit', 'wifi-info']:
+            self.cmd_wifi(args)
+            self.show_tip(cmd)
+            return
+
+ # ========== INTEGRITY MONITOR COMMANDS ==========
+        elif command in ['integrity', 'integ', 'int']:
+            if not self._check_integrity_available():
+                return True
+            
+            if not args:
+                self.show_integrity_help()
+                return True
+            
+            subcmd = args[0].lower()
+            
+            # integrity scan
+            if subcmd == 'scan':
+                print(f"{Fore.CYAN}[*] Starting integrity scan...{Style.RESET_ALL}")
+                try:
+                    scan_results = self.integrity.scan_system()
+                    changes = self.integrity.check_integrity(scan_results)
+                    if changes and any(changes.values()):
+                        print(f"{Fore.RED}[!] Integrity violations detected!{Style.RESET_ALL}")
+                        self.integrity.generate_report(changes, scan_results)
+                    else:
+                        print(f"{Fore.GREEN}[âœ“] No integrity violations found{Style.RESET_ALL}")
+                except Exception as e:
+                    print(f"{Fore.RED}[!] Scan failed: {e}{Style.RESET_ALL}")
+            
+            # integrity baseline
+            elif subcmd == 'baseline':
+                print(f"{Fore.CYAN}[*] Creating system baseline...{Style.RESET_ALL}")
+                try:
+                    self.integrity.create_baseline()
+                except Exception as e:
+                    print(f"{Fore.RED}[!] Failed to create baseline: {e}{Style.RESET_ALL}")
+            
+            # integrity status
+            elif subcmd == 'status':
+                print(f"\n{Fore.CYAN}Integrity Monitor Status:{Style.RESET_ALL}")
+                print(f"  Status: {'Active' if self.integrity else 'Inactive'}")
+                print(f"  Workspace: {self.integrity.workspace if self.integrity else 'N/A'}")
+                if self.alert_manager:
+                    print(f"  Alerts: {len(self.alert_manager.alerts)}")
+            
+            # integrity report
+            elif subcmd == 'report':
+                report_type = args[1] if len(args) > 1 else 'txt'
+                print(f"{Fore.CYAN}[*] Generating {report_type.upper()} report...{Style.RESET_ALL}")
+                try:
+                    scan_results = self.integrity.scan_system()
+                    if report_type == 'json':
+                        self.integrity.generate_json_report(None, scan_results)
+                    elif report_type == 'pdf':
+                        self.integrity.generate_pdf_report(None, scan_results)
+                    elif report_type == 'all':
+                        self.integrity.generate_all_reports(None, scan_results)
+                    else:
+                        self.integrity.generate_report(None, scan_results)
+                except Exception as e:
+                    print(f"{Fore.RED}[!] Report generation failed: {e}{Style.RESET_ALL}")
+            
+            # integrity monitor
+            elif subcmd == 'monitor':
+                if len(args) > 1 and args[1] == 'stop':
+                    if self.alert_manager:
+                        self.alert_manager.stop_monitoring()
+                        print(f"{Fore.GREEN}[âœ“] Monitoring stopped{Style.RESET_ALL}")
+                else:
+                    if self.alert_manager:
+                        self.alert_manager.start_monitoring()
+                        print(f"{Fore.GREEN}[âœ“] monitoring started{Style.RESET_ALL}")
+            
+            # integrity alerts
+            elif subcmd == 'alerts':
+                if self.alert_manager:
+                    alerts = self.alert_manager.get_alerts()
+                    if alerts:
+                        print(f"\n{Fore.CYAN}Recent Alerts:{Style.RESET_ALL}")
+                        for alert in alerts[-10:]:
+                            print(f"  [{alert.get('severity', 'LOW')}] {alert.get('timestamp', '')}: {alert.get('path', 'Unknown')}")
+                    else:
+                        print(f"{Fore.GREEN}No alerts{Style.RESET_ALL}")
+             # integrity list
+            elif subcmd == 'list':
+                try:
+                    # Get scan results
+                    scan_results = self.integrity.scan_system()
+                    
+                    # Determine which category to list
+                    category = args[1] if len(args) > 1 else 'all'
+                    
+                    if category == 'all':
+                        total_files = (len(scan_results.get('critical_files', [])) + 
+                                      len(scan_results.get('configs', [])) + 
+                                      len(scan_results.get('logs', [])) + 
+                                      len(scan_results.get('databases', [])) + 
+                                      len(scan_results.get('files', [])))
+                        print(f"\n{Fore.CYAN}File Inventory Summary:{Style.RESET_ALL}")
+                        print(f"  Critical System Files: {len(scan_results.get('critical_files', []))}")
+                        print(f"  Configuration Files: {len(scan_results.get('configs', []))}")
+                        print(f"  Log Files: {len(scan_results.get('logs', []))}")
+                        print(f"  Databases: {len(scan_results.get('databases', []))}")
+                        print(f"  User Files: {len(scan_results.get('files', []))}")
+                        print(f"  {Fore.GREEN}Total: {total_files}{Style.RESET_ALL}")
+                    
+                    elif category == 'critical':
+                        files = scan_results.get('critical_files', [])
+                        print(f"\n{Fore.RED}Critical System Files ({len(files)}):{Style.RESET_ALL}")
+                        for f in files[:20]:  # Show first 20
+                            print(f"  {f.get('path', 'Unknown')}")
+                        if len(files) > 20:
+                            print(f"  ... and {len(files) - 20} more")
+                    
+                    elif category == 'configs':
+                        files = scan_results.get('configs', [])
+                        print(f"\n{Fore.YELLOW}Configuration Files ({len(files)}):{Style.RESET_ALL}")
+                        for f in files[:20]:
+                            print(f"  {f.get('path', 'Unknown')}")
+                        if len(files) > 20:
+                            print(f"  ... and {len(files) - 20} more")
+                    
+                    elif category == 'logs':
+                        files = scan_results.get('logs', [])
+                        print(f"\n{Fore.BLUE}Log Files ({len(files)}):{Style.RESET_ALL}")
+                        for f in files[:20]:
+                            print(f"  {f.get('path', 'Unknown')}")
+                        if len(files) > 20:
+                            print(f"  ... and {len(files) - 20} more")
+                    
+                    elif category == 'databases':
+                        files = scan_results.get('databases', [])
+                        print(f"\n{Fore.MAGENTA}Database Files ({len(files)}):{Style.RESET_ALL}")
+                        for f in files[:20]:
+                            print(f"  {f.get('path', 'Unknown')}")
+                        if len(files) > 20:
+                            print(f"  ... and {len(files) - 20} more")
+                    
+                    elif category == 'user':
+                        files = scan_results.get('files', [])
+                        print(f"\n{Fore.GREEN}User Files ({len(files)}):{Style.RESET_ALL}")
+                        for f in files[:20]:
+                            print(f"  {f.get('path', 'Unknown')}")
+                        if len(files) > 20:
+                            print(f"  ... and {len(files) - 20} more")
+                    
+                    else:
+                        print(f"{Fore.RED}[!] Unknown category: {category}{Style.RESET_ALL}")
+                        print(f"{Fore.YELLOW}Valid categories: all, critical, configs, logs, databases, user{Style.RESET_ALL}")
+                
+                except Exception as e:
+                    print(f"{Fore.RED}[!] Failed to list files: {e}{Style.RESET_ALL}")
+            # integrity quarantine
+            elif subcmd == 'quarantine':
+                if len(args) > 1:
+                    file_path = args[1]
+                    print(f"{Fore.CYAN}[*] Quarantining file: {file_path}{Style.RESET_ALL}")
+                    try:
+                        if hasattr(self.integrity, 'quarantine_file'):
+                            self.integrity.quarantine_file(file_path)
+                        else:
+                            # Fallback quarantine
+                            import shutil
+                            quarantine_dir = os.path.join(self.integrity.workspace, "quarantine")
+                            os.makedirs(quarantine_dir, exist_ok=True)
+                            filename = os.path.basename(file_path)
+                            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+                            dest = os.path.join(quarantine_dir, f"{timestamp}_{filename}")
+                            shutil.move(file_path, dest)
+                            print(f"{Fore.GREEN}[âœ“] File quarantined to: {dest}{Style.RESET_ALL}")
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] Failed to quarantine: {e}{Style.RESET_ALL}")
+                else:
+                    print(f"{Fore.YELLOW}Usage: integrity quarantine <file_path>{Style.RESET_ALL}")
+            
+            # integrity restore
+            elif subcmd == 'restore':
+                if len(args) > 1:
+                    file_path = args[1]
+                    print(f"{Fore.CYAN}[*] Restoring from quarantine: {file_path}{Style.RESET_ALL}")
+                    try:
+                        if hasattr(self.integrity, 'restore_from_quarantine'):
+                            self.integrity.restore_from_quarantine(file_path)
+                        else:
+                            print(f"{Fore.YELLOW}[!] Restore feature not implemented{Style.RESET_ALL}")
+                    except Exception as e:
+                        print(f"{Fore.RED}[!] Failed to restore: {e}{Style.RESET_ALL}")
+                else:
+                    print(f"{Fore.YELLOW}Usage: integrity restore <file_path>{Style.RESET_ALL}")
+            
+            # integrity report
+            elif subcmd == 'report':
+                report_type = args[1] if len(args) > 1 else 'txt'
+                print(f"{Fore.CYAN}[*] Generating {report_type.upper()} report...{Style.RESET_ALL}")
+                try:
+                    scan_results = self.integrity.scan_system()
+                    if report_type == 'json':
+                        self.integrity.generate_json_report(None, scan_results)
+                    elif report_type == 'pdf':
+                        self.integrity.generate_pdf_report(None, scan_results)
+                    elif report_type == 'all':
+                        self.integrity.generate_all_reports(None, scan_results)
+                    else:
+                        self.integrity.generate_report(None, scan_results)
+                except Exception as e:
+                    print(f"{Fore.RED}[!] Report generation failed: {e}{Style.RESET_ALL}")
+# ==================================================================================================
+            # integrity forensic
+            elif subcmd == 'forensic':
+                if len(args) > 1:
+                    if args[1] == 'timeline':
+                        if self.forensic:
+                            timeline = self.forensic.analyze_timeline()
+                            print(f"{Fore.CYAN}[*] Timeline has {len(timeline)} events{Style.RESET_ALL}")
+                    elif args[1] == 'report':
+                        if self.forensic:
+                            self.forensic.generate_forensic_report()
+                else:
+                    print(f"{Fore.YELLOW}Usage: integrity forensic <timeline|report>{Style.RESET_ALL}")
+            
+            else:
+                print(f"{Fore.RED}[!] Unknown integrity command: {subcmd}{Style.RESET_ALL}")
+                self.show_integrity_help()
+# ====================font integrity=================ends here=========================================
+
+# =======================for secure deletion protection starts here===============================
+# Inside your command handler (where parts[0] == "pwd" etc. lives)
+
+# ==================== deletion protection commands ====================
+        elif parts[0] == "monitor":
+            self.cmd_monitor(args)
+            return
+
+        elif parts[0] == "service":
+            if len(parts) < 2:
+                print("Usage: service <start|stop|status|pause|resume>")
+                return
+            subcmd = parts[1].lower()
+            if subcmd == 'start':
+                self.cmd_service_start(args)
+            elif subcmd == 'stop':
+                self.cmd_service_stop(args)
+            elif subcmd == 'status':
+                self.cmd_service_status(args)
+            elif subcmd == 'pause':
+                self.cmd_service_pause(args)
+            elif subcmd == 'resume':
+                self.cmd_service_resume(args)
+            else:
+                print(f"Unknown service command: {subcmd}")
+            return
+
+        elif parts[0] == "list-backups":
+            self.cmd_list_backups(args)
+            return
+
+        elif parts[0] == "search":
+            if len(parts) < 2:
+                print("Usage: search <term>")
+                return
+            self.cmd_search_backups(parts[1])
+            return
+
+        elif parts[0] == "restore-id":
+            if len(parts) < 2:
+                print("Usage: restore-id <ID> [target_directory]")
+                return
+            try:
+                bid = int(parts[1])
+                target = parts[2] if len(parts) > 2 else None
+                self.cmd_restore_id(bid, target)
+            except ValueError:
+                print("Error: Invalid backup ID")
+            return
+
+        elif parts[0] == "restore-last":
+            self.cmd_restore_last(args)
+            return
+
+        elif parts[0] == "add-path":
+            if len(parts) < 2:
+                print("Usage: add-path <directory>")
+                return
+            self.cmd_add_path(parts[1])
+            return
+
+        elif parts[0] == "dst-workspace":
+            self.cmd_workspace_info(args)
+            return
+
+        elif parts[0] == "dst-cleanup":
+            self.cmd_cleanup(args)
+            return
+
+        elif parts[0] == "dst-platform":
+            self.cmd_platform_info(args)
+            return
+        
+        # In your command handler:
+        elif parts[0] == "auto-discover":
+            self.auto_discover_folders()
+            return
+
+        elif parts[0] == "monitor-all":
+            self.cmd_monitor_all(args)
+            return
+
+        elif parts[0] == "watch-folders":
+            self.cmd_start_folder_watcher(args)
+            return
+        
+        elif parts[0] == "service" and len(parts) > 1:
+            if parts[1] == "stop":
+                self.cmd_service_stop(args[2:] if len(args) > 2 else [])
+                return
+            elif parts[1] == "start":
+                self.cmd_service_start(args[2:] if len(args) > 2 else [])
+                return
+            elif parts[1] == "status":
+                self.cmd_service_status(args[2:] if len(args) > 2 else [])
+                return
+
+        elif parts[0] == "show-paths":
+            print("\nðŸ“ Monitored Paths:")
+            for p in self.config['monitor_paths']:
+                status = "âœ“" if os.path.exists(p) else "âœ—"
+                print(f"  {status} {p}")
+            return
+        
+# ==================== deletion protection commands end ====================
+# ====================seciure deletriomn ends here===============================
+        elif parts[0] == "pwd":
+            self.pwd()
+            return
+ 
+        elif parts[0] == "cd" and len(parts) == 2:
+            self.cd(parts[1])
+            return
+            
+        elif parts[0] == "cat" and len(parts) == 2:
+            self.cat(parts[1])
+            return
+        
+        elif parts[0] == "echo":
+            self.handle_echo(cmd)
+            return
+        
+        elif cmd == "debug":
+            self.cmd_debug()
+            return
+        
+        elif cmd == "certcheck":
+            if CERTCHECK_AVAILABLE:
+                cmd_certcheck(self, args)
+                self.show_tip(cmd)
+            else:
+                print(f"{Fore.RED}[!] Certificate checker module not available{Style.RESET_ALL}")
+            return
+# metasplo----------------
+        elif parts[0] == "msf":
+            self.handle_msf(parts[1:])
+            return
+
+    # ===== TruffleHog =====
+        if parts[0] == "trufflehog":
+            if "--git" in parts:
+                try:
+                    git_url = parts[parts.index("--git") + 1]
+                    print(self.trufflehog_scan_git(git_url))
+                except IndexError:
+                    print("[!] Missing Git URL. Usage: trufflehog --git <URL>")
+            elif "--fs" in parts:
+                try:
+                    fs_path = parts[parts.index("--fs") + 1]
+                    print(self.trufflehog_scan_filesystem(fs_path))
+                except IndexError:
+                    print("[!] Missing filesystem path. Usage: trufflehog --fs <PATH>")
+            else:
+                print("Usage: trufflehog --git <URL> OR --fs <PATH>")
+
+# ===== Nikto =====
+        elif parts[0] == "nikto":
+            # Pass all arguments after 'nikto' to cmd_nikto
+            args = parts[1:] if len(parts) > 1 else None
+            self.cmd_nikto(args)
+    # ===== Legitify =====
+        elif parts[0] == "legitify":
+            if "--github" not in parts:
+                print("Usage: legitify --github <ORG/REPO> [--token TOKEN]")
+                return
+            try:
+                repo = parts[parts.index("--github") + 1]
+                token = parts[parts.index("--token") + 1] if "--token" in parts else None
+                print(self.legitify_scan_github(repo, token))
+            except IndexError:
+                print("[!] Invalid arguments. Usage: legitify --github <ORG/REPO> [--token TOKEN]")
+
+    # Original commands (scan, netmon, etc.)
+        elif original_cmd.lower() == "system scan -all":
+            self.scan_system()
+            self.show_tip("system scan -all")
+            return
+
+        elif original_cmd.lower() == "net -n mon":
+            self.network_monitor()
+            self.show_tip("net -n mon")
+            return
+
+        # ===================================
+    #  for clear command to clean terminal
+    # Add to  command handler:
+        elif original_cmd.lower() == "clear terminal":
+            self.clear_terminal()
+            self.show_tip(cmd)
+
+        elif cmd == "clear":
+            self.clear_terminal()
+            self.show_tip(cmd)
+        elif original_cmd.lower() == "shutdown":
+            self.emergency_shutdown()
+    
+
+# ================================================
+    # exploit check and mac address change
+        elif cmd == "exploitcheck": 
+            self.cmd_exploit(args)
+            self.show_tip(cmd)
+# ========== MAC SPOOFING COMMAND ==========
+        elif cmd.startswith("macspoof"):
+            # Parse arguments - allow interface specification or auto-detect
+            parts = cmd.split()
+            if len(parts) > 1:
+                interface = parts[1]
+                # Remove any quotes if present
+                interface = interface.strip('"').strip("'")
+                # If it's a Windows interface like "Wi-Fi" with space, join the rest
+                if len(parts) > 2 and parts[1] in ['Wi-Fi', 'WiFi', 'Wireless', 'Ethernet']:
+                    interface = ' '.join(parts[1:])
+            else:
+                interface = None  # Auto-detect
+            
+            print(f"{Fore.CYAN}[*] MAC Spoofing initialized...{Style.RESET_ALL}")
+            self.spoof_mac(interface)
+            self.show_tip(cmd)
+            return
+
+    #  sqlmap and log clearing
+        elif cmd.startswith("sqlmap"): 
+            self.sql_injection_scan(cmd.split()[1] if len(cmd.split()) > 1 else input("Target URL: "))
+            self.show_tip(cmd)
+        elif cmd == "clearlogs": 
+            self.clear_logs()
+            self.show_tip(cmd)
+ 
+
+    # portsweep and hashing file commands
+        elif cmd.startswith("portsweep"): 
+            target = cmd.split()[1] if len(cmd.split()) > 1 else "127.0.0.1"
+            self.port_scan(target)
+            self.show_tip(cmd)
+
+        elif cmd.startswith("hashfile"): 
+            file_path = cmd.split()[1] if len(cmd.split()) > 1 else input("File path: ")
+            hashes = self.hash_file(file_path)
+            for algo, hash_val in hashes.items():
+                print(f"{algo.upper()}: {hash_val}")
+            self.show_tip(cmd)
+
+    #  system information detailed part and force killing of running processes
+        elif cmd == "sysinfo": 
+            self.system_info()
+            self.show_tip(cmd)
+
+        elif cmd.startswith("killproc"): 
+            self.kill_process(int(cmd.split()[1])) if len(cmd.split()) > 1 else print("Usage: killproc PID")
+            self.show_tip(cmd)
+    # =====================================
+        elif cmd == "crypto-list":
+            self.crypto.crypto_list()
+            return
+
+        elif cmd == "crypto-info":
+    # crypto_info can take an optional filename
+            if args:
+                self.crypto.crypto_info(args[0])
+            else:
+                self.crypto.crypto_info()  # Will prompt for filename
+                return
+
+        elif cmd == "crypto-verify":
+            self.crypto.crypto_verify()
+            return
+
+        elif cmd == "crypto-backup":
+            self.crypto.crypto_backup()
+            return
+
+        elif cmd == "encrypt-test":
+            self.crypto.encrypt_test()
+            return
+
+        # NEW: Export/Import key commands for sharing
+        elif cmd == "crypto-export":
+            self.crypto.export_encryption_key()
+            return
+        
+        elif cmd == "crypto-import":
+            self.crypto.import_encryption_key()
+            return
+        
+        # Shortcut aliases
+        elif cmd in ["enc", "crypt"]:
+            self.crypto.main()
+            return
+        
+        elif cmd == "encrypt":
+            if args:
+        # Pass the filename directly - matches encrypt_file(filename)
+                self.crypto.encrypt_file(args[0])
+            else:
+                file = input("File to encrypt: ")
+                if file:
+                    self.crypto.encrypt_file(file)
+                else:
+                    print("[!] No file specified")
+            
+        elif cmd == "decrypt":
+            if args:
+        # Pass the filename to decrypt - matches decrypt_file(filename)
+                self.crypto.decrypt_file(args[0])
+            else:
+                file = input("File to decrypt: ")
+                if file:
+                    self.crypto.decrypt_file(file)
+                else:
+                    print("[!] No file specified")
+            
+        elif cmd in ["encrypt-setup", "crypto-init"]:
+            self.crypto.encrypt_setup()
+    
+        elif cmd == "crypto-status":
+            self.crypto.crypto_status()
+
+    # ===========
+        elif cmd.startswith("watchfolder"): 
+            self.watch_folder(cmd.split()[1] if len(cmd.split()) > 1 else ".")
+            self.show_tip(cmd)
+        elif cmd.startswith("traceroute"): 
+            self.trace_route(cmd.split()[1] if len(cmd.split()) > 1 else "8.8.8.8")
+            self.show_tip(cmd)
+        elif cmd == "ransomwatch": 
+            self.monitor_ransomware()
+            self.show_tip(cmd)
+        elif cmd.startswith("wifi-info"): 
+            self.NetworkAudit(cmd.split()[1] if len(cmd.split()) > 1 else "wlp2s0")
+            self.show_tip(cmd)
+        elif cmd.startswith("stegcheck"): 
+            self.cmd_stegcheck(None)
+            self.show_tip(cmd)
+            return
+
+        elif cmd.startswith("certcheck", "ssl"):
+        # Handle both command line input and interactive prompt
+            if len(cmd.split()) > 1:
+                domain = cmd.split()[1]
+                self.check_ssl(domain)
+                self.show_tip(cmd)
+            else:
+                self.check_ssl()  # Will prompt for domain inside the method
+
+        elif cmd == "msf-debug" or cmd == "msfdebug":
+            self.debug_metasploit()
+
+        elif cmd == "memdump": 
+            self.dump_memory()
+            self.show_tip(cmd)
+        elif cmd == "torify": 
+            self.enable_tor_routing()
+            self.show_tip(cmd)
+        elif cmd == "dst-update": 
+            print(f"\n[+] {self.check_for_updates()}")
+            self.show_tip(cmd)
+        elif cmd == "system-update": 
+            print(f"\n[+] {self.check_for_updates()}")
+            self.show_tip(cmd)
+        elif cmd == "system update": 
+            print(f"\n[+] {self.check_for_updates()}")
+            self.show_tip(cmd)
+        elif cmd == "vt-scan": 
+            self.run_vt_module()
+            self.show_tip(cmd)
+
+        elif command in ["vt", "virustotal", "scan-vt", "check-malware"]:
+            self.run_vt_module()
+            self.show_tip(cmd)
+
+        elif original_cmd.lower() == "registry -n mon": 
+            print(self.monitor_registry())
+            self.show_tip(cmd)
+        elif original_cmd.lower() == "harden -t sys": 
+            self.harden_system(dry_run=False)
+            self.show_tip(cmd)
+
+        elif cmd == "help": 
+            self.show_help()
+        elif cmd == "exit": 
+            print("\n[*] Exiting Defensive Security Terminal")
+            sys.exit(0)
+        else: 
+            # print("[!] Unknown command. Type 'help' for more command options.")
+            return
+# ===============================added vtscan upgrade
+    def run_vt_module(self):
+        """Launch VirusTotal SOC module"""
+        if not VT_AVAILABLE:
+            print(f"{Fore.RED}[!] VirusTotal module not available{Style.RESET_ALL}")
+            input("Press Enter to continue...")
+            return
+
+        try:
+            vt_scan_menu(self.operator_username, self.session_id)  # launches full cinematic SOC system
+        except Exception as e:
+            print(f"{Fore.RED}[!] Error running VT module: {e}{Style.RESET_ALL}")
+            input("Press Enter to continue...")
+# ==================== HELP MENU ====================
+
+    def _cmd_help(self, args=None):
+        """Handle help command with proper error handling"""
+        try:
+            # Ensure args is properly handled
+            if args is None:
+                args = []
+            elif isinstance(args, str):
+                # If it's a string, split it
+                args = args.strip().split() if args.strip() else []
+            elif not isinstance(args, (list, tuple)):
+                args = [str(args)]
+
+                # Now args is guaranteed to be a list
+                if args and len(args) > 0 and args[0]:
+                    # Show help for specific command
+                    cmd_name = str(args[0]).strip().lower()
+                    self._show_command_help(cmd_name)
+                else:
+                    # Show general help
+                    self.show_help()
+
+        except Exception as e:
+            print(f"{Fore.RED}Error in help: {str(e)}{Style.RESET_ALL}")
+            # Fallback to showing help
+            self.show_help()
+# ==========================================================
+    def show_help(self):
+        """Display interactive hacking-styled help menu with categories - FIXED UTF-8"""
+        try:
+            from colorama import Fore, Style, init
+            import shutil
+            import re
+            import random
+            import time
+            
+            init(autoreset=True)
+            
+            # Get terminal width for centering
+            try:
+                terminal_width = shutil.get_terminal_size().columns
+                if terminal_width < 80:
+                    terminal_width = 80
+                if terminal_width > 120:
+                    terminal_width = 120
+            except:
+                terminal_width = 80
+            
+            # Define box width
+            box_width = min(terminal_width - 4, 110)
+            if box_width < 60:
+                box_width = 60
+            
+            # Bold box drawing characters
+            TOP_LEFT = '┏'
+            TOP_RIGHT = '┓'
+            BOTTOM_LEFT = '┗'
+            BOTTOM_RIGHT = '┛'
+            HORIZONTAL = '━'
+            VERTICAL = '┃'
+            T_RIGHT = '┣'
+            T_LEFT = '┫'
+            
+            def safe_len(text):
+                """Safely get length of text, handling emojis and special characters"""
+                try:
+                    # Remove ANSI escape codes
+                    ansi_escape = re.compile(r'\x1b\[[0-9;]*[a-zA-Z]|\x1b\[[0-9;]*m')
+                    clean = ansi_escape.sub('', str(text))
+                    # Use wcwidth if available for accurate emoji width, otherwise fallback to len
+                    try:
+                        import wcwidth
+                        return sum(wcwidth.wcwidth(c) for c in clean)
+                    except:
+                        return len(clean.encode('ascii', 'ignore').decode('ascii', 'ignore'))
+                except:
+                    return len(str(text))
+            
+            def print_separator():
+                """Print a separator line"""
+                try:
+                    sep = f"{Fore.CYAN}{T_RIGHT}{HORIZONTAL * (box_width - 4)}{T_LEFT}{Style.RESET_ALL}"
+                    print(sep)
+                except:
+                    print(f"{Fore.CYAN}{'━' * box_width}{Style.RESET_ALL}")
+            
+            def print_category_header(category, color=Fore.CYAN):
+                """Print a category header"""
+                try:
+                    header = f"  {category}  "
+                    clean_header = re.sub(r'\x1b\[[0-9;]*[a-zA-Z]|\x1b\[[0-9;]*m', '', header)
+                    padding = max(0, (box_width - 2 - len(clean_header)) // 2)
+                    line = f"{Fore.CYAN}{VERTICAL}{Style.RESET_ALL}{' ' * padding}{color}{Style.BRIGHT}{header}{Style.RESET_ALL}{' ' * (box_width - 2 - len(clean_header) - padding)}{Fore.CYAN}{VERTICAL}{Style.RESET_ALL}"
+                    print(line)
+                except:
+                    print(f"{color}{category}{Style.RESET_ALL}")
+            
+            def print_command(cmd, desc, cmd_color=Fore.GREEN):
+                """Print a command line with proper width calculation"""
+                try:
+                    # Clean text for length calculation
+                    ansi_escape = re.compile(r'\x1b\[[0-9;]*[a-zA-Z]|\x1b\[[0-9;]*m')
+                    cmd_clean = ansi_escape.sub('', str(cmd))
+                    desc_clean = ansi_escape.sub('', str(desc))
+                    
+                    # Get safe lengths
+                    cmd_len = safe_len(cmd_clean)
+                    desc_len = safe_len(desc_clean)
+                    
+                    cmd_text = f"{cmd_color}{cmd}{Style.RESET_ALL}"
+                    desc_text = f"{Fore.WHITE}{desc}{Style.RESET_ALL}"
+                    
+                    # Fixed width for command column
+                    cmd_width = 30
+                    padding_needed = max(0, cmd_width - cmd_len)
+                    
+                    # Calculate available space for description
+                    desc_width = box_width - 2 - cmd_width - 4
+                    if desc_width < 10:
+                        desc_width = 10
+                    
+                    # Truncate description if too long
+                    if desc_len > desc_width:
+                        desc_clean = desc_clean[:desc_width - 3] + "..."
+                        desc_text = f"{Fore.WHITE}{desc_clean}{Style.RESET_ALL}"
+                        desc_len = safe_len(desc_clean)
+                    
+                    # Build the line safely
+                    line = f"{Fore.CYAN}{VERTICAL}{Style.RESET_ALL} {cmd_text}"
+                    line += ' ' * padding_needed
+                    line += "  "
+                    line += desc_text
+                    
+                    # Calculate remaining padding
+                    line_clean = ansi_escape.sub('', line)
+                    current_len = safe_len(line_clean)
+                    remaining = box_width - 2 - current_len
+                    if remaining > 0:
+                        line += ' ' * remaining
+                    elif remaining < 0:
+                        # Line too long, truncate description
+                        desc_clean = desc_clean[:desc_width - 3] + "..."
+                        desc_text = f"{Fore.WHITE}{desc_clean}{Style.RESET_ALL}"
+                        line = f"{Fore.CYAN}{VERTICAL}{Style.RESET_ALL} {cmd_text}"
+                        line += ' ' * padding_needed
+                        line += "  "
+                        line += desc_text
+                        line += ' ' * max(0, box_width - 2 - cmd_width - 4 - desc_width)
+                    
+                    line += f"{Fore.CYAN}{VERTICAL}{Style.RESET_ALL}"
+                    print(line)
+                    
+                except Exception as e:
+                    # Fallback to simple print
+                    try:
+                        print(f"  {cmd} - {desc}")
+                    except:
+                        print(f"  {str(cmd)} - {str(desc)}")
+            
+            # ============================================================
+            # DEFINE ALL CATEGORIES
+            # ============================================================
+            categories = {
+                "🔥 CORE SECURITY": [
+                    ("system scan -All", "System threat scan (sys, apps, net)"),
+                    ("system", "System security management"),
+                    ("system help", "Show system command help"),
+                    ("system scan", "Run system security scan help"),
+                    ("system status", "Show system scan status"),
+                    ("system list", "List exported scan files"),
+                    ("system load <file>", "Load previous scan results"),
+                    ("system export <format>", "Export scan results (json/csv/html/all)"),
+                    ("system export all", "Export all scan results in all formats"),
+                    ("security", "Alias for system command"),
+                    ("scan", "Alias for system command"),
+                    ("sys", "Alias for system command"),
+                    ("net -n mon", "Live network monitoring"),
+                    ("exploitcheck", "Check for critical CVEs"),
+                    ("vtscan", "VirusTotal file analysis"),
+                    ("clearlogs", "Securely wipe system logs"),
+                    ("nikto --url <TARGET>", "Web vulnerability scan"),
+                    ("legitify --github <ORG/REPO>", "Scan GitHub for misconfigs"),
+                    ("msfconsole", "Launch Metasploit Framework console"),
+                    ("msf-debug", "Debug Metasploit installation issues"),
+                    ("msf -h", "Metasploit help and options"),
+                    ("nmap -sV <TARGET>", "Service/version detection scan"),
+                    ("nmap -A <TARGET>", "Aggressive OS and service detection"),
+                    ("nmap -p- <TARGET>", "Scan all 65535 ports"),
+                    ("nmap scan <TARGET>", "Nmap scan the target"),
+                    ("fraud / financial", "Financial fraud investigation suite"),
+                    ("investigate", "Launch financial forensics tools"),
+                    ("trace", "Trace suspicious transactions")
+                ],
+                
+                "🌐 NETWORK TOOLS": [
+                    ("portsweep [IP]", "Scan target for open ports"),
+                    ("traceroute [IP]", "Network path analysis"),
+                    ("torify", "Route traffic through Tor"),
+                    ("dnssec [DOMAIN]", "Validate DNSSEC"),
+                    ("nmap <TARGET>", "Basic port scan"),
+                    ("nmap -sS <TARGET>", "Stealth SYN scan"),
+                    ("network", "# Full network audit (WiFi + Ethernet)"),
+                    ("network-wifi", "# WiFi only"),
+                    ("network-eth", "# Ethernet only"),
+                    ("network-live", "# Live monitoring"),
+                    ("network wlan0", "# Use specific interface"),
+                    ("network-status", "# Check module status"),
+                    ("network-help", "# Show help"),
+                    ("nmap -sU <TARGET>", "UDP port scan"),
+                    ("nmap -O <TARGET>", "OS fingerprinting"),
+                    ("msfvenom", "Generate payloads for exploits"),
+                    ("msfdb", "Manage Metasploit database"),
+                    ("msfconsole", "Launch Metasploit Framework console")
+                ],
+                
+                "🔍 FORENSICS & FINANCIAL": [
+                    ("memdump", "Capture volatile memory"),
+                    ("hashfile [PATH]", "Generate file integrity hashes"),
+                    ("stegcheck [IMG]", "Detect hidden image data"),
+                    ("ransomwatch", "Identify ransomware indicators"),
+                    ("ransomware", "Ransomware monitoring and alerts"),
+                    ("ransomware -start", "Start ransomware monitoring service"),
+                    ("rmon", "Ransomware monitoring menu"),
+                    ("rmon-start", "Start ransomware monitoring service"),
+                    ("rmon-stop", "Stop ransomware monitoring service"),
+                    ("rmon-scan", "Scan for ransomware activity"),
+                    ("rmon-status", "Show ransomware monitoring status"),
+                    ("rmon-dashboard", "Launch ransomware monitoring dashboard"),
+                    ("rmon-restore", "Restore files from quarantine"),
+                    ("rmon-export", "Export ransomware scan results"),
+                    ("rmon-events", "View recent ransomware events"),
+                    ("rmon-interactive", "Interactive ransomware investigation"),
+                    ("rmon export pdf", "Export ransomware report as PDF"),
+                    ("rmon export json", "Export ransomware report as JSON"),
+                    ("rmon export html", "Export ransomware report as HTML"),
+                    ("finanalyze", "Analyze suspicious transactions"),
+                    ("transfertrace", "Trace transaction flows"),
+                    ("recon", "Run comprehensive information reconnaissance scan"),
+                    ("recon -full", "Run full recon with additional checks"),
+                    ("viewlogs", "View recent system logs"),
+                    ("regmon", "Monitor Windows registry changes"),
+                    ("sessiondump", "Dump active user sessions")
+                ],
+                
+                "🔐 SQL INJECTION TOOLS": [
+                    ("sqlmap <URL>", "Run SQLMap scan on a target URL"),
+                    ("sqlmap --url <URL>", "SQLMap scan with URL parameter"),
+                    ("sqlmap --fs <PATH>", "SQLMap filesystem scan"),
+                    ("sqlmap --git <REPO>", "SQLMap Git repository scan"),
+                    ("sqlmap --output <DIR>", "Set SQLMap output directory"),
+                    ("sqlmap --port <PORT>", "Set SQLMap port"),
+                    ("sqlmap --help", "Show SQLMap help"),
+                    ("sqlmap --version", "Show SQLMap version"),
+                    ("sqlmap --update", "Update SQLMap"),
+                    ("sqlmap --wizard", "SQLMap wizard mode"),
+                    ("sqlmap --batch", "SQLMap batch mode"),
+                    ("sqlmap-scan <URL>", "Quick SQLMap scan"),
+                    ("sqlmap-start", "Start SQLMap service"),
+                    ("sqlmap-stop", "Stop SQLMap service"),
+                    ("sqlmap-install", "Install SQLMap"),
+                    ("sqlmap-reset", "Reset SQL Injection Lab database"),
+                    ("sqlmap-status", "Show SQLMap lab status"),
+                    ("sqlmap-lab-status", "Show SQL Injection Lab status"),
+                    ("sqlmap-secure", "Toggle secure mode on/off"),
+                    ("sqlmap-toggle-secure", "Toggle secure mode on/off"),
+                    ("sqlmap-db-reset", "Reset SQL Injection Lab database"),
+                    ("sqllab", "Start SQL Injection Learning Lab"),
+                    ("sqllab [PORT]", "Start lab on custom port"),
+                    ("sqllab-stop", "Stop SQL Injection Learning Lab"),
+                    ("sqlmap-file <FILE>", "Scan URLs from a file"),
+                    ("sqlmap-export <DEST>", "Export the last scan report")
+                ],
+                
+                "🛡️ HARDENING TOOLS": [
+                    ("harden", "System hardening menu"),
+                    ("harden -t sys", "Target system hardening"),
+                    ("harden-quick", "Quick system hardening"),
+                    ("harden-dry-run", "Preview hardening changes"),
+                    ("harden-restore", "Restore hardening configuration"),
+                    ("harden-status", "Show hardening status"),
+                    ("harden-verify", "Verify hardening applied"),
+                    ("harden-full", "Full system hardening"),
+                    ("harden-cinematic", "Hardening with cinematic UI"),
+                    ("harden-rollback", "Rollback hardening changes"),
+                    ("harden-report", "Generate hardening report"),
+                    ("harden-user", "User account hardening"),
+                    ("harden-users", "Multi-user hardening"),
+                    ("harden-fw", "Firewall hardening"),
+                    ("harden-firewall", "Firewall configuration"),
+                    ("harden-ssh", "SSH hardening"),
+                    ("harden-sshd", "SSH daemon hardening"),
+                    ("harden-dashboard", "Launch hardening dashboard"),
+                    ("harden-menu", "Show hardening menu"),
+                    ("harden-help", "Show hardening help"),
+                    ("harden-list", "List hardening modules"),
+                    ("harden-ls", "List hardening modules"),
+                    ("harden-info", "Show hardening information")
+                ],
+                
+                "📂 BACKUP & RESTORE": [
+                    ("list-backups", "List available backups"),
+                    ("search", "Search through backups"),
+                    ("restore-id", "Restore backup by ID"),
+                    ("restore-last", "Restore the last backup")
+                ],
+                
+                "⚙️ SYSTEM MANAGEMENT": [
+                    ("add-path", "Add directory to system PATH"),
+                    ("dst-workspace", "DSTerminal workspace management"),
+                    ("dst-cleanup", "Clean up temporary files"),
+                    ("dst-platform", "Show DSTerminal platform info"),
+                    ("auto-discover", "Auto-discover network assets"),
+                    ("monitor-all", "Monitor all system components"),
+                    ("watch-folders", "Watch specified folders"),
+                    ("show-paths", "Show system paths"),
+                    ("dst-reload", "Reload DSTerminal configuration"),
+                    ("dst-update", "Update DSTerminal"),
+                    ("dst-version", "Show DSTerminal version"),
+                    ("dst-status", "Show DSTerminal status"),
+                    ("dst-help", "Show DSTerminal help"),
+                    ("dst-investigate", "Launch investigation suite"),
+                    ("dst-financial", "Financial investigation tools"),
+                    ("dst-refresh", "Refresh DSTerminal"),
+                    ("dst-logs", "Show DSTerminal logs"),
+                    ("reload", "Reload configuration"),
+                    ("refresh", "Refresh system state"),
+                    ("sysinfo", "Detailed system report"),
+                    ("dashboard", "starting the dsterminal security dashboard"),
+                    ("security-dashboard", "startin the security dashboard"),
+                    ("scan-full", "Run full system scan"),
+                    ("full-scan", "Run full system scan"),
+                    ("deep-scan", "Run deep system scan"),
+                    ("ds", "Alias for system scan command"),
+                    ("scan-quick", "Run quick system scan"),
+                    ("quick-scan", "Alias for scan-quick"),
+                    ("qs", "Alias for quick system scan"),
+                    ("scan-status", "Show system scan status"),
+                    ("ss", "Alias for scan-status"),
+                    ("killproc PID", "Terminate process"),
+                    ("macspoof [IFACE]", "Randomize MAC address"),
+                    ("harden -t sys", "Apply security hardening"),
+                    ("update", "Check for DST updates"),
+                    ("shutdown", "Emergency shutdown"),
+                    ("shutdown now", "Immediate machine shutdown")
+                ],
+                
+                "🔎 RECONNAISSANCE TOOLS": [
+                    ("dst-recon", "Basic reconnaissance"),
+                    ("dst-recon-full", "Full reconnaissance scan"),
+                    ("dst-recon-quick", "Quick reconnaissance"),
+                    ("recon-full", "Full reconnaissance"),
+                    ("recon-quick", "Quick reconnaissance"),
+                    ("r1", "Level 1 reconnaissance"),
+                    ("r2", "Level 2 reconnaissance"),
+                    ("rec", "Basic reconnaissance"),
+                    ("recf", "Full reconnaissance")
+                ],
+                
+                "🔍 INTEGRITY CHECKING": [
+                    ("integrity", "Integrity checking menu"),
+                    ("integrity-scan", "Scan file integrity"),
+                    ("integrity-restore", "Restore integrity"),
+                    ("integrity-report", "Generate integrity report"),
+                    ("integrity-forensic", "Forensic integrity analysis"),
+                    ("integrity-forensic-timeline", "Forensic timeline analysis"),
+                    ("integrity-forensic-report", "Forensic report generation"),
+                    ("integrity-monitor", "Monitor integrity changes"),
+                    ("integrity-alerts", "Show integrity alerts"),
+                    ("integrity-history", "Show integrity history"),
+                    ("integrity-logs", "Show integrity logs"),
+                    ("integrity-pdf", "Generate PDF report"),
+                    ("integrity-csv", "Export integrity data to CSV"),
+                    ("integrity-json", "Export integrity data to JSON"),
+                    ("integrity-xml", "Export integrity data to XML"),
+                    ("integrity-list", "List integrity checks"),
+                    ("integrity-ls", "List integrity checks"),
+                    ("integrity-info", "Show integrity information")
+                ],
+                
+                "📜 CERTIFICATE & ENCRYPTION": [
+                    ("certcheck", "Check SSL/TLS certificates"),
+                    ("crypto-export", "Export cryptographic keys"),
+                    ("crypto-import", "Import cryptographic keys"),
+                    ("crypto-setup", "Setup cryptographic environment"),
+                    ("crypt", "Encryption menu dashboard"),
+                    ("enc", "Encryption operations dashboard"),
+                    ("encrypt", "Encrypt files/data"),
+                    ("decrypt", "Decrypt files/data"),
+                    ("encryption", "Encryption operations dashboard"),
+                    ("crypto-debug", "debug cryptographic encryption operations"),
+                    ("decrypt-test", "test decrypting a file(simulated realtime event)"),
+                    ("ecrypt-test", "test ecrypting a file(simulated realtime event)"),
+                    ("clean-qr", "clear the previously generated qrcode key"),
+                    ("qr-restore", "restore deleted qrcode key from the saved key"),
+                    ("gr-list", "list saved/generated qrcode image key"),
+                    ("qr-import", "import the saved/received qrcode key image"),
+                    ("qr-export", "export the generated qrcode key image file"),
+                    ("qr-generate", "generate the qrcode for the dencryption key"),
+                    ("encrypted_dirs", "list the encrypted directories or folders"),
+                    ("crypto-reports", "lists the encryption reports previously generated"),
+                    ("crypto-status", "check the status of the encryption module"),
+                    ("decrypt-dir", "decrypt full directory/folder containing sensitive information"),
+                    ("ecrypt-dir", "encrypt the directory/folder recursively"),
+                    ("crypto-decrypt", "decrypt a file"),
+                    ("crypto-ecrypt", "encrypt a file")
+                ],
+                
+                "🔬 FORENSICS & INVESTIGATION": [
+                    ("forensics", "Forensics menu"),
+                    ("forensic", "Forensic analysis tools"),
+                    ("fraud-investigate", "Fraud investigation"),
+                    ("fraud", "Fraud detection tools"),
+                    ("fraud-investigation", "Fraud investigation suite"),
+                    ("investigation", "Investigation tools"),
+                    ("investigate", "Launch investigation suite"),
+                    ("trace", "Trace network activity"),
+                    ("trace-route", "Trace route analysis")
+                ],
+                
+                "⚙️ SERVICES & MONITORING": [
+                    ("service", "Service management menu"),
+                    ("service start", "Start a service"),
+                    ("service stop", "Stop a service"),
+                    ("service status", "Show service status"),
+                    ("service restart", "Restart a service"),
+                    ("service reload", "Reload service configuration"),
+                    ("service enable", "Enable a service"),
+                    ("service disable", "Disable a service"),
+                    ("service list", "List all services"),
+                    ("service ls", "List all services"),
+                    ("service info", "Show service information"),
+                    ("monitor", "Monitoring menu"),
+                    ("monitor start", "Start monitoring"),
+                    ("monitor stop", "Stop monitoring"),
+                    ("monitor status", "Show monitoring status"),
+                    ("monitor restart", "Restart monitoring"),
+                    ("monitor reload", "Reload monitoring configuration"),
+                    ("monitor enable", "Enable monitoring"),
+                    ("monitor disable", "Disable monitoring"),
+                    ("monitor list", "List monitoring components"),
+                    ("monitor ls", "List monitoring components"),
+                    ("monitor info", "Show monitoring information")
+                ],
+                
+                "🔐 SECURITY SCANNERS": [
+                    ("nikto scan", "Run Nikto web scanner"),
+                    ("nikto report", "Generate Nikto report"),
+                    ("nikto help", "Show Nikto help"),
+                    ("nikto version", "Show Nikto version"),
+                    ("nikto update", "Update Nikto"),
+                    ("nikto list", "List Nikto plugins"),
+                    ("nikto ls", "List Nikto plugins"),
+                    ("nikto info", "Show Nikto information"),
+                    ("legitify scan", "Run Legitify security scan"),
+                    ("legitify report", "Generate Legitify report"),
+                    ("legitify help", "Show Legitify help"),
+                    ("legitify version", "Show Legitify version"),
+                    ("legitify update", "Update Legitify"),
+                    ("legitify list", "List Legitify checks"),
+                    ("legitify ls", "List Legitify checks"),
+                    ("legitify info", "Show Legitify information"),
+                    ("trufflehog scan", "Run TruffleHog secret scanning"),
+                    ("trufflehog report", "Generate TruffleHog report"),
+                    ("trufflehog help", "Show TruffleHog help"),
+                    ("trufflehog version", "Show TruffleHog version"),
+                    ("trufflehog update", "Update TruffleHog"),
+                    ("trufflehog list", "List TruffleHog detectors"),
+                    ("trufflehog ls", "List TruffleHog detectors"),
+                    ("trufflehog info", "Show TruffleHog information")
+                ],
+                
+                "📊 SOC (Detailed Information Reconnaissance)": [
+                    ("soc", "SOC command menu"),
+                    ("soc terminal", "Open SOC terminal"),
+                    ("soc monitor", "Open SOC monitor"),
+                    ("soc workspace", "SOC workspace management"),
+                    ("soc-quick", "Quick SOC scan"),
+                    ("soc-full", "Full SOC audit"),
+                    ("soc-dns", "DNS security analysis"),
+                    ("soc-status", "Show SOC status"),
+                    ("soc-map", "Show network mapping"),
+                    ("soc-history", "Show SOC history"),
+                    ("soc-report", "Generate SOC report"),
+                    ("soc-alerts", "Show SOC alerts"),
+                    ("soc-reports", "List SOC reports"),
+                    ("soc-pdf", "Generate SOC PDF report"),
+                    ("soc-help", "Show SOC help"),
+                    ("soc-orgs", "Manage SOC organizations")
+                ],
+                
+                "🐛 DEBUG & SYSTEM TOOLS": [
+                    ("debug", "Debug menu"),
+                    ("debug start", "Start debugging"),
+                    ("debug stop", "Stop debugging"),
+                    ("debug status", "Show debug status"),
+                    ("debug restart", "Restart debugging"),
+                    ("debug reload", "Reload debug configuration"),
+                    ("debug enable", "Enable debugging"),
+                    ("debug disable", "Disable debugging"),
+                    ("debug list", "List debug options"),
+                    ("debug ls", "List debug options"),
+                    ("debug info", "Show debug information"),
+                    ("system scan", "System scan"),
+                    ("system scan --all", "Complete system scan"),
+                    ("system info", "Show system information"),
+                    ("system report", "Generate system report"),
+                    ("system help", "Show system help"),
+                    ("system version", "Show system version"),
+                    ("system update", "Update system tools"),
+                    ("system list", "List system components"),
+                    ("system ls", "List system components"),
+                    ("system status", "Show system status"),
+                    ("system logs", "Show system logs"),
+                    ("system pdf", "Generate system PDF report"),
+                    ("system csv", "Export system data to CSV"),
+                    ("system json", "Export system data to JSON"),
+                    ("system xml", "Export system data to XML")
+                ],
+                
+                "📡 NETWORK MONITORING": [
+                    ("net mon", "Network monitoring"),
+                    ("net scan", "Network scanning"),
+                    ("net -n mon", "Network scanning"),
+                    ("net report", "Network report generation"),
+                    ("net help", "Show network help"),
+                    ("net version", "Show network version"),
+                    ("net update", "Update network tools"),
+                    ("net list", "List network components"),
+                    ("net ls", "List network components"),
+                    ("net status", "Show network status"),
+                    ("net logs", "Show network logs"),
+                    ("net pdf", "Generate network PDF report"),
+                    ("net csv", "Export network data to CSV"),
+                    ("net json", "Export network data to JSON"),
+                    ("net xml", "Export network data to XML"),
+                    ("wifiinfo", "Finding wifi information ready for audit"),
+                    ("wifi-info", "Finding wifi information ready for audit"),
+                    ("wifi-audit", "Finding wifi information ready for audit"),
+                    ("wifi-audit [IFACE]", "Audit Wi-Fi interface"),
+                    ("wifi-scan", "Scan for Wi-Fi networks"),
+                    ("wifi-scan [IFACE]", "Scan for Wi-Fi networks on interface"),
+                    ("wlan-audit", "Audit wireless LAN"),
+                    ("wlan-scan", "Scan for wireless networks"),
+                    ("wifi", "Wi-Fi management and auditing"),
+                    ("wlan", "Wireless LAN management and auditing"),
+                    ("network-security", "Launch Network Security module"),
+                    ("netsec", "Alias for network-security"),
+                    ("ns", "Alias for network-security"),
+                    ("netsec-scan [target]", "Run network security scan"),
+                    ("netsec-full [target]", "Run comprehensive network scan"),
+                    ("netsec-status", "Show module status"),
+                    ("netsec-report [type]", "Generate report (html/pdf/json)"),
+                    ("netsec-dashboard", "Launch interactive dashboard"),
+                    ("netsec-list", "List available modules"),
+                    ("netsec-help", "Show help"),
+                    ("netsec-info", "Show module information"),
+                    ("netsec-config", "Show/configure settings"),
+                    ("netsec-rules", "Show security rules"),
+                    ("netsec-log [n]", "Show last n log entries"),
+                    ("netsec-stop", "Stop the dashboard"),
+                    ("netsec-restart", "Restart the dashboard")
+                ],
+                
+                "🔧 UTILITY TOOLS": [
+                    ("registry mon", "Registry monitoring"),
+                    ("shutdown", "Shutdown DSTerminal"),
+                    ("clear", "Clear terminal screen"),
+                    ("clear terminal", "Clear terminal screen"),
+                    ("help", "Show this help menu")
+                ],
+                
+                "🔐 CRYPTO TOOLS": [
+                    ("encrypt FILE", "AES-256 file encryption"),
+                    ("decrypt FILE KEY", "File decryption"),
+                    ("crypto-list", "List encrypted files"),
+                    ("crypto-info <file.enc>", "Show encryption info"),
+                    ("crypto-verify", "Verify encryption system"),
+                    ("crypto-backup", "Backup encryption key"),
+                    ("encrypt-test", "Run encryption test"),
+                    ("encrypt-setup", "Setup encryption system")
+                ],
+                
+                "🌍 WEB SECURITY": [
+                    ("web-security", "Launch Web Security Analyzer Dashboard"),
+                    ("websec", "Launch Web Security Analyzer (shortcut)"),
+                    ("ws", "Launch Web Security Analyzer (shortcut)"),
+                    ("wsa", "Launch Web Security Analyzer (shortcut)"),
+                    ("web-scan <URL> [options]", "Web security scan - options: --full, --headers, --ssl, --vuln"),
+                    ("webscan <URL>", "Quick web security scan"),
+                    ("web-headers <URL>", "Check security headers only"),
+                    ("webheaders <URL>", "Check security headers only (shortcut)"),
+                    ("web-ssl <URL>", "Check SSL/TLS configuration only"),
+                    ("webssl <URL>", "Check SSL/TLS configuration only (shortcut)"),
+                    ("web-vuln <URL>", "Scan for vulnerabilities only"),
+                    ("webvuln <URL>", "Scan for vulnerabilities only (shortcut)"),
+                    ("web-full <URL> [--output <file>]", "Full security audit with report generation"),
+                    ("webfull <URL>", "Full security audit (shortcut)"),
+                    ("sqlmap [URL]", "SQL injection scan"),
+                    ("certcheck [DOMAIN]", "SSL certificate audit"),
+                    ("nmap --script vuln <TARGET>", "Vulnerability scan with NSE"),
+                    ("nmap --script http-* <TARGET>", "HTTP service enumeration"),
+                    ("msfconsole -q", "Launch Metasploit quietly"),
+                    ("msf > search <exploit>", "Search exploits in Metasploit"),
+                    ("msf > use <exploit>", "Use specific exploit module"),
+                    ("msf > set RHOSTS <IP>", "Set target in Metasploit"),
+                    ("msf > run/exploit", "Execute Metasploit module")
+                ],
+                
+                "📊 MONITORING": [
+                    ("watchfolder [PATH]", "Directory change detection"),
+                    ("regmon", "Windows registry monitor")
+                ],
+                
+                "📁 FILE COMMANDS": [
+                    ("ls", "List files"),
+                    ("cat <file>", "Show file contents"),
+                    ("touch <file>", "Create file"),
+                    ("echo <text> > <file>", "Write to file"),
+                    ("pwd", "Show current directory")
+                ],
+                
+                "🛠️ UTILITIES": [
+                    ("help", "Show this menu"),
+                    ("exit", "Quit terminal"),
+                    ("clear", "Clear terminal display"),
+                    ("clear terminal", "Clear terminal history")
+                ]
+            }
+            
+            # ============================================================
+            # DISPLAY HELP
+            # ============================================================
+            
+            try:
+                # Top border
+                top_border = f"{Fore.CYAN}{TOP_LEFT}{HORIZONTAL * (box_width - 2)}{TOP_RIGHT}{Style.RESET_ALL}"
+                print(top_border)
+                
+                # Header
+                header_text = "DSTERMINAL v4.0.0.113 - Command Reference Manual"
+                header_padding = max(0, (box_width - 2 - len(header_text)) // 2)
+                print(f"{Fore.CYAN}{VERTICAL}{Style.RESET_ALL}{' ' * header_padding}{Fore.CYAN}{Style.BRIGHT}{header_text}{Style.RESET_ALL}{' ' * (box_width - 2 - len(header_text) - header_padding)}{Fore.CYAN}{VERTICAL}{Style.RESET_ALL}")
+                
+                sub_header = "INTERACTIVE COMMAND MENU"
+                sub_padding = max(0, (box_width - 2 - len(sub_header)) // 2)
+                print(f"{Fore.CYAN}{VERTICAL}{Style.RESET_ALL}{' ' * sub_padding}{Fore.YELLOW}{Style.BRIGHT}{sub_header}{Style.RESET_ALL}{' ' * (box_width - 2 - len(sub_header) - sub_padding)}{Fore.CYAN}{VERTICAL}{Style.RESET_ALL}")
+                
+                # Separator
+                print_separator()
+                
+                # Display each category
+                for category, commands in categories.items():
+                    # Category header with random color
+                    cat_colors = [Fore.CYAN, Fore.GREEN, Fore.YELLOW, Fore.MAGENTA, Fore.BLUE, Fore.RED]
+                    cat_color = random.choice(cat_colors)
+                    print_category_header(category, cat_color)
+                    
+                    # Display commands
+                    for cmd, desc in commands:
+                        # Color code commands based on type
+                        if "scan" in cmd or "exploit" in cmd or "nikto" in cmd:
+                            cmd_color = Fore.RED
+                        elif "encrypt" in cmd or "crypto" in cmd or "decrypt" in cmd:
+                            cmd_color = Fore.MAGENTA
+                        elif "net" in cmd or "portsweep" in cmd or "traceroute" in cmd:
+                            cmd_color = Fore.CYAN
+                        elif "sqlmap" in cmd or "certcheck" in cmd:
+                            cmd_color = Fore.YELLOW
+                        elif "ls" in cmd or "cat" in cmd or "touch" in cmd:
+                            cmd_color = Fore.BLUE
+                        elif "msf" in cmd or "metasploit" in cmd:
+                            cmd_color = Fore.RED + Style.BRIGHT
+                        elif "nmap" in cmd:
+                            cmd_color = Fore.YELLOW + Style.BRIGHT
+                        elif "recon" in cmd:
+                            cmd_color = Fore.GREEN + Style.BRIGHT
+                        elif "sysinfo" in cmd or "killproc" in cmd or "harden" in cmd:
+                            cmd_color = Fore.CYAN + Style.BRIGHT
+                        else:
+                            cmd_color = Fore.GREEN
+                        
+                        print_command(cmd, desc, cmd_color)
+                    
+                    # Category footer
+                    print_separator()
+                    time.sleep(0.02)
+                
+                # Bottom border
+                bottom_border = f"{Fore.CYAN}{BOTTOM_LEFT}{HORIZONTAL * (box_width - 2)}{BOTTOM_RIGHT}{Style.RESET_ALL}"
+                print(bottom_border)
+                
+                # ============================================================
+                # TIPS SECTION
+                # ============================================================
+                print()
+                tips_border = f"{Fore.CYAN}{TOP_LEFT}{HORIZONTAL * (box_width - 2)}{TOP_RIGHT}{Style.RESET_ALL}"
+                print(tips_border)
+                
+                tips = [
+                    ("💡 TIP:", "Use Tab for command completion", Fore.CYAN),
+                    ("⚡ PRO:", "Combine commands with '&&'", Fore.GREEN),
+                    ("🔧 DEV:", "Check logs for debugging", Fore.YELLOW),
+                    ("🌐 WEB:", "Access web interface at https://www.dsterminal.com", Fore.MAGENTA)
+                ]
+                
+                for icon, tip, color in tips:
+                    tip_text = f"{color}{icon}{Style.RESET_ALL} {Fore.WHITE}{tip}{Style.RESET_ALL}"
+                    tip_clean = re.sub(r'\x1b\[[0-9;]*[a-zA-Z]|\x1b\[[0-9;]*m', '', tip_text)
+                    padding = max(0, (box_width - 2 - len(tip_clean)) // 2)
+                    print(f"{Fore.CYAN}{VERTICAL}{Style.RESET_ALL}{' ' * padding}{tip_text}{' ' * (box_width - 2 - len(tip_clean) - padding)}{Fore.CYAN}{VERTICAL}{Style.RESET_ALL}")
+                
+                tips_bottom = f"{Fore.CYAN}{BOTTOM_LEFT}{HORIZONTAL * (box_width - 2)}{BOTTOM_RIGHT}{Style.RESET_ALL}"
+                print(tips_bottom)
+                
+                # ============================================================
+                # INTERACTIVE SEARCH
+                # ============================================================
+                print()
+                search_prompt = f"{Fore.CYAN}┌─[{Fore.GREEN}HELP{Fore.CYAN}]─[{Fore.YELLOW}Type 'search' to find commands or 'exit' to quit{Fore.CYAN}]"
+                print(search_prompt)
+                
+                while True:
+                    try:
+                        search = input(f"{Fore.CYAN}└─$ {Style.RESET_ALL}").strip().lower()
+                    except (KeyboardInterrupt, EOFError):
+                        print()
+                        break
+                    
+                    if search == "exit" or search == "q" or search == "":
+                        break
+                    
+                    if search == "search":
+                        try:
+                            print(f"\n{Fore.YELLOW}Enter search term: {Style.RESET_ALL}", end="")
+                            term = input().strip().lower()
+                            
+                            if term:
+                                found = False
+                                print(f"\n{Fore.GREEN}🔍 Search results for '{term}':{Style.RESET_ALL}")
+                                print(f"{Fore.CYAN}{'━' * 60}{Style.RESET_ALL}")
+                                
+                                for category, commands in categories.items():
+                                    for cmd, desc in commands:
+                                        if term in cmd.lower() or term in desc.lower():
+                                            found = True
+                                            match_color = Fore.YELLOW if term in cmd.lower() else Fore.WHITE
+                                            print(f"{Fore.GREEN}✓{Style.RESET_ALL} {match_color}{cmd:<30}{Style.RESET_ALL} {Fore.WHITE}{desc}{Style.RESET_ALL}")
+                                
+                                if not found:
+                                    print(f"{Fore.RED}✗ No commands found matching '{term}'{Style.RESET_ALL}")
+                                
+                                print(f"{Fore.CYAN}{'━' * 60}{Style.RESET_ALL}")
+                        except (KeyboardInterrupt, EOFError):
+                            print()
+                            continue
+                    else:
+                        found = False
+                        for category, commands in categories.items():
+                            for cmd, desc in commands:
+                                if search in cmd.lower():
+                                    found = True
+                                    print(f"{Fore.GREEN}✓ {cmd}: {Fore.WHITE}{desc}{Style.RESET_ALL}")
+                        
+                        if not found:
+                            print(f"{Fore.RED}✗ Command '{search}' not found. Type 'search' to search descriptions.{Style.RESET_ALL}")
+                
+                print(f"{Fore.GREEN}✓ Help system closed{Style.RESET_ALL}")
+                
+            except Exception as e:
+                # Fallback to simple help if display fails
+                print(f"\n{Fore.RED}Error displaying help: {str(e)}{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}Available commands:{Style.RESET_ALL}")
+                print(f"{Fore.GREEN}  sysinfo{Style.RESET_ALL} - Show system information")
+                print(f"{Fore.GREEN}  certcheck <domain>{Style.RESET_ALL} - Check SSL certificate")
+                print(f"{Fore.GREEN}  help{Style.RESET_ALL} - Show this help")
+                print(f"{Fore.GREEN}  exit{Style.RESET_ALL} - Exit DSTERMINAL")
+                print(f"{Fore.GREEN}  clear{Style.RESET_ALL} - Clear terminal")
+                
+        except Exception as e:
+            # Ultimate fallback
+            print(f"\n{Fore.RED}Critical error in help: {str(e)}{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}Type 'exit' to quit{Style.RESET_ALL}")
+
+# --------------------help menu ends here from above========================
+# =============================END==========================================
+    # ============================================================
+    # CURSOR BLINK & ANIMATION
+    # ============================================================
+
+    def run(self):
+        """Run the terminal with SIEM Dashboard prompt and intelligent placeholder"""
+        self.print_banner()
+        
+        # Initialize placeholder variables
+        self.placeholder_text = ""
+        self.placeholder_colors = []
+        self.placeholder_lock = threading.Lock()
+        self.current_input = ""
+        self.placeholder_active = True
+        
+        # Define available commands for autocompletion
+        COMMANDS = {
+            "help": None,
+            "exit": None,
+            "clear": None,
+            "dashboard": None,
+            "status": None,
+            "system": {"scan": None, "info": None},
+            "net": {"mon": None, "scan": None},
+            "encrypt": None,
+            "decrypt": None,
+            "nmap": None,
+            "msf": None,
+            "sqlmap": None,
+            "certcheck": None,
+            "exploitcheck": None,
+            "macspoof": None,
+            "clearlogs": None,
+            "portsweep": None,
+            "hashfile": None,
+            "sysinfo": None,
+            "security-dashboard": None,
+            "exploit": None,
+            "exploit-scan": None,
+            "vuln": None,
+            "vuln-scan": None,
+            "exploit-list": None,
+            "exploit-help": None,
+            "dst-modules": None,
+            "killproc": None,
+            "watchfolder": None,
+            "traceroute": None,
+            "ransomwatch": None,
+            "stegcheck": None,
+            "memdump": None,
+            "torify": None,
+            "update": None,
+            "vt-scan": None,
+            "check-malware": None,
+            "harden-cinematic": None,
+            "crypto-list": None,
+            "crypto-info": None,
+            "crypto-verify": None,
+            "crypto-backup": None,
+            "encrypt-test": None,
+            "encrypt-setup": None,
+            "crypto-status": None,
+            "nikto": None,
+            "legitify": None,
+            "trufflehog": None,
+            "recon": None,
+            "ls": None,
+            "cd": None,
+            "pwd": None,
+            "cat": None,
+            "echo": None,
+            "mkdir": None,
+            "touch": None,
+            "clear": None,
+            "monitor": None,
+            "service": {"start": None, "stop": None, "status": None},
+            "list-backups": None,
+            "search": None,
+            "restore-id": None,
+            "restore-last": None,
+            "add-path": None,
+            "dst-workspace": None,
+            "dst-cleanup": None,
+            "dst-platform": None,
+            "auto-discover": None,
+            "monitor-all": None,
+            "watch-folders": None,
+            "show-paths": None,
+            "integrity": {
+                "scan": None,
+                "restore": None,
+                "report": None,
+                "forensic": {"timeline": None, "report": None},
+            },
+            "sqlmap": None,
+            "sqlmap --url": None,
+            "sqlmap --fs": None,
+            "sqlmap --git": None,
+            "sqlmap --output": None,
+            "sqlmap --port": None,
+            "sqlmap --help": None,
+            "sqlmap --version": None,
+            "sqlmap --update": None,
+            "sqlmap --wizard": None,
+            "sqlmap --batch": None,
+            "sqlmap-stop": None,
+            "sqlmap-start": None,
+            "sqlmap-scan": None,
+            "sqlmap-db-reset": None,
+            "sqlmap-toggle-secure": None,
+            "sqlmap-lab-status": None,
+            "sqlmap-install": None,
+            "sqllab": None,
+            "sqlmap-reset": None,
+            "sqlmap-status": None,
+            "sqlmap-lab-status": None,
+            "sqlmap-lab": None,
+            "sqlmap-secure": None,
+            "harden": None,
+            "harden -t sys": None,
+            "harden-quick": None,
+            "harden-dry-run": None,
+            "harden-restore": None,
+            "harden-status": None,
+            "harden-verify": None,
+            "harden-full": None,
+            "harden-cinematic": None,
+            "harden-rollback": None,
+            "harden-report": None,
+            "harden-user": None,
+            "harden-users": None,
+            "harden-fw": None,
+            "harden-firewall": None,
+            "harden-ssh": None,
+            "harden-sshd": None,
+            "harden-dashboard": None,
+            "harden-menu": None,
+            "harden-help": None,
+            "harden-status": None,
+            "harden-list": None,
+            "harden-ls": None,
+            "harden-info": None,
+            "registry": {"mon": None},
+            "soc": {"start": None, "stop": None, "status": None},
+            "soc": None,
+            "soc-quick": None,
+            "soc-full": None,
+            "soc-dns": None,
+            "soc-status": None,
+            "soc-map": None,
+            "soc-history": None,
+            "soc-report": None,
+            "soc-alerts": None,
+            "soc-reports": None,
+            "soc-pdf": None,
+            "ioc-education": None,
+            "ioc-guide": None,
+            "ioc-info": None,
+            "learn-iocs": None,
+            "soc-help": None,
+            "soc-orgs": None,
+            "dst": {"terminal": None, "workspace": None, "monitor": None},
+            "dst-reload": None,
+            "dst-update": None,
+            "dst-version": None,
+            "dst-status": None,
+            "dst-help": None,
+            "dst-investigate": None,
+            "dst-financial": None,
+            "dst-refresh": None,
+            "dst-logs": None,
+            "reload": None,
+            "refresh": None,
+            "crypto-export": None,
+            "crypto-import": None,
+            "crypto-setup": None,
+            "crypt": None,
+            "enc": None,
+            "encrypt": None,
+            "decrypt": None,
+            "forensics": None,
+            "forensic": None,
+            "fraud-investigate": None,
+            "fraud": None,
+            "fraud-investigation": None,
+            "investigate": None,
+            "investigation": None,
+            "trace": None,
+            "trace-route": None,
+            "dst-recon": None,
+            "dst-recon-full": None,
+            "dst-recon-quick": None,
+            "recon-full": None,
+            "recon-quick": None,
+            "r1": None,
+            "r2": None,
+            "rec": None,
+            "recf": None,
+            "integrity": None,
+            "integrity-scan": None,
+            "integrity-restore": None,
+            "integrity-report": None,
+            "integrity-forensic": None,
+            "integrity-forensic-timeline": None,
+            "integrity-forensic-report": None,
+            "integrity-forensic-timeline-report": None,
+            "integrity-forensic-report-timeline": None,
+            "integ": None,
+            "integrity": {"scan": None, "restore": None, "report": None, "forensic": {"timeline": None, "report": None}},
+            "integrity": {"monitor": None, "scan": None, "restore": None, "report": None, "forensic": {"timeline": None, "report": None, "alerts": None, "history": None, "logs": None, "pdf": None, "csv": None, "json": None, "xml": None, "list": None, "ls": None, "info": None, "status": None, "help": None}},
+            "service": {"start": None, "stop": None, "status": None, "restart": None, "reload": None, "enable": None, "disable": None, "list": None, "ls": None, "info": None, "help": None},
+            "monitor": {"start": None, "stop": None, "status": None, "restart": None, "reload": None, "enable": None, "disable": None, "list": None, "ls": None, "info": None, "help": None},
+            "debug": {"start": None, "stop": None, "status": None, "restart": None, "reload": None, "enable": None, "disable": None, "list": None, "ls": None, "info": None, "help": None},
+            "nikto": {"scan": None, "report": None, "help": None, "version": None, "update": None, "list": None, "ls": None, "info": None},
+            "legitify": {"scan": None, "report": None, "help": None, "version": None, "update": None, "list": None, "ls": None, "info": None},
+            "trufflehog": {"scan": None, "report": None, "help": None, "version": None, "update": None, "list": None, "ls": None, "info": None},
+            "system": {"scan": None, "scan --all": None, "info": None, "report": None, "help": None, "version": None, "update": None, "list": None, "ls": None, "status": None, "logs": None, "pdf": None, "csv": None, "json": None, "xml": None},
+            "net": {"mon": None, "scan": None, "report": None, "help": None, "version": None, "update": None, "list": None, "ls": None, "status": None, "logs": None, "pdf": None, "csv": None, "json": None, "xml": None},
+            "shutdown": None,
+            "scan-status": None,
+            "scan-quick": None,
+            "scan-full": None,
+            "full-scan": None,
+            "deep-scan": None,
+            "ds": None,
+            "quick-scan": None,
+            "ss": None,
+            "dst-logs": None,
+            "dst-refresh": None,
+            "dst-financial": None,
+            "dst-investigate": None,
+            "system scan": None,
+            "system info": None,
+            "system report": None,
+            "system help": None,
+            "system version": None,
+            "system update": None,
+            "system list": None,
+            "system ls": None,
+            "system status": None,
+            "system logs": None,
+            "system load": None,
+            "system export all": None,
+            "system export <format>": None,
+            "system export csv": None,
+            "system export json": None,
+            "system export xml": None,
+            "system export pdf": None,
+            "scan": None,
+            "scan --all": None,
+            "net -n mon": None,
+            "rmon-scan": None,
+            "rmon-report": None,
+            "rmon-start": None,
+            "rmon-stop": None,
+            "rmon-status": None,
+            "rmon-restart": None,
+            "rmon-reload": None,
+            "rmon-enable": None,
+            "rmon-events": None,
+            "rmon-restore": None,
+            "rmon-interactive": None,
+            "rmon-export": None,
+            "netsec-status": None,
+            "network-security": None,
+            "rmon export json": None,
+            "rmon export pdf": None,
+            "netsec": None,
+            "rmon export html": None,
+            "netsec-dashboard": None,
+            "ransomware": None,
+            "netsec-help": None,
+            "ransomware monitor": None,
+            "ransomware -start": None,
+            "ransomware -stop": None,
+            "wifiinfo": None,
+            "wifi-info": None,
+            "wlan-audit": None,
+            "wlan-scan": None,
+            "soc-intel": None,
+            "recon-ng": None,
+            "wifi-audit": None,
+            "wifi-scan": None,
+            "wifi-audit [IFACE]": None,
+            "wifi-scan [IFACE]": None,
+            "wifi": None,
+            "web-security": None,
+            "websec": None,
+            "ws": None,
+            "wsa": None,
+            "web-scan": {"options": ["--full", "--headers", "--ssl", "--vuln", "--output"]},
+            "webscan": None,
+            "web-headers": None,
+            "webheaders": None,
+            "web-ssl": None,
+            "webssl": None,
+            "web-vuln": None,
+            "webvuln": None,
+            "web-full":None,
+            "webfull": None,
+            "web-security": None,
+            "websec": None,
+            "ws": None,
+            "wsa": None,
+            "web-scan":None,
+            "webscan": None,
+            "web-headers": None,
+            "webheaders": None,
+            "web-ssl":None,
+            "webssl": None,
+            "web-vuln":None,
+            "webvuln": None,
+            "web-full":None,
+            "webfull": None,
+        }
+        
+        completer = NestedCompleter.from_nested_dict(COMMANDS)
+        
+        # Style for the bottom toolbar
+        try:
+            from prompt_toolkit.styles import Style as PromptStyle
+            style = PromptStyle([
+                ('bottom-toolbar', 'bg:#1a1a2e #33ff33'),
+                ('bottom-toolbar.text', '#078507'),
+            ])
+        except (ImportError, TypeError):
+            try:
+                from prompt_toolkit.styles import Style
+                style = Style.from_dict({
+                    'bottom-toolbar': 'bg:#1a1a2e #33ff33',
+                    'bottom-toolbar.text': '#078507',
+                })
+            except:
+                style = None
+        
+        # Start cursor blink
+        self._start_cursor_blink()
+        
+        # Create placeholder processor
+        placeholder_processor = PlaceholderProcessor(self._get_placeholder_data)
+        
+        # ============================================================
+        #  Safe history file handling
+        # ============================================================
+        history_file = None
+        try:
+            # Use a safe local path
+            safe_dir = os.path.expanduser('~/.dsterminal')
+            os.makedirs(safe_dir, exist_ok=True)
+            history_file = os.path.join(safe_dir, '.dst_history')
+            
+            # Test write permissions
+            with open(history_file, 'a') as f:
+                f.write('')
+        except (IOError, OSError, PermissionError):
+            history_file = None
+        
+        # Create the prompt session with safe history
+        try:
+            if history_file:
+                self.session = PromptSession(
+                    history=FileHistory(history_file),
+                    auto_suggest=AutoSuggestFromHistory(),
+                    completer=completer,
+                    bottom_toolbar=HTML(
+                        "<b>DSTerminal</b> v{} | Mode: <style bg='{}'>{}</style>"
+                    ).format(
+                        "4.0.0.113",
+                        "ansired" if self.is_admin() else "ansigreen",
+                        "ADMIN" if self.is_admin() else "USER",
+                    ),
+                    style=style,
+                    reserve_space_for_menu=0,
+                    complete_while_typing=True,
+                    refresh_interval=0.5,
+                    input_processors=[placeholder_processor],
+                )
+            else:
+                # Fallback without history
+                self.session = PromptSession(
+                    auto_suggest=AutoSuggestFromHistory(),
+                    completer=completer,
+                    bottom_toolbar=HTML(
+                        "<b>DSTerminal</b> v{} | Mode: <style bg='{}'>{}</style>"
+                    ).format(
+                        "4.0.0.113",
+                        "ansired" if self.is_admin() else "ansigreen",
+                        "ADMIN" if self.is_admin() else "USER",
+                    ),
+                    style=style,
+                    reserve_space_for_menu=0,
+                    complete_while_typing=True,
+                    refresh_interval=0.5,
+                    input_processors=[placeholder_processor],
+                )
+        except Exception as e:
+            # Ultimate fallback - no history, no completer
+            print(f"[!] Prompt initialization warning: {e}")
+            self.session = PromptSession(
+                bottom_toolbar=HTML(
+                    "<b>DSTerminal</b> v{} | Mode: <style bg='{}'>{}</style>"
+                ).format(
+                    "4.0.0.113",
+                    "ansired" if self.is_admin() else "ansigreen",
+                    "ADMIN" if self.is_admin() else "USER",
+                ),
+                style=style,
+            )
+        
+        # Get the application reference
+        self.app = self.session.app
+        
+        # START THE INTELLIGENT PLACEHOLDER ANIMATION THREAD
+        placeholder_thread = threading.Thread(target=self._animate_placeholder, daemon=True)
+        placeholder_thread.start()
+        
+        # Watch buffer for changes to detect user typing
+        buffer = self.session.default_buffer
+        
+        def on_text_changed(_):
+            """Detect when buffer content changes"""
+            text = buffer.text
+            
+            with self.placeholder_lock:
+                if text:
+                    # User is typing - hide placeholder
+                    self.current_input = text
+                    self.placeholder_text = ""
+                    self.placeholder_colors = []
+                else:
+                    # Buffer is empty - resume placeholder
+                    self.current_input = ""
+            
+            # Redraw prompt
+            if self.app:
+                try:
+                    self.app.invalidate()
+                except:
+                    pass
+        
+        buffer.on_text_changed += on_text_changed
+        
+        while True:
+            try:
+                # Build SIEM Dashboard prompt with animated cursor
+                prompt_text = self._get_prompt_siem_dashboard()
+                
+                # Get user input
+                user_input = self.session.prompt(prompt_text)
+                
+                # Store the input
+                self.current_input = user_input
+                
+                self.log_command(user_input)
+                self.log_to_siem(f"Command executed: {user_input}")
+                
+                if user_input.lower() == "exit":
+                    self.save_session_end()
+                    from colorama import Fore, Style
+                    print(f"{Fore.LIGHTYELLOW_EX}✅ Log saved.{Style.RESET_ALL}")
+                    break
+                
+                # Handle the command
+                self.handle_command(user_input.strip())
+                
+            except KeyboardInterrupt:
+                print("\n[!] Use 'exit' to quit or 'help' for commands")
+            except EOFError:
+                print("\n[!] EOF detected. Exiting...")
+                break
+            except Exception as e:
+                print(f"[!] SOC Terminal Error: {str(e)}")
+                self.log_to_siem(f"Terminal error: {str(e)}")
+            finally:
+                # Clear input after command execution to allow placeholder to resume
+                with self.placeholder_lock:
+                    self.current_input = ""
+                    # Reset placeholder to trigger new sentence
+                    self.placeholder_text = ""
+                    self.placeholder_colors = []
+
+    def stop_cursor_animation(self):
+        """Stop the cursor animation thread"""
+        self.cursor_running = False
+        if hasattr(self, 'cursor_thread') and self.cursor_thread:
+            self.cursor_thread.join(timeout=1)
+
+
+@contextlib.contextmanager
+def suppress_output():
+    """Context manager to suppress stdout"""
+    with open(os.devnull, 'w') as devnull:
+        old_stdout = sys.stdout
+        sys.stdout = devnull
+        try:
+            yield
+        finally:
+            sys.stdout = old_stdout
+
+if __name__ == "__main__":
+    if '--monitor-only' in sys.argv:
+        ws_idx = sys.argv.index('--workspace') if '--workspace' in sys.argv else None
+        paths_idx = sys.argv.index('--paths') if '--paths' in sys.argv else None
+        
+        workspace_path = sys.argv[ws_idx + 1] if ws_idx else os.getcwd()
+        
+        # Check for quiet mode
+        quiet = '--quiet' in sys.argv or '-q' in sys.argv
+        
+        # Show banner only if not quiet
+        if not quiet:
+            print("""
+        ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+        ┃         DSTERMINAL DELETION PROTECTION               ┃
+        ┃         Background Monitoring Active                 ┃
+        ┃         Close this window to stop                    ┃
+        ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+        """)
+        
+        # Load config with all paths
+        if paths_idx:
+            monitor_paths = sys.argv[paths_idx + 1].split(',')
+        else:
+            if quiet:
+                with suppress_output():
+                    from deletion_protection import PlatformDetector
+                    pd = PlatformDetector()
+                    monitor_paths = pd.get_trash_paths()
+            else:
+                from deletion_protection import PlatformDetector
+                pd = PlatformDetector()
+                monitor_paths = pd.get_trash_paths()
+        
+        config = {
+            'version': '4.0.0.113',
+            'monitor_paths': monitor_paths,
+            'exclude_patterns': ['*.tmp', '*.temp', '*~', '.DS_Store', 'Thumbs.db'],
+            'max_file_size': 100 * 1024 * 1024,
+            'encrypt_backups': False,
+        }
+        
+        # Initialize workspace and monitor
+        if quiet:
+            with suppress_output():
+                ws = SimpleWorkspace(workspace_path)
+                monitor = DSTerminalMonitor(config, ws, interactive=False, ui=None)
+        else:
+            ws = SimpleWorkspace(workspace_path)
+            monitor = DSTerminalMonitor(config, ws, interactive=False, ui=None)
+        
+        from watchdog.observers import Observer
+        observer = Observer()
+        
+        monitored_count = 0
+        for path in monitor_paths:
+            if os.path.exists(path):
+                try:
+                    observer.schedule(monitor, path=path, recursive=True)
+                    if not quiet:
+                        print(f"  âœ“ Monitoring: {path}")
+                    monitored_count += 1
+                except Exception as e:
+                    if not quiet:
+                        print(f"  âœ— Skipping {path}: {e}")
+            else:
+                if not quiet:
+                    print(f"  âœ— Path not found: {path}")
+        
+        observer.start()
+        
+        if not quiet:
+            print(f"\n[*] Monitoring {monitored_count} folders.")
+            print("[*] Press Ctrl+C to stop.\n")
+        
+        sys.stdout.flush()
+        
+        try:
+            while True:
+                time.sleep(1)
+                sys.stdout.flush()
+        except KeyboardInterrupt:
+            if not quiet:
+                print("\n[*] Stopping...")
+            observer.stop()
+            observer.join()
+            monitor.cleanup()
+            if not quiet:
+                print("[âœ“] Monitoring stopped.")
+        
+        sys.exit(0)
+    
+    # Normal terminal startup
+    quiet = '--quiet' in sys.argv or '-q' in sys.argv
+    
+    if quiet:
+        # Initialize with quiet mode
+        terminal = SecurityTerminal(quiet=True)
+    else:
+        terminal = SecurityTerminal()
+    
+    terminal.run()

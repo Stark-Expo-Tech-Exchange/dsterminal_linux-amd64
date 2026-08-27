@@ -1,5 +1,71 @@
-﻿#!/usr/bin/env python3
+#!python
+import sys
 # -*- coding: utf-8 -*-
+
+# ============================================================
+# FIX: Handle OSError 22 on Windows
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(["chcp", "65001"], capture_output=True, shell=True)
+    except:
+        pass
+
+_original_stdout_write = sys.stdout.write
+
+def _safe_stdout_write(text):
+    try:
+        _original_stdout_write(text)
+    except OSError as e:
+        if e.errno == 22:
+            try:
+                clean = text.encode("ascii", "ignore").decode("ascii")
+                _original_stdout_write(clean)
+            except:
+                pass
+        else:
+            raise
+    except UnicodeEncodeError:
+        try:
+            clean = text.encode("ascii", "ignore").decode("ascii")
+            _original_stdout_write(clean)
+        except:
+            pass
+
+sys.stdout.write = _safe_stdout_write
+
+
+# ============================================================
+# FIX: Handle OSError 22 on Windows
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(["chcp", "65001"], capture_output=True, shell=True)
+    except:
+        pass
+
+
+    try:
+    except OSError as e:
+        if e.errno == 22:
+            try:
+                clean = text.encode("ascii", "ignore").decode("ascii")
+                _original_stdout_write(clean)
+            except:
+                pass
+        else:
+            raise
+    except UnicodeEncodeError:
+        try:
+            clean = text.encode("ascii", "ignore").decode("ascii")
+            _original_stdout_write(clean)
+        except:
+            pass
+
+sys.stdout.write = _safe_stdout_write
+
 
 """
 SQLMap Scanner & Learning Lab - DSTERMINAL Enterprise Edition v4.0
@@ -12,17 +78,7 @@ Advanced SQL Injection Learning Lab with:
 - MITRE ATT&CK Mapping
 """
 import sys
-if sys.platform == 'win32':
-    import os
-    import msvcrt
-    # Ensure stdout is properly set
-    if hasattr(sys.stdout, 'buffer'):
-        sys.stdout = open(sys.stdout.fileno(), 'w', encoding='utf-8', errors='ignore')
-    if hasattr(sys.stderr, 'buffer'):
-        sys.stderr = open(sys.stderr.fileno(), 'w', encoding='utf-8', errors='ignore')
-        
 import os
-import sys
 import subprocess
 import random
 import time
@@ -45,9 +101,93 @@ import urllib.parse
 from collections import defaultdict
 
 # ============================================================
-# FIX CONSOLE ENCODING
+# FIX WINDOWS CONSOLE ENCODING - MUST BE FIRST
 # ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(['chcp', '65001'], capture_output=True, shell=True)
+    except:
+        pass
+    
+    # Fix stdout encoding
+    try:
+        if hasattr(sys.stdout, 'reconfigure'):
+            sys.stdout.reconfigure(encoding='utf-8', errors='ignore')
+        else:
+            import io
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
+    except:
+        pass
 
+# ============================================================
+# ANSI COLOR DEFINITIONS (ALWAYS AVAILABLE)
+# ============================================================
+class Colors:
+    """ANSI color codes for terminal output"""
+    RED = '\033[91m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    BLUE = '\033[94m'
+    MAGENTA = '\033[95m'
+    CYAN = '\033[96m'
+    WHITE = '\033[97m'
+    RESET = '\033[0m'
+    DIM = '\033[2m'
+    ORANGE = '\033[38;5;208m'
+    PURPLE = '\033[38;5;129m'
+    BRIGHT_RED = '\033[91;1m'
+    BRIGHT_GREEN = '\033[92;1m'
+    BRIGHT_YELLOW = '\033[93;1m'
+    BRIGHT_CYAN = '\033[96;1m'
+    BRIGHT_MAGENTA = '\033[95;1m'
+    BRIGHT_BLUE = '\033[94;1m'
+
+class Styles:
+    BRIGHT = '\033[1m'
+    DIM = '\033[2m'
+    NORMAL = '\033[22m'
+    RESET_ALL = '\033[0m'
+
+# ============================================================
+# TRY TO IMPORT COLORAMA WITH PROPER ERROR HANDLING
+# ============================================================
+try:
+    from colorama import init, Fore, Back, Style
+    init(autoreset=True)
+    COLORAMA_AVAILABLE = True
+except ImportError:
+    COLORAMA_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = Styles
+    Back = type('Back', (), {'RESET': '', 'BLACK': '', 'RED': '', 'GREEN': '', 'YELLOW': '', 'BLUE': '', 'MAGENTA': '', 'CYAN': '', 'WHITE': ''})
+except Exception as e:
+    COLORAMA_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = Styles
+    Back = type('Back', (), {'RESET': '', 'BLACK': '', 'RED': '', 'GREEN': '', 'YELLOW': '', 'BLUE': '', 'MAGENTA': '', 'CYAN': '', 'WHITE': ''})
+
+# ============================================================
+# SIMPLE SAFE PRINT FUNCTION
+# ============================================================
+def safe_print_unicode(message):
+    """Safely print unicode/emoji characters on Windows"""
+    try:
+        print(message)
+    except UnicodeEncodeError:
+        clean_message = message.encode('ascii', 'ignore').decode('ascii')
+        print(clean_message)
+    except Exception:
+        try:
+            print(str(message))
+        except:
+            pass
+
+# ============================================================
+# FIX CONSOLE ENCODING (Without reassigning stdout/stderr)
+# ============================================================
 def fix_console_encoding():
     """Fix console encoding for Windows to display UTF-8 characters"""
     if platform.system() == 'Windows':
@@ -63,18 +203,15 @@ def fix_console_encoding():
                 ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
                 if not (mode.value & ENABLE_VIRTUAL_TERMINAL_PROCESSING):
                     kernel32.SetConsoleMode(handle, mode.value | ENABLE_VIRTUAL_TERMINAL_PROCESSING)
-            
-            if sys.stdout.encoding != 'utf-8':
-                import codecs
-                sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
-                sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
         except:
             pass
 
-# Apply encoding fix
+# Apply encoding fix (does NOT reassign stdout/stderr)
 fix_console_encoding()
 
-# Rich imports for UI
+# ============================================================
+# RICH IMPORTS (Optional)
+# ============================================================
 try:
     from rich.console import Console
     from rich.live import Live
@@ -92,9 +229,11 @@ except ImportError:
     RICH_AVAILABLE = False
     Console = None
 
-# Try to import reportlab for PDF generation
+# ============================================================
+# REPORTLAB IMPORTS (Optional)
+# ============================================================
 try:
-    from reportlab.lib import colors
+    from reportlab.lib import colors as reportlab_colors
     from reportlab.lib.pagesizes import A4, letter
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, Image
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -104,6 +243,7 @@ try:
     REPORTLAB_AVAILABLE = True
 except ImportError:
     REPORTLAB_AVAILABLE = False
+ 
 
 # ============================================================
 # ADVANCED SQL INJECTION TECHNIQUES DATABASE
@@ -805,8 +945,7 @@ class EnhancedPDFNotesGenerator:
             if self.console:
                 self.console.print(f"[red]PDF generation failed: {str(e)}[/red]")
             return None
-
-
+ 
 # ============================================================
 # ENHANCED SQL INJECTION LAB
 # ============================================================

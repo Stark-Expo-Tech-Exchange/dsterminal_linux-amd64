@@ -1,4 +1,4 @@
-﻿# Install Chocolatey Package Manager - With Admin Elevation & Alternatives
+# Install Chocolatey Package Manager - With Admin Elevation & Alternatives
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "  Installing Chocolatey Package Manager" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Cyan

@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!python
 """
 Dsterminal Manifest PDF Generator
 Version: 4.0.0.113

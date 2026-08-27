@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!python
 """
 DSTERMINAL Complete Installer - Automatically installs DSTERMINAL and all dependencies
 """

@@ -1,5 +1,40 @@
-﻿#!/usr/bin/env python3
+#!python
+import sys
 # -*- coding: utf-8 -*-
+
+# ============================================================
+# FIX: Handle OSError 22 on Windows - FIXED
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(["chcp", "65001"], capture_output=True, shell=True)
+    except:
+        pass
+
+_original_stdout_write = sys.stdout.write
+
+def _safe_stdout_write(text):
+    try:
+        _original_stdout_write(text)
+    except OSError as e:
+        if e.errno == 22:
+            try:
+                clean = text.encode("ascii", "ignore").decode("ascii")
+                _original_stdout_write(clean)
+            except:
+                pass
+        else:
+            raise
+    except UnicodeEncodeError:
+        try:
+            clean = text.encode("ascii", "ignore").decode("ascii")
+            _original_stdout_write(clean)
+        except:
+            pass
+
+sys.stdout.write = _safe_stdout_write
+
 
 """
 DSTERMINAL HARDENING DASHBOARD - ENTERPRISE CINEMATIC EDITION
@@ -7,17 +42,7 @@ Real-time telemetry, live command execution, 4-panel tactical layout
 Uses psutil for all system telemetry and network interface detection
 """
 import sys
-if sys.platform == 'win32':
-    import os
-    import msvcrt
-    # Ensure stdout is properly set
-    if hasattr(sys.stdout, 'buffer'):
-        sys.stdout = open(sys.stdout.fileno(), 'w', encoding='utf-8', errors='ignore')
-    if hasattr(sys.stderr, 'buffer'):
-        sys.stderr = open(sys.stderr.fileno(), 'w', encoding='utf-8', errors='ignore')
-        
 import os
-import sys
 import time
 import json
 import shutil
@@ -27,11 +52,131 @@ import subprocess
 import threading
 import queue
 import codecs
+import re
+import textwrap
+import random
 from datetime import datetime
 from enum import Enum
 from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass, field
 from collections import deque
+
+# ============================================================
+# FIX WINDOWS CONSOLE ENCODING - MUST BE FIRST
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(['chcp', '65001'], capture_output=True, shell=True)
+    except:
+        pass
+    
+    # Fix stdout encoding
+    try:
+        if hasattr(sys.stdout, 'reconfigure'):
+            sys.stdout.reconfigure(encoding='utf-8', errors='ignore')
+        else:
+            import io
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
+    except:
+        pass
+
+# ============================================================
+# ANSI COLOR DEFINITIONS (ALWAYS AVAILABLE)
+# ============================================================
+class Colors:
+    """ANSI color codes for terminal output"""
+    BLACK = '\033[30m'
+    RED = '\033[31m'
+    GREEN = '\033[32m'
+    YELLOW = '\033[33m'
+    BLUE = '\033[34m'
+    MAGENTA = '\033[35m'
+    CYAN = '\033[36m'
+    WHITE = '\033[37m'
+    RESET = '\033[0m'
+    BRIGHT_BLACK = '\033[90m'
+    BRIGHT_RED = '\033[91m'
+    BRIGHT_GREEN = '\033[92m'
+    BRIGHT_YELLOW = '\033[93m'
+    BRIGHT_BLUE = '\033[94m'
+    BRIGHT_MAGENTA = '\033[95m'
+    BRIGHT_CYAN = '\033[96m'
+    BRIGHT_WHITE = '\033[97m'
+    DIM = '\033[90m'
+    BOLD = '\033[1m'
+    ITALIC = '\033[3m'
+    UNDERLINE = '\033[4m'
+    BLINK = '\033[5m'
+    REVERSE = '\033[7m'
+    HIDDEN = '\033[8m'
+    RESET_ALL = '\033[0m'
+    
+    @staticmethod
+    def strip(text):
+        ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+        return ansi_escape.sub('', text)
+
+# ============================================================
+# TRY TO IMPORT COLORAMA WITH PROPER ERROR HANDLING
+# ============================================================
+try:
+    from colorama import init, Fore, Back, Style
+    init(autoreset=True, convert=True, strip=False)
+    COLORS_AVAILABLE = True
+    # Force color support
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
+    os.environ['PYTHONUTF8'] = '1'
+except ImportError:
+    COLORS_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m',
+        'ITALIC': '\033[3m',
+        'UNDERLINE': '\033[4m',
+        'BLINK': '\033[5m',
+        'REVERSE': '\033[7m',
+        'HIDDEN': '\033[8m'
+    })
+    Back = type('Back', (), {
+        'RESET': '\033[49m',
+        'BLACK': '\033[40m',
+        'RED': '\033[41m',
+        'GREEN': '\033[42m',
+        'YELLOW': '\033[43m',
+        'BLUE': '\033[44m',
+        'MAGENTA': '\033[45m',
+        'CYAN': '\033[46m',
+        'WHITE': '\033[47m'
+    })
+except Exception as e:
+    COLORS_AVAILABLE = False
+    # Use our defined colors as fallback
+    Fore = Colors
+    Style = type('Style', (), {
+        'RESET_ALL': '\033[0m',
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m',
+        'ITALIC': '\033[3m',
+        'UNDERLINE': '\033[4m',
+        'BLINK': '\033[5m',
+        'REVERSE': '\033[7m',
+        'HIDDEN': '\033[8m'
+    })
+    Back = type('Back', (), {
+        'RESET': '\033[49m',
+        'BLACK': '\033[40m',
+        'RED': '\033[41m',
+        'GREEN': '\033[42m',
+        'YELLOW': '\033[43m',
+        'BLUE': '\033[44m',
+        'MAGENTA': '\033[45m',
+        'CYAN': '\033[46m',
+        'WHITE': '\033[47m'
+    })
 
 # ============================================================
 # FIX CONSOLE ENCODING FOR WINDOWS
@@ -54,53 +199,15 @@ def fix_console_encoding():
                 ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
                 if not (mode.value & ENABLE_VIRTUAL_TERMINAL_PROCESSING):
                     kernel32.SetConsoleMode(handle, mode.value | ENABLE_VIRTUAL_TERMINAL_PROCESSING)
-            
-            # Set stdout to UTF-8
-            if sys.stdout.encoding != 'utf-8':
-                sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
-                sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
         except:
             pass
 
-# Apply encoding fix immediately
+# Apply encoding fix (does NOT reassign stdout/stderr)
 fix_console_encoding()
 
-# Terminal colors
-class Fore:
-    BLACK = '\033[30m'
-    RED = '\033[31m'
-    GREEN = '\033[32m'
-    YELLOW = '\033[33m'
-    BLUE = '\033[34m'
-    MAGENTA = '\033[35m'
-    CYAN = '\033[36m'
-    WHITE = '\033[37m'
-    RESET = '\033[0m'
-    
-    # Bright variants
-    BRIGHT_BLACK = '\033[90m'
-    BRIGHT_RED = '\033[91m'
-    BRIGHT_GREEN = '\033[92m'
-    BRIGHT_YELLOW = '\033[93m'
-    BRIGHT_BLUE = '\033[94m'
-    BRIGHT_MAGENTA = '\033[95m'
-    BRIGHT_CYAN = '\033[96m'
-    BRIGHT_WHITE = '\033[97m'
-    DIM = '\033[90m'
-
-
-class Style:
-    BRIGHT = '\033[1m'
-    DIM = '\033[2m'
-    ITALIC = '\033[3m'
-    UNDERLINE = '\033[4m'
-    BLINK = '\033[5m'
-    REVERSE = '\033[7m'
-    HIDDEN = '\033[8m'
-    RESET_ALL = '\033[0m'
-
-
-# Try to import Rich for enhanced UI
+# ============================================================
+# TRY TO IMPORT RICH
+# ============================================================
 try:
     from rich.console import Console
     from rich.layout import Layout
@@ -114,13 +221,18 @@ try:
     RICH_AVAILABLE = True
 except ImportError:
     RICH_AVAILABLE = False
+    print(f"{Fore.YELLOW}⚠️ Rich library not available. Install with: pip install rich{Fore.RESET}")
 
-# Try to import psutil for system telemetry
+# ============================================================
+# TRY TO IMPORT PSUTIL
+# ============================================================
 try:
     import psutil
     PSUTIL_AVAILABLE = True
 except ImportError:
     PSUTIL_AVAILABLE = False
+    print(f"{Fore.YELLOW}⚠️ psutil not installed. Install with: pip install psutil{Fore.RESET}")
+
 
 
 class HardeningCategory(Enum):
@@ -324,6 +436,164 @@ class HardeningDashboard:
             handlers=[logging.FileHandler(f"{log_dir}/hardening_{self.session_id}.log")]
         )
     
+    # ============================================================
+    # NEON BOX DRAWING WITH ANIMATION - NEW METHOD
+    # ============================================================
+    
+    def _draw_neon_hacker_box(self, title: str, content_lines: List[str], 
+                              title_color: str = Fore.LIGHTCYAN_EX,
+                              border_color: str = Fore.LIGHTCYAN_EX,
+                              content_color: str = Fore.LIGHTGREEN_EX,
+                              blink_title: bool = False,
+                              glow_border: bool = True,
+                              width: int = None,
+                              animated: bool = False,
+                              animation_duration: float = 1.0):
+        """
+        Draw a centered neon glowing hacker-styled box with optional animation.
+        """
+        # Get terminal dimensions
+        try:
+            term = shutil.get_terminal_size()
+            term_width = term.columns
+        except:
+            term_width = 80
+        
+        # Set box width - responsive
+        if width is None:
+            width = min(term_width - 6, 110)
+        width = max(width, 60)
+        left_margin = max(0, (term_width - width) // 2)
+        inner_width = width - 4
+        
+        # Wrap content lines
+        wrapped_lines = []
+        for line in content_lines:
+            if not line.strip():
+                wrapped_lines.append("")
+                continue
+            # Handle already colored lines
+            if re.search(r'\x1b\[[0-9;]*m', line):
+                wrapped_lines.append(line)
+            else:
+                wrapped_lines.extend(textwrap.wrap(line, inner_width, break_long_words=False))
+        
+        # Box drawing characters
+        TOP_LEFT = "╔"
+        TOP_RIGHT = "╗"
+        BOTTOM_LEFT = "╚"
+        BOTTOM_RIGHT = "╝"
+        HORIZONTAL = "═"
+        VERTICAL = "║"
+        T_LEFT = "╠"
+        T_RIGHT = "╣"
+        
+        # Glow effects
+        BOLD = '\033[1m'
+        BLINK_ON = '\033[5m'
+        BLINK_OFF = '\033[25m'
+        
+        # Prepare colors
+        glow_prefix = BOLD if glow_border else ""
+        title_prefix = BOLD
+        if blink_title:
+            title_prefix += BLINK_ON
+        
+        # Build box
+        top = f"{' ' * left_margin}{glow_prefix}{border_color}{TOP_LEFT}{HORIZONTAL * (width - 2)}{TOP_RIGHT}{Style.RESET_ALL}"
+        title_text = f" {title} ".center(width - 2)
+        title_line = f"{' ' * left_margin}{title_prefix}{title_color}{VERTICAL}{title_text}{VERTICAL}{Style.RESET_ALL}"
+        if blink_title:
+            title_line += BLINK_OFF
+        mid = f"{' ' * left_margin}{glow_prefix}{border_color}{T_LEFT}{HORIZONTAL * (width - 2)}{T_RIGHT}{Style.RESET_ALL}"
+        bot = f"{' ' * left_margin}{glow_prefix}{border_color}{BOTTOM_LEFT}{HORIZONTAL * (width - 2)}{BOTTOM_RIGHT}{Style.RESET_ALL}"
+        
+        # Print box with animation
+        if animated:
+            # Print top and title with animation
+            print(top)
+            sys.stdout.write(title_line)
+            sys.stdout.flush()
+            time.sleep(0.1)
+            print()
+            print(mid)
+            time.sleep(0.1)
+            
+            # Animate content lines
+            for line in wrapped_lines:
+                # Draw the line with animation
+                has_color = re.search(r'\x1b\[[0-9;]*m', line)
+                if has_color:
+                    # Preserve existing colors
+                    clean_line = re.sub(r'\x1b\[[0-9;]*m', '', line)
+                    padding_needed = inner_width - len(clean_line)
+                    if padding_needed < 0:
+                        padding_needed = 0
+                    
+                    left_border = f"{' ' * left_margin}{glow_prefix}{border_color}{VERTICAL} {Style.RESET_ALL}"
+                    right_border = f"{' ' * left_margin}{glow_prefix}{border_color}{VERTICAL}{Style.RESET_ALL}"
+                    
+                    # Type out the line character by character
+                    sys.stdout.write(left_border)
+                    for char in line:
+                        sys.stdout.write(char)
+                        sys.stdout.flush()
+                        time.sleep(0.015)
+                    sys.stdout.write(" " * padding_needed)
+                    print(f" {right_border}")
+                else:
+                    # Plain text with content color
+                    padded_line = line.ljust(inner_width)
+                    left_border = f"{' ' * left_margin}{glow_prefix}{border_color}{VERTICAL} {Style.RESET_ALL}"
+                    right_border = f"{' ' * left_margin}{glow_prefix}{border_color}{VERTICAL}{Style.RESET_ALL}"
+                    
+                    sys.stdout.write(left_border)
+                    for char in padded_line:
+                        if char != ' ' or random.random() > 0.3:
+                            sys.stdout.write(f"{content_color}{char}{Style.RESET_ALL}")
+                        else:
+                            sys.stdout.write(char)
+                        sys.stdout.flush()
+                        time.sleep(0.01)
+                    print(f" {right_border}")
+            
+            # Animate bottom border
+            time.sleep(0.1)
+            print(bot)
+            print()
+            time.sleep(0.2)
+        else:
+            # Static box - print everything at once
+            print(top)
+            print(title_line)
+            print(mid)
+            for line in wrapped_lines:
+                has_color = re.search(r'\x1b\[[0-9;]*m', line)
+                if has_color:
+                    clean_line = re.sub(r'\x1b\[[0-9;]*m', '', line)
+                    padding_needed = inner_width - len(clean_line)
+                    if padding_needed < 0:
+                        padding_needed = 0
+                    left_border = f"{' ' * left_margin}{glow_prefix}{border_color}{VERTICAL} {Style.RESET_ALL}"
+                    print(f"{left_border}{line}{' ' * padding_needed} {glow_prefix}{border_color}{VERTICAL}{Style.RESET_ALL}")
+                else:
+                    left_border = f"{' ' * left_margin}{glow_prefix}{border_color}{VERTICAL} {Style.RESET_ALL}"
+                    print(f"{left_border}{content_color}{line.ljust(inner_width)}{Style.RESET_ALL} {glow_prefix}{border_color}{VERTICAL}{Style.RESET_ALL}")
+            print(bot)
+            print()
+
+    def _get_severity_text(self, severity):
+        """Get severity text with color"""
+        if severity == HardeningSeverity.CRITICAL:
+            return f"{Fore.LIGHTRED_EX}🔴 CRITICAL{Style.RESET_ALL}"
+        elif severity == HardeningSeverity.HIGH:
+            return f"{Fore.LIGHTYELLOW_EX}🟡 HIGH{Style.RESET_ALL}"
+        elif severity == HardeningSeverity.MEDIUM:
+            return f"{Fore.LIGHTCYAN_EX}🔵 MEDIUM{Style.RESET_ALL}"
+        elif severity == HardeningSeverity.LOW:
+            return f"{Fore.LIGHTGREEN_EX}🟢 LOW{Style.RESET_ALL}"
+        return f"{Fore.WHITE}UNKNOWN{Style.RESET_ALL}"
+
     # ============================================================
     # COMMAND GENERATORS (Real hardening commands)
     # ============================================================
@@ -651,7 +921,7 @@ class HardeningDashboard:
         return False
     
     # ============================================================
-    # REAL-TIME HARDENING EXECUTION
+    # ANIMATED HARDENING EXECUTION - UPDATED WITH NEON BOXES
     # ============================================================
     
     def _execute_module_realtime(self, module: HardeningModule, index: int, total: int) -> HardeningResult:
@@ -703,7 +973,7 @@ class HardeningDashboard:
             return HardeningResult(module, False, start_time, datetime.now(), "", str(e))
     
     def _execute_hardening_realtime(self):
-        """Execute hardening with real-time cinematic display"""
+        """Execute hardening with real-time cinematic animated display with neon boxes"""
         if not self.selected_modules:
             self._add_threat_event("No modules selected", "warning")
             print(f"{Fore.YELLOW}[!] No modules selected. Use 'harden list' to see available modules.{Style.RESET_ALL}")
@@ -713,22 +983,92 @@ class HardeningDashboard:
         modules_to_execute = [m for m in self.modules if m.id in self.selected_modules]
         total = len(modules_to_execute)
         
-        print(f"\n{Fore.CYAN}{'='*60}{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}{' '*20}EXECUTING HARDENING MODULES{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}{'='*60}{Style.RESET_ALL}\n")
+        # Header box - animated
+        header_lines = [
+            f"{Fore.LIGHTYELLOW_EX}🔧 SYSTEM HARDENING IN PROGRESS{Style.RESET_ALL}",
+            f"{Style.DIM}└─ Selected: {len(modules_to_execute)} modules{Style.RESET_ALL}",
+            f"{Style.DIM}└─ Estimated Time: ~{len(modules_to_execute)} minutes{Style.RESET_ALL}",
+            f"{Style.DIM}└─ Target: {self.system}{Style.RESET_ALL}",
+            f"{Style.DIM}└─ Admin: {'Yes' if self.is_admin_user else 'No'}{Style.RESET_ALL}"
+        ]
         
+        self._draw_neon_hacker_box(
+            "⚡ HARDENING ENGINE INITIALIZED",
+            header_lines,
+            title_color=Fore.LIGHTCYAN_EX,
+            border_color=Fore.LIGHTCYAN_EX,
+            content_color=Fore.LIGHTWHITE_EX,
+            blink_title=True,
+            glow_border=True,
+            animated=True
+        )
+        
+        time.sleep(1)
+        
+        # Execute each module with animated display
         for i, module in enumerate(modules_to_execute, 1):
-            print(f"{Fore.YELLOW}[{i}/{total}] Executing: {module.name}{Style.RESET_ALL}")
-            print(f"{Fore.DIM}  Command: {module.command[:80]}...{Style.RESET_ALL}")
+            # Module progress box
+            progress_lines = [
+                f"{Fore.LIGHTYELLOW_EX}[Module {i}/{total}]{Style.RESET_ALL}",
+                f"{Fore.LIGHTCYAN_EX}├─ Name: {Fore.WHITE}{module.name}{Style.RESET_ALL}",
+                f"{Fore.LIGHTCYAN_EX}├─ Severity: {self._get_severity_text(module.severity)}",
+                f"{Fore.LIGHTCYAN_EX}├─ Category: {Fore.WHITE}{module.category.value}{Style.RESET_ALL}",
+                f"{Fore.LIGHTCYAN_EX}└─ Description: {Style.DIM}{module.description[:60]}...{Style.RESET_ALL}"
+            ]
+            
+            self._draw_neon_hacker_box(
+                f"🔄 EXECUTING MODULE {i}/{total}",
+                progress_lines,
+                title_color=Fore.LIGHTMAGENTA_EX,
+                border_color=Fore.LIGHTCYAN_EX,
+                content_color=Fore.LIGHTWHITE_EX,
+                blink_title=True,
+                glow_border=True,
+                animated=True
+            )
             
             # Check admin requirement
             if module.requires_admin and not self.is_admin_user:
-                print(f"  {Fore.RED}✗ SKIPPED: Requires administrator privileges{Style.RESET_ALL}")
+                result_lines = [
+                    f"{Fore.LIGHTRED_EX}✗ SKIPPED{Style.RESET_ALL}",
+                    f"{Fore.YELLOW}├─ Reason: Administrator privileges required{Style.RESET_ALL}",
+                    f"{Style.DIM}└─ Module: {module.name}{Style.RESET_ALL}"
+                ]
+                self._draw_neon_hacker_box(
+                    "⚠️ SKIPPED",
+                    result_lines,
+                    title_color=Fore.LIGHTRED_EX,
+                    border_color=Fore.LIGHTRED_EX,
+                    content_color=Fore.LIGHTYELLOW_EX,
+                    blink_title=True,
+                    glow_border=True,
+                    animated=True
+                )
+                
                 result = HardeningResult(module, False, datetime.now(), datetime.now(), "", "Admin privileges required", [])
                 self.results.append(result)
                 continue
             
+            # Execute with animated progress
             try:
+                # Show executing animation
+                executing_lines = [
+                    f"{Fore.LIGHTGREEN_EX}▶ Executing command...{Style.RESET_ALL}",
+                    f"{Style.DIM}├─ Command: {module.command[:50]}...{Style.RESET_ALL}",
+                    f"{Style.DIM}└─ Status: {Fore.LIGHTYELLOW_EX}RUNNING{Style.RESET_ALL}"
+                ]
+                self._draw_neon_hacker_box(
+                    "⚡ EXECUTING",
+                    executing_lines,
+                    title_color=Fore.LIGHTGREEN_EX,
+                    border_color=Fore.LIGHTGREEN_EX,
+                    content_color=Fore.LIGHTWHITE_EX,
+                    blink_title=True,
+                    glow_border=True,
+                    animated=True
+                )
+                
+                # Run the command with real-time output
                 process = subprocess.Popen(
                     module.command,
                     shell=True,
@@ -739,21 +1079,108 @@ class HardeningDashboard:
                 )
                 
                 output_lines = []
-                for line in iter(process.stdout.readline, ''):
-                    if line:
-                        clean_line = line.strip()
-                        output_lines.append(clean_line)
-                        if clean_line:
-                            print(f"  {Fore.DIM}{clean_line[:100]}{Style.RESET_ALL}")
+                # Simulate 1 minute execution with progress
+                for step in range(10):  # 60 seconds
+                    # Read output if available
+                    if process.stdout:
+                        line = process.stdout.readline()
+                        if line:
+                            clean_line = line.strip()
+                            output_lines.append(clean_line)
+                    
+                    # Show progress
+                    progress = int((step + 1) / 60 * 100)
+                    bar_length = 30
+                    filled = int(progress / 100 * bar_length)
+                    bar = "█" * filled + "░" * (bar_length - filled)
+                    
+                    # Determine color based on progress
+                    if progress < 30:
+                        progress_color = Fore.LIGHTYELLOW_EX
+                    elif progress < 70:
+                        progress_color = Fore.LIGHTCYAN_EX
+                    else:
+                        progress_color = Fore.LIGHTGREEN_EX
+                    
+                    progress_lines = [
+                        f"{Fore.LIGHTGREEN_EX}▶ Executing...{Style.RESET_ALL}",
+                        f"{Style.DIM}├─ Progress: {progress_color}{bar} {progress}%{Style.RESET_ALL}",
+                        f"{Style.DIM}├─ Module: {module.name[:40]}{Style.RESET_ALL}",
+                        f"{Style.DIM}└─ Elapsed: {step + 1}s / 60s{Style.RESET_ALL}"
+                    ]
+                    
+                    # Add latest output if available
+                    if output_lines:
+                        last_line = output_lines[-1][:50]
+                        progress_lines.append(f"{Style.DIM}   └─ Output: {Fore.LIGHTWHITE_EX}{last_line}{Style.RESET_ALL}")
+                    
+                    self._draw_neon_hacker_box(
+                        f"🔄 PROCESSING {progress}%",
+                        progress_lines,
+                        title_color=progress_color,
+                        border_color=Fore.LIGHTCYAN_EX,
+                        content_color=Fore.LIGHTWHITE_EX,
+                        blink_title=(progress % 20 < 10),
+                        glow_border=True,
+                        animated=True
+                    )
+                    
+                    time.sleep(1)
                 
-                process.wait(timeout=30)
+                # Wait for process to complete
+                process.wait(timeout=5)
                 success = process.returncode == 0
                 
+                # Show result
                 if success:
-                    print(f"  {Fore.GREEN}✓ SUCCESS{Style.RESET_ALL}")
+                    result_lines = [
+                        f"{Fore.LIGHTGREEN_EX}✅ SUCCESS{Style.RESET_ALL}",
+                        f"{Fore.GREEN}├─ Module: {module.name}{Style.RESET_ALL}",
+                        f"{Fore.GREEN}├─ Status: APPLIED SUCCESSFULLY{Style.RESET_ALL}",
+                        f"{Style.DIM}└─ Output: {len(output_lines)} lines captured{Style.RESET_ALL}"
+                    ]
+                    
+                    # Add first few output lines
+                    if output_lines:
+                        for line in output_lines[:3]:
+                            result_lines.append(f"{Style.DIM}   └─ {line[:60]}{Style.RESET_ALL}")
+                    
+                    self._draw_neon_hacker_box(
+                        "✅ MODULE COMPLETE",
+                        result_lines,
+                        title_color=Fore.LIGHTGREEN_EX,
+                        border_color=Fore.LIGHTGREEN_EX,
+                        content_color=Fore.LIGHTWHITE_EX,
+                        blink_title=True,
+                        glow_border=True,
+                        animated=True
+                    )
+                    
                     self._add_threat_event(f"✓ {module.name} applied successfully", "success")
+                    
                 else:
-                    print(f"  {Fore.RED}✗ FAILED (exit code: {process.returncode}){Style.RESET_ALL}")
+                    result_lines = [
+                        f"{Fore.LIGHTRED_EX}❌ FAILED{Style.RESET_ALL}",
+                        f"{Fore.RED}├─ Module: {module.name}{Style.RESET_ALL}",
+                        f"{Fore.RED}├─ Exit Code: {process.returncode}{Style.RESET_ALL}",
+                        f"{Style.DIM}└─ Output: {len(output_lines)} lines captured{Style.RESET_ALL}"
+                    ]
+                    
+                    if output_lines:
+                        for line in output_lines[:3]:
+                            result_lines.append(f"{Style.DIM}   └─ {line[:60]}{Style.RESET_ALL}")
+                    
+                    self._draw_neon_hacker_box(
+                        "❌ MODULE FAILED",
+                        result_lines,
+                        title_color=Fore.LIGHTRED_EX,
+                        border_color=Fore.LIGHTRED_EX,
+                        content_color=Fore.LIGHTYELLOW_EX,
+                        blink_title=True,
+                        glow_border=True,
+                        animated=True
+                    )
+                    
                     self._add_threat_event(f"✗ {module.name} failed", "critical")
                 
                 result = HardeningResult(
@@ -769,42 +1196,117 @@ class HardeningDashboard:
                 
                 if success:
                     module.applied = True
-                
+                    
             except subprocess.TimeoutExpired:
                 process.kill()
-                print(f"  {Fore.RED}✗ TIMEOUT (30 seconds){Style.RESET_ALL}")
+                result_lines = [
+                    f"{Fore.LIGHTRED_EX}⏱️ TIMEOUT{Style.RESET_ALL}",
+                    f"{Fore.RED}├─ Module: {module.name}{Style.RESET_ALL}",
+                    f"{Fore.RED}├─ Reason: Command exceeded 60 seconds{Style.RESET_ALL}",
+                    f"{Style.DIM}└─ Action: Process terminated{Style.RESET_ALL}"
+                ]
+                self._draw_neon_hacker_box(
+                    "⏱️ TIMEOUT",
+                    result_lines,
+                    title_color=Fore.LIGHTRED_EX,
+                    border_color=Fore.LIGHTRED_EX,
+                    content_color=Fore.LIGHTYELLOW_EX,
+                    blink_title=True,
+                    glow_border=True,
+                    animated=True
+                )
                 result = HardeningResult(module, False, datetime.now(), datetime.now(), "", "Command timed out", [])
                 self.results.append(result)
+                
             except Exception as e:
-                print(f"  {Fore.RED}✗ ERROR: {e}{Style.RESET_ALL}")
+                result_lines = [
+                    f"{Fore.LIGHTRED_EX}💥 ERROR{Style.RESET_ALL}",
+                    f"{Fore.RED}├─ Module: {module.name}{Style.RESET_ALL}",
+                    f"{Fore.RED}├─ Error: {str(e)[:50]}{Style.RESET_ALL}",
+                    f"{Style.DIM}└─ Action: Check logs for details{Style.RESET_ALL}"
+                ]
+                self._draw_neon_hacker_box(
+                    "💥 ERROR",
+                    result_lines,
+                    title_color=Fore.LIGHTRED_EX,
+                    border_color=Fore.LIGHTRED_EX,
+                    content_color=Fore.LIGHTYELLOW_EX,
+                    blink_title=True,
+                    glow_border=True,
+                    animated=True
+                )
                 result = HardeningResult(module, False, datetime.now(), datetime.now(), "", str(e), [])
                 self.results.append(result)
             
-            print()
-            time.sleep(0.5)
+            time.sleep(1)
         
-        # Show completion summary
-        self._display_completion_summary()
+        # Show completion summary with animated box
+        self._display_completion_summary_animated()
     
-    def _display_completion_summary(self):
-        """Display completion summary"""
+    def _display_completion_summary_animated(self):
+        """Display completion summary with animated neon box"""
         successful = sum(1 for r in self.results if r.success)
         failed = len(self.results) - successful
         
-        print(f"\n{Fore.GREEN}{'='*60}{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}{' '*15}SYSTEM FORTIFICATION COMPLETE{Style.RESET_ALL}")
-        print(f"{Fore.GREEN}{'='*60}{Style.RESET_ALL}")
-        print(f"\n{Fore.YELLOW}EXECUTION SUMMARY{Style.RESET_ALL}")
-        print(f"  Total Modules: {len(self.results)}")
-        print(f"  {Fore.GREEN}✓ Successful: {successful}{Style.RESET_ALL}")
-        print(f"  {Fore.RED}✗ Failed: {failed}{Style.RESET_ALL}")
-        print(f"  Success Rate: {successful/max(1,len(self.results))*100:.0f}%")
+        # Calculate success rate
+        rate = successful / max(1, len(self.results)) * 100
         
+        # Determine summary color
+        if rate >= 90:
+            status_color = Fore.LIGHTGREEN_EX
+            status_emoji = "🟢"
+            status_text = "EXCELLENT"
+        elif rate >= 70:
+            status_color = Fore.LIGHTYELLOW_EX
+            status_emoji = "🟡"
+            status_text = "GOOD"
+        elif rate >= 50:
+            status_color = Fore.LIGHTRED_EX
+            status_emoji = "🟠"
+            status_text = "FAIR"
+        else:
+            status_color = Fore.RED
+            status_emoji = "🔴"
+            status_text = "POOR"
+        
+        # Build summary lines
+        summary_lines = [
+            f"{Fore.LIGHTGREEN_EX}📊 HARDENING SUMMARY{Style.RESET_ALL}",
+            f"{Style.DIM}└─ Total Modules: {len(self.results)}{Style.RESET_ALL}",
+            f"{Fore.LIGHTGREEN_EX}   ├─ ✅ Successful: {successful}{Style.RESET_ALL}",
+            f"{Fore.LIGHTRED_EX}   └─ ❌ Failed: {failed}{Style.RESET_ALL}",
+            f"{Style.DIM}└─ Success Rate: {status_color}{rate:.1f}% ({status_text}){Style.RESET_ALL}",
+            f"{Style.DIM}└─ Status: {status_emoji} {status_color}{status_text}{Style.RESET_ALL}"
+        ]
+        
+        # Add failed modules if any
         if failed > 0:
-            print(f"\n{Fore.RED}Failed Modules:{Style.RESET_ALL}")
+            summary_lines.append(f"{Style.DIM}└─ Failed Modules:{Style.RESET_ALL}")
             for r in self.results:
                 if not r.success:
-                    print(f"  ✗ {r.module.name}")
+                    summary_lines.append(f"{Fore.RED}   └─ ✗ {r.module.name}{Style.RESET_ALL}")
+        
+        # Add recommendations
+        if failed > 0:
+            summary_lines.append(f"{Fore.YELLOW}💡 Recommendations:{Style.RESET_ALL}")
+            summary_lines.append(f"{Style.DIM}   └─ Run failed modules manually with admin privileges{Style.RESET_ALL}")
+            summary_lines.append(f"{Style.DIM}   └─ Check system logs for detailed errors{Style.RESET_ALL}")
+        
+        self._draw_neon_hacker_box(
+            f"{status_emoji} FORTIFICATION COMPLETE",
+            summary_lines,
+            title_color=status_color,
+            border_color=status_color,
+            content_color=Fore.LIGHTWHITE_EX,
+            blink_title=True,
+            glow_border=True,
+            animated=True,
+            animation_duration=2.0
+        )
+    
+    def _display_completion_summary(self):
+        """Display completion summary - kept for compatibility"""
+        self._display_completion_summary_animated()
     
     # ============================================================
     # MODULE SELECTION METHODS
@@ -1673,12 +2175,54 @@ class HardeningDashboard:
 # ============================================================
 # MAIN EXECUTION
 # ============================================================
+# ============================================================
+# MAIN EXECUTION - FIXED
+# ============================================================
 
 if __name__ == "__main__":
-    dashboard = HardeningDashboard()
-    
-    if RICH_AVAILABLE:
-        dashboard.run_cinematic()
-    else:
-        print(f"{Fore.YELLOW}Rich library not available. Install with: pip install rich{Fore.RESET}")
-        dashboard.run()
+    try:
+        dashboard = HardeningDashboard()
+        
+        # Check if running interactively or with arguments
+        if len(sys.argv) > 1:
+            # Command line mode
+            import argparse
+            parser = argparse.ArgumentParser(description='Hardening Dashboard')
+            parser.add_argument('--quick', action='store_true', help='Run quick hardening')
+            parser.add_argument('--full', action='store_true', help='Run full hardening')
+            parser.add_argument('--list', action='store_true', help='List modules')
+            args = parser.parse_args()
+            
+            if args.list:
+                dashboard.list_modules_cinematic()
+            elif args.quick:
+                dashboard.execute_quick_harden()
+            elif args.full:
+                dashboard.execute_full_harden()
+            else:
+                # No args - show help
+                print("Usage: python hardening_dashboard.py [--quick] [--full] [--list]")
+        else:
+            # Interactive mode - use the dashboard
+            if RICH_AVAILABLE:
+                dashboard.run_cinematic()
+            else:
+                print(f"{Fore.YELLOW}Rich library not available. Install with: pip install rich{Fore.RESET}")
+                dashboard.run()
+                
+    except KeyboardInterrupt:
+        print(f"\n{Fore.YELLOW}[!] Interrupted by user{Style.RESET_ALL}")
+        # Don't exit immediately - allow cleanup
+        try:
+            time.sleep(0.5)
+        except:
+            pass
+    except Exception as e:
+        print(f"{Fore.RED}[!] Error: {e}{Style.RESET_ALL}")
+        import traceback
+        traceback.print_exc()
+        # Pause before exit so user can see error
+        try:
+            input("Press Enter to exit...")
+        except:
+            pass

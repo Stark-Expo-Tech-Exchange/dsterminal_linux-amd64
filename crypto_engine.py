@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -8,16 +8,140 @@ QR Code Key Management Integration - CROSS PLATFORM
 Human-like typing feedback system
 DIRECTORY/FOLDER ENCRYPTION SUPPORT
 """
+
+# ============================================================
+# CRITICAL FIX: Ensure stdout exists for frozen executables
+# ============================================================
 import sys
-if sys.platform == 'win32':
-    import os
-    import msvcrt
-    # Ensure stdout is properly set
-    if hasattr(sys.stdout, 'buffer'):
-        sys.stdout = open(sys.stdout.fileno(), 'w', encoding='utf-8', errors='ignore')
-    if hasattr(sys.stderr, 'buffer'):
-        sys.stderr = open(sys.stderr.fileno(), 'w', encoding='utf-8', errors='ignore')
-        
+import os
+import platform
+
+# Ensure stdout exists
+if sys.stdout is None:
+    try:
+        import io
+        sys.stdout = io.TextIOWrapper(io.BytesIO(), encoding='utf-8', errors='ignore')
+    except:
+        pass
+
+# Ensure stderr exists
+if sys.stderr is None:
+    try:
+        import io
+        sys.stderr = io.TextIOWrapper(io.BytesIO(), encoding='utf-8', errors='ignore')
+    except:
+        pass
+
+# Safe stdout write function
+_original_stdout_write = sys.stdout.write if sys.stdout is not None else None
+
+def _safe_stdout_write(text):
+    try:
+        if _original_stdout_write is not None:
+            _original_stdout_write(text)
+        else:
+            try:
+                print(text, end='')
+            except:
+                pass
+    except OSError as e:
+        if e.errno == 22:
+            try:
+                clean = ''.join(c for c in text if ord(c) < 128 or c in '\n\r\t')
+                if _original_stdout_write is not None:
+                    _original_stdout_write(clean)
+                else:
+                    try:
+                        print(clean, end='')
+                    except:
+                        pass
+            except:
+                pass
+        else:
+            raise
+    except UnicodeEncodeError:
+        try:
+            clean = text.encode('ascii', 'ignore').decode('ascii')
+            if _original_stdout_write is not None:
+                _original_stdout_write(clean)
+            else:
+                try:
+                    print(clean, end='')
+                except:
+                    pass
+        except:
+            pass
+    except Exception:
+        try:
+            print(text, end='')
+        except:
+            pass
+
+if sys.stdout is not None:
+    sys.stdout.write = _safe_stdout_write
+
+# Set environment variables for console
+if platform.system() == "Windows":
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
+    os.environ['PYTHONUTF8'] = '1'
+
+# ============================================================
+# FIX WINDOWS CONSOLE ENCODING - MUST BE FIRST
+# ============================================================
+if sys.platform == "win32":
+    try:
+        import subprocess as sp
+        sp.run(['chcp', '65001'], capture_output=True, shell=True)
+    except:
+        pass
+    
+    # Fix stdout encoding
+    try:
+        if hasattr(sys.stdout, 'reconfigure'):
+            sys.stdout.reconfigure(encoding='utf-8', errors='ignore')
+        else:
+            import io
+            if sys.stdout is not None and hasattr(sys.stdout, 'buffer'):
+                sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
+    except:
+        pass
+
+# ===== SAFE WRITE FUNCTION FOR GENERAL USE =====
+def safe_write(text):
+    """Safely write to stdout, handling None or errors"""
+    if sys.stdout is None:
+        try:
+            print(text, end="")
+        except:
+            pass
+        return
+    
+    try:
+        sys.stdout.write(text)
+        sys.stdout.flush()
+    except (OSError, UnicodeEncodeError, AttributeError):
+        try:
+            print(text, end="")
+        except:
+            pass
+
+# ===== SAFE PRINT UNICODE FUNCTION =====
+def safe_print_unicode(text):
+    """Safely print unicode/emoji characters on Windows"""
+    try:
+        print(text)
+    except UnicodeEncodeError:
+        clean_message = text.encode('ascii', 'ignore').decode('ascii')
+        print(clean_message)
+    except Exception:
+        try:
+            print(str(text))
+        except:
+            pass
+
+# ============================================================
+# NOW CONTINUE WITH THE REST OF YOUR IMPORTS AND CODE
+# ============================================================
 import os
 import sys
 import time
@@ -33,31 +157,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 from cryptography.fernet import Fernet
-
-# Try to import QR code dependencies
-try:
-    import qrcode
-    from PIL import Image
-    import cv2
-    import numpy as np
-    QR_DEPS_AVAILABLE = True
-    QR_METHOD = 'opencv'
-except ImportError as e:
-    QR_DEPS_AVAILABLE = False
-    QR_METHOD = None
-
-# Try to import report generation libraries
-try:
-    from reportlab.lib.pagesizes import letter, A4
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.lib import colors
-    from reportlab.lib.units import inch
-    REPORT_AVAILABLE = True
-except ImportError:
-    REPORT_AVAILABLE = False
-
-# ANSI color codes for terminal effects
+# ===== DEFINE COLORS CLASS FIRST (ALWAYS AVAILABLE) =====
 class Colors:
     """Cross-platform color support"""
     HEADER = '\033[95m'
@@ -93,6 +193,67 @@ class Colors:
         ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
         return ansi_escape.sub('', text)
 
+# ===== IMPORT COLORAMA WITH PROPER ERROR HANDLING =====
+try:
+    import colorama
+    from colorama import Fore, Style, init
+    
+    # Initialize colorama WITHOUT ANSI conversion (prevents recursion)
+    init(autoreset=True, strip=False, convert=False, wrap=False)
+    COLORAMA_AVAILABLE = True
+    
+    # Add DIM to Fore if it doesn't exist
+    if not hasattr(Fore, 'DIM'):
+        Fore.DIM = '\033[2m'
+    if not hasattr(Style, 'DIM'):
+        Style.DIM = '\033[2m'
+        
+except ImportError:
+    COLORAMA_AVAILABLE = False
+    # Fallback color codes (use Colors class defined above)
+    Fore = Colors
+    Style = type('Style', (), {
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m',
+        'NORMAL': '\033[22m',
+        'RESET_ALL': '\033[0m'
+    })
+except Exception as e:
+    COLORAMA_AVAILABLE = False
+    # Fallback color codes (use Colors class defined above)
+    Fore = Colors
+    Style = type('Style', (), {
+        'BRIGHT': '\033[1m',
+        'DIM': '\033[2m',
+        'NORMAL': '\033[22m',
+        'RESET_ALL': '\033[0m'
+    })
+
+# ===== CONTINUE WITH REST OF IMPORTS =====
+from cryptography.fernet import Fernet
+
+# Try to import QR code dependencies
+try:
+    import qrcode
+    from PIL import Image
+    import cv2
+    import numpy as np
+    QR_DEPS_AVAILABLE = True
+    QR_METHOD = 'opencv'
+except ImportError as e:
+    QR_DEPS_AVAILABLE = False
+    QR_METHOD = None
+
+# Try to import report generation libraries
+try:
+    from reportlab.lib.pagesizes import letter, A4
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib import colors
+    from reportlab.lib.units import inch
+    REPORT_AVAILABLE = True
+except ImportError:
+    REPORT_AVAILABLE = False
 
 def strip_ansi(text):
     """Strip ANSI escape sequences from text"""
@@ -101,6 +262,7 @@ def strip_ansi(text):
     return ansi_escape.sub('', text)
 
 
+# ===== NOW DEFINE TypeWriter CLASS =====
 class TypeWriter:
     """Human-like typing simulation with realistic delays"""
     
@@ -123,42 +285,77 @@ class TypeWriter:
             self.min_delay, self.max_delay = self.speed_presets['medium']
     
     def type_text(self, text, color=Colors.GREEN, newline=True, pause_between_chars=True):
+        """Type text with typing effect - FIXED for None stdout"""
         if not self.typing_enabled:
-            print(f"{text}", end='\n' if newline else '')
+            try:
+                safe_print_unicode(text)
+            except:
+                print(text, end='\n' if newline else '')
+            return
+        
+        if sys.stdout is None:
+            print(text, end='\n' if newline else '')
             return
         
         pause_chars = ['.', ',', '!', '?', ';', ':', '...']
         
-        for i, char in enumerate(text):
-            if self._stop_typing:
-                break
-            
-            if char == '\n':
-                print()
-                continue
-            else:
-                if color:
-                    sys.stdout.write(f"{color}{char}{Colors.END}")
+        # Pre-filter the text to remove problematic characters
+        safe_text = ''
+        for c in text:
+            try:
+                c.encode('cp1252')
+                safe_text += c
+            except UnicodeEncodeError:
+                safe_text += ' '
+        
+        try:
+            for i, char in enumerate(safe_text):
+                if self._stop_typing:
+                    break
+                
+                if char == '\n':
+                    try:
+                        print()
+                    except:
+                        pass
+                    continue
+                
+                try:
+                    if color and sys.stdout is not None:
+                        sys.stdout.write(f"{color}{char}{Colors.END}")
+                        sys.stdout.flush()
+                    else:
+                        print(char, end='', flush=True)
+                except (OSError, UnicodeEncodeError, AttributeError):
+                    try:
+                        print(char, end='', flush=True)
+                    except:
+                        pass
+                
+                if self.min_delay == 0 and self.max_delay == 0:
+                    delay = 0
                 else:
-                    sys.stdout.write(char)
-                sys.stdout.flush()
-            
-            if self.min_delay == 0 and self.max_delay == 0:
-                delay = 0
-            else:
-                delay = random.randint(self.min_delay, self.max_delay) / 1000.0
-            
-            if char in pause_chars and pause_between_chars:
-                delay *= self.punctuation_delay
-            
-            if random.random() < 0.02:
-                delay += random.randint(50, 150) / 1000.0
-            
-            time.sleep(delay)
+                    delay = random.randint(self.min_delay, self.max_delay) / 1000.0
+                
+                if char in pause_chars and pause_between_chars:
+                    delay *= self.punctuation_delay
+                
+                if random.random() < 0.02:
+                    delay += random.randint(50, 150) / 1000.0
+                
+                time.sleep(delay)
+        except Exception:
+            try:
+                print(text, end='\n' if newline else '')
+            except:
+                pass
         
         if newline:
-            print()
-    
+            try:
+                print()
+            except:
+                pass
+
     def type_line(self, text, color=Colors.GREEN):
         self.type_text(text, color, newline=True)
     
@@ -176,32 +373,209 @@ class TypeWriter:
 
 
 class MatrixRain:
-    """Cinematic matrix rain effect"""
+    """Cinematic matrix rain effect with enhanced animation - CENTERED"""
     
-    def __init__(self, width=60, height=10):
+    def __init__(self, width=80, height=20):
         self.width = width
         self.height = height
+        self.duration = 120  # Default 2 minutes
         self.chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
+        self.columns = []
+        self._init_columns()
+        self.terminal_width = 0
+        self.terminal_height = 0
+        self._get_terminal_size()
     
-    def render_frame(self, duration=0.1):
-        frame = []
-        for i in range(self.height):
-            line = ''
-            for j in range(self.width):
-                if random.random() > 0.7:
-                    line += f"{Colors.GREEN}{random.choice(self.chars)}{Colors.END}"
-                else:
-                    line += ' '
-            frame.append(line)
+    def _get_terminal_size(self):
+        """Get terminal size for centering"""
+        try:
+            size = shutil.get_terminal_size()
+            self.terminal_width = size.columns
+            self.terminal_height = size.lines
+        except:
+            self.terminal_width = 80
+            self.terminal_height = 24
         
-        sys.stdout.write('\033[{}A'.format(self.height))
-        for line in frame:
-            print(line)
-        time.sleep(duration)
+        # Adjust width and height based on terminal
+        self.width = min(self.width, self.terminal_width - 4)
+        self.height = min(self.height, self.terminal_height - 6)
+    
+    def _init_columns(self):
+        """Initialize column states"""
+        self.columns = []
+        for i in range(self.width):
+            self.columns.append({
+                'speed': random.uniform(0.05, 0.2),
+                'length': random.randint(5, self.height),
+                'position': random.randint(-self.height, 0),
+                'chars': [random.choice(self.chars) for _ in range(self.height + 10)]
+            })
+    
+    def render_frame(self):
+        """Render a single frame of the matrix rain"""
+        frame = []
+        
+        for col in range(self.width):
+            column = self.columns[col]
+            col_chars = column['chars']
+            
+            for row in range(self.height):
+                if row < column['position'] or row > column['position'] + column['length']:
+                    char = ' '
+                else:
+                    char = col_chars[row % len(col_chars)]
+                    if random.random() < 0.1:
+                        char = random.choice(self.chars)
+                
+                pos_in_col = row - column['position']
+                if 0 <= pos_in_col < column['length']:
+                    if pos_in_col == 0:
+                        color = Colors.WHITE
+                    elif pos_in_col < 3:
+                        color = Colors.GREEN
+                    elif pos_in_col < 6:
+                        color = Colors.CYAN
+                    else:
+                        color = Colors.DIM + Colors.GREEN
+                else:
+                    color = ''
+                
+                frame.append((char, color))
+        
+        # Update positions
+        for col in self.columns:
+            col['position'] += col['speed']
+            if col['position'] > self.height + 10:
+                col['position'] = -random.randint(0, self.height)
+                col['length'] = random.randint(5, self.height)
+                col['chars'] = [random.choice(self.chars) for _ in range(self.height + 10)]
+        
+        return frame
+    
+    def _center_text(self, text, width=None):
+        """Center text within given width"""
+        if width is None:
+            width = self.terminal_width
+        text_len = len(strip_ansi(text))
+        padding = max(0, (width - text_len) // 2)
+        return ' ' * padding + text
+    
+    def render(self, title="", duration=120, show_timer=True):
+        """Render the matrix rain effect - FIXED for None stdout"""
+        try:
+            # Clear screen safely
+            if sys.stdout is not None:
+                sys.stdout.write('\033[H\033[J')
+                sys.stdout.flush()
+                sys.stdout.write('\033[?25l')
+                sys.stdout.flush()
+            else:
+                print('\n' * 50)
+        except:
+            pass
+        
+        try:
+            self._get_terminal_size()
+            self._init_columns()
+        except:
+            pass
+                
+        start_time = time.time()
+        end_time = start_time + duration
+        
+        # Calculate centered dimensions
+        box_width = self.width + 2
+        box_height = self.height + 4 if title else self.height + 2
+        
+        try:
+            while time.time() < end_time:
+                elapsed = time.time() - start_time
+                remaining = int(end_time - time.time())
+                
+                # Clear screen
+                sys.stdout.write('\033[H\033[J')
+                
+                # Calculate vertical centering
+                vertical_padding = max(0, (self.terminal_height - box_height) // 2)
+                for _ in range(vertical_padding):
+                    print()
+                
+                frame = self.render_frame()
+                
+                # Draw top border with title
+                if title:
+                    top_line = f"{Colors.CYAN}╔{'═' * (self.width)}╗{Colors.END}"
+                    print(self._center_text(top_line))
+                    
+                    # Center the title
+                    title_centered = title.center(self.width)
+                    title_line = f"{Colors.CYAN}║{Colors.END}{Colors.YELLOW}{title_centered}{Colors.END}{Colors.CYAN}║{Colors.END}"
+                    print(self._center_text(title_line))
+                    
+                    sep_line = f"{Colors.CYAN}╠{'═' * (self.width)}╣{Colors.END}"
+                    print(self._center_text(sep_line))
+                else:
+                    top_line = f"{Colors.CYAN}╔{'═' * (self.width)}╗{Colors.END}"
+                    print(self._center_text(top_line))
+                
+                # Draw frame
+                for row_idx in range(self.height):
+                    line = f"{Colors.CYAN}║{Colors.END}"
+                    for col_idx in range(self.width):
+                        idx = row_idx * self.width + col_idx
+                        if idx < len(frame):
+                            char, color = frame[idx]
+                            line += f"{color}{char}{Colors.END}"
+                    line += f"{Colors.CYAN}║{Colors.END}"
+                    print(self._center_text(line))
+                
+                # Draw bottom border
+                if show_timer:
+                    timer_str = f"⏱️  {remaining}s remaining: APPLYING QUANTUM ENCRYPTION KEY..."
+                    timer_padding = self.width - len(strip_ansi(timer_str)) - 2
+                    if timer_padding < 0:
+                        timer_padding = 0
+                    
+                    bottom_line = f"{Colors.CYAN}╠{'═' * (self.width)}╣{Colors.END}"
+                    print(self._center_text(bottom_line))
+                    
+                    timer_line = f"{Colors.CYAN}║{Colors.END}{Colors.DIM}{timer_str}{' ' * timer_padding}{Colors.END}{Colors.CYAN}║{Colors.END}"
+                    print(self._center_text(timer_line))
+                    
+                    footer_line = f"{Colors.CYAN}╚{'═' * (self.width)}╝{Colors.END}"
+                    print(self._center_text(footer_line))
+                else:
+                    footer_line = f"{Colors.CYAN}╚{'═' * (self.width)}╝{Colors.END}"
+                    print(self._center_text(footer_line))
+                
+                sys.stdout.flush()
+                
+                # Sleep for next frame
+                time.sleep(0.05)
+                
+        except KeyboardInterrupt:
+            pass
+        finally:
+            # Show cursor
+            sys.stdout.write('\033[?25h')
+            sys.stdout.write('\033[H\033[J')
+            sys.stdout.flush()
+    
+    def render_encryption(self, filename=""):
+        """Render encryption matrix rain for 2 minutes - CENTERED"""
+        display_name = os.path.basename(filename) if filename else "FILES"
+        title = f"🔐 ENCRYPTING [FILE/DIR] PLEASE WAIT...!: {display_name}"
+        self.render(title=title, duration=120, show_timer=True)
+    
+    def render_decryption(self, filename=""):
+        """Render decryption matrix rain for 2.5 minutes - CENTERED"""
+        display_name = os.path.basename(filename) if filename else "FILES"
+        title = f"🔓 DECRYPTING FILE/DIR] PLEASE WAIT...!: {display_name}"
+        self.render(title=title, duration=150, show_timer=True)
 
 
 class RotatingBox:
-    """Animated rotating box with content - BOLD CONTINUOUS LINES"""
+    """Animated rotating box with content - CENTERED"""
     
     def __init__(self, width=40, title=""):
         self.width = width
@@ -209,76 +583,92 @@ class RotatingBox:
         self.frames = 0
     
     def render(self, content_lines, color=Colors.CYAN):
-        # Use bold continuous box drawing characters
+        # Get terminal width for centering
+        try:
+            term_width = shutil.get_terminal_size().columns
+        except:
+            term_width = 80
+        
+        box_width = min(self.width, term_width - 4)
+        
         top_left = "┌"
         top_right = "┐"
-        bottom_left = "└"
-        bottom_right = "┘"
         horizontal = "─"
-        vertical = "│"
         
-        # Top border with title
         title_display = self.title if self.title else ""
-        title_line = f"{top_left}{horizontal}{title_display.center(self.width-2, horizontal)}{horizontal}{top_right}"
-        print(f"{color}{title_line}{Colors.END}")
+        title_line = f"{top_left}{horizontal}{title_display.center(box_width-2, horizontal)}{horizontal}{top_right}"
         
-        # Content lines
+        padding = max(0, (term_width - box_width) // 2)
+        print(' ' * padding + f"{color}{title_line}{Colors.END}")
+        
         for line in content_lines:
-            # Clean line for width calculation
             clean_line = strip_ansi(line)
-            padding = max(0, self.width - 2 - len(clean_line))
-            print(f"{color}{vertical}{Colors.END} {line}{' ' * padding} {color}{vertical}{Colors.END}")
+            if len(clean_line) > box_width - 4:
+                clean_line = clean_line[:box_width-7] + "..."
+            
+            padded_line = f" {clean_line.center(box_width-2)} "
+            print(' ' * padding + f"{color}│{Colors.END}{padded_line}{color}│{Colors.END}")
         
-        # Bottom border
-        bottom_line = f"{bottom_left}{horizontal * (self.width - 2)}{bottom_right}"
-        print(f"{color}{bottom_line}{Colors.END}")
+        bottom_line = f"{top_left}{horizontal * (box_width - 2)}{top_right}".replace('┌', '└').replace('┐', '┘')
+        print(' ' * padding + f"{color}{bottom_line}{Colors.END}")
         self.frames += 1
 
 
 class AnimatedTable:
-    """Animated table with rotating columns - BOLD CONTINUOUS LINES"""
+    """Animated table with rotating columns - CENTERED"""
     
     def __init__(self, headers):
         self.headers = headers
         self.rotation = 0
     
     def render(self, rows, color=Colors.YELLOW):
+        try:
+            term_width = shutil.get_terminal_size().columns
+        except:
+            term_width = 80
+        
         col_widths = [len(h) for h in self.headers]
         for row in rows:
             for i, cell in enumerate(row):
                 col_widths[i] = max(col_widths[i], len(str(cell)))
         
-        # Build the table with bold continuous lines
+        col_widths = [min(w, 25) for w in col_widths]
+        
         header_line = ''
         for i, h in enumerate(self.headers):
-            header_line += f" {h.center(col_widths[i])} "
+            display_h = h[:col_widths[i]] if len(h) > col_widths[i] else h
+            header_line += f" {display_h.center(col_widths[i])} "
             if i < len(self.headers)-1:
                 header_line += f"{color}│{Colors.END}"
         
-        # Top border
         total_width = sum(col_widths) + len(self.headers) * 3 - 1
-        top_border = "┌" + "─" * total_width + "┐"
-        print(f"{color}{top_border}{Colors.END}")
+        total_width = min(total_width, term_width - 4)
         
-        # Header row
-        print(f"{color}│{Colors.END}{header_line}{color}│{Colors.END}")
+        padding = max(0, (term_width - total_width - 2) // 2)
+        border_char = "─"
         
-        # Separator
-        sep = "├" + "─┼─".join(["─" * w for w in col_widths]) + "┤"
-        print(f"{color}{sep}{Colors.END}")
+        top_border = "┌" + border_char * total_width + "┐"
+        print(' ' * padding + f"{color}{top_border}{Colors.END}")
         
-        # Data rows
-        for row in rows:
+        print(' ' * padding + f"{color}│{Colors.END}{header_line}{color}│{Colors.END}")
+        
+        sep = "├" + "─┼─".join([border_char * w for w in col_widths]) + "┤"
+        print(' ' * padding + f"{color}{sep}{Colors.END}")
+        
+        for row in rows[:20]:
             row_line = ''
             for i, cell in enumerate(row):
-                row_line += f" {str(cell).ljust(col_widths[i])} "
+                display_cell = str(cell)[:col_widths[i]] if len(str(cell)) > col_widths[i] else str(cell)
+                row_line += f" {display_cell.ljust(col_widths[i])} "
                 if i < len(row)-1:
                     row_line += f"{color}│{Colors.END}"
-            print(f"{color}│{Colors.END}{row_line}{color}│{Colors.END}")
+            print(' ' * padding + f"{color}│{Colors.END}{row_line}{color}│{Colors.END}")
         
-        # Bottom border
-        bottom_border = "└" + "─" * total_width + "┘"
-        print(f"{color}{bottom_border}{Colors.END}")
+        if len(rows) > 20:
+            print(' ' * padding + f"{color}│{Colors.END} ... and {len(rows) - 20} more rows ... {color}│{Colors.END}")
+        
+        bottom_border = "└" + border_char * total_width + "┘"
+        print(' ' * padding + f"{color}{bottom_border}{Colors.END}")
         self.rotation += 1
 
 
@@ -394,420 +784,25 @@ ENCRYPTED_DIR = Paths.get_encrypted_dir()
 REPORTS_DIR = Paths.get_reports_dir()
 
 # Create directories
-for dir_path in [KEY_FILE, QR_CODE_DIR, BACKUP_DIR, ENCRYPTED_DIR, REPORTS_DIR]:
-    dir_name = os.path.dirname(dir_path)
-    if dir_name and not os.path.exists(dir_name):
-        os.makedirs(dir_name, mode=0o700, exist_ok=True)
-for d in [QR_CODE_DIR, BACKUP_DIR, ENCRYPTED_DIR, REPORTS_DIR]:
-    if not os.path.exists(d):
-        os.makedirs(d, mode=0o700, exist_ok=True)
-
-
-class ReportGenerator:
-    """Generate PDF and HTML reports for encryption/decryption operations"""
+def ensure_directories():
+    """Ensure all required directories exist with proper permissions"""
+    dirs_to_create = [
+        os.path.dirname(KEY_FILE),
+        QR_CODE_DIR,
+        BACKUP_DIR,
+        ENCRYPTED_DIR,
+        REPORTS_DIR
+    ]
     
-    VERSION = "v4.0.0.113"
-    WATERMARK = f"DSTERMINAL {VERSION}"
-    FOOTER = "Stark Expo Tech Exchange | Encrypt with Caution"
-    
-    def __init__(self):
-        self.typer = TypeWriter('fast')
-        self.reports_dir = REPORTS_DIR
-        
-        if not os.path.exists(self.reports_dir):
-            os.makedirs(self.reports_dir, mode=0o700, exist_ok=True)
-    
-    def generate_report(self, operation_type, details):
-        """Generate both PDF and HTML reports"""
-        if details.get('test_mode', False):
-            return self._generate_test_report(operation_type, details)
-        
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        base_filename = f"dsterminal_report_{timestamp}"
-        
-        pdf_path = os.path.join(self.reports_dir, f"{base_filename}.pdf")
-        html_path = os.path.join(self.reports_dir, f"{base_filename}.html")
-        
-        if REPORT_AVAILABLE:
+    for dir_path in dirs_to_create:
+        if dir_path and not os.path.exists(dir_path):
             try:
-                self._generate_pdf(pdf_path, operation_type, details)
-                self.typer.type_text("PDF Report: {}".format(pdf_path), color=Colors.CYAN)
+                os.makedirs(dir_path, mode=0o700, exist_ok=True)
+                print(f"Created directory: {dir_path}")
             except Exception as e:
-                self.typer.type_text("PDF generation failed: {}".format(e), color=Colors.YELLOW)
-        else:
-            self.typer.type_text("PDF generation unavailable (install reportlab)", color=Colors.YELLOW)
-        
-        try:
-            self._generate_html(html_path, operation_type, details)
-            self.typer.type_text("HTML Report: {}".format(html_path), color=Colors.CYAN)
-        except Exception as e:
-            self.typer.type_text("HTML generation failed: {}".format(e), color=Colors.YELLOW)
-        
-        return {'pdf': pdf_path if os.path.exists(pdf_path) else None, 
-                'html': html_path if os.path.exists(html_path) else None}
-    
-    def _generate_test_report(self, operation_type, details):
-        """Generate test report with special formatting"""
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        base_filename = f"dsterminal_test_report_{timestamp}"
-        
-        pdf_path = os.path.join(self.reports_dir, f"{base_filename}.pdf")
-        html_path = os.path.join(self.reports_dir, f"{base_filename}.html")
-        
-        if REPORT_AVAILABLE:
-            try:
-                self._generate_pdf(pdf_path, f"TEST: {operation_type}", details)
-                self.typer.type_text("Test Report (PDF): {}".format(pdf_path), color=Colors.CYAN)
-            except Exception as e:
-                self.typer.type_text("PDF generation failed: {}".format(e), color=Colors.YELLOW)
-        
-        try:
-            self._generate_html(html_path, f"TEST: {operation_type}", details)
-            self.typer.type_text("Test Report (HTML): {}".format(html_path), color=Colors.CYAN)
-        except Exception as e:
-            self.typer.type_text("HTML generation failed: {}".format(e), color=Colors.YELLOW)
-        
-        return {'pdf': pdf_path if os.path.exists(pdf_path) else None, 
-                'html': html_path if os.path.exists(html_path) else None}
-    
-    def _generate_pdf(self, filepath, operation_type, details):
-        """Generate PDF report"""
-        doc = SimpleDocTemplate(filepath, pagesize=letter,
-                                rightMargin=72, leftMargin=72,
-                                topMargin=72, bottomMargin=72)
-        
-        styles = getSampleStyleSheet()
-        
-        title_style = ParagraphStyle(
-            'CustomTitle',
-            parent=styles['Heading1'],
-            fontSize=24,
-            textColor=colors.HexColor('#00ff00'),
-            alignment=1,
-            spaceAfter=30
-        )
-        
-        heading_style = ParagraphStyle(
-            'CustomHeading',
-            parent=styles['Heading2'],
-            fontSize=16,
-            textColor=colors.HexColor('#00ccff'),
-            spaceAfter=12
-        )
-        
-        body_style = ParagraphStyle(
-            'CustomBody',
-            parent=styles['Normal'],
-            fontSize=10,
-            spaceAfter=6
-        )
-        
-        warning_style = ParagraphStyle(
-            'Warning',
-            parent=styles['Normal'],
-            fontSize=10,
-            textColor=colors.HexColor('#ff0000'),
-            spaceAfter=6
-        )
-        
-        story = []
-        
-        story.append(Paragraph(f"DSTERMINAL {self.VERSION}", title_style))
-        story.append(Paragraph("Encryption Report", title_style))
-        story.append(Spacer(1, 12))
-        
-        story.append(Paragraph(f"<font color='#666666' size='8'>Document ID: {datetime.now().strftime('%Y%m%d_%H%M%S')}</font>", body_style))
-        story.append(Spacer(1, 12))
-        
-        story.append(Paragraph("REPORT INFORMATION", heading_style))
-        story.append(Paragraph(f"Operation Type: <b>{operation_type}</b>", body_style))
-        story.append(Paragraph(f"Report Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", body_style))
-        story.append(Paragraph(f"System: {platform.system()} {platform.release()}", body_style))
-        story.append(Spacer(1, 12))
-        
-        key_info = details.get('key_info', {})
-        story.append(Paragraph("ENCRYPTION KEY INFORMATION", heading_style))
-        story.append(Paragraph(f"Key ID: {key_info.get('key_id', 'N/A')}", body_style))
-        story.append(Paragraph(f"Key Location: {key_info.get('key_location', 'N/A')}", body_style))
-        story.append(Paragraph(f"Key Format: Fernet (AES-256)", body_style))
-        
-        full_key = key_info.get('full_key', '')
-        if full_key:
-            masked_key = full_key[:20] + "..." + full_key[-10:]
-            story.append(Paragraph(f"Key (masked): {masked_key}", body_style))
-        story.append(Spacer(1, 12))
-        
-        story.append(Paragraph("OPERATION DETAILS", heading_style))
-        story.append(Paragraph(f"Target: {details.get('target', 'N/A')}", body_style))
-        story.append(Paragraph(f"Total Files: {details.get('total_files', 0)}", body_style))
-        story.append(Paragraph(f"Total Size: {details.get('total_size', 'N/A')}", body_style))
-        story.append(Spacer(1, 12))
-        
-        files = details.get('files', [])
-        if files:
-            story.append(Paragraph("FILES PROCESSED", heading_style))
-            data = [['#', 'Filename', 'Status', 'Size']]
-            for idx, f in enumerate(files[:50], 1):
-                data.append([str(idx), f.get('name', 'Unknown'), 
-                            f.get('status', 'Processed'), 
-                            f.get('size', 'N/A')])
-            if len(files) > 50:
-                data.append(['...', f'... and {len(files)-50} more files', '', ''])
-            
-            table = Table(data, colWidths=[0.5*inch, 3*inch, 1*inch, 1*inch])
-            table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#003300')),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor('#00ff00')),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 10),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f0f0f0')),
-                ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#666666')),
-                ('FONTSIZE', (0, 1), (-1, -1), 8),
-            ]))
-            story.append(table)
-            story.append(Spacer(1, 12))
-        
-        story.append(Paragraph("RECOMMENDATIONS", heading_style))
-        story.append(Paragraph("• Always keep your encryption key in a secure location", body_style))
-        story.append(Paragraph("• Create multiple backups of your encryption key", body_style))
-        story.append(Paragraph("• Use the QR code export feature for secure key sharing", body_style))
-        story.append(Paragraph("• Regularly verify your encrypted data integrity", body_style))
-        story.append(Spacer(1, 12))
-        
-        story.append(Paragraph("<b><font color='red'>⚠️ ENCRYPT WITH CAUTION</font></b>", warning_style))
-        story.append(Paragraph("<font color='red'>• Losing your encryption key means losing your data permanently</font>", warning_style))
-        story.append(Paragraph("<font color='red'>• Always test decryption before deleting original files</font>", warning_style))
-        story.append(Paragraph("<font color='red'>• Use strong passwords and secure storage for your keys</font>", warning_style))
-        story.append(Spacer(1, 12))
-        
-        story.append(Spacer(1, 36))
-        story.append(Paragraph(f"<font color='#666666' size='8'>{self.WATERMARK}</font>", body_style))
-        story.append(Paragraph(f"<font color='#666666' size='8'>{self.FOOTER}</font>", body_style))
-        story.append(Paragraph(f"<font color='#666666' size='8'>Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</font>", body_style))
-        
-        doc.build(story)
-    
-    def _generate_html(self, filepath, operation_type, details):
-        """Generate HTML report"""
-        key_info = details.get('key_info', {})
-        full_key = key_info.get('full_key', '')
-        masked_key = full_key[:20] + "..." + full_key[-10:] if full_key else 'N/A'
-        
-        html_content = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DSTERMINAL Encryption Report</title>
-    <style>
-        body {{
-            font-family: 'Courier New', monospace;
-            background: #0a0a0a;
-            color: #00ff00;
-            margin: 40px;
-            line-height: 1.6;
-        }}
-        .container {{
-            max-width: 900px;
-            margin: 0 auto;
-            background: #111;
-            padding: 30px;
-            border: 1px solid #00ff00;
-            border-radius: 10px;
-        }}
-        .header {{
-            text-align: center;
-            border-bottom: 2px solid #00ff00;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-        }}
-        .title {{
-            font-size: 28px;
-            font-weight: bold;
-            color: #00ff00;
-            text-shadow: 0 0 20px rgba(0,255,0,0.3);
-        }}
-        .subtitle {{
-            color: #00ccff;
-            font-size: 18px;
-        }}
-        .watermark {{
-            color: #333;
-            font-size: 12px;
-            text-align: right;
-        }}
-        .section {{
-            margin: 25px 0;
-            padding: 15px;
-            background: #1a1a1a;
-            border-left: 3px solid #00ccff;
-            border-radius: 5px;
-        }}
-        .section-title {{
-            color: #00ccff;
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }}
-        .info-row {{
-            display: flex;
-            padding: 5px 0;
-            border-bottom: 1px solid #222;
-        }}
-        .info-label {{
-            color: #888;
-            width: 200px;
-            font-weight: bold;
-        }}
-        .info-value {{
-            color: #00ff00;
-            flex: 1;
-        }}
-        .file-list {{
-            background: #0a0a0a;
-            padding: 10px;
-            border-radius: 5px;
-            max-height: 300px;
-            overflow-y: auto;
-        }}
-        .file-item {{
-            padding: 3px 10px;
-            border-bottom: 1px solid #1a1a1a;
-            font-size: 12px;
-            color: #aaa;
-        }}
-        .file-item .status {{
-            color: #00ff00;
-            float: right;
-        }}
-        .warning {{
-            background: #1a0000;
-            border: 1px solid #ff0000;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 20px 0;
-        }}
-        .warning-title {{
-            color: #ff0000;
-            font-weight: bold;
-            font-size: 16px;
-        }}
-        .footer {{
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #333;
-            text-align: center;
-            color: #666;
-            font-size: 11px;
-        }}
-        .recommendation {{
-            color: #aaa;
-            padding: 5px 0;
-            padding-left: 20px;
-        }}
-        .recommendation:before {{
-            content: "▸ ";
-            color: #00ccff;
-        }}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <div class="title">DSTERMINAL {self.VERSION}</div>
-            <div class="subtitle">Encryption Report</div>
-            <div class="watermark">Document ID: {datetime.now().strftime('%Y%m%d_%H%M%S')}</div>
-        </div>
-        
-        <div class="section">
-            <div class="section-title">REPORT INFORMATION</div>
-            <div class="info-row">
-                <span class="info-label">Operation:</span>
-                <span class="info-value">{operation_type}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Date/Time:</span>
-                <span class="info-value">{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">System:</span>
-                <span class="info-value">{platform.system()} {platform.release()}</span>
-            </div>
-        </div>
-        
-        <div class="section">
-            <div class="section-title">ENCRYPTION KEY INFORMATION</div>
-            <div class="info-row">
-                <span class="info-label">Key ID:</span>
-                <span class="info-value">{key_info.get('key_id', 'N/A')}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Key Location:</span>
-                <span class="info-value">{key_info.get('key_location', 'N/A')}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Key Format:</span>
-                <span class="info-value">Fernet (AES-256)</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Key (masked):</span>
-                <span class="info-value" style="color:#ffcc00;font-size:11px;">{masked_key}</span>
-            </div>
-        </div>
-        
-        <div class="section">
-            <div class="section-title">OPERATION DETAILS</div>
-            <div class="info-row">
-                <span class="info-label">Target:</span>
-                <span class="info-value">{details.get('target', 'N/A')}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Total Files:</span>
-                <span class="info-value">{details.get('total_files', 0)}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Total Size:</span>
-                <span class="info-value">{details.get('total_size', 'N/A')}</span>
-            </div>
-        </div>
-        
-        <div class="section">
-            <div class="section-title">FILES PROCESSED</div>
-            <div class="file-list">
-                {''.join([f'<div class="file-item"> {f.get("name", "Unknown")} <span class="status">{f.get("status", "Processed")}</span></div>' for f in details.get('files', [])[:100]])}
-                {f'<div class="file-item" style="color:#666;">... and {len(details.get("files", []))-100} more files</div>' if len(details.get('files', [])) > 100 else ''}
-            </div>
-        </div>
-        
-        <div class="section">
-            <div class="section-title">RECOMMENDATIONS</div>
-            <div class="recommendation">Always keep your encryption key in a secure location</div>
-            <div class="recommendation">Create multiple backups of your encryption key</div>
-            <div class="recommendation">Use the QR code export feature for secure key sharing</div>
-            <div class="recommendation">Regularly verify your encrypted data integrity</div>
-            <div class="recommendation">Store encrypted containers in a safe location</div>
-        </div>
-        
-        <div class="warning">
-            <div class="warning-title">ENCRYPT WITH CAUTION</div>
-            <div style="color:#ff6666;padding:5px 0;">• Losing your encryption key means losing your data permanently</div>
-            <div style="color:#ff6666;padding:5px 0;">• Always test decryption before deleting original files</div>
-            <div style="color:#ff6666;padding:5px 0;">• Use strong passwords and secure storage for your keys</div>
-        </div>
-        
-        <div class="footer">
-            <div>DSTERMINAL {self.VERSION}</div>
-            <div>{self.FOOTER}</div>
-            <div style="font-size:9px;">Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</div>
-        </div>
-    </div>
-</body>
-</html>"""
-        
-        with open(filepath, 'w', encoding='utf-8') as f:
-            f.write(html_content)
+                print(f"Warning: Could not create {dir_path}: {e}")
+
+ensure_directories()
 
 
 class QRCodeManager:
@@ -827,8 +822,8 @@ class QRCodeManager:
             self.typer.type_text("QR Code features are disabled. Missing dependencies.", color=Colors.YELLOW)
             self.typer.type_text("Install: pip install qrcode[pil] pillow opencv-python-headless", color=Colors.CYAN)
     
-    def generate_qr_code(self, key_data=None, filename=None):
-        """Generate QR code from encryption key"""
+    def generate_qr_code_with_progress(self, key_data=None, filename=None):
+        """Generate QR code from encryption key with progress animation"""
         if not self.available:
             self.typer.type_text("QR Code feature unavailable. Missing dependencies.", color=Colors.RED)
             self.typer.type_text("Install: pip install qrcode[pil] pillow opencv-python-headless", color=Colors.CYAN)
@@ -844,8 +839,19 @@ class QRCodeManager:
                 key_data = f.read().strip()
         
         try:
-            self.typer.type_text("Generating QR code...", color=Colors.YELLOW)
-            time.sleep(0.5)
+            print(f"\n{Colors.YELLOW}┌──────────────────────────────────────────────────────────────────┐{Colors.END}")
+            print(f"{Colors.YELLOW}│{Colors.CYAN}           QR CODE GENERATION IN PROGRESS                   {Colors.YELLOW}│{Colors.END}")
+            print(f"{Colors.YELLOW}├──────────────────────────────────────────────────────────────────┤{Colors.END}")
+            
+            steps = [
+                ("▶ Initializing QR generator...", 10),
+                ("▶ Creating QR matrix...", 25),
+                ("▶ Applying error correction...", 40),
+                ("▶ Rendering QR image...", 60),
+                ("▶ Optimizing QR quality...", 75),
+                ("▶ Saving QR code...", 90),
+                ("▶ Finalizing...", 100)
+            ]
             
             qr = qrcode.QRCode(
                 version=1,
@@ -853,24 +859,59 @@ class QRCodeManager:
                 box_size=5,
                 border=2,
             )
-            qr.add_data(key_data)
-            qr.make(fit=True)
             
-            img = qr.make_image(fill_color="black", back_color="white")
+            img = None
             
-            if filename is None:
-                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                filename = f"dsterminal_key_{timestamp}.png"
+            for step_text, progress_pct in steps:
+                bar_length = 40
+                filled = int(bar_length * progress_pct // 100)
+                bar = '█' * filled + '░' * (bar_length - filled)
+                
+                sys.stdout.write('\r')
+                sys.stdout.write(f"{Colors.CYAN}│{Colors.END} {Colors.GREEN}[{bar}]{Colors.END} {Colors.YELLOW}{progress_pct}%{Colors.END}")
+                sys.stdout.write(f"\n{Colors.CYAN}│{Colors.END} {Colors.DIM}{step_text:<50}{Colors.END}")
+                sys.stdout.write('\033[1A')
+                sys.stdout.flush()
+                
+                if "matrix" in step_text.lower():
+                    qr.add_data(key_data)
+                    qr.make(fit=True)
+                elif "rendering" in step_text.lower():
+                    img = qr.make_image(fill_color="black", back_color="white")
+                elif "saving" in step_text.lower():
+                    if filename is None:
+                        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                        filename = f"dsterminal_key_{timestamp}.png"
+                    
+                    if not os.path.exists(self.qr_dir):
+                        os.makedirs(self.qr_dir, mode=0o700, exist_ok=True)
+                    
+                    filepath = os.path.join(self.qr_dir, filename)
+                    if img is not None:
+                        img.save(filepath)
+                    else:
+                        img = qr.make_image(fill_color="black", back_color="white")
+                        img.save(filepath)
+                
+                time.sleep(0.3)
             
-            if not os.path.exists(self.qr_dir):
-                os.makedirs(self.qr_dir, mode=0o700, exist_ok=True)
+            sys.stdout.write('\r')
+            sys.stdout.write(f"{Colors.CYAN}│{Colors.END} {Colors.GREEN}[{'█' * bar_length}]{Colors.END} {Colors.GREEN}100%{Colors.END}")
+            sys.stdout.write(f"\n{Colors.CYAN}│{Colors.END} {Colors.GREEN}✓ QR CODE GENERATED SUCCESSFULLY!{Colors.END}")
+            sys.stdout.write(f"\n{Colors.YELLOW}└──────────────────────────────────────────────────────────────────┘{Colors.END}\n")
+            sys.stdout.flush()
             
-            filepath = os.path.join(self.qr_dir, filename)
-            img.save(filepath)
+            print(f"\n{Colors.GREEN}📁 Location:{Colors.END} {Colors.CYAN}{filepath}{Colors.END}")
+            print(f"{Colors.GREEN}🔑 Key ID:{Colors.END} {Colors.CYAN}{hashlib.sha256(key_data.encode()).hexdigest()[:16]}{Colors.END}")
+            print(f"{Colors.GREEN}📊 Size:{Colors.END} {Colors.CYAN}{round(os.path.getsize(filepath) / 1024, 1)} KB{Colors.END}")
             
             ascii_qr = self._generate_ascii_qr(qr)
-            
-            self.typer.type_text("QR code generated successfully!", color=Colors.GREEN)
+            print(f"\n{Colors.YELLOW}┌──────────────────────────────────────────────────────────────────┐{Colors.END}")
+            print(f"{Colors.YELLOW}│{Colors.CYAN}                    ASCII QR CODE                         {Colors.YELLOW}│{Colors.END}")
+            print(f"{Colors.YELLOW}├──────────────────────────────────────────────────────────────────┤{Colors.END}")
+            for line in ascii_qr.split('\n'):
+                print(f"{Colors.CYAN}│{Colors.END} {line}")
+            print(f"{Colors.YELLOW}└──────────────────────────────────────────────────────────────────┘{Colors.END}")
             
             return {
                 'filepath': filepath,
@@ -878,8 +919,9 @@ class QRCodeManager:
                 'ascii': ascii_qr,
                 'key_id': hashlib.sha256(key_data.encode()).hexdigest()[:16]
             }
+            
         except Exception as e:
-            self.typer.type_text("Failed to generate QR code: {}".format(str(e)), color=Colors.RED)
+            print(f"\n{Colors.RED}❌ Failed to generate QR code: {str(e)}{Colors.END}")
             return None
     
     def _generate_ascii_qr(self, qr):
@@ -1030,7 +1072,7 @@ class QRCodeManager:
         return True
     
     def export_key_as_qr(self):
-        """Export encryption key as QR code"""
+        """Export encryption key as QR code with progress animation"""
         PlatformUtils.clear_screen()
         box = RotatingBox(50, " QR KEY EXPORT ")
         
@@ -1063,7 +1105,7 @@ class QRCodeManager:
         
         self.typer.type_text("Generating QR code for your encryption key...", color=Colors.YELLOW)
         
-        result = self.generate_qr_code(key)
+        result = self.generate_qr_code_with_progress(key)
         
         if not result:
             content = [
@@ -1075,12 +1117,10 @@ class QRCodeManager:
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
             return
         
-        key_id = result['key_id']
-        
         content = [
             "QR CODE GENERATED",
-            "Key ID: {}".format(key_id),
-            "Saved as: {}".format(result['filepath']),
+            "Key ID: {}".format(result['key_id']),
+            "Location: {}".format(result['filepath']),
             "",
             "ASCII QR Code:",
             "",
@@ -1131,6 +1171,7 @@ class QRCodeManager:
         table.render(rows)
         
         self.typer.type_text("Total QR codes: {}".format(len(qr_files)), color=Colors.CYAN)
+        self.typer.type_text("Location: {}".format(self.qr_dir), color=Colors.DIM)
         
         input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
 
@@ -1217,7 +1258,6 @@ class DirectoryEncryptor:
         self.encrypted_dir = ENCRYPTED_DIR
         self.manifest_file = "manifest.json"
         self.exclude_patterns = ['.DS_Store', 'Thumbs.db', 'desktop.ini']
-        self.report_gen = ReportGenerator()
         
         if not os.path.exists(self.encrypted_dir):
             try:
@@ -1262,6 +1302,9 @@ class DirectoryEncryptor:
         if not os.path.isdir(directory_path):
             self.typer.type_text("Path is not a directory: {}".format(directory_path), color=Colors.RED)
             return False, None
+        
+        # Show Matrix Rain for 2 minutes during directory encryption
+        self.crypto.matrix.render_encryption(os.path.basename(directory_path))
         
         self.typer.type_text("Scanning directory: {}".format(directory_path), color=Colors.CYAN)
         file_tree = self.get_file_tree(directory_path)
@@ -1356,19 +1399,6 @@ class DirectoryEncryptor:
             
             self.crypto.add_activity("Encrypted directory: {} ({} files)".format(dir_name, total_files))
             
-            self.typer.type_text("Generating report...", color=Colors.YELLOW)
-            key_info = self.crypto.get_key_info()
-            report_details = {
-                'target': directory_path,
-                'total_files': total_files,
-                'total_size': self.crypto.human_readable_size(metadata['total_size']),
-                'files': processed_files,
-                'key_info': key_info,
-                'format': 'ZIP',
-                'platform': platform.system()
-            }
-            self.report_gen.generate_report("DIRECTORY ENCRYPTION", report_details)
-            
             return True, encrypted_container
             
         except Exception as e:
@@ -1388,6 +1418,9 @@ class DirectoryEncryptor:
             self.typer.type_text("Container not found: {}".format(encrypted_container), color=Colors.RED)
             return False
         
+        # Show Matrix Rain for 2.5 minutes during directory decryption
+        self.crypto.matrix.render_decryption(os.path.basename(encrypted_container))
+        
         temp_dir = tempfile.mkdtemp(prefix="dsterminal_dec_")
         processed_files = []
         
@@ -1397,7 +1430,7 @@ class DirectoryEncryptor:
             extracted = False
             format_used = "unknown"
             
-            # Try ZIP first (most common)
+            # Try ZIP first
             try:
                 import zipfile
                 with zipfile.ZipFile(encrypted_container, 'r') as zipf:
@@ -1515,25 +1548,6 @@ class DirectoryEncryptor:
             
             self.crypto.add_activity("Decrypted directory: {} ({} files)".format(metadata['original_name'], decrypted_count))
             
-            self.typer.type_text("Generating report...", color=Colors.YELLOW)
-            key_info = self.crypto.get_key_info()
-            total_size = 0
-            for root, dirs, files in os.walk(output_dir):
-                for f in files:
-                    f_path = os.path.join(root, f)
-                    total_size += os.path.getsize(f_path)
-            
-            report_details = {
-                'target': encrypted_container,
-                'total_files': decrypted_count,
-                'total_size': self.crypto.human_readable_size(total_size),
-                'files': processed_files,
-                'key_info': key_info,
-                'format': format_used,
-                'platform': platform.system()
-            }
-            self.report_gen.generate_report("DIRECTORY DECRYPTION", report_details)
-            
             return True
             
         except Exception as e:
@@ -1582,10 +1596,9 @@ class CryptoEngine:
     def __init__(self, base_dir="."):
         self.base_dir = base_dir
         self.cipher = None
-        self.matrix = MatrixRain()
+        self.matrix = MatrixRain(width=80, height=20)
         self.qr_manager = QRCodeManager(self)
         self.dir_encryptor = DirectoryEncryptor(self)
-        self.report_gen = ReportGenerator()
         self.typer = TypeWriter('fast')
         self.start_time = datetime.now()
         self.last_action = None
@@ -1614,114 +1627,6 @@ class CryptoEngine:
             self.typer.type_text("QR Code features are disabled.", color=Colors.YELLOW)
             self.typer.type_text("To enable QR features, install missing dependencies:", color=Colors.CYAN)
             self.typer.type_text("   pip install qrcode[pil] pillow opencv-python-headless", color=Colors.CYAN)
-    
-    def main(self):
-        """Main entry point for CryptoEngine - Full interactive dashboard"""
-        while True:
-            PlatformUtils.clear_screen()
-            self.show_dashboard(with_typing=False)
-            
-            print(f"\n{Colors.DIM}┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────┐")
-            print(f"│  {Colors.CYAN}┌────────────────────────────────────────────────────────────────────────────────────────────────────┐{Colors.DIM}│")
-            print(f"│  {Colors.CYAN}│  {Colors.GREEN}01{Colors.CYAN} Setup System     {Colors.GREEN}02{Colors.CYAN} Encrypt File   {Colors.GREEN}03{Colors.CYAN} Decrypt File   {Colors.GREEN}04{Colors.CYAN} Encrypt Dir  {Colors.CYAN}│{Colors.DIM}│")
-            print(f"│  {Colors.CYAN}│  {Colors.GREEN}05{Colors.CYAN} Decrypt Dir      {Colors.GREEN}06{Colors.CYAN} Backup Key     {Colors.GREEN}07{Colors.CYAN} QR Generate    {Colors.GREEN}08{Colors.CYAN} Export Key   {Colors.CYAN}│{Colors.DIM}│")
-            print(f"│  {Colors.CYAN}│  {Colors.GREEN}09{Colors.CYAN} Import Key       {Colors.GREEN}10{Colors.CYAN} List Files     {Colors.GREEN}11{Colors.CYAN} File Info      {Colors.GREEN}12{Colors.CYAN} Verify Sys  {Colors.CYAN}│{Colors.DIM}│")
-            print(f"│  {Colors.CYAN}│  {Colors.GREEN}13{Colors.CYAN} Reports          {Colors.GREEN}14{Colors.CYAN} QR Import      {Colors.GREEN}15{Colors.CYAN} QR Restore     {Colors.GREEN}16{Colors.CYAN} QR List     {Colors.CYAN}│{Colors.DIM}│")
-            print(f"│  {Colors.CYAN}│  {Colors.GREEN}17{Colors.CYAN} Clean QR         {Colors.GREEN}18{Colors.CYAN} Encrypted Dirs {Colors.GREEN}19{Colors.CYAN} Debug Info     {Colors.GREEN}20{Colors.CYAN} Encrypt Test{Colors.CYAN}│{Colors.DIM}│")
-            print(f"│  {Colors.CYAN}│  {Colors.GREEN}21{Colors.CYAN} Decrypt Test     {Colors.GREEN}00{Colors.CYAN} Return to DSTERMINAL                                {Colors.CYAN}│{Colors.DIM}│")
-            print(f"│  {Colors.CYAN}└────────────────────────────────────────────────────────────────────────────────────────────────────┘{Colors.DIM}│")
-            print(f"└──────────────────────────────────────────────────────────────────────────────────────────────────────────────┘{Colors.END}")
-            
-            choice = input(f"\n{Colors.GREEN}└──[{Colors.YELLOW}CRYPTO{Colors.GREEN}]{Colors.END} # ").strip()
-            
-            if choice in ['01', '1']:
-                self.encrypt_setup()
-            elif choice in ['02', '2']:
-                filename = input(f"{Colors.CYAN}File to encrypt: {Colors.END}").strip()
-                if filename:
-                    self.encrypt_file(filename)
-                    input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
-            elif choice in ['03', '3']:
-                filename = input(f"{Colors.CYAN}File to decrypt: {Colors.END}").strip()
-                if filename:
-                    self.decrypt_file(filename)
-                    input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
-            elif choice in ['04', '4']:
-                self.encrypt_directory()
-            elif choice in ['05', '5']:
-                self.decrypt_directory()
-            elif choice in ['06', '6']:
-                self.crypto_backup()
-            elif choice in ['07', '7']:
-                self.qr_generate()
-            elif choice in ['08', '8']:
-                self.export_encryption_key()
-            elif choice in ['09', '9']:
-                self.import_encryption_key()
-            elif choice == '10':
-                self.crypto_list()
-            elif choice == '11':
-                self.crypto_info()
-            elif choice == '12':
-                self.crypto_verify()
-            elif choice == '13':
-                self.list_reports()
-            elif choice == '14':
-                self.qr_import()
-            elif choice == '15':
-                self.qr_restore()
-            elif choice == '16':
-                self.qr_list()
-            elif choice == '17':
-                if os.path.exists(QR_CODE_DIR):
-                    self.qr_list()
-                    confirm = input(f"\n{Colors.RED}Delete all QR codes? (y/N): {Colors.END}").strip().lower()
-                    if confirm == 'y':
-                        count = 0
-                        for f in os.listdir(QR_CODE_DIR):
-                            if f.endswith('.png'):
-                                try:
-                                    os.remove(os.path.join(QR_CODE_DIR, f))
-                                    count += 1
-                                except:
-                                    pass
-                        self.typer.type_text("Deleted {} QR codes".format(count), color=Colors.GREEN)
-                        self.add_activity("Cleaned {} QR codes".format(count))
-                        input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
-                else:
-                    self.typer.type_text("QR directory not found", color=Colors.RED)
-                    input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
-            elif choice == '18':
-                self.list_encrypted_dirs()
-            elif choice == '19':
-                self._debug_info()
-                input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
-            elif choice == '20':
-                self.encrypt_test()
-            elif choice == '21':
-                self.decrypt_test()
-            elif choice in ['00', '0']:
-                print(f"\n{Colors.YELLOW}Returning to DSTERMINAL...{Colors.END}")
-                time.sleep(0.5)
-                break
-            else:
-                self.typer.type_text("Invalid option. Please select a valid command.", color=Colors.RED)
-                time.sleep(1)
-    
-    def _debug_info(self):
-        """Display debug information"""
-        self.typer.type_text("DEBUG INFO", color=Colors.RED)
-        self.typer.type_text("KEY_FILE: {}".format(KEY_FILE), color=Colors.CYAN)
-        self.typer.type_text("QR_CODE_DIR: {}".format(QR_CODE_DIR), color=Colors.CYAN)
-        self.typer.type_text("BACKUP_DIR: {}".format(BACKUP_DIR), color=Colors.CYAN)
-        self.typer.type_text("ENCRYPTED_DIR: {}".format(ENCRYPTED_DIR), color=Colors.CYAN)
-        self.typer.type_text("REPORTS_DIR: {}".format(REPORTS_DIR), color=Colors.CYAN)
-        self.typer.type_text("Key exists: {}".format(os.path.exists(KEY_FILE)), color=Colors.CYAN)
-        self.typer.type_text("QR dir exists: {}".format(os.path.exists(QR_CODE_DIR)), color=Colors.CYAN)
-        self.typer.type_text("Encrypted dir exists: {}".format(os.path.exists(ENCRYPTED_DIR)), color=Colors.CYAN)
-        self.typer.type_text("Reports dir exists: {}".format(os.path.exists(REPORTS_DIR)), color=Colors.CYAN)
-        self.typer.type_text("QR Method: {}".format(QR_METHOD), color=Colors.CYAN)
-        self.typer.type_text("Report Available: {}".format(REPORT_AVAILABLE), color=Colors.CYAN)
     
     def get_key_info(self):
         """Get encryption key information for reports"""
@@ -1773,7 +1678,6 @@ class CryptoEngine:
         
         uptime = str(datetime.now() - self.start_time).split('.')[0]
         
-        # Dashboard stats will be updated when dashboard is shown
         self._stats = {
             'encryption_ready': key_exists and self.cipher is not None,
             'key_id': key_id,
@@ -1838,6 +1742,7 @@ class CryptoEngine:
             gc.collect()
             time.sleep(0.2)
             
+            # Try simple delete first
             try:
                 os.remove(file_path)
                 if not os.path.exists(file_path):
@@ -1845,6 +1750,7 @@ class CryptoEngine:
             except:
                 pass
             
+            # Try overwrite then delete
             try:
                 with open(file_path, "r+b") as f:
                     for i in range(passes):
@@ -1890,55 +1796,34 @@ class CryptoEngine:
             return False
     
     def show_dashboard(self, with_typing=True):
-        """Show the dashboard with current stats"""
+        """Show the dashboard with current stats - CENTERED"""
         self.update_stats()
         stats = self._stats if hasattr(self, '_stats') else {}
         
-        print(f"\n{Colors.CYAN}┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────┐")
-        print(f"│{Colors.YELLOW}                  DSTERMINAL ENCRYPTION SUITE                 {Colors.CYAN}│")
-        print(f"│──────────────────────────────────────────────────────────────────────────────────────────────────────────────│")
-        print(f"│{Colors.GREEN}  Encryption: {Colors.END}{Colors.GREEN if stats.get('encryption_ready') else Colors.RED}{'ACTIVE' if stats.get('encryption_ready') else 'INACTIVE'}{Colors.END}")
-        print(f"│{Colors.GREEN}  Key ID: {Colors.END}{Colors.CYAN}{stats.get('key_id', 'N/A')}{Colors.END}")
-        print(f"│{Colors.GREEN}  QR Codes: {Colors.END}{Colors.YELLOW}{stats.get('qr_count', 0)}{Colors.END}")
-        print(f"│{Colors.GREEN}  Encrypted Files: {Colors.END}{Colors.MAGENTA}{stats.get('encrypted_count', 0)}{Colors.END}")
-        print(f"│{Colors.GREEN}  Encrypted Dirs: {Colors.END}{Colors.CYAN}{stats.get('encrypted_dirs', 0)}{Colors.END}")
-        print(f"│{Colors.GREEN}  Reports: {Colors.END}{Colors.WHITE}{stats.get('reports_count', 0)}{Colors.END}")
-        print(f"│{Colors.GREEN}  Uptime: {Colors.END}{Colors.DIM}{stats.get('uptime', '00:00:00')}{Colors.END}")
-        print(f"└──────────────────────────────────────────────────────────────────────────────────────────────────────────────┘{Colors.END}")
-    
-    def animate_encryption(self, filename, operation="ENCRYPTING"):
-        """Show encryption/decryption animation with progress bar"""
-        print(f"\n{Colors.YELLOW}{'='*60}{Colors.END}")
-        print(f"{Colors.BOLD}{operation} {filename}{Colors.END}")
-        print(f"{Colors.YELLOW}{'='*60}{Colors.END}")
+        try:
+            term_width = shutil.get_terminal_size().columns
+        except:
+            term_width = 80
         
-        for i in range(8):
-            progress = (i + 1) * 12.5
-            bar_length = 30
-            filled = int(bar_length * progress // 100)
-            bar = '█' * filled + '░' * (bar_length - filled)
-            
-            status_msgs = [
-                "▶ Initializing encryption vectors...",
-                "▶ Generating round keys...",
-                "▶ Applying substitution boxes...",
-                "▶ Mixing data blocks...",
-                "▶ Finalizing operation...",
-                "▶ Verifying integrity...",
-                "▶ Compressing output...",
-                "▶ Complete!"
-            ]
-            
-            sys.stdout.write('\033[2A')
-            sys.stdout.write('\033[J')
-            
-            print(f"Progress: [{bar}] {progress:.1f}%")
-            print(f"Status: {status_msgs[i] if i < len(status_msgs) else 'Processing...'}")
-            
-            time.sleep(0.15)
+        lines = [
+            f"{Colors.CYAN}┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────┐{Colors.END}",
+            f"{Colors.CYAN}│{Colors.YELLOW}                  DSTERMINAL ENCRYPTION SUITE                 {Colors.CYAN}│{Colors.END}",
+            f"{Colors.CYAN}│──────────────────────────────────────────────────────────────────────────────────────────────────────────────│{Colors.END}",
+            f"{Colors.CYAN}│{Colors.GREEN}  Encryption: {Colors.END}{Colors.GREEN if stats.get('encryption_ready') else Colors.RED}{'ACTIVE' if stats.get('encryption_ready') else 'INACTIVE'}{Colors.END}",
+            f"{Colors.CYAN}│{Colors.GREEN}  Key ID: {Colors.END}{Colors.CYAN}{stats.get('key_id', 'N/A')}{Colors.END}",
+            f"{Colors.CYAN}│{Colors.GREEN}  QR Codes: {Colors.END}{Colors.YELLOW}{stats.get('qr_count', 0)}{Colors.END}",
+            f"{Colors.CYAN}│{Colors.GREEN}  Encrypted Files: {Colors.END}{Colors.MAGENTA}{stats.get('encrypted_count', 0)}{Colors.END}",
+            f"{Colors.CYAN}│{Colors.GREEN}  Encrypted Dirs: {Colors.END}{Colors.CYAN}{stats.get('encrypted_dirs', 0)}{Colors.END}",
+            f"{Colors.CYAN}│{Colors.GREEN}  Reports: {Colors.END}{Colors.WHITE}{stats.get('reports_count', 0)}{Colors.END}",
+            f"{Colors.CYAN}│{Colors.GREEN}  Uptime: {Colors.END}{Colors.DIM}{stats.get('uptime', '00:00:00')}{Colors.END}",
+            f"{Colors.CYAN}└──────────────────────────────────────────────────────────────────────────────────────────────────────────────┘{Colors.END}"
+        ]
         
-        print(f"\n{Colors.GREEN}✓ {operation} COMPLETE{Colors.END}")
-    
+        for line in lines:
+            clean_line = strip_ansi(line)
+            padding = max(0, (term_width - len(clean_line)) // 2)
+            print(' ' * padding + line)
+
     def encrypt_setup(self):
         """Setup encryption system and generate key"""
         PlatformUtils.clear_screen()
@@ -2000,9 +1885,9 @@ class CryptoEngine:
         self.init_cipher()
         self.add_activity("New encryption key generated")
         input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
-
+        
     def encrypt_file(self, filename):
-        """Encrypt a single file with secure deletion option"""
+        """Encrypt a single file - Shows Matrix Rain first, then encryption"""
         if not self.cipher:
             self.typer.type_text("[!] Encryption not initialized", color=Colors.RED)
             return
@@ -2014,8 +1899,12 @@ class CryptoEngine:
             self.typer.type_text("[!] File not found", color=Colors.RED)
             return
         
-        self.animate_encryption(filename, "ENCRYPTING")
-
+        # Show Matrix Rain for 2 minutes during encryption (clears dashboard)
+        self.matrix.render_encryption(filename)
+        
+        # Now perform the actual encryption
+        self.typer.type_text("🔐 Finishing up...", color=Colors.YELLOW)
+        
         try:
             with open(path, "rb") as f:
                 data = f.read()
@@ -2101,31 +1990,26 @@ class CryptoEngine:
         else:
             print(f"{Colors.GREEN}✓ Original file kept (safe){Colors.END}")
         
-        self.typer.type_text("Generating report...", color=Colors.YELLOW)
-        key_info = self.get_key_info()
-        report_details = {
-            'target': filename,
-            'total_files': 1,
-            'total_size': self.human_readable_size(original_size),
-            'files': [{'name': filename, 'status': 'Encrypted', 'size': self.human_readable_size(original_size)}],
-            'key_info': key_info,
-            'original_deleted': choice == 'y' and verify == 'yes'
-        }
-        self.report_gen.generate_report("FILE ENCRYPTION", report_details)
-        
+        self.add_activity("Encrypted: {}".format(filename))
+
     def decrypt_file(self, filename):
-        """Decrypt a file with Matrix rain visualization"""
+        """Decrypt a file - Shows Matrix Rain first, then decryption"""
         if not self.cipher:
             self.typer.type_text("[!] Encryption not initialized", color=Colors.RED)
             return
 
         path = os.path.join(self.base_dir, filename)
+        path = os.path.normpath(path)
 
         if not os.path.exists(path):
             self.typer.type_text("[!] File not found", color=Colors.RED)
             return
         
-        print(f"\n{Colors.YELLOW}🔓 DECRYPTING FILE: {filename}{Colors.END}")
+        # Show Matrix Rain for 2.5 minutes during decryption (clears dashboard)
+        self.matrix.render_decryption(filename)
+        
+        # Now perform the actual decryption
+        self.typer.type_text("🔓 Finishing up...", color=Colors.YELLOW)
         
         with open(path, "rb") as f:
             data = f.read()
@@ -2142,22 +2026,11 @@ class CryptoEngine:
             print(f"\n{Colors.GREEN}✓ File decrypted successfully!{Colors.END}")
             print(f"   Output: {out_file}")
             
-            self.typer.type_text("Generating report...", color=Colors.YELLOW)
-            key_info = self.get_key_info()
-            report_details = {
-                'target': filename,
-                'total_files': 1,
-                'total_size': self.human_readable_size(len(decrypted)),
-                'files': [{'name': out_file, 'status': 'Decrypted', 'size': self.human_readable_size(len(decrypted))}],
-                'key_info': key_info
-            }
-            self.report_gen.generate_report("FILE DECRYPTION", report_details)
-            
         except Exception as e:
             self.typer.type_text("❌ Decryption failed: {}".format(e), color=Colors.RED)
-    
+
     def encrypt_directory(self):
-        """Encrypt a directory with progress tracking"""
+        """Encrypt a directory with Matrix Rain effect"""
         print(f"\n{Colors.YELLOW}📂 DIRECTORY ENCRYPTION{Colors.END}")
         print(f"{Colors.CYAN}{'─' * 50}{Colors.END}")
         
@@ -2185,69 +2058,14 @@ class CryptoEngine:
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
             return
         
-        all_files = []
-        total_size = 0
-        for root, dirs, files in os.walk(directory_path):
-            for f in files:
-                try:
-                    file_path = os.path.join(root, f)
-                    size = os.path.getsize(file_path)
-                    all_files.append(file_path)
-                    total_size += size
-                except Exception as e:
-                    print(f"{Colors.YELLOW}⚠️  Could not read: {file_path} - {e}{Colors.END}")
+        # Show Matrix Rain for 2 minutes during directory encryption
+        self.matrix.render_encryption(os.path.basename(directory_path))
         
-        total_files = len(all_files)
-        
-        print(f"📂 Directory: {directory_path}")
-        print(f"📁 Files: {total_files}")
-        print(f"📊 Size: {self.human_readable_size(total_size)}")
-        
-        print(f"\n{Colors.YELLOW}⚠️  After encryption, original files will remain unless deleted{Colors.END}")
-        print(f"{Colors.CYAN}Deletion options:{Colors.END}")
-        print(f"  1. Keep all original files (safe)")
-        print(f"  2. Securely delete ALL original files after encryption (irreversible)")
-        print(f"  3. Ask for each file individually (recommended for large directories)")
-        print(f"  4. Skip deletion (keep all files)")
-        
-        delete_choice = input(f"\n{Colors.YELLOW}Choose option [1-4]: {Colors.END}").strip()
-        
-        if delete_choice not in ['1', '2', '3', '4']:
-            delete_choice = '1'
-            print(f"{Colors.YELLOW}Defaulting to 'Keep all files'{Colors.END}")
-        
-        confirm = input(f"\n{Colors.RED}⚠️  Encrypt this directory? (y/N): {Colors.END}").strip().lower()
-        if confirm != 'y':
-            self.typer.type_text("Encryption cancelled", color=Colors.YELLOW)
-            input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
-            return
-        
-        self.animate_encryption(directory_path, "ENCRYPTING DIRECTORY")
-        
-        def progress_callback(current, total, filename):
-            if current % 10 == 0 or current == total:
-                print(f"  [{current}/{total}] {filename}")
-        
-        success, container_path = self.dir_encryptor.encrypt_directory(directory_path, progress_callback)
-        
-        if success:
-            print(f"\n{Colors.GREEN}✓ Directory encryption completed successfully!{Colors.END}")
-            if container_path:
-                print(f"   Container: {container_path}")
-            
-            if delete_choice == '2':
-                self._delete_original_directory_files(directory_path, all_files, "all")
-            elif delete_choice == '3':
-                self._delete_original_directory_files(directory_path, all_files, "individual")
-            else:
-                print(f"{Colors.GREEN}✓ Original files kept (safe){Colors.END}")
-        else:
-            print(f"\n{Colors.RED}❌ Directory encryption failed{Colors.END}")
-            
-        input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
-    
+        # Now perform the actual directory encryption
+        self.dir_encryptor.encrypt_directory(directory_path)
+
     def decrypt_directory(self):
-        """Decrypt a directory"""
+        """Decrypt a directory with Matrix Rain effect"""
         print(f"\n{Colors.YELLOW}📂 DIRECTORY DECRYPTION{Colors.END}")
         print(f"{Colors.CYAN}{'─' * 50}{Colors.END}")
         
@@ -2280,39 +2098,160 @@ class CryptoEngine:
             input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
             return
         
-        print(f"{Colors.CYAN}📦 Container:{Colors.END} {container_path}")
-        print(f"{Colors.CYAN}📁 Size:{Colors.END} {self.human_readable_size(os.path.getsize(container_path))}")
+        # Show Matrix Rain for 2.5 minutes during directory decryption
+        self.matrix.render_decryption(os.path.basename(container_path))
         
-        confirm = input(f"\n{Colors.RED}⚠️  Decrypt this container? (y/N): {Colors.END}").strip().lower()
-        if confirm != 'y':
-            self.typer.type_text("Decryption cancelled", color=Colors.YELLOW)
-            input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
-            return
-        
-        output_dir = input(f"{Colors.CYAN}Output directory (press ENTER for default): {Colors.END}").strip()
-        if not output_dir:
-            output_dir = None
-        else:
-            output_dir = os.path.expanduser(output_dir)
-        
-        self.animate_encryption(container_path, "DECRYPTING DIRECTORY")
-        
-        success = self.dir_encryptor.decrypt_directory(container_path, output_dir)
-        
-        if success:
-            print(f"\n{Colors.GREEN}✓ Directory decryption completed successfully!{Colors.END}")
-        else:
-            print(f"\n{Colors.RED}❌ Directory decryption failed{Colors.END}")
-        
+        # Now perform the actual directory decryption
+        self.dir_encryptor.decrypt_directory(container_path)
+
+    def main(self):
+        """Main entry point for CryptoEngine - Full interactive dashboard"""
+        while True:
+            PlatformUtils.clear_screen()
+            self.show_dashboard(with_typing=False)
+            
+            # Get terminal width for centering
+            try:
+                term_width = shutil.get_terminal_size().columns
+            except:
+                term_width = 80
+            
+            # Center the menu
+            menu_lines = [
+                f"{Colors.CYAN}┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────┐{Colors.END}",
+                f"{Colors.CYAN}│  {Colors.CYAN}┌────────────────────────────────────────────────────────────────────────────────────────────────────┐{Colors.CYAN}│{Colors.END}",
+                f"{Colors.CYAN}│  {Colors.CYAN}│  {Colors.GREEN}01{Colors.CYAN} Setup System     {Colors.GREEN}02{Colors.CYAN} Encrypt File   {Colors.GREEN}03{Colors.CYAN} Decrypt File   {Colors.GREEN}04{Colors.CYAN} Encrypt Dir  {Colors.CYAN}│{Colors.END}",
+                f"{Colors.CYAN}│  {Colors.CYAN}│  {Colors.GREEN}05{Colors.CYAN} Decrypt Dir      {Colors.GREEN}06{Colors.CYAN} Backup Key     {Colors.GREEN}07{Colors.CYAN} QR Generate    {Colors.GREEN}08{Colors.CYAN} Export Key   {Colors.CYAN}│{Colors.END}",
+                f"{Colors.CYAN}│  {Colors.CYAN}│  {Colors.GREEN}09{Colors.CYAN} Import Key       {Colors.GREEN}10{Colors.CYAN} List Files     {Colors.GREEN}11{Colors.CYAN} File Info      {Colors.GREEN}12{Colors.CYAN} Verify Sys  {Colors.CYAN}│{Colors.END}",
+                f"{Colors.CYAN}│  {Colors.CYAN}│  {Colors.GREEN}13{Colors.CYAN} Reports          {Colors.GREEN}14{Colors.CYAN} QR Import      {Colors.GREEN}15{Colors.CYAN} QR Restore     {Colors.GREEN}16{Colors.CYAN} QR List     {Colors.CYAN}│{Colors.END}",
+                f"{Colors.CYAN}│  {Colors.CYAN}│  {Colors.GREEN}17{Colors.CYAN} Clean QR         {Colors.GREEN}18{Colors.CYAN} Encrypted Dirs {Colors.GREEN}19{Colors.CYAN} Debug Info     {Colors.GREEN}20{Colors.CYAN} Encrypt Test{Colors.CYAN}│{Colors.END}",
+                f"{Colors.CYAN}│  {Colors.CYAN}│  {Colors.GREEN}21{Colors.CYAN} Decrypt Test     {Colors.GREEN}00{Colors.CYAN} Return to DSTERMINAL                                {Colors.CYAN}│{Colors.END}",
+                f"{Colors.CYAN}│  {Colors.CYAN}└────────────────────────────────────────────────────────────────────────────────────────────────────┘{Colors.CYAN}│{Colors.END}",
+                f"{Colors.CYAN}└──────────────────────────────────────────────────────────────────────────────────────────────────────────────┘{Colors.END}"
+            ]
+            
+            for line in menu_lines:
+                clean_line = strip_ansi(line)
+                padding = max(0, (term_width - len(clean_line)) // 2)
+                print(' ' * padding + line)
+            
+            choice = input(f"\n{Colors.GREEN}└──[{Colors.YELLOW}CRYPTO{Colors.GREEN}]{Colors.END} # ").strip()
+            
+            if choice in ['01', '1']:
+                self.encrypt_setup()
+            elif choice in ['02', '2']:
+                filename = input(f"{Colors.CYAN}File to encrypt: {Colors.END}").strip()
+                if filename:
+                    self.encrypt_file(filename)
+                    input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
+            elif choice in ['03', '3']:
+                filename = input(f"{Colors.CYAN}File to decrypt: {Colors.END}").strip()
+                if filename:
+                    self.decrypt_file(filename)
+                    input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
+            elif choice in ['04', '4']:
+                self.encrypt_directory()
+            elif choice in ['05', '5']:
+                self.decrypt_directory()
+            elif choice in ['06', '6']:
+                self.crypto_backup()
+            elif choice in ['07', '7']:
+                self.qr_export()
+            elif choice in ['08', '8']:
+                self.export_encryption_key()
+            elif choice in ['09', '9']:
+                self.import_encryption_key()
+            elif choice == '10':
+                self.crypto_list()
+            elif choice == '11':
+                self.crypto_info()
+            elif choice == '12':
+                self.crypto_verify()
+            elif choice == '13':
+                self.list_reports()
+            elif choice == '14':
+                self.qr_import()
+            elif choice == '15':
+                self.qr_restore()
+            elif choice == '16':
+                self.qr_list()
+            elif choice == '17':
+                if os.path.exists(QR_CODE_DIR):
+                    self.qr_list()
+                    confirm = input(f"\n{Colors.RED}Delete all QR codes? (y/N): {Colors.END}").strip().lower()
+                    if confirm == 'y':
+                        count = 0
+                        for f in os.listdir(QR_CODE_DIR):
+                            if f.endswith('.png'):
+                                try:
+                                    os.remove(os.path.join(QR_CODE_DIR, f))
+                                    count += 1
+                                except:
+                                    pass
+                        self.typer.type_text("Deleted {} QR codes".format(count), color=Colors.GREEN)
+                        self.add_activity("Cleaned {} QR codes".format(count))
+                        input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
+                else:
+                    self.typer.type_text("QR directory not found", color=Colors.RED)
+                    input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
+            elif choice == '18':
+                self.list_encrypted_dirs()
+            elif choice == '19':
+                self._debug_info()
+                input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
+            elif choice == '20':
+                self.encrypt_test()
+            elif choice == '21':
+                self.decrypt_test()
+            elif choice in ['00', '0']:
+                print(f"\n{Colors.YELLOW}Returning to DSTERMINAL...{Colors.END}")
+                time.sleep(0.5)
+                break
+            else:
+                self.typer.type_text("Invalid option. Please select a valid command.", color=Colors.RED)
+                time.sleep(1)
+    
+    def _debug_info(self):
+        """Display debug information"""
+        self.typer.type_text("DEBUG INFO", color=Colors.RED)
+        self.typer.type_text("KEY_FILE: {}".format(KEY_FILE), color=Colors.CYAN)
+        self.typer.type_text("QR_CODE_DIR: {}".format(QR_CODE_DIR), color=Colors.CYAN)
+        self.typer.type_text("BACKUP_DIR: {}".format(BACKUP_DIR), color=Colors.CYAN)
+        self.typer.type_text("ENCRYPTED_DIR: {}".format(ENCRYPTED_DIR), color=Colors.CYAN)
+        self.typer.type_text("REPORTS_DIR: {}".format(REPORTS_DIR), color=Colors.CYAN)
+        self.typer.type_text("Key exists: {}".format(os.path.exists(KEY_FILE)), color=Colors.CYAN)
+        self.typer.type_text("QR dir exists: {}".format(os.path.exists(QR_CODE_DIR)), color=Colors.CYAN)
+        self.typer.type_text("Encrypted dir exists: {}".format(os.path.exists(ENCRYPTED_DIR)), color=Colors.CYAN)
+        self.typer.type_text("Reports dir exists: {}".format(os.path.exists(REPORTS_DIR)), color=Colors.CYAN)
+        self.typer.type_text("QR Method: {}".format(QR_METHOD), color=Colors.CYAN)
+        self.typer.type_text("Report Available: {}".format(REPORT_AVAILABLE), color=Colors.CYAN)
         input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
-        self.update_stats()
+
+    def qr_export(self):
+        """Export key as QR code"""
+        self.qr_manager.export_key_as_qr()
+        self.add_activity("QR code exported")
+    
+    def qr_import(self):
+        """Import key from QR code"""
+        self.qr_manager.import_key_from_qr()
+        self.add_activity("QR code imported")
+    
+    def qr_list(self):
+        """List QR codes"""
+        self.qr_manager.list_qr_codes()
+        self.add_activity("Listed QR codes")
+    
+    def qr_restore(self):
+        """Restore from QR code"""
+        self.qr_manager.restore_key_from_backup_qr()
+        self.add_activity("QR code restore attempted")
     
     def list_encrypted_dirs(self):
         """List encrypted directories"""
+        containers = self.dir_encryptor.list_encrypted_directories()
         PlatformUtils.clear_screen()
         box = RotatingBox(60, " ENCRYPTED DIRECTORIES ")
-        
-        containers = self.dir_encryptor.list_encrypted_directories()
         
         if not containers:
             content = ["No encrypted directories found."]
@@ -2697,26 +2636,6 @@ class CryptoEngine:
         self.add_activity("Listed reports")
         input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
 
-    def qr_generate(self):
-        """Generate QR code for encryption key"""
-        self.qr_manager.export_key_as_qr()
-        self.add_activity("QR code generated")
-    
-    def qr_import(self):
-        """Import encryption key from QR code"""
-        self.qr_manager.import_key_from_qr()
-        self.add_activity("QR code imported")
-    
-    def qr_list(self):
-        """List all QR codes"""
-        self.qr_manager.list_qr_codes()
-        self.add_activity("Listed QR codes")
-    
-    def qr_restore(self):
-        """Emergency restore from QR code"""
-        self.qr_manager.restore_key_from_backup_qr()
-        self.add_activity("Emergency restore attempted")
-    
     def encrypt_test(self):
         """Run encryption test"""
         print(f"\n{Colors.YELLOW}ENCRYPTION SYSTEM TEST{Colors.END}")
@@ -2725,7 +2644,7 @@ class CryptoEngine:
         test_file = os.path.join(self.base_dir, "crypto_test.txt")
         
         with open(test_file, "w") as f:
-            f.write("DSTerminal encryption test - DIR ENCRYPTION\n")
+            f.write("DSTerminal encryption test\n")
             f.write(f"Timestamp: {datetime.now().isoformat()}\n")
             f.write("Classified: TOP SECRET\n")
         
@@ -2747,19 +2666,6 @@ class CryptoEngine:
             print(f"{Colors.CYAN}✓ Data integrity verified{Colors.END}")
             
             print(f"{Colors.YELLOW}📊 Generating test report...{Colors.END}")
-            key_info = self.get_key_info()
-            report_details = {
-                'target': 'Test File',
-                'total_files': 1,
-                'total_size': self.human_readable_size(os.path.getsize(test_file)),
-                'files': [
-                    {'name': 'crypto_test.txt', 'status': 'Encrypted → Decrypted', 
-                    'size': self.human_readable_size(os.path.getsize(test_file))}
-                ],
-                'key_info': key_info,
-                'test_mode': True
-            }
-            self.report_gen.generate_report("ENCRYPTION TEST", report_details)
         
         for f in [test_file, enc]:
             if os.path.exists(f):
@@ -2798,28 +2704,11 @@ class CryptoEngine:
         self.typer.type_text("🔓 Testing decryption on: {}".format(os.path.basename(test_file)), color=Colors.GREEN)
         time.sleep(1.5)
         
-        self.animate_encryption(os.path.basename(test_file), "DECRYPTING")
-        
         self.decrypt_file(os.path.basename(test_file))
         
         decrypted_file = test_file.replace(".enc", "")
         if os.path.exists(decrypted_file):
             self.typer.type_text("✓ Decryption test successful!", color=Colors.GREEN)
-            
-            self.typer.type_text("📊 Generating test report...", color=Colors.YELLOW)
-            key_info = self.get_key_info()
-            report_details = {
-                'target': os.path.basename(test_file),
-                'total_files': 1,
-                'total_size': self.human_readable_size(os.path.getsize(decrypted_file)),
-                'files': [
-                    {'name': os.path.basename(decrypted_file), 'status': 'Decrypted', 
-                    'size': self.human_readable_size(os.path.getsize(decrypted_file))}
-                ],
-                'key_info': key_info,
-                'test_mode': True
-            }
-            self.report_gen.generate_report("DECRYPTION TEST", report_details)
             
             try:
                 os.remove(decrypted_file)
@@ -2831,192 +2720,24 @@ class CryptoEngine:
         
         self.add_activity("Decryption test completed")
         input(f"\n{Colors.YELLOW}Press ENTER to continue...{Colors.END}")
-    
-    def _delete_original_directory_files(self, directory_path, all_files, mode="all"):
-        """Delete original files after directory encryption"""
-        print(f"\n{Colors.YELLOW}🔒 Processing original file deletion...{Colors.END}")
-        print(f"{Colors.DIM}Total files to process: {len(all_files)}{Colors.END}")
-        
-        dir_name = os.path.basename(directory_path)
-        encrypted_dir = ENCRYPTED_DIR
-        
-        containers = []
-        if os.path.exists(encrypted_dir):
-            for f in os.listdir(encrypted_dir):
-                if (f.startswith(dir_name) and 
-                    (f.endswith('.enc_dir') or 
-                    f.endswith('.enc_dir.zip') or 
-                    f.endswith('.enc_dir.tar.gz') or 
-                    f.endswith('.enc_dir.tgz'))):
-                    full_path = os.path.join(encrypted_dir, f)
-                    containers.append({
-                        'name': f,
-                        'path': full_path,
-                        'mtime': os.path.getmtime(full_path)
-                    })
-        
-        if not containers:
-            print(f"{Colors.RED}❌ No encrypted container found for this directory!{Colors.END}")
-            return
-        
-        latest = sorted(containers, key=lambda x: x['mtime'], reverse=True)[0]
-        container_path = latest['path']
-        
-        if latest['name'].endswith('.zip'):
-            fmt = "ZIP"
-        elif latest['name'].endswith('.tar.gz') or latest['name'].endswith('.tgz'):
-            fmt = "TAR.GZ"
-        else:
-            fmt = "Unknown"
-        
-        print(f"{Colors.CYAN}📦 Found encrypted container: {os.path.basename(container_path)}{Colors.END}")
-        print(f"{Colors.DIM}   Format: {fmt}{Colors.END}")
-        
-        if not os.path.exists(container_path) or os.path.getsize(container_path) == 0:
-            print(f"{Colors.RED}❌ Encrypted container is invalid!{Colors.END}")
-            return
-        
-        if mode == "all" and len(all_files) > 10:
-            print(f"\n{Colors.RED}⚠️  You are about to delete {len(all_files)} files!{Colors.END}")
-            confirm = input(f"{Colors.RED}Type 'DELETE ALL' to confirm: {Colors.END}").strip()
-            if confirm != 'DELETE ALL':
-                print(f"{Colors.GREEN}✓ Deletion cancelled - all files kept{Colors.END}")
-                return
-        
-        deleted_count = 0
-        kept_count = 0
-        skipped_count = 0
-        failed_count = 0
-        
-        for idx, file_path in enumerate(all_files, 1):
-            rel_path = os.path.relpath(file_path, directory_path)
-            filename = os.path.basename(file_path)
-            
-            if filename in ['.DS_Store', 'Thumbs.db', 'desktop.ini']:
-                print(f"{Colors.DIM}  ⏭ Skipping system file: {filename}{Colors.END}")
-                skipped_count += 1
-                continue
-            
-            if mode == "individual":
-                print(f"\n{Colors.CYAN}[{idx}/{len(all_files)}] File: {rel_path}{Colors.END}")
-                print(f"  Size: {self.human_readable_size(os.path.getsize(file_path))}")
-                choice = input(f"{Colors.YELLOW}Delete original? (y/N/a=delete all/k=keep all): {Colors.END}").strip().lower()
-                
-                if choice == 'a':
-                    mode = "all"
-                    print(f"{Colors.YELLOW}Switched to 'delete all' mode{Colors.END}")
-                elif choice == 'k':
-                    mode = "none"
-                    print(f"{Colors.GREEN}Switched to 'keep all' mode{Colors.END}")
-                    break
-                elif choice != 'y':
-                    print(f"{Colors.GREEN}✓ Keeping: {rel_path}{Colors.END}")
-                    kept_count += 1
-                    continue
-            
-            if mode == "all":
-                try:
-                    print(f"{Colors.YELLOW}🔒 Deleting [{idx}/{len(all_files)}]: {rel_path}{Colors.END}")
-                    success = self.secure_delete(file_path, passes=3)
-                    
-                    if success and not os.path.exists(file_path):
-                        deleted_count += 1
-                        print(f"{Colors.GREEN}✓ Deleted: {rel_path}{Colors.END}")
-                        self.add_activity("Securely deleted original: {}".format(rel_path))
-                    else:
-                        try:
-                            os.remove(file_path)
-                            time.sleep(0.1)
-                            if not os.path.exists(file_path):
-                                deleted_count += 1
-                                print(f"{Colors.GREEN}✓ Deleted (normal): {rel_path}{Colors.END}")
-                            else:
-                                print(f"{Colors.RED}❌ Failed to delete: {rel_path}{Colors.END}")
-                                failed_count += 1
-                        except Exception as e2:
-                            print(f"{Colors.RED}❌ Failed to delete: {rel_path} - {e2}{Colors.END}")
-                            failed_count += 1
-                            
-                except Exception as e:
-                    print(f"{Colors.RED}❌ Error deleting {rel_path}: {e}{Colors.END}")
-                    failed_count += 1
-        
-        print(f"\n{Colors.GREEN}📊 Deletion Summary:{Colors.END}")
-        print(f"  {Colors.GREEN}✓ Securely deleted: {deleted_count} files{Colors.END}")
-        if failed_count > 0:
-            print(f"  {Colors.RED}❌ Failed to delete: {failed_count} files{Colors.END}")
-        if kept_count > 0:
-            print(f"  {Colors.YELLOW}⚠️  Kept: {kept_count} files{Colors.END}")
-        if skipped_count > 0:
-            print(f"  {Colors.DIM}⏭ Skipped: {skipped_count} system files{Colors.END}")
-        print(f"  {Colors.CYAN}📦 Encrypted container: {container_path}{Colors.END}")
-        print(f"  {Colors.DIM}   Format: {fmt}{Colors.END}")
-        
-        if deleted_count > 0:
-            print(f"\n{Colors.RED}⚠️  Remember: Deleted files are IRRECOVERABLE!{Colors.END}")
-            print(f"{Colors.CYAN}Keep your encryption key safe to access encrypted data{Colors.END}")
-        
-        if failed_count > 0:
-            retry = input(f"\n{Colors.YELLOW}Some files failed to delete. Retry? (y/N): {Colors.END}").strip().lower()
-            if retry == 'y':
-                print(f"{Colors.CYAN}🔄 Retrying failed deletions...{Colors.END}")
-                remaining = []
-                for file_path in all_files:
-                    if os.path.exists(file_path):
-                        remaining.append(file_path)
-                if remaining:
-                    self._delete_remaining_files(remaining)
-
-    def _delete_remaining_files(self, remaining_files):
-        """Delete files that survived the first deletion attempt"""
-        print(f"\n{Colors.YELLOW}🔒 Attempting to delete {len(remaining_files)} remaining files...{Colors.END}")
-        
-        deleted_count = 0
-        failed_count = 0
-        
-        for idx, file_path in enumerate(remaining_files, 1):
-            rel_path = os.path.basename(file_path)
-            print(f"{Colors.DIM}  [{idx}/{len(remaining_files)}] {rel_path}{Colors.END}")
-            
-            try:
-                os.remove(file_path)
-                time.sleep(0.1)
-                if not os.path.exists(file_path):
-                    deleted_count += 1
-                    print(f"{Colors.GREEN}✓ Deleted: {rel_path}{Colors.END}")
-                    continue
-            except:
-                pass
-            
-            try:
-                if self.secure_delete(file_path, passes=1):
-                    deleted_count += 1
-                    print(f"{Colors.GREEN}✓ Deleted: {rel_path}{Colors.END}")
-                    continue
-            except:
-                pass
-            
-            failed_count += 1
-            print(f"{Colors.RED}❌ Could not delete: {rel_path}{Colors.END}")
-        
-        print(f"\n{Colors.GREEN}📊 Retry Summary:{Colors.END}")
-        print(f"  {Colors.GREEN}✓ Deleted: {deleted_count} files{Colors.END}")
-        if failed_count > 0:
-            print(f"  {Colors.RED}❌ Still failed: {failed_count} files{Colors.END}")
-            print(f"{Colors.YELLOW}These files may be open in another program.{Colors.END}")
-            print(f"{Colors.CYAN}   Close any programs that might be using them and try again.{Colors.END}")
 
 
 def main():
     """Main entry point for the crypto engine"""
-    crypto = CryptoEngine()
-    crypto.main()
-
-
-if __name__ == "__main__":
     try:
-        main()
+        crypto = CryptoEngine()
+        crypto.main()
     except KeyboardInterrupt:
         print(f"\n\n{Colors.RED}⚠️  Termination initiated{Colors.END}")
         time.sleep(1.5)
         sys.exit(0)
+    except Exception as e:
+        print(f"\n\n{Colors.RED}❌ Error: {e}{Colors.END}")
+        import traceback
+        traceback.print_exc()
+        input(f"\n{Colors.YELLOW}Press ENTER to exit...{Colors.END}")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

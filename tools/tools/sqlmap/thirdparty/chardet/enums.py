@@ -1,3 +1,4 @@
+#!python
 """
 All of the Enums that are used throughout the chardet package.
 

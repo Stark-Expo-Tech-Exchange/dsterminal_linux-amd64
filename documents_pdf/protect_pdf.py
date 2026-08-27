@@ -1,4 +1,5 @@
-﻿"""
+#!python
+"""
 PDF Copy Protection Tool - Working Version
 Converts PDF to images to prevent text copying
 """

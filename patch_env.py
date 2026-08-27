@@ -1,3 +1,4 @@
+#!python
 ﻿#!/usr/bin/env python3
 """
 Patch Script - Environment Variable Setup for update.py

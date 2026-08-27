@@ -1,4 +1,4 @@
-﻿# netifaces.py - DSTERMINAL wrapper for netifaces native module
+#!python
 # This file redirects imports to the native .pyd module
 
 import sys

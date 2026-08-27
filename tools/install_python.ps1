@@ -1,4 +1,4 @@
-﻿# Check Python (No admin required)
+# Check Python (No admin required)
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "  Checking Python Installation" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Cyan

@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!python
 """
 DSTERMINAL License Agreement PDF Generator
 Clean, professional legal document with no background colors

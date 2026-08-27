@@ -1,4 +1,4 @@
-﻿@echo off
+@echo off
 title DSTERMINAL - Install Remaining Dependencies
 color 0A
 

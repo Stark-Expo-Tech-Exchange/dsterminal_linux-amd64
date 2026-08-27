@@ -1,4 +1,5 @@
-﻿# create_pitch_deck.py
+#!python
+# create_pitch_deck.py
 """
 DSTERMINAL INVESTOR PITCH DECK GENERATOR
 Creates a professional PowerPoint presentation

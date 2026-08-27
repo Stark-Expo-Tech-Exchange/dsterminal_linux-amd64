@@ -1,4 +1,4 @@
-﻿<<<<<<< HEAD
+<<<<<<< HEAD
 # install_sqlmap.ps1 - Extract bundled SQLMap (No Python required)
 # SQLMap Installation Script for DSTerminal
 

@@ -1,3 +1,4 @@
+#!python
 ﻿# create_bundles.py - Complete Fixed Version
 import os
 import sys
