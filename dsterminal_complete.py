@@ -45,7 +45,6 @@ PYTHON_3_13 = PYTHON_VERSION.major == 3 and PYTHON_VERSION.minor >= 13
 # CROSS-PLATFORM CONSOLE FIXES
 # ============================================================
 if IS_WINDOWS:
-    # Windows console encoding fixes
     try:
         import subprocess as sp
         sp.run(['chcp', '65001'], capture_output=True, shell=True)
@@ -65,7 +64,6 @@ if IS_WINDOWS:
     os.environ['PYTHONUTF8'] = '1'
     os.environ['PROMPT_TOOLKIT_NO_CP437'] = '1'
 elif IS_UNIX:
-    # Linux/macOS locale fixes
     os.environ.setdefault('LC_ALL', 'C.UTF-8')
     os.environ.setdefault('LANG', 'en_US.UTF-8')
     os.environ.setdefault('PYTHONIOENCODING', 'utf-8')
@@ -121,7 +119,7 @@ except ImportError:
     print("[!] netifaces not installed. Install with: pip install netifaces")
 
 # ============================================================
-# CROSS-PLATFORM COLOR CODES
+# CROSS-PLATFORM COLOR CODES - FIXED
 # ============================================================
 class Colors:
     """ANSI color codes - works on all platforms"""
@@ -132,6 +130,7 @@ class Colors:
     MAGENTA = '\033[95m' if not IS_WINDOWS else ''
     CYAN = '\033[96m' if not IS_WINDOWS else ''
     WHITE = '\033[97m' if not IS_WINDOWS else ''
+    BLACK = '\033[30m' if not IS_WINDOWS else ''  # <-- ADDED THIS
     RESET = '\033[0m' if not IS_WINDOWS else ''
     DIM = '\033[2m' if not IS_WINDOWS else ''
     BRIGHT = '\033[1m' if not IS_WINDOWS else ''
@@ -150,6 +149,7 @@ class ServerColors:
     MAGENTA = Colors.MAGENTA
     CYAN = Colors.CYAN
     WHITE = Colors.WHITE
+    BLACK = Colors.BLACK  # <-- ADDED THIS
     RESET = Colors.RESET
     DIM = Colors.DIM
     BOLD = Colors.BRIGHT
@@ -175,7 +175,7 @@ def server_alert(message, alert_type="INFO"):
         "CRITICAL": ServerColors.BG_RED + ServerColors.WHITE + ServerColors.BOLD,
         "QUARANTINE": ServerColors.MAGENTA + ServerColors.BOLD,
         "RANSOMWARE": ServerColors.BG_RED + ServerColors.WHITE + ServerColors.BOLD,
-        "HONEYPOT": ServerColors.BG_YELLOW + Colors.BLACK + ServerColors.BOLD,
+        "HONEYPOT": ServerColors.BG_YELLOW + ServerColors.BLACK + ServerColors.BOLD,
     }
     
     icons = {
@@ -1643,7 +1643,6 @@ def isolate_system():
     
     try:
         if IS_WINDOWS:
-            # Windows: Disable all network interfaces
             if NETIFACES_AVAILABLE:
                 for interface in netifaces.interfaces():
                     try:
@@ -1652,12 +1651,10 @@ def isolate_system():
                     except:
                         pass
             
-            # Block all traffic with Windows Firewall
             subprocess.run(['netsh', 'advfirewall', 'set', 'allprofiles', 'firewallpolicy', 'blockinbound,blockoutbound'], 
                           capture_output=True)
             
         elif IS_LINUX:
-            # Linux: Disable all network interfaces
             if NETIFACES_AVAILABLE:
                 for interface in netifaces.interfaces():
                     if interface != 'lo':
@@ -1667,13 +1664,11 @@ def isolate_system():
                         except:
                             pass
             
-            # Block all traffic with iptables
             subprocess.run(['sudo', 'iptables', '-P', 'INPUT', 'DROP'], capture_output=True)
             subprocess.run(['sudo', 'iptables', '-P', 'OUTPUT', 'DROP'], capture_output=True)
             subprocess.run(['sudo', 'iptables', '-P', 'FORWARD', 'DROP'], capture_output=True)
             
         elif IS_MAC:
-            # macOS: Disable all network interfaces
             if NETIFACES_AVAILABLE:
                 for interface in netifaces.interfaces():
                     if interface != 'lo0':
@@ -1683,7 +1678,6 @@ def isolate_system():
                         except:
                             pass
             
-            # Block all traffic with pf
             with open('/etc/pf.conf', 'w') as f:
                 f.write('block all\n')
             subprocess.run(['sudo', 'pfctl', '-f', '/etc/pf.conf'], capture_output=True)
@@ -1700,7 +1694,6 @@ def restore_network():
     
     try:
         if IS_WINDOWS:
-            # Windows: Enable all network interfaces
             if NETIFACES_AVAILABLE:
                 for interface in netifaces.interfaces():
                     try:
@@ -1709,12 +1702,10 @@ def restore_network():
                     except:
                         pass
             
-            # Restore firewall
             subprocess.run(['netsh', 'advfirewall', 'set', 'allprofiles', 'firewallpolicy', 'blockinbound,allowoutbound'], 
                           capture_output=True)
             
         elif IS_LINUX:
-            # Linux: Enable all network interfaces
             if NETIFACES_AVAILABLE:
                 for interface in netifaces.interfaces():
                     if interface != 'lo':
@@ -1724,13 +1715,11 @@ def restore_network():
                         except:
                             pass
             
-            # Restore iptables
             subprocess.run(['sudo', 'iptables', '-P', 'INPUT', 'ACCEPT'], capture_output=True)
             subprocess.run(['sudo', 'iptables', '-P', 'OUTPUT', 'ACCEPT'], capture_output=True)
             subprocess.run(['sudo', 'iptables', '-P', 'FORWARD', 'ACCEPT'], capture_output=True)
             
         elif IS_MAC:
-            # macOS: Enable all network interfaces
             if NETIFACES_AVAILABLE:
                 for interface in netifaces.interfaces():
                     if interface != 'lo0':
@@ -1740,7 +1729,6 @@ def restore_network():
                         except:
                             pass
             
-            # Disable pf
             subprocess.run(['sudo', 'pfctl', '-d'], capture_output=True)
         
         system_isolated = False
@@ -1996,11 +1984,11 @@ def kill_process(pid):
             if IS_WINDOWS:
                 subprocess.run(['taskkill', '/F', '/PID', str(pid)], capture_output=True)
             else:
-                os.kill(pid, 15)  # SIGTERM
+                os.kill(pid, 15)
                 time.sleep(1)
                 try:
                     os.kill(pid, 0)
-                    os.kill(pid, 9)  # SIGKILL
+                    os.kill(pid, 9)
                 except OSError:
                     pass
         return {'success': True}
