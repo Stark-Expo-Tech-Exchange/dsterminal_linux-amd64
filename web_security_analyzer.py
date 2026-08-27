@@ -1996,7 +1996,7 @@ class PDFReportGenerator:
                 'CustomTitle',
                 parent=styles['Heading1'],
                 fontSize=24,
-                textColor=colors.HexColor('#0066cc'),
+                textColor=reportlab_colors.HexColor('#0066cc'),  # Changed from colors to reportlab_colors
                 alignment=TA_CENTER,
                 spaceAfter=20,
                 fontName='Helvetica-Bold'
@@ -2006,7 +2006,7 @@ class PDFReportGenerator:
                 'Subtitle',
                 parent=styles['Normal'],
                 fontSize=12,
-                textColor=colors.HexColor('#666666'),
+                textColor=reportlab_colors.HexColor('#666666'),  # Changed
                 alignment=TA_CENTER,
                 spaceAfter=10
             )
@@ -2015,7 +2015,7 @@ class PDFReportGenerator:
                 'Heading',
                 parent=styles['Heading2'],
                 fontSize=16,
-                textColor=colors.HexColor('#004d99'),
+                textColor=reportlab_colors.HexColor('#004d99'),  # Changed
                 spaceAfter=10,
                 spaceBefore=15,
                 fontName='Helvetica-Bold'
@@ -2025,7 +2025,7 @@ class PDFReportGenerator:
                 'SubHeading',
                 parent=styles['Heading3'],
                 fontSize=13,
-                textColor=colors.HexColor('#0066cc'),
+                textColor=reportlab_colors.HexColor('#0066cc'),  # Changed
                 spaceAfter=8,
                 spaceBefore=10,
                 fontName='Helvetica-Bold'
@@ -2035,7 +2035,7 @@ class PDFReportGenerator:
                 'Body',
                 parent=styles['Normal'],
                 fontSize=10,
-                textColor=colors.HexColor('#333333'),
+                textColor=reportlab_colors.HexColor('#333333'),  # Changed
                 alignment=TA_LEFT,
                 spaceAfter=6,
                 fontName='Helvetica'
@@ -2045,7 +2045,7 @@ class PDFReportGenerator:
                 'Code',
                 parent=styles['Normal'],
                 fontSize=8,
-                textColor=colors.HexColor('#006600'),
+                textColor=reportlab_colors.HexColor('#006600'),  # Changed
                 alignment=TA_LEFT,
                 spaceAfter=4,
                 fontName='Courier'
@@ -2055,7 +2055,7 @@ class PDFReportGenerator:
                 'Footer',
                 parent=styles['Normal'],
                 fontSize=8,
-                textColor=colors.HexColor('#666666'),
+                textColor=reportlab_colors.HexColor('#666666'),  # Changed
                 alignment=TA_CENTER,
                 spaceAfter=4
             )
@@ -2063,11 +2063,11 @@ class PDFReportGenerator:
             # Watermark
             def add_watermark(canvas_obj, doc_obj):
                 canvas_obj.saveState()
-                canvas_obj.setFillColor(colors.HexColor('#cccccc'))
+                canvas_obj.setFillColor(reportlab_colors.HexColor('#cccccc'))  # Changed
                 canvas_obj.setFont('Helvetica-Bold', 50)
                 canvas_obj.rotate(45)
                 canvas_obj.drawString(150, 100, WATERMARK_TEXT)
-                canvas_obj.setFillColor(colors.HexColor('#dddddd'))
+                canvas_obj.setFillColor(reportlab_colors.HexColor('#dddddd'))  # Changed
                 canvas_obj.setFont('Helvetica', 25)
                 canvas_obj.rotate(-30)
                 canvas_obj.drawString(400, -50, WATERMARK_TEXT)
@@ -2082,11 +2082,11 @@ class PDFReportGenerator:
             story.append(Spacer(1, 12))
             
             # Risk Score
-            risk_color = colors.HexColor('#00ff00')
+            risk_color = reportlab_colors.HexColor('#00ff00')  # Changed
             if report.risk_score >= 70:
-                risk_color = colors.HexColor('#ff0000')
+                risk_color = reportlab_colors.HexColor('#ff0000')  # Changed
             elif report.risk_score >= 40:
-                risk_color = colors.HexColor('#ff8800')
+                risk_color = reportlab_colors.HexColor('#ff8800')  # Changed
             
             risk_style = ParagraphStyle(
                 'Risk',
@@ -2128,15 +2128,15 @@ class PDFReportGenerator:
             
             server_table = PDFTable(server_info_data, colWidths=[2*inch, 4*inch])
             server_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#34495e')),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('BACKGROUND', (0, 0), (-1, 0), reportlab_colors.HexColor('#34495e')),  # Changed
+                ('TEXTCOLOR', (0, 0), (-1, 0), reportlab_colors.whitesmoke),
                 ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
                 ('FONTSIZE', (0, 0), (-1, 0), 10),
                 ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
                 ('TOPPADDING', (0, 0), (-1, 0), 8),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8f9fa')),
-                ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
+                ('BACKGROUND', (0, 1), (-1, -1), reportlab_colors.HexColor('#f8f9fa')),  # Changed
+                ('GRID', (0, 0), (-1, -1), 1, reportlab_colors.HexColor('#dee2e6')),  # Changed
                 ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
                 ('FONTSIZE', (0, 1), (-1, -1), 9),
             ]))
@@ -2165,15 +2165,15 @@ class PDFReportGenerator:
                 if len(header_data) > 1:
                     header_table = PDFTable(header_data, colWidths=[2*inch, 3*inch, 1.5*inch])
                     header_table.setStyle(TableStyle([
-                        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#34495e')),
-                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                        ('BACKGROUND', (0, 0), (-1, 0), reportlab_colors.HexColor('#34495e')),  # Changed
+                        ('TEXTCOLOR', (0, 0), (-1, 0), reportlab_colors.whitesmoke),
                         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
                         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
                         ('FONTSIZE', (0, 0), (-1, 0), 10),
                         ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
                         ('TOPPADDING', (0, 0), (-1, 0), 8),
-                        ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8f9fa')),
-                        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
+                        ('BACKGROUND', (0, 1), (-1, -1), reportlab_colors.HexColor('#f8f9fa')),  # Changed
+                        ('GRID', (0, 0), (-1, -1), 1, reportlab_colors.HexColor('#dee2e6')),  # Changed
                         ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
                         ('FONTSIZE', (0, 1), (-1, -1), 9),
                     ]))
@@ -2208,7 +2208,6 @@ class PDFReportGenerator:
                 sec_config = configs['security_headers']
                 story.append(Paragraph(f"<b>{sec_config.get('title', 'Configuration')}</b>", body_style))
                 
-                # Code
                 if sec_config.get('code'):
                     code_lines = sec_config['code'].split('\n')
                     story.append(Paragraph("<i>Configuration Code:</i>", body_style))
@@ -2216,7 +2215,6 @@ class PDFReportGenerator:
                         if line.strip():
                             story.append(Paragraph(f"  {line}", code_style))
                 
-                # Commands
                 if sec_config.get('commands'):
                     story.append(Paragraph("<i>Commands to Apply:</i>", body_style))
                     for cmd in sec_config.get('commands', []):
@@ -2307,17 +2305,17 @@ class PDFReportGenerator:
                 
                 for i, finding in enumerate(report.findings, 1):
                     # Severity color
-                    severity_color = colors.HexColor('#ff8800')
+                    severity_color = reportlab_colors.HexColor('#ff8800')  # Changed
                     if finding.severity == 'CRITICAL':
-                        severity_color = colors.HexColor('#ff0000')
+                        severity_color = reportlab_colors.HexColor('#ff0000')  # Changed
                     elif finding.severity == 'HIGH':
-                        severity_color = colors.HexColor('#ff4444')
+                        severity_color = reportlab_colors.HexColor('#ff4444')  # Changed
                     elif finding.severity == 'MEDIUM':
-                        severity_color = colors.HexColor('#ff8800')
+                        severity_color = reportlab_colors.HexColor('#ff8800')  # Changed
                     elif finding.severity == 'LOW':
-                        severity_color = colors.HexColor('#00aa00')
+                        severity_color = reportlab_colors.HexColor('#00aa00')  # Changed
                     else:
-                        severity_color = colors.HexColor('#888888')
+                        severity_color = reportlab_colors.HexColor('#888888')  # Changed
                     
                     # Finding header
                     story.append(Paragraph(f"Finding #{i}: {finding.title}", subheading_style))
@@ -2375,8 +2373,9 @@ class PDFReportGenerator:
             
         except Exception as e:
             print(f"[red]❌ PDF generation failed: {str(e)}[/red]")
+            import traceback
+            traceback.print_exc()
             return None
-
 # ============================================================
 # MAIN DASHBOARD
 # ============================================================
