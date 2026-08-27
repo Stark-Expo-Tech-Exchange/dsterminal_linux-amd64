@@ -1,70 +1,6 @@
 # -*- coding: utf-8 -*-
 
 """
-# ============================================================
-# FIX: Handle OSError 22 on Windows
-# ============================================================
-if sys.platform == "win32":
-    try:
-        import subprocess as sp
-        sp.run(["chcp", "65001"], capture_output=True, shell=True)
-    except:
-        pass
-
-_original_stdout_write = sys.stdout.write
-
-def _safe_stdout_write(text):
-    try:
-        _original_stdout_write(text)
-    except OSError as e:
-        if e.errno == 22:
-            try:
-                clean = text.encode("ascii", "ignore").decode("ascii")
-                _original_stdout_write(clean)
-            except:
-                pass
-        else:
-            raise
-    except UnicodeEncodeError:
-        try:
-            clean = text.encode("ascii", "ignore").decode("ascii")
-            _original_stdout_write(clean)
-        except:
-            pass
-
-sys.stdout.write = _safe_stdout_write
-
-
-# ============================================================
-# FIX: Handle OSError 22 on Windows
-# ============================================================
-if sys.platform == "win32":
-    try:
-        import subprocess as sp
-        sp.run(["chcp", "65001"], capture_output=True, shell=True)
-    except:
-        pass
-
-
-    try:
-    except OSError as e:
-        if e.errno == 22:
-            try:
-                clean = text.encode("ascii", "ignore").decode("ascii")
-                _original_stdout_write(clean)
-            except:
-                pass
-        else:
-            raise
-    except UnicodeEncodeError:
-        try:
-            clean = text.encode("ascii", "ignore").decode("ascii")
-            _original_stdout_write(clean)
-        except:
-            pass
-
-sys.stdout.write = _safe_stdout_write
-
 NETWORK SECURITY & REAL-TIME MONITORING SYSTEM
 ================================================
 
@@ -98,10 +34,10 @@ Features
 
 Run
 ---
+    python network_security.py
 
 Dashboard
 ---------
-
     http://127.0.0.1:5001
 """
 
@@ -147,7 +83,6 @@ if sys.platform == "win32":
     except:
         pass
     
-    # Fix stdout encoding
     try:
         if hasattr(sys.stdout, 'reconfigure'):
             sys.stdout.reconfigure(encoding='utf-8', errors='ignore')
@@ -196,12 +131,10 @@ try:
     from colorama import init, Fore, Back, Style
     init(autoreset=True, convert=True, strip=False)
     COLORS_AVAILABLE = True
-    # Force color support
     os.environ['PYTHONIOENCODING'] = 'utf-8'
     os.environ['PYTHONUTF8'] = '1'
 except ImportError:
     COLORS_AVAILABLE = False
-    # Use our defined colors as fallback
     Fore = Colors
     Style = type('Style', (), {
         'RESET_ALL': '\033[0m',
@@ -211,7 +144,6 @@ except ImportError:
     Back = type('Back', (), {'RESET': '\033[49m'})
 except Exception as e:
     COLORS_AVAILABLE = False
-    # Use our defined colors as fallback
     Fore = Colors
     Style = type('Style', (), {
         'RESET_ALL': '\033[0m',
@@ -274,15 +206,12 @@ def start_security_dashboard(host="0.0.0.0", port=5001, open_browser=True):
             global _SECURITY_DASHBOARD_RUNNING, _SECURITY_ENGINE
             
             try:
-                # Initialize the security engine
                 workspace = "~/network_security_workspace"
                 _SECURITY_ENGINE = SecurityEngine(workspace)
                 
-                # Start the monitoring thread
                 worker = threading.Thread(target=_SECURITY_ENGINE.run, daemon=True, name="security-monitor")
                 worker.start()
                 
-                # Get local IP
                 try:
                     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
                     s.connect(("8.8.8.8", 80))
@@ -301,18 +230,15 @@ def start_security_dashboard(host="0.0.0.0", port=5001, open_browser=True):
                 safe_print_unicode(f"🔄 Press Ctrl+C in this window to stop")
                 safe_print_unicode("=" * 60 + "\n")
                 
-                # Open browser
                 if open_browser:
                     try:
                         threading.Timer(1.2, lambda: webbrowser.open(f"http://127.0.0.1:{port}")).start()
                     except:
                         pass
                 
-                # Set the global ENGINE for Flask routes
                 global ENGINE
                 ENGINE = _SECURITY_ENGINE
                 
-                # Run Flask app
                 app.run(host=host, port=port, debug=False, threaded=True, use_reloader=False)
                 
             except Exception as e:
@@ -328,7 +254,6 @@ def start_security_dashboard(host="0.0.0.0", port=5001, open_browser=True):
         _SECURITY_DASHBOARD_THREAD.start()
         _SECURITY_DASHBOARD_RUNNING = True
         
-        # Wait a moment for server to start
         time.sleep(2)
         return f"[+] Network Security dashboard started at http://127.0.0.1:{port}"
         
@@ -382,7 +307,7 @@ def security_dashboard_help(args=None):
 ╚═══════════════════════════════════════════════════════════════════╝
 """
 
-# Command functions for DSTerminal (matching the dashboard pattern)
+# Command functions for DSTerminal
 cmd_sec_start = start_security_dashboard
 cmd_sec_stop = stop_security_dashboard
 cmd_sec_status = security_dashboard_status
@@ -391,6 +316,7 @@ cmd_sec_help = security_dashboard_help
 
 # Flag for availability
 NETWORK_SECURITY_AVAILABLE = True
+
 # ============================================================
 # CONFIGURATION
 # ============================================================
@@ -1099,19 +1025,15 @@ import scapy.all as scapy
 import warnings
 import logging
 
-# Suppress Scapy runtime warnings
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-# Suppress Scapy logging
 logging.getLogger("scapy").setLevel(logging.ERROR)
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 
-# Suppress Scapy's "Mac address to reach destination not found" messages
 import scapy
-scapy.config.conf.logLevel = 40  # ERROR level only
+scapy.config.conf.logLevel = 40
 
-# Also suppress specific Scapy warnings
 import sys
 import io
 
@@ -1124,10 +1046,6 @@ class SuppressScapyWarnings:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         sys.stderr = self._original_stderr
-
-        # Patch the send/srp functions to suppress warnings
-        _original_send = None
-        _original_srp = None
 
 class NetworkDeviceManager:
     """Discover and manage devices on the local network with ARP spoofing"""
@@ -1145,16 +1063,13 @@ class NetworkDeviceManager:
         self._load_blocked_devices()
         self._discover_gateway()
 
-        # Suppress Scapy warnings in the class
         import scapy
-        scapy.config.conf.logLevel = 40  # ERROR level only
-        scapy.config.conf.verb = 0  # Suppress verbose output
+        scapy.config.conf.logLevel = 40
+        scapy.config.conf.verb = 0
         
-        # Start auto-block restoration
         self._restore_blocks()
         
     def _get_my_ip(self) -> str:
-        """Get the local IP address"""
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             s.connect(("8.8.8.8", 80))
@@ -1165,7 +1080,6 @@ class NetworkDeviceManager:
             return "127.0.0.1"
     
     def _get_my_mac(self) -> str:
-        """Get the MAC address of this machine"""
         try:
             import psutil
             for iface, addrs in psutil.net_if_addrs().items():
@@ -1175,7 +1089,6 @@ class NetworkDeviceManager:
         except:
             pass
         
-        # Fallback: use getmac
         try:
             import getmac
             return getmac.get_mac_address()
@@ -1183,7 +1096,6 @@ class NetworkDeviceManager:
             return "00:00:00:00:00:00"
     
     def _discover_gateway(self):
-        """Discover the network gateway (router)"""
         try:
             if platform.system() == "Windows":
                 result = subprocess.run(['ipconfig'], capture_output=True, text=True)
@@ -1192,7 +1104,6 @@ class NetworkDeviceManager:
                         match = re.search(r'(\d+\.\d+\.\d+\.\d+)', line)
                         if match:
                             self.gateway_ip = match.group(1)
-                            # Get gateway MAC
                             arp_result = subprocess.run(['arp', '-a', self.gateway_ip], 
                                                        capture_output=True, text=True)
                             mac_match = re.search(r'([0-9a-fA-F]{2}[:-]){5}[0-9a-fA-F]{2}', arp_result.stdout)
@@ -1200,14 +1111,12 @@ class NetworkDeviceManager:
                                 self.gateway_mac = mac_match.group(0).replace('-', ':')
                             break
             else:
-                # Linux/Mac
                 result = subprocess.run(['ip', 'route'], capture_output=True, text=True)
                 for line in result.stdout.split('\n'):
                     if 'default via' in line:
                         match = re.search(r'via\s+(\d+\.\d+\.\d+\.\d+)', line)
                         if match:
                             self.gateway_ip = match.group(1)
-                            # Get gateway MAC
                             arp_result = subprocess.run(['arp', '-n', self.gateway_ip], 
                                                        capture_output=True, text=True)
                             parts = arp_result.stdout.split()
@@ -1218,7 +1127,6 @@ class NetworkDeviceManager:
             print(f"[!] Could not discover gateway: {e}")
         
         if not self.gateway_ip:
-            # Fallback: use common gateway IPs
             ip_parts = self.my_ip.split('.')
             for i in range(1, 5):
                 test_ip = f"{ip_parts[0]}.{ip_parts[1]}.{ip_parts[2]}.{i}"
@@ -1227,7 +1135,6 @@ class NetworkDeviceManager:
                     break
     
     def _restore_blocks(self):
-        """Restore all previously blocked devices"""
         for device in self.blocked_devices:
             ip = device.get('ip')
             mac = device.get('mac')
@@ -1236,31 +1143,24 @@ class NetworkDeviceManager:
                 self._start_arp_spoofing(ip, mac)
     
     def _arp_spoof(self, target_ip: str, target_mac: str, spoof_ip: str):
-        """Send ARP spoofing packets to disconnect a device"""
         try:
-            # Create ARP response telling the target that the gateway is at a fake MAC
             packet = ARP(op=2, pdst=target_ip, hwdst=target_mac, psrc=spoof_ip, hwsrc="00:00:00:00:00:00")
-            
-            # Send the packet repeatedly to maintain the block
             while self.running and target_ip in self.blocking_threads:
                 send(packet, verbose=False)
-                time.sleep(0.5)  # Send every 500ms
+                time.sleep(0.5)
         except Exception as e:
             print(f"[!] ARP spoof error for {target_ip}: {e}")
     
     def _start_arp_spoofing(self, target_ip: str, target_mac: Optional[str] = None):
-        """Start ARP spoofing to disconnect a device"""
         if target_ip in self.blocking_threads:
             return
         
-        # If we don't have the MAC, try to get it
         if not target_mac or target_mac == 'Unknown':
             target_mac = self._get_mac_from_ip(target_ip)
             if not target_mac:
                 print(f"[!] Could not get MAC for {target_ip}")
                 return
         
-        # Get gateway info
         if not self.gateway_ip:
             self._discover_gateway()
         
@@ -1268,7 +1168,6 @@ class NetworkDeviceManager:
             print("[!] Could not discover gateway")
             return
         
-        # Start the spoofing thread
         thread = threading.Thread(
             target=self._arp_spoof,
             args=(target_ip, target_mac, self.gateway_ip),
@@ -1279,13 +1178,10 @@ class NetworkDeviceManager:
         
         print(f"[+] ARP spoofing started for {target_ip} ({target_mac})")
         
-        # Also poison the gateway's ARP cache
         self._poison_gateway(target_ip, target_mac)
     
     def _poison_gateway(self, target_ip: str, target_mac: str):
-        """Tell the gateway that the target is unreachable"""
         try:
-            # Tell the gateway that the target's MAC is invalid
             packet = ARP(op=2, pdst=self.gateway_ip, hwdst=self.gateway_mac, 
                         psrc=target_ip, hwsrc="00:00:00:00:00:00")
             send(packet, verbose=False)
@@ -1293,28 +1189,21 @@ class NetworkDeviceManager:
             print(f"[!] Gateway poison error: {e}")
     
     def _stop_arp_spoofing(self, target_ip: str):
-        """Stop ARP spoofing for a device and restore normal connectivity"""
         if target_ip in self.blocking_threads:
             del self.blocking_threads[target_ip]
             print(f"[+] ARP spoofing stopped for {target_ip}")
-            
-            # Send ARP restoration packets
             self._restore_device_connectivity(target_ip)
     
     def _restore_device_connectivity(self, target_ip: str):
-        """Send ARP packets to restore normal connectivity"""
         try:
-            # Get the device's MAC (if available)
             target_mac = self._get_mac_from_ip(target_ip)
             if not target_mac:
                 return
             
-            # Tell the target that the gateway is at the correct MAC
             restore_packet = ARP(op=2, pdst=target_ip, hwdst=target_mac, 
                                psrc=self.gateway_ip, hwsrc=self.gateway_mac)
             send(restore_packet, verbose=False)
             
-            # Tell the gateway that the target is at the correct MAC
             gateway_packet = ARP(op=2, pdst=self.gateway_ip, hwdst=self.gateway_mac,
                                psrc=target_ip, hwsrc=target_mac)
             send(gateway_packet, verbose=False)
@@ -1324,20 +1213,16 @@ class NetworkDeviceManager:
             print(f"[!] Restoration error: {e}")
     
     def _get_mac_from_ip(self, ip: str) -> Optional[str]:
-        """Get MAC address from IP using ARP request"""
         try:
-            # Use scapy to send ARP request
             arp_request = ARP(pdst=ip)
             broadcast = Ether(dst="ff:ff:ff:ff:ff:ff")
             packet = broadcast / arp_request
             answered, _ = srp(packet, timeout=2, verbose=False)
-            
             if answered:
                 return answered[0][1].hwsrc
         except:
             pass
         
-        # Fallback: use system ARP table
         try:
             if platform.system() == "Windows":
                 result = subprocess.run(['arp', '-a', ip], capture_output=True, text=True)
@@ -1355,18 +1240,15 @@ class NetworkDeviceManager:
         return None
     
     def _scan_with_nmap(self, network_cidr: str) -> List[Dict]:
-        """Use nmap to scan for devices (more reliable on Windows)"""
         devices = []
         
         try:
-            # Check if nmap is available
             result = subprocess.run(['nmap', '--version'], capture_output=True, text=True, timeout=5)
             if result.returncode != 0:
                 return devices
             
             print("[*] Using SHIELD_CORE for device discovery...")
             
-            # Run nmap ping scan
             result = subprocess.run(
                 ['nmap', '-sn', network_cidr],
                 capture_output=True, text=True, timeout=60
@@ -1384,11 +1266,8 @@ class NetworkDeviceManager:
             for line in lines:
                 line = line.strip()
                 
-                # Check for IP address
                 if 'Nmap scan report for' in line:
-                    # Save previous device if exists
                     if current_ip and current_ip != my_ip:
-                        # Try to get MAC for this IP
                         if not current_mac:
                             current_mac = self._get_mac_from_arp(current_ip)
                         
@@ -1408,26 +1287,22 @@ class NetworkDeviceManager:
                             'is_self': current_ip == my_ip
                         })
                     
-                    # Parse new IP
                     ip_match = re.search(r'(\d+\.\d+\.\d+\.\d+)', line)
                     if ip_match:
                         current_ip = ip_match.group(1)
                         current_mac = None
                         current_hostname = None
                 
-                # Check for MAC address
                 elif 'MAC Address:' in line:
                     mac_match = re.search(r'([0-9a-fA-F]{2}[:-]){5}[0-9a-fA-F]{2}', line, re.IGNORECASE)
                     if mac_match:
                         current_mac = mac_match.group(0).replace('-', ':')
                 
-                # Check for hostname
                 elif '(' in line and ')' in line:
                     hostname_match = re.search(r'\(([^)]+)\)', line)
                     if hostname_match:
                         current_hostname = hostname_match.group(1)
             
-            # Save last device
             if current_ip and current_ip != my_ip:
                 if not current_mac:
                     current_mac = self._get_mac_from_arp(current_ip)
@@ -1448,7 +1323,6 @@ class NetworkDeviceManager:
                     'is_self': current_ip == my_ip
                 })
             
-            # Add "Your Machine" if not in list
             if my_ip not in [d['ip'] for d in devices]:
                 my_mac = self._get_my_mac()
                 devices.append({
@@ -1467,9 +1341,7 @@ class NetworkDeviceManager:
         
         return devices
 
-
     def _get_mac_from_arp(self, ip: str) -> Optional[str]:
-        """Get MAC address from ARP cache for a specific IP"""
         try:
             if platform.system() == "Windows":
                 result = subprocess.run(['arp', '-a', ip], capture_output=True, text=True)
@@ -1477,7 +1349,6 @@ class NetworkDeviceManager:
                 if match:
                     return match.group(0).replace('-', ':')
                 else:
-                    # Linux/Mac
                     result = subprocess.run(['arp', '-n', ip], capture_output=True, text=True)
                     parts = result.stdout.split()
                     if len(parts) >= 3:
@@ -1487,35 +1358,29 @@ class NetworkDeviceManager:
         return None
 
     def scan_network(self, network_cidr: Optional[str] = None) -> List[Dict]:
-        """Scan the local network for devices using multiple methods"""
         if network_cidr is None:
             network_cidr = self.get_local_network()
         
         devices = []
         my_ip = self._get_my_ip()
         
-        # Method 1: Try nmap first (most reliable on Windows)
         nmap_devices = self._scan_with_nmap(network_cidr)
         if nmap_devices:
             devices.extend(nmap_devices)
         
-        # Method 2: Use ARP table (if nmap didn't find everything)
         if not devices or len(devices) < 3:
             arp_devices = self._get_arp_table()
             for device in arp_devices:
                 if device['ip'] not in [d['ip'] for d in devices] and device['ip'] != '255.255.255.255':
-                    # Skip multicast addresses
                     if not device['ip'].startswith(('224.', '239.')):
                         devices.append(device)
         
-        # Method 3: Ping sweep for remaining IPs
         if not devices or len(devices) < 3:
             print("[*] Running ping sweep for more devices...")
             network = ipaddress.ip_network(network_cidr, strict=False)
             ip_parts = my_ip.split('.')
             base = f"{ip_parts[0]}.{ip_parts[1]}.{ip_parts[2]}"
             
-            # Check common IPs
             for i in range(1, 20):
                 test_ip = f"{base}.{i}"
                 if test_ip != my_ip and test_ip not in [d['ip'] for d in devices]:
@@ -1535,7 +1400,6 @@ class NetworkDeviceManager:
                             'is_self': test_ip == my_ip
                         })
         
-        # Make sure "Your Machine" is in the list
         if my_ip not in [d['ip'] for d in devices]:
             my_mac = self._get_my_mac()
             devices.append({
@@ -1553,11 +1417,9 @@ class NetworkDeviceManager:
         return devices
 
     def _arp_spoof(self, target_ip: str, target_mac: str, spoof_ip: str):
-        """Send ARP spoofing packets to disconnect a device"""
         try:
             with SuppressScapyWarnings():
                 packet = ARP(op=2, pdst=target_ip, hwdst=target_mac, psrc=spoof_ip, hwsrc="00:00:00:00:00:00")
-                
                 while self.running and target_ip in self.blocking_threads:
                     send(packet, verbose=False)
                     time.sleep(0.5)
@@ -1565,7 +1427,6 @@ class NetworkDeviceManager:
             print(f"[!] ARP spoof error for {target_ip}: {e}")
             
     def _get_arp_table(self) -> List[Dict]:
-        """Get devices from ARP table (fallback)"""
         devices = []
         
         try:
@@ -1620,14 +1481,11 @@ class NetworkDeviceManager:
         return devices
     
     def get_local_network(self) -> str:
-        """Get the local network CIDR"""
         ip = self.my_ip
         ip_parts = ip.split('.')
         return f"{ip_parts[0]}.{ip_parts[1]}.{ip_parts[2]}.0/24"
     
     def _get_vendor(self, mac: str) -> str:
-        """Get vendor from MAC address"""
-        # Same vendor lookup as before
         vendors = {
             '00:0C:29': 'VMware',
             '00:50:56': 'VMware',
@@ -1678,7 +1536,6 @@ class NetworkDeviceManager:
         return 'Unknown'
     
     def _ping_host(self, ip: str) -> bool:
-        """Ping a host to check if it's alive"""
         try:
             if platform.system() == "Windows":
                 result = subprocess.run(['ping', '-n', '1', '-w', '1000', ip], 
@@ -1691,10 +1548,8 @@ class NetworkDeviceManager:
             return False
     
     def block_device(self, ip: str, mac: Optional[str] = None, reason: str = "Manual block", permanent: bool = True) -> Dict:
-        """Block a device from the network using ARP spoofing"""
         result = {'success': False, 'message': '', 'device': None}
         
-        # Get MAC if not provided
         if not mac or mac == 'Unknown':
             mac = self._get_mac_from_ip(ip)
         
@@ -1702,17 +1557,14 @@ class NetworkDeviceManager:
             result['message'] = f"Could not get MAC for {ip}"
             return result
         
-        # Check if already blocked
         if ip in self.blocking_threads:
             result['message'] = f"Device {ip} is already blocked"
             result['success'] = True
             return result
         
         try:
-            # Start ARP spoofing
             self._start_arp_spoofing(ip, mac)
             
-            # Save to permanent block list
             if permanent:
                 blocked_device = {
                     'ip': ip,
@@ -1721,12 +1573,10 @@ class NetworkDeviceManager:
                     'reason': reason,
                     'permanent': True
                 }
-                # Remove if already in list
                 self.blocked_devices = [d for d in self.blocked_devices if d['ip'] != ip]
                 self.blocked_devices.append(blocked_device)
                 self._save_blocked_devices()
             
-            # Also add firewall rule on this machine
             if valid_ip(ip):
                 self._system_block_ip(ip)
             
@@ -1740,18 +1590,14 @@ class NetworkDeviceManager:
         return result
     
     def unblock_device(self, ip: str) -> Dict:
-        """Unblock a device and restore network access"""
         result = {'success': False, 'message': ''}
         
         try:
-            # Stop ARP spoofing
             self._stop_arp_spoofing(ip)
             
-            # Remove from blocked list
             self.blocked_devices = [d for d in self.blocked_devices if d['ip'] != ip]
             self._save_blocked_devices()
             
-            # Remove firewall rule
             if valid_ip(ip):
                 self._system_unblock_ip(ip)
             
@@ -1764,11 +1610,9 @@ class NetworkDeviceManager:
         return result
     
     def get_blocked_devices(self) -> List[Dict]:
-        """Get list of permanently blocked devices"""
         return self.blocked_devices
     
     def _system_block_ip(self, ip: str) -> Dict:
-        """Block IP using system firewall"""
         try:
             if platform.system() == "Windows":
                 rule_name = f"BLOCK_DEVICE_{ip.replace('.', '_')}"
@@ -1786,7 +1630,6 @@ class NetworkDeviceManager:
             return {'success': False, 'message': str(e)}
     
     def _system_unblock_ip(self, ip: str) -> Dict:
-        """Remove IP block from system firewall"""
         try:
             if platform.system() == "Windows":
                 rule_name = f"BLOCK_DEVICE_{ip.replace('.', '_')}"
@@ -1803,7 +1646,6 @@ class NetworkDeviceManager:
             return {'success': False, 'message': str(e)}
     
     def _save_blocked_devices(self):
-        """Save blocked devices to persistent storage"""
         try:
             path = Path("~/network_security_workspace/blocked_devices.json").expanduser()
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -1813,7 +1655,6 @@ class NetworkDeviceManager:
             pass
     
     def _load_blocked_devices(self):
-        """Load blocked devices from persistent storage"""
         try:
             path = Path("~/network_security_workspace/blocked_devices.json").expanduser()
             if path.exists():
@@ -1822,7 +1663,6 @@ class NetworkDeviceManager:
         except:
             self.blocked_devices = []
 
-# Initialize device manager globally
 device_manager = NetworkDeviceManager()
 
 # ============================================================
@@ -1868,7 +1708,6 @@ class SecurityEngine:
                     self.clients.remove(client)
 
     def broadcast_event(self, source: str, event_type: str, severity: str, message: str, data=None):
-        """Broadcast an event to all connected SSE clients"""
         event = {
             "type": "event",
             "data": {
@@ -2063,27 +1902,25 @@ from functools import wraps
 from flask import request, Response, jsonify, session, redirect, url_for
 import secrets
 
-# Change these credentials!
 AUTH_USERNAME = "admin"
 AUTH_PASSWORD = "admin123"
 
-# Secret key for session management
 app.secret_key = secrets.token_hex(16)
 
-# Custom login page HTML - CLEAN VERSION
+# Custom login page HTML - DARK BLUE WITH NEON GLOW
 LOGIN_PAGE = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔐 Network Security - Login</title>
+    <title>Network Security - Login</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            background: #05080d;
-            color: #d7e3ef;
+            background: #0a0e1a;
+            color: #8899bb;
             font-family: 'Courier New', monospace;
             min-height: 100vh;
             display: flex;
@@ -2099,10 +1936,9 @@ LOGIN_PAGE = """
             right: 0;
             bottom: 0;
             z-index: 0;
-            background: 
-                radial-gradient(ellipse at 20% 50%, rgba(0, 255, 156, 0.05) 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 50%, rgba(255, 70, 85, 0.05) 0%, transparent 60%),
-                #05080d;
+            background: radial-gradient(ellipse at 20% 50%, rgba(0, 100, 200, 0.08) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 50%, rgba(0, 200, 255, 0.08) 0%, transparent 60%),
+                        #0a0e1a;
         }
         
         .bg-animation::before {
@@ -2112,7 +1948,7 @@ LOGIN_PAGE = """
             left: 0;
             right: 0;
             bottom: 0;
-            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 255, 156, 0.02) 2px, rgba(0, 255, 156, 0.02) 4px);
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 100, 200, 0.02) 2px, rgba(0, 100, 200, 0.02) 4px);
             animation: scanline 8s linear infinite;
             pointer-events: none;
         }
@@ -2131,16 +1967,17 @@ LOGIN_PAGE = """
             z-index: 0;
             pointer-events: none;
             overflow: hidden;
-            opacity: 0.15;
+            opacity: 0.08;
         }
         
         .matrix-rain span {
             position: absolute;
             top: -100px;
-            color: #00ff9c;
+            color: #00aaff;
             font-size: 14px;
             animation: rain linear infinite;
             font-family: 'Courier New', monospace;
+            text-shadow: 0 0 10px rgba(0, 170, 255, 0.3);
         }
         
         @keyframes rain {
@@ -2152,19 +1989,26 @@ LOGIN_PAGE = """
             position: relative;
             z-index: 1;
             width: 100%;
-            max-width: 480px;
+            max-width: 440px;
             padding: 20px;
         }
         
         .login-box {
-            background: #0a111a;
-            border: 2px solid #00ff9c;
-            border-radius: 5px;
-            padding: 40px 45px;
-            animation: borderPulse 3s ease-in-out infinite;
-            box-shadow: 0 0 60px rgba(0, 255, 156, 0.08), inset 0 0 60px rgba(0, 255, 156, 0.03);
+            background: #0d1520;
+            border: 2px solid #004488;
+            border-radius: 6px;
+            padding: 35px 40px;
+            box-shadow: 0 0 40px rgba(0, 100, 200, 0.15), 0 0 80px rgba(0, 100, 200, 0.05);
             position: relative;
             overflow: hidden;
+            animation: neonGlow 4s ease-in-out infinite;
+        }
+        
+        @keyframes neonGlow {
+            0%, 100% { border-color: #004488; box-shadow: 0 0 40px rgba(0, 100, 200, 0.15); }
+            25% { border-color: #0066cc; box-shadow: 0 0 60px rgba(0, 102, 204, 0.25); }
+            50% { border-color: #0088ff; box-shadow: 0 0 80px rgba(0, 136, 255, 0.35); }
+            75% { border-color: #0066cc; box-shadow: 0 0 60px rgba(0, 102, 204, 0.25); }
         }
         
         .login-box::before {
@@ -2174,152 +2018,145 @@ LOGIN_PAGE = """
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(transparent 50%, rgba(0, 255, 156, 0.02) 50%);
+            background: linear-gradient(transparent 50%, rgba(0, 100, 200, 0.02) 50%);
             background-size: 100% 4px;
             pointer-events: none;
-            animation: scanline 8s linear infinite;
             border-radius: inherit;
-        }
-        
-        @keyframes borderPulse {
-            0%, 100% { border-color: #00ff9c; box-shadow: 0 0 60px rgba(0, 255, 156, 0.08); }
-            33% { border-color: #ff4655; box-shadow: 0 0 60px rgba(255, 70, 85, 0.08); }
-            66% { border-color: #ffd166; box-shadow: 0 0 60px rgba(255, 209, 102, 0.08); }
         }
         
         .logo {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
         
         .logo .icon {
-            font-size: 48px;
+            font-size: 40px;
             display: block;
-            margin-bottom: 8px;
-            animation: glitch 3s infinite;
-        }
-        
-        @keyframes glitch {
-            0%, 100% { text-shadow: none; }
-            2% { text-shadow: 2px 0 #ff4655, -2px 0 #00ff9c; transform: translateX(0); }
-            4% { text-shadow: -2px 0 #ff4655, 2px 0 #00ff9c; transform: translateX(0); }
-            6% { text-shadow: none; transform: translateX(0); }
+            margin-bottom: 6px;
+            opacity: 0.8;
+            filter: drop-shadow(0 0 20px rgba(0, 136, 255, 0.3));
         }
         
         .logo h1 {
-            color: #00ff9c;
-            font-size: 20px;
-            letter-spacing: 4px;
+            color: #00aaff;
+            font-size: 18px;
+            letter-spacing: 3px;
             text-transform: uppercase;
             font-weight: normal;
+            text-shadow: 0 0 20px rgba(0, 170, 255, 0.3);
         }
         
         .logo .subtitle {
-            color: #52677d;
-            font-size: 12px;
+            color: #445577;
+            font-size: 11px;
             letter-spacing: 2px;
             margin-top: 4px;
         }
         
         .divider {
             border: none;
-            border-top: 1px solid rgba(0, 255, 156, 0.2);
-            margin: 20px 0;
+            border-top: 1px solid #004488;
+            margin: 18px 0;
+            box-shadow: 0 0 10px rgba(0, 100, 200, 0.2);
         }
         
         .status {
             text-align: center;
-            font-size: 13px;
-            margin-bottom: 20px;
-            min-height: 24px;
-            color: #ffd166;
+            font-size: 12px;
+            margin-bottom: 18px;
+            min-height: 22px;
+            color: #667799;
             font-family: 'Courier New', monospace;
         }
         
         .status.error {
-            color: #ff4655;
+            color: #cc4455;
+            text-shadow: 0 0 20px rgba(204, 68, 85, 0.3);
         }
         
         .status.success {
-            color: #00ff9c;
+            color: #00cc88;
+            text-shadow: 0 0 20px rgba(0, 204, 136, 0.3);
         }
         
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 16px;
         }
         
         .form-group label {
             display: block;
-            color: #6fb7ff;
-            font-size: 11px;
+            color: #445577;
+            font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
             font-weight: bold;
         }
         
         .form-group input {
             width: 100%;
-            padding: 12px 16px;
-            background: #05080d;
-            border: 1px solid #1b2b3e;
-            border-radius: 6px;
-            color: #d7e3ef;
+            padding: 10px 14px;
+            background: #0a0f1a;
+            border: 1px solid #004488;
+            border-radius: 4px;
+            color: #8899bb;
             font-family: 'Courier New', monospace;
-            font-size: 14px;
+            font-size: 13px;
             transition: all 0.3s ease;
             outline: none;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
         }
         
         .form-group input:focus {
-            border-color: #00ff9c;
-            box-shadow: 0 0 20px rgba(0, 255, 156, 0.1);
+            border-color: #00aaff;
+            box-shadow: 0 0 30px rgba(0, 170, 255, 0.1), inset 0 0 20px rgba(0, 170, 255, 0.05);
         }
         
         .form-group input::placeholder {
-            color: #3a4a5a;
+            color: #334466;
         }
         
         .login-btn {
             width: 100%;
-            padding: 14px;
+            padding: 12px;
             background: transparent;
-            border: 2px solid #00ff9c;
-            border-radius: 6px;
-            color: #00ff9c;
+            border: 2px solid #004488;
+            border-radius: 4px;
+            color: #00aaff;
             font-family: 'Courier New', monospace;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 6px;
-            position: relative;
-            overflow: hidden;
+            margin-top: 4px;
+            animation: btnGlow 4s ease-in-out infinite;
+            text-shadow: 0 0 10px rgba(0, 170, 255, 0.3);
+        }
+        
+        @keyframes btnGlow {
+            0%, 100% { border-color: #004488; box-shadow: 0 0 20px rgba(0, 100, 200, 0.1); }
+            50% { border-color: #0088ff; box-shadow: 0 0 40px rgba(0, 136, 255, 0.3); }
         }
         
         .login-btn:hover {
-            background: #00ff9c;
-            color: #05080d;
-            box-shadow: 0 0 40px rgba(0, 255, 156, 0.2);
-            transform: scale(1.02);
-        }
-        
-        .login-btn:active {
-            transform: scale(0.98);
+            background: #00aaff;
+            color: #0a0e1a;
+            box-shadow: 0 0 60px rgba(0, 170, 255, 0.2);
+            border-color: #00aaff;
         }
         
         .login-btn:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
         }
         
         .footer {
             text-align: center;
-            margin-top: 20px;
-            color: #3a4a5a;
-            font-size: 10px;
+            margin-top: 18px;
+            color: #334466;
+            font-size: 9px;
             letter-spacing: 1px;
         }
         
@@ -2334,17 +2171,17 @@ LOGIN_PAGE = """
         
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-10px); }
-            40% { transform: translateX(10px); }
-            60% { transform: translateX(-10px); }
-            80% { transform: translateX(10px); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-8px); }
+            80% { transform: translateX(8px); }
         }
         
         @media (max-width: 500px) {
-            .login-box { padding: 30px 25px; }
-            .logo h1 { font-size: 16px; }
-            .form-group input { font-size: 12px; padding: 10px 14px; }
-            .login-btn { font-size: 12px; padding: 12px; }
+            .login-box { padding: 25px 20px; }
+            .logo h1 { font-size: 15px; }
+            .form-group input { font-size: 12px; padding: 8px 12px; }
+            .login-btn { font-size: 11px; padding: 10px; }
         }
     </style>
 </head>
@@ -2389,30 +2226,25 @@ LOGIN_PAGE = """
 </div>
 
 <script>
-    // ============================================================
-    // LOGIN PAGE JAVASCRIPT - CLEAN VERSION
-    // ============================================================
-
-    // Matrix rain effect
     (function() {
         const container = document.getElementById('matrixRain');
         if (!container) return;
         const chars = '01';
-        const numDrops = 30;
+        const numDrops = 25;
         
         for (let i = 0; i < numDrops; i++) {
             const span = document.createElement('span');
             span.textContent = chars[Math.floor(Math.random() * chars.length)];
             span.style.left = Math.random() * 100 + '%';
-            span.style.fontSize = (10 + Math.random() * 15) + 'px';
+            span.style.fontSize = (10 + Math.random() * 12) + 'px';
             span.style.animationDuration = (8 + Math.random() * 12) + 's';
             span.style.animationDelay = (Math.random() * 15) + 's';
-            span.style.opacity = 0.1 + Math.random() * 0.3;
+            span.style.opacity = 0.05 + Math.random() * 0.2;
+            span.style.textShadow = '0 0 10px rgba(0, 170, 255, 0.2)';
             container.appendChild(span);
         }
     })();
 
-    // Login form submission
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.getElementById('loginForm');
         const usernameField = document.getElementById('username');
@@ -2425,7 +2257,6 @@ LOGIN_PAGE = """
             return;
         }
         
-        // Focus on username field
         usernameField.focus();
         
         form.addEventListener('submit', function(e) {
@@ -2440,7 +2271,6 @@ LOGIN_PAGE = """
                 return;
             }
             
-            // Disable button during login
             loginBtn.disabled = true;
             loginBtn.textContent = '⏳ AUTHENTICATING...';
             status.textContent = '⏳ Authenticating...';
@@ -2466,7 +2296,6 @@ LOGIN_PAGE = """
                     status.textContent = '✅ Access Granted! Redirecting...';
                     status.className = 'status success';
                     loginBtn.textContent = '✅ SUCCESS';
-                    // Redirect to dashboard
                     window.location.href = '/';
                 } else {
                     throw new Error(data.message || 'Invalid credentials');
@@ -2484,13 +2313,11 @@ LOGIN_PAGE = """
                         box.style.animation = '';
                     }, 500);
                 }
-                // Clear password field for security
                 passwordField.value = '';
                 passwordField.focus();
             });
         });
 
-        // Enter key triggers submit
         passwordField.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 form.dispatchEvent(new Event('submit'));
@@ -2503,35 +2330,28 @@ LOGIN_PAGE = """
 """
 
 def check_auth(username, password):
-    """Check if username/password is valid"""
     return username == AUTH_USERNAME and password == AUTH_PASSWORD
 
 def requires_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        # Check if user is already logged in via session
         if 'logged_in' in session and session['logged_in']:
             return f(*args, **kwargs)
-        # Check if Basic Auth is provided (for API calls)
         auth = request.authorization
         if auth and check_auth(auth.username, auth.password):
             session['logged_in'] = True
             return f(*args, **kwargs)
-        # Redirect to login page
         return redirect(url_for('login_page'))
     return decorated
 
 
-# Login page route
 @app.route("/login", methods=["GET"])
 def login_page():
-    # If already logged in, redirect to dashboard
     if 'logged_in' in session and session['logged_in']:
         return redirect(url_for('dashboard'))
     return LOGIN_PAGE
 
 
-# Login API endpoint
 @app.route("/login", methods=["POST"])
 def login():
     data = request.get_json(silent=True) or {}
@@ -2545,14 +2365,13 @@ def login():
         return jsonify({"success": False, "message": "Invalid credentials"}), 401
 
 
-# Logout route
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect(url_for('login_page'))
 
 # ============================================================
-# DASHBOARD HTML - COMPLETE WORKING VERSION
+# DASHBOARD HTML - DARK BLUE THEME WITH NEON GLOWING BORDERS
 # ============================================================
 
 DASHBOARD_HTML = r"""
@@ -2567,306 +2386,315 @@ DASHBOARD_HTML = r"""
         * { box-sizing: border-box; }
         body {
             margin: 0;
-            background: #05080d;
-            color: #d7e3ef;
-            font-family: Inter, ui-monospace, monospace;
+            background: #0a0e1a;
+            color: #8899bb;
+            font-family: 'Courier New', monospace;
         }
+        
+        /* Dark Blue Theme with Neon Glow */
         header {
-            padding: 18px 24px;
-            background: #080d14;
-            border-bottom: 1px solid #172435;
+            padding: 14px 20px;
+            background: #0d1520;
+            border-bottom: 2px solid #004488;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
             position: relative;
             z-index: 100;
+            animation: headerGlow 4s ease-in-out infinite;
+            box-shadow: 0 0 40px rgba(0, 100, 200, 0.1);
         }
-        .logo { color: #00ff9c; font-size: 22px; font-weight: bold; }
-        .live { color: #00ff9c; }
-        .container { padding: 18px; max-width: 100%; }
+        
+        @keyframes headerGlow {
+            0%, 100% { border-bottom-color: #004488; box-shadow: 0 0 40px rgba(0, 100, 200, 0.1); }
+            50% { border-bottom-color: #0088ff; box-shadow: 0 0 60px rgba(0, 136, 255, 0.2); }
+        }
+        
+        .logo { 
+            color: #00aaff; 
+            font-size: 20px; 
+            font-weight: bold; 
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(0, 170, 255, 0.3);
+        }
+        .live { color: #00aaff; text-shadow: 0 0 20px rgba(0, 170, 255, 0.3); }
+        .container { padding: 15px; max-width: 100%; }
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 14px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
         }
+        
+        /* Card with Neon Glow Border */
         .card {
-            background: #0a111a;
-            border: 1px solid #1b2b3e;
-            border-radius: 8px;
-            padding: 16px;
+            background: #0d1520;
+            border: 2px solid #004488;
+            border-radius: 6px;
+            padding: 14px;
             overflow: hidden;
+            animation: borderGlow 4s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(0, 100, 200, 0.05);
+            transition: all 0.3s ease;
         }
-        .card h3 { margin-top: 0; color: #6fb7ff; }
-        .metric { font-size: 28px; color: #00ff9c; margin: 8px 0; }
-        .small { color: #8194a8; font-size: 12px; }
-        .red { color: #ff4655; }
-        .yellow { color: #ffd166; }
-        .blue { color: #56b4ff; }
-        .green { color: #00ff9c; }
-        .orange { color: #ff9f43; }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th, td { padding: 8px; border-bottom: 1px solid #182536; text-align: left; }
-        th { color: #6fb7ff; }
-        .scroll { max-height: 420px; overflow: auto; }
+        
+        .card:hover {
+            box-shadow: 0 0 40px rgba(0, 100, 200, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        @keyframes borderGlow {
+            0%, 100% { border-color: #004488; box-shadow: 0 0 20px rgba(0, 100, 200, 0.05); }
+            25% { border-color: #0066cc; box-shadow: 0 0 30px rgba(0, 102, 204, 0.1); }
+            50% { border-color: #0088ff; box-shadow: 0 0 40px rgba(0, 136, 255, 0.15); }
+            75% { border-color: #0066cc; box-shadow: 0 0 30px rgba(0, 102, 204, 0.1); }
+        }
+        
+        /* Hacker Panel with Neon Glow */
+        .hacker-panel {
+            border: 2px solid #004488;
+            position: relative;
+            transition: all 0.3s ease;
+            background: #0d1520;
+            animation: panelGlow 5s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(0, 100, 200, 0.05);
+        }
+        
+        @keyframes panelGlow {
+            0%, 100% { border-color: #004488; box-shadow: 0 0 20px rgba(0, 100, 200, 0.05); }
+            33% { border-color: #0066cc; box-shadow: 0 0 40px rgba(0, 102, 204, 0.1); }
+            66% { border-color: #0088ff; box-shadow: 0 0 60px rgba(0, 136, 255, 0.15); }
+        }
+        
+        .hacker-panel:hover {
+            border-color: #00aaff;
+            box-shadow: 0 0 60px rgba(0, 170, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .card h3 { margin-top: 0; color: #445577; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+        .metric { font-size: 26px; color: #00aaff; margin: 6px 0; font-weight: normal; text-shadow: 0 0 20px rgba(0, 170, 255, 0.2); }
+        .small { color: #445577; font-size: 11px; }
+        .red { color: #cc4455; text-shadow: 0 0 20px rgba(204, 68, 85, 0.2); }
+        .yellow { color: #ccaa44; text-shadow: 0 0 20px rgba(204, 170, 68, 0.2); }
+        .blue { color: #4488cc; text-shadow: 0 0 20px rgba(68, 136, 204, 0.2); }
+        .green { color: #00cc88; text-shadow: 0 0 20px rgba(0, 204, 136, 0.2); }
+        .orange { color: #cc8844; text-shadow: 0 0 20px rgba(204, 136, 68, 0.2); }
+        .white { color: #8899bb; }
+        
+        table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        th, td { padding: 6px; border-bottom: 1px solid #0a0f1a; text-align: left; }
+        th { color: #445577; font-weight: normal; letter-spacing: 1px; text-transform: uppercase; font-size: 9px; border-bottom: 1px solid #004488; }
+        .scroll { max-height: 360px; overflow: auto; }
         input, select, button {
-            background: #07101a;
-            border: 1px solid #29425b;
-            color: #d7e3ef;
-            padding: 9px;
-            border-radius: 5px;
-        }
-        button { cursor: pointer; }
-        button:hover { border-color: #00ff9c; color: #00ff9c; }
-        .form { display: flex; flex-wrap: wrap; gap: 8px; }
-        .alert {
-            padding: 9px;
-            margin-bottom: 6px;
-            border-left: 3px solid;
-            background: #08111a;
-        }
-        .CRITICAL { border-color: #ff304f; }
-        .HIGH { border-color: #ff9f43; }
-        .MEDIUM { border-color: #ffd166; }
-        .LOW { border-color: #00ff9c; }
-        pre { white-space: pre-wrap; word-wrap: break-word; }
-        footer { color: #52677d; padding: 20px; text-align: center; }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .connection-line {
-            stroke-dasharray: 8, 6;
-            animation: flowLine 1.5s linear infinite;
-        }
-        @keyframes flowLine {
-            from { stroke-dashoffset: 0; }
-            to { stroke-dashoffset: -14; }
-        }
-        .pulse-ring { animation: pulse 2s ease-out infinite; }
-        @keyframes pulse {
-            0% { r: 5; opacity: 1; }
-            100% { r: 20; opacity: 0; }
-        }
-        .map-feed-item {
-            background: #0a111a;
-            border-left: 3px solid #00ff9c;
-            padding: 4px 8px;
-            margin-bottom: 3px;
-            border-radius: 3px;
+            background: #0a0f1a;
+            border: 1px solid #004488;
+            color: #8899bb;
+            padding: 7px 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
             font-size: 11px;
+            transition: all 0.3s ease;
+        }
+        input:focus {
+            border-color: #00aaff;
+            box-shadow: 0 0 30px rgba(0, 170, 255, 0.1);
+            outline: none;
+        }
+        button { cursor: pointer; transition: all 0.3s ease; }
+        button:hover { border-color: #00aaff; color: #00aaff; box-shadow: 0 0 30px rgba(0, 170, 255, 0.1); }
+        .form { display: flex; flex-wrap: wrap; gap: 6px; }
+        .alert {
+            padding: 7px;
+            margin-bottom: 4px;
+            border-left: 3px solid;
+            background: #0d1520;
+        }
+        .CRITICAL { border-color: #cc4455; }
+        .HIGH { border-color: #cc8844; }
+        .MEDIUM { border-color: #ccaa44; }
+        .LOW { border-color: #00cc88; }
+        pre { white-space: pre-wrap; word-wrap: break-word; color: #445577; }
+        footer { color: #334466; padding: 15px; text-align: center; font-size: 10px; border-top: 1px solid #004488; margin-top: 10px; animation: footerGlow 4s ease-in-out infinite; }
+        
+        @keyframes footerGlow {
+            0%, 100% { border-top-color: #004488; }
+            50% { border-top-color: #0088ff; }
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .map-feed-item {
+            background: #0d1520;
+            border-left: 2px solid #00aaff;
+            padding: 3px 6px;
+            margin-bottom: 2px;
+            border-radius: 2px;
+            font-size: 10px;
             animation: slideIn 0.3s ease;
         }
-        .map-feed-item.critical { border-color: #ff4655; }
-        .map-feed-item.high { border-color: #ff9f43; }
-        .map-feed-item.medium { border-color: #ffd166; }
-        .map-feed-item.low { border-color: #00ff9c; }
-        .map-feed-item .time { color: #52677d; font-size: 9px; }
-        .map-feed-item .type { font-weight: 600; color: #6fb7ff; }
-        .map-feed-item .severity { font-weight: 600; font-size: 9px; text-transform: uppercase; }
-        .map-feed-item .severity.critical { color: #ff4655; }
-        .map-feed-item .severity.high { color: #ff9f43; }
-        .map-feed-item .message { color: #d7e3ef; margin-top: 2px; }
-        .map-feed-item .ip { color: #56b4ff; font-family: monospace; }
+        .map-feed-item.critical { border-color: #cc4455; }
+        .map-feed-item.high { border-color: #cc8844; }
+        .map-feed-item.medium { border-color: #ccaa44; }
+        .map-feed-item.low { border-color: #00cc88; }
+        .map-feed-item .time { color: #445577; font-size: 8px; }
+        .map-feed-item .type { font-weight: 600; color: #445577; }
+        .map-feed-item .severity { font-weight: 600; font-size: 8px; text-transform: uppercase; }
+        .map-feed-item .severity.critical { color: #cc4455; }
+        .map-feed-item .severity.high { color: #cc8844; }
+        .map-feed-item .message { color: #8899bb; margin-top: 2px; }
+        .map-feed-item .ip { color: #4488cc; font-family: monospace; }
         @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-10px); }
+            from { opacity: 0; transform: translateX(-8px); }
             to { opacity: 1; transform: translateX(0); }
         }
         .map-tooltip {
-            background: #0a111a !important;
-            border: 1px solid #1b2b3e !important;
-            color: #d7e3ef !important;
+            background: #0d1520 !important;
+            border: 1px solid #004488 !important;
+            color: #8899bb !important;
             font-family: monospace !important;
-            font-size: 11px !important;
-            padding: 6px 10px !important;
-            border-radius: 4px !important;
+            font-size: 10px !important;
+            padding: 4px 8px !important;
+            border-radius: 3px !important;
+            box-shadow: 0 0 20px rgba(0, 100, 200, 0.1) !important;
         }
-        .map-tooltip strong { color: #00ff9c !important; }
-        .map-tooltip .popup-ip { color: #56b4ff !important; }
-        .map-tooltip .popup-label { color: #6fb7ff !important; }
-        .map-tooltip .popup-danger { color: #ff4655 !important; }
-        .map-tooltip .popup-success { color: #00ff9c !important; }
 
-        #threatMap { width: 100%; height: 100%; min-height: 250px; }
-        #mapFeedList { max-height: 150px; overflow-y: auto; }
-        #mapFeedList::-webkit-scrollbar { width: 4px; }
-        #mapFeedList::-webkit-scrollbar-track { background: #0a111a; }
-        #mapFeedList::-webkit-scrollbar-thumb { background: #1b2b3e; border-radius: 4px; }
+        #threatMap { width: 100%; height: 100%; min-height: 200px; }
+        #mapFeedList { max-height: 120px; overflow-y: auto; }
+        #mapFeedList::-webkit-scrollbar { width: 3px; }
+        #mapFeedList::-webkit-scrollbar-track { background: #0a0e1a; }
+        #mapFeedList::-webkit-scrollbar-thumb { background: #004488; border-radius: 2px; }
 
-        @keyframes hackerBorder {
-            0% { border-color: #00ff9c; box-shadow: 0 0 5px rgba(0, 255, 156, 0.3); }
-            25% { border-color: #ff4655; box-shadow: 0 0 15px rgba(255, 70, 85, 0.5); }
-            50% { border-color: #ffd166; box-shadow: 0 0 10px rgba(255, 209, 102, 0.4); }
-            75% { border-color: #56b4ff; box-shadow: 0 0 15px rgba(86, 180, 255, 0.5); }
-            100% { border-color: #00ff9c; box-shadow: 0 0 5px rgba(0, 255, 156, 0.3); }
+        .hacker-btn {
+            border: 1px solid #004488;
+            background: #0d1520;
+            color: #8899bb;
+            font-size: 10px;
+            letter-spacing: 0.5px;
+            padding: 6px 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: btnGlow 5s ease-in-out infinite;
         }
-        @keyframes hackerBlink {
-            0%, 100% { border-color: #00ff9c; box-shadow: 0 0 5px rgba(0, 255, 156, 0.4); }
-            25% { border-color: #ff4655; box-shadow: 0 0 15px rgba(255, 70, 85, 0.6); }
-            50% { border-color: #ffd166; box-shadow: 0 0 10px rgba(255, 209, 102, 0.5); }
-            75% { border-color: #56b4ff; box-shadow: 0 0 15px rgba(86, 180, 255, 0.6); }
+        
+        @keyframes btnGlow {
+            0%, 100% { border-color: #004488; }
+            50% { border-color: #0088ff; box-shadow: 0 0 20px rgba(0, 136, 255, 0.1); }
         }
-        .hacker-panel {
-            border: 2px solid #00ff9c !important;
-            animation: hackerBorder 4s ease-in-out infinite;
-            position: relative;
+        
+        .hacker-btn:hover {
+            border-color: #00aaff;
+            color: #00aaff;
+            background: #0a0f1a;
+            box-shadow: 0 0 30px rgba(0, 170, 255, 0.15);
+        }
+        .hacker-btn-danger { border-color: #663344; color: #cc4455; }
+        .hacker-btn-danger:hover { border-color: #cc4455; color: #ff5566; box-shadow: 0 0 30px rgba(204, 68, 85, 0.15); }
+        .hacker-btn-warning { border-color: #665533; color: #ccaa44; }
+        .hacker-btn-warning:hover { border-color: #ccaa44; color: #ffcc55; box-shadow: 0 0 30px rgba(204, 170, 68, 0.15); }
+        .hacker-btn-success { border-color: #336644; color: #00cc88; }
+        .hacker-btn-success:hover { border-color: #00cc88; color: #00ff99; box-shadow: 0 0 30px rgba(0, 204, 136, 0.15); }
+        .hacker-btn-blue { border-color: #334466; color: #4488cc; }
+        .hacker-btn-blue:hover { border-color: #4488cc; color: #66aadd; box-shadow: 0 0 30px rgba(68, 136, 204, 0.15); }
+
+        .hacker-input {
+            background: #0a0f1a;
+            border: 1px solid #004488;
+            color: #8899bb;
+            font-family: monospace;
+            font-size: 11px;
+            padding: 5px 8px;
             transition: all 0.3s ease;
         }
-        .hacker-panel:hover {
-            animation-duration: 1.5s;
-            transform: translateY(-2px);
-            box-shadow: 0 0 30px rgba(0, 255, 156, 0.15);
-        }
-        .hacker-panel::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(transparent 50%, rgba(0, 255, 156, 0.02) 50%);
-            background-size: 100% 4px;
-            pointer-events: none;
-            animation: scanline 8s linear infinite;
-            border-radius: inherit;
-        }
-        @keyframes scanline {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(100%); }
-        }
-        .hacker-btn {
-            border: 2px solid #00ff9c !important;
-            animation: hackerBlink 2s ease-in-out infinite;
-            position: relative;
-            background: #07101a !important;
-            color: #00ff9c !important;
-            font-weight: bold !important;
-            text-transform: uppercase !important;
-            font-size: 11px !important;
-            letter-spacing: 1px !important;
-            transition: all 0.3s ease !important;
-            padding: 8px 16px !important;
-            cursor: pointer;
-        }
-        .hacker-btn:hover {
-            transform: scale(1.05);
-            background: #00ff9c !important;
-            color: #05080d !important;
-            box-shadow: 0 0 30px rgba(0, 255, 156, 0.3);
-            animation-duration: 0.5s;
-        }
-        .hacker-btn-danger { border-color: #ff4655 !important; color: #ff4655 !important; animation: hackerBlink 1.2s ease-in-out infinite; }
-        .hacker-btn-danger:hover { background: #ff4655 !important; color: #05080d !important; box-shadow: 0 0 30px rgba(255, 70, 85, 0.3); }
-        .hacker-btn-warning { border-color: #ffd166 !important; color: #ffd166 !important; animation: hackerBlink 2.5s ease-in-out infinite; }
-        .hacker-btn-warning:hover { background: #ffd166 !important; color: #05080d !important; box-shadow: 0 0 30px rgba(255, 209, 102, 0.3); }
-        .hacker-btn-success { border-color: #00ff9c !important; color: #00ff9c !important; animation: hackerBlink 2s ease-in-out infinite; }
-        .hacker-btn-success:hover { background: #00ff9c !important; color: #05080d !important; box-shadow: 0 0 30px rgba(0, 255, 156, 0.3); }
-        .hacker-btn-blue { border-color: #56b4ff !important; color: #56b4ff !important; animation: hackerBlink 3s ease-in-out infinite; }
-        .hacker-btn-blue:hover { background: #56b4ff !important; color: #05080d !important; box-shadow: 0 0 30px rgba(86, 180, 255, 0.3); }
-
-        .hacker-glitch { animation: glitch 3s infinite; }
-        @keyframes glitch {
-            0%, 100% { text-shadow: none; }
-            2% { text-shadow: 2px 0 #ff4655, -2px 0 #00ff9c; }
-            4% { text-shadow: -2px 0 #ff4655, 2px 0 #00ff9c; }
-            6% { text-shadow: none; }
-        }
-        .hacker-input {
-            background: #07101a !important;
-            border: 2px solid #00ff9c !important;
-            color: #00ff9c !important;
-            animation: hackerBlink 3s ease-in-out infinite;
-            font-family: monospace !important;
-        }
         .hacker-input:focus {
-            outline: none !important;
-            box-shadow: 0 0 20px rgba(0, 255, 156, 0.2) !important;
-            border-color: #ffd166 !important;
+            outline: none;
+            border-color: #00aaff;
+            box-shadow: 0 0 30px rgba(0, 170, 255, 0.1);
         }
-        .hacker-table { border-collapse: separate; border-spacing: 0; }
+        
         .hacker-table th {
-            background: #0a111a !important;
-            border-bottom: 2px solid #00ff9c !important;
-            color: #00ff9c !important;
+            background: #0d1520;
+            border-bottom: 1px solid #004488;
+            color: #445577;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            animation: hackerBorder 4s ease-in-out infinite;
+            letter-spacing: 0.5px;
+            font-size: 9px;
         }
-        .hacker-table td { border-bottom: 1px solid rgba(0, 255, 156, 0.1) !important; }
-        .hacker-table tr:hover td { background: rgba(0, 255, 156, 0.05) !important; }
+        .hacker-table td { border-bottom: 1px solid #0a0f1a; }
+        .hacker-table tr:hover td { background: #0a0f1a; }
 
-        .hacker-scroll::-webkit-scrollbar { width: 6px; }
-        .hacker-scroll::-webkit-scrollbar-track { background: #05080d; border-left: 1px solid rgba(0, 255, 156, 0.2); }
-        .hacker-scroll::-webkit-scrollbar-thumb { background: #00ff9c; border-radius: 3px; animation: hackerBlink 2s ease-in-out infinite; }
-        .hacker-scroll::-webkit-scrollbar-thumb:hover { background: #ff4655; }
+        .hacker-scroll::-webkit-scrollbar { width: 4px; }
+        .hacker-scroll::-webkit-scrollbar-track { background: #0a0e1a; }
+        .hacker-scroll::-webkit-scrollbar-thumb { background: #004488; border-radius: 2px; }
 
         .hacker-header {
-            border-bottom: 2px solid #00ff9c !important;
-            padding-bottom: 8px !important;
-            animation: hackerBorder 3s ease-in-out infinite;
+            border-bottom: 1px solid #004488;
+            padding-bottom: 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 5px;
+            gap: 4px;
+            animation: headerBorderGlow 4s ease-in-out infinite;
         }
+        
+        @keyframes headerBorderGlow {
+            0%, 100% { border-bottom-color: #004488; }
+            50% { border-bottom-color: #0088ff; }
+        }
+        
         .hacker-header .badge {
-            background: #ff4655 !important;
-            color: #fff !important;
-            animation: hackerBlink 1s ease-in-out infinite;
-            padding: 2px 10px !important;
-            border-radius: 12px !important;
-            font-size: 10px !important;
+            background: #004488;
+            color: #8899bb;
+            padding: 1px 8px;
+            border-radius: 2px;
+            font-size: 9px;
+            animation: badgeGlow 4s ease-in-out infinite;
         }
+        
+        @keyframes badgeGlow {
+            0%, 100% { background: #004488; box-shadow: 0 0 10px rgba(0, 100, 200, 0.1); }
+            50% { background: #0088ff; box-shadow: 0 0 20px rgba(0, 136, 255, 0.2); }
+        }
+        
         .hacker-title {
             font-family: 'Courier New', monospace;
-            color: #00ff9c;
-            text-shadow: 0 0 10px rgba(0, 255, 156, 0.3);
-            animation: glitch 4s infinite;
+            color: #00aaff;
+            font-size: 12px;
+            font-weight: normal;
+            letter-spacing: 1px;
+            text-shadow: 0 0 20px rgba(0, 170, 255, 0.2);
         }
         .hacker-status {
             display: inline-block;
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            margin-right: 6px;
-            animation: hackerBlink 1s ease-in-out infinite;
+            margin-right: 4px;
         }
-        .hacker-status.online { background: #00ff9c; box-shadow: 0 0 10px rgba(0, 255, 156, 0.5); }
-        .hacker-status.offline { background: #ff4655; box-shadow: 0 0 10px rgba(255, 70, 85, 0.5); }
-        .hacker-status.warning { background: #ffd166; box-shadow: 0 0 10px rgba(255, 209, 102, 0.5); }
+        .hacker-status.online { background: #00cc88; box-shadow: 0 0 20px rgba(0, 204, 136, 0.3); }
+        .hacker-status.offline { background: #cc4455; box-shadow: 0 0 20px rgba(204, 68, 85, 0.3); }
+        .hacker-status.warning { background: #ccaa44; box-shadow: 0 0 20px rgba(204, 170, 68, 0.3); }
 
         .hacker-alert {
-            border-left: 3px solid #00ff9c !important;
-            animation: hackerBorder 3s ease-in-out infinite;
-            margin-bottom: 6px !important;
-            padding: 8px 12px !important;
-            background: #0a111a !important;
-            border-radius: 4px !important;
-            transition: all 0.3s ease !important;
+            border-left: 2px solid #00aaff;
+            margin-bottom: 4px;
+            padding: 6px 10px;
+            background: #0d1520;
+            border-radius: 2px;
+            animation: alertGlow 4s ease-in-out infinite;
         }
-        .hacker-alert:hover { transform: translateX(4px); box-shadow: 0 0 20px rgba(0, 255, 156, 0.1); }
-        .hacker-alert.critical { border-color: #ff4655 !important; animation: hackerBlink 0.8s ease-in-out infinite !important; }
-        .hacker-alert.high { border-color: #ff9f43 !important; animation: hackerBlink 1.2s ease-in-out infinite !important; }
-        .hacker-alert.medium { border-color: #ffd166 !important; animation: hackerBlink 2s ease-in-out infinite !important; }
-        .hacker-alert.low { border-color: #00ff9c !important; animation: hackerBorder 4s ease-in-out infinite !important; }
-
-        .hacker-matrix-border { position: relative; overflow: hidden; }
-        .hacker-matrix-border::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: repeating-linear-gradient(0deg, transparent, rgba(0, 255, 156, 0.03) 2px, transparent 4px);
-            animation: matrixRain 20s linear infinite;
-            pointer-events: none;
-            border-radius: inherit;
+        
+        @keyframes alertGlow {
+            0%, 100% { border-left-color: #00aaff; }
+            50% { border-left-color: #0088ff; }
         }
-        @keyframes matrixRain {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(50%); }
-        }
+        
+        .hacker-alert.critical { border-left-color: #cc4455; }
+        .hacker-alert.high { border-left-color: #cc8844; }
+        .hacker-alert.medium { border-left-color: #ccaa44; }
+        .hacker-alert.low { border-left-color: #00cc88; }
 
         .progress-overlay {
             position: fixed;
@@ -2874,8 +2702,7 @@ DASHBOARD_HTML = r"""
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(5, 8, 13, 0.85);
-            backdrop-filter: blur(5px);
+            background: rgba(10, 14, 26, 0.9);
             display: none;
             align-items: center;
             justify-content: center;
@@ -2884,126 +2711,80 @@ DASHBOARD_HTML = r"""
         }
         .progress-overlay.active { display: flex; }
         .progress-container {
-            background: #0a111a;
-            border: 2px solid #00ff9c;
-            border-radius: 12px;
-            padding: 40px 50px;
-            min-width: 400px;
+            background: #0d1520;
+            border: 2px solid #004488;
+            border-radius: 6px;
+            padding: 30px 40px;
+            min-width: 320px;
             max-width: 80%;
             text-align: center;
-            animation: hackerBorder 2s ease-in-out infinite;
-            box-shadow: 0 0 60px rgba(0, 255, 156, 0.15);
+            animation: borderGlow 4s ease-in-out infinite;
+            box-shadow: 0 0 60px rgba(0, 100, 200, 0.1);
         }
         .progress-title {
-            color: #00ff9c;
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 20px;
+            color: #00aaff;
+            font-size: 16px;
+            margin-bottom: 16px;
             font-family: 'Courier New', monospace;
-            animation: glitch 3s infinite;
+            text-shadow: 0 0 20px rgba(0, 170, 255, 0.2);
         }
         .progress-bar-wrapper {
-            background: #05080d;
-            border: 1px solid #1b2b3e;
-            border-radius: 8px;
-            height: 30px;
+            background: #0a0f1a;
+            border: 1px solid #004488;
+            border-radius: 4px;
+            height: 20px;
             overflow: hidden;
-            position: relative;
         }
         .progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, #00ff9c, #56b4ff, #ff4655, #ffd166, #00ff9c);
-            background-size: 200% 100%;
-            animation: progressGradient 2s linear infinite;
-            border-radius: 8px;
+            background: linear-gradient(90deg, #004488, #0088ff, #00aaff);
+            border-radius: 4px;
             transition: width 0.3s ease;
             width: 0%;
-        }
-        @keyframes progressGradient {
-            0% { background-position: 0% 0%; }
-            100% { background-position: 200% 0%; }
+            box-shadow: 0 0 20px rgba(0, 136, 255, 0.2);
         }
         .progress-percent {
-            color: #00ff9c;
-            font-size: 24px;
-            font-weight: bold;
+            color: #00aaff;
+            font-size: 20px;
+            margin-top: 8px;
             font-family: 'Courier New', monospace;
+            text-shadow: 0 0 20px rgba(0, 170, 255, 0.2);
         }
         .progress-status {
-            color: #6fb7ff;
-            font-size: 13px;
-            margin-top: 8px;
+            color: #445577;
+            font-size: 12px;
+            margin-top: 6px;
             font-family: monospace;
-            min-height: 20px;
-        }
-        .progress-icon {
-            font-size: 40px;
-            margin-bottom: 10px;
-            animation: spin 2s linear infinite;
+            min-height: 18px;
         }
         .progress-result {
-            margin-top: 15px;
-            padding: 12px;
-            background: #05080d;
-            border-radius: 6px;
-            border: 1px solid #00ff9c;
+            margin-top: 12px;
+            padding: 10px;
+            background: #0a0f1a;
+            border-radius: 3px;
+            border: 1px solid #004488;
             display: none;
-            max-height: 200px;
+            max-height: 150px;
             overflow-y: auto;
             text-align: left;
             font-family: monospace;
-            font-size: 12px;
-            color: #d7e3ef;
+            font-size: 11px;
+            color: #8899bb;
         }
         .progress-result.show { display: block; }
-        .progress-result .item { padding: 4px 8px; border-bottom: 1px solid #0a111a; }
-        .progress-result .item:last-child { border-bottom: none; }
-        .progress-result .item.highlight { color: #ff4655; }
-        .progress-result .item.success { color: #00ff9c; }
+        .progress-result .item { padding: 3px 6px; border-bottom: 1px solid #0d1520; }
+        .progress-result .item.highlight { color: #cc4455; }
+        .progress-result .item.success { color: #00cc88; }
 
         .cache-status {
-            font-size: 10px;
-            color: #52677d;
+            font-size: 9px;
+            color: #445577;
             font-family: monospace;
-            margin-left: 10px;
+            margin-left: 8px;
         }
-        .cache-status.cached { color: #00ff9c; }
-        .cache-status.fresh { color: #56b4ff; }
-        .cache-status.stale { color: #ffd166; }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .grid { grid-template-columns: 1fr; }
-            header { flex-direction: column; text-align: center; padding: 12px; }
-            .logo { font-size: 18px; }
-            .container { padding: 10px; }
-            .card { padding: 12px; }
-            .progress-container { min-width: unset; padding: 20px; margin: 10px; width: 90%; }
-            .hacker-btn { font-size: 10px; padding: 6px 12px; }
-            .hacker-title { font-size: 14px; }
-            .metric { font-size: 22px; }
-            table { font-size: 10px; }
-            th, td { padding: 4px; }
-            .scroll { max-height: 250px; }
-            #threatMapContainer { min-height: 200px !important; }
-            .hacker-header { flex-direction: column; align-items: flex-start; }
-            footer { font-size: 11px; padding: 12px; }
-        }
-        @media (max-width: 480px) {
-            header { padding: 8px; }
-            .logo { font-size: 14px; }
-            .container { padding: 6px; }
-            .card { padding: 8px; }
-            .hacker-btn { font-size: 9px; padding: 4px 8px; }
-            .metric { font-size: 18px; }
-            .grid { gap: 8px; }
-            .hacker-input { font-size: 10px; padding: 5px; }
-            #threatMapContainer { min-height: 150px !important; }
-        }
-
-        /* ============================================================
-        WARNING OVERLAY & PROGRESS BAR
-        ============================================================ */
+        .cache-status.cached { color: #00cc88; }
+        .cache-status.fresh { color: #4488cc; }
+        .cache-status.stale { color: #ccaa44; }
 
         .warning-overlay {
             position: fixed;
@@ -3012,157 +2793,65 @@ DASHBOARD_HTML = r"""
             right: 0;
             bottom: 0;
             background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(10px);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 10000;
-            animation: fadeIn 0.3s ease;
         }
-
-        .warning-overlay.active {
-            display: flex;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 40px rgba(255, 70, 85, 0.2); }
-            50% { box-shadow: 0 0 80px rgba(255, 70, 85, 0.4); }
-        }
+        .warning-overlay.active { display: flex; }
 
         .warning-box {
-            background: #0a111a;
-            border: 3px solid #ff4655;
-            border-radius: 16px;
-            padding: 40px 50px;
-            max-width: 600px;
+            background: #0d1520;
+            border: 2px solid #cc4455;
+            border-radius: 6px;
+            padding: 30px 40px;
+            max-width: 500px;
             width: 90%;
-            animation: pulseGlow 2s ease-in-out infinite;
             position: relative;
-            overflow: hidden;
+            animation: warningGlow 2s ease-in-out infinite;
+            box-shadow: 0 0 60px rgba(204, 68, 85, 0.15);
         }
-
-        .warning-box::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 70, 85, 0.03) 2px, rgba(255, 70, 85, 0.03) 4px);
-            pointer-events: none;
-            animation: scanline 4s linear infinite;
+        
+        @keyframes warningGlow {
+            0%, 100% { border-color: #cc4455; box-shadow: 0 0 60px rgba(204, 68, 85, 0.15); }
+            50% { border-color: #ff6677; box-shadow: 0 0 80px rgba(204, 68, 85, 0.3); }
         }
-
-        @keyframes scanline {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(100%); }
-        }
-
-        .warning-icon {
-            font-size: 60px;
-            text-align: center;
-            display: block;
-            margin-bottom: 15px;
-            animation: warningPulse 1.5s ease-in-out infinite;
-        }
-
-        @keyframes warningPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        .warning-title {
-            color: #ff4655;
-            font-family: 'Courier New', monospace;
-            font-size: 24px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            text-shadow: 0 0 20px rgba(255, 70, 85, 0.3);
-        }
-
-        .warning-text {
-            color: #d7e3ef;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            line-height: 1.8;
-            margin-bottom: 20px;
-        }
-
-        .warning-text .highlight {
-            color: #ff4655;
-            font-weight: bold;
-        }
-
-        .warning-text .bullet {
-            color: #ffd166;
-            padding-right: 8px;
-        }
-
-        .warning-text .info {
-            color: #00ff9c;
-        }
-
-        .warning-divider {
-            border: none;
-            border-top: 2px solid rgba(255, 70, 85, 0.3);
-            margin: 15px 0;
-        }
-
-        .warning-buttons {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
+        
+        .warning-icon { font-size: 40px; text-align: center; display: block; margin-bottom: 10px; }
+        .warning-title { color: #cc4455; font-family: 'Courier New', monospace; font-size: 18px; text-align: center; margin-bottom: 12px; text-shadow: 0 0 20px rgba(204, 68, 85, 0.3); }
+        .warning-text { color: #8899bb; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.6; }
+        .warning-text .highlight { color: #cc4455; }
+        .warning-text .bullet { color: #ccaa44; padding-right: 6px; }
+        .warning-text .info { color: #00cc88; }
+        .warning-divider { border: none; border-top: 1px solid #004488; margin: 12px 0; }
+        .warning-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
         .warning-btn {
-            padding: 12px 40px;
+            padding: 10px 30px;
             border: 2px solid;
-            border-radius: 8px;
+            border-radius: 4px;
             font-family: 'Courier New', monospace;
-            font-size: 14px;
-            font-weight: bold;
+            font-size: 12px;
             cursor: pointer;
             transition: all 0.3s ease;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
         }
-
-        .warning-btn-proceed {
-            background: transparent;
-            border-color: #ff4655;
-            color: #ff4655;
+        .warning-btn-proceed { 
+            background: transparent; 
+            border-color: #cc4455; 
+            color: #cc4455;
+            animation: btnWarning 2s ease-in-out infinite;
         }
-
-        .warning-btn-proceed:hover {
-            background: #ff4655;
-            color: #05080d;
-            box-shadow: 0 0 40px rgba(255, 70, 85, 0.3);
-            transform: scale(1.05);
+        
+        @keyframes btnWarning {
+            0%, 100% { border-color: #cc4455; box-shadow: 0 0 20px rgba(204, 68, 85, 0.1); }
+            50% { border-color: #ff6677; box-shadow: 0 0 40px rgba(204, 68, 85, 0.3); }
         }
+        
+        .warning-btn-proceed:hover { background: #cc4455; color: #0a0e1a; box-shadow: 0 0 60px rgba(204, 68, 85, 0.3); }
+        .warning-btn-cancel { background: transparent; border-color: #445577; color: #445577; }
+        .warning-btn-cancel:hover { background: #445577; color: #0a0e1a; }
 
-        .warning-btn-cancel {
-            background: transparent;
-            border-color: #52677d;
-            color: #52677d;
-        }
-
-        .warning-btn-cancel:hover {
-            background: #52677d;
-            color: #05080d;
-            box-shadow: 0 0 40px rgba(82, 103, 125, 0.3);
-            transform: scale(1.05);
-        }
-
-        /* Blocking Progress Overlay */
         .blocking-progress-overlay {
             position: fixed;
             top: 0;
@@ -3170,118 +2859,89 @@ DASHBOARD_HTML = r"""
             right: 0;
             bottom: 0;
             background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 10001;
         }
-
-        .blocking-progress-overlay.active {
-            display: flex;
-        }
-
+        .blocking-progress-overlay.active { display: flex; }
         .blocking-progress-box {
-            background: #0a111a;
-            border: 2px solid #00ff9c;
-            border-radius: 16px;
-            padding: 40px 50px;
-            max-width: 450px;
+            background: #0d1520;
+            border: 2px solid #004488;
+            border-radius: 6px;
+            padding: 30px 40px;
+            max-width: 400px;
             width: 90%;
             text-align: center;
-            animation: hackerBorder 2s ease-in-out infinite;
+            animation: borderGlow 4s ease-in-out infinite;
+            box-shadow: 0 0 40px rgba(0, 100, 200, 0.1);
         }
-
-        .blocking-progress-icon {
-            font-size: 50px;
-            margin-bottom: 15px;
-            animation: spin 1.5s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .blocking-progress-title {
-            color: #00ff9c;
-            font-family: 'Courier New', monospace;
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .blocking-progress-text {
-            color: #6fb7ff;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            margin-bottom: 15px;
-            min-height: 20px;
-        }
-
+        .blocking-progress-icon { font-size: 40px; margin-bottom: 10px; }
+        .blocking-progress-title { color: #00aaff; font-family: 'Courier New', monospace; font-size: 16px; margin-bottom: 8px; text-shadow: 0 0 20px rgba(0, 170, 255, 0.2); }
+        .blocking-progress-text { color: #445577; font-family: 'Courier New', monospace; font-size: 12px; margin-bottom: 12px; min-height: 18px; }
         .blocking-progress-bar-wrapper {
-            background: #05080d;
-            border: 1px solid #1b2b3e;
-            border-radius: 10px;
-            height: 30px;
+            background: #0a0f1a;
+            border: 1px solid #004488;
+            border-radius: 4px;
+            height: 20px;
             overflow: hidden;
-            position: relative;
         }
-
         .blocking-progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, #00ff9c, #56b4ff, #ff4655, #ffd166, #00ff9c);
-            background-size: 300% 100%;
-            animation: progressGradient 2s linear infinite;
-            border-radius: 10px;
+            background: linear-gradient(90deg, #004488, #0088ff, #00aaff);
+            border-radius: 4px;
             transition: width 0.5s ease;
             width: 0%;
+            box-shadow: 0 0 20px rgba(0, 136, 255, 0.2);
+        }
+        .blocking-progress-percent { color: #00aaff; font-size: 18px; margin-top: 6px; text-shadow: 0 0 20px rgba(0, 170, 255, 0.2); }
+        .blocking-progress-status { color: #445577; font-size: 11px; margin-top: 4px; min-height: 16px; }
+        .blocking-progress-done { display: none; margin-top: 12px; padding: 12px; background: #0a0f1a; border: 1px solid #00cc88; border-radius: 3px; color: #00cc88; font-size: 12px; }
+        .blocking-progress-done.show { display: block; }
+
+        #threatMapContainer {
+            border: 2px solid #004488 !important;
+            animation: mapGlow 4s ease-in-out infinite !important;
+            box-shadow: 0 0 20px rgba(0, 100, 200, 0.05) !important;
+        }
+        
+        @keyframes mapGlow {
+            0%, 100% { border-color: #004488; box-shadow: 0 0 20px rgba(0, 100, 200, 0.05); }
+            50% { border-color: #0088ff; box-shadow: 0 0 40px rgba(0, 136, 255, 0.15); }
         }
 
-        @keyframes progressGradient {
-            0% { background-position: 0% 0%; }
-            100% { background-position: 300% 0%; }
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+            header { flex-direction: column; text-align: center; padding: 10px; }
+            .logo { font-size: 16px; }
+            .container { padding: 8px; }
+            .card { padding: 10px; }
+            .progress-container { min-width: unset; padding: 20px; margin: 10px; width: 90%; }
+            .hacker-btn { font-size: 9px; padding: 4px 10px; }
+            .metric { font-size: 20px; }
+            table { font-size: 9px; }
+            th, td { padding: 3px; }
+            .scroll { max-height: 200px; }
+            #threatMapContainer { min-height: 180px; }
         }
-
-        .blocking-progress-percent {
-            color: #00ff9c;
-            font-family: 'Courier New', monospace;
-            font-size: 22px;
-            font-weight: bold;
-            margin-top: 10px;
+        @media (max-width: 480px) {
+            header { padding: 6px; }
+            .logo { font-size: 13px; }
+            .container { padding: 4px; }
+            .card { padding: 6px; }
+            .hacker-btn { font-size: 8px; padding: 3px 6px; }
+            .metric { font-size: 16px; }
+            .grid { gap: 6px; }
+            .hacker-input { font-size: 9px; padding: 3px 5px; }
+            #threatMapContainer { min-height: 120px; }
         }
-
-        .blocking-progress-status {
-            color: #52677d;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            margin-top: 8px;
-            min-height: 18px;
-        }
-
-        .blocking-progress-done {
-            display: none;
-            margin-top: 15px;
-            padding: 15px;
-            background: rgba(0, 255, 156, 0.05);
-            border: 1px solid #00ff9c;
-            border-radius: 8px;
-            color: #00ff9c;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-        }
-
-        .blocking-progress-done.show {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-
     </style>
 </head>
 <body>
 
 <div class="progress-overlay" id="progressOverlay">
     <div class="progress-container">
-        <div class="progress-icon" id="progressIcon">🔄</div>
+        <div class="progress-icon" id="progressIcon" style="font-size:35px; margin-bottom:8px;">🔄</div>
         <div class="progress-title" id="progressTitle">SCANNING...</div>
         <div class="progress-bar-wrapper">
             <div class="progress-bar" id="progressBar"></div>
@@ -3292,56 +2952,44 @@ DASHBOARD_HTML = r"""
     </div>
 </div>
 
-    <!-- ============================================================
-        WARNING OVERLAY
-        ============================================================ -->
-
-    <div class="warning-overlay" id="warningOverlay">
-        <div class="warning-box">
-            <span class="warning-icon">⚠️</span>
-            <div class="warning-title">Security Warning</div>
-            <hr class="warning-divider">
-            <div class="warning-text">
-                This is a <span class="highlight">powerful network management tool</span>. Use it responsibly:
-                <br><br>
-                <span class="bullet">•</span> Only block devices you <span class="highlight">own</span> or have <span class="highlight">permission</span> to manage<br>
-                <span class="bullet">•</span> <span class="highlight">Don't</span> block critical infrastructure (routers, servers, etc.)<br>
-                <span class="bullet">•</span> Be aware that blocking network devices is <span class="highlight">detectable</span>
-                <br><br>
-                <span class="info">🔒 Now your device blocking will actually disconnect devices from the network until you unblock them!</span>
-            </div>
-            <hr class="warning-divider">
-            <div class="warning-buttons">
-                <button class="warning-btn warning-btn-cancel" onclick="closeWarning()">Cancel</button>
-                <button class="warning-btn warning-btn-proceed" id="proceedBlockBtn">Proceed & Block</button>
-            </div>
+<div class="warning-overlay" id="warningOverlay">
+    <div class="warning-box">
+        <span class="warning-icon">⚠️</span>
+        <div class="warning-title">Security Warning</div>
+        <hr class="warning-divider">
+        <div class="warning-text">
+            This is a <span class="highlight">powerful network management tool</span>. Use it responsibly:
+            <br><br>
+            <span class="bullet">•</span> Only block devices you <span class="highlight">own</span> or have <span class="highlight">permission</span> to manage<br>
+            <span class="bullet">•</span> <span class="highlight">Don't</span> block critical infrastructure (routers, servers, etc.)<br>
+            <span class="bullet">•</span> Be aware that blocking network devices is <span class="highlight">detectable</span>
+            <br><br>
+            <span class="info">🔒 This will disconnect the device from the network until you unblock it.</span>
+        </div>
+        <hr class="warning-divider">
+        <div class="warning-buttons">
+            <button class="warning-btn warning-btn-cancel" onclick="closeWarning()">Cancel</button>
+            <button class="warning-btn warning-btn-proceed" id="proceedBlockBtn">Proceed & Block</button>
         </div>
     </div>
+</div>
 
-    <!-- ============================================================
-        BLOCKING PROGRESS OVERLAY
-        ============================================================ -->
-
-    <div class="blocking-progress-overlay" id="blockingProgressOverlay">
-        <div class="blocking-progress-box">
-            <div class="blocking-progress-icon" id="progressIcon">🔄</div>
-            <div class="blocking-progress-title">Blocking Device...</div>
-            <div class="blocking-progress-text" id="progressText">Initializing blocking sequence...</div>
-            <div class="blocking-progress-bar-wrapper">
-                <div class="blocking-progress-bar" id="blockingProgressBar"></div>
-            </div>
-            <div class="blocking-progress-percent" id="progressPercent">0%</div>
-            <div class="blocking-progress-status" id="progressStatus">Preparing...</div>
-            <div class="blocking-progress-done" id="progressDone">
-                ✅ Device blocked successfully!
-                <br>
-                <span style="font-size: 11px; color: #52677d;">The device has been disconnected from the network.</span>
-            </div>
+<div class="blocking-progress-overlay" id="blockingProgressOverlay">
+    <div class="blocking-progress-box">
+        <div class="blocking-progress-icon">🔄</div>
+        <div class="blocking-progress-title">Blocking Device...</div>
+        <div class="blocking-progress-text" id="blockProgressText">Initializing blocking sequence...</div>
+        <div class="blocking-progress-bar-wrapper">
+            <div class="blocking-progress-bar" id="blockingProgressBar"></div>
         </div>
+        <div class="blocking-progress-percent" id="blockProgressPercent">0%</div>
+        <div class="blocking-progress-status" id="blockProgressStatus">Preparing...</div>
+        <div class="blocking-progress-done" id="blockProgressDone">✅ Device blocked successfully!</div>
     </div>
+</div>
 
 <header>
-    <div class="logo hacker-glitch">🔐 NETWORK WATCHDOG</div>
+    <div class="logo">🔐 NETWORK SURVEILLANCE</div>
     <div>
         <span class="hacker-status online" id="statusDot"></span>
         <span class="live">●</span>
@@ -3389,7 +3037,7 @@ DASHBOARD_HTML = r"""
                 <h3 class="hacker-title">🛡️ Security</h3>
                 <span class="badge">● MONITORING</span>
             </div>
-            <div>Critical: <span class="red hacker-glitch" id="critical">0</span></div>
+            <div>Critical: <span class="red" id="critical">0</span></div>
             <div>High: <span class="orange" id="high">0</span></div>
             <div>Medium: <span class="yellow" id="medium">0</span></div>
             <div>SIEM events: <span class="blue" id="siem">0</span></div>
@@ -3401,20 +3049,20 @@ DASHBOARD_HTML = r"""
             <h3 class="hacker-title">🧪 TEST SIEM EVENTS</h3>
             <span class="badge">● REAL-TIME</span>
         </div>
-        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <button class="hacker-btn hacker-btn-danger" onclick="testSIEMEvents()" style="flex: 1; min-width: 100px;">🚀 Generate Test</button>
-            <button class="hacker-btn hacker-btn-blue" onclick="testCriticalAlerts()" style="flex: 1; min-width: 100px;">🔴 Critical Alerts</button>
-            <button class="hacker-btn hacker-btn-warning" onclick="testAllEvents()" style="flex: 1; min-width: 100px;">⚡ All Events</button>
-            <button class="hacker-btn" onclick="document.getElementById('testResults').innerHTML=''; updateTestStatus('Cleared',true);" style="flex: 0.5; min-width: 50px;">🗑️</button>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <button class="hacker-btn hacker-btn-danger" onclick="testSIEMEvents()">🚀 Generate Test</button>
+            <button class="hacker-btn hacker-btn-blue" onclick="testCriticalAlerts()">🔴 Critical Alerts</button>
+            <button class="hacker-btn hacker-btn-warning" onclick="testAllEvents()">⚡ All Events</button>
+            <button class="hacker-btn" onclick="document.getElementById('testResults').innerHTML=''; updateTestStatus('Cleared',true);">🗑️</button>
         </div>
-        <div id="testStatus" style="margin-top: 8px; font-family: monospace; font-size: 12px; color: #52677d;">Ready to test...</div>
-        <div id="testResults" style="margin-top: 6px; max-height: 80px; overflow-y: auto; font-family: monospace; font-size: 11px; background: #05080d; border-radius: 4px; padding: 4px 8px; border: 1px solid #0a111a;"></div>
+        <div id="testStatus" style="margin-top:6px; font-size:11px; color:#445577;">Ready to test...</div>
+        <div id="testResults" style="margin-top:4px; max-height:60px; overflow-y:auto; font-size:10px; background:#0a0f1a; border-radius:2px; padding:3px 6px; border:1px solid #004488;"></div>
     </div>
 
     <br>
 
     <div class="grid">
-        <div class="card hacker-panel hacker-matrix-border">
+        <div class="card hacker-panel">
             <div class="hacker-header">
                 <h3 class="hacker-title">⚙️ Firewall Controls</h3>
             </div>
@@ -3437,7 +3085,7 @@ DASHBOARD_HTML = r"""
             </div>
         </div>
 
-        <div class="card hacker-panel hacker-matrix-border">
+        <div class="card hacker-panel">
             <div class="hacker-header">
                 <h3 class="hacker-title">🖥️ Endpoint Controls</h3>
             </div>
@@ -3466,56 +3114,46 @@ DASHBOARD_HTML = r"""
             <div class="scroll hacker-scroll">
                 <table class="hacker-table">
                     <thead>
-                        <tr>
-                            <th>Process</th>
-                            <th>PID</th>
-                            <th>Local</th>
-                            <th>Remote</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
+                        <tr><th>Process</th><th>PID</th><th>Local</th><th>Remote</th><th>Status</th><th>Action</th></tr>
                     </thead>
                     <tbody id="connections"></tbody>
                 </table>
             </div>
         </div>
 
-        <div class="card hacker-panel" style="grid-column: span 1; min-height: 480px;">
+        <div class="card hacker-panel" style="grid-column: span 1; min-height: 400px;">
             <div class="hacker-header">
                 <h3 class="hacker-title">🗺️ REAL-TIME THREAT MAP & FEED</h3>
                 <span class="badge" id="mapFeedBadge">0</span>
             </div>
-            <div style="display: flex; flex-direction: column; height: 430px; margin-top: 8px;">
-                <div id="threatMapContainer" style="flex: 2; background: #0a111a; border-radius: 6px; border: 2px solid #00ff9c; overflow: hidden; min-height: 220px; animation: hackerBorder 4s ease-in-out infinite; position: relative;">
+            <div style="display: flex; flex-direction: column; height: 380px; margin-top: 6px;">
+                <div id="threatMapContainer" style="flex: 2; background: #0a0f1a; border-radius: 4px; border: 2px solid #004488; overflow: hidden; min-height: 180px; position: relative; animation: borderGlow 4s ease-in-out infinite; box-shadow: 0 0 20px rgba(0, 100, 200, 0.05);">
                     <div id="threatMap" style="width: 100%; height: 100%;">
-                        <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #52677d; font-size: 13px; padding: 20px; flex-direction: column;">
-                            <div style="width: 40px; height: 40px; border: 3px solid #172435; border-top-color: #00ff9c; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px;"></div>
+                        <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #445577; font-size: 12px; padding: 15px; flex-direction: column;">
+                            <div style="width: 30px; height: 30px; border: 2px solid #004488; border-top-color: #00aaff; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 10px;"></div>
                             <div>Loading threat map...</div>
-                            <div style="font-size: 10px; margin-top: 8px; color: #3a4a5a;">Connecting to security sensors...</div>
                         </div>
                     </div>
-                    <div style="position: absolute; bottom: 10px; left: 10px; background: rgba(5, 8, 13, 0.85); border: 1px solid #1b2b3e; border-radius: 4px; padding: 6px 10px; font-size: 9px; font-family: monospace; color: #52677d; z-index: 1000;">
-                        <span style="color: #ff4655;">●</span> Threat &nbsp;
-                        <span style="color: #00ff9c;">●</span> Normal &nbsp;
-                        <span style="color: #ff0000;">◉</span> Security Host
+                    <div style="position: absolute; bottom: 8px; left: 8px; background: rgba(13, 21, 32, 0.85); border: 1px solid #004488; border-radius: 2px; padding: 4px 8px; font-size: 8px; color: #445577; z-index: 1000;">
+                        <span style="color:#cc4455;">●</span> Threat <span style="color:#00aaff;">●</span> Normal
                     </div>
-                    <div style="position: absolute; bottom: 10px; right: 10px; z-index: 1000; display: flex; gap: 4px;">
-                        <button onclick="refreshThreatMap()" style="background: rgba(5, 8, 13, 0.85); border: 1px solid #00ff9c; color: #00ff9c; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 10px;">🔄</button>
+                    <div style="position: absolute; bottom: 8px; right: 8px; z-index: 1000;">
+                        <button onclick="refreshThreatMap()" style="background:rgba(13, 21, 32, 0.85); border:1px solid #004488; color:#445577; padding:2px 8px; border-radius:2px; cursor:pointer; font-size:9px;">🔄</button>
                     </div>
                 </div>
-                <div style="flex: 1; background: #080d14; border-radius: 6px; border: 2px solid #00ff9c; display: flex; flex-direction: column; overflow: hidden; margin-top: 6px; min-height: 100px; animation: hackerBorder 3s ease-in-out infinite;">
-                    <div style="padding: 4px 10px; border-bottom: 1px solid #1b2b3e; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
-                        <span style="color: #6fb7ff; font-size: 11px; font-weight: 500;">🔴 THREAT FEED</span>
-                        <span id="mapFeedBadge2" style="background: #ff4655; color: #fff; font-size: 10px; padding: 1px 10px; border-radius: 12px; font-weight: bold; animation: hackerBlink 1s ease-in-out infinite;">0</span>
+                <div style="flex: 1; background: #0a0f1a; border-radius: 4px; border: 1px solid #004488; display: flex; flex-direction: column; overflow: hidden; margin-top: 4px; min-height: 80px; animation: borderGlow 4s ease-in-out infinite;">
+                    <div style="padding: 3px 8px; border-bottom: 1px solid #004488; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+                        <span style="color:#445577; font-size: 10px;">🔴 THREAT FEED</span>
+                        <span id="mapFeedBadge2" style="background:#004488; color:#8899bb; font-size: 8px; padding: 1px 8px; border-radius: 2px;">0</span>
                     </div>
-                    <div id="mapFeedList" style="flex: 1; overflow-y: auto; padding: 4px 6px;" class="hacker-scroll">
-                        <div style="color: #52677d; text-align: center; padding: 15px 0; font-size: 12px;">Waiting for events...</div>
+                    <div id="mapFeedList" style="flex: 1; overflow-y: auto; padding: 3px 4px;" class="hacker-scroll">
+                        <div style="color:#445577; text-align:center; padding: 10px 0; font-size: 11px;">Waiting for events...</div>
                     </div>
-                    <div style="padding: 4px 8px; border-top: 1px solid #1b2b3e; display: flex; gap: 4px; flex-shrink: 0; flex-wrap: wrap;">
-                        <input id="mapBlockIP" placeholder="Block IP" class="hacker-input" style="flex:1; padding:2px 6px; font-size:10px; min-width:70px;">
-                        <button class="hacker-btn" onclick="mapBlockIP()" style="padding:2px 10px; font-size:10px;">🚫 Block</button>
-                        <button class="hacker-btn hacker-btn-blue" onclick="refreshThreatMap()" style="padding:2px 10px; font-size:10px;">🔄</button>
-                        <button class="hacker-btn hacker-btn-success" onclick="forceRefresh()" style="padding:2px 10px; font-size:10px;">⚡</button>
+                    <div style="padding: 3px 6px; border-top: 1px solid #004488; display: flex; gap: 4px; flex-shrink: 0; flex-wrap: wrap;">
+                        <input id="mapBlockIP" placeholder="Block IP" class="hacker-input" style="flex:1; padding:2px 6px; font-size:9px; min-width:60px;">
+                        <button class="hacker-btn" onclick="mapBlockIP()" style="padding:2px 8px; font-size:9px;">🚫 Block</button>
+                        <button class="hacker-btn hacker-btn-blue" onclick="refreshThreatMap()" style="padding:2px 8px; font-size:9px;">🔄</button>
+                        <button class="hacker-btn hacker-btn-success" onclick="forceRefresh()" style="padding:2px 8px; font-size:9px;">⚡</button>
                     </div>
                 </div>
             </div>
@@ -3532,15 +3170,7 @@ DASHBOARD_HTML = r"""
             </div>
             <div class="scroll hacker-scroll">
                 <table class="hacker-table">
-                    <thead>
-                        <tr>
-                            <th>PID</th>
-                            <th>Name</th>
-                            <th>User</th>
-                            <th>CPU</th>
-                            <th>Memory</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>PID</th><th>Name</th><th>User</th><th>CPU</th><th>Memory</th></tr></thead>
                     <tbody id="processes"></tbody>
                 </table>
             </div>
@@ -3553,14 +3183,7 @@ DASHBOARD_HTML = r"""
             </div>
             <div class="scroll hacker-scroll">
                 <table class="hacker-table">
-                    <thead>
-                        <tr>
-                            <th>Time</th>
-                            <th>Severity</th>
-                            <th>Type</th>
-                            <th>Message</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>Time</th><th>Severity</th><th>Type</th><th>Message</th></tr></thead>
                     <tbody id="events"></tbody>
                 </table>
             </div>
@@ -3574,7 +3197,7 @@ DASHBOARD_HTML = r"""
             <div class="hacker-header">
                 <h3 class="hacker-title">🌐 Network Protocols</h3>
             </div>
-            <pre id="protocols" style="color: #00ff9c; font-family: monospace; font-size: 12px; max-height: 120px; overflow-y: auto;">Waiting for data...</pre>
+            <pre id="protocols" style="color:#00aaff; font-size:11px; max-height:100px; overflow-y:auto; text-shadow: 0 0 10px rgba(0, 170, 255, 0.1);">Waiting for data...</pre>
         </div>
 
         <div class="card hacker-panel">
@@ -3582,9 +3205,9 @@ DASHBOARD_HTML = r"""
                 <h3 class="hacker-title">⚠️ Threat Intelligence</h3>
                 <span class="badge" id="threatBadge">0</span>
             </div>
-            <div id="threats" style="font-family: monospace; font-size: 12px; max-height: 120px; overflow-y: auto;"></div>
+            <div id="threats" style="font-size:11px; max-height:100px; overflow-y:auto;"></div>
             <br>
-            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <div style="display: flex; gap: 4px; flex-wrap: wrap;">
                 <button class="hacker-btn hacker-btn-warning" onclick="generateMap()">🗺️ Generate Map</button>
                 <button class="hacker-btn hacker-btn-blue" onclick="browserConnections()">🌐 Browser Conn</button>
                 <button class="hacker-btn hacker-btn-success" onclick="forceRefresh()">⚡ Refresh</button>
@@ -3592,45 +3215,40 @@ DASHBOARD_HTML = r"""
         </div>
     </div>
 
-    <!-- ============================================================
-        NETWORK DEVICES MANAGEMENT PANEL
-        ============================================================ -->
-
     <div class="grid">
         <div class="card hacker-panel" style="grid-column: span 2;">
             <div class="hacker-header">
                 <h3 class="hacker-title">🌐 NETWORK DEVICES</h3>
                 <span class="badge" id="deviceBadge">0</span>
-                <div style="display: flex; gap: 6px;">
-                    <button class="hacker-btn hacker-btn-success" onclick="scanNetwork()" style="padding: 4px 12px; font-size: 10px;">🔄 Scan</button>
-                    <button class="hacker-btn hacker-btn-blue" onclick="refreshDevices()" style="padding: 4px 12px; font-size: 10px;">⟳ Refresh</button>
+                <div style="display: flex; gap: 4px;">
+                    <button class="hacker-btn hacker-btn-success" onclick="scanNetwork()" style="padding:3px 10px; font-size:9px;">🔄 Scan</button>
+                    <button class="hacker-btn hacker-btn-blue" onclick="refreshDevices()" style="padding:3px 10px; font-size:9px;">⟳ Refresh</button>
                 </div>
             </div>
-            <div style="margin-top: 10px; max-height: 400px; overflow-y: auto;" class="hacker-scroll" id="deviceList">
-                <div style="text-align: center; color: #52677d; padding: 30px 0;">
-                    <div style="font-size: 40px; margin-bottom: 10px;">📡</div>
+            <div style="margin-top: 8px; max-height: 350px; overflow-y: auto;" class="hacker-scroll" id="deviceList">
+                <div style="text-align: center; color: #445577; padding: 25px 0;">
+                    <div style="font-size: 35px; margin-bottom: 8px;">📡</div>
                     <div>Click "Scan" to discover devices on your network</div>
-                    <div style="font-size: 11px; margin-top: 5px; color: #3a4a5a;">This will scan your local network (e.g., 192.168.1.0/24)</div>
+                    <div style="font-size: 10px; margin-top: 4px; color: #334466;">This will scan your local network (e.g., 192.168.1.0/24)</div>
                 </div>
             </div>
-            <div style="margin-top: 8px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; border-top: 1px solid #0a111a; padding-top: 8px;">
-                <span style="color: #6fb7ff; font-size: 11px;">🔍 Quick Block:</span>
-                <input id="quickBlockIP" placeholder="Enter IP to block" class="hacker-input" style="flex:1; padding:4px 8px; font-size:11px; min-width:120px;">
-                <input id="quickBlockReason" placeholder="Reason" class="hacker-input" style="flex:1; padding:4px 8px; font-size:11px; min-width:100px;">
-                <button class="hacker-btn hacker-btn-danger" onclick="quickBlockDevice()" style="padding:4px 12px; font-size:10px;">🚫 Block</button>
-                <span style="color: #52677d; font-size: 10px;">|</span>
-                <button class="hacker-btn hacker-btn-warning" onclick="showBlockedDevices()" style="padding:4px 12px; font-size:10px;">📋 Blocked</button>
+            <div style="margin-top: 6px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; border-top: 1px solid #004488; padding-top: 6px;">
+                <span style="color:#445577; font-size:10px;">🔍 Quick Block:</span>
+                <input id="quickBlockIP" placeholder="Enter IP to block" class="hacker-input" style="flex:1; padding:3px 6px; font-size:10px; min-width:100px;">
+                <input id="quickBlockReason" placeholder="Reason" class="hacker-input" style="flex:1; padding:3px 6px; font-size:10px; min-width:80px;">
+                <button class="hacker-btn hacker-btn-danger" onclick="quickBlockDevice()" style="padding:3px 10px; font-size:9px;">🚫 Block</button>
+                <span style="color:#334466; font-size:9px;">|</span>
+                <button class="hacker-btn hacker-btn-warning" onclick="showBlockedDevices()" style="padding:3px 10px; font-size:9px;">📋 Blocked</button>
             </div>
         </div>
     </div>
 
-
 </div>
 
-<footer style="color: #52677d; padding: 20px; text-align: center; font-family: monospace; border-top: 1px solid #172435; margin-top: 10px; font-size: 12px;">
+<footer>
     ⚡ Real host telemetry — no simulated network traffic ⚡
     <br>
-    <span style="font-size: 10px; color: #3a4a5a;">Cache: <span id="cacheAge">0s</span> ago</span>
+    <span style="font-size: 9px; color: #334466;">Cache: <span id="cacheAge">0s</span> ago</span>
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -3658,20 +3276,13 @@ DASHBOARD_HTML = r"""
     }
 
     async function api(url, method = "GET", body = null) {
-        const options = {
-            method: method,
-            headers: { "Content-Type": "application/json" }
-        };
-        if (body !== null) {
-            options.body = JSON.stringify(body);
-        }
+        const options = { method, headers: { "Content-Type": "application/json" } };
+        if (body !== null) options.body = JSON.stringify(body);
         const response = await fetch(url, options);
         return await response.json();
     }
 
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
+    function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
     // ============================================================
     // TEST SIEM EVENTS
@@ -3679,10 +3290,7 @@ DASHBOARD_HTML = r"""
 
     function updateTestStatus(message, isSuccess = true) {
         const statusEl = document.getElementById('testStatus');
-        if (statusEl) {
-            statusEl.textContent = message;
-            statusEl.style.color = isSuccess ? '#00ff9c' : '#ff4655';
-        }
+        if (statusEl) { statusEl.textContent = message; statusEl.style.color = isSuccess ? '#00cc88' : '#cc4455'; }
     }
 
     function addTestResult(message, isSuccess = true) {
@@ -3690,13 +3298,11 @@ DASHBOARD_HTML = r"""
         if (!resultsEl) return;
         const div = document.createElement('div');
         div.style.padding = '2px 0';
-        div.style.borderBottom = '1px solid #0a111a';
-        div.style.color = isSuccess ? '#00ff9c' : '#ff4655';
+        div.style.borderBottom = '1px solid #0d1520';
+        div.style.color = isSuccess ? '#00cc88' : '#cc4455';
         div.textContent = (isSuccess ? '✅ ' : '❌ ') + message;
         resultsEl.prepend(div);
-        while (resultsEl.children.length > 30) {
-            resultsEl.removeChild(resultsEl.lastChild);
-        }
+        while (resultsEl.children.length > 20) resultsEl.removeChild(resultsEl.lastChild);
     }
 
     async function testSIEMEvents() {
@@ -3707,10 +3313,7 @@ DASHBOARD_HTML = r"""
             {severity: "HIGH", type: "failed_login", msg: "Failed login from 192.168.1.50", data: {source_ip: "192.168.1.50"}},
             {severity: "HIGH", type: "failed_login", msg: "Failed login from 192.168.1.51", data: {source_ip: "192.168.1.51"}},
             {severity: "MEDIUM", type: "connection_attempt", msg: "Port scan from 10.0.0.100", data: {source_ip: "10.0.0.100", port: 22}},
-            {severity: "MEDIUM", type: "connection_attempt", msg: "Port scan from 10.0.0.100", data: {source_ip: "10.0.0.100", port: 80}},
-            {severity: "MEDIUM", type: "connection_attempt", msg: "Port scan from 10.0.0.100", data: {source_ip: "10.0.0.100", port: 443}},
             {severity: "HIGH", type: "suspicious_process", msg: "Suspicious process: cryptominer.exe", data: {pid: 1234, name: "cryptominer.exe"}},
-            {severity: "HIGH", type: "suspicious_process", msg: "Suspicious process: keylogger.exe", data: {pid: 5678, name: "keylogger.exe"}},
         ];
 
         for (const event of events) {
@@ -3722,17 +3325,11 @@ DASHBOARD_HTML = r"""
                     message: event.msg,
                     data: event.data
                 });
-                if (response && response.success) {
-                    addTestResult(`[${event.severity}] ${event.type}`, true);
-                } else {
-                    addTestResult(`Failed: ${event.type}`, false);
-                }
-            } catch (error) {
-                addTestResult(`Error: ${event.type}`, false);
-            }
+                if (response && response.success) addTestResult(`[${event.severity}] ${event.type}`, true);
+                else addTestResult(`Failed: ${event.type}`, false);
+            } catch (error) { addTestResult(`Error: ${event.type}`, false); }
             await sleep(150);
         }
-
         updateTestStatus('✅ Test completed! Check threat feed and SIEM events.', true);
         addTestResult('✅ SIEM event test complete!', true);
     }
@@ -3744,9 +3341,7 @@ DASHBOARD_HTML = r"""
         const alerts = [
             {severity: "CRITICAL", type: "Ransomware Detected", msg: "Ransomware activity detected!", data: {threat: "ransomware", score: 95}},
             {severity: "CRITICAL", type: "C2 Communication", msg: "C2 comm on port 4444", data: {remote_ip: "185.130.5.253", port: 4444}},
-            {severity: "CRITICAL", type: "Privilege Escalation", msg: "Unauthorized privilege escalation", data: {user: "admin", privilege: "root"}},
             {severity: "HIGH", type: "Data Exfiltration", msg: "Large data upload detected", data: {bytes: "500MB", remote_ip: "94.102.61.78"}},
-            {severity: "HIGH", type: "Malware Download", msg: "Malicious file download detected", data: {url: "http://malware.com/payload.exe"}},
         ];
 
         for (const alert of alerts) {
@@ -3758,17 +3353,11 @@ DASHBOARD_HTML = r"""
                     message: alert.msg,
                     data: alert.data
                 });
-                if (response && response.success) {
-                    addTestResult(`🔴 [${alert.severity}] ${alert.type}`, true);
-                } else {
-                    addTestResult(`Failed: ${alert.type}`, false);
-                }
-            } catch (error) {
-                addTestResult(`Error: ${alert.type}`, false);
-            }
+                if (response && response.success) addTestResult(`🔴 [${alert.severity}] ${alert.type}`, true);
+                else addTestResult(`Failed: ${alert.type}`, false);
+            } catch (error) { addTestResult(`Error: ${alert.type}`, false); }
             await sleep(250);
         }
-
         updateTestStatus('✅ Critical alerts generated!', true);
         addTestResult('✅ Critical alert test complete!', true);
     }
@@ -3776,27 +3365,20 @@ DASHBOARD_HTML = r"""
     async function testAllEvents() {
         updateTestStatus('⏳ Generating all event types...', true);
         addTestResult('🚀 Starting comprehensive test...', true);
-        const resultsEl = document.getElementById('testResults');
-        if (resultsEl) resultsEl.innerHTML = '';
+        document.getElementById('testResults').innerHTML = '';
 
         for (let i = 1; i <= 3; i++) {
             const ip = `10.0.0.${i}`;
             try {
                 const response = await api("/api/firewall/block-ip", "POST", { ip, reason: `Test block ${i}` });
-                if (response && response.success) {
-                    addTestResult(`🔥 Blocked IP ${ip}`, true);
-                }
-            } catch (error) {
-                addTestResult(`Failed to block ${ip}`, false);
-            }
+                if (response && response.success) addTestResult(`🔥 Blocked IP ${ip}`, true);
+            } catch (error) { addTestResult(`Failed to block ${ip}`, false); }
             await sleep(200);
         }
 
         const events = [
             {severity: "HIGH", type: "failed_login", msg: "Brute force from 192.168.1.100", data: {source_ip: "192.168.1.100"}},
             {severity: "CRITICAL", type: "known_threat", msg: "Known threat IOC: 185.130.5.253", data: {remote_ip: "185.130.5.253"}},
-            {severity: "HIGH", type: "suspicious_process", msg: "Suspicious: backdoor.exe", data: {pid: 9999, name: "backdoor.exe"}},
-            {severity: "MEDIUM", type: "port_scan", msg: "Port scan from 10.0.0.50", data: {source_ip: "10.0.0.50"}},
             {severity: "CRITICAL", type: "ransomware", msg: "Ransomware activity detected!", data: {files_encrypted: 100}},
         ];
 
@@ -3809,23 +3391,16 @@ DASHBOARD_HTML = r"""
                     message: event.msg,
                     data: event.data
                 });
-                if (response && response.success) {
-                    addTestResult(`📊 [${event.severity}] ${event.type}`, true);
-                }
-            } catch (error) {
-                addTestResult(`Failed: ${event.type}`, false);
-            }
+                if (response && response.success) addTestResult(`📊 [${event.severity}] ${event.type}`, true);
+                else addTestResult(`Failed: ${event.type}`, false);
+            } catch (error) { addTestResult(`Error: ${event.type}`, false); }
             await sleep(150);
         }
 
         try {
             const response = await api("/api/process/scan", "POST");
-            if (response && response.success) {
-                addTestResult(`🔍 Process scan complete - ${response.suspicious || 0} suspicious`, true);
-            }
-        } catch (error) {
-            addTestResult('Failed to trigger process scan', false);
-        }
+            if (response && response.success) addTestResult(`🔍 Process scan complete - ${response.suspicious || 0} suspicious`, true);
+        } catch (error) { addTestResult('Failed to trigger process scan', false); }
 
         updateTestStatus('✅ All tests complete! Check real-time updates.', true);
         addTestResult('✅ Comprehensive test complete!', true);
@@ -3839,45 +3414,21 @@ DASHBOARD_HTML = r"""
     // PROGRESS BAR
     // ============================================================
 
-    // ============================================================
-    // PROGRESS BAR - COMPLETE FIXED VERSION
-    // ============================================================
-
     function showProgress(title, icon = '🔄') {
         const overlay = document.getElementById('progressOverlay');
+        if (!overlay) { alert(title + ' - Please refresh the page'); return; }
+        overlay.className = 'progress-overlay active';
         const bar = document.getElementById('progressBar');
         const percent = document.getElementById('progressPercent');
         const status = document.getElementById('progressStatus');
         const result = document.getElementById('progressResult');
         const titleEl = document.getElementById('progressTitle');
         const iconEl = document.getElementById('progressIcon');
-
-        // Check if overlay exists
-        if (!overlay) {
-            console.error('Progress overlay not found');
-            // Create a fallback alert
-            alert(title + ' - Please refresh the page');
-            return;
-        }
-
-        overlay.className = 'progress-overlay active';
         
         if (bar) bar.style.width = '0%';
         if (percent) percent.textContent = '0%';
         if (status) status.textContent = 'Initializing...';
-        if (result) {
-            result.innerHTML = '';
-            result.className = 'progress-result';
-        } else {
-            // If result element doesn't exist, create it
-            const container = overlay.querySelector('.progress-container');
-            if (container) {
-                const newResult = document.createElement('div');
-                newResult.id = 'progressResult';
-                newResult.className = 'progress-result';
-                container.appendChild(newResult);
-            }
-        }
+        if (result) { result.innerHTML = ''; result.className = 'progress-result'; }
         if (titleEl) titleEl.textContent = title;
         if (iconEl) iconEl.textContent = icon;
     }
@@ -3886,22 +3437,15 @@ DASHBOARD_HTML = r"""
         const bar = document.getElementById('progressBar');
         const percent = document.getElementById('progressPercent');
         const status = document.getElementById('progressStatus');
-
         if (!bar || !percent) return;
-
         const clamped = Math.min(100, Math.max(0, value));
         bar.style.width = clamped + '%';
         percent.textContent = Math.round(clamped) + '%';
-        if (statusText && status) {
-            status.textContent = statusText;
-        }
+        if (statusText && status) status.textContent = statusText;
     }
 
     function showProgressResult(resultData, isSuccess = true) {
-        // Try to find the result element
         let result = document.getElementById('progressResult');
-        
-        // If not found, try to create it
         if (!result) {
             const overlay = document.getElementById('progressOverlay');
             if (overlay) {
@@ -3914,29 +3458,15 @@ DASHBOARD_HTML = r"""
                 }
             }
         }
-        
-        // If still not found, log error and return
-        if (!result) {
-            console.error('progressResult element not found and could not be created');
-            return;
-        }
-
+        if (!result) { console.error('progressResult element not found'); return; }
         const status = document.getElementById('progressStatus');
         const percent = document.getElementById('progressPercent');
-
         result.className = 'progress-result show';
         if (percent) percent.textContent = '100%';
-
         if (status) {
-            if (isSuccess) {
-                status.textContent = '✅ Complete!';
-                status.style.color = '#00ff9c';
-            } else {
-                status.textContent = '❌ Failed';
-                status.style.color = '#ff4655';
-            }
+            status.textContent = isSuccess ? '✅ Complete!' : '❌ Failed';
+            status.style.color = isSuccess ? '#00cc88' : '#cc4455';
         }
-
         if (Array.isArray(resultData)) {
             let html = '';
             for (const item of resultData) {
@@ -3954,28 +3484,21 @@ DASHBOARD_HTML = r"""
     function hideProgress() {
         const overlay = document.getElementById('progressOverlay');
         if (!overlay) return;
-        
         overlay.className = 'progress-overlay';
         setTimeout(() => {
             const bar = document.getElementById('progressBar');
             const result = document.getElementById('progressResult');
             if (bar) bar.style.width = '0%';
-            if (result) {
-                result.className = 'progress-result';
-                result.innerHTML = '';
-            }
+            if (result) { result.className = 'progress-result'; result.innerHTML = ''; }
         }, 300);
     }
+
     // ============================================================
     // PERSISTENT CACHE
     // ============================================================
 
     function saveToCache(data) {
-        try {
-            localStorage.setItem(CACHE_KEY, JSON.stringify(data));
-            localStorage.setItem(CACHE_TIME_KEY, Date.now().toString());
-            updateCacheAge();
-        } catch (e) {}
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); localStorage.setItem(CACHE_TIME_KEY, Date.now().toString()); updateCacheAge(); } catch (e) {}
     }
 
     function loadFromCache() {
@@ -3984,9 +3507,7 @@ DASHBOARD_HTML = r"""
             const timestamp = localStorage.getItem(CACHE_TIME_KEY);
             if (data && timestamp) {
                 const age = Date.now() - parseInt(timestamp);
-                if (age < 60000) {
-                    return JSON.parse(data);
-                }
+                if (age < 60000) return JSON.parse(data);
             }
         } catch (e) {}
         return null;
@@ -3995,9 +3516,7 @@ DASHBOARD_HTML = r"""
     function getCacheAge() {
         try {
             const timestamp = localStorage.getItem(CACHE_TIME_KEY);
-            if (timestamp) {
-                return Math.round((Date.now() - parseInt(timestamp)) / 1000);
-            }
+            if (timestamp) return Math.round((Date.now() - parseInt(timestamp)) / 1000);
         } catch (e) {}
         return null;
     }
@@ -4005,30 +3524,16 @@ DASHBOARD_HTML = r"""
     function updateCacheAge() {
         const age = getCacheAge();
         const el = document.getElementById('cacheAge');
-        if (el) {
-            el.textContent = age !== null ? age + 's' : 'N/A';
-        }
+        if (el) el.textContent = age !== null ? age + 's' : 'N/A';
         const statusEl = document.getElementById('cacheStatus');
         if (statusEl) {
-            if (age !== null && age < 10) {
-                statusEl.className = 'cache-status fresh';
-                statusEl.textContent = '● FRESH';
-            } else if (age !== null && age < 30) {
-                statusEl.className = 'cache-status cached';
-                statusEl.textContent = '● CACHED';
-            } else {
-                statusEl.className = 'cache-status stale';
-                statusEl.textContent = '● STALE';
-            }
+            if (age !== null && age < 10) { statusEl.className = 'cache-status fresh'; statusEl.textContent = '● FRESH'; }
+            else if (age !== null && age < 30) { statusEl.className = 'cache-status cached'; statusEl.textContent = '● CACHED'; }
+            else { statusEl.className = 'cache-status stale'; statusEl.textContent = '● STALE'; }
         }
     }
 
-    function clearCache() {
-        try {
-            localStorage.removeItem(CACHE_KEY);
-            localStorage.removeItem(CACHE_TIME_KEY);
-        } catch (e) {}
-    }
+    function clearCache() { try { localStorage.removeItem(CACHE_KEY); localStorage.removeItem(CACHE_TIME_KEY); } catch (e) {} }
 
     // ============================================================
     // RENDER FUNCTIONS
@@ -4036,7 +3541,6 @@ DASHBOARD_HTML = r"""
 
     function render(data) {
         if (!data) return;
-
         document.getElementById("clock").textContent = " " + data.time;
         document.getElementById("blockedIPs").textContent = data.firewall?.blocked_ips || 0;
         document.getElementById("blockedPorts").textContent = data.firewall?.blocked_ports || 0;
@@ -4054,9 +3558,7 @@ DASHBOARD_HTML = r"""
         renderAlerts(data.recent_alerts || []);
         renderEvents(data.recent_events || []);
         renderThreats(data.threat_intelligence || {});
-
         document.getElementById("protocols").textContent = JSON.stringify(data.network?.protocol_stats || {}, null, 2);
-
         saveToCache(data);
         updateCacheAge();
     }
@@ -4072,8 +3574,8 @@ DASHBOARD_HTML = r"""
                 <td>${esc(c.pid)}</td>
                 <td>${esc(c.local_ip)}:${esc(c.local_port)}</td>
                 <td>${esc(remote)}</td>
-                <td>${c.blocked ? '<span class="red hacker-glitch">BLOCKED</span>' : esc(c.status)}</td>
-                <td>${c.remote_ip ? `<button class="hacker-btn hacker-btn-danger" onclick="quickBlock('${esc(c.remote_ip)}')" style="padding:2px 6px; font-size:9px;">🚫 Block</button>` : ""}</td>
+                <td>${c.blocked ? '<span class="red">BLOCKED</span>' : esc(c.status)}</td>
+                <td>${c.remote_ip ? `<button class="hacker-btn hacker-btn-danger" onclick="quickBlock('${esc(c.remote_ip)}')" style="padding:1px 5px; font-size:8px;">🚫 Block</button>` : ""}</td>
             `;
             tbody.appendChild(tr);
         }
@@ -4084,28 +3586,19 @@ DASHBOARD_HTML = r"""
         tbody.innerHTML = "";
         for (const p of processes.slice(0, 100)) {
             const tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td>${esc(p.pid)}</td>
-                <td>${esc(p.name)}</td>
-                <td>${esc(p.username)}</td>
-                <td>${esc(p.cpu_percent)}%</td>
-                <td>${esc(p.memory_percent)}%</td>
-            `;
+            tr.innerHTML = `<td>${esc(p.pid)}</td><td>${esc(p.name)}</td><td>${esc(p.username)}</td><td>${esc(p.cpu_percent)}%</td><td>${esc(p.memory_percent)}%</td>`;
             tbody.appendChild(tr);
         }
     }
 
     function renderAlerts(alerts) {
         const element = document.getElementById("alerts");
+        if (!element) return;
         element.innerHTML = "";
         for (const alert of alerts.slice().reverse()) {
             const div = document.createElement("div");
-            div.className = "alert hacker-alert " + alert.severity;
-            div.innerHTML = `
-                <strong>[${esc(alert.severity)}] ${esc(alert.title)}</strong>
-                <br>${esc(alert.message)}
-                <br><span class="small">${esc(alert.timestamp)} | ${esc(alert.source)}</span>
-            `;
+            div.className = "hacker-alert " + alert.severity.toLowerCase();
+            div.innerHTML = `<strong>[${esc(alert.severity)}] ${esc(alert.title)}</strong><br>${esc(alert.message)}<br><span style="color:#445577;font-size:9px;">${esc(alert.timestamp)} | ${esc(alert.source)}</span>`;
             element.appendChild(div);
         }
     }
@@ -4115,28 +3608,19 @@ DASHBOARD_HTML = r"""
         tbody.innerHTML = "";
         for (const event of events.slice().reverse()) {
             const tr = document.createElement("tr");
-            const color = {
-                'CRITICAL': 'red',
-                'HIGH': 'orange',
-                'MEDIUM': 'yellow',
-                'LOW': 'blue'
-            }[event.severity] || 'blue';
-            tr.innerHTML = `
-                <td>${esc(event.timestamp)}</td>
-                <td class="${color}">${esc(event.severity)}</td>
-                <td>${esc(event.event_type)}</td>
-                <td>${esc(event.message)}</td>
-            `;
+            const color = { 'CRITICAL': 'red', 'HIGH': 'orange', 'MEDIUM': 'yellow', 'LOW': 'blue' }[event.severity] || 'blue';
+            tr.innerHTML = `<td>${esc(event.timestamp)}</td><td class="${color}">${esc(event.severity)}</td><td>${esc(event.event_type)}</td><td>${esc(event.message)}</td>`;
             tbody.appendChild(tr);
         }
     }
 
     function renderThreats(threats) {
         const element = document.getElementById("threats");
+        if (!element) return;
         element.innerHTML = "";
         let count = 0;
         for (const [ip, description] of Object.entries(threats)) {
-            element.innerHTML += `<div><span class="red hacker-glitch">${esc(ip)}</span> — ${esc(description)}</div>`;
+            element.innerHTML += `<div><span class="red">${esc(ip)}</span> — ${esc(description)}</div>`;
             count++;
         }
         document.getElementById("threatBadge").textContent = count;
@@ -4158,279 +3642,84 @@ DASHBOARD_HTML = r"""
     function initThreatMap() {
         const container = document.getElementById('threatMap');
         if (!container) return;
-        if (threatMap) {
-            setTimeout(() => { if (threatMap) threatMap.invalidateSize(); }, 300);
-            return;
-        }
-
+        if (threatMap) { setTimeout(() => { if (threatMap) threatMap.invalidateSize(); }, 300); return; }
         container.innerHTML = '';
-        threatMap = L.map('threatMap', {
-            center: [hostLat, hostLon],
-            zoom: 3,
-            zoomControl: true,
-            fadeAnimation: true,
-            zoomAnimation: true,
-            markerZoomAnimation: true,
-            attributionControl: true,
-        });
-
+        threatMap = L.map('threatMap', { center: [hostLat, hostLon], zoom: 3, zoomControl: true, fadeAnimation: true, zoomAnimation: true, markerZoomAnimation: true, attributionControl: true });
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; CartoDB',
-            subdomains: 'abcd',
-            maxZoom: 19,
-            minZoom: 2,
+            subdomains: 'abcd', maxZoom: 19, minZoom: 2
         }).addTo(threatMap);
-
         addHostLocation(hostLat, hostLon);
-        addMapLegend();
-
         setTimeout(() => { if (threatMap) threatMap.invalidateSize(); }, 500);
         setTimeout(() => { if (threatMap) threatMap.invalidateSize(); }, 1500);
     }
 
     function addHostLocation(lat, lon) {
         if (!threatMap) return;
-        if (hostMarker) {
-            threatMap.removeLayer(hostMarker);
-            hostMarker = null;
-        }
-        for (const ring of hostPulseRings) {
-            threatMap.removeLayer(ring);
-        }
+        if (hostMarker) { threatMap.removeLayer(hostMarker); hostMarker = null; }
+        for (const ring of hostPulseRings) { threatMap.removeLayer(ring); }
         hostPulseRings = [];
 
-        const ring1 = L.circle([lat, lon], {
-            radius: 80000,
-            color: '#ff0000',
-            fillColor: 'rgba(255, 0, 0, 0.05)',
-            fillOpacity: 0.1,
-            weight: 2,
-            opacity: 0.4,
-            className: 'pulse-ring',
-            interactive: false,
-        }).addTo(threatMap);
-        hostPulseRings.push(ring1);
-
-        const ring2 = L.circle([lat, lon], {
-            radius: 50010,
-            color: '#ff3333',
-            fillColor: 'rgba(255, 50, 50, 0.08)',
-            fillOpacity: 0.15,
-            weight: 2,
-            opacity: 0.5,
-            className: 'pulse-ring',
-            interactive: false,
-        }).addTo(threatMap);
-        hostPulseRings.push(ring2);
-
-        const ring3 = L.circle([lat, lon], {
-            radius: 30000,
-            color: '#ff4655',
-            fillColor: 'rgba(255, 70, 85, 0.15)',
-            fillOpacity: 0.2,
-            weight: 3,
-            opacity: 0.6,
-            className: 'pulse-ring',
-            interactive: false,
-        }).addTo(threatMap);
-        hostPulseRings.push(ring3);
-
-        const ring4 = L.circle([lat, lon], {
-            radius: 15001,
-            color: '#ff0000',
-            fillColor: 'rgba(255, 0, 0, 0.3)',
-            fillOpacity: 0.3,
-            weight: 3,
-            opacity: 0.8,
-            className: 'pulse-ring-fast',
-            interactive: false,
-        }).addTo(threatMap);
-        hostPulseRings.push(ring4);
-
         hostMarker = L.circleMarker([lat, lon], {
-            radius: 12,
-            color: '#ff0000',
-            fillColor: '#ff0000',
-            fillOpacity: 1,
-            weight: 3,
-            className: 'host-marker',
-            interactive: true,
+            radius: 10, color: '#cc4455', fillColor: '#cc4455', fillOpacity: 0.8, weight: 2
         }).addTo(threatMap);
-
-        const popupContent = `
-            <div style="text-align: center; background: #0a0a0f; padding: 12px; border: 2px solid #ff0000; border-radius: 5px; min-width: 150px;">
-                <div style="font-size: 20px; color: #ff0000;">🔴</div>
-                <div style="color: #00ff9c; font-weight: bold; font-size: 14px;">SECURITY HOST</div>
-                <div style="color: #ffffff; font-size: 11px; font-family: monospace;">📍 ${window.location.hostname || 'Local Host'}</div>
-                <div style="color: #52677d; font-size: 10px; margin-top: 4px;">● ACTIVE</div>
-            </div>
-        `;
+        const popupContent = `<div style="text-align:center;background:#0d1520;padding:8px;border:1px solid #004488;border-radius:3px;">
+            <div style="color:#cc4455;font-size:16px;">🔴</div>
+            <div style="color:#00aaff;font-size:12px;">SECURITY HOST</div>
+            <div style="color:#8899bb;font-size:10px;">${window.location.hostname || 'Local Host'}</div>
+        </div>`;
         hostMarker.bindPopup(popupContent, { className: 'map-tooltip' });
-
-        const style = document.createElement('style');
-        style.id = 'map-animations';
-        if (!document.getElementById('map-animations')) {
-            style.textContent = `
-                .host-marker { animation: hostGlow 1.5s ease-in-out infinite; }
-                @keyframes hostGlow { 0%, 100% { r: 12; fill-opacity: 1; stroke-width: 3; } 50% { r: 18; fill-opacity: 0.7; stroke-width: 5; } }
-                .pulse-ring { animation: pulseRing 3s ease-out infinite; }
-                .pulse-ring-fast { animation: pulseRingFast 1.5s ease-out infinite; }
-                @keyframes pulseRing { 0% { stroke-opacity: 0.8; fill-opacity: 0.15; stroke-width: 2; } 50% { stroke-opacity: 0.3; fill-opacity: 0.05; stroke-width: 4; } 100% { stroke-opacity: 0.8; fill-opacity: 0.15; stroke-width: 2; } }
-                @keyframes pulseRingFast { 0% { stroke-opacity: 1; fill-opacity: 0.3; stroke-width: 3; } 50% { stroke-opacity: 0.3; fill-opacity: 0.1; stroke-width: 5; } 100% { stroke-opacity: 1; fill-opacity: 0.3; stroke-width: 3; } }
-                .connection-line { stroke-dasharray: 8, 6; animation: flowLine 1.5s linear infinite; }
-                @keyframes flowLine { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -14; } }
-            `;
-            document.head.appendChild(style);
-        }
         threatMap.setView([lat, lon], 4);
-    }
-
-    function addMapLegend() {
-        const legendHtml = `
-            <div style="position: absolute; bottom: 10px; left: 10px; background: rgba(5, 8, 13, 0.85); border: 1px solid #1b2b3e; border-radius: 4px; padding: 6px 10px; font-size: 9px; font-family: monospace; color: #52677d; z-index: 1000;">
-                <span style="color: #ff4655;">●</span> Threat &nbsp;
-                <span style="color: #00ff9c;">●</span> Normal &nbsp;
-                <span style="color: #ff0000;">◉</span> Security Host
-            </div>
-        `;
-        const container = document.getElementById('threatMapContainer');
-        if (container) {
-            const existing = container.querySelector('.map-legend');
-            if (!existing) {
-                const div = document.createElement('div');
-                div.className = 'map-legend';
-                div.innerHTML = legendHtml;
-                container.appendChild(div);
-            }
-        }
     }
 
     function addMapMarker(ip, data) {
         if (!threatMap) return;
         const key = ip;
-        if (mapMarkers[key]) {
-            threatMap.removeLayer(mapMarkers[key]);
-            delete mapMarkers[key];
-        }
-        if (mapLines[key]) {
-            threatMap.removeLayer(mapLines[key]);
-            delete mapLines[key];
-        }
-        if (mapPulseRings[key]) {
-            threatMap.removeLayer(mapPulseRings[key]);
-            delete mapPulseRings[key];
-        }
+        if (mapMarkers[key]) { threatMap.removeLayer(mapMarkers[key]); delete mapMarkers[key]; }
+        if (mapLines[key]) { threatMap.removeLayer(mapLines[key]); delete mapLines[key]; }
+        if (mapPulseRings[key]) { threatMap.removeLayer(mapPulseRings[key]); delete mapPulseRings[key]; }
 
         const isThreat = data.threat || false;
-        const color = isThreat ? '#ff4655' : '#00ff9c';
-        const fillColor = isThreat ? '#ff4655' : '#00ff9c';
-
+        const color = isThreat ? '#cc4455' : '#00aaff';
         const marker = L.circleMarker([data.lat, data.lon], {
-            radius: isThreat ? 8 : 5,
-            color: color,
-            fillColor: fillColor,
-            fillOpacity: 0.8,
-            weight: 2,
-            className: isThreat ? 'threat-marker' : 'normal-marker',
+            radius: isThreat ? 7 : 4, color: color, fillColor: color, fillOpacity: 0.7, weight: 1
         });
-
-        const popupContent = `
-            <div style="font-family: monospace; font-size: 11px; min-width: 180px; color: #d7e3ef;">
-                <div><span style="color: #6fb7ff;">IP:</span> <strong style="color: #00ff9c;">${ip}</strong></div>
-                <div><span style="color: #6fb7ff;">Host:</span> <span style="color: #d7e3ef;">${data.hostname || 'Unknown'}</span></div>
-                <div><span style="color: #6fb7ff;">Location:</span> <span style="color: #d7e3ef;">${data.city || ''}, ${data.country || ''}</span></div>
-                ${isThreat ? `<div style="color: #ff4655; margin-top: 4px;">⚠️ THREAT DETECTED</div>` : ''}
-                <div style="margin-top: 6px; border-top: 1px solid #1b2b3e; padding-top: 6px;">
-                    <button onclick="quickBlockMap('${ip}')" style="background:#ff4655;color:#fff;border:none;padding:3px 12px;border-radius:3px;cursor:pointer;font-size:10px;font-weight:bold;">🚫 Block IP</button>
-                </div>
+        const popupContent = `<div style="font-size:10px;min-width:150px;color:#8899bb;">
+            <div><span style="color:#445577;">IP:</span> <strong style="color:#00aaff;">${ip}</strong></div>
+            <div><span style="color:#445577;">Host:</span> ${data.hostname || 'Unknown'}</div>
+            <div><span style="color:#445577;">Location:</span> ${data.city || ''}, ${data.country || ''}</div>
+            ${isThreat ? `<div style="color:#cc4455;margin-top:3px;">⚠️ THREAT DETECTED</div>` : ''}
+            <div style="margin-top:4px;border-top:1px solid #0d1520;padding-top:4px;">
+                <button onclick="quickBlockMap('${ip}')" style="background:#1a2a3a;color:#8899bb;border:1px solid #004488;padding:2px 10px;border-radius:2px;cursor:pointer;font-size:9px;">🚫 Block IP</button>
             </div>
-        `;
-        marker.bindPopup(popupContent, { className: 'map-tooltip', maxWidth: 250 });
-
-        if (isThreat) {
-            const ring = L.circleMarker([data.lat, data.lon], {
-                radius: 15,
-                color: '#ff4655',
-                fillColor: '#ff4655',
-                fillOpacity: 0.1,
-                weight: 2,
-                className: 'pulse-ring',
-                interactive: false,
-            }).addTo(threatMap);
-            mapPulseRings[key] = ring;
-        }
-
+        </div>`;
+        marker.bindPopup(popupContent, { className: 'map-tooltip', maxWidth: 200 });
         marker.addTo(threatMap);
         mapMarkers[key] = marker;
 
         if (data.hostLat && data.hostLon && data.lat && data.lon) {
-            const line = L.polyline([
-                [data.hostLat, data.hostLon],
-                [data.lat, data.lon]
-            ], {
-                color: isThreat ? '#ff4655' : '#56b4ff',
-                weight: isThreat ? 2 : 1.5,
-                opacity: isThreat ? 0.7 : 0.4,
-                className: 'connection-line',
-                dashArray: '8, 6',
-                interactive: true,
+            const line = L.polyline([[data.hostLat, data.hostLon], [data.lat, data.lon]], {
+                color: isThreat ? '#cc4455' : '#4488cc', weight: isThreat ? 1.5 : 1, opacity: isThreat ? 0.6 : 0.3
             }).addTo(threatMap);
-            line.bindTooltip(
-                isThreat ? '⚠️ Threat Connection' : '🔗 Normal Connection',
-                { permanent: false, direction: 'center', className: 'map-tooltip' }
-            );
             mapLines[key] = line;
-        }
-
-        if (isThreat) {
-            let flash = 0;
-            const interval = setInterval(() => {
-                if (!mapMarkers[key]) { clearInterval(interval); return; }
-                flash = flash === 0 ? 1 : 0;
-                const currentMarker = mapMarkers[key];
-                if (currentMarker) {
-                    currentMarker.setRadius(flash === 0 ? 8 : 12);
-                    currentMarker.setStyle({
-                        fillOpacity: flash === 0 ? 0.8 : 0.4,
-                        weight: flash === 0 ? 2 : 3,
-                    });
-                }
-            }, 600);
-            marker._flashInterval = interval;
         }
     }
 
     async function loadThreatMapData() {
         try {
-            const cached = loadFromCache ? loadFromCache() : null;
+            const cached = loadFromCache();
             let snapshot = cached;
             if (!snapshot) {
-                try {
-                    const response = await fetch(API_BASE + '/api/snapshot');
-                    if (response.ok) {
-                        snapshot = await response.json();
-                    }
-                } catch (e) {
-                    console.error('Failed to fetch snapshot:', e);
-                }
+                try { const response = await fetch(API_BASE + '/api/snapshot'); if (response.ok) snapshot = await response.json(); } catch (e) {}
             }
-            if (!snapshot) {
-                console.warn('No data available for threat map');
-                return;
-            }
+            if (!snapshot) { console.warn('No data available for threat map'); return; }
 
             try {
                 const geo = await fetch('https://ipapi.co/json/').then(r => r.json());
                 if (geo.latitude && geo.longitude) {
-                    hostLat = geo.latitude;
-                    hostLon = geo.longitude;
-                    if (hostMarker) {
-                        threatMap.removeLayer(hostMarker);
-                        hostMarker = null;
-                    }
-                    for (const ring of hostPulseRings) {
-                        threatMap.removeLayer(ring);
-                    }
+                    hostLat = geo.latitude; hostLon = geo.longitude;
+                    if (hostMarker) { threatMap.removeLayer(hostMarker); hostMarker = null; }
+                    for (const ring of hostPulseRings) { threatMap.removeLayer(ring); }
                     hostPulseRings = [];
                     addHostLocation(hostLat, hostLon);
                 }
@@ -4439,112 +3728,41 @@ DASHBOARD_HTML = r"""
             const connections = snapshot.network?.connections || [];
             const threats = snapshot.threat_intelligence || {};
 
-            for (const key in mapMarkers) {
-                if (mapMarkers[key]) {
-                    threatMap.removeLayer(mapMarkers[key]);
-                    delete mapMarkers[key];
-                }
-            }
-            for (const key in mapLines) {
-                if (mapLines[key]) {
-                    threatMap.removeLayer(mapLines[key]);
-                    delete mapLines[key];
-                }
-            }
-            for (const key in mapPulseRings) {
-                if (mapPulseRings[key]) {
-                    threatMap.removeLayer(mapPulseRings[key]);
-                    delete mapPulseRings[key];
-                }
-            }
+            for (const key in mapMarkers) { if (mapMarkers[key]) { threatMap.removeLayer(mapMarkers[key]); delete mapMarkers[key]; } }
+            for (const key in mapLines) { if (mapLines[key]) { threatMap.removeLayer(mapLines[key]); delete mapLines[key]; } }
+            for (const key in mapPulseRings) { if (mapPulseRings[key]) { threatMap.removeLayer(mapPulseRings[key]); delete mapPulseRings[key]; } }
 
             const ipMap = {};
-            let threatCount = 0;
-
             for (const conn of connections) {
                 const remoteIp = conn.remote_ip;
                 if (!remoteIp || remoteIp === 'N/A' || remoteIp === '127.0.0.1') continue;
                 if (ipMap[remoteIp]) continue;
-
                 const isThreat = threats[remoteIp] || false;
                 let lat = null, lon = null, city = '', country = '';
-
                 try {
                     const geo = await fetch(API_BASE + '/api/geolocate?ip=' + remoteIp).then(r => r.json());
-                    if (geo && geo.latitude && geo.longitude) {
-                        lat = geo.latitude;
-                        lon = geo.longitude;
-                        city = geo.city || '';
-                        country = geo.country || '';
-                    }
+                    if (geo && geo.latitude && geo.longitude) { lat = geo.latitude; lon = geo.longitude; city = geo.city || ''; country = geo.country || ''; }
                 } catch (e) {}
-
                 if (lat === null || lon === null) {
                     const hash = remoteIp.split('.').reduce((a, b) => a + parseInt(b || 0), 0);
                     lat = ((hash % 180) - 90) + (Math.random() * 2 - 1);
                     lon = ((hash * 7) % 360) - 180 + (Math.random() * 2 - 1);
                 }
-
                 ipMap[remoteIp] = {
-                    lat: lat,
-                    lon: lon,
-                    city: city,
-                    country: country,
+                    lat, lon, city, country,
                     hostname: conn.dns || conn.process || 'Unknown',
                     threat: isThreat || null,
-                    hostLat: hostLat,
-                    hostLon: hostLon,
+                    hostLat, hostLon
                 };
-
-                if (isThreat) threatCount++;
                 addMapMarker(remoteIp, ipMap[remoteIp]);
             }
-
-            const threatEl = document.getElementById('threatCount');
-            if (threatEl) {
-                threatEl.textContent = threatCount;
-            }
-
-            const allPositions = Object.values(ipMap).map(d => [d.lat, d.lon]);
-            if (allPositions.length > 0) {
-                const bounds = L.latLngBounds(allPositions);
-                if (bounds.isValid()) {
-                    bounds.extend([hostLat, hostLon]);
-                    threatMap.fitBounds(bounds, { padding: [50, 50], maxZoom: 6 });
-                }
-            }
-
-            if (threatMap) {
-                setTimeout(() => threatMap.invalidateSize(), 300);
-            }
-
-        } catch (error) {
-            console.error('Error loading threat map data:', error);
-        }
+            if (threatMap) setTimeout(() => threatMap.invalidateSize(), 300);
+        } catch (error) { console.error('Error loading threat map data:', error); }
     }
 
-    async function refreshThreatMap() {
-        if (!threatMap) { initThreatMap(); }
-        await loadThreatMapData();
-    }
-
-    function initThreatMapOnLoad() {
-        setTimeout(() => {
-            initThreatMap();
-            setTimeout(() => {
-                loadThreatMapData();
-                if (!window._mapRefreshInterval) {
-                    window._mapRefreshInterval = setInterval(loadThreatMapData, 30000);
-                }
-            }, 500);
-        }, 1000);
-    }
-
-    window.addEventListener('resize', function() {
-        if (threatMap) {
-            setTimeout(() => threatMap.invalidateSize(), 300);
-        }
-    });
+    async function refreshThreatMap() { if (!threatMap) initThreatMap(); await loadThreatMapData(); }
+    function initThreatMapOnLoad() { setTimeout(() => { initThreatMap(); setTimeout(() => { loadThreatMapData(); if (!window._mapRefreshInterval) { window._mapRefreshInterval = setInterval(loadThreatMapData, 30000); } }, 500); }, 1000); }
+    window.addEventListener('resize', function() { if (threatMap) setTimeout(() => threatMap.invalidateSize(), 300); });
 
     // ============================================================
     // DASHBOARD ACTIONS WITH PROGRESS BAR
@@ -4566,60 +3784,31 @@ DASHBOARD_HTML = r"""
             if (result && result.success) {
                 const suspicious = result.suspicious || 0;
                 const findings = result.results || [];
-                if (suspicious > 0) {
-                    showProgressResult(findings, true);
-                    document.getElementById('progressStatus').textContent = `⚠️ Found ${suspicious} suspicious processes`;
-                } else {
-                    showProgressResult(['✅ No suspicious processes found'], true);
-                    document.getElementById('progressStatus').textContent = '✅ Scan complete - System clean';
-                }
-            } else {
-                showProgressResult(['❌ Scan failed: ' + (result?.message || 'Unknown error')], false);
-            }
+                if (suspicious > 0) { showProgressResult(findings, true); document.getElementById('progressStatus').textContent = `⚠️ Found ${suspicious} suspicious processes`; } 
+                else { showProgressResult(['✅ No suspicious processes found'], true); document.getElementById('progressStatus').textContent = '✅ Scan complete - System clean'; }
+            } else { showProgressResult(['❌ Scan failed: ' + (result?.message || 'Unknown error')], false); }
             setTimeout(hideProgress, 3000);
-        } catch (error) {
-            updateProgress(100, '❌ Error during scan');
-            showProgressResult(['❌ Error: ' + error.message], false);
-            setTimeout(hideProgress, 3000);
-        }
+        } catch (error) { updateProgress(100, '❌ Error during scan'); showProgressResult(['❌ Error: ' + error.message], false); setTimeout(hideProgress, 3000); }
     }
 
     async function forceRefresh() {
-        // Check if progress elements exist
         const overlay = document.getElementById('progressOverlay');
-        if (!overlay) {
-            console.error('Progress overlay not found');
-            // Fallback: just refresh the page
-            location.reload();
-            return;
+        if (!overlay) { location.reload(); return; }
+        showProgress('⚡ FORCE REFRESH', '⚡');
+        try {
+            updateProgress(30, 'Clearing cache...');
+            clearCache();
+            await sleep(300);
+            updateProgress(50, 'Fetching fresh data...');
+            const data = await api("/api/snapshot");
+            updateProgress(80, 'Updating dashboard...');
+            if (data) { render(data); saveToCache(data); if (threatMap) loadThreatMapData(); }
+            updateProgress(100, '✅ Refresh complete');
+            showProgressResult(['✅ Dashboard refreshed successfully!'], true);
+            setTimeout(hideProgress, 2000);
+        } catch (error) { showProgressResult(['❌ Error: ' + (error.message || 'Unknown error')], false); setTimeout(hideProgress, 3000); }
     }
 
-    showProgress('⚡ FORCE REFRESH', '⚡');
-    try {
-        updateProgress(30, 'Clearing cache...');
-        clearCache();
-        await sleep(300);
-
-        updateProgress(50, 'Fetching fresh data...');
-        const data = await api("/api/snapshot");
-
-        updateProgress(80, 'Updating dashboard...');
-        if (data) {
-            render(data);
-            saveToCache(data);
-            if (threatMap) {
-                loadThreatMapData();
-            }
-        }
-        updateProgress(100, '✅ Refresh complete');
-        showProgressResult(['✅ Dashboard refreshed successfully!'], true);
-        setTimeout(hideProgress, 2000);
-    } catch (error) {
-        console.error('Force refresh error:', error);
-        showProgressResult(['❌ Error: ' + (error.message || 'Unknown error')], false);
-        setTimeout(hideProgress, 3000);
-    }
-    }
     async function generateMap() {
         showProgress('🗺️ GENERATING THREAT MAP', '🗺️');
         try {
@@ -4633,32 +3822,14 @@ DASHBOARD_HTML = r"""
             const result = await api("/api/threat-map", "POST");
             updateProgress(90, 'Finalizing...');
             await sleep(300);
-            
             if (result && result.success) {
                 const mapUrl = result.url || result.file;
                 showProgressResult(['✅ Threat map generated successfully!', '📍 ' + mapUrl], true);
                 document.getElementById('progressStatus').textContent = '✅ Map ready - opening in new tab';
-                
-                // Open map in new tab
-                setTimeout(() => {
-                    if (result.url) {
-                        window.open(result.url, "_blank");
-                    } else if (result.file) {
-                        // If only file path is returned, construct URL
-                        window.open('/' + result.file, "_blank");
-                    }
-                }, 500);
+                setTimeout(() => { if (result.url) window.open(result.url, "_blank"); else if (result.file) window.open('/' + result.file, "_blank"); }, 500);
                 setTimeout(hideProgress, 4000);
-            } else {
-                const errorMsg = result?.message || 'Unknown error';
-                showProgressResult(['❌ Map generation failed: ' + errorMsg], false);
-                setTimeout(hideProgress, 3000);
-            }
-        } catch (error) {
-            updateProgress(100, '❌ Error generating map');
-            showProgressResult(['❌ Error: ' + error.message], false);
-            setTimeout(hideProgress, 3000);
-        }
+            } else { showProgressResult(['❌ Map generation failed: ' + (result?.message || 'Unknown error')], false); setTimeout(hideProgress, 3000); }
+        } catch (error) { showProgressResult(['❌ Error: ' + error.message], false); setTimeout(hideProgress, 3000); }
     }
 
     async function blockIP() {
@@ -4673,14 +3844,9 @@ DASHBOARD_HTML = r"""
                 updateProgress(100, '✅ IP blocked successfully');
                 showProgressResult([`✅ IP ${ip} blocked successfully`, `Reason: ${reason}`], true);
                 document.getElementById("blockedIPs").textContent = parseInt(document.getElementById("blockedIPs").textContent) + 1;
-            } else {
-                showProgressResult(['❌ ' + (result?.message || 'Failed to block IP')], false);
-            }
+            } else { showProgressResult(['❌ ' + (result?.message || 'Failed to block IP')], false); }
             setTimeout(hideProgress, 2500);
-        } catch (error) {
-            showProgressResult(['❌ Error: ' + error.message], false);
-            setTimeout(hideProgress, 2500);
-        }
+        } catch (error) { showProgressResult(['❌ Error: ' + error.message], false); setTimeout(hideProgress, 2500); }
     }
 
     async function unblockIP() {
@@ -4690,17 +3856,10 @@ DASHBOARD_HTML = r"""
         try {
             updateProgress(30, `Unblocking IP ${ip}...`);
             const result = await api("/api/firewall/unblock-ip", "POST", { ip });
-            if (result && result.success) {
-                updateProgress(100, '✅ IP unblocked successfully');
-                showProgressResult([`✅ IP ${ip} unblocked successfully`], true);
-            } else {
-                showProgressResult(['❌ ' + (result?.message || 'Failed to unblock IP')], false);
-            }
+            if (result && result.success) { updateProgress(100, '✅ IP unblocked successfully'); showProgressResult([`✅ IP ${ip} unblocked successfully`], true); } 
+            else { showProgressResult(['❌ ' + (result?.message || 'Failed to unblock IP')], false); }
             setTimeout(hideProgress, 2500);
-        } catch (error) {
-            showProgressResult(['❌ Error: ' + error.message], false);
-            setTimeout(hideProgress, 2500);
-        }
+        } catch (error) { showProgressResult(['❌ Error: ' + error.message], false); setTimeout(hideProgress, 2500); }
     }
 
     async function blockPort() {
@@ -4710,17 +3869,10 @@ DASHBOARD_HTML = r"""
         try {
             updateProgress(30, `Blocking port ${port}...`);
             const result = await api("/api/firewall/block-port", "POST", { port });
-            if (result && result.success) {
-                updateProgress(100, '✅ Port blocked successfully');
-                showProgressResult([`✅ Port ${port} blocked successfully`], true);
-            } else {
-                showProgressResult(['❌ ' + (result?.message || 'Failed to block port')], false);
-            }
+            if (result && result.success) { updateProgress(100, '✅ Port blocked successfully'); showProgressResult([`✅ Port ${port} blocked successfully`], true); } 
+            else { showProgressResult(['❌ ' + (result?.message || 'Failed to block port')], false); }
             setTimeout(hideProgress, 2500);
-        } catch (error) {
-            showProgressResult(['❌ Error: ' + error.message], false);
-            setTimeout(hideProgress, 2500);
-        }
+        } catch (error) { showProgressResult(['❌ Error: ' + error.message], false); setTimeout(hideProgress, 2500); }
     }
 
     async function unblockPort() {
@@ -4730,17 +3882,10 @@ DASHBOARD_HTML = r"""
         try {
             updateProgress(30, `Unblocking port ${port}...`);
             const result = await api("/api/firewall/unblock-port", "POST", { port });
-            if (result && result.success) {
-                updateProgress(100, '✅ Port unblocked successfully');
-                showProgressResult([`✅ Port ${port} unblocked successfully`], true);
-            } else {
-                showProgressResult(['❌ ' + (result?.message || 'Failed to unblock port')], false);
-            }
+            if (result && result.success) { updateProgress(100, '✅ Port unblocked successfully'); showProgressResult([`✅ Port ${port} unblocked successfully`], true); } 
+            else { showProgressResult(['❌ ' + (result?.message || 'Failed to unblock port')], false); }
             setTimeout(hideProgress, 2500);
-        } catch (error) {
-            showProgressResult(['❌ Error: ' + error.message], false);
-            setTimeout(hideProgress, 2500);
-        }
+        } catch (error) { showProgressResult(['❌ Error: ' + error.message], false); setTimeout(hideProgress, 2500); }
     }
 
     async function killProcess() {
@@ -4751,17 +3896,10 @@ DASHBOARD_HTML = r"""
         try {
             updateProgress(30, `Terminating PID ${pid}...`);
             const result = await api("/api/process/terminate", "POST", { pid });
-            if (result && result.success) {
-                updateProgress(100, '✅ Process terminated');
-                showProgressResult(['✅ ' + result.message], true);
-            } else {
-                showProgressResult(['❌ ' + (result?.message || 'Failed to terminate')], false);
-            }
+            if (result && result.success) { updateProgress(100, '✅ Process terminated'); showProgressResult(['✅ ' + result.message], true); } 
+            else { showProgressResult(['❌ ' + (result?.message || 'Failed to terminate')], false); }
             setTimeout(hideProgress, 2500);
-        } catch (error) {
-            showProgressResult(['❌ Error: ' + error.message], false);
-            setTimeout(hideProgress, 2500);
-        }
+        } catch (error) { showProgressResult(['❌ Error: ' + error.message], false); setTimeout(hideProgress, 2500); }
     }
 
     async function addIOC() {
@@ -4772,17 +3910,10 @@ DASHBOARD_HTML = r"""
         try {
             updateProgress(30, `Adding IOC ${ip}...`);
             const result = await api("/api/ioc/add", "POST", { ip, description });
-            if (result && result.success) {
-                updateProgress(100, '✅ IOC added');
-                showProgressResult([`✅ Added threat IOC: ${ip}`, `Description: ${description || 'N/A'}`], true);
-            } else {
-                showProgressResult(['❌ ' + (result?.message || 'Failed to add IOC')], false);
-            }
+            if (result && result.success) { updateProgress(100, '✅ IOC added'); showProgressResult([`✅ Added threat IOC: ${ip}`, `Description: ${description || 'N/A'}`], true); } 
+            else { showProgressResult(['❌ ' + (result?.message || 'Failed to add IOC')], false); }
             setTimeout(hideProgress, 2500);
-        } catch (error) {
-            showProgressResult(['❌ Error: ' + error.message], false);
-            setTimeout(hideProgress, 2500);
-        }
+        } catch (error) { showProgressResult(['❌ Error: ' + error.message], false); setTimeout(hideProgress, 2500); }
     }
 
     async function browserConnections() {
@@ -4793,21 +3924,14 @@ DASHBOARD_HTML = r"""
             updateProgress(80, 'Compiling results...');
             await sleep(300);
             let text = "BROWSERS\n\n";
-            for (const browser of result.browsers) {
-                text += browser.name + " PID " + browser.pid + "\n";
-            }
+            for (const browser of result.browsers) { text += browser.name + " PID " + browser.pid + "\n"; }
             text += "\nCONNECTIONS\n\n";
-            for (const c of result.connections) {
-                text += c.process + " -> " + c.remote_ip + ":" + c.remote_port + " " + c.dns + "\n";
-            }
+            for (const c of result.connections) { text += c.process + " -> " + c.remote_ip + ":" + c.remote_port + " " + c.dns + "\n"; }
             showProgressResult(['✅ Browser connections retrieved'], true);
             document.getElementById('progressStatus').textContent = '✅ Ready';
             setTimeout(hideProgress, 2500);
             alert(text);
-        } catch (error) {
-            showProgressResult(['❌ Error: ' + error.message], false);
-            setTimeout(hideProgress, 2500);
-        }
+        } catch (error) { showProgressResult(['❌ Error: ' + error.message], false); setTimeout(hideProgress, 2500); }
     }
 
     // ============================================================
@@ -4817,593 +3941,186 @@ DASHBOARD_HTML = r"""
     let discoveredDevices = [];
     let blockedDevices = [];
     let isScanning = false;
-    let pendingBlockIP = null;
-    let pendingBlockMAC = null;
 
     async function scanNetwork() {
-        if (isScanning) {
-            alert('Scan already in progress...');
-            return;
-        }
-        
+        if (isScanning) { alert('Scan already in progress...'); return; }
         isScanning = true;
         const deviceList = document.getElementById('deviceList');
         const badge = document.getElementById('deviceBadge');
-        
-        // Show scanning status
-        deviceList.innerHTML = `
-            <div style="text-align: center; color: #00ff9c; padding: 30px 0;">
-                <div style="font-size: 40px; margin-bottom: 10px; animation: spin 1s linear infinite;">🔄</div>
-                <div>Scanning network for devices...</div>
-                <div style="font-size: 11px; margin-top: 5px; color: #3a4a5a;">This may take 10-30 seconds</div>
-                <div style="margin-top: 10px; width: 80%; max-width: 300px; margin-left: auto; margin-right: auto; background: #0a111a; border-radius: 10px; overflow: hidden; height: 6px;">
-                    <div id="scanProgress" style="width: 0%; height: 100%; background: linear-gradient(90deg, #00ff9c, #56b4ff); transition: width 0.5s;"></div>
-                </div>
-            </div>
-        `;
+        deviceList.innerHTML = `<div style="text-align:center;color:#00aaff;padding:25px 0;"><div style="font-size:35px;margin-bottom:8px;">🔄</div><div>Scanning network for devices...</div><div style="font-size:10px;color:#445577;">This may take 10-30 seconds</div></div>`;
         badge.textContent = '⏳';
-        
         try {
-            // Simulate progress
-            let progress = 0;
-            const progressInterval = setInterval(() => {
-                progress += Math.random() * 15;
-                if (progress > 95) progress = 95;
-                const el = document.getElementById('scanProgress');
-                if (el) el.style.width = progress + '%';
-            }, 300);
-            
-            // Call the API
-            const response = await fetch('/api/devices/scan', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({})
-            });
-            
-            clearInterval(progressInterval);
-            
+            const response = await fetch('/api/devices/scan', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
             if (response.ok) {
                 const data = await response.json();
                 discoveredDevices = data.devices || [];
-                const el = document.getElementById('scanProgress');
-                if (el) el.style.width = '100%';
-                
-                // Update badge
-                const count = discoveredDevices.length;
-                badge.textContent = count;
-                badge.style.background = count > 0 ? '#00ff9c' : '#ff4655';
-                badge.style.color = '#05080d';
-                
+                badge.textContent = discoveredDevices.length;
                 renderDevices(discoveredDevices);
-                
-                // Show success message
-                const statusDiv = document.createElement('div');
-                statusDiv.style.cssText = 'text-align: center; color: #00ff9c; padding: 8px; font-size: 12px; background: rgba(0,255,156,0.05); border-radius: 4px; margin-top: 8px;';
-                statusDiv.textContent = `✅ Scan complete! Found ${count} device${count !== 1 ? 's' : ''}`;
-                const list = document.getElementById('deviceList');
-                if (list) {
-                    const existing = list.querySelector('.scan-status');
-                    if (existing) existing.remove();
-                    list.prepend(statusDiv);
-                    setTimeout(() => {
-                        if (statusDiv.parentNode) statusDiv.remove();
-                    }, 5000);
-                }
-            } else {
-                throw new Error('Scan failed');
-            }
+            } else { throw new Error('Scan failed'); }
         } catch (error) {
-            console.error('Scan error:', error);
-            deviceList.innerHTML = `
-                <div style="text-align: center; color: #ff4655; padding: 30px 0;">
-                    <div style="font-size: 40px; margin-bottom: 10px;">❌</div>
-                    <div>Failed to scan network</div>
-                    <div style="font-size: 11px; margin-top: 5px; color: #3a4a5a;">${error.message}</div>
-                    <button class="hacker-btn" onclick="scanNetwork()" style="margin-top: 10px; padding: 6px 20px;">🔄 Retry</button>
-                </div>
-            `;
+            deviceList.innerHTML = `<div style="text-align:center;color:#cc4455;padding:25px 0;"><div style="font-size:35px;">❌</div><div>Failed to scan network</div><div style="font-size:10px;color:#445577;">${error.message}</div><button class="hacker-btn" onclick="scanNetwork()" style="margin-top:8px;padding:4px 16px;">🔄 Retry</button></div>`;
             badge.textContent = '❌';
         }
-        
         isScanning = false;
     }
 
     function renderDevices(devices) {
         const deviceList = document.getElementById('deviceList');
         if (!deviceList) return;
-        
         if (!devices || devices.length === 0) {
-            deviceList.innerHTML = `
-                <div style="text-align: center; color: #52677d; padding: 30px 0;">
-                    <div style="font-size: 40px; margin-bottom: 10px;">📭</div>
-                    <div>No devices found</div>
-                    <div style="font-size: 11px; margin-top: 5px; color: #3a4a5a;">Try scanning again</div>
-                </div>
-            `;
+            deviceList.innerHTML = `<div style="text-align:center;color:#445577;padding:25px 0;"><div style="font-size:35px;">📭</div><div>No devices found</div><div style="font-size:10px;color:#334466;">Try scanning again</div></div>`;
             return;
         }
-        
-        // Sort: Self first, then by vendor, then by IP
-        const sorted = [...devices].sort((a, b) => {
-            if (a.is_self) return -1;
-            if (b.is_self) return 1;
-            if (a.vendor !== 'Unknown' && b.vendor === 'Unknown') return -1;
-            if (a.vendor === 'Unknown' && b.vendor !== 'Unknown') return 1;
-            return a.ip.localeCompare(b.ip);
-        });
-        
-        let html = '<table class="hacker-table" style="width:100%; font-size: 11px;">';
-        html += `
-            <thead>
-                <tr>
-                    <th style="width:20%;">Device</th>
-                    <th style="width:15%;">IP Address</th>
-                    <th style="width:20%;">MAC Address</th>
-                    <th style="width:15%;">Vendor</th>
-                    <th style="width:10%;">Status</th>
-                    <th style="width:20%;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-        `;
-        
+        const sorted = [...devices].sort((a, b) => { if (a.is_self) return -1; if (b.is_self) return 1; return a.ip.localeCompare(b.ip); });
+        let html = '<table class="hacker-table" style="width:100%;font-size:10px;"><thead><tr><th>Device</th><th>IP</th><th>MAC</th><th>Vendor</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
         for (const device of sorted) {
             const isSelf = device.is_self || false;
             const isBlocked = blockedDevices.some(d => d.ip === device.ip);
             const vendor = device.vendor || 'Unknown';
             const hostname = device.hostname || 'Unknown';
-            const status = device.status || 'active';
-            
-            // Icon based on vendor/type
-            let icon = '📶';
-            let color = '#d7e3ef';
-            let bgColor = 'transparent';
-            
-            if (isSelf) {
-                icon = '🖥️';
-                color = '#00ff9c';
-                bgColor = 'rgba(0, 255, 156, 0.05)';
-            } else if (vendor.toLowerCase().includes('apple')) {
-                icon = '🍎';
-                color = '#ff9f43';
-            } else if (vendor.toLowerCase().includes('samsung')) {
-                icon = '📱';
-                color = '#56b4ff';
-            } else if (vendor.toLowerCase().includes('google')) {
-                icon = '🔍';
-                color = '#4caf50';
-            } else if (vendor.toLowerCase().includes('amazon')) {
-                icon = '📦';
-                color = '#ffd166';
-            } else if (vendor.toLowerCase().includes('microsoft')) {
-                icon = '💻';
-                color = '#6fb7ff';
-            } else if (vendor.toLowerCase().includes('cisco') || vendor.toLowerCase().includes('netgear') || vendor.toLowerCase().includes('tp-link')) {
-                icon = '🌐';
-                color = '#ff9f43';
-            } else if (vendor.toLowerCase().includes('sony')) {
-                icon = '🎮';
-                color = '#ff4655';
-            } else if (vendor.toLowerCase().includes('roku') || vendor.toLowerCase().includes('apple')) {
-                icon = '📺';
-                color = '#ffd166';
-            } else if (vendor !== 'Unknown') {
-                icon = '📡';
-                color = '#56b4ff';
-            }
-            
-            const statusColor = isBlocked ? '#ff4655' : (status === 'active' ? '#00ff9c' : '#ffd166');
-            const statusText = isBlocked ? '🚫 BLOCKED' : (status === 'active' ? '🟢 Active' : '🟡 Inactive');
-            
-            html += `
-                <tr style="${isSelf ? 'border-left: 3px solid #00ff9c;' : ''} background: ${bgColor};">
-                    <td>
-                        <span style="font-size: 16px;">${icon}</span>
-                        <span style="color: ${color}; font-weight: ${isSelf ? 'bold' : 'normal'};">
-                            ${isSelf ? '🖥️ Your Machine' : (hostname || device.ip)}
-                        </span>
-                        ${isSelf ? '<span style="font-size: 9px; color: #00ff9c; background: rgba(0,255,156,0.1); padding: 0 6px; border-radius: 3px;">SELF</span>' : ''}
-                    </td>
-                    <td style="font-family: monospace; color: #56b4ff;">${device.ip}</td>
-                    <td style="font-family: monospace; font-size: 10px; color: #ffd166;">${device.mac || 'Unknown'}</td>
-                    <td style="color: ${vendor === 'Unknown' ? '#52677d' : '#d7e3ef'};">${vendor}</td>
-                    <td><span style="color: ${statusColor};">${statusText}</span></td>
-                    <td>
-                        ${!isSelf ? `
-                            ${!isBlocked ? `
-                                <button class="hacker-btn hacker-btn-danger" onclick="blockDevice('${device.ip}', '${device.mac || ''}')" style="padding:2px 8px; font-size:9px;">
-                                    🚫 Block
-                                </button>
-                            ` : `
-                                <button class="hacker-btn hacker-btn-success" onclick="unblockDevice('${device.ip}')" style="padding:2px 8px; font-size:9px;">
-                                    ✅ Unblock
-                                </button>
-                            `}
-                            <button class="hacker-btn hacker-btn-blue" onclick="showDeviceInfo('${device.ip}')" style="padding:2px 6px; font-size:9px;">
-                                ℹ️
-                            </button>
-                        ` : `
-                            <span style="color: #52677d; font-size: 9px;">Cannot block self</span>
-                        `}
-                    </td>
-                </tr>
-            `;
+            const statusColor = isBlocked ? '#cc4455' : '#00aaff';
+            const statusText = isBlocked ? '🚫 BLOCKED' : '🟢 Active';
+            html += `<tr style="${isSelf ? 'border-left:2px solid #00aaff;' : ''}">
+                <td>${isSelf ? '🖥️ Your Machine' : (hostname || device.ip)}</td>
+                <td style="color:#4488cc;">${device.ip}</td>
+                <td style="font-size:9px;color:#ccaa44;">${device.mac || 'Unknown'}</td>
+                <td style="color:${vendor === 'Unknown' ? '#445577' : '#8899bb'};">${vendor}</td>
+                <td><span style="color:${statusColor};">${statusText}</span></td>
+                <td>${!isSelf ? (isBlocked ? `<button class="hacker-btn hacker-btn-success" onclick="unblockDevice('${device.ip}')" style="padding:1px 6px;font-size:8px;">✅ Unblock</button>` : `<button class="hacker-btn hacker-btn-danger" onclick="blockDevice('${device.ip}','${device.mac||''}')" style="padding:1px 6px;font-size:8px;">🚫 Block</button>`) : `<span style="color:#445577;font-size:8px;">Cannot block self</span>`}</td>
+            </tr>`;
         }
-        
         html += '</tbody></table>';
         deviceList.innerHTML = html;
     }
 
-    // ============================================================
-    // BLOCK DEVICE WITH WARNING & PROGRESS
-    // ============================================================
-
     function blockDevice(ip, mac) {
-        // Store the device info for later
-        pendingBlockIP = ip;
-        pendingBlockMAC = mac;
-        
-        // Show the warning overlay
         const overlay = document.getElementById('warningOverlay');
-        if (overlay) {
-            overlay.className = 'warning-overlay active';
-        }
-        
-        // Store reference to the proceed button
-        const proceedBtn = document.getElementById('proceedBlockBtn');
-        if (proceedBtn) {
-            proceedBtn.onclick = function() {
-                closeWarning();
-                executeBlock(ip, mac);
-            };
-        }
+        if (overlay) { overlay.className = 'warning-overlay active'; }
+        document.getElementById('proceedBlockBtn').onclick = function() { closeWarning(); executeBlock(ip, mac); };
     }
 
     function closeWarning() {
         const overlay = document.getElementById('warningOverlay');
-        if (overlay) {
-            overlay.className = 'warning-overlay';
-        }
-        pendingBlockIP = null;
-        pendingBlockMAC = null;
+        if (overlay) { overlay.className = 'warning-overlay'; }
     }
 
     async function executeBlock(ip, mac) {
-        // Show progress overlay
-        const progressOverlay = document.getElementById('blockingProgressOverlay');
-        if (progressOverlay) {
-            progressOverlay.className = 'blocking-progress-overlay active';
-        }
-        
-        // Reset progress
+        const overlay = document.getElementById('blockingProgressOverlay');
+        if (overlay) { overlay.className = 'blocking-progress-overlay active'; }
         const bar = document.getElementById('blockingProgressBar');
-        const percent = document.getElementById('progressPercent');
-        const status = document.getElementById('progressStatus');
-        const text = document.getElementById('progressText');
-        const done = document.getElementById('progressDone');
-        const icon = document.getElementById('progressIcon');
-        
+        const percent = document.getElementById('blockProgressPercent');
+        const status = document.getElementById('blockProgressStatus');
+        const text = document.getElementById('blockProgressText');
+        const done = document.getElementById('blockProgressDone');
         if (bar) bar.style.width = '0%';
         if (percent) percent.textContent = '0%';
         if (status) status.textContent = 'Preparing...';
         if (text) text.textContent = 'Initializing blocking sequence...';
         if (done) done.className = 'blocking-progress-done';
-        if (icon) {
-            icon.textContent = '🔄';
-            icon.style.animation = 'spin 1.5s linear infinite';
-        }
-        
-        // Progress steps
-        const steps = [
-            { progress: 10, status: '🔍 Identifying device MAC address...', text: 'Locating device on network...' },
-            { progress: 25, status: '📡 Sending ARP spoofing packets...', text: 'Disconnecting device from network...' },
-            { progress: 40, status: '🛡️ Adding firewall rules...', text: 'Securing block with firewall...' },
-            { progress: 55, status: '🔒 Poisoning ARP cache...', text: 'Preventing reconnection...' },
-            { progress: 70, status: '🔄 Maintaining block...', text: 'Ensuring device stays disconnected...' },
-            { progress: 85, status: '💾 Saving block settings...', text: 'Making block permanent...' },
-            { progress: 95, status: '✅ Finalizing...', text: 'Almost done...' },
-        ];
-        
         try {
-            // Execute each step with delay
-            for (const step of steps) {
-                await sleep(400);
-                if (bar) bar.style.width = step.progress + '%';
-                if (percent) percent.textContent = step.progress + '%';
-                if (status) status.textContent = step.status;
-                if (text) text.textContent = step.text;
-            }
-            
-            // Make the actual API call
-            if (status) status.textContent = '🚀 Executing block...';
-            if (text) text.textContent = 'Blocking device now...';
-            
-            const response = await fetch('/api/devices/block', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    ip: ip,
-                    mac: mac,
-                    reason: 'Manual block from dashboard',
-                    permanent: true
-                })
-            });
-            
+            const steps = [
+                { progress: 25, status: '🔍 Identifying device MAC...', text: 'Locating device on network...' },
+                { progress: 50, status: '📡 Sending ARP spoofing packets...', text: 'Disconnecting device from network...' },
+                { progress: 75, status: '🔒 Poisoning ARP cache...', text: 'Preventing reconnection...' },
+                { progress: 90, status: '💾 Saving block settings...', text: 'Making block permanent...' },
+            ];
+            for (const step of steps) { await sleep(400); if (bar) bar.style.width = step.progress + '%'; if (percent) percent.textContent = step.progress + '%'; if (status) status.textContent = step.status; if (text) text.textContent = step.text; }
+            const response = await fetch('/api/devices/block', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ip, mac, reason: 'Manual block from dashboard', permanent: true }) });
             await sleep(300);
-            
             if (response.ok) {
                 const data = await response.json();
-                
                 if (data.success) {
-                    // Success!
                     if (bar) bar.style.width = '100%';
                     if (percent) percent.textContent = '100%';
                     if (status) status.textContent = '✅ Block successful!';
-                    if (text) text.textContent = `Device ${ip} is now blocked from the network.`;
-                    if (icon) {
-                        icon.textContent = '✅';
-                        icon.style.animation = 'none';
-                    }
-                    if (done) {
-                        done.className = 'blocking-progress-done show';
-                        done.innerHTML = `
-                            ✅ Device <strong>${ip}</strong> blocked successfully!
-                            <br>
-                            <span style="font-size: 11px; color: #52677d;">The device has been disconnected from the network.</span>
-                            <br>
-                            <span style="font-size: 11px; color: #ffd166;">🔄 Click "Unblock" to restore access.</span>
-                        `;
-                    }
-                    
-                    // Refresh devices after a moment
-                    setTimeout(() => {
-                        closeProgress();
-                        refreshDevices();
-                    }, 2500);
-                    
-                } else {
-                    throw new Error(data.message || 'Block failed');
-                }
-            } else {
-                throw new Error('API request failed');
-            }
-            
+                    if (text) text.textContent = `Device ${ip} is now blocked.`;
+                    if (done) { done.className = 'blocking-progress-done show'; done.innerHTML = `✅ Device <strong>${ip}</strong> blocked successfully!<br><span style="color:#445577;font-size:10px;">The device has been disconnected from the network.</span>`; }
+                    setTimeout(() => { closeProgress(); refreshDevices(); }, 2500);
+                } else { throw new Error(data.message || 'Block failed'); }
+            } else { throw new Error('API request failed'); }
         } catch (error) {
-            console.error('Block error:', error);
-            // Show error
             if (bar) bar.style.width = '100%';
             if (percent) percent.textContent = '❌';
             if (status) status.textContent = '❌ Block failed';
             if (text) text.textContent = error.message || 'Unknown error occurred';
-            if (icon) {
-                icon.textContent = '❌';
-                icon.style.animation = 'none';
-            }
-            if (done) {
-                done.className = 'blocking-progress-done show';
-                done.style.borderColor = '#ff4655';
-                done.style.color = '#ff4655';
-                done.innerHTML = `
-                    ❌ Failed to block device: ${error.message}
-                    <br>
-                    <span style="font-size: 11px; color: #52677d;">Please check permissions and try again.</span>
-                `;
-            }
-            
-            setTimeout(() => {
-                closeProgress();
-            }, 3000);
+            if (done) { done.className = 'blocking-progress-done show'; done.style.borderColor = '#cc4455'; done.style.color = '#cc4455'; done.innerHTML = `❌ Failed to block device: ${error.message}`; }
+            setTimeout(closeProgress, 3000);
         }
     }
 
     function closeProgress() {
-        const progressOverlay = document.getElementById('blockingProgressOverlay');
-        if (progressOverlay) {
-            progressOverlay.className = 'blocking-progress-overlay';
-        }
-        
-        const done = document.getElementById('progressDone');
-        if (done) {
-            done.className = 'blocking-progress-done';
-            done.style.borderColor = '#00ff9c';
-            done.style.color = '#00ff9c';
-        }
+        const overlay = document.getElementById('blockingProgressOverlay');
+        if (overlay) { overlay.className = 'blocking-progress-overlay'; }
+        const done = document.getElementById('blockProgressDone');
+        if (done) { done.className = 'blocking-progress-done'; }
     }
-
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    // ============================================================
-    // UNBLOCK DEVICE WITH PROGRESS
-    // ============================================================
 
     async function unblockDevice(ip) {
         if (!confirm(`Unblock device ${ip}?`)) return;
-        
-        // Show progress overlay for unblock
-        const progressOverlay = document.getElementById('blockingProgressOverlay');
-        if (progressOverlay) {
-            progressOverlay.className = 'blocking-progress-overlay active';
-        }
-        
+        const overlay = document.getElementById('blockingProgressOverlay');
+        if (overlay) { overlay.className = 'blocking-progress-overlay active'; }
         const bar = document.getElementById('blockingProgressBar');
-        const percent = document.getElementById('progressPercent');
-        const status = document.getElementById('progressStatus');
-        const text = document.getElementById('progressText');
-        const done = document.getElementById('progressDone');
-        const icon = document.getElementById('progressIcon');
-        
+        const percent = document.getElementById('blockProgressPercent');
+        const status = document.getElementById('blockProgressStatus');
+        const text = document.getElementById('blockProgressText');
+        const done = document.getElementById('blockProgressDone');
         if (bar) bar.style.width = '0%';
         if (percent) percent.textContent = '0%';
         if (status) status.textContent = 'Preparing...';
         if (text) text.textContent = 'Initializing unblock sequence...';
         if (done) done.className = 'blocking-progress-done';
-        if (icon) {
-            icon.textContent = '🔓';
-            icon.style.animation = 'spin 1.5s linear infinite';
-        }
-        
         try {
-            // Progress steps
-            await sleep(400);
-            if (bar) bar.style.width = '25%';
-            if (percent) percent.textContent = '25%';
-            if (status) status.textContent = '🔍 Locating device...';
-            if (text) text.textContent = 'Finding device on network...';
-            
             await sleep(400);
             if (bar) bar.style.width = '50%';
             if (percent) percent.textContent = '50%';
             if (status) status.textContent = '🔄 Removing ARP spoofing...';
             if (text) text.textContent = 'Restoring network connectivity...';
-            
-            await sleep(400);
-            if (bar) bar.style.width = '75%';
-            if (percent) percent.textContent = '75%';
-            if (status) status.textContent = '🛡️ Removing firewall rules...';
-            if (text) text.textContent = 'Removing security restrictions...';
-            
-            const response = await fetch('/api/devices/unblock', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ip: ip })
-            });
-            
+            const response = await fetch('/api/devices/unblock', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ip }) });
             await sleep(300);
-            
             if (response.ok) {
                 const data = await response.json();
                 if (data.success) {
                     if (bar) bar.style.width = '100%';
                     if (percent) percent.textContent = '100%';
                     if (status) status.textContent = '✅ Unblock successful!';
-                    if (text) text.textContent = `Device ${ip} can now reconnect to the network.`;
-                    if (icon) {
-                        icon.textContent = '✅';
-                        icon.style.animation = 'none';
-                    }
-                    if (done) {
-                        done.className = 'blocking-progress-done show';
-                        done.innerHTML = `
-                            ✅ Device <strong>${ip}</strong> unblocked successfully!
-                            <br>
-                            <span style="font-size: 11px; color: #00ff9c;">The device can now reconnect to the network.</span>
-                        `;
-                    }
-                    
-                    setTimeout(() => {
-                        closeProgress();
-                        refreshDevices();
-                    }, 2500);
-                } else {
-                    throw new Error(data.message || 'Unblock failed');
-                }
-            } else {
-                throw new Error('API request failed');
-            }
+                    if (text) text.textContent = `Device ${ip} can now reconnect.`;
+                    if (done) { done.className = 'blocking-progress-done show'; done.innerHTML = `✅ Device <strong>${ip}</strong> unblocked successfully!<br><span style="color:#00cc88;">The device can now reconnect.</span>`; }
+                    setTimeout(() => { closeProgress(); refreshDevices(); }, 2500);
+                } else { throw new Error(data.message || 'Unblock failed'); }
+            } else { throw new Error('API request failed'); }
         } catch (error) {
-            console.error('Unblock error:', error);
             if (bar) bar.style.width = '100%';
             if (percent) percent.textContent = '❌';
             if (status) status.textContent = '❌ Unblock failed';
             if (text) text.textContent = error.message || 'Unknown error occurred';
-            if (icon) {
-                icon.textContent = '❌';
-                icon.style.animation = 'none';
-            }
-            if (done) {
-                done.className = 'blocking-progress-done show';
-                done.style.borderColor = '#ff4655';
-                done.style.color = '#ff4655';
-                done.innerHTML = `
-                    ❌ Failed to unblock device: ${error.message}
-                    <br>
-                    <span style="font-size: 11px; color: #52677d;">Please try again.</span>
-                `;
-            }
-            
-            setTimeout(() => {
-                closeProgress();
-            }, 3000);
+            if (done) { done.className = 'blocking-progress-done show'; done.style.borderColor = '#cc4455'; done.style.color = '#cc4455'; done.innerHTML = `❌ Failed to unblock device: ${error.message}`; }
+            setTimeout(closeProgress, 3000);
         }
     }
 
-    // ============================================================
-    // REFRESH & UTILITY FUNCTIONS
-    // ============================================================
-
     async function refreshDevices() {
-        if (discoveredDevices.length === 0) {
-            scanNetwork();
-            return;
-        }
-        
-        // Just re-render with current data and fetch blocked list
+        if (discoveredDevices.length === 0) { scanNetwork(); return; }
         await loadBlockedDevices();
         renderDevices(discoveredDevices);
     }
 
     async function loadBlockedDevices() {
-        try {
-            const response = await fetch('/api/devices/blocked');
-            if (response.ok) {
-                const data = await response.json();
-                blockedDevices = data.devices || [];
-            }
-        } catch (error) {
-            console.error('Failed to load blocked devices:', error);
-        }
+        try { const response = await fetch('/api/devices/blocked'); if (response.ok) { const data = await response.json(); blockedDevices = data.devices || []; } } catch (error) { console.error('Failed to load blocked devices:', error); }
     }
 
     function showDeviceInfo(ip) {
         const device = discoveredDevices.find(d => d.ip === ip);
-        if (!device) {
-            alert('Device not found');
-            return;
-        }
-        
-        const info = `
-    📡 Device Information
-    ═══════════════════════════════
-    IP Address:  ${device.ip}
-    MAC Address: ${device.mac || 'Unknown'}
-    Hostname:    ${device.hostname || 'Unknown'}
-    Vendor:      ${device.vendor || 'Unknown'}
-    Status:      ${device.status || 'Unknown'}
-    Self:        ${device.is_self ? '✅ Yes' : 'No'}
-        `;
-        alert(info);
+        if (!device) { alert('Device not found'); return; }
+        alert(`📡 Device Information\n═══════════════════════════════\nIP: ${device.ip}\nMAC: ${device.mac || 'Unknown'}\nHostname: ${device.hostname || 'Unknown'}\nVendor: ${device.vendor || 'Unknown'}\nStatus: ${device.status || 'Unknown'}\nSelf: ${device.is_self ? '✅ Yes' : 'No'}`);
     }
-
-    // ============================================================
-    // QUICK BLOCK WITH WARNING
-    // ============================================================
 
     async function quickBlockDevice() {
         const ip = document.getElementById('quickBlockIP').value.trim();
-        const reason = document.getElementById('quickBlockReason').value.trim() || 'Quick block from dashboard';
-        
-        if (!ip) {
-            alert('Please enter an IP address');
-            return;
-        }
-        
-        // Show warning first
-        pendingBlockIP = ip;
-        pendingBlockMAC = null;
-        
+        const reason = document.getElementById('quickBlockReason').value.trim() || 'Quick block';
+        if (!ip) { alert('Please enter an IP address'); return; }
         const overlay = document.getElementById('warningOverlay');
-        if (overlay) {
-            overlay.className = 'warning-overlay active';
-        }
-        
-        document.getElementById('proceedBlockBtn').onclick = function() {
-            closeWarning();
-            executeBlock(ip, null);
-        };
+        if (overlay) { overlay.className = 'warning-overlay active'; }
+        document.getElementById('proceedBlockBtn').onclick = function() { closeWarning(); executeBlock(ip, null); };
     }
 
     async function showBlockedDevices() {
@@ -5412,44 +4129,22 @@ DASHBOARD_HTML = r"""
             if (response.ok) {
                 const data = await response.json();
                 const devices = data.devices || [];
-                
-                if (devices.length === 0) {
-                    alert('📋 No devices currently blocked');
-                    return;
-                }
-                
+                if (devices.length === 0) { alert('📋 No devices currently blocked'); return; }
                 let message = '🚫 BLOCKED DEVICES\n═══════════════════════════════\n\n';
-                for (const device of devices) {
-                    message += `IP: ${device.ip}\n`;
-                    message += `MAC: ${device.mac || 'Unknown'}\n`;
-                    message += `Reason: ${device.reason || 'No reason'}\n`;
-                    message += `Blocked: ${device.timestamp || 'Unknown'}\n`;
-                    message += `─────────────────────────────\n\n`;
-                }
+                for (const device of devices) { message += `IP: ${device.ip}\nMAC: ${device.mac || 'Unknown'}\nReason: ${device.reason || 'No reason'}\nBlocked: ${device.timestamp || 'Unknown'}\n─────────────────────────────\n\n`; }
                 message += `Total: ${devices.length} device${devices.length !== 1 ? 's' : ''} blocked`;
                 alert(message);
-            } else {
-                alert('❌ Failed to get blocked devices');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('❌ Error getting blocked devices');
-        }
+            } else { alert('❌ Failed to get blocked devices'); }
+        } catch (error) { alert('❌ Error getting blocked devices'); }
     }
 
-    // Load blocked devices on page load
     document.addEventListener('DOMContentLoaded', function() {
-        // Load blocked devices
         loadBlockedDevices();
-        
-        // Auto-scan after 2 seconds
-        setTimeout(() => {
-            scanNetwork();
-        }, 2000);
+        setTimeout(scanNetwork, 2000);
     });
 
     // ============================================================
-    // EXISTING QUICK BLOCK FUNCTIONS (Keep these as they are)
+    // EXISTING QUICK BLOCK FUNCTIONS
     // ============================================================
 
     async function quickBlock(ip) {
@@ -5462,14 +4157,9 @@ DASHBOARD_HTML = r"""
                 updateProgress(100, '✅ IP blocked');
                 showProgressResult([`✅ IP ${ip} blocked`], true);
                 document.getElementById("blockedIPs").textContent = parseInt(document.getElementById("blockedIPs").textContent) + 1;
-            } else {
-                showProgressResult(['❌ ' + (result?.message || 'Failed to block IP')], false);
-            }
+            } else { showProgressResult(['❌ ' + (result?.message || 'Failed to block IP')], false); }
             setTimeout(hideProgress, 2500);
-        } catch (error) {
-            showProgressResult(['❌ Error: ' + error.message], false);
-            setTimeout(hideProgress, 2500);
-        }
+        } catch (error) { showProgressResult(['❌ Error: ' + error.message], false); setTimeout(hideProgress, 2500); }
     }
 
     async function mapBlockIP() {
@@ -5479,20 +4169,15 @@ DASHBOARD_HTML = r"""
         showProgress('🚫 BLOCKING IP', '🚫');
         try {
             updateProgress(30, `Blocking IP ${ip}...`);
-            const result = await api('/api/firewall/block-ip', 'POST', { ip: ip, reason: 'Map block' });
+            const result = await api('/api/firewall/block-ip', 'POST', { ip, reason: 'Map block' });
             if (result && result.success) {
                 updateProgress(100, '✅ IP blocked');
                 showProgressResult([`✅ IP ${ip} blocked`], true);
                 input.value = '';
                 refreshThreatMap();
-            } else {
-                showProgressResult(['❌ ' + (result?.message || 'Failed to block IP')], false);
-            }
+            } else { showProgressResult(['❌ ' + (result?.message || 'Failed to block IP')], false); }
             setTimeout(hideProgress, 2500);
-        } catch (error) {
-            showProgressResult(['❌ Error: ' + error.message], false);
-            setTimeout(hideProgress, 2500);
-        }
+        } catch (error) { showProgressResult(['❌ Error: ' + error.message], false); setTimeout(hideProgress, 2500); }
     }
 
     async function quickBlockMap(ip) {
@@ -5500,22 +4185,12 @@ DASHBOARD_HTML = r"""
         showProgress('🚫 BLOCKING IP', '🚫');
         try {
             updateProgress(30, `Blocking IP ${ip}...`);
-            const result = await api('/api/firewall/block-ip', 'POST', { ip: ip, reason: 'Quick map block' });
-            if (result && result.success) {
-                updateProgress(100, '✅ IP blocked');
-                showProgressResult([`✅ IP ${ip} blocked`], true);
-                refreshThreatMap();
-            } else {
-                showProgressResult(['❌ ' + (result?.message || 'Failed to block IP')], false);
-            }
+            const result = await api('/api/firewall/block-ip', 'POST', { ip, reason: 'Quick map block' });
+            if (result && result.success) { updateProgress(100, '✅ IP blocked'); showProgressResult([`✅ IP ${ip} blocked`], true); refreshThreatMap(); } 
+            else { showProgressResult(['❌ ' + (result?.message || 'Failed to block IP')], false); }
             setTimeout(hideProgress, 2500);
-        } catch (error) {
-            showProgressResult(['❌ Error: ' + error.message], false);
-            setTimeout(hideProgress, 2500);
-        }
+        } catch (error) { showProgressResult(['❌ Error: ' + error.message], false); setTimeout(hideProgress, 2500); }
     }
-
- 
 
     // ============================================================
     // SSE STREAM
@@ -5529,7 +4204,7 @@ DASHBOARD_HTML = r"""
                 if (payload.type === "snapshot") {
                     render(payload.data);
                     saveToCache(payload.data);
-                    if (threatMap) { loadThreatMapData(); }
+                    if (threatMap) loadThreatMapData();
                 } else if (payload.type === "alert") {
                     const alert = payload.data;
                     if (alert.severity === 'CRITICAL' || alert.severity === 'HIGH') {
@@ -5537,86 +4212,41 @@ DASHBOARD_HTML = r"""
                         if (feedList) {
                             const item = document.createElement('div');
                             item.className = `map-feed-item ${alert.severity.toLowerCase()}`;
-                            item.innerHTML = `
-                                <div>
-                                    <span class="time">${alert.timestamp || new Date().toLocaleTimeString()}</span>
-                                    <span class="severity ${alert.severity.toLowerCase()}">[${alert.severity}]</span>
-                                    <span class="type">${alert.title || alert.type || 'Alert'}</span>
-                                </div>
-                                <div class="message">${alert.message}</div>
-                                ${alert.data?.ip ? `<div class="ip">📍 ${alert.data.ip}</div>` : ''}
-                            `;
+                            item.innerHTML = `<div><span class="time">${alert.timestamp || new Date().toLocaleTimeString()}</span> <span class="severity ${alert.severity.toLowerCase()}">[${alert.severity}]</span> <span class="type">${alert.title || alert.type || 'Alert'}</span></div><div class="message">${alert.message}</div>${alert.data?.ip ? `<div class="ip">📍 ${alert.data.ip}</div>` : ''}`;
                             feedList.prepend(item);
-                            while (feedList.children.length > 50) {
-                                feedList.removeChild(feedList.lastChild);
-                            }
-                            const count = feedList.children.length;
-                            document.getElementById('mapFeedBadge').textContent = count;
-                            document.getElementById('mapFeedBadge2').textContent = count;
+                            while (feedList.children.length > 50) feedList.removeChild(feedList.lastChild);
+                            document.getElementById('mapFeedBadge').textContent = feedList.children.length;
+                            document.getElementById('mapFeedBadge2').textContent = feedList.children.length;
                         }
                         setTimeout(() => { if (threatMap) loadThreatMapData(); }, 500);
                     }
                 } else if (payload.type === "event") {
                     addSIEMEvent(payload.data);
                 }
-            } catch (error) {
-                console.error('[SSE] Parse error:', error);
-            }
+            } catch (error) { console.error('[SSE] Parse error:', error); }
         };
-        eventSource.onerror = function() {
-            console.log('[SSE] Connection lost, reconnecting...');
-            setTimeout(connectStream, 2000);
-        };
+        eventSource.onerror = function() { console.log('[SSE] Connection lost, reconnecting...'); setTimeout(connectStream, 2000); };
         window._eventSource = eventSource;
         return eventSource;
     }
 
-    // ============================================================
-    // HEARTBEAT
-    // ============================================================
-
     function startHeartbeat() {
-        setInterval(() => {
-            fetch('/api/health', { method: 'GET', headers: { 'Cache-Control': 'no-cache' } }).catch(() => {});
-            updateCacheAge();
-        }, 30000);
+        setInterval(() => { fetch('/api/health', { method: 'GET', headers: { 'Cache-Control': 'no-cache' } }).catch(() => {}); updateCacheAge(); }, 30000);
     }
-
-    // ============================================================
-    // NETWORK STATUS
-    // ============================================================
 
     function updateNetworkStatus(connected) {
         const dot = document.getElementById('statusDot');
-        if (dot) {
-            dot.className = 'hacker-status ' + (connected ? 'online' : 'warning');
-        }
+        if (dot) dot.className = 'hacker-status ' + (connected ? 'online' : 'warning');
     }
-
-    // ============================================================
-    // ADD SIEM EVENT IN REAL-TIME
-    // ============================================================
 
     function addSIEMEvent(event) {
         const tbody = document.getElementById("events");
         if (!tbody) return;
         const tr = document.createElement("tr");
-        const color = {
-            'CRITICAL': 'red',
-            'HIGH': 'orange',
-            'MEDIUM': 'yellow',
-            'LOW': 'blue'
-        }[event.severity] || 'blue';
-        tr.innerHTML = `
-            <td>${esc(event.timestamp || new Date().toLocaleTimeString())}</td>
-            <td class="${color}">${esc(event.severity)}</td>
-            <td>${esc(event.event_type || 'Unknown')}</td>
-            <td>${esc(event.message || '')}</td>
-        `;
+        const color = { 'CRITICAL': 'red', 'HIGH': 'orange', 'MEDIUM': 'yellow', 'LOW': 'blue' }[event.severity] || 'blue';
+        tr.innerHTML = `<td>${esc(event.timestamp || new Date().toLocaleTimeString())}</td><td class="${color}">${esc(event.severity)}</td><td>${esc(event.event_type || 'Unknown')}</td><td>${esc(event.message || '')}</td>`;
         tbody.prepend(tr);
-        while (tbody.children.length > 100) {
-            tbody.removeChild(tbody.lastChild);
-        }
+        while (tbody.children.length > 100) tbody.removeChild(tbody.lastChild);
     }
 
     // ============================================================
@@ -5625,68 +4255,29 @@ DASHBOARD_HTML = r"""
 
     document.addEventListener('DOMContentLoaded', function() {
         console.log('[Init] Starting dashboard with instant recovery...');
-
         const cached = loadFromCache();
-        if (cached) {
-            console.log('[Init] Rendering cached data instantly...');
-            render(cached);
-            initThreatMap();
-            setTimeout(loadThreatMapData, 100);
-        }
-
+        if (cached) { console.log('[Init] Rendering cached data instantly...'); render(cached); initThreatMap(); setTimeout(loadThreatMapData, 100); }
         startHeartbeat();
         connectStream();
-
         setTimeout(async function() {
             try {
                 console.log('[Init] Fetching fresh data...');
                 const data = await api('/api/snapshot');
-                if (data) {
-                    render(data);
-                    saveToCache(data);
-                    if (threatMap) { loadThreatMapData(); }
-                    console.log('[Init] Data updated successfully');
-                }
-            } catch (error) {
-                console.error('[Init] Failed to fetch data:', error);
-            }
+                if (data) { render(data); saveToCache(data); if (threatMap) loadThreatMapData(); console.log('[Init] Data updated successfully'); }
+            } catch (error) { console.error('[Init] Failed to fetch data:', error); }
         }, 200);
-
         updateNetworkStatus(true);
-
         document.addEventListener('visibilitychange', function() {
             if (!document.hidden) {
                 console.log('[Init] Tab active, refreshing data...');
                 setTimeout(async function() {
-                    try {
-                        const data = await api('/api/snapshot');
-                        if (data) {
-                            render(data);
-                            saveToCache(data);
-                            if (threatMap) { loadThreatMapData(); }
-                        }
-                    } catch (error) {
-                        console.error('[Init] Refresh error:', error);
-                    }
+                    try { const data = await api('/api/snapshot'); if (data) { render(data); saveToCache(data); if (threatMap) loadThreatMapData(); } } catch (error) { console.error('[Init] Refresh error:', error); }
                 }, 100);
             }
         });
-
-        window.addEventListener('online', function() {
-            console.log('[Network] Online, reconnecting...');
-            updateNetworkStatus(true);
-            if (window._eventSource) {
-                window._eventSource.close();
-            }
-            connectStream();
-        });
-        window.addEventListener('offline', function() {
-            console.log('[Network] Offline');
-            updateNetworkStatus(false);
-        });
-
+        window.addEventListener('online', function() { console.log('[Network] Online, reconnecting...'); updateNetworkStatus(true); if (window._eventSource) { window._eventSource.close(); } connectStream(); });
+        window.addEventListener('offline', function() { console.log('[Network] Offline'); updateNetworkStatus(false); });
         setInterval(updateCacheAge, 5001);
-
         console.log('[Init] Dashboard ready with instant recovery!');
     });
 
@@ -5715,6 +4306,14 @@ DASHBOARD_HTML = r"""
     window.updateTestStatus = updateTestStatus;
     window.addTestResult = addTestResult;
     window.quickBlock = quickBlock;
+    window.scanNetwork = scanNetwork;
+    window.refreshDevices = refreshDevices;
+    window.blockDevice = blockDevice;
+    window.unblockDevice = unblockDevice;
+    window.showBlockedDevices = showBlockedDevices;
+    window.quickBlockDevice = quickBlockDevice;
+    window.showDeviceInfo = showDeviceInfo;
+    window.closeWarning = closeWarning;
 
 </script>
 </body>
@@ -5728,90 +4327,53 @@ DASHBOARD_HTML = r"""
 @app.route("/api/devices/scan", methods=["POST"])
 @requires_auth
 def api_scan_devices():
-    """Scan the network for connected devices"""
     data = request.get_json(silent=True) or {}
     network = data.get("network")
-    
     try:
-        if network:
-            devices = device_manager.scan_network(network)
-        else:
-            devices = device_manager.scan_network()
-        
-        return jsonify({
-            "success": True,
-            "count": len(devices),
-            "devices": devices
-        })
+        devices = device_manager.scan_network(network) if network else device_manager.scan_network()
+        return jsonify({"success": True, "count": len(devices), "devices": devices})
     except Exception as e:
-        return jsonify({
-            "success": False,
-            "message": str(e),
-            "devices": []
-        }), 500
+        return jsonify({"success": False, "message": str(e), "devices": []}), 500
 
 @app.route("/api/devices")
 @requires_auth
 def api_get_devices():
-    """Get the last scanned device list"""
-    return jsonify({
-        "devices": device_manager.discovered_devices
-    })
+    return jsonify({"devices": device_manager.discovered_devices})
 
 @app.route("/api/devices/block", methods=["POST"])
 @requires_auth
 def api_block_device():
-    """Block a device from the network"""
     data = request.get_json(silent=True) or {}
     ip = data.get("ip")
     mac = data.get("mac")
     reason = data.get("reason", "Manual block")
     permanent = data.get("permanent", True)
-    
     if not ip:
         return jsonify({"success": False, "message": "IP address required"})
-    
     result = device_manager.block_device(ip, mac, reason, permanent)
     return jsonify(result)
 
 @app.route("/api/devices/unblock", methods=["POST"])
 @requires_auth
 def api_unblock_device():
-    """Unblock a device from the network"""
     data = request.get_json(silent=True) or {}
     ip = data.get("ip")
-    
     if not ip:
         return jsonify({"success": False, "message": "IP address required"})
-    
     result = device_manager.unblock_device(ip)
     return jsonify(result)
 
 @app.route("/api/devices/blocked")
 @requires_auth
 def api_get_blocked_devices():
-    """Get list of permanently blocked devices"""
-    return jsonify({
-        "devices": device_manager.get_blocked_devices()
-    })
+    return jsonify({"devices": device_manager.get_blocked_devices()})
 
 @app.route("/api/firewall/status")
 @requires_auth
 def api_firewall_status():
-    """Get firewall status including blocked IPs"""
     if ENGINE:
-        return jsonify({
-            "blocked_ips": len(ENGINE.firewall.blocked_ips),
-            "blocked_ports": len(ENGINE.firewall.blocked_ports),
-            "rules": len(ENGINE.firewall.rules),
-            "ip_list": list(ENGINE.firewall.blocked_ips)
-        })
-    return jsonify({
-        "blocked_ips": 0,
-        "blocked_ports": 0,
-        "rules": 0,
-        "ip_list": []
-    })
+        return jsonify({"blocked_ips": len(ENGINE.firewall.blocked_ips), "blocked_ports": len(ENGINE.firewall.blocked_ports), "rules": len(ENGINE.firewall.rules), "ip_list": list(ENGINE.firewall.blocked_ips)})
+    return jsonify({"blocked_ips": 0, "blocked_ports": 0, "rules": 0, "ip_list": []})
 
 # ============================================================
 # FLASK ROUTES
@@ -5843,10 +4405,8 @@ def api_events():
         severity = data.get("severity", "LOW")
         message = data.get("message", "No message")
         event_data = data.get("data", {})
-
         ENGINE.broadcast_event(source, event_type, severity, message, event_data)
         return jsonify({"success": True, "message": "Event broadcasted"})
-
     limit = int(request.args.get("limit", 100))
     return jsonify(ENGINE.siem.recent(limit))
 
@@ -5994,13 +4554,7 @@ def api_stream():
 
 @app.route("/api/health")
 def api_health():
-    return jsonify({
-        "status": "running",
-        "time": now_iso(),
-        "hostname": socket.gethostname(),
-        "platform": platform.platform(),
-        "psutil": psutil.__version__,
-    })
+    return jsonify({"status": "running", "time": now_iso(), "hostname": socket.gethostname(), "platform": platform.platform(), "psutil": psutil.__version__})
 
 # ============================================================
 # STARTUP
@@ -6008,11 +4562,9 @@ def api_health():
 import logging
 import sys
 
-# Suppress Flask startup messages
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
-# Also suppress console output for the startup
 cli = sys.modules.get('flask.cli')
 if cli:
     cli.show_server_banner = lambda *args: None
@@ -6041,7 +4593,6 @@ def main():
     worker = threading.Thread(target=ENGINE.run, daemon=True, name="security-monitor")
     worker.start()
 
-    # Get local IP
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
