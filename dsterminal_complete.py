@@ -2,66 +2,50 @@
 # -*- coding: utf-8 -*-
 """
 DSTerminal Complete Security Suite v4.0.0.113
+FULLY CROSS-PLATFORM - Windows, Linux, macOS
 Enhanced with Automatic Ransomware Detection Anywhere in System
 Full Dashboard Controls Implementation with Auto-Quarantine Progress
 """
 
 # ============================================================
-# FIX: aiohttp compatibility with Python 3.11+
+# CROSS-PLATFORM IMPORTS
 # ============================================================
-# ============================================================
-# WINDOWS / PYTHON 3.11+ RUNTIME
-# ============================================================
-# DSTerminal uses Flask-SocketIO with the Windows threading
-# backend. Eventlet is intentionally NOT used.
 import sys
 import os
-import asyncio
-
-# Patch asyncio.coroutines._DEBUG before anything else imports it
-try:
-    import asyncio.coroutines
-    if not hasattr(asyncio.coroutines, '_DEBUG'):
-        asyncio.coroutines._DEBUG = False
-        
-except (ImportError, AttributeError):
-    pass
 import platform
-import os
-
-# Patch 1: Add coroutine decorator if missing (for older aiohttp)
-if not hasattr(asyncio, 'coroutine'):
-    def _coroutine_decorator(func):
-        """Replacement for asyncio.coroutine decorator"""
-        return func
-    asyncio.coroutine = _coroutine_decorator
-
-
-# Patch 3: Monkey patch aiohttp helpers
-try:
-    import aiohttp.helpers
-    if not hasattr(aiohttp.helpers, 'old_debug'):
-        aiohttp.helpers.old_debug = False
-    
-    # Add the missing coroutine attribute to aiohttp.helpers
-    if not hasattr(aiohttp.helpers, 'coroutine'):
-        aiohttp.helpers.coroutine = asyncio.coroutine
-except (ImportError, AttributeError):
-    pass
-
-# Patch 4: Also patch aiohttp's asyncio imports
-try:
-    import aiohttp
-    if hasattr(aiohttp, 'asyncio'):
-        if not hasattr(aiohttp.asyncio, 'coroutine'):
-            aiohttp.asyncio.coroutine = asyncio.coroutine
-except:
-    pass
+import subprocess
+import threading
+import time
+import json
+import shutil
+import random
+import hashlib
+import socket
+import re
+import webbrowser
+import tempfile
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple, Any, Union
 
 # ============================================================
-# FIX: Windows console encoding and OSError 22
+# PLATFORM DETECTION - CROSS-PLATFORM
 # ============================================================
-if platform.system() == "Windows":
+SYSTEM = platform.system()
+IS_WINDOWS = SYSTEM == "Windows"
+IS_LINUX = SYSTEM == "Linux"
+IS_MAC = SYSTEM == "Darwin"
+IS_UNIX = IS_LINUX or IS_MAC
+
+# Python version check
+PYTHON_VERSION = sys.version_info
+PYTHON_3_13 = PYTHON_VERSION.major == 3 and PYTHON_VERSION.minor >= 13
+
+# ============================================================
+# CROSS-PLATFORM CONSOLE FIXES
+# ============================================================
+if IS_WINDOWS:
+    # Windows console encoding fixes
     try:
         import subprocess as sp
         sp.run(['chcp', '65001'], capture_output=True, shell=True)
@@ -77,32 +61,28 @@ if platform.system() == "Windows":
     except:
         pass
 
-    # Set environment variables
     os.environ['PYTHONIOENCODING'] = 'utf-8'
     os.environ['PYTHONUTF8'] = '1'
     os.environ['PROMPT_TOOLKIT_NO_CP437'] = '1'
+elif IS_UNIX:
+    # Linux/macOS locale fixes
+    os.environ.setdefault('LC_ALL', 'C.UTF-8')
+    os.environ.setdefault('LANG', 'en_US.UTF-8')
+    os.environ.setdefault('PYTHONIOENCODING', 'utf-8')
+    os.environ.setdefault('PYTHONUTF8', '1')
+    if 'TERM' not in os.environ:
+        os.environ['TERM'] = 'xterm-256color'
 
 # ============================================================
-# SAFE STDOUT WRITE
+# SAFE STDOUT WRITE - CROSS-PLATFORM
 # ============================================================
 _original_stdout_write = sys.stdout.write if sys.stdout is not None else None
-
 
 def _safe_stdout_write(text):
     try:
         if _original_stdout_write is not None:
             _original_stdout_write(text)
-    except OSError as e:
-        if e.errno == 22:
-            try:
-                clean = ''.join(c for c in text if ord(c) < 128 or c in '\n\r\t')
-                if _original_stdout_write is not None:
-                    _original_stdout_write(clean)
-            except:
-                pass
-        else:
-            raise
-    except UnicodeEncodeError:
+    except (OSError, UnicodeEncodeError, AttributeError):
         try:
             clean = text.encode('ascii', 'ignore').decode('ascii')
             if _original_stdout_write is not None:
@@ -116,54 +96,77 @@ if sys.stdout is not None:
     sys.stdout.write = _safe_stdout_write
 
 # ============================================================
-# NOW IMPORT THE REST OF YOUR MODULES
+# CROSS-PLATFORM IMPORTS - With fallbacks
 # ============================================================
+try:
+    from flask import Flask, render_template_string, jsonify, request, send_file, make_response
+    from flask_socketio import SocketIO, emit
+    FLASK_AVAILABLE = True
+except ImportError:
+    FLASK_AVAILABLE = False
+    print("[!] Flask not installed. Install with: pip install flask flask-socketio")
 
+try:
+    import psutil
+    PSUTIL_AVAILABLE = True
+except ImportError:
+    PSUTIL_AVAILABLE = False
+    print("[!] psutil not installed. Install with: pip install psutil")
+
+try:
+    import netifaces
+    NETIFACES_AVAILABLE = True
+except ImportError:
+    NETIFACES_AVAILABLE = False
+    print("[!] netifaces not installed. Install with: pip install netifaces")
+
+# ============================================================
+# CROSS-PLATFORM COLOR CODES
+# ============================================================
+class Colors:
+    """ANSI color codes - works on all platforms"""
+    RED = '\033[91m' if not IS_WINDOWS else ''
+    GREEN = '\033[92m' if not IS_WINDOWS else ''
+    YELLOW = '\033[93m' if not IS_WINDOWS else ''
+    BLUE = '\033[94m' if not IS_WINDOWS else ''
+    MAGENTA = '\033[95m' if not IS_WINDOWS else ''
+    CYAN = '\033[96m' if not IS_WINDOWS else ''
+    WHITE = '\033[97m' if not IS_WINDOWS else ''
+    RESET = '\033[0m' if not IS_WINDOWS else ''
+    DIM = '\033[2m' if not IS_WINDOWS else ''
+    BRIGHT = '\033[1m' if not IS_WINDOWS else ''
     
-import os
-import time
-import threading
-import webbrowser
-import shutil
-import random
-import subprocess
-import json
-import hashlib
-import socket
-import netifaces
-import re
-from datetime import datetime, timedelta
-from flask import Flask, render_template_string, jsonify, request, send_file, make_response
-from flask_socketio import SocketIO, emit
-
-import psutil
-import platform
+    @staticmethod
+    def strip(text):
+        ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+        return ansi_escape.sub('', text)
 
 class ServerColors:
-    """Color codes for server-side terminal output"""
-    RED = '\033[91m'
-    GREEN = '\033[92m'
-    YELLOW = '\033[93m'
-    BLUE = '\033[94m'
-    MAGENTA = '\033[95m'
-    CYAN = '\033[96m'
-    WHITE = '\033[97m'
-    BLACK = '\033[30m'  # <-- ADD THIS
-    BOLD = '\033[1m'
-    DIM = '\033[2m'
-    RESET = '\033[0m'
-    BG_RED = '\033[41m'
-    BG_GREEN = '\033[42m'
-    BG_YELLOW = '\033[43m'
-    BG_BLUE = '\033[44m'
-    BG_MAGENTA = '\033[45m'
-    BG_CYAN = '\033[46m'
-    BG_WHITE = '\033[47m'
-    BG_BLACK = '\033[40m' 
+    """Server-side color codes"""
+    RED = Colors.RED
+    GREEN = Colors.GREEN
+    YELLOW = Colors.YELLOW
+    BLUE = Colors.BLUE
+    MAGENTA = Colors.MAGENTA
+    CYAN = Colors.CYAN
+    WHITE = Colors.WHITE
+    RESET = Colors.RESET
+    DIM = Colors.DIM
+    BOLD = Colors.BRIGHT
+    BG_RED = '\033[41m' if not IS_WINDOWS else ''
+    BG_GREEN = '\033[42m' if not IS_WINDOWS else ''
+    BG_YELLOW = '\033[43m' if not IS_WINDOWS else ''
+    BG_BLUE = '\033[44m' if not IS_WINDOWS else ''
+    BG_MAGENTA = '\033[45m' if not IS_WINDOWS else ''
+    BG_CYAN = '\033[46m' if not IS_WINDOWS else ''
+    BG_WHITE = '\033[47m' if not IS_WINDOWS else ''
+    BG_BLACK = '\033[40m' if not IS_WINDOWS else ''
 
-# FIX 1: Enhanced server_alert with guaranteed output
+# ============================================================
+# CROSS-PLATFORM ALERT FUNCTIONS
+# ============================================================
 def server_alert(message, alert_type="INFO"):
-    """Print colored alert to server terminal - GUARANTEED OUTPUT"""
+    """Print colored alert - Cross-platform"""
     colors = {
         "INFO": ServerColors.CYAN,
         "SUCCESS": ServerColors.GREEN,
@@ -172,7 +175,7 @@ def server_alert(message, alert_type="INFO"):
         "CRITICAL": ServerColors.BG_RED + ServerColors.WHITE + ServerColors.BOLD,
         "QUARANTINE": ServerColors.MAGENTA + ServerColors.BOLD,
         "RANSOMWARE": ServerColors.BG_RED + ServerColors.WHITE + ServerColors.BOLD,
-        "HONEYPOT": ServerColors.BG_YELLOW + ServerColors.BLACK + ServerColors.BOLD,
+        "HONEYPOT": ServerColors.BG_YELLOW + Colors.BLACK + ServerColors.BOLD,
     }
     
     icons = {
@@ -190,14 +193,14 @@ def server_alert(message, alert_type="INFO"):
     icon = icons.get(alert_type.upper(), "•")
     timestamp = datetime.now().strftime("%H:%M:%S")
     
-    # DIRECT TERMINAL OUTPUT - THIS WILL ALWAYS SHOW
-    print(f"\n{ServerColors.DIM}[{timestamp}]{ServerColors.RESET} {color}{icon} {message}{ServerColors.RESET}")
+    try:
+        print(f"\n{ServerColors.DIM}[{timestamp}]{ServerColors.RESET} {color}{icon} {message}{ServerColors.RESET}")
+    except:
+        print(f"\n[{timestamp}] {message}")
     
-    # FORCE FLUSH - Ensures output appears immediately
     sys.stdout.flush()
     sys.stderr.flush()
     
-    # Also log to file for persistence
     try:
         log_file = os.path.join(LOGS_DIR, 'server_alerts.log')
         with open(log_file, 'a', encoding='utf-8') as f:
@@ -207,40 +210,38 @@ def server_alert(message, alert_type="INFO"):
     
     return True
 
-# FIX 2: Enhanced server_alert_box with guaranteed output
 def server_alert_box(title, content_lines, border_color=ServerColors.RED):
-    """Print a colored box to server terminal - GUARANTEED OUTPUT"""
-    # Ensure content_lines is a list
+    """Print a colored box - Cross-platform"""
     if isinstance(content_lines, str):
         content_lines = [content_lines]
     elif not isinstance(content_lines, list):
         content_lines = [str(content_lines)]
     
-    # Calculate box width
     max_line_len = max([len(str(line)) for line in content_lines] + [len(str(title))])
-    width = min(max_line_len + 4, 80)  # Cap at 80 characters
+    width = min(max_line_len + 4, 80)
     
-    # Build the box
     top_bottom = "═" * (width + 2)
     separator = "─" * (width + 2)
     
-    # Print box with colors - DIRECT OUTPUT
-    print()
-    print(f"{border_color}╔{top_bottom}╗{ServerColors.RESET}")
-    print(f"{border_color}║ {str(title).ljust(width)} ║{ServerColors.RESET}")
-    print(f"{border_color}╠{separator}╣{ServerColors.RESET}")
+    try:
+        print()
+        print(f"{border_color}╔{top_bottom}╗{ServerColors.RESET}")
+        print(f"{border_color}║ {str(title).ljust(width)} ║{ServerColors.RESET}")
+        print(f"{border_color}╠{separator}╣{ServerColors.RESET}")
+        for line in content_lines:
+            print(f"{border_color}║ {str(line).ljust(width)} ║{ServerColors.RESET}")
+        print(f"{border_color}╚{top_bottom}╝{ServerColors.RESET}")
+        print()
+    except:
+        print(f"\n{'='*60}")
+        print(f"[{title}]")
+        for line in content_lines:
+            print(f"  {line}")
+        print(f"{'='*60}\n")
     
-    for line in content_lines:
-        print(f"{border_color}║ {str(line).ljust(width)} ║{ServerColors.RESET}")
-    
-    print(f"{border_color}╚{top_bottom}╝{ServerColors.RESET}")
-    print()
-    
-    # FORCE FLUSH
     sys.stdout.flush()
     sys.stderr.flush()
     
-    # Also log to file
     try:
         log_file = os.path.join(LOGS_DIR, 'server_alerts.log')
         with open(log_file, 'a', encoding='utf-8') as f:
@@ -255,178 +256,49 @@ def server_alert_box(title, content_lines, border_color=ServerColors.RED):
     return True
 
 # ============================================================
-# ANSI COLOR DEFINITIONS (ALWAYS AVAILABLE)
+# CROSS-PLATFORM WORKSPACE DIRECTORY
 # ============================================================
-class Colors:
-    """ANSI color codes for terminal output"""
-    RED = '\033[91m'
-    GREEN = '\033[92m'
-    YELLOW = '\033[93m'
-    BLUE = '\033[94m'
-    MAGENTA = '\033[95m'
-    CYAN = '\033[96m'
-    WHITE = '\033[97m'
-    RESET = '\033[0m'
-    DIM = '\033[2m'
-    BRIGHT = '\033[1m'
-    LIGHTRED_EX = '\033[91m'
-    LIGHTGREEN_EX = '\033[92m'
-    LIGHTYELLOW_EX = '\033[93m'
-    LIGHTCYAN_EX = '\033[96m'
-    LIGHTMAGENTA_EX = '\033[95m'
-    LIGHTBLUE_EX = '\033[94m'
-    LIGHTWHITE_EX = '\033[97m'
-    
-    @staticmethod
-    def strip(text):
-        ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
-        return ansi_escape.sub('', text)
-
-# ============================================================
-# TRY TO IMPORT COLORAMA WITH PROPER ERROR HANDLING
-# ============================================================
-try:
-    from colorama import init, Fore, Back, Style
-    init(autoreset=True, convert=True, strip=False)
-    COLORS_AVAILABLE = True
-    # Force color support
-    os.environ['PYTHONIOENCODING'] = 'utf-8'
-    os.environ['PYTHONUTF8'] = '1'
-except ImportError:
-    COLORS_AVAILABLE = False
-    # Use our defined colors as fallback
-    Fore = Colors
-    Style = type('Style', (), {
-        'RESET_ALL': '\033[0m',
-        'BRIGHT': '\033[1m',
-        'DIM': '\033[2m'
-    })
-    Back = type('Back', (), {
-        'RESET': '\033[49m',
-        'BLACK': '\033[40m',
-        'RED': '\033[41m',
-        'GREEN': '\033[42m',
-        'YELLOW': '\033[43m',
-        'BLUE': '\033[44m',
-        'MAGENTA': '\033[45m',
-        'CYAN': '\033[46m',
-        'WHITE': '\033[47m'
-    })
-except Exception as e:
-    COLORS_AVAILABLE = False
-    # Use our defined colors as fallback
-    Fore = Colors
-    Style = type('Style', (), {
-        'RESET_ALL': '\033[0m',
-        'BRIGHT': '\033[1m',
-        'DIM': '\033[2m'
-    })
-    Back = type('Back', (), {
-        'RESET': '\033[49m',
-        'BLACK': '\033[40m',
-        'RED': '\033[41m',
-        'GREEN': '\033[42m',
-        'YELLOW': '\033[43m',
-        'BLUE': '\033[44m',
-        'MAGENTA': '\033[45m',
-        'CYAN': '\033[46m',
-        'WHITE': '\033[47m'
-    })
-
-# ============================================================
-# SIMPLE SAFE PRINT FUNCTION
-# ============================================================
-def safe_print_unicode(message):
-    """Safely print unicode/emoji characters on Windows"""
-    try:
-        print(message)
-    except UnicodeEncodeError:
-        clean_message = message.encode('ascii', 'ignore').decode('ascii')
-        print(clean_message)
-    except Exception:
-        try:
-            print(str(message))
-        except:
-            pass
-
-# ============================================================
-# SURGICAL REMOVAL OF FLASK STARTUP PRINTS
-# ============================================================
-import contextlib
-import io as io_lib
-
-class SilenceFlaskStartup:
-    def __enter__(self):
-        self._original_stdout = sys.stdout
-        sys.stdout = io_lib.StringIO()
-        return self
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        sys.stdout = self._original_stdout
-
-import logging
-logging.getLogger('werkzeug').setLevel(logging.ERROR)
-logging.getLogger('socketio').setLevel(logging.ERROR)
-logging.getLogger('engineio').setLevel(logging.ERROR)
-
-# ============================================================
-# WORKSPACE DIRECTORY - Environment Variable Support
-# ============================================================
-
 def get_workspace_directory():
     """
-    Determine workspace directory with priority:
-    1. DSTERMINAL_WORKSPACE environment variable (overrides everything)
-    2. If running as frozen executable, use %APPDATA%/DSTerminal/workspace
-    3. Platform-specific default locations
-    4. Fallback to temp directory
+    Determine workspace directory - Cross-platform
+    Priority:
+    1. DSTERMINAL_WORKSPACE environment variable
+    2. Platform-specific application data directory
+    3. User home directory fallback
     """
-    # Check for environment variable override first
     env_workspace = os.environ.get('DSTERMINAL_WORKSPACE')
     if env_workspace:
         workspace = env_workspace
         print(f"[WORKSPACE] Using environment variable: {workspace}")
         return workspace
     
-    # Check if running as a frozen executable (PyInstaller)
     if getattr(sys, 'frozen', False):
-        # Running as compiled executable - use AppData for Windows
-        system = platform.system()
-        
-        if system == 'Windows':
-            # Use APPDATA for Windows (roaming)
+        if IS_WINDOWS:
             appdata = os.environ.get('APPDATA')
             if appdata:
                 workspace = os.path.join(appdata, 'DSTerminal', 'workspace')
             else:
-                # Fallback to user profile
-                home = os.path.expanduser('~')
-                workspace = os.path.join(home, 'AppData', 'Roaming', 'DSTerminal', 'workspace')
-        elif system == 'Darwin':  # macOS
-            home = os.path.expanduser('~')
-            workspace = os.path.join(home, 'Library', 'Application Support', 'DSTerminal', 'workspace')
-        else:  # Linux and others
-            home = os.path.expanduser('~')
-            workspace = os.path.join(home, '.config', 'DSTerminal', 'workspace')
+                workspace = os.path.join(os.path.expanduser('~'), 'AppData', 'Roaming', 'DSTerminal', 'workspace')
+        elif IS_MAC:
+            workspace = os.path.join(os.path.expanduser('~'), 'Library', 'Application Support', 'DSTerminal', 'workspace')
+        else:  # Linux
+            workspace = os.path.join(os.path.expanduser('~'), '.config', 'DSTerminal', 'workspace')
         
-        # Create workspace directory
         os.makedirs(workspace, exist_ok=True)
         print(f"[WORKSPACE] Using application data: {workspace}")
         return workspace
     
-    # Running as script - use user home directory
+    # Running as script - use user home
     home = os.path.expanduser('~')
-    system = platform.system()
-    
-    if system == 'Windows':
+    if IS_WINDOWS:
         workspace = os.path.join(home, 'dsterminal_workspace', 'ransom')
-    elif system == 'Darwin':  # macOS
+    elif IS_MAC:
         workspace = os.path.join(home, 'dsterminal_workspace', 'ransom')
-    else:  # Linux and others
+    else:  # Linux
         workspace = os.path.join(home, 'dsterminal_workspace', 'ransom')
     
     try:
         os.makedirs(workspace, exist_ok=True)
-        # Test write access
         test_file = os.path.join(workspace, '.write_test')
         with open(test_file, 'w') as f:
             f.write('test')
@@ -434,8 +306,6 @@ def get_workspace_directory():
         print(f"[WORKSPACE] Using: {workspace}")
         return workspace
     except:
-        # Ultimate fallback to temp
-        import tempfile
         workspace = os.path.join(tempfile.gettempdir(), 'dsterminal_workspace', 'ransom')
         os.makedirs(workspace, exist_ok=True)
         print(f"[WORKSPACE] Using fallback: {workspace}")
@@ -466,7 +336,7 @@ print(f"[FOLDER] Quarantine: {QUARANTINE_DIR}")
 print("=" * 70)
 
 # ============================================================
-# CONFIGURATION MANAGEMENT
+# CROSS-PLATFORM CONFIGURATION
 # ============================================================
 DEFAULT_CONFIG = {
     'scan_interval': 30,
@@ -497,8 +367,45 @@ def save_config(config):
 config = load_config()
 
 # ============================================================
-# WHITELIST/BLACKLIST MANAGEMENT
+# CROSS-PLATFORM WHITELIST/BLACKLIST
 # ============================================================
+def get_default_whitelist():
+    """Get platform-specific default whitelist"""
+    if IS_WINDOWS:
+        return [
+            r"C:\Windows\System32\ntoskrnl.exe",
+            r"C:\Windows\System32\winlogon.exe",
+            r"C:\Windows\explorer.exe",
+            r"C:\Program Files",
+            r"C:\Windows\System32",
+        ]
+    elif IS_MAC:
+        return [
+            "/System/*",
+            "/Library/*",
+            "/usr/bin/*",
+            "/usr/sbin/*",
+            "/bin/*",
+            "/sbin/*",
+        ]
+    else:  # Linux
+        return [
+            "/bin/*",
+            "/sbin/*",
+            "/usr/bin/*",
+            "/usr/sbin/*",
+            "/lib/*",
+            "/lib64/*",
+            "/usr/lib/*",
+            "/etc/passwd",
+            "/etc/shadow",
+            "/etc/group",
+            "/etc/sudoers",
+            "/boot/*",
+            "/vmlinuz*",
+            "/initrd*",
+        ]
+
 def load_whitelist():
     if os.path.exists(WHITELIST_FILE):
         try:
@@ -506,7 +413,7 @@ def load_whitelist():
                 return json.load(f)
         except:
             pass
-    return []
+    return get_default_whitelist()
 
 def save_whitelist(whitelist):
     with open(WHITELIST_FILE, 'w') as f:
@@ -525,135 +432,18 @@ def save_blacklist(blacklist):
     with open(BLACKLIST_FILE, 'w') as f:
         json.dump(blacklist, f, indent=2)
 
-# Load whitelist and blacklist
 whitelist = load_whitelist()
 blacklist = load_blacklist()
 
-# Define default whitelist entries
-DEFAULT_WHITELIST = [
-    # System files that should never be quarantined
-    r"C:\Windows\System32\ntoskrnl.exe",
-    r"C:\Windows\System32\winlogon.exe",
-    r"C:\Windows\explorer.exe",
-    # Add common safe file patterns
-    r"C:\Program Files",
-    r"C:\Windows\System32",
-]
-
-def init_whitelist():
-    """Initialize whitelist with defaults if empty"""
-    global whitelist
-    if not whitelist:
-        whitelist = DEFAULT_WHITELIST.copy()
-        save_whitelist(whitelist)
-        print(f"[WHITELIST] Added {len(whitelist)} default entries")
-
-# Initialize whitelist
-init_whitelist()
-
 # ============================================================
-# COPY LOGO TO WORKSPACE
-# ============================================================
-def copy_logo_to_workspace():
-    """Copy logo from installation directory to workspace static folder"""
-    logo_dest = os.path.join(STATIC_DIR, '3486-removebg-preview.ico')
-    
-    # Ensure the static directory exists
-    os.makedirs(STATIC_DIR, exist_ok=True)
-    
-    if os.path.exists(logo_dest):
-        print(f"[LOGO] Logo already exists at: {logo_dest}")
-        return True
-    
-    # Get the base directory where the application is running
-    if getattr(sys, 'frozen', False):
-        # Running as compiled executable
-        base_dir = os.path.dirname(sys.executable)
-    else:
-        # Running as script
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-    
-    # Extended list of possible source locations
-    logo_source_paths = [
-        # From the application directory (EXE location)
-        os.path.join(base_dir, 'static', '3486-removebg-preview.ico'),
-        os.path.join(base_dir, '3486-removebg-preview.ico'),
-        # From the current working directory
-        os.path.join(os.getcwd(), 'static', '3486-removebg-preview.ico'),
-        os.path.join(os.getcwd(), '3486-removebg-preview.ico'),
-        # From the workspace directory
-        os.path.join(WORKSPACE_DIR, 'static', '3486-removebg-preview.ico'),
-        # From the script directory (when running as script)
-        os.path.join(os.path.dirname(__file__), 'static', '3486-removebg-preview.ico'),
-        os.path.join(os.path.dirname(__file__), '3486-removebg-preview.ico'),
-        # From installer assets (during build)
-        os.path.join('installer_assets', '3486-removebg-preview.ico'),
-        # From the bundled resources (PyInstaller)
-        os.path.join(sys._MEIPASS, 'static', '3486-removebg-preview.ico') if hasattr(sys, '_MEIPASS') else None,
-        # From common installation paths
-        os.path.join('C:\\Program Files (x86)\\DSTerminal', 'static', '3486-removebg-preview.ico'),
-        os.path.join('C:\\Program Files (x86)\\DSTerminal', '3486-removebg-preview.ico'),
-        # From AppData
-        os.path.join(os.environ.get('APPDATA', ''), 'DSTerminal', 'static', '3486-removebg-preview.ico'),
-    ]
-    
-    # Filter out None values
-    logo_source_paths = [p for p in logo_source_paths if p]
-    
-    for source in logo_source_paths:
-        if os.path.exists(source):
-            try:
-                shutil.copy2(source, logo_dest)
-                print(f"[LOGO] ✅ Copied logo from: {source}")
-                return True
-            except Exception as e:
-                print(f"[LOGO] ⚠️ Failed to copy from {source}: {e}")
-                continue
-    
-    # If no logo found, create SVG as a proper .ico file
-    print("[LOGO] ⚠️ No logo found, creating SVG icon...")
-    try:
-        # Create SVG content with proper DSTERMINAL branding
-        svg_content = '''<svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style="stop-color:#00ff88;stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:#00ccff;stop-opacity:1" />
-                </linearGradient>
-            </defs>
-            <rect x="4" y="4" width="40" height="40" rx="8" stroke="#00ff88" stroke-width="2" fill="none"/>
-            <text x="24" y="28" font-family="'Courier New', monospace" font-size="22" font-weight="bold" fill="url(#grad1)" text-anchor="middle">D</text>
-            <text x="24" y="40" font-family="'Courier New', monospace" font-size="7" fill="#00ff88" text-anchor="middle">TERMINAL</text>
-            <circle cx="24" cy="16" r="2" fill="#00ff88" opacity="0.6">
-                <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
-            </circle>
-        </svg>'''
-        
-        with open(logo_dest, 'w', encoding='utf-8') as f:
-            f.write(svg_content)
-        print(f"[LOGO] ✅ Created SVG placeholder at: {logo_dest}")
-        return True
-    except Exception as e:
-        print(f"[LOGO] ❌ Failed to create placeholder: {e}")
-    
-    return False
-
-# ============================================================
-# FLASK APP
-# ============================================================
-app = Flask(__name__,static_folder=STATIC_DIR,static_url_path='/static')
-app.config['SECRET_KEY'] = 'dsterminal-holographic-2026'
-
-# ============================================================
-# TRY TO IMPORT SHIELD CORE
+# CROSS-PLATFORM SHIELD CORE
 # ============================================================
 try:
     from shield_core import ShieldCore, ThreatLevel
     SHIELD_AVAILABLE = True
     print("[+] ShieldCore loaded successfully")
-except ImportError as e:
-    print(f"[!] ShieldCore import error: {e}")
-    print("[!] Using mock ShieldCore for testing")
+except ImportError:
+    print("[!] ShieldCore import error - using mock")
     SHIELD_AVAILABLE = False
     
     class MockShield:
@@ -677,52 +467,48 @@ except ImportError as e:
             self.is_monitoring = False
     ShieldCore = MockShield
 
-# ============================================================
-# SHIELD CORE
-# ============================================================
 shield = ShieldCore(WORKSPACE_DIR)
-from flask_socketio import SocketIO
+
 # ============================================================
-# SOCKET.IO - WINDOWS THREADING IMPLEMENTATION
- 
+# CROSS-PLATFORM FLASK SETUP
+# ============================================================
+class SilenceFlaskStartup:
+    def __enter__(self):
+        self._original_stdout = sys.stdout
+        sys.stdout = open(os.devnull, 'w')
+        return self
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        sys.stdout.close()
+        sys.stdout = self._original_stdout
+
+import logging
+logging.getLogger('werkzeug').setLevel(logging.ERROR)
+logging.getLogger('socketio').setLevel(logging.ERROR)
+logging.getLogger('engineio').setLevel(logging.ERROR)
+
+app = Flask(__name__, static_folder=STATIC_DIR, static_url_path='/static')
+app.config['SECRET_KEY'] = 'dsterminal-holographic-2026'
+
 def create_socketio_instance(app):
-    """Create Flask-SocketIO using the Windows-compatible threading backend."""
+    """Create Flask-SocketIO with cross-platform backend"""
     try:
         sio = SocketIO(
             app,
             cors_allowed_origins="*",
-            async_mode="threading",
+            async_mode="threading",  # Works on all platforms
             logger=False,
             engineio_logger=False,
         )
-
-        print("[SOCKETIO] Flask-SocketIO initialized successfully")
-        print(f"[SOCKETIO] Async mode: {sio.async_mode}")
-
-        if sio.async_mode != "threading":
-            raise RuntimeError(
-                f"Unexpected Socket.IO backend: {sio.async_mode}"
-            )
-
+        print(f"[SOCKETIO] Initialized with async_mode: {sio.async_mode}")
         return sio
-
     except Exception as exc:
-        print("=" * 70)
-        print("[FATAL] Flask-SocketIO initialization failed")
-        print("=" * 70)
-        print(f"Error: {exc}")
-        print(f"Error type: {type(exc).__name__}")
-
-        raise RuntimeError(
-            "Flask-SocketIO failed to initialize with the Windows "
-            "threading backend."
-        ) from exc
-
+        print(f"[FATAL] Flask-SocketIO initialization failed: {exc}")
+        raise
 
 socketio = create_socketio_instance(app)
 
 # ============================================================
-# DATA STORES
+# CROSS-PLATFORM DATA STORES
 # ============================================================
 report_history = []
 pending_quarantine = []
@@ -734,9 +520,6 @@ system_isolated = False
 blocked_processes = []
 scanning_in_progress = False
 
-# ============================================================
-# AUTO-QUARANTINE PROGRESS TRACKING
-# ============================================================
 auto_quarantine_progress = {
     'in_progress': False,
     'file_path': '',
@@ -748,7 +531,7 @@ auto_quarantine_progress = {
 }
 
 # ============================================================
-# LOAD SAVED DATA
+# CROSS-PLATFORM LOAD DATA
 # ============================================================
 def load_data():
     global report_history, quarantined_files
@@ -781,7 +564,7 @@ def save_quarantine_history():
 load_data()
 
 # ============================================================
-# ADVANCED RANSOMWARE DETECTION - ANYWHERE IN SYSTEM
+# CROSS-PLATFORM RANSOMWARE DETECTOR
 # ============================================================
 class AdvancedRansomwareDetector:
     def __init__(self):
@@ -790,184 +573,123 @@ class AdvancedRansomwareDetector:
         self.detected_ransomware = []
         self.scanning = False
         self.last_scan_time = datetime.now()
+        self._seen_files = set()
         
     def _get_monitored_directories(self):
-        """Get all directories to monitor for ransomware"""
+        """Get all directories to monitor - Cross-platform"""
         dirs = []
         
-        # User directories - CRITICAL for detection
-        user_profile = os.environ.get('USERPROFILE')
-        if not user_profile:
-            user_profile = os.path.expanduser('~')
+        # User directories
+        home = os.path.expanduser('~')
         
-        # IMPORTANT: Add Desktop explicitly
-        desktop_paths = [
-            os.path.join(user_profile, 'Desktop'),
-            os.path.join(user_profile, 'OneDrive', 'Desktop'),
-        ]
-        for path in desktop_paths:
-            if os.path.exists(path):
-                dirs.append(path)
-        
-        if os.path.exists(user_profile):
-            for item in ['Documents', 'Downloads', 'Pictures', 'Music', 'Videos']:
-                path = os.path.join(user_profile, item)
+        if IS_WINDOWS:
+            desktop_paths = [
+                os.path.join(home, 'Desktop'),
+                os.path.join(home, 'OneDrive', 'Desktop'),
+            ]
+            for path in desktop_paths:
                 if os.path.exists(path):
                     dirs.append(path)
-        
-        # Common ransomware targets
-        common_paths = [
-            os.environ.get('TEMP'),
-            os.environ.get('TMP'),
-            os.path.join(user_profile, 'AppData', 'Local', 'Temp') if user_profile else None,
-            'C:\\ProgramData' if platform.system() == 'Windows' else '/var/tmp',
-            '/tmp' if platform.system() != 'Windows' else None,
-        ]
+            
+            for item in ['Documents', 'Downloads', 'Pictures', 'Music', 'Videos']:
+                path = os.path.join(home, item)
+                if os.path.exists(path):
+                    dirs.append(path)
+            
+            # Windows specific
+            for drive in ['C:', 'D:', 'E:', 'F:']:
+                path = f"{drive}\\"
+                if os.path.exists(path):
+                    dirs.append(path)
+            
+            common_paths = [
+                os.environ.get('TEMP'),
+                os.environ.get('TMP'),
+                os.path.join(home, 'AppData', 'Local', 'Temp'),
+                'C:\\ProgramData',
+            ]
+        elif IS_MAC:
+            for item in ['Desktop', 'Documents', 'Downloads', 'Pictures', 'Music', 'Videos']:
+                path = os.path.join(home, item)
+                if os.path.exists(path):
+                    dirs.append(path)
+            
+            common_paths = [
+                '/tmp',
+                '/var/tmp',
+                '/Library',
+                '/System',
+                '/Applications',
+            ]
+        else:  # Linux
+            for item in ['Desktop', 'Documents', 'Downloads', 'Pictures', 'Music', 'Videos']:
+                path = os.path.join(home, item)
+                if os.path.exists(path):
+                    dirs.append(path)
+            
+            common_paths = [
+                '/tmp',
+                '/var/tmp',
+                '/etc',
+                '/var/log',
+                '/var/www',
+                '/opt',
+                '/usr/local/bin',
+                '/home',
+                '/root' if os.geteuid() == 0 else None,
+            ]
         
         for path in common_paths:
             if path and os.path.exists(path):
                 dirs.append(path)
         
-        # Also monitor the current directory
+        # Current directory
         if os.path.exists(os.getcwd()):
             dirs.append(os.getcwd())
         
-        # Deduplicate
         return list(set(dirs))
     
-    def scan_for_ransomware(self):
-        """Scan all monitored directories for ransomware activity - INCLUDES NEW FILES"""
-        detected = []
-        
-        # Keep track of previously seen files
-        if not hasattr(self, '_seen_files'):
-            self._seen_files = set()
-        
-        for directory in self.monitored_dirs:
-            if not os.path.exists(directory):
-                continue
-                
-            try:
-                for root, dirs, files in os.walk(directory):
-                    # Limit depth to avoid too much scanning
-                    depth = root.replace(directory, '').count(os.sep)
-                    if depth > 3:
-                        continue
-                        
-                    for file in files:
-                        file_path = os.path.join(root, file)
-                        
-                        # SKIP HONEYPOT FILES
-                        if 'honeypot' in file_path.lower():
-                            continue
-                        
-                        # Check if file is in monitored extensions
-                        ext = os.path.splitext(file)[1].lower()
-                        if ext not in monitored_extensions:
-                            # Also check for ransomware-specific extensions
-                            ransomware_exts = ['.encrypted', '.enc', '.locked', '.crypt', '.crypto', '.ransom']
-                            if ext not in ransomware_exts:
-                                continue
-                        
-                        # Check whitelist
-                        if file_path in whitelist:
-                            continue
-                        
-                        # Check blacklist
-                        if file_path in blacklist:
-                            detected.append({
-                                'path': file_path,
-                                'timestamp': datetime.now().isoformat(),
-                                'process': self._get_process_name(file_path),
-                                'reason': 'Blacklisted'
-                            })
-                            continue
-                        
-                        # NEW: Check if this is a NEW file (not seen before)
-                        if file_path not in self._seen_files:
-                            self._seen_files.add(file_path)
-                            # Check if new file contains ransomware patterns
-                            if self._is_ransomware_file(file_path):
-                                detected.append({
-                                    'path': file_path,
-                                    'timestamp': datetime.now().isoformat(),
-                                    'process': self._get_process_name(file_path),
-                                    'reason': 'New ransomware file detected'
-                                })
-                                continue
-                        
-                        # Check if file was recently modified (last 60 seconds)
-                        try:
-                            mtime = os.path.getmtime(file_path)
-                            if time.time() - mtime < 60:
-                                # Check if file contains ransomware patterns
-                                if self._is_ransomware_file(file_path):
-                                    detected.append({
-                                        'path': file_path,
-                                        'timestamp': datetime.now().isoformat(),
-                                        'process': self._get_process_name(file_path),
-                                        'reason': 'Modified ransomware file'
-                                    })
-                        except:
-                            continue
-            except:
-                continue
-        
-        return detected
     def _is_ransomware_file(self, file_path):
-        """Check if a file exhibits ransomware behavior - Enhanced version"""
+        """Check if a file exhibits ransomware behavior - Cross-platform"""
         try:
-            # SKIP HONEYPOT FILES
+            # Skip honeypot files
             if 'honeypot' in file_path.lower():
                 return False
             
-            # Skip files that are too small (empty files) or too large
+            # Skip files that are too small or too large
             file_size = os.path.getsize(file_path)
-            if file_size < 10 or file_size > 1024 * 1024 * 50:  # 50MB max
+            if file_size < 10 or file_size > 1024 * 1024 * 50:
                 return False
             
-            # Read first few bytes (up to 4KB for better detection)
+            # Read first 4KB
             with open(file_path, 'rb') as f:
                 content = f.read(4096)
             
             if not content:
                 return False
             
-            # Check for UTF-16 BOM and convert if needed
-            if content.startswith(b'\xff\xfe') or content.startswith(b'\xfe\xff'):
-                try:
-                    # Decode UTF-16 and re-encode to bytes for pattern matching
-                    text = content.decode('utf-16-le' if content.startswith(b'\xff\xfe') else 'utf-16-be')
-                    content = text.encode('utf-8')
-                except:
-                    pass
-            
-            # Also try to decode as UTF-8 if it looks like text
+            # Try to decode as text
             try:
                 text_content = content.decode('utf-8', errors='ignore').upper()
             except:
                 text_content = content.upper().decode('ascii', errors='ignore')
             
-            # Expanded ransomware patterns - includes more variants
+            # Ransomware patterns
             ransomware_patterns = [
                 b'ENCRYPTED', b'DECRYPT', b'RANSOM', b'BITCOIN', b'MONERO',
                 b'WALLET', b'LOCKED', b'ENCRYPTION', b'CRYPTO', b'DECRYPTION',
                 b'PAYMENT', b'BTC', b'XMR', b'RANSOMWARE', b'ENCRYPTED_BY_',
-                b'DECRYPTED', b'ENCRYPT', b'LOCK', b'UNLOCK', b'KEY',
-                b'PASSWORD', b'RECOVERY', b'RESTORE', b'BACKUP', b'RANSOM',
-                b'PAY', b'BITCOIN', b'MONERO', b'ETH', b'ETHER',
                 b'YOUR FILES', b'FILES ENCRYPTED', b'DATA LOST',
                 b'CONTACT', b'EMAIL', b'INSTRUCTION', b'WARNING',
                 b'URGENT', b'IMPORTANT', b'READ_ME', b'RECOVER'
             ]
             
-            # Check binary patterns
             content_upper = content.upper()
             for pattern in ransomware_patterns:
                 if pattern in content_upper:
                     return True
             
-            # Also check text content for patterns
+            # Text patterns
             text_patterns = [
                 'ENCRYPTED', 'DECRYPT', 'RANSOM', 'BITCOIN', 'MONERO',
                 'WALLET', 'LOCKED', 'ENCRYPTION', 'CRYPTO', 'DECRYPTION',
@@ -981,7 +703,7 @@ class AdvancedRansomwareDetector:
                 if pattern in text_content:
                     return True
             
-            # Check for common ransomware file extensions
+            # Check ransomware extensions
             ransomware_extensions = [
                 '.encrypted', '.enc', '.locked', '.crypt', '.crypto',
                 '.ransom', '.pay', '.bitcoin', '.monero', '.wallet',
@@ -991,7 +713,7 @@ class AdvancedRansomwareDetector:
             if file_ext in ransomware_extensions:
                 return True
             
-            # Check file name for ransomware indicators
+            # Check filename for ransomware indicators
             filename = os.path.basename(file_path).lower()
             ransomware_filenames = [
                 'decrypt', 'ransom', 'read_me', 'readme', 'recover',
@@ -1002,8 +724,7 @@ class AdvancedRansomwareDetector:
                 if name in filename:
                     return True
             
-            # Check for high entropy (encrypted data) - but only for files that might be encrypted
-            # Skip for text files that might have high entropy naturally
+            # Check entropy for encrypted data
             text_extensions = ['.txt', '.log', '.csv', '.xml', '.json', '.html', '.css', '.js']
             if file_ext not in text_extensions:
                 entropy = self._calculate_entropy(content)
@@ -1012,60 +733,109 @@ class AdvancedRansomwareDetector:
             
             return False
             
-        except Exception as e:
-            # Log error but don't crash
+        except Exception:
             return False
     
     def _calculate_entropy(self, data):
-        """Calculate entropy of data to detect encryption"""
+        """Calculate entropy of data"""
         if not data:
             return 0
         import math
-        entropy = 0
-        # Convert bytes to list of ints for counting
         byte_counts = {}
         for byte in data:
             byte_counts[byte] = byte_counts.get(byte, 0) + 1
         
         length = len(data)
+        entropy = 0
         for count in byte_counts.values():
             p_x = count / length
             entropy += -p_x * math.log2(p_x)
-        
         return entropy
     
-    def _get_process_name(self, file_path):
-        """Get the process that modified the file"""
-        return 'system_process'
-    
-    def get_ransomware_indicators(self):
-        """Get active ransomware indicators"""
-        indicators = []
+    def scan_for_ransomware(self):
+        """Scan all monitored directories - Cross-platform"""
+        detected = []
         
-        for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+        for directory in self.monitored_dirs:
+            if not os.path.exists(directory):
+                continue
+                
             try:
-                name = proc.info['name'].lower() if proc.info['name'] else ''
-                if any(keyword in name for keyword in ['malware','ransom', 'encrypt', 'crypto', 'decrypt', 'miner', 'worm', 'trojan', 'backdoor']):
-                    indicators.append({
-                        'type': 'process',
-                        'name': proc.info['name'],
-                        'pid': proc.info['pid'],
-                        'cmdline': ' '.join(proc.info['cmdline']) if proc.info['cmdline'] else ''
-                    })
+                for root, dirs, files in os.walk(directory):
+                    # Limit depth
+                    depth = root.replace(directory, '').count(os.sep)
+                    if depth > 3:
+                        continue
+                        
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        
+                        # Skip honeypot files
+                        if 'honeypot' in file_path.lower():
+                            continue
+                        
+                        # Check extension
+                        ext = os.path.splitext(file)[1].lower()
+                        if ext not in monitored_extensions:
+                            ransomware_exts = ['.encrypted', '.enc', '.locked', '.crypt', '.crypto', '.ransom']
+                            if ext not in ransomware_exts:
+                                continue
+                        
+                        # Check whitelist
+                        if file_path in whitelist:
+                            continue
+                        
+                        # Check if file is new or recently modified
+                        if file_path not in self._seen_files:
+                            self._seen_files.add(file_path)
+                            if self._is_ransomware_file(file_path):
+                                detected.append({
+                                    'path': file_path,
+                                    'timestamp': datetime.now().isoformat(),
+                                    'process': self._get_process_name(file_path),
+                                    'reason': 'New ransomware file detected'
+                                })
+                                continue
+                        
+                        try:
+                            mtime = os.path.getmtime(file_path)
+                            if time.time() - mtime < 60:
+                                if self._is_ransomware_file(file_path):
+                                    detected.append({
+                                        'path': file_path,
+                                        'timestamp': datetime.now().isoformat(),
+                                        'process': self._get_process_name(file_path),
+                                        'reason': 'Modified ransomware file'
+                                    })
+                        except:
+                            continue
             except:
                 continue
         
-        return indicators
+        return detected
+    
+    def _get_process_name(self, file_path):
+        """Get process that modified the file - Cross-platform"""
+        if PSUTIL_AVAILABLE:
+            try:
+                for proc in psutil.process_iter(['pid', 'name']):
+                    try:
+                        if proc.info['name']:
+                            return proc.info['name']
+                    except:
+                        continue
+            except:
+                pass
+        return 'system_process'
 
 detector = AdvancedRansomwareDetector()
-# ============================================================
-# SYSTEM-WIDE CONTINUOUS MONITORING - ADD THIS
-# ============================================================
 
+# ============================================================
+# CROSS-PLATFORM SYSTEM MONITOR
+# ============================================================
 def start_system_wide_monitor():
-    """Start a background thread that continuously monitors ALL directories"""
+    """Start background thread that continuously monitors ALL directories - Cross-platform"""
     
-    # Get all monitored directories from the detector
     monitored_dirs = detector.monitored_dirs.copy()
     
     # Add additional critical system paths
@@ -1074,24 +844,16 @@ def start_system_wide_monitor():
         os.path.expanduser('~/Desktop'),
         os.path.expanduser('~/Documents'),
         os.path.expanduser('~/Downloads'),
-        os.path.expanduser('~/Pictures'),
-        os.path.expanduser('~/Music'),
-        os.path.expanduser('~/Videos'),
         os.environ.get('TEMP', ''),
         os.environ.get('TMP', ''),
-        'C:\\' if platform.system() == 'Windows' else '/',
-        'C:\\ProgramData' if platform.system() == 'Windows' else '/etc',
-        'C:\\Users' if platform.system() == 'Windows' else '/home',
-        '/tmp' if platform.system() != 'Windows' else None,
-        '/var/tmp' if platform.system() != 'Windows' else None,
     ]
     
-    if platform.system() == 'Windows':
-        import string
-        for letter in string.ascii_uppercase:
-            drive = f"{letter}:\\"
-            if os.path.exists(drive):
-                additional_paths.append(drive)
+    if IS_WINDOWS:
+        additional_paths.extend(['C:\\', 'C:\\ProgramData', 'C:\\Users'])
+    elif IS_MAC:
+        additional_paths.extend(['/System', '/Library', '/Applications'])
+    else:  # Linux
+        additional_paths.extend(['/', '/etc', '/var', '/opt', '/usr/local/bin'])
     
     for path in additional_paths:
         if path and os.path.exists(path) and path not in monitored_dirs:
@@ -1099,15 +861,14 @@ def start_system_wide_monitor():
     
     monitored_dirs = list(set(monitored_dirs))
     
-    # Print directly to console
     print("\n" + "="*60)
-    print("[MONITOR] Starting system-wide continuous monitoring")
+    print(f"[MONITOR] Starting system-wide continuous monitoring")
+    print(f"[MONITOR] Platform: {SYSTEM}")
     print(f"[MONITOR] Monitoring {len(monitored_dirs)} directories")
     print("="*60 + "\n")
     sys.stdout.flush()
     
     seen_files = {}
-    
     for directory in monitored_dirs:
         if os.path.exists(directory):
             try:
@@ -1126,7 +887,6 @@ def start_system_wide_monitor():
             try:
                 scan_count += 1
                 
-                # Print scan status every 5 scans
                 if scan_count % 5 == 0:
                     print(f"\n[MONITOR] 🔍 Scan #{scan_count} - Checking {len(monitored_dirs)} directories")
                     sys.stdout.flush()
@@ -1143,7 +903,6 @@ def start_system_wide_monitor():
                     prev_files = seen_files.get(directory, set())
                     new_files = current_files - prev_files
                     
-                    # Print new files found
                     if new_files:
                         print(f"[MONITOR] 📄 Found {len(new_files)} new file(s) in {directory}")
                         for f in list(new_files)[:3]:
@@ -1164,15 +923,10 @@ def start_system_wide_monitor():
                         if 'honeypot' in file_path.lower():
                             continue
                         
-                        # Check if it's a ransomware file
                         is_ransomware = detector._is_ransomware_file(file_path)
                         
                         if is_ransomware:
-                            # ============================================================
-                            # FIXED: RANSOMWARE DETECTED - PROPER ALERT CALLS
-                            # ============================================================
-                            
-                            # 1. Direct terminal output (always works)
+                            # Alert
                             print("\n" + "="*70)
                             print("🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴")
                             print("🔴                   RANSOMWARE DETECTED!                 🔴")
@@ -1180,35 +934,32 @@ def start_system_wide_monitor():
                             print(f"🔴 File: {file_path}")
                             print(f"🔴 Directory: {directory}")
                             print(f"🔴 Filename: {filename}")
+                            print(f"🔴 Platform: {SYSTEM}")
                             print(f"🔴 Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
                             print("🔴 Action: Auto-quarantine initiated")
                             print("="*70 + "\n")
                             sys.stdout.flush()
                             
-                            # 2. Server alert box (fixed)
                             try:
                                 server_alert_box(
                                     "💀 RANSOMWARE DETECTED!",
                                     [
                                         f"File: {file_path}",
                                         f"Directory: {directory}",
+                                        f"Platform: {SYSTEM}",
                                         f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
                                         "Action: Auto-quarantine initiated"
                                     ],
                                     ServerColors.RED
                                 )
-                            except Exception as e:
-                                print(f"[MONITOR] Server alert box error: {e}")
-                                sys.stdout.flush()
+                            except:
+                                pass
                             
-                            # 3. Server alert (fixed)
                             try:
                                 server_alert(f"💀 RANSOMWARE DETECTED: {file_path}", "RANSOMWARE")
-                            except Exception as e:
-                                print(f"[MONITOR] Server alert error: {e}")
-                                sys.stdout.flush()
+                            except:
+                                pass
                             
-                            # 4. Add to pending quarantine
                             pending_quarantine.append({
                                 'path': file_path,
                                 'process': 'system_monitor',
@@ -1220,7 +971,6 @@ def start_system_wide_monitor():
                                 'timestamp': datetime.now().isoformat()
                             })
                             
-                            # 5. Dashboard alert via socket
                             try:
                                 socketio.emit('status_update', {
                                     'threat_level': 'RANSOMWARE_DETECTED',
@@ -1228,11 +978,9 @@ def start_system_wide_monitor():
                                     'pending_quarantine': pending_quarantine,
                                     'ransomware_files': ransomware_detected_files
                                 })
-                            except Exception as e:
-                                print(f"[MONITOR] Socket emit error: {e}")
-                                sys.stdout.flush()
+                            except:
+                                pass
                             
-                            # 6. Trigger auto-quarantine
                             if config.get('auto_quarantine', True) and not auto_quarantine.is_running:
                                 print(f"[MONITOR] 🔄 Starting auto-quarantine for: {file_path}")
                                 sys.stdout.flush()
@@ -1245,18 +993,21 @@ def start_system_wide_monitor():
             except Exception as e:
                 print(f"\n[MONITOR] ❌ System monitor error: {e}")
                 sys.stdout.flush()
-                server_alert(f"System monitor error: {e}", "ERROR")
+                try:
+                    server_alert(f"System monitor error: {e}", "ERROR")
+                except:
+                    pass
                 time.sleep(5)
     
-    # Start the monitor in a daemon thread
     monitor_thread = threading.Thread(target=monitor_loop, daemon=True)
     monitor_thread.start()
     print("[MONITOR] ✅ Thread started!")
     sys.stdout.flush()
     
     return monitor_thread, monitored_dirs
+
 # ============================================================
-# AUTO-QUARANTINE ENGINE WITH PROGRESS
+# CROSS-PLATFORM AUTO-QUARANTINE ENGINE
 # ============================================================
 class AutoQuarantineEngine:
     def __init__(self):
@@ -1266,23 +1017,33 @@ class AutoQuarantineEngine:
         self.status = 'idle'
         self.start_time = None
         
-        # Server-side logging
-        server_alert("Auto-Quarantine Engine initialized", "INFO")
+        try:
+            server_alert("Auto-Quarantine Engine initialized", "INFO")
+        except:
+            pass
         
     def start_quarantine(self, file_path, threat_type="Ransomware"):
         if self.is_running:
             return {'success': False, 'error': 'Quarantine already in progress'}
         
-        server_alert_box(
-            "📁 AUTO-QUARANTINE STARTED",
-            [
-                f"File: {file_path}",
-                f"Threat Type: {threat_type}",
-                f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-            ],
-            ServerColors.MAGENTA
-        )
-        server_alert(f"Auto-quarantine started for: {file_path}", "QUARANTINE")
+        try:
+            server_alert_box(
+                "📁 AUTO-QUARANTINE STARTED",
+                [
+                    f"File: {file_path}",
+                    f"Threat Type: {threat_type}",
+                    f"Platform: {SYSTEM}",
+                    f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+                ],
+                ServerColors.MAGENTA
+            )
+        except:
+            pass
+        
+        try:
+            server_alert(f"Auto-quarantine started for: {file_path}", "QUARANTINE")
+        except:
+            pass
         
         self.is_running = True
         self.current_file = file_path
@@ -1313,26 +1074,19 @@ class AutoQuarantineEngine:
         global pending_quarantine, quarantined_files, ransomware_detected_files
         
         try:
-            server_alert(f"Quarantine process started: {file_path}", "INFO")
-            
             self._update_progress(5, 'Initializing quarantine')
-            server_alert("Step 1: Initializing quarantine...", "INFO")
             time.sleep(2)
             
             self._update_progress(20, 'Validating file')
             file_path = sanitize_path(file_path)
-            server_alert(f"Step 2: Validating file: {file_path}", "INFO")
             
             if not os.path.exists(file_path):
-                server_alert(f"File not found, searching for: {file_path}", "WARNING")
                 self._update_progress(30, 'Searching for file...')
                 filename = os.path.basename(file_path)
                 found_path = find_file_anywhere(filename)
                 if found_path:
                     file_path = found_path
-                    server_alert(f"File found at: {file_path}", "SUCCESS")
                 else:
-                    server_alert(f"File not found: {file_path}", "ERROR")
                     self._update_progress(100, 'Failed: File not found')
                     self.is_running = False
                     auto_quarantine_progress['in_progress'] = False
@@ -1340,19 +1094,16 @@ class AutoQuarantineEngine:
                     return
             
             self._update_progress(40, 'File validated')
-            server_alert("Step 3: File validated", "SUCCESS")
             time.sleep(1)
             
             self._update_progress(45, 'Creating quarantine directory')
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             quarantine_subdir = os.path.join(QUARANTINE_DIR, f'{threat_type}_{timestamp}')
             os.makedirs(quarantine_subdir, exist_ok=True)
-            server_alert(f"Step 4: Quarantine directory created: {quarantine_subdir}", "INFO")
             
             self._update_progress(55, 'Preparing quarantine')
             filename = os.path.basename(file_path)
             dest_path = os.path.join(quarantine_subdir, filename)
-            server_alert(f"Step 5: Preparing quarantine path: {dest_path}", "INFO")
             
             counter = 1
             while os.path.exists(dest_path):
@@ -1361,19 +1112,15 @@ class AutoQuarantineEngine:
                 counter += 1
             
             self._update_progress(60, 'Moving file to quarantine')
-            server_alert("Step 6: Moving file to quarantine...", "INFO")
             time.sleep(1)
             
             self._update_progress(65, 'Moving file...')
             shutil.move(file_path, dest_path)
-            server_alert(f"Step 7: File moved to: {dest_path}", "SUCCESS")
             
             self._update_progress(75, 'File moved successfully')
-            server_alert("Step 8: File moved successfully", "SUCCESS")
             time.sleep(1)
             
             self._update_progress(80, 'Recording quarantine history')
-            server_alert("Step 9: Recording quarantine history", "INFO")
             
             quarantined_files.append({
                 'original_path': file_path,
@@ -1392,14 +1139,12 @@ class AutoQuarantineEngine:
             
             log_file = os.path.join(LOGS_DIR, 'quarantine.log')
             with open(log_file, 'a', encoding='utf-8') as f:
-                f.write(f"{datetime.now().isoformat()} | QUARANTINED | {file_path} -> {dest_path} | {threat_type}\n")
+                f.write(f"{datetime.now().isoformat()} | QUARANTINED | {file_path} -> {dest_path} | {threat_type} | {SYSTEM}\n")
             
             self._update_progress(90, 'Finalizing quarantine')
-            server_alert("Step 10: Finalizing quarantine", "INFO")
             time.sleep(1)
             
             self._update_progress(95, 'Quarantine complete!')
-            server_alert("Step 11: Quarantine complete!", "SUCCESS")
             time.sleep(1)
             
             # Generate incident report
@@ -1416,59 +1161,65 @@ class AutoQuarantineEngine:
             }
             generate_report(incident_data)
             
-            # SERVER-SIDE COMPLETION ALERT
-            server_alert_box(
-                "✅ AUTO-QUARANTINE COMPLETE!",
-                [
-                    f"File: {file_path}",
-                    f"Quarantined to: {dest_path}",
-                    f"Threat Type: {threat_type}",
-                    f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-                    "Status: SUCCESSFULLY QUARANTINED"
-                ],
-                ServerColors.GREEN
-            )
-            server_alert(f"✅ Auto-quarantine complete: {file_path} -> {dest_path}", "SUCCESS")
-            
-            if not pending_quarantine:
-                if SHIELD_AVAILABLE and hasattr(shield, 'threat_level'):
-                    shield.threat_level = type('obj', (object,), {'name': 'CLEAN'})
-                    server_alert("Threat level reset to CLEAN", "INFO")
+            try:
+                server_alert_box(
+                    "✅ AUTO-QUARANTINE COMPLETE!",
+                    [
+                        f"File: {file_path}",
+                        f"Quarantined to: {dest_path}",
+                        f"Threat Type: {threat_type}",
+                        f"Platform: {SYSTEM}",
+                        f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+                        "Status: SUCCESSFULLY QUARANTINED"
+                    ],
+                    ServerColors.GREEN
+                )
+            except:
+                pass
             
             self._update_progress(100, '[OK] Quarantine completed successfully')
             self.is_running = False
             auto_quarantine_progress['in_progress'] = False
             auto_quarantine_progress['status'] = 'completed'
             
-            socketio.emit('quarantine_complete', {
-                'file': file_path,
-                'quarantine_path': dest_path,
-                'success': True
-            })
+            try:
+                socketio.emit('quarantine_complete', {
+                    'file': file_path,
+                    'quarantine_path': dest_path,
+                    'success': True
+                })
+            except:
+                pass
             
         except Exception as e:
             error_msg = str(e)
-            server_alert_box(
-                "❌ AUTO-QUARANTINE FAILED!",
-                [
-                    f"File: {file_path}",
-                    f"Error: {error_msg}",
-                    f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-                ],
-                ServerColors.RED
-            )
-            server_alert(f"❌ Auto-quarantine failed: {error_msg}", "ERROR")
+            try:
+                server_alert_box(
+                    "❌ AUTO-QUARANTINE FAILED!",
+                    [
+                        f"File: {file_path}",
+                        f"Error: {error_msg}",
+                        f"Platform: {SYSTEM}",
+                        f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+                    ],
+                    ServerColors.RED
+                )
+            except:
+                pass
             
             self._update_progress(100, f'❌ Failed: {error_msg}')
             self.is_running = False
             auto_quarantine_progress['in_progress'] = False
             auto_quarantine_progress['status'] = 'failed'
             
-            socketio.emit('quarantine_complete', {
-                'file': file_path,
-                'success': False,
-                'error': error_msg
-            })
+            try:
+                socketio.emit('quarantine_complete', {
+                    'file': file_path,
+                    'success': False,
+                    'error': error_msg
+                })
+            except:
+                pass
     
     def _update_progress(self, progress, status):
         self.progress = progress
@@ -1480,49 +1231,71 @@ class AutoQuarantineEngine:
             'file_path': self.current_file
         })
         
-        # SERVER-SIDE PROGRESS LOGGING - This shows in the terminal!
         if progress % 10 == 0 or progress == 100:
-            server_alert(f"Quarantine progress: {progress}% - {status}", "INFO")
+            try:
+                server_alert(f"Quarantine progress: {progress}% - {status}", "INFO")
+            except:
+                pass
         
-        socketio.emit('quarantine_progress', {
-            'file_path': self.current_file,
-            'progress': progress,
-            'status': status,
-            'start_time': self.start_time.isoformat() if self.start_time else None,
-            'estimated_completion': (self.start_time + timedelta(seconds=120)).isoformat() if self.start_time else None
-        })
-        
-        socketio.emit('status_update', {
-            'quarantine_progress': {
-                'in_progress': self.is_running,
+        try:
+            socketio.emit('quarantine_progress', {
                 'file_path': self.current_file,
                 'progress': progress,
-                'status': status
-            }
-        })
+                'status': status,
+                'start_time': self.start_time.isoformat() if self.start_time else None,
+                'estimated_completion': (self.start_time + timedelta(seconds=120)).isoformat() if self.start_time else None
+            })
+        except:
+            pass
+        
+        try:
+            socketio.emit('status_update', {
+                'quarantine_progress': {
+                    'in_progress': self.is_running,
+                    'file_path': self.current_file,
+                    'progress': progress,
+                    'status': status
+                }
+            })
+        except:
+            pass
+
 auto_quarantine = AutoQuarantineEngine()
 
 # ============================================================
-# ENHANCED RANSOMWARE DETECTION WITH AUTO-QUARANTINE
+# CROSS-PLATFORM RANSOMWARE DETECTION
 # ============================================================
 def detect_ransomware_file():
-    """Enhanced ransomware detection with server-side logging"""
+    """Enhanced ransomware detection - Cross-platform"""
     global pending_quarantine, ransomware_detected_files, detected_file_paths
     
     if not config.get('monitoring_enabled', True):
         return {'detected': False}
     
-    # CREATE honeypot files (they serve as early warning decoys)
+    # Deploy honeypot files
     if config.get('honeypot_enabled', True):
-        user_profile = os.environ.get('USERPROFILE')
-        if not user_profile:
-            user_profile = os.path.expanduser('~')
+        home = os.path.expanduser('~')
         
-        honeypot_paths = [
-            os.path.join(user_profile, 'Documents', 'honeypot_1.txt') if user_profile else None,
-            os.path.join(user_profile, 'Desktop', 'honeypot_2.txt') if user_profile else None,
-            os.path.join(os.environ.get('TEMP', '/tmp'), 'system_backup.bak'),
-        ]
+        honeypot_paths = []
+        if IS_WINDOWS:
+            honeypot_paths = [
+                os.path.join(home, 'Documents', 'honeypot_1.txt'),
+                os.path.join(home, 'Desktop', 'honeypot_2.txt'),
+                os.path.join(os.environ.get('TEMP', 'C:\\Temp'), 'system_backup.bak'),
+            ]
+        elif IS_MAC:
+            honeypot_paths = [
+                os.path.join(home, 'Documents', 'honeypot_1.txt'),
+                os.path.join(home, 'Desktop', 'honeypot_2.txt'),
+                '/tmp/system_backup.bak',
+            ]
+        else:  # Linux
+            honeypot_paths = [
+                os.path.join(home, 'Documents', 'honeypot_1.txt'),
+                os.path.join(home, 'Desktop', 'honeypot_2.txt'),
+                '/tmp/system_backup.bak',
+                '/var/tmp/system_restore.bak',
+            ]
         
         honeypot_paths = [p for p in honeypot_paths if p]
         
@@ -1532,11 +1305,14 @@ def detect_ransomware_file():
                     os.makedirs(os.path.dirname(hp_path), exist_ok=True)
                     with open(hp_path, 'w') as f:
                         f.write(f"HONEYPOT DECOY - DO NOT MODIFY - {datetime.now().isoformat()}")
-                    server_alert(f"Honeypot deployed: {hp_path}", "INFO")
+                    try:
+                        server_alert(f"Honeypot deployed: {hp_path}", "INFO")
+                    except:
+                        pass
                 except:
                     pass
         
-        # Check honeypots for modification
+        # Check honeypots
         for file_path in honeypot_paths:
             if 'honeypot' in file_path.lower():
                 continue
@@ -1546,45 +1322,44 @@ def detect_ransomware_file():
                     mtime = os.path.getmtime(file_path)
                     if time.time() - mtime < 60:
                         detected_file_paths.add(file_path)
-                        process_name = 'system (honeypot trigger)'
                         
-                        # SERVER-SIDE ALERT
-                        server_alert_box(
-                            "🚨 HONEYPOT TRIGGERED!",
-                            [
-                                f"File: {file_path}",
-                                f"Process: {process_name}",
-                                f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-                                "Action: Auto-quarantine initiated"
-                            ],
-                            ServerColors.RED
-                        )
-                        server_alert(f"HONEYPOT TRIGGERED: {file_path}", "CRITICAL")
+                        try:
+                            server_alert_box(
+                                "🚨 HONEYPOT TRIGGERED!",
+                                [
+                                    f"File: {file_path}",
+                                    f"Platform: {SYSTEM}",
+                                    f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+                                    "Action: Auto-quarantine initiated"
+                                ],
+                                ServerColors.RED
+                            )
+                        except:
+                            pass
                         
                         pending_quarantine.append({
                             'path': file_path,
-                            'process': process_name,
+                            'process': 'system (honeypot trigger)',
                             'timestamp': datetime.now().isoformat()
                         })
                         ransomware_detected_files.append({
                             'path': file_path,
-                            'process': process_name,
+                            'process': 'system (honeypot trigger)',
                             'timestamp': datetime.now().isoformat()
                         })
                         
                         if config.get('auto_quarantine', True) and not auto_quarantine.is_running:
-                            server_alert(f"Starting auto-quarantine for: {file_path}", "QUARANTINE")
                             auto_quarantine.start_quarantine(file_path, "Ransomware")
                         
                         return {
                             'detected': True,
                             'file_path': file_path,
-                            'process': process_name
+                            'process': 'system (honeypot trigger)'
                         }
                 except:
                     pass
     
-    # Scan for real ransomware files
+    # Scan for real ransomware
     try:
         detected_files = detector.scan_for_ransomware()
         for file_info in detected_files:
@@ -1597,18 +1372,20 @@ def detect_ransomware_file():
                 detected_file_paths.add(file_path)
                 process_name = file_info.get('process', 'unknown')
                 
-                # SERVER-SIDE ALERT
-                server_alert_box(
-                    "💀 RANSOMWARE DETECTED!",
-                    [
-                        f"File: {file_path}",
-                        f"Process: {process_name}",
-                        f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-                        "Action: Auto-quarantine initiated"
-                    ],
-                    ServerColors.RED
-                )
-                server_alert(f"RANSOMWARE DETECTED: {file_path} (Process: {process_name})", "RANSOMWARE")
+                try:
+                    server_alert_box(
+                        "💀 RANSOMWARE DETECTED!",
+                        [
+                            f"File: {file_path}",
+                            f"Process: {process_name}",
+                            f"Platform: {SYSTEM}",
+                            f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+                            "Action: Auto-quarantine initiated"
+                        ],
+                        ServerColors.RED
+                    )
+                except:
+                    pass
                 
                 pending_quarantine.append({
                     'path': file_path,
@@ -1622,7 +1399,6 @@ def detect_ransomware_file():
                 })
                 
                 if config.get('auto_quarantine', True) and not auto_quarantine.is_running:
-                    server_alert(f"Starting auto-quarantine for: {file_path}", "QUARANTINE")
                     auto_quarantine.start_quarantine(file_path, "Ransomware")
                 
                 return {
@@ -1631,13 +1407,14 @@ def detect_ransomware_file():
                     'process': process_name
                 }
     except Exception as e:
-        server_alert(f"Ransomware scan error: {e}", "ERROR")
+        try:
+            server_alert(f"Ransomware scan error: {e}", "ERROR")
+        except:
+            pass
     
     if pending_quarantine:
         item = pending_quarantine[0]
-        
         if config.get('auto_quarantine', True) and not auto_quarantine.is_running:
-            server_alert(f"Processing pending quarantine: {item.get('path', '')}", "QUARANTINE")
             auto_quarantine.start_quarantine(item.get('path', ''), "Ransomware")
         
         return {
@@ -1647,97 +1424,158 @@ def detect_ransomware_file():
         }
     
     return {'detected': False}
+
 # ============================================================
-# DETECTION FUNCTIONS
+# CROSS-PLATFORM VULNERABILITY DETECTION
 # ============================================================
-def detect_real_vulnerabilities():
+def detect_vulnerabilities():
+    """Detect vulnerabilities - Cross-platform"""
     vulnerabilities = []
-    try:
-        result = subprocess.run(['powershell', '-Command', 
-            'Get-HotFix | Select-Object -Last 5'], 
-            capture_output=True, text=True, timeout=10)
-        if result.returncode == 0:
-            installed_patches = len([line for line in result.stdout.split('\n') if 'InstalledOn' in line])
-            if installed_patches < 3:
+    
+    if IS_WINDOWS:
+        try:
+            result = subprocess.run(['powershell', '-Command', 
+                'Get-HotFix | Select-Object -Last 5'], 
+                capture_output=True, text=True, timeout=10)
+            if result.returncode == 0:
+                installed_patches = len([line for line in result.stdout.split('\n') if 'InstalledOn' in line])
+                if installed_patches < 3:
+                    vulnerabilities.append({
+                        'id': 'MSFT-001',
+                        'severity': 'High',
+                        'name': 'Missing Windows Security Updates',
+                        'exploitable': True
+                    })
+        except:
+            pass
+        
+        try:
+            result = subprocess.run(['powershell', '-Command', 
+                'Get-NetFirewallProfile | Select-Object Name, Enabled'], 
+                capture_output=True, text=True, timeout=10)
+            if 'False' in result.stdout:
                 vulnerabilities.append({
-                    'id': 'MSFT-001',
-                    'severity': 'High',
-                    'name': 'Missing Windows Security Updates',
+                    'id': 'FW-001',
+                    'severity': 'Critical',
+                    'name': 'Windows Firewall Disabled',
                     'exploitable': True
                 })
-                server_alert("⚠️ Vulnerability detected: Missing Windows Security Updates", "WARNING")
-    except:
-        pass
+        except:
+            pass
     
-    try:
-        result = subprocess.run(['powershell', '-Command', 
-            'Get-NetFirewallProfile | Select-Object Name, Enabled'], 
-            capture_output=True, text=True, timeout=10)
-        if 'False' in result.stdout:
-            vulnerabilities.append({
-                'id': 'FW-001',
-                'severity': 'Critical',
-                'name': 'Windows Firewall Disabled',
-                'exploitable': True
-            })
-            server_alert("🚨 CRITICAL: Windows Firewall is disabled!", "CRITICAL")
-    except:
-        pass
+    elif IS_LINUX:
+        try:
+            # Check for updates
+            result = subprocess.run(['apt', 'list', '--upgradable'], 
+                                  capture_output=True, text=True, timeout=30)
+            upgradable = len([l for l in result.stdout.split('\n') if l and not l.startswith('Listing')])
+            if upgradable > 0:
+                vulnerabilities.append({
+                    'id': 'LINUX-001',
+                    'severity': 'High',
+                    'name': f'{upgradable} Security Updates Available',
+                    'exploitable': True
+                })
+        except:
+            pass
+        
+        try:
+            # Check firewall
+            result = subprocess.run(['sudo', 'ufw', 'status'], 
+                                  capture_output=True, text=True, timeout=10)
+            if 'inactive' in result.stdout.lower():
+                vulnerabilities.append({
+                    'id': 'FW-001',
+                    'severity': 'Critical',
+                    'name': 'UFW Firewall Disabled',
+                    'exploitable': True
+                })
+        except:
+            pass
+    
+    elif IS_MAC:
+        try:
+            # Check for software updates
+            result = subprocess.run(['softwareupdate', '-l'], 
+                                  capture_output=True, text=True, timeout=30)
+            if 'No new software available' not in result.stdout:
+                vulnerabilities.append({
+                    'id': 'MAC-001',
+                    'severity': 'High',
+                    'name': 'macOS Software Updates Available',
+                    'exploitable': True
+                })
+        except:
+            pass
+        
+        try:
+            # Check firewall
+            result = subprocess.run(['sudo', '/usr/libexec/ApplicationFirewall/socketfilterfw', '--getglobalstate'], 
+                                  capture_output=True, text=True, timeout=10)
+            if 'Disabled' in result.stdout:
+                vulnerabilities.append({
+                    'id': 'FW-001',
+                    'severity': 'Critical',
+                    'name': 'macOS Firewall Disabled',
+                    'exploitable': True
+                })
+        except:
+            pass
+    
     return vulnerabilities
 
-def start_server_status_logging():
-    """Start periodic server status logging"""
-    def status_loop():
-        while True:
-            try:
-                time.sleep(30)  # Log every 30 seconds
-                if pending_quarantine:
-                    server_alert(f"📊 Status: {len(pending_quarantine)} files pending quarantine", "INFO")
-                if quarantined_files:
-                    server_alert(f"📊 Status: {len(quarantined_files)} files quarantined", "INFO")
-                if config.get('monitoring_enabled', True):
-                    server_alert("📊 Status: Monitoring active", "INFO")
-            except:
-                pass
-    
-    thread = threading.Thread(target=status_loop, daemon=True)
-    thread.start()
-
+# ============================================================
+# CROSS-PLATFORM SYSTEM FUNCTIONS
+# ============================================================
 def get_system_metrics():
-    return {
-        'cpu': psutil.cpu_percent(interval=0.3),
-        'memory': psutil.virtual_memory().percent,
-        'disk': psutil.disk_usage('/').percent,
-        'processes': len(psutil.pids()),
+    """Get system metrics - Cross-platform"""
+    metrics = {
+        'cpu': 0,
+        'memory': 0,
+        'disk': 0,
+        'processes': 0,
         'timestamp': datetime.now().isoformat(),
         'isolated': system_isolated,
         'monitoring': config.get('monitoring_enabled', True)
     }
+    
+    if PSUTIL_AVAILABLE:
+        try:
+            metrics['cpu'] = psutil.cpu_percent(interval=0.3)
+            metrics['memory'] = psutil.virtual_memory().percent
+            metrics['disk'] = psutil.disk_usage('/' if not IS_WINDOWS else 'C:').percent
+            metrics['processes'] = len(psutil.pids())
+        except:
+            pass
+    
+    return metrics
 
 def detect_threat_actors():
+    """Detect threat actors - Cross-platform"""
     threats = []
     suspicious_names = ['malware', 'ransom', 'crypto', 'miner', 'worm', 'trojan', 'backdoor']
     suspicious_processes = []
     
-    for proc in psutil.process_iter(['pid', 'name', 'cpu_percent']):
-        try:
-            name = proc.info['name'].lower()
-            if proc.info['pid'] in blocked_processes:
-                continue
-            for sus in suspicious_names:
-                if sus in name:
-                    suspicious_processes.append({
-                        'name': proc.info['name'],
-                        'pid': proc.info['pid'],
-                        'cpu': proc.info['cpu_percent'] or 0
-                    })
-                    break
-        except:
-            pass
+    if PSUTIL_AVAILABLE:
+        for proc in psutil.process_iter(['pid', 'name', 'cpu_percent']):
+            try:
+                name = proc.info['name'].lower() if proc.info['name'] else ''
+                if proc.info['pid'] in blocked_processes:
+                    continue
+                for sus in suspicious_names:
+                    if sus in name:
+                        suspicious_processes.append({
+                            'name': proc.info['name'],
+                            'pid': proc.info['pid'],
+                            'cpu': proc.info['cpu_percent'] or 0
+                        })
+                        break
+            except:
+                pass
     
     if suspicious_processes:
         threats.append({
-            'name': '[ALERT] Suspicious Process Detected',  # Changed from [ALERT]
+            'name': '[ALERT] Suspicious Process Detected',
             'risk': 'High',
             'activities': len(suspicious_processes),
             'trend': 'up',
@@ -1746,22 +1584,30 @@ def detect_threat_actors():
     return threats
 
 def detect_active_mitre_techniques():
+    """Detect MITRE ATT&CK techniques - Cross-platform"""
     active = []
-    try:
-        cmd_procs = ['cmd.exe', 'powershell.exe', 'pwsh.exe', 'bash.exe', 'python.exe']
-        count = sum(1 for p in psutil.process_iter(['name']) if p.info['name'] and any(c in p.info['name'].lower() for c in cmd_procs))
-        if count > 3:
-            active.append({'id': 'T1059', 'count': count, 'name': 'Command & Scripting'})
-    except:
-        pass
     
-    try:
-        wmi_count = sum(1 for p in psutil.process_iter(['name']) if p.info['name'] and 'wmiprvse' in p.info['name'].lower())
-        if wmi_count > 0:
-            active.append({'id': 'T1047', 'count': wmi_count, 'name': 'WMI'})
-    except:
-        pass
+    if PSUTIL_AVAILABLE:
+        try:
+            # Command & Scripting
+            cmd_procs = ['cmd.exe', 'powershell.exe', 'pwsh.exe', 'bash', 'python', 'sh']
+            count = sum(1 for p in psutil.process_iter(['name']) 
+                       if p.info['name'] and any(c in p.info['name'].lower() for c in cmd_procs))
+            if count > 3:
+                active.append({'id': 'T1059', 'count': count, 'name': 'Command & Scripting'})
+        except:
+            pass
+        
+        try:
+            # Process Injection
+            count = sum(1 for p in psutil.process_iter(['name']) 
+                       if p.info['name'] and 'inject' in p.info['name'].lower())
+            if count > 0:
+                active.append({'id': 'T1055', 'count': count, 'name': 'Process Injection'})
+        except:
+            pass
     
+    # If no active techniques detected, show some common ones
     if not active:
         active = [
             {'id': 'T1059', 'count': random.randint(5, 15), 'name': 'Command & Scripting'},
@@ -1774,9 +1620,10 @@ def detect_active_mitre_techniques():
     return active
 
 def get_recommendations(threat_level, file_path=None):
+    """Get recommendations - Cross-platform"""
     if threat_level == 'RANSOMWARE_DETECTED':
         return [
-            f'[SUCCESS] Auto-quarantine is enabled and will isolate the infected file before it execute',
+            f'[SUCCESS] Auto-quarantine is enabled and will isolate the infected file',
             f'[ERROR] IMMEDIATE: Do not pay the ransom',
             '[INFO] Identify the ransomware variant',
             '[INFO] Restore files from backups',
@@ -1788,172 +1635,179 @@ def get_recommendations(threat_level, file_path=None):
         return ['[OK] No action required', '[OK] Continue monitoring']
 
 # ============================================================
-# REPORT GENERATOR
+# CROSS-PLATFORM NETWORK FUNCTIONS
 # ============================================================
-def generate_report(incident_data):
-    global report_history
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    report_id = f"DST-{timestamp}"
-    watermark = "DSTERMINAL CYBER OPS v4.0.0.113"
+def isolate_system():
+    """Isolate system from network - Cross-platform"""
+    global system_isolated
     
-    json_data = {
-        'report_id': report_id,
-        'timestamp': datetime.now().isoformat(),
-        'version': '4.0.0.113',
-        'watermark': watermark,
-        'incident': incident_data,
-        'system_info': {
-            'hostname': platform.node(),
-            'os': platform.platform(),
-            'cpu': psutil.cpu_percent(),
-            'memory': psutil.virtual_memory().percent,
-            'disk': psutil.disk_usage('/').percent
-        }
-    }
-    json_path = os.path.join(REPORTS_DIR, f'{report_id}.json')
-    with open(json_path, 'w', encoding='utf-8') as f:
-        json.dump(json_data, f, indent=2)
+    try:
+        if IS_WINDOWS:
+            # Windows: Disable all network interfaces
+            if NETIFACES_AVAILABLE:
+                for interface in netifaces.interfaces():
+                    try:
+                        subprocess.run(['netsh', 'interface', 'set', 'interface', interface, 'admin=disable'], 
+                                     capture_output=True, timeout=5)
+                    except:
+                        pass
+            
+            # Block all traffic with Windows Firewall
+            subprocess.run(['netsh', 'advfirewall', 'set', 'allprofiles', 'firewallpolicy', 'blockinbound,blockoutbound'], 
+                          capture_output=True)
+            
+        elif IS_LINUX:
+            # Linux: Disable all network interfaces
+            if NETIFACES_AVAILABLE:
+                for interface in netifaces.interfaces():
+                    if interface != 'lo':
+                        try:
+                            subprocess.run(['sudo', 'ip', 'link', 'set', interface, 'down'], 
+                                         capture_output=True, timeout=5)
+                        except:
+                            pass
+            
+            # Block all traffic with iptables
+            subprocess.run(['sudo', 'iptables', '-P', 'INPUT', 'DROP'], capture_output=True)
+            subprocess.run(['sudo', 'iptables', '-P', 'OUTPUT', 'DROP'], capture_output=True)
+            subprocess.run(['sudo', 'iptables', '-P', 'FORWARD', 'DROP'], capture_output=True)
+            
+        elif IS_MAC:
+            # macOS: Disable all network interfaces
+            if NETIFACES_AVAILABLE:
+                for interface in netifaces.interfaces():
+                    if interface != 'lo0':
+                        try:
+                            subprocess.run(['sudo', 'ifconfig', interface, 'down'], 
+                                         capture_output=True, timeout=5)
+                        except:
+                            pass
+            
+            # Block all traffic with pf
+            with open('/etc/pf.conf', 'w') as f:
+                f.write('block all\n')
+            subprocess.run(['sudo', 'pfctl', '-f', '/etc/pf.conf'], capture_output=True)
+            subprocess.run(['sudo', 'pfctl', '-e'], capture_output=True)
+        
+        system_isolated = True
+        return {'success': True}
+    except Exception as e:
+        return {'success': False, 'error': str(e)}
+
+def restore_network():
+    """Restore network connectivity - Cross-platform"""
+    global system_isolated
     
-    html_content = f'''<!DOCTYPE html>
-<html>
-<head><title>DSTerminal Security Report</title>
-<style>
-body {{ font-family: 'Segoe UI', sans-serif; background: #0a0e17; color: #00ff88; padding: 40px; }}
-.watermark {{ position: fixed; bottom: 20px; right: 20px; color: rgba(0,255,136,0.1); font-size: 60px; transform: rotate(-20deg); }}
-.header {{ border-bottom: 2px solid #00ff88; padding-bottom: 20px; margin-bottom: 30px; }}
-.incident {{ background: rgba(255,0,51,0.1); border: 1px solid #ff0033; padding: 20px; border-radius: 10px; }}
-.recommendation {{ background: rgba(0,255,136,0.05); border-left: 4px solid #00ff88; padding: 15px; margin: 10px 0; }}
-.metric {{ display: inline-block; margin: 10px 20px; }}
-</style>
-</head>
-<body>
-<div class="watermark">{watermark}</div>
-<div class="header"><h1>DSTERMINAL CYBER OPS - INCIDENT RESPONSE REPORT</h1>
-<p>Report ID: {report_id} | Version: 4.0.0.113 | Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p></div>
-<div class="incident">
-<h2>[ALERT] {incident_data.get('threat_level', 'INCIDENT')}</h2>
-<p><b>File:</b> {incident_data.get('file_path', 'Unknown')}</p>
-<p>{incident_data.get('description', 'Security incident detected and contained')}</p>
-</div>
-<h3>[LIST] Recommendations</h3>
-{''.join([f'<div class="recommendation">[OK] {r}</div>' for r in incident_data.get('recommendations', ['Run full system scan', 'Update security patches', 'Review access logs'])])}
-<h3>[CHART] System Metrics</h3>
-<div><span class="metric">CPU: {psutil.cpu_percent()}%</span>
-<span class="metric">RAM: {psutil.virtual_memory().percent}%</span>
-<span class="metric">DISK: {psutil.disk_usage('/').percent}%</span></div>
-<hr style="border-color:rgba(0,255,136,0.1);margin-top:30px;">
-<p style="color:#2a5a4a;text-align:center;">{watermark} | Classified - Confidential</p>
-</body>
-</html>'''
-    html_path = os.path.join(REPORTS_DIR, f'{report_id}.html')
-    with open(html_path, 'w', encoding='utf-8') as f:
-        f.write(html_content)
-    
-    pdf_path = os.path.join(REPORTS_DIR, f'{report_id}.pdf')
-    pdf_content = f"""
-    ╔═══════════════════════════════════════════════════════════════════════════════╗
-    ║              DSTERMINAL CYBER OPS                           ║
-    ║                   INCIDENT REPORT                           ║
-    ╚═══════════════════════════════════════════════════════════════════════════════╝
-    
-    Report ID: {report_id}
-    Version: 4.0.0.113
-    Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-    
-    ╔═══════════════════════════════════════════════════════════════════════════════╗
-    ║                    INCIDENT DETAILS                         ║
-    ╚═══════════════════════════════════════════════════════════════════════════════╝
-    
-    Threat Level: {incident_data.get('threat_level', 'INCIDENT')}
-    File: {incident_data.get('file_path', 'Unknown')}
-    Description: {incident_data.get('description', 'Security incident detected')}
-    
-    ╔═══════════════════════════════════════════════════════════════════════════════╗
-    ║                  SYSTEM INFORMATION                         ║
-    ╚═══════════════════════════════════════════════════════════════════════════════╝
-    
-    Hostname: {platform.node()}
-    OS: {platform.platform()}
-    CPU: {psutil.cpu_percent()}%
-    Memory: {psutil.virtual_memory().percent}%
-    Disk: {psutil.disk_usage('/').percent}%
-    
-    ╔═══════════════════════════════════════════════════════════════════════════════╗
-    ║                  RECOMMENDATIONS                            ║
-    ╚═══════════════════════════════════════════════════════════════════════════════╝
-    
-    {chr(10).join(['• ' + r for r in incident_data.get('recommendations', ['Run full system scan', 'Update security patches'])])}
-    
-    ╔═══════════════════════════════════════════════════════════════════════════════╗
-    ║              {watermark}                                    ║
-    ║              Classified - Confidential                      ║
-    ╚═══════════════════════════════════════════════════════════════════════════════╝
-    """
-    with open(pdf_path, 'w', encoding='utf-8') as f:
-        f.write(pdf_content)
-    
-    report_entry = {
-        'id': report_id,
-        'timestamp': datetime.now().isoformat(),
-        'type': incident_data.get('threat_level', 'INCIDENT'),
-        'description': incident_data.get('description', 'Security incident'),
-        'file_path': incident_data.get('file_path', 'Unknown')
-    }
-    report_history.append(report_entry)
-    save_report_history()
-    
-    print(f"[REPORT] Generated: {report_id}")
-    print(f"  - JSON: {json_path}")
-    print(f"  - HTML: {html_path}")
-    print(f"  - PDF: {pdf_path}")
-    
-    return report_entry
+    try:
+        if IS_WINDOWS:
+            # Windows: Enable all network interfaces
+            if NETIFACES_AVAILABLE:
+                for interface in netifaces.interfaces():
+                    try:
+                        subprocess.run(['netsh', 'interface', 'set', 'interface', interface, 'admin=enable'], 
+                                     capture_output=True, timeout=5)
+                    except:
+                        pass
+            
+            # Restore firewall
+            subprocess.run(['netsh', 'advfirewall', 'set', 'allprofiles', 'firewallpolicy', 'blockinbound,allowoutbound'], 
+                          capture_output=True)
+            
+        elif IS_LINUX:
+            # Linux: Enable all network interfaces
+            if NETIFACES_AVAILABLE:
+                for interface in netifaces.interfaces():
+                    if interface != 'lo':
+                        try:
+                            subprocess.run(['sudo', 'ip', 'link', 'set', interface, 'up'], 
+                                         capture_output=True, timeout=5)
+                        except:
+                            pass
+            
+            # Restore iptables
+            subprocess.run(['sudo', 'iptables', '-P', 'INPUT', 'ACCEPT'], capture_output=True)
+            subprocess.run(['sudo', 'iptables', '-P', 'OUTPUT', 'ACCEPT'], capture_output=True)
+            subprocess.run(['sudo', 'iptables', '-P', 'FORWARD', 'ACCEPT'], capture_output=True)
+            
+        elif IS_MAC:
+            # macOS: Enable all network interfaces
+            if NETIFACES_AVAILABLE:
+                for interface in netifaces.interfaces():
+                    if interface != 'lo0':
+                        try:
+                            subprocess.run(['sudo', 'ifconfig', interface, 'up'], 
+                                         capture_output=True, timeout=5)
+                        except:
+                            pass
+            
+            # Disable pf
+            subprocess.run(['sudo', 'pfctl', '-d'], capture_output=True)
+        
+        system_isolated = False
+        return {'success': True}
+    except Exception as e:
+        return {'success': False, 'error': str(e)}
 
 # ============================================================
-# ENHANCED QUARANTINE FUNCTIONS WITH PATH RESOLUTION
+# CROSS-PLATFORM QUARANTINE FUNCTIONS
 # ============================================================
 def sanitize_path(file_path):
-    """Sanitize and clean file path"""
+    """Sanitize file path - Cross-platform"""
     file_path = file_path.strip().strip('"').strip("'")
     file_path = file_path.replace('\t', '\\')
     file_path = file_path.replace('	', '\\')
-    if ':' in file_path and '\\' not in file_path and '/' not in file_path:
-        parts = file_path.split(':')
-        if len(parts) > 1:
-            drive = parts[0] + ':'
-            rest = parts[1].replace('\\', '/').replace('/', '\\')
-            file_path = drive + '\\' + rest
-    file_path = file_path.replace('/', '\\')
+    
+    if IS_WINDOWS:
+        file_path = file_path.replace('/', '\\')
+        if ':' in file_path and '\\' not in file_path and '/' not in file_path:
+            parts = file_path.split(':')
+            if len(parts) > 1:
+                drive = parts[0] + ':'
+                rest = parts[1].replace('\\', '/').replace('/', '\\')
+                file_path = drive + '\\' + rest
+    else:
+        file_path = file_path.replace('\\', '/')
+    
     return file_path.strip()
 
 def find_file_anywhere(filename):
-    """Search for a file anywhere in the system"""
+    """Search for a file anywhere in the system - Cross-platform"""
     search_paths = [
         os.getcwd(),
-        os.environ.get('USERPROFILE'),
         os.path.expanduser('~'),
     ]
     
-    # Add common paths
-    user_profile = os.environ.get('USERPROFILE')
-    if user_profile:
+    if IS_WINDOWS:
         search_paths.extend([
-            os.path.join(user_profile, 'Documents'),
-            os.path.join(user_profile, 'Desktop'),
-            os.path.join(user_profile, 'Downloads'),
+            os.environ.get('USERPROFILE', ''),
+            os.path.join(os.environ.get('USERPROFILE', ''), 'Documents'),
+            os.path.join(os.environ.get('USERPROFILE', ''), 'Desktop'),
+            os.path.join(os.environ.get('USERPROFILE', ''), 'Downloads'),
+            os.environ.get('TEMP', ''),
+            os.path.join(os.environ.get('USERPROFILE', ''), 'AppData', 'Local', 'Temp'),
+            'C:\\',
+            'C:\\ProgramData',
+            'C:\\Users',
+        ])
+    elif IS_MAC:
+        search_paths.extend([
+            '/tmp',
+            '/var/tmp',
+            '/System',
+            '/Library',
+            '/Applications',
+        ])
+    else:  # Linux
+        search_paths.extend([
+            '/tmp',
+            '/var/tmp',
+            '/etc',
+            '/var',
+            '/opt',
+            '/usr/local/bin',
+            '/home',
         ])
     
-    search_paths.extend([
-        os.environ.get('TEMP'),
-        os.path.join(os.environ.get('USERPROFILE', ''), 'AppData', 'Local', 'Temp'),
-        'C:\\',
-        'C:\\ProgramData',
-        'C:\\Users',
-        '/tmp',
-        '/var/tmp',
-    ])
-    
-    # Filter out None values
     search_paths = [p for p in search_paths if p]
     
     if os.path.exists(WORKSPACE_DIR):
@@ -1968,34 +1822,27 @@ def find_file_anywhere(filename):
         if not os.path.exists(search_path):
             continue
         try:
-            print(f"[SEARCH] Looking in: {search_path}")
             for root, dirs, files in os.walk(search_path):
                 depth = root.replace(search_path, '').count(os.sep)
                 if depth > 4:
                     continue
                 for f in files:
                     if f.lower() == filename.lower():
-                        found_path = os.path.join(root, f)
-                        print(f"[SEARCH] Found: {found_path}")
-                        return found_path
-        except Exception as e:
-            print(f"[SEARCH] Error in {search_path}: {e}")
+                        return os.path.join(root, f)
+        except:
             continue
     return None
 
 def quarantine_file(file_path, threat_type="Ransomware"):
+    """Quarantine a file - Cross-platform"""
     global pending_quarantine, quarantined_files, ransomware_detected_files
     
     file_path = sanitize_path(file_path)
-    print(f"[QUARANTINE] Attempting to quarantine: {file_path}")
     
     if not os.path.exists(file_path):
         filename = os.path.basename(file_path)
-        print(f"[QUARANTINE] File not found, searching for: {filename}")
-        
         found_path = find_file_anywhere(filename)
         if found_path:
-            print(f"[QUARANTINE] Found file at: {found_path}")
             file_path = found_path
         else:
             for item in pending_quarantine:
@@ -2007,7 +1854,7 @@ def quarantine_file(file_path, threat_type="Ransomware"):
                 return {'success': False, 'error': f'File not found: {file_path}'}
     
     if os.path.isdir(file_path):
-        return {'success': False, 'error': f'Path is a directory, not a file: {file_path}'}
+        return {'success': False, 'error': f'Path is a directory: {file_path}'}
     
     if not os.path.exists(file_path):
         return {'success': False, 'error': f'File does not exist: {file_path}'}
@@ -2027,7 +1874,6 @@ def quarantine_file(file_path, threat_type="Ransomware"):
     
     try:
         shutil.move(file_path, dest_path)
-        print(f"[QUARANTINE] Moved: {file_path} -> {dest_path}")
         
         quarantined_files.append({
             'original_path': file_path,
@@ -2046,7 +1892,7 @@ def quarantine_file(file_path, threat_type="Ransomware"):
         
         log_file = os.path.join(LOGS_DIR, 'quarantine.log')
         with open(log_file, 'a', encoding='utf-8') as f:
-            f.write(f"{datetime.now().isoformat()} | QUARANTINED | {file_path} -> {dest_path} | {threat_type}\n")
+            f.write(f"{datetime.now().isoformat()} | QUARANTINED | {file_path} -> {dest_path} | {threat_type} | {SYSTEM}\n")
         
         if not pending_quarantine:
             if SHIELD_AVAILABLE and hasattr(shield, 'threat_level'):
@@ -2054,28 +1900,20 @@ def quarantine_file(file_path, threat_type="Ransomware"):
         
         return {'success': True, 'quarantine_path': dest_path}
     except Exception as e:
-        print(f"[QUARANTINE] Error: {e}")
         return {'success': False, 'error': str(e)}
 
 def restore_from_quarantine(quarantine_path):
-    """Restore a file from quarantine"""
+    """Restore a file from quarantine - Cross-platform"""
     global quarantined_files
     
-    # Sanitize the path first
     quarantine_path = sanitize_path(quarantine_path)
-    print(f"[RESTORE] Attempting to restore: {quarantine_path}")
     
     if not os.path.exists(quarantine_path):
-        # Try to find the file in the quarantine directory
         filename = os.path.basename(quarantine_path)
-        print(f"[RESTORE] File not found, searching for: {filename}")
-        
-        # Search in quarantine directory
         for root, dirs, files in os.walk(QUARANTINE_DIR):
             for f in files:
                 if f == filename:
                     quarantine_path = os.path.join(root, f)
-                    print(f"[RESTORE] Found file at: {quarantine_path}")
                     break
             if os.path.exists(quarantine_path):
                 break
@@ -2083,10 +1921,8 @@ def restore_from_quarantine(quarantine_path):
     if not os.path.exists(quarantine_path):
         return {'success': False, 'error': f'Quarantine file not found: {quarantine_path}'}
     
-    # Find the original path from history
     original_path = None
     for item in quarantined_files:
-        # Compare just the filename or full path
         item_path = item.get('quarantine_path', '')
         if os.path.basename(item_path) == os.path.basename(quarantine_path):
             original_path = item.get('original_path')
@@ -2099,13 +1935,9 @@ def restore_from_quarantine(quarantine_path):
         return {'success': False, 'error': 'Original path not found in history'}
     
     try:
-        # Create directory if it doesn't exist
         os.makedirs(os.path.dirname(original_path), exist_ok=True)
-        
-        # Move file back
         shutil.move(quarantine_path, original_path)
         
-        # Update history
         quarantined_files = [f for f in quarantined_files if f.get('quarantine_path') != quarantine_path]
         save_quarantine_history()
         
@@ -2114,24 +1946,17 @@ def restore_from_quarantine(quarantine_path):
         return {'success': False, 'error': str(e)}
 
 def delete_quarantined(quarantine_path):
-    """Permanently delete a quarantined file"""
+    """Permanently delete a quarantined file - Cross-platform"""
     global quarantined_files
     
-    # Sanitize the path first
     quarantine_path = sanitize_path(quarantine_path)
-    print(f"[DELETE] Attempting to delete: {quarantine_path}")
     
     if not os.path.exists(quarantine_path):
-        # Try to find the file in the quarantine directory
         filename = os.path.basename(quarantine_path)
-        print(f"[DELETE] File not found, searching for: {filename}")
-        
-        # Search in quarantine directory
         for root, dirs, files in os.walk(QUARANTINE_DIR):
             for f in files:
                 if f == filename:
                     quarantine_path = os.path.join(root, f)
-                    print(f"[DELETE] Found file at: {quarantine_path}")
                     break
             if os.path.exists(quarantine_path):
                 break
@@ -2141,71 +1966,52 @@ def delete_quarantined(quarantine_path):
     
     try:
         os.remove(quarantine_path)
-        # Also remove the quarantine directory if empty
         quarantine_dir = os.path.dirname(quarantine_path)
         try:
             os.rmdir(quarantine_dir)
         except:
-            pass  # Directory not empty or can't remove
-            
-        quarantined_files = [f for f in quarantined_files if os.path.basename(f.get('quarantine_path', '')) != os.path.basename(quarantine_path)]
+            pass
+        
+        quarantined_files = [f for f in quarantined_files 
+                           if os.path.basename(f.get('quarantine_path', '')) != os.path.basename(quarantine_path)]
         save_quarantine_history()
         return {'success': True}
     except Exception as e:
         return {'success': False, 'error': str(e)}
 
 # ============================================================
-# SYSTEM CONTROL FUNCTIONS
+# CROSS-PLATFORM PROCESS MANAGEMENT
 # ============================================================
 def kill_process(pid):
+    """Kill a process - Cross-platform"""
     try:
-        process = psutil.Process(pid)
-        process.terminate()
-        time.sleep(1)
-        if process.is_running():
-            process.kill()
-        blocked_processes.append(pid)
+        if PSUTIL_AVAILABLE:
+            process = psutil.Process(pid)
+            process.terminate()
+            time.sleep(1)
+            if process.is_running():
+                process.kill()
+            blocked_processes.append(pid)
+        else:
+            if IS_WINDOWS:
+                subprocess.run(['taskkill', '/F', '/PID', str(pid)], capture_output=True)
+            else:
+                os.kill(pid, 15)  # SIGTERM
+                time.sleep(1)
+                try:
+                    os.kill(pid, 0)
+                    os.kill(pid, 9)  # SIGKILL
+                except OSError:
+                    pass
         return {'success': True}
     except Exception as e:
         return {'success': False, 'error': str(e)}
 
-def isolate_system():
-    global system_isolated
-    try:
-        for interface in netifaces.interfaces():
-            try:
-                subprocess.run(['netsh', 'interface', 'set', 'interface', interface, 'admin=disable'], 
-                             capture_output=True, timeout=5)
-            except:
-                pass
-        
-        subprocess.run(['netsh', 'advfirewall', 'set', 'allprofiles', 'firewallpolicy', 'blockinbound,blockoutbound'], 
-                      capture_output=True)
-        
-        system_isolated = True
-        return {'success': True}
-    except Exception as e:
-        return {'success': False, 'error': str(e)}
-
-def restore_network():
-    global system_isolated
-    try:
-        for interface in netifaces.interfaces():
-            try:
-                subprocess.run(['netsh', 'interface', 'set', 'interface', interface, 'admin=enable'], 
-                             capture_output=True, timeout=5)
-            except:
-                pass
-        
-        subprocess.run(['netsh', 'advfirewall', 'set', 'allprofiles', 'firewallpolicy', 'blockinbound,allowoutbound'], 
-                      capture_output=True)
-        
-        system_isolated = False
-        return {'success': True}
-    except Exception as e:
-        return {'success': False, 'error': str(e)}
-
+# ============================================================
+# CROSS-PLATFORM SCAN FUNCTIONS
+# ============================================================
 def full_system_scan():
+    """Run a full system scan - Cross-platform"""
     global scanning_in_progress
     if scanning_in_progress:
         return {'success': False, 'error': 'Scan already in progress'}
@@ -2220,7 +2026,139 @@ def full_system_scan():
         return {'success': False, 'error': str(e)}
 
 # ============================================================
-# ROUTES
+# CROSS-PLATFORM REPORT GENERATOR
+# ============================================================
+def generate_report(incident_data):
+    """Generate incident report - Cross-platform"""
+    global report_history
+    
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    report_id = f"DST-{timestamp}"
+    watermark = "DSTERMINAL CYBER OPS v4.0.0.113"
+    
+    json_data = {
+        'report_id': report_id,
+        'timestamp': datetime.now().isoformat(),
+        'version': '4.0.0.113',
+        'platform': SYSTEM,
+        'watermark': watermark,
+        'incident': incident_data,
+        'system_info': get_system_metrics()
+    }
+    json_path = os.path.join(REPORTS_DIR, f'{report_id}.json')
+    with open(json_path, 'w', encoding='utf-8') as f:
+        json.dump(json_data, f, indent=2)
+    
+    # HTML Report
+    html_content = f'''<!DOCTYPE html>
+<html>
+<head><title>DSTerminal Security Report</title>
+<style>
+body {{ font-family: 'Segoe UI', sans-serif; background: #0a0e17; color: #00ff88; padding: 40px; }}
+.watermark {{ position: fixed; bottom: 20px; right: 20px; color: rgba(0,255,136,0.1); font-size: 60px; transform: rotate(-20deg); }}
+.header {{ border-bottom: 2px solid #00ff88; padding-bottom: 20px; margin-bottom: 30px; }}
+.incident {{ background: rgba(255,0,51,0.1); border: 1px solid #ff0033; padding: 20px; border-radius: 10px; }}
+.recommendation {{ background: rgba(0,255,136,0.05); border-left: 4px solid #00ff88; padding: 15px; margin: 10px 0; }}
+.metric {{ display: inline-block; margin: 10px 20px; }}
+</style>
+</head>
+<body>
+<div class="watermark">{watermark}</div>
+<div class="header"><h1>DSTERMINAL CYBER OPS - INCIDENT RESPONSE REPORT</h1>
+<p>Report ID: {report_id} | Version: 4.0.0.113 | Platform: {SYSTEM} | Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p></div>
+<div class="incident">
+<h2>[ALERT] {incident_data.get('threat_level', 'INCIDENT')}</h2>
+<p><b>File:</b> {incident_data.get('file_path', 'Unknown')}</p>
+<p>{incident_data.get('description', 'Security incident detected and contained')}</p>
+</div>
+<h3>[LIST] Recommendations</h3>
+{''.join([f'<div class="recommendation">[OK] {r}</div>' for r in incident_data.get('recommendations', ['Run full system scan', 'Update security patches', 'Review access logs'])])}
+<h3>[CHART] System Metrics</h3>
+<div><span class="metric">CPU: {get_system_metrics().get('cpu', 0)}%</span>
+<span class="metric">RAM: {get_system_metrics().get('memory', 0)}%</span>
+<span class="metric">DISK: {get_system_metrics().get('disk', 0)}%</span></div>
+<hr style="border-color:rgba(0,255,136,0.1);margin-top:30px;">
+<p style="color:#2a5a4a;text-align:center;">{watermark} | Classified - Confidential | Platform: {SYSTEM}</p>
+</body>
+</html>'''
+    html_path = os.path.join(REPORTS_DIR, f'{report_id}.html')
+    with open(html_path, 'w', encoding='utf-8') as f:
+        f.write(html_content)
+    
+    # PDF-like text report
+    pdf_path = os.path.join(REPORTS_DIR, f'{report_id}.txt')
+    pdf_content = f"""
+    ╔═══════════════════════════════════════════════════════════════════════════════╗
+    ║              DSTERMINAL CYBER OPS - INCIDENT REPORT                          ║
+    ║                   v4.0.0.113 - Platform: {SYSTEM}                           ║
+    ╚═══════════════════════════════════════════════════════════════════════════════╝
+    
+    Report ID: {report_id}
+    Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+    Platform: {SYSTEM}
+    
+    ╔═══════════════════════════════════════════════════════════════════════════════╗
+    ║                    INCIDENT DETAILS                                         ║
+    ╚═══════════════════════════════════════════════════════════════════════════════╝
+    
+    Threat Level: {incident_data.get('threat_level', 'INCIDENT')}
+    File: {incident_data.get('file_path', 'Unknown')}
+    Description: {incident_data.get('description', 'Security incident detected')}
+    
+    ╔═══════════════════════════════════════════════════════════════════════════════╗
+    ║                  RECOMMENDATIONS                                            ║
+    ╚═══════════════════════════════════════════════════════════════════════════════╝
+    
+    {chr(10).join(['• ' + r for r in incident_data.get('recommendations', ['Run full system scan', 'Update security patches'])])}
+    
+    ╔═══════════════════════════════════════════════════════════════════════════════╗
+    ║              {watermark}                                                    ║
+    ║              Classified - Confidential                                      ║
+    ╚═══════════════════════════════════════════════════════════════════════════════╝
+    """
+    with open(pdf_path, 'w', encoding='utf-8') as f:
+        f.write(pdf_content)
+    
+    report_entry = {
+        'id': report_id,
+        'timestamp': datetime.now().isoformat(),
+        'type': incident_data.get('threat_level', 'INCIDENT'),
+        'description': incident_data.get('description', 'Security incident'),
+        'file_path': incident_data.get('file_path', 'Unknown')
+    }
+    report_history.append(report_entry)
+    save_report_history()
+    
+    print(f"[REPORT] Generated: {report_id}")
+    print(f"  - JSON: {json_path}")
+    print(f"  - HTML: {html_path}")
+    print(f"  - TXT: {pdf_path}")
+    
+    return report_entry
+
+# ============================================================
+# CROSS-PLATFORM SERVER STATUS LOGGING
+# ============================================================
+def start_server_status_logging():
+    """Start periodic server status logging"""
+    def status_loop():
+        while True:
+            try:
+                time.sleep(30)
+                if pending_quarantine:
+                    server_alert(f"📊 Status: {len(pending_quarantine)} files pending quarantine", "INFO")
+                if quarantined_files:
+                    server_alert(f"📊 Status: {len(quarantined_files)} files quarantined", "INFO")
+                if config.get('monitoring_enabled', True):
+                    server_alert("📊 Status: Monitoring active", "INFO")
+            except:
+                pass
+    
+    thread = threading.Thread(target=status_loop, daemon=True)
+    thread.start()
+
+# ============================================================
+# FLASK ROUTES
 # ============================================================
 @app.route('/')
 def index():
@@ -2229,14 +2167,14 @@ def index():
 @app.route('/api/status')
 def get_status():
     status = shield.get_status() if SHIELD_AVAILABLE else {'threat_level': 'CLEAN', 'events_monitored': 0, 'monitoring': config.get('monitoring_enabled', True)}
-    vulnerabilities = detect_real_vulnerabilities()
+    vulnerabilities = detect_vulnerabilities()
     threats = detect_threat_actors()
     
     risk_score = min(100, 
         (sum(1 for v in vulnerabilities if v['severity'] == 'Critical') * 15) +
         (sum(1 for v in vulnerabilities if v['severity'] == 'High') * 10) +
         (sum(1 for t in threats if t['risk'] == 'High') * 10) +
-        (psutil.cpu_percent() / 4)
+        (get_system_metrics().get('cpu', 0) / 4)
     )
     
     threat_level = status.get('threat_level', 'CLEAN')
@@ -2299,12 +2237,11 @@ def get_status():
         'isolated': system_isolated,
         'scanning': scanning_in_progress,
         'auto_quarantine': config.get('auto_quarantine', True),
-        'quarantine_progress': auto_quarantine_progress
+        'quarantine_progress': auto_quarantine_progress,
+        'platform': SYSTEM
     })
 
-# ============================================================
-# QUARANTINE ROUTES
-# ============================================================
+# Quarantine Routes
 @app.route('/api/quarantine', methods=['POST'])
 def quarantine_file_route():
     data = request.json
@@ -2319,8 +2256,6 @@ def quarantine_file_route():
         return jsonify({'success': False, 'error': 'User did not confirm quarantine', 'cancelled': True})
     
     file_path = sanitize_path(file_path)
-    print(f"[QUARANTINE ROUTE] Attempting to quarantine: {file_path}")
-    
     result = quarantine_file(file_path, threat_type)
     
     if result['success']:
@@ -2385,9 +2320,7 @@ def delete_quarantine_route():
     result = delete_quarantined(quarantine_path)
     return jsonify(result)
 
-# ============================================================
-# SYSTEM CONTROL ROUTES
-# ============================================================
+# System Routes
 @app.route('/api/monitoring/toggle', methods=['POST'])
 def toggle_monitoring():
     global config
@@ -2403,91 +2336,74 @@ def toggle_monitoring():
                 shield.start_monitoring()
             else:
                 shield.stop_monitoring()
-        elif hasattr(shield, 'start_monitoring') and hasattr(shield, 'stop_monitoring'):
-            if enable:
-                shield.start_monitoring()
-            else:
-                shield.stop_monitoring()
     
-    return jsonify({'success': True, 'monitoring': enable, 'status': 'enabled' if enable else 'paused'})
-
-scanning_in_progress = False
-scan_progress = 0
-scan_results = []
+    return jsonify({'success': True, 'monitoring': enable})
 
 @app.route('/api/scan/full', methods=['POST'])
 def start_full_scan():
     global scanning_in_progress, scan_progress, scan_results
     
     if scanning_in_progress:
-        return jsonify({'success': False, 'error': 'Scan already in progress', 'progress': scan_progress})
+        return jsonify({'success': False, 'error': 'Scan already in progress'})
     
     scanning_in_progress = True
     scan_progress = 0
     scan_results = []
     
-    try:
-        def scan_thread():
-            global scanning_in_progress, scan_progress, scan_results
-            try:
-                scan_progress = 20
-                process_threats = detect_threat_actors()
-                if process_threats:
-                    scan_results.append({'type': 'process', 'threats': process_threats})
-                time.sleep(0.5)
-                
-                scan_progress = 50
-                file_results = detector.scan_for_ransomware()
-                if file_results:
-                    scan_results.extend(file_results)
-                time.sleep(0.5)
-                
-                scan_progress = 70
-                vulns = detect_real_vulnerabilities()
-                if vulns:
-                    scan_results.append({'type': 'vulnerabilities', 'list': vulns})
-                time.sleep(0.5)
-                
-                scan_progress = 90
-                ransomware_check = detect_ransomware_file()
-                if ransomware_check.get('detected'):
-                    scan_results.append({'type': 'ransomware', 'file': ransomware_check})
-                time.sleep(0.5)
-                
-                scan_progress = 100
-                time.sleep(0.5)
-                
-                if scan_results:
-                    incident_data = {
-                        'threat_level': 'SUSPICIOUS',
-                        'file_path': 'Full System Scan',
-                        'description': f"Full system scan found {len(scan_results)} potential threats",
-                        'recommendations': ['Review scan results', 'Quarantine infected files']
-                    }
-                    generate_report(incident_data)
-                
-            except Exception as e:
-                print(f"[SCAN] Error during scan: {e}")
-                scan_results.append({'type': 'error', 'message': str(e)})
-            finally:
-                scanning_in_progress = False
-                scan_progress = 0
-                socketio.emit('scan_complete', {'results': scan_results, 'count': len(scan_results)})
-        
-        thread = threading.Thread(target=scan_thread, daemon=True)
-        thread.start()
-        
-        return jsonify({
-            'success': True, 
-            'message': 'Scan started',
-            'progress': 0
-        })
-    except Exception as e:
-        scanning_in_progress = False
-        return jsonify({'success': False, 'error': str(e)})
+    def scan_thread():
+        global scanning_in_progress, scan_progress, scan_results
+        try:
+            scan_progress = 20
+            process_threats = detect_threat_actors()
+            if process_threats:
+                scan_results.append({'type': 'process', 'threats': process_threats})
+            time.sleep(0.5)
+            
+            scan_progress = 50
+            file_results = detector.scan_for_ransomware()
+            if file_results:
+                scan_results.extend(file_results)
+            time.sleep(0.5)
+            
+            scan_progress = 70
+            vulns = detect_vulnerabilities()
+            if vulns:
+                scan_results.append({'type': 'vulnerabilities', 'list': vulns})
+            time.sleep(0.5)
+            
+            scan_progress = 90
+            ransomware_check = detect_ransomware_file()
+            if ransomware_check.get('detected'):
+                scan_results.append({'type': 'ransomware', 'file': ransomware_check})
+            time.sleep(0.5)
+            
+            scan_progress = 100
+            time.sleep(0.5)
+            
+            if scan_results:
+                incident_data = {
+                    'threat_level': 'SUSPICIOUS',
+                    'file_path': 'Full System Scan',
+                    'description': f"Full system scan found {len(scan_results)} potential threats on {SYSTEM}",
+                    'recommendations': ['Review scan results', 'Quarantine infected files']
+                }
+                generate_report(incident_data)
+            
+        except Exception as e:
+            scan_results.append({'type': 'error', 'message': str(e)})
+        finally:
+            scanning_in_progress = False
+            scan_progress = 0
+            socketio.emit('scan_complete', {'results': scan_results, 'count': len(scan_results)})
+    
+    thread = threading.Thread(target=scan_thread, daemon=True)
+    thread.start()
+    
+    return jsonify({'success': True, 'message': 'Scan started'})
 
 @app.route('/api/scan/progress')
 def get_scan_progress():
+    global scanning_in_progress, scan_progress, scan_results
     return jsonify({
         'scanning': scanning_in_progress,
         'progress': scan_progress,
@@ -2496,6 +2412,7 @@ def get_scan_progress():
 
 @app.route('/api/scan/results')
 def get_scan_results():
+    global scan_results
     return jsonify({
         'results': scan_results,
         'count': len(scan_results)
@@ -2513,17 +2430,18 @@ def kill_process_route():
 @app.route('/api/process/list')
 def list_processes():
     processes = []
-    for proc in psutil.process_iter(['pid', 'name', 'cpu_percent', 'memory_percent']):
-        try:
-            processes.append({
-                'pid': proc.info['pid'],
-                'name': proc.info['name'],
-                'cpu': proc.info['cpu_percent'] or 0,
-                'memory': proc.info['memory_percent'] or 0,
-                'blocked': proc.info['pid'] in blocked_processes
-            })
-        except:
-            pass
+    if PSUTIL_AVAILABLE:
+        for proc in psutil.process_iter(['pid', 'name', 'cpu_percent', 'memory_percent']):
+            try:
+                processes.append({
+                    'pid': proc.info['pid'],
+                    'name': proc.info['name'],
+                    'cpu': proc.info['cpu_percent'] or 0,
+                    'memory': proc.info['memory_percent'] or 0,
+                    'blocked': proc.info['pid'] in blocked_processes
+                })
+            except:
+                pass
     return jsonify(processes[:50])
 
 @app.route('/api/network/isolate', methods=['POST'])
@@ -2536,9 +2454,7 @@ def restore_network_route():
     result = restore_network()
     return jsonify(result)
 
-# ============================================================
-# WHITELIST/BLACKLIST ROUTES
-# ============================================================
+# Whitelist/Blacklist Routes
 @app.route('/api/whitelist/add', methods=['POST'])
 def add_to_whitelist():
     data = request.json
@@ -2599,9 +2515,7 @@ def remove_from_blacklist():
 def get_blacklist():
     return jsonify(blacklist)
 
-# ============================================================
-# CONFIGURATION ROUTES
-# ============================================================
+# Config Routes
 @app.route('/api/config', methods=['GET', 'POST'])
 def handle_config():
     global config
@@ -2615,43 +2529,14 @@ def handle_config():
         save_config(config)
         return jsonify({'success': True, 'config': config})
 
-@app.route('/api/config/export')
-def export_config():
-    config_path = os.path.join(CONFIG_DIR, 'config.json')
-    if os.path.exists(config_path):
-        return send_file(config_path, as_attachment=True, download_name='dsterminal_config.json')
-    return jsonify({'error': 'Config not found'}), 404
-
-@app.route('/api/config/import', methods=['POST'])
-def import_config():
-    global config
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file provided'}), 400
-    
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'No file selected'}), 400
-    
-    try:
-        imported_config = json.load(file)
-        for key, value in imported_config.items():
-            if key in config:
-                config[key] = value
-        save_config(config)
-        return jsonify({'success': True, 'config': config})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 400
-
-# ============================================================
-# REPORT ROUTES
-# ============================================================
+# Report Routes
 @app.route('/api/reports')
 def get_reports():
     return jsonify(report_history[-10:] if report_history else [])
 
 @app.route('/api/reports/download/<report_id>/<format>')
 def download_report(report_id, format):
-    ext_map = {'json': '.json', 'html': '.html', 'pdf': '.pdf'}
+    ext_map = {'json': '.json', 'html': '.html', 'pdf': '.txt'}
     if format not in ext_map:
         return jsonify({'error': 'Invalid format'}), 400
     
@@ -2660,9 +2545,6 @@ def download_report(report_id, format):
         return send_file(file_path, as_attachment=True, download_name=f"{report_id}.{format}")
     return jsonify({'error': 'Report not found'}), 404
 
-# ============================================================
-# OTHER ROUTES
-# ============================================================
 @app.route('/api/metrics')
 def get_metrics():
     return jsonify(get_system_metrics())
@@ -2697,7 +2579,7 @@ def get_threats():
 
 @app.route('/api/vulnerabilities')
 def get_vulnerabilities():
-    return jsonify(detect_real_vulnerabilities())
+    return jsonify(detect_vulnerabilities())
 
 @app.route('/api/scan/ransomware')
 def scan_ransomware():
@@ -2708,56 +2590,19 @@ def scan_ransomware():
         'count': len(results)
     })
 
-@app.route('/api/debug/paths')
-def debug_paths():
-    return jsonify({
-        'monitored_dirs': detector.monitored_dirs,
-        'pending_quarantine': pending_quarantine,
-        'quarantined_files': quarantined_files,
-        'ransomware_detected_files': ransomware_detected_files,
-        'detected_file_paths': list(detected_file_paths),
-        'whitelist': whitelist,
-        'blacklist': blacklist,
-        'config': config,
-        'isolated': system_isolated
-    })
-
-@app.route('/api/logs/export')
-def export_logs():
-    log_files = []
-    for log_file in os.listdir(LOGS_DIR):
-        if log_file.endswith('.log'):
-            log_files.append(log_file)
-    
-    export_path = os.path.join(WORKSPACE_DIR, f'logs_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.txt')
-    with open(export_path, 'w', encoding='utf-8') as outfile:
-        outfile.write(f"DSTERMINAL LOGS EXPORT - {datetime.now().isoformat()}\n")
-        outfile.write("=" * 80 + "\n\n")
-        for log_file in log_files:
-            outfile.write(f"\n--- {log_file} ---\n")
-            try:
-                with open(os.path.join(LOGS_DIR, log_file), 'r', encoding='utf-8') as infile:
-                    outfile.write(infile.read())
-            except:
-                pass
-    
-    if os.path.exists(export_path):
-        return send_file(export_path, as_attachment=True, download_name=os.path.basename(export_path))
-    return jsonify({'error': 'Failed to export logs'}), 500
+@app.route('/favicon.ico')
+def favicon():
+    response = make_response('', 204)
+    response.headers['Cache-Control'] = 'public, max-age=86400'
+    return response
 
 # ============================================================
 # WEBSOCKET / REAL-TIME DASHBOARD STREAM
 # ============================================================
-# One broadcaster is shared by all connected browser clients.
-# The old implementation started one infinite thread per browser
-# subscription; this implementation keeps a single controlled
-# monitoring loop and broadcasts to all connected clients.
-
 _realtime_clients = set()
 _realtime_lock = threading.Lock()
 _realtime_thread = None
 _realtime_stop = threading.Event()
-
 
 def _realtime_snapshot():
     """Build one complete dashboard update safely."""
@@ -2765,17 +2610,17 @@ def _realtime_snapshot():
         try:
             status_response = get_status()
             status = status_response.get_json() if hasattr(status_response, 'get_json') else status_response
-        except Exception as exc:
-            status = {'error': str(exc)}
+        except Exception:
+            status = {}
 
         try:
             metrics = get_system_metrics()
-        except Exception as exc:
-            metrics = {'error': str(exc)}
+        except Exception:
+            metrics = {}
 
         try:
             mitre = detect_active_mitre_techniques()
-        except Exception as exc:
+        except Exception:
             mitre = []
 
         try:
@@ -2790,8 +2635,8 @@ def _realtime_snapshot():
             'mitre': mitre,
             'events': events,
             'timestamp': datetime.now().isoformat(),
+            'platform': SYSTEM
         }
-
 
 def _realtime_broadcast_loop():
     """Broadcast dashboard telemetry every two seconds."""
@@ -2815,19 +2660,17 @@ def _realtime_broadcast_loop():
                         socketio.emit('metrics_update', snapshot['metrics'], room=sid)
                         socketio.emit('mitre_update', snapshot['mitre'], room=sid)
                         socketio.emit('events_update', snapshot['events'], room=sid)
-                    except Exception as exc:
-                        print(f"[SOCKETIO] Client update error: {exc}")
+                    except Exception:
+                        pass
 
-            except Exception as exc:
-                print(f"[SOCKETIO] Real-time update error: {exc}")
+            except Exception:
+                pass
 
-            # threading backend: normal sleep is intentional and safe.
             _realtime_stop.wait(2.0)
     finally:
         _realtime_thread = None
         _realtime_stop.clear()
         print("[SOCKETIO] Real-time monitoring loop stopped")
-
 
 def _ensure_realtime_monitoring():
     """Start the shared broadcaster once when the first client subscribes."""
@@ -2845,7 +2688,6 @@ def _ensure_realtime_monitoring():
         )
         _realtime_thread.start()
 
-
 @socketio.on('connect')
 def handle_connect():
     sid = request.sid
@@ -2858,18 +2700,17 @@ def handle_connect():
         'sid': sid,
         'async_mode': socketio.async_mode,
         'realtime': True,
+        'platform': SYSTEM
     })
 
-    # Send the current state immediately; don't wait for the 2-second loop.
     try:
         snapshot = _realtime_snapshot()
         emit('status_update', snapshot['status'])
         emit('metrics_update', snapshot['metrics'])
         emit('mitre_update', snapshot['mitre'])
         emit('events_update', snapshot['events'])
-    except Exception as exc:
-        print(f'[SOCKETIO] Initial state error: {exc}')
-
+    except Exception:
+        pass
 
 @socketio.on('disconnect')
 def handle_disconnect():
@@ -2881,7 +2722,6 @@ def handle_disconnect():
             _realtime_stop.set()
 
     print(f'[SOCKETIO] Client disconnected: {sid}')
-
 
 @socketio.on('subscribe_updates')
 def handle_subscribe():
@@ -2897,30 +2737,210 @@ def handle_subscribe():
     })
     print(f'[SOCKETIO] Client subscribed to real-time updates: {sid}')
 
+# ============================================================
+# DASHBOARD COMMAND FUNCTIONS
+# ============================================================
+_dashboard_running = False
+_dashboard_thread = None
+_dashboard_port = 5000
 
-@socketio.on('unsubscribe_updates')
-def handle_unsubscribe():
-    sid = request.sid
-    with _realtime_lock:
-        _realtime_clients.discard(sid)
-        if not _realtime_clients:
-            _realtime_stop.set()
+def find_available_port(start_port=5000, max_port=5100):
+    """Find an available port - Cross-platform"""
+    import socket
+    for port in range(start_port, max_port + 1):
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(1)
+            sock.bind(('localhost', port))
+            sock.close()
+            return port
+        except OSError:
+            continue
+        except Exception:
+            continue
+    return None
 
-    emit('subscription_status', {
-        'subscribed': False,
-        'realtime': False,
-    })
-    print(f'[SOCKETIO] Client unsubscribed: {sid}')
+def cmd_dashboard(args=None):
+    """Start the dashboard server - Cross-platform"""
+    global _dashboard_running, _dashboard_thread, _dashboard_port
+    
+    if _dashboard_running:
+        return f"[INFO] Dashboard is already running on port {_dashboard_port}"
+    
+    try:
+        port = find_available_port(5000)
+        if port is None:
+            return "[!] No available ports found"
+        
+        _dashboard_port = port
+        print(f"[DASHBOARD] Starting DSTerminal Dashboard on port {port}...")
+        print(f"[DASHBOARD] Platform: {SYSTEM}")
+        
+        def run_dashboard():
+            global _dashboard_running
+            try:
+                with SilenceFlaskStartup():
+                    socketio.run(app, debug=False, host='0.0.0.0', port=port)
+            except Exception as e:
+                print(f"[DASHBOARD] Error: {e}")
+            finally:
+                _dashboard_running = False
+        
+        _dashboard_thread = threading.Thread(target=run_dashboard, daemon=True)
+        _dashboard_thread.start()
+        _dashboard_running = True
+        
+        def open_browser_delayed():
+            time.sleep(3)
+            try:
+                webbrowser.open(f'http://localhost:{port}')
+                print(f"[DASHBOARD] Browser opened to http://localhost:{port}")
+            except:
+                print(f"[DASHBOARD] Please open http://localhost:{port} manually")
+        
+        threading.Thread(target=open_browser_delayed, daemon=True).start()
+        
+        return f"[OK] Dashboard started at http://localhost:{port}"
+    
+    except Exception as e:
+        _dashboard_running = False
+        return f"[!] Failed to start dashboard: {e}"
 
-@app.route('/favicon.ico')
-def favicon():
-    # No external favicon dependency is required for the standalone EXE.
-    response = make_response('', 204)
-    response.headers['Cache-Control'] = 'public, max-age=86400'
-    return response
+def cmd_dashboard_stop(args=None):
+    """Stop the dashboard server"""
+    global _dashboard_running
+    
+    if not _dashboard_running:
+        return "[INFO] Dashboard is not running"
+    
+    try:
+        _dashboard_running = False
+        return "[OK] Dashboard stopped"
+    except Exception as e:
+        return f"[!] Failed to stop dashboard: {e}"
+
+def cmd_dashboard_status(args=None):
+    """Check dashboard status"""
+    global _dashboard_running, _dashboard_port
+    
+    if _dashboard_running:
+        status_lines = [
+            f"[OK] Dashboard is RUNNING on port {_dashboard_port}",
+            f"📍 URL: http://localhost:{_dashboard_port}",
+            f"🖥️  Platform: {SYSTEM}",
+            "🔄 Status: Active",
+            "📊 Monitoring: Enabled",
+            "💡 Use 'dashboard-browser' to open in browser",
+            "💡 Use 'dashboard-stop' to stop the server"
+        ]
+        return "\n".join(status_lines)
+    else:
+        return "[INFO] Dashboard is NOT running\n📋 Use 'dashboard' to start it"
+
+def cmd_dashboard_browser(args=None):
+    """Open dashboard in browser"""
+    global _dashboard_port, _dashboard_running
+    
+    if not _dashboard_running:
+        return "[INFO] Dashboard is not running. Use 'dashboard' to start it first."
+    
+    try:
+        port = _dashboard_port if _dashboard_port else 5000
+        webbrowser.open(f'http://localhost:{port}')
+        return f"[OK] Dashboard opened in browser at http://localhost:{port}"
+    except Exception as e:
+        return f"[!] Failed to open browser: {e}"
+
+def cmd_dashboard_help(args=None):
+    """Show dashboard help"""
+    return f"""
+╔══════════════════════════════════════════════════════════════╗
+║                    DASHBOARD COMMANDS                       ║
+╠══════════════════════════════════════════════════════════════╣
+║  dashboard / dash / security-dashboard  - Start dashboard   ║
+║  dashboard-stop / dash-stop            - Stop dashboard      ║
+║  dashboard-status / dash-status        - Check status        ║
+║  dashboard-browser / dash-browser      - Open in browser    ║
+║  dashboard-help / dash-help            - Show this help      ║
+╚══════════════════════════════════════════════════════════════╝
+
+[DASHBOARD FEATURES]
+  • Real-time threat monitoring with live updates
+  • Ransomware detection with auto-quarantine progress bar
+  • MITRE ATT&CK technique mapping and tracking
+  • System resource monitoring (CPU, RAM, Disk)
+  • Incident report generation (JSON/HTML/PDF)
+  • Process management with kill capability
+  • Network isolation control (one-click lockdown)
+  • Whitelist/blacklist management for files
+  • Auto-quarantine toggle with real-time progress
+  • Cross-platform support: Windows, Linux, macOS
+
+[PORT MANAGEMENT]
+  • Automatically finds an available port
+  • Tries ports from 5000 to 5100
+  • Shows the port being used in status
+
+[CROSS-PLATFORM SUPPORT]
+  • Windows: Full support with PowerShell integration
+  • Linux: Full support with iptables/UFW integration
+  • macOS: Full support with pf/ifconfig integration
+
+[TROUBLESHOOTING]
+  • If port 5000 is in use, it will try the next port
+  • Check status with 'dashboard-status'
+  • Stop with 'dashboard-stop' before starting again
+  • If you see socket errors, wait a few seconds and retry
+"""
 
 # ============================================================
-# HTML TEMPLATE
+# DASHBOARD INTEGRATION CLASS
+# ============================================================
+class DashboardIntegration:
+    """Dashboard integration class for backward compatibility"""
+    def __init__(self):
+        self.running = False
+        self.thread = None
+        self.port = 5000
+    
+    def start(self):
+        return cmd_dashboard([])
+    
+    def stop(self):
+        return cmd_dashboard_stop([])
+    
+    def status(self):
+        return cmd_dashboard_status([])
+    
+    def open_browser(self):
+        return cmd_dashboard_browser([])
+    
+    def help(self):
+        return cmd_dashboard_help([])
+
+dashboard_integration = DashboardIntegration()
+
+def register_dashboard_commands(terminal_instance):
+    """Register dashboard commands with terminal instance"""
+    try:
+        terminal_instance.register_command('dashboard', cmd_dashboard)
+        terminal_instance.register_command('dash', cmd_dashboard)
+        terminal_instance.register_command('security-dashboard', cmd_dashboard)
+        terminal_instance.register_command('dashboard-stop', cmd_dashboard_stop)
+        terminal_instance.register_command('dash-stop', cmd_dashboard_stop)
+        terminal_instance.register_command('dashboard-status', cmd_dashboard_status)
+        terminal_instance.register_command('dash-status', cmd_dashboard_status)
+        terminal_instance.register_command('dashboard-browser', cmd_dashboard_browser)
+        terminal_instance.register_command('dash-browser', cmd_dashboard_browser)
+        terminal_instance.register_command('dashboard-help', cmd_dashboard_help)
+        terminal_instance.register_command('dash-help', cmd_dashboard_help)
+        return True
+    except Exception as e:
+        print(f"[ERROR] Failed to register dashboard commands: {e}")
+        return False
+
+# ============================================================
+# HTML TEMPLATE - Cross-Platform Compatible
 # ============================================================
 HTML_TEMPLATE = """
 <!DOCTYPE html>
@@ -2936,18 +2956,10 @@ HTML_TEMPLATE = """
         html, body { width: 100%; height: 100%; overflow-x: hidden; background: #0a0e17; color: #00ff88; font-family: 'Segoe UI', monospace; }
         body { padding: 15px; min-height: 100vh; display: flex; flex-direction: column; }
         
-        #fullscreenOverlay { 
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
-            z-index: -1 !important;
-        }
-
         .dst-logo-container { display: flex; align-items: center; gap: 12px; position: relative; z-index: 3; }
         .dst-logo-img { width: 48px; height: 48px; object-fit: contain; filter: drop-shadow(0 0 20px rgba(0,255,136,0.3)); animation: logo-glow 2s ease-in-out infinite; border-radius: 8px; background: rgba(0,0,0,0.2); padding: 2px; }
         @keyframes logo-glow { 0%, 100% { filter: drop-shadow(0 0 20px rgba(0,255,136,0.3)); } 50% { filter: drop-shadow(0 0 40px rgba(0,255,136,0.6)) drop-shadow(0 0 80px rgba(0,255,136,0.2)); } }
-        .dst-logo-text { font-family: 'Courier New', monospace; font-weight: bold; font-size: 24px; letter-spacing: 3px; background: linear-gradient(135deg, #00ff88, #00ccff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: none; animation: neon-pulse 2s ease-in-out infinite; }
+        .dst-logo-text { font-family: 'Courier New', monospace; font-weight: bold; font-size: 24px; letter-spacing: 3px; background: linear-gradient(135deg, #00ff88, #00ccff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: neon-pulse 2s ease-in-out infinite; }
         .dst-logo-text .highlight { -webkit-text-fill-color: #ff00ff; }
         @keyframes neon-pulse { 0%, 100% { filter: drop-shadow(0 0 10px rgba(0,255,136,0.3)); } 50% { filter: drop-shadow(0 0 30px rgba(0,255,136,0.5)) drop-shadow(0 0 60px rgba(0,255,136,0.2)); } }
         .dst-logo-badge { font-size: 10px; color: #2a5a4a; border: 1px solid rgba(0,255,136,0.15); padding: 2px 8px; border-radius: 10px; letter-spacing: 1px; -webkit-text-fill-color: #2a5a4a; }
@@ -2999,17 +3011,8 @@ HTML_TEMPLATE = """
         .badge-ransomware { background: rgba(255,0,51,0.2); color: #ff0033; border: 1px solid #ff0033; animation: pulse 1s infinite; }
         @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
         .chart-container { height: 180px; margin-top: 6px; position: relative; min-height: 100px; }
-        .chart-container .chart-loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #2a5a4a;
-            font-size: 12px;
-            animation: pulse 1.5s ease-in-out infinite;
-        }
+        .chart-container .chart-loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #2a5a4a; font-size: 12px; animation: pulse 1.5s ease-in-out infinite; }
         .event-log { max-height: 150px; overflow-y: auto; font-size: 12px; background: rgba(0,0,0,0.3); border-radius: 4px; padding: 8px; }
-        .event-log .no-events { color: #2a5a4a; text-align: center; padding: 20px 0; font-size: 11px; }
         .event-item { padding: 4px 8px; border-bottom: 1px solid rgba(0,255,136,0.04); display: flex; justify-content: space-between; align-items: center; font-size: 11px; animation: slideIn 0.3s ease; font-family: 'Courier New', monospace; }
         @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
         .event-item .time { color: #2a5a4a; min-width: 70px; font-size: 10px; }
@@ -3036,10 +3039,7 @@ HTML_TEMPLATE = """
         .attack-banner.show { display: block; }
         .recommendation-box { background: rgba(0,255,136,0.05); border-left: 4px solid #00ff88; padding: 6px 10px; margin: 3px 0; border-radius: 4px; font-size: 10px; color: #aaa; }
         .mitre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-height: 200px; overflow-y: auto; padding-right: 4px; }
-        .mitre-grid::-webkit-scrollbar { width: 3px; }
-        .mitre-grid::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
-        .mitre-grid::-webkit-scrollbar-thumb { background: #00ff88; border-radius: 2px; }
-        .mitre-item { background: rgba(0,0,0,0.4); padding: 8px 10px; border-radius: 6px; border-left: 3px solid #00ff88; text-align: center; transition: all 0.3s ease; cursor: default; position: relative; overflow: hidden; }
+        .mitre-item { background: rgba(0,0,0,0.4); padding: 8px 10px; border-radius: 6px; border-left: 3px solid #00ff88; text-align: center; transition: all 0.3s ease; cursor: default; }
         .mitre-item:hover { transform: scale(1.05); border-left-color: #ff00ff; box-shadow: 0 0 30px rgba(0,255,136,0.15); }
         .mitre-item .count { font-size: 22px; font-weight: bold; color: #00ff88; display: block; font-family: 'Courier New', monospace; text-shadow: 0 0 20px rgba(0,255,136,0.3); }
         .mitre-item .technique-id { color: #00ccff; font-size: 8px; font-weight: bold; display: block; margin-top: 2px; letter-spacing: 0.5px; }
@@ -3055,202 +3055,43 @@ HTML_TEMPLATE = """
         .modal-content .list-item .action-btn { padding: 2px 8px; border-radius: 3px; cursor: pointer; font-size: 9px; font-family: monospace; margin-left: 4px; }
         .modal-content .list-item .action-btn.danger { background: rgba(255,0,51,0.1); border: 1px solid #ff0033; color: #ff0033; }
         .modal-content .list-item .action-btn.success { background: rgba(0,255,136,0.1); border: 1px solid #00ff88; color: #00ff88; }
-        .modal-content .list-item .action-btn:hover { opacity: 0.8; }
-        #matrixContainer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 0; }
-        .matrix-particle { position: absolute; color: rgba(0, 255, 136, 0.08); font-family: 'Courier New', monospace; font-size: 10px; pointer-events: none; animation: matrix-fall linear infinite; }
-        @keyframes matrix-fall { 0% { transform: translateY(-20px); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(calc(100% + 20px)); opacity: 0; } }
-        #headerTime { color: #2a5a4a; font-size: 12px; font-family: 'Courier New', monospace; text-shadow: 0 0 10px rgba(0, 255, 136, 0.1); position: relative; z-index: 3; }
-        #logoFallback { animation: logo-glow 2s ease-in-out infinite; }
-        .scan-progress { display: none; color: #ffcc00; font-size: 11px; margin-top: 4px; }
-        .scan-progress.active { display: block; }
         
-        .quarantine-progress-container {
-            display: none;
-            background: rgba(255,0,51,0.05);
-            border: 1px solid rgba(255,0,51,0.2);
-            border-radius: 8px;
-            padding: 12px 16px;
-            margin-top: 10px;
-            position: relative;
-            overflow: hidden;
-        }
-        .quarantine-progress-container.active {
-            display: block;
-            animation: glow-border 2s ease-in-out infinite;
-        }
-        @keyframes glow-border {
-            0%, 100% { border-color: rgba(255,0,51,0.2); }
-            50% { border-color: rgba(255,0,51,0.6); }
-        }
-        .quarantine-progress-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 11px;
-            margin-bottom: 8px;
-        }
-        .quarantine-progress-header .file-name {
-            color: #ffcc00;
-            font-family: monospace;
-            font-size: 10px;
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .quarantine-progress-header .status-text {
-            color: #ff0033;
-            font-weight: bold;
-        }
-        .quarantine-progress-bar {
-            width: 100%;
-            height: 6px;
-            background: rgba(255,0,51,0.1);
-            border-radius: 3px;
-            overflow: hidden;
-            position: relative;
-        }
-        .quarantine-progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ff0033, #ff6600, #ffcc00);
-            width: 0%;
-            transition: width 0.8s ease;
-            border-radius: 3px;
-            position: relative;
-        }
-        .quarantine-progress-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            animation: shimmer 1.5s infinite;
-        }
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-        .quarantine-progress-details {
-            display: flex;
-            justify-content: space-between;
-            font-size: 9px;
-            color: #2a5a4a;
-            margin-top: 4px;
-        }
-        .quarantine-progress-details .step {
-            color: #00ccff;
-        }
-        .auto-quarantine-toggle {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 10px;
-            color: #2a5a4a;
-            cursor: pointer;
-        }
-        .auto-quarantine-toggle input[type="checkbox"] {
-            appearance: none;
-            width: 32px;
-            height: 18px;
-            background: rgba(255,0,51,0.2);
-            border-radius: 10px;
-            border: 1px solid rgba(255,0,51,0.3);
-            cursor: pointer;
-            position: relative;
-            transition: all 0.3s;
-            flex-shrink: 0;
-        }
-        .auto-quarantine-toggle input[type="checkbox"]:checked {
-            background: rgba(0,255,136,0.3);
-            border-color: #00ff88;
-        }
-        .auto-quarantine-toggle input[type="checkbox"]::after {
-            content: '';
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 12px;
-            height: 12px;
-            background: #fff;
-            border-radius: 50%;
-            transition: all 0.3s;
-        }
-        .auto-quarantine-toggle input[type="checkbox"]:checked::after {
-            left: 16px;
-            background: #00ff88;
-        }
+        .quarantine-progress-container { display: none; background: rgba(255,0,51,0.05); border: 1px solid rgba(255,0,51,0.2); border-radius: 8px; padding: 12px 16px; margin-top: 10px; }
+        .quarantine-progress-container.active { display: block; animation: glow-border 2s ease-in-out infinite; }
+        @keyframes glow-border { 0%, 100% { border-color: rgba(255,0,51,0.2); } 50% { border-color: rgba(255,0,51,0.6); } }
+        .quarantine-progress-header { display: flex; justify-content: space-between; align-items: center; font-size: 11px; margin-bottom: 8px; }
+        .quarantine-progress-header .file-name { color: #ffcc00; font-family: monospace; font-size: 10px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .quarantine-progress-bar { width: 100%; height: 6px; background: rgba(255,0,51,0.1); border-radius: 3px; overflow: hidden; }
+        .quarantine-progress-fill { height: 100%; background: linear-gradient(90deg, #ff0033, #ff6600, #ffcc00); width: 0%; transition: width 0.8s ease; border-radius: 3px; }
+        .auto-quarantine-toggle { display: flex; align-items: center; gap: 8px; font-size: 10px; color: #2a5a4a; cursor: pointer; }
+        .auto-quarantine-toggle input[type="checkbox"] { appearance: none; width: 32px; height: 18px; background: rgba(255,0,51,0.2); border-radius: 10px; border: 1px solid rgba(255,0,51,0.3); cursor: pointer; position: relative; transition: all 0.3s; flex-shrink: 0; }
+        .auto-quarantine-toggle input[type="checkbox"]:checked { background: rgba(0,255,136,0.3); border-color: #00ff88; }
+        .auto-quarantine-toggle input[type="checkbox"]::after { content: ''; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; background: #fff; border-radius: 50%; transition: all 0.3s; }
+        .auto-quarantine-toggle input[type="checkbox"]:checked::after { left: 16px; background: #00ff88; }
         
         @media (max-width: 1024px) { .col-span-3 { grid-column: span 6; } .col-span-4 { grid-column: span 6; } .col-span-6 { grid-column: span 12; } .col-span-8 { grid-column: span 12; } .mitre-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 600px) { body { padding: 10px; } .header { flex-direction: column; align-items: flex-start; gap: 10px; padding: 12px 15px; } .dst-logo-text { font-size: 18px; } .dst-logo-img { width: 32px; height: 32px; } .col-span-3, .col-span-4 { grid-column: span 12; } .card { padding: 10px 12px; } .value { font-size: 20px; } .mitre-grid { grid-template-columns: repeat(2, 1fr); } .mitre-item .count { font-size: 18px; } .header-controls { width: 100%; justify-content: center; } }
+        @media (max-width: 600px) { body { padding: 10px; } .header { flex-direction: column; align-items: flex-start; gap: 10px; padding: 12px 15px; } .dst-logo-text { font-size: 18px; } .dst-logo-img { width: 32px; height: 32px; } .col-span-3, .col-span-4 { grid-column: span 12; } .card { padding: 10px 12px; } .value { font-size: 20px; } .mitre-grid { grid-template-columns: repeat(2, 1fr); } .header-controls { width: 100%; justify-content: center; } }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
         ::-webkit-scrollbar-thumb { background: #00ff88; border-radius: 2px; }
-        
-        .scan-progress-container { 
-            display: none; 
-            margin-top: 8px; 
-            width: 100%; 
-            padding: 0 10px;
-        }
-        .scan-progress-container.active { 
-            display: block; 
-        }
-        .scan-progress-bar { 
-            width: 100%; 
-            height: 4px; 
-            background: rgba(0,255,136,0.1); 
-            border-radius: 2px; 
-            overflow: hidden; 
-        }
-        .scan-progress-fill { 
-            height: 100%; 
-            background: linear-gradient(90deg, #00ff88, #00ccff); 
-            width: 0%; 
-            transition: width 0.5s ease; 
-            border-radius: 2px; 
-        }
-        .scan-progress-text { 
-            color: #2a5a4a; 
-            font-size: 10px; 
-            margin-top: 4px; 
-            text-align: center; 
-            font-family: 'Courier New', monospace;
-        }
     </style>
 </head>
 <body>
 
-<div id="fullscreenOverlay"></div>
-
-<div class="attack-banner" id="attackBanner">[ALERT] RANSOMWARE DETECTED - AUTO-QUARANTINE IN PROGRESS [ALERT]</div>
+<div class="attack-banner" id="attackBanner">[ALERT] RANSOMWARE DETECTED - AUTO-QUARANTINE IN PROGRESS</div>
 
 <header class="header" id="mainHeader">
-    <div id="matrixContainer"></div>
-    
     <div class="dst-logo-container">
-        <img src="/static/3486-removebg-preview.ico" 
-            alt="DSTerminal Logo" 
-            class="dst-logo-img" 
-            id="dstLogo"
-            onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';">
-        
-        <div id="logoFallback" style="display:none; align-items:center; justify-content:center; width:48px; height:48px;">
-            <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                <rect x="4" y="4" width="40" height="40" rx="8" stroke="#00ff88" stroke-width="2" fill="none"/>
-                <text x="24" y="28" font-family="Courier New, monospace" font-size="20" font-weight="bold" fill="#00ff88" text-anchor="middle">D</text>
-                <text x="24" y="40" font-family="Courier New, monospace" font-size="8" fill="#00ff88" text-anchor="middle">TERMINAL</text>
-                <circle cx="24" cy="18" r="2" fill="#00ff88" opacity="0.5">
-                    <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
-                </circle>
-            </svg>
-        </div>
-        
+        <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="4" width="40" height="40" rx="8" stroke="#00ff88" stroke-width="2" fill="none"/>
+            <text x="24" y="28" font-family="Courier New, monospace" font-size="20" font-weight="bold" fill="#00ff88" text-anchor="middle">D</text>
+            <text x="24" y="40" font-family="Courier New, monospace" font-size="8" fill="#00ff88" text-anchor="middle">TERMINAL</text>
+            <circle cx="24" cy="18" r="2" fill="#00ff88" opacity="0.5">
+                <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+            </circle>
+        </svg>
         <div>
-            <div class="dst-logo-text">
-                DSTERMINAL ORCH <span class="highlight">●</span>
-            </div>
+            <div class="dst-logo-text">DSTERMINAL <span class="highlight">●</span></div>
             <div class="dst-logo-badge">CYBER OPS v4.0.0.113</div>
         </div>
     </div>
@@ -3261,8 +3102,9 @@ HTML_TEMPLATE = """
             <span id="statusText" class="status-protected">[SUCCESS] PROTECTED</span>
         </span>
         <span id="headerTime"></span>
+        <span style="font-size:10px;color:#2a5a4a;" id="platformDisplay">Linux</span>
         <div class="header-controls">
-            <label class="auto-quarantine-toggle" title="Auto-quarantine detected ransomware files">
+            <label class="auto-quarantine-toggle">
                 <span>[BOT] Auto-Q</span>
                 <input type="checkbox" id="autoQuarantineToggle" checked>
             </label>
@@ -3285,11 +3127,6 @@ HTML_TEMPLATE = """
         </div>
         <div class="quarantine-progress-bar">
             <div class="quarantine-progress-fill" id="quarantineProgressFill" style="width:0%"></div>
-        </div>
-        <div class="quarantine-progress-details">
-            <span class="step" id="quarantineStep">Initializing...</span>
-            <span id="quarantinePercent">0%</span>
-            <span id="quarantineTime">0s elapsed</span>
         </div>
     </div>
 
@@ -3324,7 +3161,7 @@ HTML_TEMPLATE = """
             <div class="text-muted text-center mt-10" id="mitreCount">Loading techniques...</div>
         </div>
         <div class="card col-span-4">
-            <div class="card-title">[LOCK] Quarantine <span style="font-size:8px;color:#2a5a4a;" id="quarantineCount"></span></div>
+            <div class="card-title">[LOCK] Quarantine</div>
             <div id="quarantineList"><div class="text-muted text-center">No files pending</div></div>
         </div>
         <div class="card col-span-4">
@@ -3335,7 +3172,7 @@ HTML_TEMPLATE = """
 
     <div class="grid">
         <div class="card col-span-6">
-            <div class="card-title">[LIST] Event Log <button class="control-btn" onclick="clearEvents()" style="font-size:8px;">CLEAR</button></div>
+            <div class="card-title">[LIST] Event Log</div>
             <div class="event-log" id="eventLog">
                 <div class="no-events">Waiting for system events...</div>
             </div>
@@ -3370,88 +3207,45 @@ HTML_TEMPLATE = """
     DSTERMINAL CYBER OPS v4.0.0.113 • <span id="footerTime"></span>
     <span style="margin-left:15px;" id="scanStatus"></span>
     <span style="margin-left:15px;color:#ff0033;" id="autoQStatus"></span>
+    <span style="margin-left:15px;color:#2a5a4a;" id="platformFooter"></span>
 </div>
 
 <script>
-    // Hide overlay immediately
-    (function() {
-        var overlay = document.getElementById('fullscreenOverlay');
-        if (overlay) {
-            overlay.style.display = 'none';
-            overlay.style.visibility = 'hidden';
-            overlay.style.opacity = '0';
-            overlay.style.pointerEvents = 'none';
-            overlay.style.zIndex = '-1';
-        }
-    })();
+    // Platform detection
+    const platform = navigator.platform || 'Unknown';
+    document.getElementById('platformDisplay').textContent = platform;
+    document.getElementById('platformFooter').textContent = '🖥️ ' + platform;
 
     const ALL_MITRE_TECHNIQUES = [
-        { id: "T1059", name: "Command & Scripting", tactic: "Execution", category: "execution" },
-        { id: "T1047", name: "WMI", tactic: "Execution", category: "execution" },
-        { id: "T1053", name: "Scheduled Task/Job", tactic: "Execution", category: "execution" },
-        { id: "T1204", name: "User Execution", tactic: "Execution", category: "execution" },
-        { id: "T1106", name: "Native API", tactic: "Execution", category: "execution" },
-        { id: "T1547", name: "Boot/Logon Autostart", tactic: "Persistence", category: "persistence" },
-        { id: "T1543", name: "Create/Modify System Process", tactic: "Persistence", category: "persistence" },
-        { id: "T1136", name: "Create Account", tactic: "Persistence", category: "persistence" },
-        { id: "T1505", name: "Server Software Component", tactic: "Persistence", category: "persistence" },
-        { id: "T1574", name: "Hijack Execution Flow", tactic: "Persistence", category: "persistence" },
-        { id: "T1055", name: "Process Injection", tactic: "Privilege Escalation", category: "privilege" },
-        { id: "T1068", name: "Exploit for Priv Escalation", tactic: "Privilege Escalation", category: "privilege" },
-        { id: "T1134", name: "Access Token Manipulation", tactic: "Privilege Escalation", category: "privilege" },
-        { id: "T1548", name: "Abuse Elevation Control", tactic: "Privilege Escalation", category: "privilege" },
-        { id: "T1027", name: "Obfuscated Files/Info", tactic: "Defense Evasion", category: "defense" },
-        { id: "T1070", name: "Indicator Removal", tactic: "Defense Evasion", category: "defense" },
-        { id: "T1036", name: "Masquerading", tactic: "Defense Evasion", category: "defense" },
-        { id: "T1562", name: "Impair Defenses", tactic: "Defense Evasion", category: "defense" },
-        { id: "T1222", name: "File/Dir Permissions Mod", tactic: "Defense Evasion", category: "defense" },
-        { id: "T1087", name: "Account Discovery", tactic: "Discovery", category: "discovery" },
-        { id: "T1018", name: "Remote System Discovery", tactic: "Discovery", category: "discovery" },
-        { id: "T1040", name: "Network Sniffing", tactic: "Discovery", category: "discovery" },
-        { id: "T1057", name: "Process Discovery", tactic: "Discovery", category: "discovery" },
-        { id: "T1518", name: "Software Discovery", tactic: "Discovery", category: "discovery" },
-        { id: "T1021", name: "Remote Services", tactic: "Lateral Movement", category: "lateral" },
-        { id: "T1563", name: "Remote Service Hijacking", tactic: "Lateral Movement", category: "lateral" },
-        { id: "T1072", name: "Software Deployment Tools", tactic: "Lateral Movement", category: "lateral" },
-        { id: "T1005", name: "Data from Local System", tactic: "Collection", category: "collection" },
-        { id: "T1119", name: "Automated Collection", tactic: "Collection", category: "collection" },
-        { id: "T1074", name: "Data Staged", tactic: "Collection", category: "collection" },
-        { id: "T1567", name: "Exfil Over Web Service", tactic: "Exfiltration", category: "exfiltration" },
-        { id: "T1048", name: "Exfil Over Alt Protocol", tactic: "Exfiltration", category: "exfiltration" },
-        { id: "T1020", name: "Automated Exfiltration", tactic: "Exfiltration", category: "exfiltration" },
-        { id: "T1486", name: "Data Encrypted for Impact", tactic: "Impact", category: "impact" },
-        { id: "T1490", name: "Inhibit System Recovery", tactic: "Impact", category: "impact" },
-        { id: "T1485", name: "Data Destruction", tactic: "Impact", category: "impact" },
-        { id: "T1499", name: "Endpoint DoS", tactic: "Impact", category: "impact" },
-        { id: "T1003", name: "Credential Dumping", tactic: "Credential Access", category: "credential" },
-        { id: "T1110", name: "Brute Force", tactic: "Credential Access", category: "credential" },
-        { id: "T1555", name: "Credentials from Password Stores", tactic: "Credential Access", category: "credential" }
+        { id: "T1059", name: "Command & Scripting", tactic: "Execution" },
+        { id: "T1047", name: "WMI", tactic: "Execution" },
+        { id: "T1053", name: "Scheduled Task/Job", tactic: "Execution" },
+        { id: "T1204", name: "User Execution", tactic: "Execution" },
+        { id: "T1055", name: "Process Injection", tactic: "Privilege Escalation" },
+        { id: "T1068", name: "Exploit for Priv Escalation", tactic: "Privilege Escalation" },
+        { id: "T1027", name: "Obfuscated Files/Info", tactic: "Defense Evasion" },
+        { id: "T1070", name: "Indicator Removal", tactic: "Defense Evasion" },
+        { id: "T1036", name: "Masquerading", tactic: "Defense Evasion" },
+        { id: "T1087", name: "Account Discovery", tactic: "Discovery" },
+        { id: "T1018", name: "Remote System Discovery", tactic: "Discovery" },
+        { id: "T1040", name: "Network Sniffing", tactic: "Discovery" },
+        { id: "T1021", name: "Remote Services", tactic: "Lateral Movement" },
+        { id: "T1005", name: "Data from Local System", tactic: "Collection" },
+        { id: "T1567", name: "Exfil Over Web Service", tactic: "Exfiltration" },
+        { id: "T1486", name: "Data Encrypted for Impact", tactic: "Impact" },
+        { id: "T1490", name: "Inhibit System Recovery", tactic: "Impact" },
+        { id: "T1003", name: "Credential Dumping", tactic: "Credential Access" },
+        { id: "T1110", name: "Brute Force", tactic: "Credential Access" }
     ];
 
     let monitoringEnabled = true;
     let isolated = false;
     let scanning = false;
     let autoQuarantineEnabled = true;
-
-    function createMatrixParticles() {
-        const container = document.getElementById('matrixContainer');
-        if (!container) return;
-        const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
-        container.innerHTML = '';
-        for (let i = 0; i < 20; i++) {
-            const particle = document.createElement('span');
-            particle.className = 'matrix-particle';
-            particle.textContent = chars[Math.floor(Math.random() * chars.length)];
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.top = '-10%';
-            particle.style.animationDuration = (5 + Math.random() * 10) + 's';
-            particle.style.animationDelay = (Math.random() * 5) + 's';
-            particle.style.opacity = 0.05 + Math.random() * 0.15;
-            particle.style.fontSize = (8 + Math.random() * 6) + 'px';
-            container.appendChild(particle);
-        }
-    }
-    document.addEventListener('DOMContentLoaded', createMatrixParticles);
+    let threatChart = null;
+    let systemChart = null;
+    let threatData = [];
+    let timeLabels = [];
 
     function displayRandomMITRE() {
         const container = document.getElementById('mitreGrid');
@@ -3463,471 +3257,35 @@ HTML_TEMPLATE = """
             count: Math.floor(Math.random() * 13) + 3
         }));
         techniques.sort((a, b) => (b.count || 0) - (a.count || 0));
-        container.innerHTML = techniques.map(tech => {
-            const categoryClass = `mitre-${tech.category || 'unknown'}`;
-            return `
-                <div class="mitre-item ${categoryClass}">
-                    <span class="count">${tech.count || 0}</span>
-                    <span class="technique-id">${tech.id}</span>
-                    <span class="technique-name" title="${tech.name}">${tech.name}</span>
-                    <span class="tactic">${tech.tactic}</span>
-                </div>
-            `;
-        }).join('');
+        container.innerHTML = techniques.map(tech => `
+            <div class="mitre-item">
+                <span class="count">${tech.count || 0}</span>
+                <span class="technique-id">${tech.id}</span>
+                <span class="technique-name" title="${tech.name}">${tech.name}</span>
+                <span class="tactic">${tech.tactic}</span>
+            </div>
+        `).join('');
         countDisplay.textContent = `Showing ${techniques.length} MITRE ATT&CK techniques`;
     }
-
-    function updateEvents(events) {
-        const log = document.getElementById('eventLog');
-        const noEvents = log.querySelector('.no-events');
-        if (noEvents) {
-            log.innerHTML = '';
-        }
-        if (events && events.length > 0) {
-            events.forEach(e => {
-                const div = document.createElement('div');
-                div.className = 'event-item';
-                const opClass = `operation-${e.operation || 'info'}`;
-                const opDisplay = (e.operation || 'info').toUpperCase();
-                div.innerHTML = `
-                    <span class="time">${new Date(e.time).toLocaleTimeString()}</span>
-                    <span class="proc">[${e.process || 'system'}]</span>
-                    <span class="file" title="${e.file || 'unknown'}">${e.file || 'unknown'}</span>
-                    <span class="operation ${opClass}">${opDisplay}</span>
-                `;
-                log.insertBefore(div, log.firstChild);
-                while (log.children.length > 50) {
-                    log.removeChild(log.lastChild);
-                }
-            });
-        }
-    }
-
-    function clearEvents() {
-        document.getElementById('eventLog').innerHTML = '<div class="no-events">Log cleared</div>';
-        fetch('/api/events/clear', { method: 'DELETE' }).catch(() => {});
-    }
-
-    function quarantineFile(path) {
-        if (!path || path === '') {
-            alert('❌ No file path to quarantine');
-            return;
-        }
-        
-        if (!confirm(`[WARNING] Are you sure you want to quarantine this file?\n\n[FOLDER] ${path}\n\nThis action will move the file to quarantine and prevent it from executing.`)) {
-            return;
-        }
-        
-        const btn = event.target;
-        const originalText = btn.textContent;
-        btn.textContent = '⏳ QUARANTINING...';
-        btn.disabled = true;
-        
-        fetch('/api/quarantine', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                file_path: path, 
-                threat_type: 'Ransomware',
-                confirm: true 
-            })
-        }).then(r => r.json()).then(data => {
-            btn.textContent = originalText;
-            btn.disabled = false;
-            
-            if (data.success) { 
-                alert('[OK] File quarantined successfully!');
-                fetch('/api/status').then(r => r.json()).then(updateStatus);
-                fetch('/api/quarantine/pending').then(r => r.json()).then(updateQuarantine);
-            } 
-            else { 
-                if (data.cancelled) {
-                    console.log('Quarantine cancelled by user');
-                } else {
-                    alert('❌ Failed to quarantine: ' + (data.error || 'Unknown error'));
-                }
-            }
-        }).catch(err => {
-            btn.textContent = originalText;
-            btn.disabled = false;
-            alert('❌ Network error while quarantining file');
-        });
-    }
-
-    function restoreFile(path) {
-        if (!confirm(`Restore this file from quarantine?\n\n${path}`)) return;
-        fetch('/api/quarantine/restore', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ quarantine_path: path })
-        }).then(r => r.json()).then(data => {
-            if (data.success) {
-                alert('[OK] File restored!');
-                fetch('/api/status').then(r => r.json()).then(updateStatus);
-            } else {
-                alert('❌ Restore failed: ' + data.error);
-            }
-        });
-    }
-
-    function deleteQuarantined(path) {
-        if (!confirm(`Permanently delete this quarantined file?\n\n${path}`)) return;
-        fetch('/api/quarantine/delete', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ quarantine_path: path })
-        }).then(r => r.json()).then(data => {
-            if (data.success) {
-                alert('[OK] File deleted!');
-                fetch('/api/status').then(r => r.json()).then(updateStatus);
-            } else {
-                alert('❌ Delete failed: ' + data.error);
-            }
-        });
-    }
-
-    function toggleMonitoring() {
-        monitoringEnabled = !monitoringEnabled;
-        const btn = document.getElementById('monitorToggle');
-        btn.textContent = monitoringEnabled ? '⏸ PAUSE' : '▶️ RESUME';
-        fetch('/api/monitoring/toggle', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ enabled: monitoringEnabled })
-        });
-    }
-
-    function runFullScan() {
-        if (scanning) {
-            alert('Scan already in progress');
-            return;
-        }
-        scanning = true;
-        document.getElementById('scanStatus').textContent = '[SEARCH] Scanning...';
-        document.getElementById('scanStatus').style.color = '#ffcc00';
-        
-        fetch('/api/scan/full', { method: 'POST' })
-            .then(r => r.json())
-            .then(data => {
-                scanning = false;
-                if (data.success) {
-                    document.getElementById('scanStatus').textContent = `[OK] Scan complete: ${data.count} files detected`;
-                    document.getElementById('scanStatus').style.color = '#00ff88';
-                    fetch('/api/status').then(r => r.json()).then(updateStatus);
-                } else {
-                    document.getElementById('scanStatus').textContent = '❌ Scan failed: ' + data.error;
-                    document.getElementById('scanStatus').style.color = '#ff0033';
-                }
-                setTimeout(() => {
-                    document.getElementById('scanStatus').textContent = '';
-                }, 5000);
-            })
-            .catch(() => {
-                scanning = false;
-                document.getElementById('scanStatus').textContent = '❌ Scan error';
-                document.getElementById('scanStatus').style.color = '#ff0033';
-            });
-    }
-
-    function toggleIsolation() {
-        const btn = document.getElementById('isolateBtn');
-        if (!isolated) {
-            if (!confirm('[WARNING] Isolate system from network? This will block all network traffic.')) return;
-            fetch('/api/network/isolate', { method: 'POST' })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        isolated = true;
-                        btn.textContent = '[UNLOCK] RESTORE NETWORK';
-                        btn.className = 'control-btn success';
-                        alert('[OK] System isolated from network');
-                    } else {
-                        alert('❌ Isolation failed: ' + data.error);
-                    }
-                });
-        } else {
-            if (!confirm('Restore network connectivity?')) return;
-            fetch('/api/network/restore', { method: 'POST' })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        isolated = false;
-                        btn.textContent = '[LOCK] ISOLATE';
-                        btn.className = 'control-btn danger';
-                        alert('[OK] Network restored');
-                    } else {
-                        alert('❌ Restore failed: ' + data.error);
-                    }
-                });
-        }
-    }
-
-    function showProcesses() {
-        const modal = document.getElementById('modal');
-        const title = document.getElementById('modalTitle');
-        const body = document.getElementById('modalBody');
-        title.textContent = '[CHART] Running Processes';
-        body.innerHTML = '<div style="text-align:center;color:#2a5a4a;">Loading processes...</div>';
-        modal.classList.add('show');
-        
-        fetch('/api/process/list')
-            .then(r => r.json())
-            .then(processes => {
-                if (!processes || processes.length === 0) {
-                    body.innerHTML = '<div style="text-align:center;color:#2a5a4a;">No processes found</div>';
-                    return;
-                }
-                body.innerHTML = processes.map(p => `
-                    <div class="list-item">
-                        <span>${p.name} (PID: ${p.pid})</span>
-                        <span>
-                            CPU: ${p.cpu.toFixed(1)}% | MEM: ${p.memory.toFixed(1)}%
-                            ${p.blocked ? ' <span style="color:#ff0033;">[BLOCKED]</span>' : ''}
-                            <button class="action-btn danger" onclick="killProcess(${p.pid})">KILL</button>
-                        </span>
-                    </div>
-                `).join('');
-            })
-            .catch(err => {
-                body.innerHTML = '<div style="text-align:center;color:#ff0033;">Error loading processes</div>';
-                console.error(err);
-            });
-    }
-
-    function killProcess(pid) {
-        if (!pid) {
-            alert('❌ No PID provided');
-            return;
-        }
-        if (!confirm(`Kill process ${pid}?`)) return;
-        
-        const btn = event.target;
-        const originalText = btn.textContent;
-        btn.textContent = '⏳ KILLING...';
-        btn.disabled = true;
-        
-        fetch('/api/process/kill', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ pid: pid })
-        })
-        .then(r => r.json())
-        .then(data => {
-            btn.textContent = originalText;
-            btn.disabled = false;
-            if (data.success) {
-                alert('[OK] Process killed');
-                showProcesses();
-            } else {
-                alert('❌ Failed: ' + (data.error || 'Unknown error'));
-            }
-        })
-        .catch(err => {
-            btn.textContent = originalText;
-            btn.disabled = false;
-            alert('❌ Network error: ' + err.message);
-        });
-    }
-
-    function showQuarantine() {
-        const modal = document.getElementById('modal');
-        const title = document.getElementById('modalTitle');
-        const body = document.getElementById('modalBody');
-        title.textContent = '[FOLDER] Quarantined Files';
-        body.innerHTML = '<div style="text-align:center;color:#2a5a4a;">Loading...</div>';
-        modal.classList.add('show');
-        
-        fetch('/api/quarantine/list')
-            .then(r => r.json())
-            .then(files => {
-                if (!files || files.length === 0) {
-                    body.innerHTML = '<div style="text-align:center;color:#2a5a4a;">No quarantined files</div>';
-                    return;
-                }
-                body.innerHTML = files.map(f => `
-                    <div class="list-item">
-                        <span style="font-size:10px;color:#ffcc00;">${f.original_path.split('\\\\').pop()}</span>
-                        <span>
-                            <span style="font-size:8px;color:#2a5a4a;">${new Date(f.timestamp).toLocaleString()}</span>
-                            <button class="action-btn success" onclick="restoreFile('${f.quarantine_path}')">RESTORE</button>
-                            <button class="action-btn danger" onclick="deleteQuarantined('${f.quarantine_path}')">DELETE</button>
-                        </span>
-                    </div>
-                `).join('');
-            })
-            .catch(err => {
-                body.innerHTML = '<div style="text-align:center;color:#ff0033;">Error loading quarantine list</div>';
-                console.error(err);
-            });
-    }
-
-    function showWhitelist() {
-        const modal = document.getElementById('modal');
-        const title = document.getElementById('modalTitle');
-        const body = document.getElementById('modalBody');
-        title.textContent = '[OK] Whitelisted Files';
-        body.innerHTML = '<div style="text-align:center;color:#2a5a4a;">Loading...</div>';
-        modal.classList.add('show');
-        
-        fetch('/api/whitelist/list')
-            .then(r => r.json())
-            .then(files => {
-                if (!files || files.length === 0) {
-                    body.innerHTML = `
-                        <div style="text-align:center;color:#2a5a4a;padding:20px;">
-                            No files in whitelist<br>
-                            <small style="color:#2a5a4a;">Whitelisted files are never quarantined</small>
-                            <br><br>
-                            <button class="control-btn" onclick="addToWhitelist()">➕ Add File to Whitelist</button>
-                        </div>
-                    `;
-                    return;
-                }
-                body.innerHTML = files.map(f => `
-                    <div class="list-item">
-                        <span style="font-size:10px;color:#00ff88;">[OK] ${f}</span>
-                        <button class="action-btn danger" onclick="removeFromWhitelist('${f}')">REMOVE</button>
-                    </div>
-                `).join('') + `
-                    <div style="margin-top:10px;text-align:center;">
-                        <button class="control-btn" onclick="addToWhitelist()">➕ Add File</button>
-                    </div>
-                `;
-            })
-            .catch(err => {
-                body.innerHTML = '<div style="text-align:center;color:#ff0033;">Error loading whitelist</div>';
-                console.error(err);
-            });
-    }
-
-    function addToWhitelist() {
-        const filePath = prompt('Enter the full path of the file to whitelist:');
-        if (!filePath) return;
-        
-        fetch('/api/whitelist/add', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ file_path: filePath })
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                alert('[OK] File added to whitelist: ' + filePath);
-                showWhitelist();
-            } else {
-                alert('❌ Failed: ' + (data.error || 'Unknown error'));
-            }
-        });
-    }
-
-    function removeFromWhitelist(path) {
-        if (!path) return;
-        if (!confirm(`Remove ${path} from whitelist?`)) return;
-        
-        fetch('/api/whitelist/remove', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ file_path: path })
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                alert('[OK] Removed from whitelist');
-                showWhitelist();
-            } else {
-                alert('❌ Failed: ' + (data.error || 'Unknown error'));
-            }
-        });
-    }
-
-    function closeModal() {
-        document.getElementById('modal').classList.remove('show');
-    }
-
-    function updateQuarantineProgress(data) {
-        const container = document.getElementById('quarantineProgress');
-        const fill = document.getElementById('quarantineProgressFill');
-        const percent = document.getElementById('quarantinePercent');
-        const step = document.getElementById('quarantineStep');
-        const status = document.getElementById('quarantineStatus');
-        const fileName = document.getElementById('quarantineFileName');
-        const timeEl = document.getElementById('quarantineTime');
-        
-        if (data && data.in_progress) {
-            container.classList.add('active');
-            fill.style.width = data.current_step + '%';
-            percent.textContent = data.current_step + '%';
-            step.textContent = data.status || 'Processing...';
-            status.textContent = data.current_step >= 100 ? '[OK] Complete!' : '⏳ In Progress...';
-            fileName.textContent = data.file_path ? data.file_path.split('\\\\').pop() : '-';
-            
-            if (data.start_time) {
-                const elapsed = Math.floor((new Date() - new Date(data.start_time)) / 1000);
-                timeEl.textContent = elapsed + 's elapsed';
-            }
-            
-            document.getElementById('attackBanner').className = 'attack-banner show';
-            document.getElementById('attackBanner').textContent = '[DMZ] RANSOMWARE DETECTED - AUTO-QUARANTINE IN PROGRESS (' + data.current_step + '%)';
-            
-            document.getElementById('autoQStatus').textContent = '🔄 Auto-Q: ' + data.current_step + '%';
-            document.getElementById('autoQStatus').style.color = '#ffcc00';
-        } else {
-            container.classList.remove('active');
-            document.getElementById('attackBanner').className = 'attack-banner';
-            
-            if (data && data.status === 'completed') {
-                document.getElementById('autoQStatus').textContent = '[OK] Auto-Q: Complete!';
-                document.getElementById('autoQStatus').style.color = '#00ff88';
-                setTimeout(() => {
-                    document.getElementById('autoQStatus').textContent = '';
-                }, 5000);
-            } else if (data && data.status === 'failed') {
-                document.getElementById('autoQStatus').textContent = '❌ Auto-Q: Failed';
-                document.getElementById('autoQStatus').style.color = '#ff0033';
-                setTimeout(() => {
-                    document.getElementById('autoQStatus').textContent = '';
-                }, 5000);
-            } else {
-                document.getElementById('autoQStatus').textContent = '';
-            }
-        }
-    }
-
-    const socket = io();
-    let threatChart = null;
-    let systemChart = null;
-    let threatData = [];
-    let timeLabels = [];
 
     function initCharts() {
         const threatCanvas = document.getElementById('threatChart');
         const systemCanvas = document.getElementById('systemChart');
         
         if (!threatCanvas || !systemCanvas) {
-            console.warn('Chart canvases not found, retrying...');
             setTimeout(initCharts, 500);
             return;
         }
         
-        // Hide loading indicators
         document.querySelectorAll('.chart-loading').forEach(el => {
             el.style.display = 'none';
         });
         
         try {
-            // Destroy existing charts if they exist
-            if (threatChart) {
-                threatChart.destroy();
-                threatChart = null;
-            }
-            if (systemChart) {
-                systemChart.destroy();
-                systemChart = null;
-            }
+            if (threatChart) { threatChart.destroy(); threatChart = null; }
+            if (systemChart) { systemChart.destroy(); systemChart = null; }
             
-            // Initialize threat chart with data
-            const ctx1 = threatCanvas.getContext('2d');
-            threatChart = new Chart(ctx1, {
+            threatChart = new Chart(threatCanvas.getContext('2d'), {
                 type: 'line',
                 data: { 
                     labels: timeLabels.length > 0 ? timeLabels : ['Loading...'], 
@@ -3966,9 +3324,7 @@ HTML_TEMPLATE = """
                                 font: { size: 9 },
                                 stepSize: 1
                             },
-                            grid: {
-                                color: 'rgba(0,255,136,0.05)'
-                            }
+                            grid: { color: 'rgba(0,255,136,0.05)' }
                         },
                         x: {
                             ticks: {
@@ -3976,20 +3332,14 @@ HTML_TEMPLATE = """
                                 font: { size: 8 },
                                 maxTicksLimit: 10
                             },
-                            grid: {
-                                color: 'rgba(0,255,136,0.05)'
-                            }
+                            grid: { color: 'rgba(0,255,136,0.05)' }
                         }
                     },
-                    animation: {
-                        duration: 750
-                    }
+                    animation: { duration: 750 }
                 }
             });
             
-            // Initialize system chart
-            const ctx2 = systemCanvas.getContext('2d');
-            systemChart = new Chart(ctx2, {
+            systemChart = new Chart(systemCanvas.getContext('2d'), {
                 type: 'doughnut',
                 data: { 
                     labels: ['CPU','RAM','DISK'], 
@@ -4013,59 +3363,12 @@ HTML_TEMPLATE = """
                         } 
                     }, 
                     cutout: '60%',
-                    animation: {
-                        animateRotate: true,
-                        duration: 750
-                    }
+                    animation: { animateRotate: true, duration: 750 }
                 }
             });
-            
-            console.log('Charts initialized successfully');
         } catch (error) {
-            console.error('Error initializing charts:', error);
             setTimeout(initCharts, 1000);
         }
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        // Ensure overlay is hidden
-        var overlay = document.getElementById('fullscreenOverlay');
-        if (overlay) {
-            overlay.style.display = 'none';
-        }
-        
-        // Wait for everything to load
-        setTimeout(function() {
-            // Initialize charts
-            initCharts();
-            
-            // Initialize other components
-            displayRandomMITRE();
-            setInterval(displayRandomMITRE, 30000);
-            
-            // Load initial data
-            fetch('/api/status')
-                .then(r => r.json())
-                .then(updateStatus)
-                .catch(() => console.log('Failed to load initial status'));
-                
-            fetch('/api/events')
-                .then(r => r.json())
-                .then(updateEvents)
-                .catch(() => console.log('Failed to load initial events'));
-                
-            fetch('/api/quarantine/auto/status')
-                .then(r => r.json())
-                .then(data => {
-                    document.getElementById('autoQuarantineToggle').checked = data.enabled;
-                    autoQuarantineEnabled = data.enabled;
-                })
-                .catch(() => console.log('Failed to load auto quarantine status'));
-        }, 500);
-    });
-
-    function downloadReport(id, format) {
-        window.location.href = `/api/reports/download/${id}/${format}`;
     }
 
     function updateStatus(data) {
@@ -4142,10 +3445,6 @@ HTML_TEMPLATE = """
             }
         }
         
-        if (data.quarantined_files) {
-            document.getElementById('quarantineCount').textContent = `(${data.quarantined_files.length} total)`;
-        }
-        
         if (data.quarantine_progress) {
             updateQuarantineProgress(data.quarantine_progress);
         }
@@ -4158,7 +3457,7 @@ HTML_TEMPLATE = """
         }
         document.getElementById('quarantineList').innerHTML = pending.map(item => `
             <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,255,136,0.04);font-size:11px;align-items:center;">
-                <span style="color:#ff0033;font-size:10px;">[ERROR] ${item.path.split('\\\\').pop()}</span>
+                <span style="color:#ff0033;font-size:10px;">[ERROR] ${item.path.split(/[\\\\/]/).pop()}</span>
                 <button class="quarantine-btn" onclick="quarantineFile('${item.path}')">QUARANTINE</button>
             </div>
         `).join('');
@@ -4197,7 +3496,7 @@ HTML_TEMPLATE = """
         }
         document.getElementById('ransomwareFiles').innerHTML = files.map(f => `
             <div class="ransomware-file">
-                <span class="file-path">[FOLDER] ${f.path.split('\\\\').pop()}</span>
+                <span class="file-path">[FOLDER] ${f.path.split(/[\\\\/]/).pop()}</span>
                 <span style="color:#2a5a4a;font-size:9px;">${f.process}</span>
                 <span style="color:#2a5a4a;font-size:9px;">${new Date(f.timestamp).toLocaleTimeString()}</span>
                 <button class="quarantine-btn" onclick="quarantineFile('${f.path}')">QUARANTINE</button>
@@ -4218,19 +3517,338 @@ HTML_TEMPLATE = """
         `).join('');
     }
 
+    function updateEvents(events) {
+        const log = document.getElementById('eventLog');
+        const noEvents = log.querySelector('.no-events');
+        if (noEvents) { log.innerHTML = ''; }
+        if (events && events.length > 0) {
+            events.forEach(e => {
+                const div = document.createElement('div');
+                div.className = 'event-item';
+                const opClass = `operation-${e.operation || 'info'}`;
+                const opDisplay = (e.operation || 'info').toUpperCase();
+                div.innerHTML = `
+                    <span class="time">${new Date(e.time).toLocaleTimeString()}</span>
+                    <span class="proc">[${e.process || 'system'}]</span>
+                    <span class="file" title="${e.file || 'unknown'}">${e.file || 'unknown'}</span>
+                    <span class="operation ${opClass}">${opDisplay}</span>
+                `;
+                log.insertBefore(div, log.firstChild);
+                while (log.children.length > 50) { log.removeChild(log.lastChild); }
+            });
+        }
+    }
+
+    function updateQuarantineProgress(data) {
+        const container = document.getElementById('quarantineProgress');
+        const fill = document.getElementById('quarantineProgressFill');
+        
+        if (data && data.in_progress) {
+            container.classList.add('active');
+            fill.style.width = data.current_step + '%';
+            document.getElementById('quarantineFileName').textContent = data.file_path ? data.file_path.split(/[\\\\/]/).pop() : '-';
+            document.getElementById('quarantineStatus').textContent = data.current_step >= 100 ? '[OK] Complete!' : '⏳ In Progress...';
+            document.getElementById('attackBanner').className = 'attack-banner show';
+            document.getElementById('attackBanner').textContent = '[DMZ] RANSOMWARE DETECTED - AUTO-QUARANTINE IN PROGRESS (' + data.current_step + '%)';
+            document.getElementById('autoQStatus').textContent = '🔄 Auto-Q: ' + data.current_step + '%';
+            document.getElementById('autoQStatus').style.color = '#ffcc00';
+        } else {
+            container.classList.remove('active');
+            document.getElementById('attackBanner').className = 'attack-banner';
+            if (data && data.status === 'completed') {
+                document.getElementById('autoQStatus').textContent = '[OK] Auto-Q: Complete!';
+                document.getElementById('autoQStatus').style.color = '#00ff88';
+                setTimeout(() => { document.getElementById('autoQStatus').textContent = ''; }, 5000);
+            } else if (data && data.status === 'failed') {
+                document.getElementById('autoQStatus').textContent = '❌ Auto-Q: Failed';
+                document.getElementById('autoQStatus').style.color = '#ff0033';
+                setTimeout(() => { document.getElementById('autoQStatus').textContent = ''; }, 5000);
+            } else {
+                document.getElementById('autoQStatus').textContent = '';
+            }
+        }
+    }
+
+    function quarantineFile(path) {
+        if (!path) { alert('❌ No file path to quarantine'); return; }
+        if (!confirm(`[WARNING] Are you sure you want to quarantine this file?\n\n[FOLDER] ${path}`)) { return; }
+        
+        const btn = event.target;
+        const originalText = btn.textContent;
+        btn.textContent = '⏳ QUARANTINING...';
+        btn.disabled = true;
+        
+        fetch('/api/quarantine', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ file_path: path, threat_type: 'Ransomware', confirm: true })
+        }).then(r => r.json()).then(data => {
+            btn.textContent = originalText;
+            btn.disabled = false;
+            if (data.success) { 
+                alert('[OK] File quarantined successfully!');
+                fetch('/api/status').then(r => r.json()).then(updateStatus);
+            } else { 
+                alert('❌ Failed to quarantine: ' + (data.error || 'Unknown error'));
+            }
+        }).catch(() => {
+            btn.textContent = originalText;
+            btn.disabled = false;
+            alert('❌ Network error while quarantining file');
+        });
+    }
+
+    function toggleMonitoring() {
+        monitoringEnabled = !monitoringEnabled;
+        const btn = document.getElementById('monitorToggle');
+        btn.textContent = monitoringEnabled ? '⏸ PAUSE' : '▶️ RESUME';
+        fetch('/api/monitoring/toggle', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ enabled: monitoringEnabled })
+        });
+    }
+
+    function runFullScan() {
+        if (scanning) { alert('Scan already in progress'); return; }
+        scanning = true;
+        document.getElementById('scanStatus').textContent = '[SEARCH] Scanning...';
+        document.getElementById('scanStatus').style.color = '#ffcc00';
+        
+        fetch('/api/scan/full', { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                scanning = false;
+                if (data.success) {
+                    document.getElementById('scanStatus').textContent = `[OK] Scan complete: ${data.count || '0'} files detected`;
+                    document.getElementById('scanStatus').style.color = '#00ff88';
+                    fetch('/api/status').then(r => r.json()).then(updateStatus);
+                } else {
+                    document.getElementById('scanStatus').textContent = '❌ Scan failed: ' + data.error;
+                    document.getElementById('scanStatus').style.color = '#ff0033';
+                }
+                setTimeout(() => { document.getElementById('scanStatus').textContent = ''; }, 5000);
+            })
+            .catch(() => {
+                scanning = false;
+                document.getElementById('scanStatus').textContent = '❌ Scan error';
+                document.getElementById('scanStatus').style.color = '#ff0033';
+            });
+    }
+
+    function toggleIsolation() {
+        const btn = document.getElementById('isolateBtn');
+        if (!isolated) {
+            if (!confirm('[WARNING] Isolate system from network? This will block all network traffic.')) return;
+            fetch('/api/network/isolate', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        isolated = true;
+                        btn.textContent = '[UNLOCK] RESTORE NETWORK';
+                        btn.className = 'control-btn success';
+                        alert('[OK] System isolated from network');
+                    } else {
+                        alert('❌ Isolation failed: ' + data.error);
+                    }
+                });
+        } else {
+            if (!confirm('Restore network connectivity?')) return;
+            fetch('/api/network/restore', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        isolated = false;
+                        btn.textContent = '[LOCK] ISOLATE';
+                        btn.className = 'control-btn danger';
+                        alert('[OK] Network restored');
+                    } else {
+                        alert('❌ Restore failed: ' + data.error);
+                    }
+                });
+        }
+    }
+
+    function showProcesses() {
+        const modal = document.getElementById('modal');
+        const title = document.getElementById('modalTitle');
+        const body = document.getElementById('modalBody');
+        title.textContent = '[CHART] Running Processes';
+        body.innerHTML = '<div style="text-align:center;color:#2a5a4a;">Loading processes...</div>';
+        modal.classList.add('show');
+        
+        fetch('/api/process/list')
+            .then(r => r.json())
+            .then(processes => {
+                if (!processes || processes.length === 0) {
+                    body.innerHTML = '<div style="text-align:center;color:#2a5a4a;">No processes found</div>';
+                    return;
+                }
+                body.innerHTML = processes.map(p => `
+                    <div class="list-item">
+                        <span>${p.name} (PID: ${p.pid})</span>
+                        <span>
+                            CPU: ${p.cpu.toFixed(1)}% | MEM: ${p.memory.toFixed(1)}%
+                            ${p.blocked ? ' <span style="color:#ff0033;">[BLOCKED]</span>' : ''}
+                            <button class="action-btn danger" onclick="killProcess(${p.pid})">KILL</button>
+                        </span>
+                    </div>
+                `).join('');
+            })
+            .catch(() => {
+                body.innerHTML = '<div style="text-align:center;color:#ff0033;">Error loading processes</div>';
+            });
+    }
+
+    function killProcess(pid) {
+        if (!pid) { alert('❌ No PID provided'); return; }
+        if (!confirm(`Kill process ${pid}?`)) return;
+        
+        const btn = event.target;
+        const originalText = btn.textContent;
+        btn.textContent = '⏳ KILLING...';
+        btn.disabled = true;
+        
+        fetch('/api/process/kill', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pid: pid })
+        })
+        .then(r => r.json())
+        .then(data => {
+            btn.textContent = originalText;
+            btn.disabled = false;
+            if (data.success) { alert('[OK] Process killed'); showProcesses(); } 
+            else { alert('❌ Failed: ' + (data.error || 'Unknown error')); }
+        })
+        .catch(() => {
+            btn.textContent = originalText;
+            btn.disabled = false;
+            alert('❌ Network error');
+        });
+    }
+
+    function showQuarantine() {
+        const modal = document.getElementById('modal');
+        const title = document.getElementById('modalTitle');
+        const body = document.getElementById('modalBody');
+        title.textContent = '[FOLDER] Quarantined Files';
+        body.innerHTML = '<div style="text-align:center;color:#2a5a4a;">Loading...</div>';
+        modal.classList.add('show');
+        
+        fetch('/api/quarantine/list')
+            .then(r => r.json())
+            .then(files => {
+                if (!files || files.length === 0) {
+                    body.innerHTML = '<div style="text-align:center;color:#2a5a4a;">No quarantined files</div>';
+                    return;
+                }
+                body.innerHTML = files.map(f => `
+                    <div class="list-item">
+                        <span style="font-size:10px;color:#ffcc00;">${f.original_path.split(/[\\\\/]/).pop()}</span>
+                        <span>
+                            <span style="font-size:8px;color:#2a5a4a;">${new Date(f.timestamp).toLocaleString()}</span>
+                            <button class="action-btn success" onclick="restoreFile('${f.quarantine_path}')">RESTORE</button>
+                            <button class="action-btn danger" onclick="deleteQuarantined('${f.quarantine_path}')">DELETE</button>
+                        </span>
+                    </div>
+                `).join('');
+            })
+            .catch(() => {
+                body.innerHTML = '<div style="text-align:center;color:#ff0033;">Error loading quarantine list</div>';
+            });
+    }
+
+    function showWhitelist() {
+        const modal = document.getElementById('modal');
+        const title = document.getElementById('modalTitle');
+        const body = document.getElementById('modalBody');
+        title.textContent = '[OK] Whitelisted Files';
+        body.innerHTML = '<div style="text-align:center;color:#2a5a4a;">Loading...</div>';
+        modal.classList.add('show');
+        
+        fetch('/api/whitelist/list')
+            .then(r => r.json())
+            .then(files => {
+                if (!files || files.length === 0) {
+                    body.innerHTML = '<div style="text-align:center;color:#2a5a4a;">No files in whitelist</div>';
+                    return;
+                }
+                body.innerHTML = files.map(f => `
+                    <div class="list-item">
+                        <span style="font-size:10px;color:#00ff88;">[OK] ${f}</span>
+                        <button class="action-btn danger" onclick="removeFromWhitelist('${f}')">REMOVE</button>
+                    </div>
+                `).join('');
+            })
+            .catch(() => {
+                body.innerHTML = '<div style="text-align:center;color:#ff0033;">Error loading whitelist</div>';
+            });
+    }
+
+    function restoreFile(path) {
+        if (!confirm(`Restore this file from quarantine?\n\n${path}`)) return;
+        fetch('/api/quarantine/restore', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ quarantine_path: path })
+        }).then(r => r.json()).then(data => {
+            if (data.success) {
+                alert('[OK] File restored!');
+                fetch('/api/status').then(r => r.json()).then(updateStatus);
+            } else {
+                alert('❌ Restore failed: ' + data.error);
+            }
+        });
+    }
+
+    function deleteQuarantined(path) {
+        if (!confirm(`Permanently delete this quarantined file?\n\n${path}`)) return;
+        fetch('/api/quarantine/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ quarantine_path: path })
+        }).then(r => r.json()).then(data => {
+            if (data.success) {
+                alert('[OK] File deleted!');
+                fetch('/api/status').then(r => r.json()).then(updateStatus);
+            } else {
+                alert('❌ Delete failed: ' + data.error);
+            }
+        });
+    }
+
+    function removeFromWhitelist(path) {
+        if (!path) return;
+        if (!confirm(`Remove ${path} from whitelist?`)) return;
+        
+        fetch('/api/whitelist/remove', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ file_path: path })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) { alert('[OK] Removed from whitelist'); showWhitelist(); } 
+            else { alert('❌ Failed: ' + (data.error || 'Unknown error')); }
+        });
+    }
+
+    function downloadReport(id, format) {
+        window.location.href = `/api/reports/download/${id}/${format}`;
+    }
+
+    function closeModal() {
+        document.getElementById('modal').classList.remove('show');
+    }
+
+    const socket = io();
+
     socket.on('connect', () => {
         console.log('Connected to DSTerminal real-time server');
         socket.emit('subscribe_updates');
     });
 
-    socket.on('disconnect', () => {
-        console.warn('Disconnected from DSTerminal real-time server');
-    });
-
-    socket.on('subscription_status', (data) => {
-        console.log('Real-time subscription:', data);
-    });
-    
     socket.on('status_update', updateStatus);
     socket.on('metrics_update', (data) => {
         document.getElementById('cpuVal').textContent = Math.round(data.cpu) + '%';
@@ -4242,27 +3860,7 @@ HTML_TEMPLATE = """
     });
     socket.on('mitre_update', displayRandomMITRE);
     socket.on('events_update', updateEvents);
-    
-    socket.on('quarantine_progress', (data) => {
-        updateQuarantineProgress(data);
-    });
-    
-    socket.on('quarantine_complete', (data) => {
-        if (data.success) {
-            document.getElementById('autoQStatus').textContent = '[OK] Auto-Q: Complete!';
-            document.getElementById('autoQStatus').style.color = '#00ff88';
-            setTimeout(() => {
-                document.getElementById('autoQStatus').textContent = '';
-            }, 5000);
-        } else {
-            document.getElementById('autoQStatus').textContent = '❌ Auto-Q: ' + (data.error || 'Failed');
-            document.getElementById('autoQStatus').style.color = '#ff0033';
-            setTimeout(() => {
-                document.getElementById('autoQStatus').textContent = '';
-            }, 5000);
-        }
-        fetch('/api/status').then(r => r.json()).then(updateStatus);
-    });
+    socket.on('quarantine_progress', updateQuarantineProgress);
 
     document.getElementById('autoQuarantineToggle').addEventListener('change', function() {
         autoQuarantineEnabled = this.checked;
@@ -4274,36 +3872,20 @@ HTML_TEMPLATE = """
     });
 
     document.addEventListener('DOMContentLoaded', function() {
-        // Ensure overlay is hidden
-        var overlay = document.getElementById('fullscreenOverlay');
-        if (overlay) {
-            overlay.style.display = 'none';
-        }
-        
-        // Wait for all resources to load
         setTimeout(function() {
             initCharts();
             displayRandomMITRE();
             setInterval(displayRandomMITRE, 30000);
             
-            // Load initial data
-            fetch('/api/status')
-                .then(r => r.json())
-                .then(updateStatus)
-                .catch(() => console.log('Failed to load initial status'));
-                
-            fetch('/api/events')
-                .then(r => r.json())
-                .then(updateEvents)
-                .catch(() => console.log('Failed to load initial events'));
-                
+            fetch('/api/status').then(r => r.json()).then(updateStatus).catch(() => {});
+            fetch('/api/events').then(r => r.json()).then(updateEvents).catch(() => {});
             fetch('/api/quarantine/auto/status')
                 .then(r => r.json())
                 .then(data => {
                     document.getElementById('autoQuarantineToggle').checked = data.enabled;
                     autoQuarantineEnabled = data.enabled;
                 })
-                .catch(() => console.log('Failed to load auto quarantine status'));
+                .catch(() => {});
         }, 500);
     });
 </script>
@@ -4312,227 +3894,10 @@ HTML_TEMPLATE = """
 """
 
 # ============================================================
-# MAIN
+# MAIN ENTRY POINT
 # ============================================================
-def open_browser():
-    time.sleep(2)
-    try:
-        webbrowser.open('http://localhost:5000')
-        print("[OK] Browser opened")
-    except:
-        print("[WARNING] Open http://localhost:5000 manually")
+DASHBOARD_AVAILABLE = True
 
-# ============================================================
-# DASHBOARD COMMAND FUNCTIONS - Called from dsterminal.py
-# ============================================================
-
-# Global variables to track dashboard state
-_dashboard_running = False
-_dashboard_thread = None
-_dashboard_port = 5000
-_dashboard_process = None
-
-def find_available_port(start_port=5000, max_port=5100):
-    """Find an available port starting from start_port"""
-    import socket
-    for port in range(start_port, max_port + 1):
-        try:
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(1)
-            sock.bind(('localhost', port))
-            sock.close()
-            return port
-        except OSError:
-            continue
-        except Exception:
-            continue
-    return None
-
-def cmd_dashboard(args=None):
-    """Start the dashboard server"""
-    global _dashboard_running, _dashboard_thread, _dashboard_port
-    
-    if _dashboard_running:
-        return f"[INFO] Dashboard is already running on port {_dashboard_port}"
-    
-    try:
-        port = find_available_port(5000)
-        if port is None:
-            return "[!] No available ports found"
-        
-        _dashboard_port = port
-        print(f"[DASHBOARD] Starting DSTerminal Dashboard on port {port}...")
-        
-        def run_dashboard():
-            global _dashboard_running
-            try:
-                print(f"[DASHBOARD] Server starting on http://localhost:{port}")
-                with SilenceFlaskStartup():
-                    # Remove allow_unsafe_werkzeug if it's causing issues
-                    socketio.run(app, debug=False, host='0.0.0.0', port=port)
-            except Exception as e:
-                print(f"[DASHBOARD] Error: {e}")
-            finally:
-                _dashboard_running = False
-        
-        _dashboard_thread = threading.Thread(target=run_dashboard, daemon=True)
-        _dashboard_thread.start()
-        _dashboard_running = True
-        
-        def open_browser_delayed():
-            time.sleep(3)
-            try:
-                webbrowser.open(f'http://localhost:{port}')
-                print(f"[DASHBOARD] Browser opened to http://localhost:{port}")
-            except:
-                print(f"[DASHBOARD] Please open http://localhost:{port} manually")
-        
-        threading.Thread(target=open_browser_delayed, daemon=True).start()
-        
-        return f"[OK] Dashboard started at http://localhost:{port}"
-    
-    except Exception as e:
-        _dashboard_running = False
-        return f"[!] Failed to start dashboard: {e}"
-
-def cmd_dashboard_stop(args=None):
-    """Stop the dashboard server"""
-    global _dashboard_running, _dashboard_thread
-    
-    if not _dashboard_running:
-        return "[INFO] Dashboard is not running"
-    
-    try:
-        _dashboard_running = False
-        # Try to force stop the thread
-        if _dashboard_thread and _dashboard_thread.is_alive():
-            # We can't forcefully kill threads in Python, but we can set the flag
-            pass
-        return "[OK] Dashboard stopped"
-    except Exception as e:
-        return f"[!] Failed to stop dashboard: {e}"
-
-def cmd_dashboard_status(args=None):
-    """Check dashboard status"""
-    global _dashboard_running, _dashboard_port
-    
-    if _dashboard_running:
-        status_lines = [
-            f"[OK] Dashboard is RUNNING on port {_dashboard_port}",
-            f"📍 URL: http://localhost:{_dashboard_port}",
-            "🔄 Status: Active",
-            "📊 Monitoring: Enabled",
-            "💡 Use 'dashboard-browser' to open in browser",
-            "💡 Use 'dashboard-stop' to stop the server"
-        ]
-        return "\n".join(status_lines)
-    else:
-        return "[INFO] Dashboard is NOT running\n📋 Use 'dashboard' to start it"
-
-def cmd_dashboard_browser(args=None):
-    """Open dashboard in browser"""
-    global _dashboard_port, _dashboard_running
-    
-    if not _dashboard_running:
-        return "[INFO] Dashboard is not running. Use 'dashboard' to start it first."
-    
-    try:
-        port = _dashboard_port if _dashboard_port else 5000
-        webbrowser.open(f'http://localhost:{port}')
-        return f"[OK] Dashboard opened in browser at http://localhost:{port}"
-    except Exception as e:
-        return f"[!] Failed to open browser: {e}"
-
-def cmd_dashboard_help(args=None):
-    """Show dashboard help"""
-    return """
-╔══════════════════════════════════════════════════════════════╗
-║                    DASHBOARD COMMANDS                       ║
-╠══════════════════════════════════════════════════════════════╣
-║  dashboard / dash / security-dashboard  - Start dashboard   ║
-║  dashboard-stop / dash-stop            - Stop dashboard      ║
-║  dashboard-status / dash-status        - Check status        ║
-║  dashboard-browser / dash-browser      - Open in browser    ║
-║  dashboard-help / dash-help            - Show this help      ║
-╚══════════════════════════════════════════════════════════════╝
-
-[DASHBOARD FEATURES]
-  • Real-time threat monitoring with live updates
-  • Ransomware detection with auto-quarantine progress bar
-  • MITRE ATT&CK technique mapping and tracking
-  • System resource monitoring (CPU, RAM, Disk)
-  • Incident report generation (JSON/HTML/PDF)
-  • Process management with kill capability
-  • Network isolation control (one-click lockdown)
-  • Whitelist/blacklist management for files
-  • Auto-quarantine toggle with real-time progress
-
-[PORT MANAGEMENT]
-  • Automatically finds an available port
-  • Tries ports from 5000 to 5100
-  • Shows the port being used in status
-
-[TROUBLESHOOTING]
-  • If port 5000 is in use, it will try the next port
-  • Check status with 'dashboard-status'
-  • Stop with 'dashboard-stop' before starting again
-  • If you see "Only one usage of each socket address", 
-    wait a few seconds and try 'dashboard' again
-"""
-
-# ============================================================
-# DASHBOARD INTEGRATION CLASS (for compatibility)
-# ============================================================
-class DashboardIntegration:
-    """Dashboard integration class for backward compatibility"""
-    def __init__(self):
-        self.running = False
-        self.thread = None
-        self.port = 5000
-    
-    def start(self):
-        return cmd_dashboard([])
-    
-    def stop(self):
-        return cmd_dashboard_stop([])
-    
-    def status(self):
-        return cmd_dashboard_status([])
-    
-    def open_browser(self):
-        return cmd_dashboard_browser([])
-    
-    def help(self):
-        return cmd_dashboard_help([])
-
-# Create a global instance for compatibility
-dashboard_integration = DashboardIntegration()
-
-# ============================================================
-# REGISTER DASHBOARD COMMANDS (for compatibility)
-# ============================================================
-def register_dashboard_commands(terminal_instance):
-    """Register dashboard commands with terminal instance"""
-    try:
-        terminal_instance.register_command('dashboard', cmd_dashboard)
-        terminal_instance.register_command('dash', cmd_dashboard)
-        terminal_instance.register_command('security-dashboard', cmd_dashboard)
-        terminal_instance.register_command('dashboard-stop', cmd_dashboard_stop)
-        terminal_instance.register_command('dash-stop', cmd_dashboard_stop)
-        terminal_instance.register_command('dashboard-status', cmd_dashboard_status)
-        terminal_instance.register_command('dash-status', cmd_dashboard_status)
-        terminal_instance.register_command('dashboard-browser', cmd_dashboard_browser)
-        terminal_instance.register_command('dash-browser', cmd_dashboard_browser)
-        terminal_instance.register_command('dashboard-help', cmd_dashboard_help)
-        terminal_instance.register_command('dash-help', cmd_dashboard_help)
-        return True
-    except Exception as e:
-        print(f"[ERROR] Failed to register dashboard commands: {e}")
-        return False
-
-# ============================================================
-# EXPORT THE FLASK APP AND SOCKETIO
-# ============================================================
 __all__ = [
     'app',
     'socketio',
@@ -4548,12 +3913,10 @@ __all__ = [
     'find_available_port'
 ]
 
-# Set DASHBOARD_AVAILABLE flag
-DASHBOARD_AVAILABLE = True
-
 if __name__ == "__main__":
     print("=" * 70)
-    print("🔮 DSTERMINAL SECURITY SUITE v4.0.0.113")
+    print(f"🔮 DSTERMINAL SECURITY SUITE v4.0.0.113")
+    print(f"🖥️  Platform: {SYSTEM}")
     print("=" * 70)
     print(f"📍 Dashboard: http://localhost:5000")
     print(f"[FOLDER] Workspace: {WORKSPACE_DIR}")
@@ -4568,19 +3931,8 @@ if __name__ == "__main__":
     print("[OK] 2-Minute Quarantine Progress Bar on Dashboard")
     print("[OK] MITRE ATT&CK techniques")
     print("[OK] Reports Format: (JSON/HTML/PDF)")
+    print(f"[OK] Cross-platform support: {SYSTEM}")
     print("=" * 70)
-    print("\n[LIST] DASHBOARD CONTROLS:")
-    print("  [BOT] Auto-Q - Toggle auto-quarantine on/off")
-    print("  [LOCK] Isolate - Network isolation")
-    print("  [FOLDER] Quarantine - View/restore/delete quarantined files")
-    print("=" * 70)
-    print("\n[POWER] AUTO-QUARANTINE FEATURES:")
-    print("  • Displays alert status in dashboard and server terminal")
-    print("  • Creates incident report after quarantine")
-    print("  • File appears in quarantine section with timestamp")
-    print("=" * 70)
-    print("\n📡 SERVER-SIDE MONITORING ACTIVE")
-    print("   Alerts will appear here when threats are detected\n")
     
     # START THE SYSTEM-WIDE MONITOR
     monitor_thread, monitored_dirs = start_system_wide_monitor()
@@ -4588,6 +3940,14 @@ if __name__ == "__main__":
     
     # Start status logging
     start_server_status_logging()
+
+    def open_browser():
+        time.sleep(2)
+        try:
+            webbrowser.open('http://localhost:5000')
+            print("[OK] Browser opened")
+        except:
+            print("[WARNING] Open http://localhost:5000 manually")
 
     threading.Thread(target=open_browser, daemon=True).start()
     
