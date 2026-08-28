@@ -88,15 +88,18 @@ class Colors:
         ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
         return ansi_escape.sub('', text)
 
-# ============================================================
-# FORCE ANSI COLOR SUPPORT IN SUBPROCESSES
-# ============================================================
+# Force ANSI color codes to work
+os.environ['TERM'] = 'xterm-256color'
 os.environ['CLICOLOR'] = '1'
 os.environ['CLICOLOR_FORCE'] = '1'
 os.environ['FORCE_COLOR'] = '1'
 os.environ['PY_COLORS'] = '1'
-os.environ['TERM'] = os.environ.get('TERM', 'xterm-256color')
 os.environ['PAGER'] = 'cat'
+
+# Ensure escape sequences are not stripped
+import sys
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
 
 # ============================================================
 # TRY TO IMPORT COLORAMA WITH PROPER ERROR HANDLING
@@ -195,6 +198,54 @@ def fix_console_encoding():
             pass
 
 fix_console_encoding()
+
+
+def fix_color_string(text):
+    """Ensure ANSI escape characters are properly formatted"""
+    if not isinstance(text, str):
+        return text
+    
+    # First, ensure we have a clean string
+    import re
+    
+    # Fix missing escape characters - this is the key fix
+    # Pattern: [XXm (with no \033 prefix) should become \033[XXm
+    text = re.sub(r'(?<!\x1b)(?<!\033)\[([0-9;]+)m', r'\033[\1m', text)
+    
+    # Fix escaped backslashes
+    text = text.replace('\\033[', '\033[').replace('\\x1b[', '\033[').replace('\\x1B[', '\033[')
+    
+    # Fix any other common broken patterns
+    replacements = {
+        '\x1b': '\033',
+        '\x1B': '\033',
+        '[39m': '\033[39m',
+        '[90m': '\033[90m',
+        '[92m': '\033[92m',
+        '[93m': '\033[93m',
+        '[96m': '\033[96m',
+        '[97m': '\033[97m',
+        '[91m': '\033[91m',
+        '[32m': '\033[32m',
+        '[31m': '\033[31m',
+        '[33m': '\033[33m',
+        '[34m': '\033[34m',
+        '[35m': '\033[35m',
+        '[36m': '\033[36m',
+        '[37m': '\033[37m',
+        '[2m': '\033[2m',
+        '[1m': '\033[1m',
+        '[0m': '\033[0m',
+        '[5m': '\033[5m',
+        '[7m': '\033[7m',
+        '[4m': '\033[4m',
+        '[3m': '\033[3m',
+    }
+    
+    for old, new in replacements.items():
+        text = text.replace(old, new)
+    
+    return text
 
 def safe_color(attr_name, default=''):
     try:
@@ -968,14 +1019,26 @@ class HardeningDashboard:
     # ============================================================
     
     def _draw_neon_hacker_box(self, title: str, content_lines: List[str], 
-                              title_color: str = Fore.LIGHTCYAN_EX,
-                              border_color: str = Fore.LIGHTCYAN_EX,
-                              content_color: str = Fore.LIGHTGREEN_EX,
-                              blink_title: bool = False,
-                              glow_border: bool = True,
-                              width: int = None,
-                              animated: bool = False,
-                              animation_duration: float = 1.0):
+                                title_color: str = Fore.LIGHTCYAN_EX,
+                                border_color: str = Fore.LIGHTCYAN_EX,
+                                content_color: str = Fore.LIGHTGREEN_EX,
+                                blink_title: bool = False,
+                                glow_border: bool = True,
+                                width: int = None,
+                                animated: bool = False,
+                                animation_duration: float = 1.0):
+        """Draw a centered neon glowing hacker-styled box with optional animation."""
+        # ============================================================
+        # FIX: Apply ANSI color fixing to ALL input
+        # ============================================================
+        # Fix color strings
+        title_color = fix_color_string(str(title_color)) if title_color else Fore.LIGHTCYAN_EX
+        border_color = fix_color_string(str(border_color)) if border_color else Fore.LIGHTCYAN_EX
+        content_color = fix_color_string(str(content_color)) if content_color else Fore.LIGHTGREEN_EX
+        
+        # Fix content lines
+        content_lines = [fix_color_string(line) for line in content_lines]
+        
         try:
             term = shutil.get_terminal_size()
             term_width = term.columns
@@ -988,36 +1051,56 @@ class HardeningDashboard:
         left_margin = max(0, (term_width - width) // 2)
         inner_width = width - 4
         
+        # Wrap content lines
         wrapped_lines = []
         for line in content_lines:
             if not line.strip():
                 wrapped_lines.append("")
                 continue
-            if re.search(r'\x1b\[[0-9;]*m', line):
+            # Check if line has ANSI codes
+            if re.search(r'\x1b\[[0-9;]*m', line) or re.search(r'\033\[[0-9;]*m', line):
                 wrapped_lines.append(line)
             else:
                 wrapped_lines.extend(textwrap.wrap(line, inner_width, break_long_words=False))
         
-        TOP_LEFT = "╔"; TOP_RIGHT = "╗"; BOTTOM_LEFT = "╚"; BOTTOM_RIGHT = "╝"
-        HORIZONTAL = "═"; VERTICAL = "║"; T_LEFT = "╠"; T_RIGHT = "╣"
-        BOLD = '\033[1m'; BLINK_ON = '\033[5m'; BLINK_OFF = '\033[25m'
+        # Fix all wrapped lines again (safety)
+        wrapped_lines = [fix_color_string(line) for line in wrapped_lines]
         
-        title_color_str = str(title_color) if title_color else Fore.LIGHTCYAN_EX
-        border_color_str = str(border_color) if border_color else Fore.LIGHTCYAN_EX
-        content_color_str = str(content_color) if content_color else Fore.LIGHTGREEN_EX
+        # Box drawing characters
+        TOP_LEFT = "╔"
+        TOP_RIGHT = "╗"
+        BOTTOM_LEFT = "╚"
+        BOTTOM_RIGHT = "╝"
+        HORIZONTAL = "═"
+        VERTICAL = "║"
+        T_LEFT = "╠"
+        T_RIGHT = "╣"
+        
+        # ANSI escape codes
+        BOLD = '\033[1m'
+        BLINK_ON = '\033[5m'
+        BLINK_OFF = '\033[25m'
+        RESET = '\033[0m'
         
         glow_prefix = BOLD if glow_border else ""
         title_prefix = BOLD
         if blink_title:
             title_prefix += BLINK_ON
         
-        top = f"{' ' * left_margin}{glow_prefix}{border_color_str}{TOP_LEFT}{HORIZONTAL * (width - 2)}{TOP_RIGHT}{Style.RESET_ALL}"
+        # Build box with proper ANSI codes
+        top = f"{' ' * left_margin}{glow_prefix}{border_color_str}{TOP_LEFT}{HORIZONTAL * (width - 2)}{TOP_RIGHT}{RESET}"
         title_text = f" {title} ".center(width - 2)
-        title_line = f"{' ' * left_margin}{title_prefix}{title_color_str}{VERTICAL}{title_text}{VERTICAL}{Style.RESET_ALL}"
+        title_line = f"{' ' * left_margin}{title_prefix}{title_color_str}{VERTICAL}{title_text}{VERTICAL}{RESET}"
         if blink_title:
             title_line += BLINK_OFF
-        mid = f"{' ' * left_margin}{glow_prefix}{border_color_str}{T_LEFT}{HORIZONTAL * (width - 2)}{T_RIGHT}{Style.RESET_ALL}"
-        bot = f"{' ' * left_margin}{glow_prefix}{border_color_str}{BOTTOM_LEFT}{HORIZONTAL * (width - 2)}{BOTTOM_RIGHT}{Style.RESET_ALL}"
+        mid = f"{' ' * left_margin}{glow_prefix}{border_color_str}{T_LEFT}{HORIZONTAL * (width - 2)}{T_RIGHT}{RESET}"
+        bot = f"{' ' * left_margin}{glow_prefix}{border_color_str}{BOTTOM_LEFT}{HORIZONTAL * (width - 2)}{BOTTOM_RIGHT}{RESET}"
+        
+        # Fix all box parts
+        top = fix_color_string(top)
+        title_line = fix_color_string(title_line)
+        mid = fix_color_string(mid)
+        bot = fix_color_string(bot)
         
         if animated:
             print(top)
@@ -1029,14 +1112,20 @@ class HardeningDashboard:
             time.sleep(0.1)
             
             for line in wrapped_lines:
-                has_color = re.search(r'\x1b\[[0-9;]*m', line)
+                line = fix_color_string(line)
+                has_color = re.search(r'\x1b\[[0-9;]*m', line) or re.search(r'\033\[[0-9;]*m', line)
                 if has_color:
                     clean_line = re.sub(r'\x1b\[[0-9;]*m', '', line)
+                    clean_line = re.sub(r'\033\[[0-9;]*m', '', clean_line)
                     padding_needed = inner_width - len(clean_line)
                     if padding_needed < 0:
                         padding_needed = 0
-                    left_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL} {Style.RESET_ALL}"
-                    right_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL}{Style.RESET_ALL}"
+                    
+                    left_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL} {RESET}"
+                    right_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL}{RESET}"
+                    left_border = fix_color_string(left_border)
+                    right_border = fix_color_string(right_border)
+                    
                     sys.stdout.write(left_border)
                     for char in line:
                         sys.stdout.write(char)
@@ -1046,17 +1135,21 @@ class HardeningDashboard:
                     print(f" {right_border}")
                 else:
                     padded_line = line.ljust(inner_width)
-                    left_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL} {Style.RESET_ALL}"
-                    right_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL}{Style.RESET_ALL}"
+                    left_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL} {RESET}"
+                    right_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL}{RESET}"
+                    left_border = fix_color_string(left_border)
+                    right_border = fix_color_string(right_border)
+                    
                     sys.stdout.write(left_border)
                     for char in padded_line:
                         if char != ' ' or random.random() > 0.3:
-                            sys.stdout.write(f"{content_color_str}{char}{Style.RESET_ALL}")
+                            sys.stdout.write(f"{content_color_str}{char}{RESET}")
                         else:
                             sys.stdout.write(char)
                         sys.stdout.flush()
                         time.sleep(0.01)
                     print(f" {right_border}")
+            
             time.sleep(0.1)
             print(bot)
             print()
@@ -1066,20 +1159,28 @@ class HardeningDashboard:
             print(title_line)
             print(mid)
             for line in wrapped_lines:
-                has_color = re.search(r'\x1b\[[0-9;]*m', line)
+                line = fix_color_string(line)
+                has_color = re.search(r'\x1b\[[0-9;]*m', line) or re.search(r'\033\[[0-9;]*m', line)
                 if has_color:
                     clean_line = re.sub(r'\x1b\[[0-9;]*m', '', line)
+                    clean_line = re.sub(r'\033\[[0-9;]*m', '', clean_line)
                     padding_needed = inner_width - len(clean_line)
                     if padding_needed < 0:
                         padding_needed = 0
-                    left_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL} {Style.RESET_ALL}"
-                    print(f"{left_border}{line}{' ' * padding_needed} {glow_prefix}{border_color_str}{VERTICAL}{Style.RESET_ALL}")
+                    left_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL} {RESET}"
+                    left_border = fix_color_string(left_border)
+                    right_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL}{RESET}"
+                    right_border = fix_color_string(right_border)
+                    print(f"{left_border}{line}{' ' * padding_needed} {right_border}")
                 else:
-                    left_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL} {Style.RESET_ALL}"
-                    print(f"{left_border}{content_color_str}{line.ljust(inner_width)}{Style.RESET_ALL} {glow_prefix}{border_color_str}{VERTICAL}{Style.RESET_ALL}")
+                    left_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL} {RESET}"
+                    left_border = fix_color_string(left_border)
+                    right_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL}{RESET}"
+                    right_border = fix_color_string(right_border)
+                    print(f"{left_border}{content_color_str}{line.ljust(inner_width)}{RESET} {right_border}")
             print(bot)
             print()
-    
+
     def _get_severity_text(self, severity):
         if severity == HardeningSeverity.CRITICAL:
             return f"{Fore.LIGHTRED_EX}🔴 CRITICAL{Fore.RESET}"
@@ -2299,7 +2400,7 @@ class HardeningDashboard:
     def _display_header(self):
         header = f"""
 {Fore.GREEN}{'='*self.terminal_width}
-{self._center_text(f'{Fore.CYAN}DSTERMINAL HARDENING DASHBOARD v4.0{Fore.RESET}')}
+{self._center_text(f'{Fore.CYAN}DSTERMINAL HARDENING MODULE v2.91.01{Fore.RESET}')}
 {self._center_text(f'{Fore.LIGHTCYAN_EX}Enterprise Security Suite - Persistent State{Fore.RESET}')}
 {Fore.GREEN}{'='*self.terminal_width}{Fore.RESET}
 {Fore.YELLOW}System:{Fore.RESET} {self.system} | {Fore.YELLOW}Admin:{Fore.RESET} {self.is_admin_user} | {Fore.YELLOW}System ID:{Fore.RESET} {self.state_manager.get_system_id()}
@@ -2534,7 +2635,7 @@ class HardeningDashboard:
             
             try:
                 header = Panel(
-                    "[bold cyan]DSTERMINAL HARDENING DASHBOARD v4.0[/bold cyan]\n"
+                    "[bold cyan]DSTERMINAL HARDENING MODULE v2.91.01[/bold cyan]\n"
                     f"[dim]Enterprise Security Suite | System ID: {self.state_manager.get_system_id()}[/dim]\n"
                     f"[dim]Session: {self.session_id} | Platform: {self.system}[/dim]",
                     border_style="cyan"
