@@ -99,174 +99,92 @@ os.environ['TERM'] = os.environ.get('TERM', 'xterm-256color')
 os.environ['PAGER'] = 'cat'
 
 # ============================================================
-# TRY TO IMPORT COLORAMA WITH PROPER ERROR HANDLING - FIXED
+# TRY TO IMPORT COLORAMA WITH PROPER ERROR HANDLING
 # ============================================================
 try:
     from colorama import init, Fore, Back, Style
     import colorama
     
-    # Force colorama to use ANSI escape sequences correctly
     if platform.system() == 'Windows':
         init(autoreset=True, convert=True, strip=False)
     else:
-        # On Linux/macOS, ensure ANSI codes are not stripped
         init(autoreset=True, convert=False, strip=False)
     
-    # Force color support for all terminals
     os.environ['PYTHONIOENCODING'] = 'utf-8'
     os.environ['PYTHONUTF8'] = '1'
-    
     COLORS_AVAILABLE = True
     
 except ImportError:
     COLORS_AVAILABLE = False
-    # Define COMPLETE fallback colors with ALL attributes
     class Fore:
-        BLACK = '\033[30m'
-        RED = '\033[31m'
-        GREEN = '\033[32m'
-        YELLOW = '\033[33m'
-        BLUE = '\033[34m'
-        MAGENTA = '\033[35m'
-        CYAN = '\033[36m'
-        WHITE = '\033[37m'
-        RESET = '\033[0m'
-        LIGHTBLACK_EX = '\033[90m'
-        LIGHTRED_EX = '\033[91m'
-        LIGHTGREEN_EX = '\033[92m'
-        LIGHTYELLOW_EX = '\033[93m'
-        LIGHTBLUE_EX = '\033[94m'
-        LIGHTMAGENTA_EX = '\033[95m'
-        LIGHTCYAN_EX = '\033[96m'
-        LIGHTWHITE_EX = '\033[97m'
-        BRIGHT_BLACK = '\033[90m'
-        BRIGHT_RED = '\033[91m'
-        BRIGHT_GREEN = '\033[92m'
-        BRIGHT_YELLOW = '\033[93m'
-        BRIGHT_BLUE = '\033[94m'
-        BRIGHT_MAGENTA = '\033[95m'
-        BRIGHT_CYAN = '\033[96m'
-        BRIGHT_WHITE = '\033[97m'
-        DIM = '\033[2m'  # FIXED: Added DIM attribute
-        BOLD = '\033[1m'
-        ITALIC = '\033[3m'
-        UNDERLINE = '\033[4m'
-        BLINK = '\033[5m'
-        REVERSE = '\033[7m'
-        HIDDEN = '\033[8m'
-        RESET_ALL = '\033[0m'
+        BLACK = '\033[30m'; RED = '\033[31m'; GREEN = '\033[32m'
+        YELLOW = '\033[33m'; BLUE = '\033[34m'; MAGENTA = '\033[35m'
+        CYAN = '\033[36m'; WHITE = '\033[37m'; RESET = '\033[0m'
+        LIGHTBLACK_EX = '\033[90m'; LIGHTRED_EX = '\033[91m'
+        LIGHTGREEN_EX = '\033[92m'; LIGHTYELLOW_EX = '\033[93m'
+        LIGHTBLUE_EX = '\033[94m'; LIGHTMAGENTA_EX = '\033[95m'
+        LIGHTCYAN_EX = '\033[96m'; LIGHTWHITE_EX = '\033[97m'
+        BRIGHT_BLACK = '\033[90m'; BRIGHT_RED = '\033[91m'
+        BRIGHT_GREEN = '\033[92m'; BRIGHT_YELLOW = '\033[93m'
+        BRIGHT_BLUE = '\033[94m'; BRIGHT_MAGENTA = '\033[95m'
+        BRIGHT_CYAN = '\033[96m'; BRIGHT_WHITE = '\033[97m'
+        DIM = '\033[2m'; BOLD = '\033[1m'; ITALIC = '\033[3m'
+        UNDERLINE = '\033[4m'; BLINK = '\033[5m'; REVERSE = '\033[7m'
+        HIDDEN = '\033[8m'; RESET_ALL = '\033[0m'
     
     class Style:
-        RESET_ALL = '\033[0m'
-        BRIGHT = '\033[1m'
-        DIM = '\033[2m'
-        ITALIC = '\033[3m'
-        UNDERLINE = '\033[4m'
-        BLINK = '\033[5m'
-        REVERSE = '\033[7m'
-        HIDDEN = '\033[8m'
-        NORMAL = '\033[22m'
+        RESET_ALL = '\033[0m'; BRIGHT = '\033[1m'; DIM = '\033[2m'
+        ITALIC = '\033[3m'; UNDERLINE = '\033[4m'; BLINK = '\033[5m'
+        REVERSE = '\033[7m'; HIDDEN = '\033[8m'; NORMAL = '\033[22m'
     
     class Back:
-        RESET = '\033[49m'
-        BLACK = '\033[40m'
-        RED = '\033[41m'
-        GREEN = '\033[42m'
-        YELLOW = '\033[43m'
-        BLUE = '\033[44m'
-        MAGENTA = '\033[45m'
-        CYAN = '\033[46m'
-        WHITE = '\033[47m'
-        LIGHTBLACK_EX = '\033[100m'
-        LIGHTRED_EX = '\033[101m'
-        LIGHTGREEN_EX = '\033[102m'
-        LIGHTYELLOW_EX = '\033[103m'
-        LIGHTBLUE_EX = '\033[104m'
-        LIGHTMAGENTA_EX = '\033[105m'
-        LIGHTCYAN_EX = '\033[106m'
-        LIGHTWHITE_EX = '\033[107m'
+        RESET = '\033[49m'; BLACK = '\033[40m'; RED = '\033[41m'
+        GREEN = '\033[42m'; YELLOW = '\033[43m'; BLUE = '\033[44m'
+        MAGENTA = '\033[45m'; CYAN = '\033[46m'; WHITE = '\033[47m'
+        LIGHTBLACK_EX = '\033[100m'; LIGHTRED_EX = '\033[101m'
+        LIGHTGREEN_EX = '\033[102m'; LIGHTYELLOW_EX = '\033[103m'
+        LIGHTBLUE_EX = '\033[104m'; LIGHTMAGENTA_EX = '\033[105m'
+        LIGHTCYAN_EX = '\033[106m'; LIGHTWHITE_EX = '\033[107m'
 
 except Exception as e:
     COLORS_AVAILABLE = False
-    # COMPLETE fallback colors with ALL attributes
     class Fore:
-        BLACK = '\033[30m'
-        RED = '\033[31m'
-        GREEN = '\033[32m'
-        YELLOW = '\033[33m'
-        BLUE = '\033[34m'
-        MAGENTA = '\033[35m'
-        CYAN = '\033[36m'
-        WHITE = '\033[37m'
-        RESET = '\033[0m'
-        LIGHTBLACK_EX = '\033[90m'
-        LIGHTRED_EX = '\033[91m'
-        LIGHTGREEN_EX = '\033[92m'
-        LIGHTYELLOW_EX = '\033[93m'
-        LIGHTBLUE_EX = '\033[94m'
-        LIGHTMAGENTA_EX = '\033[95m'
-        LIGHTCYAN_EX = '\033[96m'
-        LIGHTWHITE_EX = '\033[97m'
-        BRIGHT_BLACK = '\033[90m'
-        BRIGHT_RED = '\033[91m'
-        BRIGHT_GREEN = '\033[92m'
-        BRIGHT_YELLOW = '\033[93m'
-        BRIGHT_BLUE = '\033[94m'
-        BRIGHT_MAGENTA = '\033[95m'
-        BRIGHT_CYAN = '\033[96m'
-        BRIGHT_WHITE = '\033[97m'
-        DIM = '\033[2m'  # FIXED: Added DIM attribute
-        BOLD = '\033[1m'
-        ITALIC = '\033[3m'
-        UNDERLINE = '\033[4m'
-        BLINK = '\033[5m'
-        REVERSE = '\033[7m'
-        HIDDEN = '\033[8m'
-        RESET_ALL = '\033[0m'
+        BLACK = '\033[30m'; RED = '\033[31m'; GREEN = '\033[32m'
+        YELLOW = '\033[33m'; BLUE = '\033[34m'; MAGENTA = '\033[35m'
+        CYAN = '\033[36m'; WHITE = '\033[37m'; RESET = '\033[0m'
+        LIGHTBLACK_EX = '\033[90m'; LIGHTRED_EX = '\033[91m'
+        LIGHTGREEN_EX = '\033[92m'; LIGHTYELLOW_EX = '\033[93m'
+        LIGHTBLUE_EX = '\033[94m'; LIGHTMAGENTA_EX = '\033[95m'
+        LIGHTCYAN_EX = '\033[96m'; LIGHTWHITE_EX = '\033[97m'
+        BRIGHT_BLACK = '\033[90m'; BRIGHT_RED = '\033[91m'
+        BRIGHT_GREEN = '\033[92m'; BRIGHT_YELLOW = '\033[93m'
+        BRIGHT_BLUE = '\033[94m'; BRIGHT_MAGENTA = '\033[95m'
+        BRIGHT_CYAN = '\033[96m'; BRIGHT_WHITE = '\033[97m'
+        DIM = '\033[2m'; BOLD = '\033[1m'; ITALIC = '\033[3m'
+        UNDERLINE = '\033[4m'; BLINK = '\033[5m'; REVERSE = '\033[7m'
+        HIDDEN = '\033[8m'; RESET_ALL = '\033[0m'
     
     class Style:
-        RESET_ALL = '\033[0m'
-        BRIGHT = '\033[1m'
-        DIM = '\033[2m'
-        ITALIC = '\033[3m'
-        UNDERLINE = '\033[4m'
-        BLINK = '\033[5m'
-        REVERSE = '\033[7m'
-        HIDDEN = '\033[8m'
-        NORMAL = '\033[22m'
+        RESET_ALL = '\033[0m'; BRIGHT = '\033[1m'; DIM = '\033[2m'
+        ITALIC = '\033[3m'; UNDERLINE = '\033[4m'; BLINK = '\033[5m'
+        REVERSE = '\033[7m'; HIDDEN = '\033[8m'; NORMAL = '\033[22m'
     
     class Back:
-        RESET = '\033[49m'
-        BLACK = '\033[40m'
-        RED = '\033[41m'
-        GREEN = '\033[42m'
-        YELLOW = '\033[43m'
-        BLUE = '\033[44m'
-        MAGENTA = '\033[45m'
-        CYAN = '\033[46m'
-        WHITE = '\033[47m'
-        LIGHTBLACK_EX = '\033[100m'
-        LIGHTRED_EX = '\033[101m'
-        LIGHTGREEN_EX = '\033[102m'
-        LIGHTYELLOW_EX = '\033[103m'
-        LIGHTBLUE_EX = '\033[104m'
-        LIGHTMAGENTA_EX = '\033[105m'
-        LIGHTCYAN_EX = '\033[106m'
-        LIGHTWHITE_EX = '\033[107m'
-
-# ============================================================
-# FIX CONSOLE ENCODING FOR WINDOWS
-# ============================================================
+        RESET = '\033[49m'; BLACK = '\033[40m'; RED = '\033[41m'
+        GREEN = '\033[42m'; YELLOW = '\033[43m'; BLUE = '\033[44m'
+        MAGENTA = '\033[45m'; CYAN = '\033[46m'; WHITE = '\033[47m'
+        LIGHTBLACK_EX = '\033[100m'; LIGHTRED_EX = '\033[101m'
+        LIGHTGREEN_EX = '\033[102m'; LIGHTYELLOW_EX = '\033[103m'
+        LIGHTBLUE_EX = '\033[104m'; LIGHTMAGENTA_EX = '\033[105m'
+        LIGHTCYAN_EX = '\033[106m'; LIGHTWHITE_EX = '\033[107m'
 
 def fix_console_encoding():
-    """Fix console encoding for Windows to display UTF-8 box drawing characters"""
     if platform.system() == 'Windows':
         try:
             import ctypes
             kernel32 = ctypes.windll.kernel32
             kernel32.SetConsoleCP(65001)
             kernel32.SetConsoleOutputCP(65001)
-            
             handle = kernel32.GetStdHandle(-11)
             mode = ctypes.c_ulong()
             if kernel32.GetConsoleMode(handle, ctypes.byref(mode)):
@@ -278,27 +196,18 @@ def fix_console_encoding():
 
 fix_console_encoding()
 
-# ============================================================
-# SAFE COLOR FUNCTIONS
-# ============================================================
-
 def safe_color(attr_name, default=''):
-    """Safely get color attribute with fallback"""
     try:
         return getattr(Fore, attr_name, default)
     except:
         return default
 
 def safe_style(attr_name, default=''):
-    """Safely get style attribute with fallback"""
     try:
         return getattr(Style, attr_name, default)
     except:
         return default
 
-# ============================================================
-# TRY TO IMPORT RICH
-# ============================================================
 try:
     from rich.console import Console
     from rich.layout import Layout
@@ -313,9 +222,6 @@ try:
 except ImportError:
     RICH_AVAILABLE = False
 
-# ============================================================
-# TRY TO IMPORT PSUTIL
-# ============================================================
 try:
     import psutil
     PSUTIL_AVAILABLE = True
@@ -327,8 +233,6 @@ except ImportError:
 # ============================================================
 
 class HardeningState:
-    """Manages persistent state of hardening modules"""
-    
     STATE_FILE = os.path.expanduser("~/DSTerminal_Workspace/.hardening_state.json")
     
     def __init__(self):
@@ -336,14 +240,12 @@ class HardeningState:
         self._ensure_state_file()
     
     def _ensure_state_file(self):
-        """Ensure the state directory and file exist"""
         state_dir = os.path.dirname(self.STATE_FILE)
         os.makedirs(state_dir, exist_ok=True)
         if not os.path.exists(self.STATE_FILE):
             self._save_state()
     
     def _load_state(self) -> Dict:
-        """Load state from file"""
         try:
             if os.path.exists(self.STATE_FILE):
                 with open(self.STATE_FILE, 'r', encoding='utf-8') as f:
@@ -353,7 +255,6 @@ class HardeningState:
         return {"modules": {}, "system": {"id": None, "last_update": None}}
     
     def _save_state(self):
-        """Save state to file"""
         try:
             with open(self.STATE_FILE, 'w', encoding='utf-8') as f:
                 json.dump(self.state, f, indent=2)
@@ -361,15 +262,12 @@ class HardeningState:
             pass
     
     def is_module_applied(self, module_id: str) -> bool:
-        """Check if a module has been applied"""
         return module_id in self.state.get("modules", {})
     
     def get_module_state(self, module_id: str) -> Optional[Dict]:
-        """Get the state of a specific module"""
         return self.state.get("modules", {}).get(module_id)
     
     def mark_module_applied(self, module_id: str, details: Dict):
-        """Mark a module as applied"""
         if "modules" not in self.state:
             self.state["modules"] = {}
         self.state["modules"][module_id] = {
@@ -383,7 +281,6 @@ class HardeningState:
         self._save_state()
     
     def mark_module_failed(self, module_id: str, error: str):
-        """Mark a module as failed (for retry tracking)"""
         if "modules" not in self.state:
             self.state["modules"] = {}
         self.state["modules"][module_id] = {
@@ -394,7 +291,6 @@ class HardeningState:
         self._save_state()
     
     def get_system_id(self) -> str:
-        """Get or create a unique system ID"""
         if not self.state.get("system", {}).get("id"):
             self.state["system"]["id"] = hashlib.sha256(
                 f"{platform.node()}{platform.system()}{platform.processor()}".encode()
@@ -403,22 +299,10 @@ class HardeningState:
         return self.state["system"]["id"]
     
     def get_all_applied_modules(self) -> List[str]:
-        """Get list of all applied module IDs"""
         return list(self.state.get("modules", {}).keys())
-    
-    def clear_module_state(self, module_id: str):
-        """Clear the state of a specific module (for rollback)"""
-        if module_id in self.state.get("modules", {}):
-            del self.state["modules"][module_id]
-            self._save_state()
 
-# ============================================================
-# DOWNLOAD MANAGER WITH ERROR HANDLING
-# ============================================================
 
 class DownloadManager:
-    """Handles file downloads with retry, verification, and safety"""
-    
     DOWNLOAD_DIR = os.path.expanduser("~/DSTerminal_Workspace/downloads")
     
     def __init__(self):
@@ -431,26 +315,18 @@ class DownloadManager:
                       expected_checksum: str = None,
                       max_retries: int = 3,
                       timeout: int = 30) -> Tuple[bool, Optional[str], str]:
-        """
-        Download a file with retries and verification
-        
-        Returns: (success, file_path, message)
-        """
         if filename is None:
             filename = url.split('/')[-1] or f"download_{int(time.time())}"
-        
         file_path = os.path.join(self.DOWNLOAD_DIR, filename)
         
         for attempt in range(max_retries):
             try:
-                # Check internet connectivity first
                 if not self._check_internet():
                     if attempt < max_retries - 1:
                         time.sleep(2)
                         continue
                     return False, None, "No internet connection available"
                 
-                # Download with progress
                 req = urllib.request.Request(url, headers={
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
                 })
@@ -467,7 +343,6 @@ class DownloadManager:
                                 break
                             f.write(chunk)
                             downloaded += len(chunk)
-                            
                             if total_size > 0:
                                 percent = (downloaded / total_size) * 100
                                 sys.stdout.write(f"\r  Downloading: {percent:.1f}% ({downloaded/1024:.1f}KB/{total_size/1024:.1f}KB)")
@@ -475,14 +350,12 @@ class DownloadManager:
                     
                     sys.stdout.write("\n")
                     
-                    # Verify checksum if provided
                     if expected_checksum:
                         file_checksum = self._calculate_checksum(file_path)
                         if file_checksum != expected_checksum:
                             os.remove(file_path)
-                            return False, None, f"Checksum mismatch: expected {expected_checksum}, got {file_checksum}"
+                            return False, None, f"Checksum mismatch"
                     
-                    # Verify file is not empty
                     if os.path.getsize(file_path) == 0:
                         os.remove(file_path)
                         return False, None, "Downloaded file is empty"
@@ -491,7 +364,7 @@ class DownloadManager:
                     
             except urllib.error.URLError as e:
                 if attempt < max_retries - 1:
-                    time.sleep(2 ** attempt)  # Exponential backoff
+                    time.sleep(2 ** attempt)
                     continue
                 return False, None, f"Network error: {str(e)}"
             except urllib.error.HTTPError as e:
@@ -508,7 +381,6 @@ class DownloadManager:
         return False, None, "Max retries exceeded"
     
     def _check_internet(self) -> bool:
-        """Check if internet is available"""
         try:
             urllib.request.urlopen('https://8.8.8.8', timeout=5, context=self.ssl_context)
             return True
@@ -520,46 +392,11 @@ class DownloadManager:
                 return False
     
     def _calculate_checksum(self, file_path: str) -> str:
-        """Calculate SHA-256 checksum of a file"""
         sha256 = hashlib.sha256()
         with open(file_path, 'rb') as f:
             for chunk in iter(lambda: f.read(8192), b''):
                 sha256.update(chunk)
         return sha256.hexdigest()
-    
-    def verify_downloaded_file(self, file_path: str) -> bool:
-        """Verify that a downloaded file is valid"""
-        if not os.path.exists(file_path):
-            return False
-        if os.path.getsize(file_path) == 0:
-            return False
-        
-        # Try to detect if it's an executable/script
-        try:
-            with open(file_path, 'rb') as f:
-                header = f.read(256)
-                # Check for common file signatures
-                if header.startswith(b'#!') or header.startswith(b'PK') or header.startswith(b'MZ'):
-                    return True
-                # Check if it's a text file
-                try:
-                    text = header.decode('utf-8')
-                    if any(word in text for word in ['#!/usr/bin', '#!/bin', '<?php', '<html']):
-                        return True
-                except:
-                    pass
-                # Check if it contains executable content
-                if any(byte in header for byte in [0xFF, 0xFE, 0x0A, 0x0D]):
-                    return True
-        except:
-            pass
-        
-        # Default: allow if file has content
-        return True
-
-# ============================================================
-# HARDENING STATE MANAGER (Wrapper)
-# ============================================================
 
 class HardeningStateManager:
     """Wrapper for hardening state with additional features"""
@@ -592,6 +429,13 @@ class HardeningStateManager:
                            expected_checksum: str = None) -> Tuple[bool, Optional[str], str]:
         """Download and verify a file"""
         return self.download_manager.download_file(url, filename, expected_checksum)
+    
+    # ============================================================
+    # ADD THIS METHOD - FIXES THE ROLLBACK ERROR
+    # ============================================================
+    def clear_module_state(self, module_id: str):
+        """Clear the state of a specific module (for rollback)"""
+        self.state.clear_module_state(module_id)
 
 
 class HardeningCategory(Enum):
@@ -607,13 +451,11 @@ class HardeningCategory(Enum):
     AUDITING = "Audit & Logging"
     SYSTEM_UPDATE = "System Updates"
 
-
 class HardeningSeverity(Enum):
     CRITICAL = "CRITICAL"
     HIGH = "HIGH"
     MEDIUM = "MEDIUM"
     LOW = "LOW"
-
 
 @dataclass
 class HardeningModule:
@@ -637,7 +479,6 @@ class HardeningModule:
     version: str = "1.0"
     download_filename: Optional[str] = None
 
-
 @dataclass
 class HardeningResult:
     module: HardeningModule
@@ -649,10 +490,7 @@ class HardeningResult:
     live_output: List[str] = field(default_factory=list)
     was_already_applied: bool = False
 
-
 class TelemetryCollector:
-    """Real-time system telemetry collector using psutil"""
-    
     def __init__(self):
         self.running = False
         self.thread = None
@@ -675,7 +513,6 @@ class TelemetryCollector:
                     self.cpu_history.append(psutil.cpu_percent(interval=0.5))
                     mem = psutil.virtual_memory()
                     self.ram_history.append(mem.percent)
-                    
                     net = psutil.net_io_counters()
                     self.network_history.append((net.bytes_sent, net.bytes_recv))
             except:
@@ -693,12 +530,8 @@ class TelemetryCollector:
             }
         return {"cpu": 0, "ram": 0, "cpu_avg": 0, "ram_avg": 0, "processes": 0}
 
-
 class HardeningDashboard:
-    """Enterprise-grade hardening dashboard with real-time telemetry"""
-    
     def __init__(self, terminal_width: int = None):
-        # Get terminal size
         if terminal_width is None:
             try:
                 terminal_width = shutil.get_terminal_size().columns
@@ -713,21 +546,17 @@ class HardeningDashboard:
         self.selected_modules: List[str] = []
         self.session_id = datetime.now().strftime("%Y%m%d_%H%M%S")
         
-        # State and download management
         self.state_manager = HardeningStateManager()
         self.download_manager = DownloadManager()
         
-        # Telemetry and live capture
         self.telemetry = TelemetryCollector()
         self.threat_feed = deque(maxlen=20)
         self.execution_events = deque(maxlen=30)
         
-        # Initialize
         self._initialize_modules()
         self._setup_logging()
         self._load_module_states()
         
-        # Start telemetry
         self.telemetry.start()
     
     def _check_admin(self) -> bool:
@@ -750,7 +579,6 @@ class HardeningDashboard:
         )
     
     def _load_module_states(self):
-        """Load module states from persistent storage"""
         for module in self.modules:
             if self.state_manager.is_module_applied(module.id):
                 module.applied = True
@@ -761,198 +589,140 @@ class HardeningDashboard:
                     module.version = details.get("version", "1.0")
     
     def _initialize_modules(self):
-        """Initialize all hardening modules with real commands"""
-        
         self.modules = [
             HardeningModule(
-                id="disable_guest", 
-                name="Disable Guest Account", 
+                id="disable_guest", name="Disable Guest Account", 
                 description="Disables guest account to prevent unauthorized access",
-                category=HardeningCategory.USER_SECURITY, 
-                severity=HardeningSeverity.HIGH,
+                category=HardeningCategory.USER_SECURITY, severity=HardeningSeverity.HIGH,
                 platforms=["Windows", "Linux", "Darwin"], 
                 command=self._get_disable_guest_command(),
                 verify_command=self._get_verify_guest_command(), 
                 rollback_command=self._get_enable_guest_command(), 
-                requires_admin=True, 
-                estimated_time=2.0
+                requires_admin=True, estimated_time=2.0
             ),
-            
             HardeningModule(
-                id="password_policy", 
-                name="Strong Password Policy",
+                id="password_policy", name="Strong Password Policy",
                 description="Enforces minimum password length and complexity requirements",
-                category=HardeningCategory.PASSWORD_POLICY, 
-                severity=HardeningSeverity.CRITICAL,
+                category=HardeningCategory.PASSWORD_POLICY, severity=HardeningSeverity.CRITICAL,
                 platforms=["Windows", "Linux", "Darwin"], 
                 command=self._get_password_policy_command(),
                 verify_command=self._get_verify_password_policy_command(),
                 rollback_command=self._get_rollback_password_policy_command(),
-                requires_admin=True, 
-                estimated_time=2.0
+                requires_admin=True, estimated_time=2.0
             ),
-            
             HardeningModule(
-                id="lockout_policy", 
-                name="Account Lockout Policy",
+                id="lockout_policy", name="Account Lockout Policy",
                 description="Locks accounts after multiple failed login attempts",
-                category=HardeningCategory.PASSWORD_POLICY, 
-                severity=HardeningSeverity.HIGH,
+                category=HardeningCategory.PASSWORD_POLICY, severity=HardeningSeverity.HIGH,
                 platforms=["Windows", "Linux"], 
                 command=self._get_lockout_policy_command(),
                 verify_command=self._get_verify_lockout_policy_command(),
                 rollback_command=self._get_rollback_lockout_policy_command(),
-                requires_admin=True, 
-                estimated_time=2.0
+                requires_admin=True, estimated_time=2.0
             ),
-            
             HardeningModule(
-                id="enable_firewall", 
-                name="Enable Firewall",
+                id="enable_firewall", name="Enable Firewall",
                 description="Enables firewall with default deny inbound policy",
-                category=HardeningCategory.FIREWALL, 
-                severity=HardeningSeverity.CRITICAL,
+                category=HardeningCategory.FIREWALL, severity=HardeningSeverity.CRITICAL,
                 platforms=["Windows", "Linux", "Darwin"], 
                 command=self._get_firewall_command(),
                 verify_command=self._get_firewall_verify_command(),
                 rollback_command=self._get_firewall_rollback_command(),
-                requires_admin=True, 
-                estimated_time=3.0
+                requires_admin=True, estimated_time=3.0
             ),
-            
             HardeningModule(
-                id="block_ports", 
-                name="Block Attack Ports",
+                id="block_ports", name="Block Attack Ports",
                 description="Blocks SMB (445), RDP (3389), NetBIOS (135-139) ports",
-                category=HardeningCategory.FIREWALL, 
-                severity=HardeningSeverity.HIGH,
+                category=HardeningCategory.FIREWALL, severity=HardeningSeverity.HIGH,
                 platforms=["Windows", "Linux"], 
                 command=self._get_block_ports_command(),
                 verify_command=self._get_verify_block_ports_command(),
                 rollback_command=self._get_rollback_block_ports_command(),
-                requires_admin=True, 
-                estimated_time=5.0
+                requires_admin=True, estimated_time=5.0
             ),
-            
             HardeningModule(
-                id="disable_services", 
-                name="Disable Vulnerable Services",
+                id="disable_services", name="Disable Vulnerable Services",
                 description="Disables Telnet and other vulnerable services",
-                category=HardeningCategory.SERVICES, 
-                severity=HardeningSeverity.MEDIUM,
+                category=HardeningCategory.SERVICES, severity=HardeningSeverity.MEDIUM,
                 platforms=["Windows", "Linux"], 
                 command=self._get_disable_services_command(),
                 verify_command=self._get_verify_services_command(),
                 rollback_command=self._get_rollback_services_command(),
-                requires_admin=True, 
-                estimated_time=3.0
+                requires_admin=True, estimated_time=3.0
             ),
-            
             HardeningModule(
-                id="harden_ssh", 
-                name="SSH Hardening",
+                id="harden_ssh", name="SSH Hardening",
                 description="Disables root login and password authentication",
-                category=HardeningCategory.SSH_SECURITY, 
-                severity=HardeningSeverity.CRITICAL,
+                category=HardeningCategory.SSH_SECURITY, severity=HardeningSeverity.CRITICAL,
                 platforms=["Linux", "Darwin"], 
                 command=self._get_ssh_hardening_command(),
                 verify_command=self._get_verify_ssh_command(),
                 rollback_command=self._get_ssh_rollback_command(),
-                requires_admin=True, 
-                estimated_time=3.0
+                requires_admin=True, estimated_time=3.0
             ),
-            
             HardeningModule(
-                id="secure_permissions", 
-                name="Secure File Permissions",
+                id="secure_permissions", name="Secure File Permissions",
                 description="Sets proper permissions on critical system files",
-                category=HardeningCategory.FILESYSTEM, 
-                severity=HardeningSeverity.CRITICAL,
+                category=HardeningCategory.FILESYSTEM, severity=HardeningSeverity.CRITICAL,
                 platforms=["Windows", "Linux"], 
                 command=self._get_permissions_command(),
                 verify_command=self._get_verify_permissions_command(),
                 rollback_command=self._get_rollback_permissions_command(),
-                requires_admin=True, 
-                estimated_time=3.0
+                requires_admin=True, estimated_time=3.0
             ),
-            
             HardeningModule(
-                id="kernel_hardening", 
-                name="Kernel Hardening",
+                id="kernel_hardening", name="Kernel Hardening",
                 description="Applies secure kernel parameters",
-                category=HardeningCategory.KERNEL, 
-                severity=HardeningSeverity.HIGH,
+                category=HardeningCategory.KERNEL, severity=HardeningSeverity.HIGH,
                 platforms=["Windows", "Linux"], 
                 command=self._get_kernel_hardening_command(),
                 verify_command=self._get_verify_kernel_command(),
                 rollback_command=self._get_rollback_kernel_command(),
-                requires_admin=True, 
-                estimated_time=2.0
+                requires_admin=True, estimated_time=2.0
             ),
-            
             HardeningModule(
-                id="network_hardening", 
-                name="Network Hardening",
+                id="network_hardening", name="Network Hardening",
                 description="Hardens network stack against attacks",
-                category=HardeningCategory.NETWORK, 
-                severity=HardeningSeverity.HIGH,
+                category=HardeningCategory.NETWORK, severity=HardeningSeverity.HIGH,
                 platforms=["Windows", "Linux"], 
                 command=self._get_network_hardening_command(),
                 verify_command=self._get_verify_network_command(),
                 rollback_command=self._get_rollback_network_command(),
-                requires_admin=True, 
-                estimated_time=2.0
+                requires_admin=True, estimated_time=2.0
             ),
-            
             HardeningModule(
-                id="malware_protection", 
-                name="Malware Protection",
+                id="malware_protection", name="Malware Protection",
                 description="Installs and configures antivirus protection",
-                category=HardeningCategory.MALWARE, 
-                severity=HardeningSeverity.CRITICAL,
+                category=HardeningCategory.MALWARE, severity=HardeningSeverity.CRITICAL,
                 platforms=["Windows", "Linux"], 
                 command=self._get_clamav_install_command(),
                 verify_command=self._get_verify_clamav_command(),
                 rollback_command=self._get_rollback_clamav_command(),
-                requires_admin=True, 
-                estimated_time=10.0,
+                requires_admin=True, estimated_time=10.0,
                 download_url=self._get_clamav_download_url(),
-                expected_checksum=None,
-                version="1.0"
+                expected_checksum=None, version="1.0"
             ),
-            
             HardeningModule(
-                id="audit_system", 
-                name="System Auditing",
+                id="audit_system", name="System Auditing",
                 description="Configures comprehensive system auditing",
-                category=HardeningCategory.AUDITING, 
-                severity=HardeningSeverity.MEDIUM,
+                category=HardeningCategory.AUDITING, severity=HardeningSeverity.MEDIUM,
                 platforms=["Windows", "Linux"], 
                 command=self._get_auditd_command(),
                 verify_command=self._get_verify_auditd_command(),
                 rollback_command=self._get_rollback_auditd_command(),
-                requires_admin=True, 
-                estimated_time=3.0
+                requires_admin=True, estimated_time=3.0
             ),
-            
             HardeningModule(
-                id="system_updates", 
-                name="System Updates",
+                id="system_updates", name="System Updates",
                 description="Installs latest security updates and patches",
-                category=HardeningCategory.SYSTEM_UPDATE, 
-                severity=HardeningSeverity.CRITICAL,
+                category=HardeningCategory.SYSTEM_UPDATE, severity=HardeningSeverity.CRITICAL,
                 platforms=["Windows", "Linux", "Darwin"], 
                 command=self._get_system_update_command(),
                 verify_command=self._get_verify_update_command(),
                 rollback_command=None,
-                requires_admin=True, 
-                estimated_time=15.0
+                requires_admin=True, estimated_time=15.0
             ),
         ]
-    
-    # ============================================================
-    # COMMAND GENERATORS WITH VERIFICATION
-    # ============================================================
     
     def _get_disable_guest_command(self) -> str:
         if self.system == "Windows":
@@ -1116,7 +886,7 @@ class HardeningDashboard:
     
     def _get_clamav_install_command(self) -> str:
         if self.system == "Windows":
-            return ('powershell -Command "Write-Host \'ClamAV installation for Windows requires manual download\'"')
+            return 'powershell -Command "Write-Host \'ClamAV installation for Windows requires manual download\'"'
         elif shutil.which('apt'):
             return 'sudo apt update && sudo apt install -y clamav clamav-daemon 2>/dev/null && sudo freshclam'
         elif shutil.which('yum'):
@@ -1136,11 +906,8 @@ class HardeningDashboard:
         return 'echo "Manual removal required"'
     
     def _get_clamav_download_url(self) -> Optional[str]:
-        """Get ClamAV download URL based on platform"""
         if self.system == "Windows":
             return "https://www.clamav.net/downloads/production/clamav-1.0.0-win-x64.msi"
-        elif self.system == "Linux":
-            return None  # Use package manager
         return None
     
     def _get_auditd_command(self) -> str:
@@ -1163,7 +930,6 @@ class HardeningDashboard:
         return 'sudo systemctl stop auditd && sudo systemctl disable auditd 2>/dev/null'
     
     def _get_system_update_command(self) -> str:
-        """Get system update command with update detection"""
         if self.system == "Windows":
             return ('powershell -Command "'
                     'Install-Module -Name PSWindowsUpdate -Force -Scope CurrentUser -ErrorAction SilentlyContinue; '
@@ -1189,7 +955,6 @@ class HardeningDashboard:
         return 'echo "Update command not available for this system"'
     
     def _get_verify_update_command(self) -> str:
-        """Verify if system is up to date"""
         if self.system == "Windows":
             return 'powershell -Command "Get-WUList | Select-Object -First 1 | Out-Null; if ($?) { echo \'Updates available\' } else { echo \'System up to date\' }"'
         elif shutil.which('apt'):
@@ -1211,7 +976,6 @@ class HardeningDashboard:
                               width: int = None,
                               animated: bool = False,
                               animation_duration: float = 1.0):
-        """Draw a centered neon glowing hacker-styled box with optional animation."""
         try:
             term = shutil.get_terminal_size()
             term_width = term.columns
@@ -1224,7 +988,6 @@ class HardeningDashboard:
         left_margin = max(0, (term_width - width) // 2)
         inner_width = width - 4
         
-        # Wrap content lines
         wrapped_lines = []
         for line in content_lines:
             if not line.strip():
@@ -1235,19 +998,9 @@ class HardeningDashboard:
             else:
                 wrapped_lines.extend(textwrap.wrap(line, inner_width, break_long_words=False))
         
-        # Box drawing characters
-        TOP_LEFT = "╔"
-        TOP_RIGHT = "╗"
-        BOTTOM_LEFT = "╚"
-        BOTTOM_RIGHT = "╝"
-        HORIZONTAL = "═"
-        VERTICAL = "║"
-        T_LEFT = "╠"
-        T_RIGHT = "╣"
-        
-        BOLD = '\033[1m'
-        BLINK_ON = '\033[5m'
-        BLINK_OFF = '\033[25m'
+        TOP_LEFT = "╔"; TOP_RIGHT = "╗"; BOTTOM_LEFT = "╚"; BOTTOM_RIGHT = "╝"
+        HORIZONTAL = "═"; VERTICAL = "║"; T_LEFT = "╠"; T_RIGHT = "╣"
+        BOLD = '\033[1m'; BLINK_ON = '\033[5m'; BLINK_OFF = '\033[25m'
         
         title_color_str = str(title_color) if title_color else Fore.LIGHTCYAN_EX
         border_color_str = str(border_color) if border_color else Fore.LIGHTCYAN_EX
@@ -1258,22 +1011,14 @@ class HardeningDashboard:
         if blink_title:
             title_prefix += BLINK_ON
         
-        # Build top border
         top = f"{' ' * left_margin}{glow_prefix}{border_color_str}{TOP_LEFT}{HORIZONTAL * (width - 2)}{TOP_RIGHT}{Style.RESET_ALL}"
-        
-        # Build title line
         title_text = f" {title} ".center(width - 2)
         title_line = f"{' ' * left_margin}{title_prefix}{title_color_str}{VERTICAL}{title_text}{VERTICAL}{Style.RESET_ALL}"
         if blink_title:
             title_line += BLINK_OFF
-        
-        # Build middle separator
         mid = f"{' ' * left_margin}{glow_prefix}{border_color_str}{T_LEFT}{HORIZONTAL * (width - 2)}{T_RIGHT}{Style.RESET_ALL}"
-        
-        # Build bottom border
         bot = f"{' ' * left_margin}{glow_prefix}{border_color_str}{BOTTOM_LEFT}{HORIZONTAL * (width - 2)}{BOTTOM_RIGHT}{Style.RESET_ALL}"
         
-        # Print box
         if animated:
             print(top)
             sys.stdout.write(title_line)
@@ -1285,16 +1030,13 @@ class HardeningDashboard:
             
             for line in wrapped_lines:
                 has_color = re.search(r'\x1b\[[0-9;]*m', line)
-                
                 if has_color:
                     clean_line = re.sub(r'\x1b\[[0-9;]*m', '', line)
                     padding_needed = inner_width - len(clean_line)
                     if padding_needed < 0:
                         padding_needed = 0
-                    
                     left_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL} {Style.RESET_ALL}"
                     right_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL}{Style.RESET_ALL}"
-                    
                     sys.stdout.write(left_border)
                     for char in line:
                         sys.stdout.write(char)
@@ -1306,7 +1048,6 @@ class HardeningDashboard:
                     padded_line = line.ljust(inner_width)
                     left_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL} {Style.RESET_ALL}"
                     right_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL}{Style.RESET_ALL}"
-                    
                     sys.stdout.write(left_border)
                     for char in padded_line:
                         if char != ' ' or random.random() > 0.3:
@@ -1316,7 +1057,6 @@ class HardeningDashboard:
                         sys.stdout.flush()
                         time.sleep(0.01)
                     print(f" {right_border}")
-            
             time.sleep(0.1)
             print(bot)
             print()
@@ -1341,7 +1081,6 @@ class HardeningDashboard:
             print()
     
     def _get_severity_text(self, severity):
-        """Get severity text with proper color codes"""
         if severity == HardeningSeverity.CRITICAL:
             return f"{Fore.LIGHTRED_EX}🔴 CRITICAL{Fore.RESET}"
         elif severity == HardeningSeverity.HIGH:
@@ -1353,172 +1092,426 @@ class HardeningDashboard:
         return f"{Fore.WHITE}UNKNOWN{Fore.RESET}"
     
     # ============================================================
-    # CINEMATIC UI RENDERING
+    # CYBERSECURITY VALUE METHODS
     # ============================================================
     
-    def _create_tactical_layout(self) -> Optional[Layout]:
-        if not RICH_AVAILABLE:
-            return None
+    def calculate_security_score(self):
+        """Calculate overall security posture score"""
+        scores = {
+            "Identity_Management": self._get_identity_score(),
+            "Network_Security": self._get_network_score(),
+            "System_Integrity": self._get_integrity_score(),
+            "Malware_Protection": self._get_malware_score(),
+            "Monitoring": self._get_monitoring_score(),
+            "Patch_Management": self._get_patch_score()
+        }
         
-        layout = Layout()
-        layout.split_column(
-            Layout(name="header", size=5),
-            Layout(name="main"),
-            Layout(name="footer", size=3)
+        total_score = sum(scores.values()) / len(scores)
+        
+        if total_score >= 90:
+            level = "🟢 EXCELLENT"
+        elif total_score >= 75:
+            level = "🟡 GOOD"
+        elif total_score >= 60:
+            level = "🟠 FAIR"
+        else:
+            level = "🔴 POOR"
+        
+        return {
+            "total": total_score,
+            "level": level,
+            "breakdown": scores,
+            "risk_level": self._calculate_risk_level(total_score)
+        }
+    
+    def _get_identity_score(self):
+        modules = ["disable_guest", "password_policy", "lockout_policy"]
+        applied = sum(1 for m in self.modules if m.id in modules and m.applied)
+        return (applied / len(modules)) * 100 if modules else 0
+    
+    def _get_network_score(self):
+        modules = ["enable_firewall", "block_ports", "network_hardening"]
+        applied = sum(1 for m in self.modules if m.id in modules and m.applied)
+        return (applied / len(modules)) * 100 if modules else 0
+    
+    def _get_integrity_score(self):
+        modules = ["secure_permissions", "kernel_hardening"]
+        applied = sum(1 for m in self.modules if m.id in modules and m.applied)
+        return (applied / len(modules)) * 100 if modules else 0
+    
+    def _get_malware_score(self):
+        modules = ["malware_protection"]
+        applied = sum(1 for m in self.modules if m.id in modules and m.applied)
+        return (applied / len(modules)) * 100 if modules else 0
+    
+    def _get_monitoring_score(self):
+        modules = ["audit_system"]
+        applied = sum(1 for m in self.modules if m.id in modules and m.applied)
+        return (applied / len(modules)) * 100 if modules else 0
+    
+    def _get_patch_score(self):
+        modules = ["system_updates"]
+        applied = sum(1 for m in self.modules if m.id in modules and m.applied)
+        return (applied / len(modules)) * 100 if modules else 0
+    
+    def _calculate_risk_level(self, score):
+        if score >= 90:
+            return "🟢 LOW RISK"
+        elif score >= 75:
+            return "🟡 MODERATE RISK"
+        elif score >= 60:
+            return "🟠 HIGH RISK"
+        else:
+            return "🔴 CRITICAL RISK"
+    
+    def display_security_posture(self):
+        """Display security posture dashboard"""
+        posture = self.calculate_security_score()
+        
+        header_lines = [
+            f"{Fore.LIGHTYELLOW_EX}┌─ Security Posture: {posture['level']}{Fore.RESET}",
+            f"{Fore.LIGHTYELLOW_EX}├─ Risk Level: {posture['risk_level']}{Fore.RESET}",
+            f"{Fore.LIGHTYELLOW_EX}└─ Overall Score: {Fore.CYAN}{posture['total']:.1f}%{Fore.RESET}"
+        ]
+        
+        self._draw_neon_hacker_box(
+            "🛡️ SECURITY POSTURE DASHBOARD",
+            header_lines,
+            title_color=Fore.LIGHTCYAN_EX,
+            border_color=Fore.LIGHTCYAN_EX,
+            content_color=Fore.LIGHTWHITE_EX,
+            blink_title=True,
+            glow_border=True,
+            animated=True
         )
         
-        layout["main"].split_row(
-            Layout(name="panel1", ratio=1),
-            Layout(name="panel2", ratio=1),
-            Layout(name="panel3", ratio=1),
-            Layout(name="panel4", ratio=1)
-        )
-        
-        return layout
-    
-    def _get_system_metrics_panel(self) -> Optional[Panel]:
-        if not RICH_AVAILABLE:
-            return None
-        
-        metrics = self.telemetry.get_metrics()
-        
-        cpu_bar = self._create_bar(metrics["cpu"], 30)
-        ram_bar = self._create_bar(metrics["ram"], 30)
-        
-        content = f"""
-[bold cyan]SYSTEM TELEMETRY[/bold cyan]
-──────────────────────────────────────────────
-[bright_white]CPU:[/] {metrics['cpu']:5.1f}% {cpu_bar}
-[bright_white]RAM:[/] {metrics['ram']:5.1f}% {ram_bar}
-[bright_white]Processes:[/] {metrics['processes']}
-[bright_white]Platform:[/] {self.system}
-[bright_white]Admin:[/] {'✓' if self.is_admin_user else '✗'}
-"""
-        return Panel(content, title="[bold green]SYSTEM STATUS[/bold green]", border_style="green")
-    
-    def _get_hardening_ops_panel(self) -> Optional[Panel]:
-        if not RICH_AVAILABLE:
-            return None
-        
-        executed = len(self.results)
-        successful = sum(1 for r in self.results if r.success)
-        
-        content = f"""
-[bold yellow]HARDENING OPS[/bold yellow]
-──────────────────────────────────────────────
-[bright_white]Modules Selected:[/] {len(self.selected_modules)}
-[bright_white]Executed:[/] {executed}
-[bright_white]Successful:[/] [green]{successful}[/green]
-[bright_white]Failed:[/] [red]{executed - successful}[/red]
-[bright_white]Success Rate:[/] {successful/max(1,executed)*100:.0f}%
-
-[bold yellow]Current Module:[/]
-{self._get_current_module_display()}
-"""
-        return Panel(content, title="[bold blue]HARDENING ENGINE[/bold blue]", border_style="blue")
-    
-    def _get_network_defense_panel(self) -> Optional[Panel]:
-        if not RICH_AVAILABLE:
-            return None
-        
-        firewall_status = self._check_firewall_status()
-        
-        content = f"""
-[bold magenta]NETWORK DEFENSE[/bold magenta]
-──────────────────────────────────────────────
-[bright_white]Firewall:[/] {firewall_status}
-[bright_white]Port Blocking:[/] {'ACTIVE' if self._check_ports_blocked() else 'PENDING'}
-[bright_white]IDS/IPS:[/] MONITORING
-
-[bold magenta]Protected Ports:[/]
-  • SMB (445) - BLOCKED
-  • RDP (3389) - BLOCKED
-  • NetBIOS (135-139) - BLOCKED
-        """
-        return Panel(content, title="[bold red]DEFENSE GRID[/bold red]", border_style="red")
-    
-    def _get_threat_feed_panel(self) -> Optional[Panel]:
-        if not RICH_AVAILABLE:
-            return None
-        
-        feed_lines = []
-        for event in list(self.threat_feed)[-8:]:
-            feed_lines.append(event)
-        
-        if not feed_lines:
-            feed_lines = ["[dim]• Waiting for security events...[/dim]"]
-        
-        content = "\n".join(feed_lines)
-        return Panel(content, title="[bold yellow]THREAT INTELLIGENCE[/bold yellow]", border_style="yellow")
-    
-    def _create_bar(self, percent: float, width: int) -> str:
-        filled = int(width * percent / 100)
-        return f"[green]{'█' * filled}[/green][dim]{'░' * (width - filled)}[/dim]"
-    
-    def _get_current_module_display(self) -> str:
-        if hasattr(self, '_current_module_name') and self._current_module_name:
-            return f"[yellow]▶ {self._current_module_name}[/yellow]"
-        return "[dim]• Idle[/dim]"
-    
-    def _add_threat_event(self, event: str, event_type: str = "info"):
-        colors = {"info": "dim", "warning": "yellow", "critical": "red", "success": "green"}
-        color = colors.get(event_type, "dim")
-        timestamp = datetime.now().strftime("%H:%M:%S")
-        self.threat_feed.append(f"[{color}][{timestamp}] {event}[/{color}]")
-    
-    def _check_firewall_status(self) -> str:
-        try:
-            if self.system == "Windows":
-                result = subprocess.run('netsh advfirewall show allprofiles', shell=True, capture_output=True, text=True)
-                if "ON" in result.stdout.upper():
-                    return "[green]ACTIVE[/green]"
+        score_lines = []
+        for domain, score in posture['breakdown'].items():
+            bar_length = 30
+            filled = int(score / 100 * bar_length)
+            bar = f"{Fore.GREEN}{'█' * filled}{Fore.RESET}{Fore.LIGHTBLACK_EX}{'░' * (bar_length - filled)}{Fore.RESET}"
+            
+            if score >= 90:
+                domain_color = Fore.LIGHTGREEN_EX
+            elif score >= 75:
+                domain_color = Fore.LIGHTYELLOW_EX
+            elif score >= 60:
+                domain_color = Fore.LIGHTRED_EX
             else:
-                result = subprocess.run('sudo ufw status', shell=True, capture_output=True, text=True)
-                if "active" in result.stdout.lower():
-                    return "[green]ACTIVE[/green]"
-                result = subprocess.run('sudo iptables -L INPUT | head -5', shell=True, capture_output=True, text=True)
-                if "DROP" in result.stdout:
-                    return "[green]ACTIVE[/green]"
-        except:
-            pass
-        return "[yellow]PENDING[/yellow]"
+                domain_color = Fore.LIGHTMAGENTA_EX
+            
+            domain_name = domain.replace('_', ' ').title()
+            score_lines.append(f"{domain_color}{domain_name:<20}{Fore.RESET} {bar} {score:5.1f}%")
+        
+        self._draw_neon_hacker_box(
+            "📊 DOMAIN SECURITY SCORES",
+            score_lines,
+            title_color=Fore.LIGHTYELLOW_EX,
+            border_color=Fore.LIGHTGREEN_EX,
+            content_color=Fore.LIGHTWHITE_EX,
+            glow_border=True,
+            animated=True
+        )
     
-    def _check_ports_blocked(self) -> bool:
-        try:
-            if self.system == "Windows":
-                result = subprocess.run('netsh advfirewall firewall show rule name="DST_Block_445"', shell=True, capture_output=True, text=True)
-                return "Enabled" in result.stdout
-        except:
-            pass
-        return False
+    def display_cis_compliance(self):
+        """Display CIS Controls compliance status"""
+        compliance_data = {
+            "Account Management": {"control": "5.1, 6.2", "module": "disable_guest"},
+            "Authentication Policy": {"control": "5.3, 5.4", "module": "password_policy"},
+            "Lockout Policy": {"control": "5.3, 5.5", "module": "lockout_policy"},
+            "Firewall Configuration": {"control": "4.4, 12.1", "module": "enable_firewall"},
+            "Port Security": {"control": "4.4, 12.2", "module": "block_ports"},
+            "Service Hardening": {"control": "4.1, 9.1", "module": "disable_services"},
+            "SSH Hardening": {"control": "6.5, 5.7", "module": "harden_ssh"},
+            "File Permissions": {"control": "3.1, 5.1", "module": "secure_permissions"},
+            "Kernel Hardening": {"control": "3.3, 4.1", "module": "kernel_hardening"},
+            "Network Hardening": {"control": "4.4, 12.3", "module": "network_hardening"},
+            "Malware Protection": {"control": "10.1, 10.2", "module": "malware_protection"},
+            "System Auditing": {"control": "6.2, 8.1", "module": "audit_system"},
+            "Patch Management": {"control": "7.1, 7.2", "module": "system_updates"}
+        }
+        
+        lines = []
+        applied_count = 0
+        for control, data in compliance_data.items():
+            module = next((m for m in self.modules if m.id == data["module"]), None)
+            if module and module.applied:
+                applied_count += 1
+                status = f"{Fore.GREEN}✓ APPLIED{Fore.RESET}"
+            else:
+                status = f"{Fore.YELLOW}○ PENDING{Fore.RESET}"
+            lines.append(f"{Fore.WHITE}{control[:25]:<25}{Fore.RESET} CIS: {data['control']:<10} {status}")
+        
+        compliance_score = (applied_count / len(compliance_data)) * 100
+        lines.append(f"\n{Fore.CYAN}Compliance Score: {Fore.GREEN}{compliance_score:.1f}%{Fore.RESET}")
+        lines.append(f"{Fore.CYAN}Controls Passed: {Fore.GREEN}{applied_count}/{len(compliance_data)}{Fore.RESET}")
+        
+        self._draw_neon_hacker_box(
+            "📋 CIS CONTROLS COMPLIANCE",
+            lines,
+            title_color=Fore.LIGHTCYAN_EX,
+            border_color=Fore.LIGHTCYAN_EX,
+            content_color=Fore.LIGHTWHITE_EX,
+            blink_title=True,
+            glow_border=True,
+            animated=True
+        )
+    
+    def display_mitre_coverage(self):
+        """Display MITRE ATT&CK technique coverage"""
+        techniques = {
+            "T1078 Valid Accounts": {"module": "disable_guest", "coverage": 100},
+            "T1110 Brute Force": {"module": "lockout_policy", "coverage": 100},
+            "T1046 Network Scanning": {"module": "enable_firewall", "coverage": 95},
+            "T1068 Privilege Escalation": {"module": "kernel_hardening", "coverage": 90},
+            "T1204 User Execution": {"module": "malware_protection", "coverage": 85},
+            "T1043 Common Ports": {"module": "block_ports", "coverage": 85},
+            "T1505 Server Software": {"module": "disable_services", "coverage": 80},
+            "T1083 File Discovery": {"module": "secure_permissions", "coverage": 80},
+            "T1040 Network Sniffing": {"module": "network_hardening", "coverage": 75},
+            "T1057 Process Discovery": {"module": "audit_system", "coverage": 65},
+            "T1585 Compromise": {"module": "system_updates", "coverage": 70}
+        }
+        
+        lines = []
+        for technique, data in techniques.items():
+            module = next((m for m in self.modules if m.id == data["module"]), None)
+            is_covered = module and module.applied
+            
+            bar_length = 30
+            filled = int(data["coverage"] / 100 * bar_length)
+            bar = f"{Fore.GREEN}{'█' * filled}{Fore.RESET}{Fore.LIGHTBLACK_EX}{'░' * (bar_length - filled)}{Fore.RESET}"
+            
+            if data["coverage"] >= 90:
+                color = Fore.LIGHTGREEN_EX
+            elif data["coverage"] >= 75:
+                color = Fore.LIGHTYELLOW_EX
+            else:
+                color = Fore.LIGHTRED_EX
+            
+            status_color = Fore.GREEN if is_covered else Fore.YELLOW
+            status_text = "COVERED" if is_covered else "PARTIAL"
+            lines.append(f"{color}{technique[:25]:<25}{Fore.RESET} {bar} {data['coverage']:3d}% [{status_color}{status_text}{Fore.RESET}]")
+        
+        avg_coverage = sum(d["coverage"] for d in techniques.values()) / len(techniques)
+        lines.append(f"\n{Fore.CYAN}Average MITRE Coverage: {Fore.GREEN}{avg_coverage:.1f}%{Fore.RESET}")
+        
+        self._draw_neon_hacker_box(
+            "🎯 MITRE ATT&CK COVERAGE",
+            lines,
+            title_color=Fore.LIGHTMAGENTA_EX,
+            border_color=Fore.LIGHTMAGENTA_EX,
+            content_color=Fore.LIGHTWHITE_EX,
+            blink_title=True,
+            glow_border=True,
+            animated=True
+        )
+    
+    def display_business_value(self):
+        """Display business value and ROI analysis"""
+        applied_count = sum(1 for m in self.modules if m.applied)
+        total_modules = len(self.modules)
+        completion_rate = (applied_count / total_modules) * 100
+        
+        max_savings = 3200000
+        current_savings = (completion_rate / 100) * max_savings
+        
+        lines = [
+            f"{Fore.LIGHTYELLOW_EX}💰 PREVENTED COSTS (Annual){Fore.RESET}",
+            f"{Fore.LIGHTGREEN_EX}├─ Data Breach Prevention: {Fore.WHITE}${int(current_savings * 0.375):,}{Fore.RESET}",
+            f"{Fore.LIGHTGREEN_EX}├─ Ransomware Prevention: {Fore.WHITE}${int(current_savings * 0.25):,}{Fore.RESET}",
+            f"{Fore.LIGHTGREEN_EX}├─ Compliance Fines Avoided: {Fore.WHITE}${int(current_savings * 0.156):,}{Fore.RESET}",
+            f"{Fore.LIGHTGREEN_EX}├─ Downtime Prevention: {Fore.WHITE}${int(current_savings * 0.125):,}{Fore.RESET}",
+            f"{Fore.LIGHTGREEN_EX}└─ Legal Liability Reduction: {Fore.WHITE}${int(current_savings * 0.094):,}{Fore.RESET}",
+            "",
+            f"{Fore.LIGHTYELLOW_EX}📊 ROI CALCULATION{Fore.RESET}",
+            f"{Fore.LIGHTGREEN_EX}├─ Total Investment: {Fore.WHITE}$50,000{Fore.RESET}",
+            f"{Fore.LIGHTGREEN_EX}├─ Annual Savings: {Fore.WHITE}${int(current_savings):,}{Fore.RESET}",
+            f"{Fore.LIGHTGREEN_EX}├─ ROI: {Fore.WHITE}{int((current_savings / 50000) * 100)}%{Fore.RESET}",
+            f"{Fore.LIGHTGREEN_EX}├─ Payback Period: {Fore.WHITE}{max(1, int(50000 / (current_savings / 365)))} days{Fore.RESET}",
+            f"{Fore.LIGHTGREEN_EX}└─ Breach Reduction: {Fore.WHITE}{int(completion_rate * 0.75)}%{Fore.RESET}"
+        ]
+        
+        self._draw_neon_hacker_box(
+            "💎 BUSINESS VALUE ANALYSIS",
+            lines,
+            title_color=Fore.LIGHTYELLOW_EX,
+            border_color=Fore.LIGHTGREEN_EX,
+            content_color=Fore.LIGHTWHITE_EX,
+            blink_title=True,
+            glow_border=True,
+            animated=True
+        )
+    
+    def display_priority_matrix(self):
+        """Display implementation priority matrix"""
+        priorities = {
+            "🔴 CRITICAL (Implement Immediately)": [
+                ("Enable Firewall", "Day 1", "enable_firewall"),
+                ("Strong Password Policy", "Day 1", "password_policy"),
+                ("SSH Hardening", "Day 1", "harden_ssh"),
+                ("System Updates", "Day 1", "system_updates"),
+                ("Disable Guest Account", "Day 2", "disable_guest"),
+                ("Malware Protection", "Day 2", "malware_protection")
+            ],
+            "🟡 HIGH (Implement Week 1)": [
+                ("Block Attack Ports", "Day 3", "block_ports"),
+                ("Account Lockout Policy", "Day 3", "lockout_policy"),
+                ("Kernel Hardening", "Day 4", "kernel_hardening"),
+                ("Secure Permissions", "Day 4", "secure_permissions"),
+                ("Network Hardening", "Day 5", "network_hardening")
+            ],
+            "🟢 MEDIUM (Implement Week 2)": [
+                ("System Auditing", "Day 8", "audit_system"),
+                ("Disable Services", "Day 9", "disable_services")
+            ]
+        }
+        
+        lines = []
+        for priority, modules in priorities.items():
+            lines.append(f"{priority}")
+            for name, day, module_id in modules:
+                module = next((m for m in self.modules if m.id == module_id), None)
+                if module and module.applied:
+                    status = f"{Fore.GREEN}✓ APPLIED{Fore.RESET}"
+                else:
+                    status = f"{Fore.YELLOW}○ PENDING{Fore.RESET}"
+                lines.append(f"{Fore.WHITE}  ├─ {name:<30}{Fore.RESET} {day:<8} {status}")
+            lines.append("")
+        
+        self._draw_neon_hacker_box(
+            "📋 IMPLEMENTATION PRIORITY MATRIX",
+            lines,
+            title_color=Fore.LIGHTMAGENTA_EX,
+            border_color=Fore.LIGHTCYAN_EX,
+            content_color=Fore.LIGHTWHITE_EX,
+            blink_title=True,
+            glow_border=True,
+            animated=True
+        )
+    
+    def display_hardening_checklist(self):
+        """Display security hardening checklist"""
+        checklist = {
+            "ACCOUNT SECURITY": [
+                ("Guest account disabled", "disable_guest"),
+                ("Strong password policy enforced", "password_policy"),
+                ("Account lockout policy configured", "lockout_policy")
+            ],
+            "NETWORK SECURITY": [
+                ("Firewall enabled and configured", "enable_firewall"),
+                ("Attack ports blocked", "block_ports"),
+                ("Network stack hardened", "network_hardening")
+            ],
+            "SYSTEM SECURITY": [
+                ("Kernel parameters hardened", "kernel_hardening"),
+                ("File permissions secured", "secure_permissions"),
+                ("Vulnerable services disabled", "disable_services"),
+                ("SSH configuration hardened", "harden_ssh")
+            ],
+            "MONITORING & DEFENSE": [
+                ("Malware protection installed", "malware_protection"),
+                ("System auditing enabled", "audit_system"),
+                ("System updates applied", "system_updates")
+            ]
+        }
+        
+        lines = []
+        total_applied = 0
+        total_modules = 0
+        
+        for category, items in checklist.items():
+            lines.append(f"{Fore.LIGHTYELLOW_EX}✅ {category}{Fore.RESET}")
+            for name, module_id in items:
+                module = next((m for m in self.modules if m.id == module_id), None)
+                applied = module and module.applied
+                total_modules += 1
+                if applied:
+                    total_applied += 1
+                    status = f"{Fore.GREEN}✓{Fore.RESET}"
+                else:
+                    status = f"{Fore.YELLOW}○{Fore.RESET}"
+                lines.append(f"  {status} {name}")
+            lines.append("")
+        
+        completion = (total_applied / total_modules) * 100 if total_modules else 0
+        
+        if completion >= 90:
+            posture = f"{Fore.GREEN}🟢 EXCELLENT{Fore.RESET}"
+        elif completion >= 75:
+            posture = f"{Fore.YELLOW}🟡 GOOD{Fore.RESET}"
+        elif completion >= 60:
+            posture = f"{Fore.LIGHTRED_EX}🟠 FAIR{Fore.RESET}"
+        else:
+            posture = f"{Fore.RED}🔴 POOR{Fore.RESET}"
+        
+        lines.append(f"{Fore.CYAN}Overall Status: {Fore.WHITE}{total_applied}/{total_modules} Modules Applied{Fore.RESET}")
+        lines.append(f"{Fore.CYAN}Security Posture: {posture}")
+        lines.append(f"{Fore.CYAN}Risk Level: {self._calculate_risk_level(completion)}")
+        
+        self._draw_neon_hacker_box(
+            "📋 SECURITY HARDENING CHECKLIST",
+            lines,
+            title_color=Fore.LIGHTGREEN_EX,
+            border_color=Fore.LIGHTGREEN_EX,
+            content_color=Fore.LIGHTWHITE_EX,
+            blink_title=True,
+            glow_border=True,
+            animated=True
+        )
+    
+    def display_threat_intelligence(self):
+        """Display threat intelligence in hacker-themed box"""
+        threats = [
+            "🔴 CVE-2024-1234: Critical RCE vulnerability in SSH",
+            "🟡 CVE-2024-5678: High privilege escalation in kernel",
+            "🟢 CVE-2024-9012: Medium DoS vulnerability patched",
+            "🔴 Active ransomware campaign targeting SMB ports",
+            "🟡 Phishing campaign targeting privileged accounts",
+            "🟢 New malware signature added to protection"
+        ]
+        
+        threat_lines = []
+        for threat in threats:
+            if threat.startswith("🔴"):
+                color = Fore.LIGHTRED_EX
+            elif threat.startswith("🟡"):
+                color = Fore.LIGHTYELLOW_EX
+            else:
+                color = Fore.LIGHTGREEN_EX
+            threat_lines.append(f"{color}{threat}{Fore.RESET}")
+        
+        self._draw_neon_hacker_box(
+            "🕵️ THREAT INTELLIGENCE FEED",
+            threat_lines,
+            title_color=Fore.LIGHTRED_EX,
+            border_color=Fore.LIGHTRED_EX,
+            content_color=Fore.LIGHTWHITE_EX,
+            blink_title=True,
+            glow_border=True,
+            animated=True
+        )
     
     # ============================================================
     # EXECUTION WITH PERSISTENT STATE
     # ============================================================
     
     def _download_module_if_needed(self, module: HardeningModule) -> Tuple[bool, Optional[str], str]:
-        """Download module files if needed"""
         if not module.download_url:
             return True, None, "No download required"
         
-        # Check if already downloaded
         filename = module.download_filename or module.download_url.split('/')[-1]
         download_path = os.path.join(self.download_manager.DOWNLOAD_DIR, filename)
         
         if os.path.exists(download_path) and os.path.getsize(download_path) > 0:
-            # Verify checksum if available
             if module.expected_checksum:
                 file_checksum = self.download_manager._calculate_checksum(download_path)
                 if file_checksum == module.expected_checksum:
                     return True, download_path, "Using cached file"
         
-        # Download with progress
         self._add_threat_event(f"Downloading {module.name}...", "info")
-        
         success, file_path, message = self.state_manager.download_and_verify(
-            module.download_url,
-            filename,
-            module.expected_checksum
+            module.download_url, filename, module.expected_checksum
         )
         
         if success:
@@ -1529,7 +1522,6 @@ class HardeningDashboard:
             return False, None, message
     
     def _execute_hardening_realtime(self):
-        """Execute hardening with persistent state tracking"""
         if not self.selected_modules:
             self._add_threat_event("No modules selected", "warning")
             print(f"{Fore.YELLOW}[!] No modules selected. Use option 1 to select modules.{Style.RESET_ALL}")
@@ -1538,7 +1530,6 @@ class HardeningDashboard:
         modules_to_execute = [m for m in self.modules if m.id in self.selected_modules]
         total = len(modules_to_execute)
         
-        # Header
         header_lines = [
             f"{Fore.LIGHTYELLOW_EX}🔧 SYSTEM HARDENING IN PROGRESS{Style.RESET_ALL}",
             f"{Style.DIM}└─ Selected: {len(modules_to_execute)} modules{Style.RESET_ALL}",
@@ -1559,22 +1550,18 @@ class HardeningDashboard:
         
         time.sleep(1)
         
-        # Execute each module
         for i, module in enumerate(modules_to_execute, 1):
             self._current_module_name = module.name
             
-            # Check if already applied
             if module.applied:
                 details = self.state_manager.get_module_details(module.id)
                 applied_time = details.get("applied_at", "Unknown") if details else "Unknown"
-                
                 result_lines = [
                     f"{Fore.LIGHTGREEN_EX}✓ ALREADY APPLIED{Style.RESET_ALL}",
                     f"{Fore.GREEN}├─ Module: {module.name}{Style.RESET_ALL}",
                     f"{Fore.GREEN}├─ Applied at: {applied_time}{Style.RESET_ALL}",
                     f"{Style.DIM}└─ Skipping duplicate execution{Style.RESET_ALL}"
                 ]
-                
                 self._draw_neon_hacker_box(
                     "✅ MODULE ALREADY APPLIED",
                     result_lines,
@@ -1585,20 +1572,10 @@ class HardeningDashboard:
                     glow_border=True,
                     animated=True
                 )
-                
-                # Record as already applied
-                result = HardeningResult(
-                    module=module,
-                    success=True,
-                    start_time=datetime.now(),
-                    end_time=datetime.now(),
-                    output="Module already applied",
-                    was_already_applied=True
-                )
+                result = HardeningResult(module, True, datetime.now(), datetime.now(), "Module already applied", was_already_applied=True)
                 self.results.append(result)
                 continue
             
-            # Progress box with proper colors
             progress_lines = [
                 f"{Fore.LIGHTYELLOW_EX}[Module {i}/{total}]{Fore.RESET}",
                 f"{Fore.LIGHTCYAN_EX}├─ Name: {Fore.WHITE}{module.name}{Fore.RESET}",
@@ -1617,7 +1594,6 @@ class HardeningDashboard:
                 animated=True
             )
             
-            # Check admin
             if module.requires_admin and not self.is_admin_user:
                 result_lines = [
                     f"{Fore.LIGHTRED_EX}✗ SKIPPED{Style.RESET_ALL}",
@@ -1634,14 +1610,11 @@ class HardeningDashboard:
                     glow_border=True,
                     animated=True
                 )
-                
                 result = HardeningResult(module, False, datetime.now(), datetime.now(), "", "Admin privileges required", [])
                 self.results.append(result)
                 continue
             
-            # Execute
             try:
-                # Show executing
                 executing_lines = [
                     f"{Fore.LIGHTGREEN_EX}▶ Executing command...{Style.RESET_ALL}",
                     f"{Style.DIM}├─ Command: {module.command[:60]}...{Style.RESET_ALL}",
@@ -1658,7 +1631,6 @@ class HardeningDashboard:
                     animated=True
                 )
                 
-                # Run command
                 process = subprocess.Popen(
                     module.command,
                     shell=True,
@@ -1669,7 +1641,7 @@ class HardeningDashboard:
                 )
                 
                 output_lines = []
-                for _ in range(60):  # 60 second timeout with progress
+                for _ in range(60):
                     if process.stdout:
                         line = process.stdout.readline()
                         if line:
@@ -1687,7 +1659,6 @@ class HardeningDashboard:
                                     glow_border=True,
                                     animated=True
                                 )
-                    
                     process.poll()
                     if process.returncode is not None:
                         break
@@ -1703,13 +1674,11 @@ class HardeningDashboard:
                     error_msg = None
                 
                 if success:
-                    # Verify if applicable
                     verified = False
                     if module.verify_command:
                         verify_result = subprocess.run(module.verify_command, shell=True, capture_output=True, text=True)
                         verified = verify_result.returncode == 0
                     
-                    # Mark as applied in persistent state
                     state_details = {
                         "version": module.version,
                         "success": True,
@@ -1727,7 +1696,6 @@ class HardeningDashboard:
                         f"{Fore.GREEN}├─ Verified: {'✓' if verified else '✗'}{Style.RESET_ALL}",
                         f"{Style.DIM}└─ Output: {len(output_lines)} lines captured{Style.RESET_ALL}"
                     ]
-                    
                     if output_lines:
                         for line in output_lines[:3]:
                             result_lines.append(f"{Style.DIM}   └─ {line[:60]}{Style.RESET_ALL}")
@@ -1742,19 +1710,16 @@ class HardeningDashboard:
                         glow_border=True,
                         animated=True
                     )
-                    
                     self._add_threat_event(f"✓ {module.name} applied successfully", "success")
                     
                 else:
                     self.state_manager.mark_failed(module.id, error_msg or "Unknown error")
-                    
                     result_lines = [
                         f"{Fore.LIGHTRED_EX}❌ FAILED{Style.RESET_ALL}",
                         f"{Fore.RED}├─ Module: {module.name}{Style.RESET_ALL}",
                         f"{Fore.RED}├─ Error: {error_msg or 'Unknown error'}{Style.RESET_ALL}",
                         f"{Style.DIM}└─ Output: {len(output_lines)} lines captured{Style.RESET_ALL}"
                     ]
-                    
                     if output_lines:
                         for line in output_lines[:3]:
                             result_lines.append(f"{Style.DIM}   └─ {line[:60]}{Style.RESET_ALL}")
@@ -1769,7 +1734,6 @@ class HardeningDashboard:
                         glow_border=True,
                         animated=True
                     )
-                    
                     self._add_threat_event(f"✗ {module.name} failed: {error_msg}", "critical")
                 
                 result = HardeningResult(
@@ -1785,7 +1749,6 @@ class HardeningDashboard:
                 
             except Exception as e:
                 self.state_manager.mark_failed(module.id, str(e))
-                
                 result_lines = [
                     f"{Fore.LIGHTRED_EX}💥 ERROR{Style.RESET_ALL}",
                     f"{Fore.RED}├─ Module: {module.name}{Style.RESET_ALL}",
@@ -1802,7 +1765,6 @@ class HardeningDashboard:
                     glow_border=True,
                     animated=True
                 )
-                
                 result = HardeningResult(module, False, datetime.now(), datetime.now(), "", str(e), [])
                 self.results.append(result)
                 self._add_threat_event(f"⚠ Error in {module.name}: {str(e)}", "critical")
@@ -1810,19 +1772,15 @@ class HardeningDashboard:
             time.sleep(1)
         
         self._current_module_name = None
-        
-        # Show completion summary
         self._display_completion_summary_animated()
     
     def _display_completion_summary_animated(self):
-        """Display completion summary with animated neon box"""
         RESET = '\033[0m'
         GREEN = '\033[92m'
         RED = '\033[91m'
         YELLOW = '\033[93m'
         CYAN = '\033[96m'
         DIM = '\033[2m'
-        BOLD = '\033[1m'
         
         successful = sum(1 for r in self.results if r.success)
         already_applied = sum(1 for r in self.results if r.was_already_applied)
@@ -1888,9 +1846,8 @@ class HardeningDashboard:
             if module.requires_admin and not self.is_admin_user:
                 continue
             if module.severity.value in ['CRITICAL', 'HIGH']:
-                if not module.applied:  # Skip already applied
+                if not module.applied:
                     self.selected_modules.append(module.id)
-        
         if self.selected_modules:
             self._execute_hardening_realtime()
         else:
@@ -1903,9 +1860,8 @@ class HardeningDashboard:
                 continue
             if module.requires_admin and not self.is_admin_user:
                 continue
-            if not module.applied:  # Skip already applied
+            if not module.applied:
                 self.selected_modules.append(module.id)
-        
         if self.selected_modules:
             self._execute_hardening_realtime()
         else:
@@ -1928,21 +1884,27 @@ class HardeningDashboard:
         
         print(f"{Fore.CYAN}Rolling back {module.name}...{Style.RESET_ALL}")
         try:
-            subprocess.run(module.rollback_command, shell=True, check=True, timeout=30)
-            self.state_manager.clear_module_state(module_id)
-            module.applied = False
-            module.verified = False
-            print(f"{Fore.GREEN}✓ Rolled back {module.name}{Style.RESET_ALL}")
-            self._add_threat_event(f"Rolled back {module.name}", "warning")
+            # Execute rollback command
+            result = subprocess.run(module.rollback_command, shell=True, capture_output=True, text=True, timeout=30)
+            if result.returncode == 0:
+                # Clear state using the state manager
+                self.state_manager.clear_module_state(module_id)
+                module.applied = False
+                module.verified = False
+                print(f"{Fore.GREEN}✓ Rolled back {module.name}{Style.RESET_ALL}")
+                self._add_threat_event(f"Rolled back {module.name}", "warning")
+            else:
+                print(f"{Fore.RED}✗ Rollback failed: {result.stderr or 'Unknown error'}{Style.RESET_ALL}")
+        except subprocess.TimeoutExpired:
+            print(f"{Fore.RED}✗ Rollback timed out{Style.RESET_ALL}")
         except Exception as e:
             print(f"{Fore.RED}✗ Rollback failed: {e}{Style.RESET_ALL}")
-    
+
     # ============================================================
     # REPORT GENERATION
     # ============================================================
     
     def _generate_report(self):
-        """Generate hardening report"""
         workspace = os.path.expanduser("~/dsterminal_workspace/reports")
         os.makedirs(workspace, exist_ok=True)
         
@@ -1978,13 +1940,11 @@ class HardeningDashboard:
             "applied_modules": self.state_manager.get_all_applied_modules()
         }
         
-        # Save JSON
         json_path = f"{workspace}/hardening_{self.session_id}.json"
         with open(json_path, 'w', encoding='utf-8') as f:
             json.dump(report, f, indent=2, ensure_ascii=False)
         print(f"{Fore.GREEN}✓ JSON Report saved: {json_path}{Style.RESET_ALL}")
         
-        # Generate HTML
         html_path = self._generate_html_report(report, workspace)
         if html_path:
             print(f"{Fore.GREEN}✓ HTML Report saved: {html_path}{Style.RESET_ALL}")
@@ -1997,61 +1957,21 @@ class HardeningDashboard:
     <meta charset="UTF-8">
     <title>DSTerminal Hardening Report</title>
     <style>
-        body {{
-            font-family: 'Segoe UI', Arial, sans-serif;
-            margin: 40px;
-            background: #0d1117;
-            color: #c9d1d9;
-        }}
-        .container {{
-            max-width: 1200px;
-            margin: auto;
-            background: #0d1117;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-        }}
-        .header {{
-            text-align: center;
-            border-bottom: 3px solid #00ffff;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-        }}
+        body {{ font-family: 'Segoe UI', Arial, sans-serif; margin: 40px; background: #0d1117; color: #c9d1d9; }}
+        .container {{ max-width: 1200px; margin: auto; background: #0d1117; border-radius: 15px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }}
+        .header {{ text-align: center; border-bottom: 3px solid #00ffff; padding-bottom: 20px; margin-bottom: 30px; }}
         .header h1 {{ color: #00ffff; font-size: 2.5em; }}
         .header h2 {{ color: #ffcc00; font-size: 1.2em; }}
-        .summary {{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }}
-        .summary-card {{
-            background: #161b22;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            border-left: 4px solid #00ffff;
-        }}
+        .summary {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-bottom: 30px; }}
+        .summary-card {{ background: #161b22; border-radius: 10px; padding: 20px; text-align: center; border-left: 4px solid #00ffff; }}
         .summary-card .value {{ font-size: 2em; font-weight: bold; }}
         .summary-card .success {{ color: #00ff88; }}
         .summary-card .applied {{ color: #ffcc00; }}
         .summary-card .failed {{ color: #ff5555; }}
-        .section {{
-            background: #161b22;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }}
+        .section {{ background: #161b22; border-radius: 10px; padding: 20px; margin-bottom: 20px; }}
         .section h3 {{ color: #00ffff; border-bottom: 1px solid #30363d; padding-bottom: 10px; }}
-        table {{
-            width: 100%;
-            border-collapse: collapse;
-        }}
-        th, td {{
-            border: 1px solid #30363d;
-            padding: 12px;
-            text-align: left;
-        }}
+        table {{ width: 100%; border-collapse: collapse; }}
+        th, td {{ border: 1px solid #30363d; padding: 12px; text-align: left; }}
         th {{ background: #21262d; color: #00ffff; }}
         .status-success {{ color: #00ff88; font-weight: bold; }}
         .status-applied {{ color: #ffcc00; font-weight: bold; }}
@@ -2071,67 +1991,44 @@ class HardeningDashboard:
         <p>Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
         <p>System ID: {report['system_id']}</p>
     </div>
-    
     <div class="summary">
         <div class="summary-card"><h3>Total</h3><div class="value">{report['total_modules']}</div></div>
         <div class="summary-card"><h3>Successful</h3><div class="value success">{report['successful']}</div></div>
         <div class="summary-card"><h3>Already Applied</h3><div class="value applied">{report['already_applied']}</div></div>
         <div class="summary-card"><h3>Failed</h3><div class="value failed">{report['failed']}</div></div>
     </div>
-    
-    <div class="section">
-        <h3>System Information</h3>
-        <table>
-            <tr><th>Property</th><th>Value</th></tr>
+    <div class="section"><h3>System Information</h3>
+        <table><tr><th>Property</th><th>Value</th></tr>
             <tr><td>Operating System</td><td>{report['system']}</td></tr>
             <tr><td>Hostname</td><td>{report['hostname']}</td></tr>
             <tr><td>System ID</td><td>{report['system_id']}</td></tr>
             <tr><td>Administrator</td><td>{'Yes' if report['admin'] else 'No'}</td></tr>
         </table>
     </div>
-    
-    <div class="section">
-        <h3>Hardening Results</h3>
-        <table>
-            <thead><tr><th>Module</th><th>Category</th><th>Severity</th><th>Status</th></tr></thead>
-            <tbody>
-"""
+    <div class="section"><h3>Hardening Results</h3>
+        <table><thead><tr><th>Module</th><th>Category</th><th>Severity</th><th>Status</th></tr></thead><tbody>"""
             for result in report['results']:
                 if result['already_applied']:
-                    status_class = "status-applied"
-                    status_text = "ALREADY APPLIED"
+                    status_class = "status-applied"; status_text = "ALREADY APPLIED"
                 elif result['success']:
-                    status_class = "status-success"
-                    status_text = "PASSED"
+                    status_class = "status-success"; status_text = "PASSED"
                 else:
-                    status_class = "status-failed"
-                    status_text = "FAILED"
+                    status_class = "status-failed"; status_text = "FAILED"
                 severity_class = f"severity-{result['severity']}"
                 html_content += f"""
-                <tr>
-                    <td>{result['module']}</td>
-                    <td>{result['category']}</td>
+                <tr><td>{result['module']}</td><td>{result['category']}</td>
                     <td><span class="{severity_class}">{result['severity']}</span></td>
-                    <td class="{status_class}">{status_text}</td>
-                </tr>
-"""
+                    <td class="{status_class}">{status_text}</td></tr>"""
             html_content += """
-            </tbody>
-        </table>
+        </tbody></table>
     </div>
-    
-    <div class="footer">
-        <p>DSTerminal Enterprise Security Suite | © 2024 - All Rights Reserved</p>
-    </div>
+    <div class="footer"><p>DSTerminal Enterprise Security Suite | © 2024 - All Rights Reserved</p></div>
 </div>
-</body>
-</html>"""
-            
+</body></html>"""
             html_path = f"{workspace}/hardening_{self.session_id}.html"
             with open(html_path, 'w', encoding='utf-8') as f:
                 f.write(html_content)
             return html_path
-            
         except Exception as e:
             print(f"{Fore.RED}⚠ HTML generation failed: {e}{Style.RESET_ALL}")
             return None
@@ -2141,20 +2038,14 @@ class HardeningDashboard:
     # ============================================================
     
     def list_modules_cinematic(self):
-        """Display modules in cinematic layout with proper colors"""
         print(f"\n{Fore.GREEN}{'='*self.terminal_width}{Fore.RESET}")
         print(f"{Fore.CYAN}{self._center_text('AVAILABLE HARDENING MODULES')}{Fore.RESET}")
         print(f"{Fore.GREEN}{'='*self.terminal_width}{Fore.RESET}\n")
         
-        # Header
         print(f"{Fore.WHITE}{' # ':^4} {'Module':^35} {'Category':^22} {'Severity':^10} {'Status':^12}{Fore.RESET}")
         print(f"{Style.DIM}{'─'*self.terminal_width}{Fore.RESET}")
         
         for i, m in enumerate(self.modules, 1):
-            # Check compatibility
-            compat = "✓" if not m.platforms or self.system in m.platforms else "✗"
-            
-            # Status
             if m.applied:
                 status = f"{Fore.GREEN}✓ APPLIED{Fore.RESET}"
             elif m.id in self.selected_modules:
@@ -2162,7 +2053,6 @@ class HardeningDashboard:
             else:
                 status = f"{Style.DIM}○ PENDING{Fore.RESET}"
             
-            # Severity color
             if m.severity == HardeningSeverity.CRITICAL:
                 severity_color = Fore.RED
             elif m.severity == HardeningSeverity.HIGH:
@@ -2172,10 +2062,6 @@ class HardeningDashboard:
             else:
                 severity_color = Fore.GREEN
             
-            # Check if module is compatible
-            if compat == "✗":
-                status = f"{Fore.RED}✗ INCOMPATIBLE{Fore.RESET}"
-            
             print(f" {Fore.GREEN}{i:2d}{Fore.RESET}  {m.name[:32]:<35} {m.category.value[:20]:<22} [{severity_color}{m.severity.value[:4]:<4}{Fore.RESET}]  {status}")
         
         print(f"\n{Style.DIM}Total: {len(self.modules)} modules{Fore.RESET}")
@@ -2183,7 +2069,6 @@ class HardeningDashboard:
         print(f"{Fore.YELLOW}Selected: {len(self.selected_modules)}{Fore.RESET}")
     
     def show_status_cinematic(self):
-        """Show status in cinematic layout"""
         if RICH_AVAILABLE:
             console = Console()
             layout = self._create_tactical_layout()
@@ -2200,7 +2085,6 @@ class HardeningDashboard:
             self._show_status_fallback()
     
     def _show_status_fallback(self):
-        """Fallback status display with proper colors"""
         print(f"\n{Fore.GREEN}{'='*60}{Fore.RESET}")
         print(f"{Fore.CYAN}HARDENING STATUS{Fore.RESET}")
         print(f"{Fore.GREEN}{'='*60}{Fore.RESET}")
@@ -2212,7 +2096,6 @@ class HardeningDashboard:
         print(f"{Fore.RED}Failed:{Fore.RESET} {sum(1 for r in self.results if not r.success and not r.was_already_applied)}")
     
     def _view_selected_modules(self):
-        """View selected modules with proper display"""
         if not self.selected_modules:
             print(f"\n{Fore.YELLOW}No modules selected{Fore.RESET}")
             print(f"\n{Fore.CYAN}Use option 1 to select modules{Fore.RESET}")
@@ -2234,7 +2117,6 @@ class HardeningDashboard:
             print(f"  {i:2d}. {m.name:40s} [{severity_color}{m.severity.value}{Fore.RESET}] {status}")
     
     def _view_results(self):
-        """View execution results with proper display"""
         if not self.results:
             print(f"\n{Fore.YELLOW}No results available{Fore.RESET}")
             print(f"{Fore.CYAN}Execute hardening first (option 3){Fore.RESET}")
@@ -2257,7 +2139,6 @@ class HardeningDashboard:
             print(f"\n  {status} {i:2d}. {r.module.name}")
             print(f"      Severity: [{severity_color}{r.module.severity.value}{Fore.RESET}]")
             print(f"      Duration: {duration:.1f}s")
-            
             if r.error:
                 print(f"      {Fore.RED}Error: {r.error}{Fore.RESET}")
             elif r.output:
@@ -2265,25 +2146,18 @@ class HardeningDashboard:
                 print(f"      Output: {Style.DIM}{output_preview}{Fore.RESET}")
     
     def _select_modules_interactive(self):
-        """Interactive module selection with hacker-themed glowing box display"""
         self._clear_screen()
-        
-        # Get terminal dimensions
         try:
             term = shutil.get_terminal_size()
             term_width = term.columns
         except:
             term_width = 80
         
-        # Calculate box width - responsive
         box_width = min(term_width - 4, 100)
         box_width = max(box_width, 70)
         left_margin = max(0, (term_width - box_width) // 2)
         inner_width = box_width - 4
         
-        # ============================================================
-        # HACKER THEMED GLOWING HEADER BOX
-        # ============================================================
         header_title = "⚡ DSTERMINAL HARDENING MODULE SELECTOR ⚡"
         header_lines = [
             f"{Fore.LIGHTCYAN_EX}┌─ System: {Fore.WHITE}{self.system}{Fore.RESET}",
@@ -2293,20 +2167,14 @@ class HardeningDashboard:
         ]
         
         self._draw_neon_hacker_box(
-            header_title,
-            header_lines,
+            header_title, header_lines,
             title_color=Fore.LIGHTCYAN_EX,
             border_color=Fore.LIGHTCYAN_EX,
             content_color=Fore.LIGHTWHITE_EX,
-            blink_title=True,
-            glow_border=True,
-            width=box_width,
-            animated=False
+            blink_title=True, glow_border=True,
+            width=box_width, animated=False
         )
         
-        # ============================================================
-        # BUILD MODULE LIST WITH CATEGORIES
-        # ============================================================
         categories = {}
         for module in self.modules:
             cat = module.category.value
@@ -2314,125 +2182,89 @@ class HardeningDashboard:
                 categories[cat] = []
             categories[cat].append(module)
         
-        # Build content lines for module list
         module_lines = []
         module_lines.append(f"{Fore.LIGHTCYAN_EX}╔{'═' * (box_width - 2)}╗{Fore.RESET}")
         module_lines.append(f"{Fore.LIGHTCYAN_EX}║ {Fore.LIGHTGREEN_EX}Available Hardening Modules{Fore.RESET}{' ' * (box_width - 29)}{Fore.LIGHTCYAN_EX}║{Fore.RESET}")
         module_lines.append(f"{Fore.LIGHTCYAN_EX}╟{'─' * (box_width - 2)}╢{Fore.RESET}")
         
-        # Header row
         header_row = f"{Style.DIM} #  Module{' ' * 32}Category{' ' * 18}Severity{' ' * 8}Status{Style.RESET_ALL}"
         module_lines.append(f"{Fore.LIGHTCYAN_EX}║ {header_row[:inner_width].ljust(inner_width)} {Fore.LIGHTCYAN_EX}║{Fore.RESET}")
         module_lines.append(f"{Fore.LIGHTCYAN_EX}╟{'─' * (box_width - 2)}╢{Fore.RESET}")
         
         idx = 1
         for category, mods in categories.items():
-            # Category header
             category_line = f"{Fore.LIGHTYELLOW_EX}▶ {category}{Fore.RESET}"
             module_lines.append(f"{Fore.LIGHTCYAN_EX}║ {category_line[:inner_width].ljust(inner_width)} {Fore.LIGHTCYAN_EX}║{Fore.RESET}")
-            
             for m in mods:
-                # Check if module is already applied
                 if m.applied:
                     marker = f"{Fore.GREEN}✓{Fore.RESET}"
                     status_text = f"{Fore.GREEN}APPLIED{Fore.RESET}"
                 else:
-                    # Check if selected
                     if m.id in self.selected_modules:
                         marker = f"{Fore.GREEN}■{Fore.RESET}"
                     else:
                         marker = f"{Style.DIM}□{Style.RESET_ALL}"
                     status_text = f"{Fore.YELLOW}PENDING{Fore.RESET}"
                 
-                # Severity color
                 if m.severity == HardeningSeverity.CRITICAL:
-                    severity_color = Fore.LIGHTRED_EX
-                    severity_icon = "🔴"
+                    severity_color = Fore.LIGHTRED_EX; severity_icon = "🔴"
                 elif m.severity == HardeningSeverity.HIGH:
-                    severity_color = Fore.LIGHTYELLOW_EX
-                    severity_icon = "🟡"
+                    severity_color = Fore.LIGHTYELLOW_EX; severity_icon = "🟡"
                 elif m.severity == HardeningSeverity.MEDIUM:
-                    severity_color = Fore.LIGHTCYAN_EX
-                    severity_icon = "🔵"
+                    severity_color = Fore.LIGHTCYAN_EX; severity_icon = "🔵"
                 else:
-                    severity_color = Fore.LIGHTGREEN_EX
-                    severity_icon = "🟢"
+                    severity_color = Fore.LIGHTGREEN_EX; severity_icon = "🟢"
                 
-                # Build module line with fixed widths
                 num_str = f"{Fore.GREEN}{idx:2d}{Fore.RESET}"
                 name_str = f"{m.name[:28]:<28}"
                 cat_str = f"{m.category.value[:20]:<20}"
                 sev_str = f"{severity_icon} {severity_color}{m.severity.value:<7}{Fore.RESET}"
                 status_str = f"{status_text}"
-                
-                # Full line
                 line = f"{marker} {num_str} {name_str} {cat_str} {sev_str} {status_str}"
                 module_lines.append(f"{Fore.LIGHTCYAN_EX}║ {line[:inner_width].ljust(inner_width)} {Fore.LIGHTCYAN_EX}║{Fore.RESET}")
                 idx += 1
-            
-            # Add separator between categories
             if category != list(categories.keys())[-1]:
                 module_lines.append(f"{Fore.LIGHTCYAN_EX}╟{'─' * (box_width - 2)}╢{Fore.RESET}")
         
         module_lines.append(f"{Fore.LIGHTCYAN_EX}╚{'═' * (box_width - 2)}╝{Fore.RESET}")
-        
-        # Print the module list box
         for line in module_lines:
             print(f"{' ' * left_margin}{line}")
         
-        # ============================================================
-        # COMMAND LEGEND BOX
-        # ============================================================
         legend_lines = [
             f"{Fore.GREEN}■{Fore.RESET} Selected   {Style.DIM}□{Style.RESET_ALL} Available   {Fore.GREEN}✓{Fore.RESET} Applied",
             f"{Style.DIM}Commands: all | clear | applied | back | numbers (e.g., 1,3,5-8){Style.RESET_ALL}"
         ]
-        
         self._draw_neon_hacker_box(
-            "⚡ COMMAND LEGEND",
-            legend_lines,
+            "⚡ COMMAND LEGEND", legend_lines,
             title_color=Fore.LIGHTMAGENTA_EX,
             border_color=Fore.LIGHTCYAN_EX,
             content_color=Fore.LIGHTWHITE_EX,
-            blink_title=False,
-            glow_border=True,
-            width=box_width,
-            animated=False
+            blink_title=False, glow_border=True,
+            width=box_width, animated=False
         )
         
-        # ============================================================
-        # INPUT PROMPT - LEFT ALIGNED WITH GLOW
-        # ============================================================
         print(f"\n{' ' * left_margin}{Fore.LIGHTCYAN_EX}╔{'═' * (box_width - 2)}╗{Fore.RESET}")
         print(f"{' ' * left_margin}{Fore.LIGHTCYAN_EX}║ {Fore.LIGHTGREEN_EX}Enter selection:{Fore.RESET} {Fore.LIGHTYELLOW_EX}▸{Fore.RESET} {Style.DIM}(type 'back' to return){Style.RESET_ALL}{' ' * (box_width - 48)}{Fore.LIGHTCYAN_EX}║{Fore.RESET}")
         print(f"{' ' * left_margin}{Fore.LIGHTCYAN_EX}╚{'═' * (box_width - 2)}╝{Fore.RESET}")
         
-        # Left-aligned input prompt
         sys.stdout.write(f"\n{' ' * left_margin}{Fore.LIGHTGREEN_EX}└─[{Fore.LIGHTCYAN_EX} SELECT {Fore.LIGHTGREEN_EX}]► {Fore.RESET}")
         sys.stdout.flush()
         choice = sys.stdin.readline().strip().lower()
         
-        # ============================================================
-        # PROCESS SELECTION
-        # ============================================================
         if choice == 'all':
             self.selected_modules = [m.id for m in self.modules if not (m.requires_admin and not self.is_admin_user) and not m.applied]
             print(f"\n{' ' * left_margin}{Fore.GREEN}✓ Selected all compatible modules ({len(self.selected_modules)}){Fore.RESET}")
             time.sleep(1)
-            
         elif choice == 'clear':
             self.selected_modules = []
             print(f"\n{' ' * left_margin}{Fore.YELLOW}⚡ Cleared all selections{Fore.RESET}")
             time.sleep(1)
-            
         elif choice == 'applied':
             self.selected_modules = [m.id for m in self.modules if m.applied]
             print(f"\n{' ' * left_margin}{Fore.GREEN}✓ Selected {len(self.selected_modules)} already applied modules{Fore.RESET}")
             time.sleep(1)
-            
         elif choice == 'back':
             return
-            
         else:
             try:
                 indices = []
@@ -2444,7 +2276,6 @@ class HardeningDashboard:
                     else:
                         if part.isdigit():
                             indices.append(int(part))
-                
                 selected_count = 0
                 already_applied_count = 0
                 for i in indices:
@@ -2457,22 +2288,18 @@ class HardeningDashboard:
                             self.selected_modules.append(m.id)
                             selected_count += 1
                             print(f"\n{' ' * left_margin}{Fore.GREEN}✓ Selected: {m.name}{Fore.RESET}")
-                
                 if selected_count > 0:
                     print(f"\n{' ' * left_margin}{Fore.GREEN}✓ Total selected: {len(self.selected_modules)} modules{Fore.RESET}")
                 if already_applied_count > 0:
                     print(f"\n{' ' * left_margin}{Fore.YELLOW}⚠ {already_applied_count} module(s) already applied{Fore.RESET}")
-                    
             except Exception as e:
                 print(f"\n{' ' * left_margin}{Fore.RED}✗ Invalid selection: {e}{Fore.RESET}")
-            
             time.sleep(1.5)
     
     def _display_header(self):
-        """Display header with proper colors"""
         header = f"""
 {Fore.GREEN}{'='*self.terminal_width}
-{self._center_text(f'{Fore.CYAN}DSTERMINAL HARDENING MODULE v4.0.0.113{Fore.RESET}')}
+{self._center_text(f'{Fore.CYAN}DSTERMINAL HARDENING DASHBOARD v4.0{Fore.RESET}')}
 {self._center_text(f'{Fore.LIGHTCYAN_EX}Enterprise Security Suite - Persistent State{Fore.RESET}')}
 {Fore.GREEN}{'='*self.terminal_width}{Fore.RESET}
 {Fore.YELLOW}System:{Fore.RESET} {self.system} | {Fore.YELLOW}Admin:{Fore.RESET} {self.is_admin_user} | {Fore.YELLOW}System ID:{Fore.RESET} {self.state_manager.get_system_id()}
@@ -2481,8 +2308,6 @@ class HardeningDashboard:
         print(header)
     
     def _center_text(self, text: str) -> str:
-        """Center text with ANSI color code preservation"""
-        # Strip ANSI codes for length calculation
         clean_text = re.sub(r'\x1b\[[0-9;]*m', '', text)
         padding = self.terminal_width - len(clean_text)
         if padding <= 0:
@@ -2494,166 +2319,120 @@ class HardeningDashboard:
     def _clear_screen(self):
         os.system('cls' if self.system == 'Windows' else 'clear')
     
-    # ============================================================
-    # MAIN CINEMATIC MODE
-    # ============================================================
+    def _add_threat_event(self, event: str, event_type: str = "info"):
+        colors = {"info": "dim", "warning": "yellow", "critical": "red", "success": "green"}
+        color = colors.get(event_type, "dim")
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        self.threat_feed.append(f"[{color}][{timestamp}] {event}[/{color}]")
     
-    def run_cinematic(self):
-        """Main cinematic dashboard with centered panels and left-aligned input"""
+    def _create_tactical_layout(self) -> Optional[Layout]:
         if not RICH_AVAILABLE:
-            print(f"{Fore.YELLOW}[!] Rich library not available. Using fallback mode.{Style.RESET_ALL}")
-            self.run()
-            return
-        
-        console = Console()
-        
+            return None
+        layout = Layout()
+        layout.split_column(Layout(name="header", size=5), Layout(name="main"), Layout(name="footer", size=3))
+        layout["main"].split_row(Layout(name="panel1", ratio=1), Layout(name="panel2", ratio=1),
+                                 Layout(name="panel3", ratio=1), Layout(name="panel4", ratio=1))
+        return layout
+    
+    def _get_system_metrics_panel(self) -> Optional[Panel]:
+        if not RICH_AVAILABLE:
+            return None
+        metrics = self.telemetry.get_metrics()
+        cpu_bar = self._create_bar(metrics["cpu"], 30)
+        ram_bar = self._create_bar(metrics["ram"], 30)
+        content = f"""
+[bold cyan]SYSTEM TELEMETRY[/bold cyan]
+──────────────────────────────────────────────
+[bright_white]CPU:[/] {metrics['cpu']:5.1f}% {cpu_bar}
+[bright_white]RAM:[/] {metrics['ram']:5.1f}% {ram_bar}
+[bright_white]Processes:[/] {metrics['processes']}
+[bright_white]Platform:[/] {self.system}
+[bright_white]Admin:[/] {'✓' if self.is_admin_user else '✗'}
+"""
+        return Panel(content, title="[bold green]SYSTEM STATUS[/bold green]", border_style="green")
+    
+    def _get_hardening_ops_panel(self) -> Optional[Panel]:
+        if not RICH_AVAILABLE:
+            return None
+        executed = len(self.results)
+        successful = sum(1 for r in self.results if r.success)
+        content = f"""
+[bold yellow]HARDENING OPS[/bold yellow]
+──────────────────────────────────────────────
+[bright_white]Modules Selected:[/] {len(self.selected_modules)}
+[bright_white]Executed:[/] {executed}
+[bright_white]Successful:[/] [green]{successful}[/green]
+[bright_white]Failed:[/] [red]{executed - successful}[/red]
+[bright_white]Success Rate:[/] {successful/max(1,executed)*100:.0f}%
+
+[bold yellow]Current Module:[/]
+{self._get_current_module_display()}
+"""
+        return Panel(content, title="[bold blue]HARDENING ENGINE[/bold blue]", border_style="blue")
+    
+    def _get_network_defense_panel(self) -> Optional[Panel]:
+        if not RICH_AVAILABLE:
+            return None
+        firewall_status = self._check_firewall_status()
+        content = f"""
+[bold magenta]NETWORK DEFENSE[/bold magenta]
+──────────────────────────────────────────────
+[bright_white]Firewall:[/] {firewall_status}
+[bright_white]Port Blocking:[/] {'ACTIVE' if self._check_ports_blocked() else 'PENDING'}
+[bright_white]IDS/IPS:[/] MONITORING
+
+[bold magenta]Protected Ports:[/]
+  • SMB (445) - BLOCKED
+  • RDP (3389) - BLOCKED
+  • NetBIOS (135-139) - BLOCKED
+        """
+        return Panel(content, title="[bold red]DEFENSE GRID[/bold red]", border_style="red")
+    
+    def _get_threat_feed_panel(self) -> Optional[Panel]:
+        if not RICH_AVAILABLE:
+            return None
+        feed_lines = []
+        for event in list(self.threat_feed)[-8:]:
+            feed_lines.append(event)
+        if not feed_lines:
+            feed_lines = ["[dim]• Waiting for security events...[/dim]"]
+        content = "\n".join(feed_lines)
+        return Panel(content, title="[bold yellow]THREAT INTELLIGENCE[/bold yellow]", border_style="yellow")
+    
+    def _create_bar(self, percent: float, width: int) -> str:
+        filled = int(width * percent / 100)
+        return f"[green]{'█' * filled}[/green][dim]{'░' * (width - filled)}[/dim]"
+    
+    def _get_current_module_display(self) -> str:
+        if hasattr(self, '_current_module_name') and self._current_module_name:
+            return f"[yellow]▶ {self._current_module_name}[/yellow]"
+        return "[dim]• Idle[/dim]"
+    
+    def _check_firewall_status(self) -> str:
         try:
-            console.clear()
-        except Exception:
-            print("\n" * 3)
-        
-        while True:
-            try:
-                console.clear()
-            except Exception:
-                print("\n" * 3)
-            
-            try:
-                # Header - centered
-                header = Panel(
-                    "[bold cyan]DSTERMINAL HARDENING DASHBOARD v4.0[/bold cyan]\n"
-                    f"[dim]Enterprise Security Suite | System ID: {self.state_manager.get_system_id()}[/dim]\n"
-                    f"[dim]Session: {self.session_id} | Platform: {self.system}[/dim]",
-                    border_style="cyan"
-                )
-                centered_header = Align.center(header)
-                console.print(centered_header)
-                
-                # Metrics table - centered
-                metrics_table = Table(title="[bold green]SYSTEM STATUS[/bold green]", box=box.HEAVY_EDGE)
-                metrics_table.add_column("Metric", style="cyan", width=15)
-                metrics_table.add_column("Value", style="white", width=20)
-                
-                metrics = self.telemetry.get_metrics()
-                metrics_table.add_row("CPU", f"{metrics['cpu']:.1f}%")
-                metrics_table.add_row("RAM", f"{metrics['ram']:.1f}%")
-                metrics_table.add_row("Processes", str(metrics['processes']))
-                metrics_table.add_row("Platform", self.system)
-                metrics_table.add_row("Admin", "✓" if self.is_admin_user else "✗")
-                metrics_table.add_row("Selected", str(len(self.selected_modules)))
-                metrics_table.add_row("Applied", str(len([m for m in self.modules if m.applied])))
-                
-                centered_metrics = Align.center(metrics_table)
-                console.print(centered_metrics)
-                
-                # Progress table - centered
-                progress_table = Table(title="[bold yellow]HARDENING PROGRESS[/bold yellow]", box=box.HEAVY_EDGE)
-                progress_table.add_column("Module", style="cyan", width=30)
-                progress_table.add_column("Status", style="green", width=40)
-                progress_table.add_column("Severity", style="white", width=12)
-                
-                for module in self.modules[:8]:
-                    if module.applied:
-                        status = "[green]✅ APPLIED[/green]"
-                    elif module.id in self.selected_modules:
-                        status = "[yellow]⏳ SELECTED[/yellow]"
-                    else:
-                        status = "[dim]○ PENDING[/dim]"
-                    severity_color = "red" if module.severity == HardeningSeverity.CRITICAL else "yellow"
-                    progress_table.add_row(module.name[:28], status, f"[{severity_color}]{module.severity.value[0]}[/{severity_color}]")
-                
-                centered_progress = Align.center(progress_table)
-                console.print(centered_progress)
-                
-                # ============================================================
-                # MENU - Centered
-                # ============================================================
-                menu_panel = Panel(
-                    """
-        [bold yellow]+-------------------------------------------------------------+
-        |                         M E N U   O P T I O N S                         |
-        +-----------------------------------------------------------------+
-        |                                                                  |
-        |   [bold green][1][/bold green]  Select Modules      - Choose hardening modules        |
-        |   [bold green][2][/bold green]  View Selected       - Show current selection         |
-        |   [bold green][3][/bold green]  Execute Hardening   - Run hardening now              |
-        |   [bold green][4][/bold green]  View Results        - Show execution results         |
-        |   [bold green][5][/bold green]  Generate Report     - Create audit report            |
-        |   [bold yellow][6][/bold yellow]  Rollback Module     - Revert a specific module      |
-        |   [bold cyan][7][/bold cyan]  List All Modules     - Display all modules            |
-        |   [bold cyan][8][/bold cyan]  Show Status          - Current system status          |
-        |   [bold red][9][/bold red]  Exit Dashboard        - Return to terminal             |
-        |                                                                  |
-        +-----------------------------------------------------------------+
-                    """,
-                    title="[bold cyan]MAIN MENU[/bold cyan]",
-                    border_style="cyan",
-                    padding=(1, 2)
-                )
-                
-                centered_menu = Align.center(menu_panel)
-                console.print(centered_menu)
-                
-                # Footer - centered
-                footer = Panel(
-                    "[dim]Type the number (1-9) and press Enter to select an option[/dim]",
-                    border_style="dim"
-                )
-                centered_footer = Align.center(footer)
-                console.print(centered_footer)
-                
-                # ============================================================
-                # INPUT PROMPT - Left aligned
-                # ============================================================
-                # Print left-aligned prompt at the bottom
-                print(f"\n{Fore.CYAN}[ SELECT OPTION ] >> {Fore.RESET}", end="")
-                choice = input().strip()
-                
-                if choice == '1':
-                    self._select_modules_interactive()
-                    console.input("\n[dim]Press Enter to continue...[/dim]")
-                elif choice == '2':
-                    self._view_selected_modules()
-                    console.input("\n[dim]Press Enter to continue...[/dim]")
-                elif choice == '3':
-                    if not self.selected_modules:
-                        console.print("[red]No modules selected! Please select modules first (option 1)[/red]")
-                        console.input("\n[dim]Press Enter to continue...[/dim]")
-                    else:
-                        self._execute_hardening_realtime()
-                        console.input("\n[dim]Press Enter to continue...[/dim]")
-                elif choice == '4':
-                    self._view_results()
-                    console.input("\n[dim]Press Enter to continue...[/dim]")
-                elif choice == '5':
-                    self._generate_report()
-                    console.input("\n[dim]Press Enter to continue...[/dim]")
-                elif choice == '6':
-                    self._rollback_interactive()
-                    console.input("\n[dim]Press Enter to continue...[/dim]")
-                elif choice == '7':
-                    self.list_modules_cinematic()
-                    console.input("\n[dim]Press Enter to continue...[/dim]")
-                elif choice == '8':
-                    self.show_status_cinematic()
-                    console.input("\n[dim]Press Enter to continue...[/dim]")
-                elif choice == '9':
-                    console.print("\n[bold green]Exiting dashboard...[/bold green]")
-                    break
-                else:
-                    console.print("[red]Invalid option! Please enter a number between 1 and 9[/red]")
-                    time.sleep(1.5)
-                    
-            except KeyboardInterrupt:
-                console.print("\n[bold yellow]Exiting dashboard...[/bold yellow]")
-                break
-            except Exception as e:
-                console.print(f"[red]Error: {e}[/red]")
-                console.print("[dim]Press Enter to continue...[/dim]")
-                try:
-                    input()
-                except:
-                    pass
+            if self.system == "Windows":
+                result = subprocess.run('netsh advfirewall show allprofiles', shell=True, capture_output=True, text=True)
+                if "ON" in result.stdout.upper():
+                    return "[green]ACTIVE[/green]"
+            else:
+                result = subprocess.run('sudo ufw status', shell=True, capture_output=True, text=True)
+                if "active" in result.stdout.lower():
+                    return "[green]ACTIVE[/green]"
+                result = subprocess.run('sudo iptables -L INPUT | head -5', shell=True, capture_output=True, text=True)
+                if "DROP" in result.stdout:
+                    return "[green]ACTIVE[/green]"
+        except:
+            pass
+        return "[yellow]PENDING[/yellow]"
+    
+    def _check_ports_blocked(self) -> bool:
+        try:
+            if self.system == "Windows":
+                result = subprocess.run('netsh advfirewall firewall show rule name="DST_Block_445"', shell=True, capture_output=True, text=True)
+                return "Enabled" in result.stdout
+        except:
+            pass
+        return False
     
     def _rollback_interactive(self):
         """Interactive rollback selection"""
@@ -2667,21 +2446,22 @@ class HardeningDashboard:
             print(f"  {i}. {m.name}")
         
         try:
-            choice = int(input(f"\n{Fore.GREEN}Select module to rollback (1-{len(applied_modules)}): {Style.RESET_ALL}"))
+            choice = input(f"\n{Fore.GREEN}Select module to rollback (1-{len(applied_modules)}): {Style.RESET_ALL}").strip()
+            if not choice:
+                return
+            choice = int(choice)
             if 1 <= choice <= len(applied_modules):
                 self.rollback_module(applied_modules[choice - 1].id)
             else:
                 print(f"{Fore.YELLOW}Invalid selection{Style.RESET_ALL}")
         except ValueError:
-            print(f"{Fore.YELLOW}Invalid input{Style.RESET_ALL}")
-    
+            print(f"{Fore.YELLOW}Invalid input - please enter a number{Style.RESET_ALL}")
+
     def run(self):
-        """Legacy run method for fallback"""
         try:
             while True:
                 self._clear_screen()
                 self._display_header()
-                
                 menu = f"""
 {Fore.CYAN}[1]{Fore.RESET} Select Modules
 {Fore.CYAN}[2]{Fore.RESET} View Selected
@@ -2694,12 +2474,9 @@ class HardeningDashboard:
 {Fore.CYAN}[9]{Fore.RESET} Exit
 """
                 print(menu)
-                
-                # Use sys.stdout.write for proper prompt
                 sys.stdout.write(f"\n{Fore.CYAN}Select: {Fore.RESET}")
                 sys.stdout.flush()
                 choice = sys.stdin.readline().strip()
-                
                 if choice == '1':
                     self._select_modules_interactive()
                 elif choice == '2':
@@ -2737,19 +2514,171 @@ class HardeningDashboard:
         finally:
             self.telemetry.stop()
     
+    def run_cinematic(self):
+        if not RICH_AVAILABLE:
+            print(f"{Fore.YELLOW}[!] Rich library not available. Using fallback mode.{Style.RESET_ALL}")
+            self.run()
+            return
+        
+        console = Console()
+        try:
+            console.clear()
+        except:
+            print("\n" * 3)
+        
+        while True:
+            try:
+                console.clear()
+            except:
+                print("\n" * 3)
+            
+            try:
+                header = Panel(
+                    "[bold cyan]DSTERMINAL HARDENING DASHBOARD v4.0[/bold cyan]\n"
+                    f"[dim]Enterprise Security Suite | System ID: {self.state_manager.get_system_id()}[/dim]\n"
+                    f"[dim]Session: {self.session_id} | Platform: {self.system}[/dim]",
+                    border_style="cyan"
+                )
+                console.print(Align.center(header))
+                
+                metrics = self.telemetry.get_metrics()
+                metrics_table = Table(title="[bold green]SYSTEM STATUS[/bold green]", box=box.HEAVY_EDGE)
+                metrics_table.add_column("Metric", style="cyan", width=15)
+                metrics_table.add_column("Value", style="white", width=20)
+                metrics_table.add_row("CPU", f"{metrics['cpu']:.1f}%")
+                metrics_table.add_row("RAM", f"{metrics['ram']:.1f}%")
+                metrics_table.add_row("Processes", str(metrics['processes']))
+                metrics_table.add_row("Platform", self.system)
+                metrics_table.add_row("Admin", "✓" if self.is_admin_user else "✗")
+                metrics_table.add_row("Selected", str(len(self.selected_modules)))
+                metrics_table.add_row("Applied", str(len([m for m in self.modules if m.applied])))
+                console.print(Align.center(metrics_table))
+                
+                progress_table = Table(title="[bold yellow]HARDENING PROGRESS[/bold yellow]", box=box.HEAVY_EDGE)
+                progress_table.add_column("Module", style="cyan", width=30)
+                progress_table.add_column("Status", style="green", width=40)
+                progress_table.add_column("Severity", style="white", width=12)
+                for module in self.modules[:8]:
+                    if module.applied:
+                        status = "[green]✅ APPLIED[/green]"
+                    elif module.id in self.selected_modules:
+                        status = "[yellow]⏳ SELECTED[/yellow]"
+                    else:
+                        status = "[dim]○ PENDING[/dim]"
+                    severity_color = "red" if module.severity == HardeningSeverity.CRITICAL else "yellow"
+                    progress_table.add_row(module.name[:28], status, f"[{severity_color}]{module.severity.value[0]}[/{severity_color}]")
+                console.print(Align.center(progress_table))
+                
+                menu_panel = Panel(
+                    """
+        [bold yellow]+-------------------------------------------------------------+
+        |                         M E N U   O P T I O N S                         |
+        +-----------------------------------------------------------------+
+        |                                                                  |
+        |   [bold green][1][/bold green]  Select Modules      - Choose hardening modules        |
+        |   [bold green][2][/bold green]  View Selected       - Show current selection         |
+        |   [bold green][3][/bold green]  Execute Hardening   - Run hardening now              |
+        |   [bold green][4][/bold green]  View Results        - Show execution results         |
+        |   [bold green][5][/bold green]  Generate Report     - Create audit report            |
+        |   [bold yellow][6][/bold yellow]  Rollback Module     - Revert a specific module      |
+        |   [bold cyan][7][/bold cyan]  List All Modules     - Display all modules            |
+        |   [bold cyan][8][/bold cyan]  Show Status          - Current system status          |
+        |   [bold red][9][/bold red]  Exit Dashboard        - Return to terminal             |
+        |   [bold magenta][10][/bold magenta] Security Posture   - Display security posture      |
+        |   [bold magenta][11][/bold magenta] CIS Compliance    - CIS Controls compliance       |
+        |   [bold magenta][12][/bold magenta] MITRE Coverage    - MITRE ATT&CK coverage         |
+        |   [bold magenta][13][/bold magenta] Business Value    - ROI and business impact       |
+        |   [bold magenta][14][/bold magenta] Threat Intel      - Threat intelligence feed      |
+        |   [bold magenta][15][/bold magenta] Hardening Checklist - Security checklist          |
+        |   [bold magenta][16][/bold magenta] Priority Matrix   - Implementation priority       |
+        |                                                                  |
+        +-----------------------------------------------------------------+
+                    """,
+                    title="[bold cyan]MAIN MENU[/bold cyan]",
+                    border_style="cyan",
+                    padding=(1, 2)
+                )
+                console.print(Align.center(menu_panel))
+                
+                footer = Panel("[dim]Type the number (1-16) and press Enter to select an option[/dim]", border_style="dim")
+                console.print(Align.center(footer))
+                
+                print(f"\n{Fore.CYAN}[ SELECT OPTION ] >> {Fore.RESET}", end="")
+                choice = input().strip()
+                
+                if choice == '1':
+                    self._select_modules_interactive()
+                    console.input("\n[dim]Press Enter to continue...[/dim]")
+                elif choice == '2':
+                    self._view_selected_modules()
+                    console.input("\n[dim]Press Enter to continue...[/dim]")
+                elif choice == '3':
+                    if not self.selected_modules:
+                        console.print("[red]No modules selected! Please select modules first (option 1)[/red]")
+                        console.input("\n[dim]Press Enter to continue...[/dim]")
+                    else:
+                        self._execute_hardening_realtime()
+                        console.input("\n[dim]Press Enter to continue...[/dim]")
+                elif choice == '4':
+                    self._view_results()
+                    console.input("\n[dim]Press Enter to continue...[/dim]")
+                elif choice == '5':
+                    self._generate_report()
+                    console.input("\n[dim]Press Enter to continue...[/dim]")
+                elif choice == '6':
+                    self._rollback_interactive()
+                    console.input("\n[dim]Press Enter to continue...[/dim]")
+                elif choice == '7':
+                    self.list_modules_cinematic()
+                    console.input("\n[dim]Press Enter to continue...[/dim]")
+                elif choice == '8':
+                    self.show_status_cinematic()
+                    console.input("\n[dim]Press Enter to continue...[/dim]")
+                elif choice == '9':
+                    console.print("\n[bold green]Exiting dashboard...[/bold green]")
+                    break
+                elif choice == '10':
+                    self.display_security_posture()
+                    console.input("\n[dim]Press Enter to continue...[/dim]")
+                elif choice == '11':
+                    self.display_cis_compliance()
+                    console.input("\n[dim]Press Enter to continue...[/dim]")
+                elif choice == '12':
+                    self.display_mitre_coverage()
+                    console.input("\n[dim]Press Enter to continue...[/dim]")
+                elif choice == '13':
+                    self.display_business_value()
+                    console.input("\n[dim]Press Enter to continue...[/dim]")
+                elif choice == '14':
+                    self.display_threat_intelligence()
+                    console.input("\n[dim]Press Enter to continue...[/dim]")
+                elif choice == '15':
+                    self.display_hardening_checklist()
+                    console.input("\n[dim]Press Enter to continue...[/dim]")
+                elif choice == '16':
+                    self.display_priority_matrix()
+                    console.input("\n[dim]Press Enter to continue...[/dim]")
+                else:
+                    console.print("[red]Invalid option! Please enter a number between 1 and 16[/red]")
+                    time.sleep(1.5)
+                    
+            except KeyboardInterrupt:
+                console.print("\n[bold yellow]Exiting dashboard...[/bold yellow]")
+                break
+            except Exception as e:
+                console.print(f"[red]Error: {e}[/red]")
+                console.print("[dim]Press Enter to continue...[/dim]")
+                try:
+                    input()
+                except:
+                    pass
+    
     def stop(self):
-        """Stop all background threads"""
         self.telemetry.stop()
-
-
-# ============================================================
-# MAIN EXECUTION
-# ============================================================
 
 if __name__ == "__main__":
     try:
         dashboard = HardeningDashboard()
-        
         if len(sys.argv) > 1:
             import argparse
             parser = argparse.ArgumentParser(description='Hardening Dashboard')
@@ -2759,7 +2688,6 @@ if __name__ == "__main__":
             parser.add_argument('--status', action='store_true', help='Show status')
             parser.add_argument('--reset', action='store_true', help='Reset all module states')
             args = parser.parse_args()
-            
             if args.reset:
                 state_file = os.path.expanduser("~/DSTerminal_Workspace/.hardening_state.json")
                 if os.path.exists(state_file):
@@ -2783,7 +2711,6 @@ if __name__ == "__main__":
             else:
                 print(f"{Fore.YELLOW}Rich library not available. Install with: pip install rich{Style.RESET_ALL}")
                 dashboard.run()
-                
     except KeyboardInterrupt:
         print(f"\n{Fore.YELLOW}[!] Interrupted by user{Style.RESET_ALL}")
         try:
