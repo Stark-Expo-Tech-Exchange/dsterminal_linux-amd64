@@ -369,6 +369,9 @@ config = load_config()
 # ============================================================
 # CROSS-PLATFORM WHITELIST/BLACKLIST
 # ============================================================
+# ============================================================
+# CROSS-PLATFORM WHITELIST/BLACKLIST
+# ============================================================
 def get_default_whitelist():
     """Get platform-specific default whitelist"""
     if IS_WINDOWS:
@@ -511,14 +514,43 @@ def get_default_whitelist():
             "/usr/share/ca-certificates/*",
         ]
 
+def is_windows_path(path):
+    """Check if a path is a Windows path (contains backslashes or drive letter)"""
+    return '\\' in path or (len(path) >= 2 and path[1] == ':')
+
 def load_whitelist():
+    """Load whitelist with platform detection - Cross-platform fix"""
     if os.path.exists(WHITELIST_FILE):
         try:
             with open(WHITELIST_FILE, 'r') as f:
-                return json.load(f)
+                loaded = json.load(f)
+            
+            # If running on Linux and the loaded whitelist contains Windows paths,
+            # replace with Linux default whitelist
+            if IS_LINUX and loaded and any(is_windows_path(p) for p in loaded):
+                print("[WHITELIST] Detected Windows paths in whitelist on Linux - replacing with Linux paths")
+                linux_whitelist = get_default_whitelist()
+                # Save the new Linux whitelist
+                save_whitelist(linux_whitelist)
+                return linux_whitelist
+            
+            # If running on Windows and the loaded whitelist contains Linux paths,
+            # replace with Windows default whitelist
+            if IS_WINDOWS and loaded and any(p.startswith('/') for p in loaded):
+                print("[WHITELIST] Detected Linux paths in whitelist on Windows - replacing with Windows paths")
+                windows_whitelist = get_default_whitelist()
+                save_whitelist(windows_whitelist)
+                return windows_whitelist
+            
+            return loaded
         except:
             pass
-    return get_default_whitelist()
+    
+    # If file doesn't exist or loading failed, use platform default
+    default_whitelist = get_default_whitelist()
+    # Save the default whitelist for future runs
+    save_whitelist(default_whitelist)
+    return default_whitelist
 
 def save_whitelist(whitelist):
     with open(WHITELIST_FILE, 'w') as f:

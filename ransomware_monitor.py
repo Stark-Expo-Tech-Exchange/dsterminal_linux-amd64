@@ -1819,6 +1819,13 @@ class RansomwareMonitor:
             return None
         
         try:
+            from reportlab.lib.pagesizes import letter
+            from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+            from reportlab.lib import colors as reportlab_colors  # <-- FIXED: use reportlab_colors
+            from reportlab.lib.units import inch
+            from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+            
             doc = SimpleDocTemplate(
                 str(filepath),
                 pagesize=letter,
@@ -1835,7 +1842,7 @@ class RansomwareMonitor:
                 'CustomTitle',
                 parent=styles['Heading1'],
                 fontSize=20,
-                textColor=colors.HexColor('#1a237e'),
+                textColor=reportlab_colors.HexColor('#1a237e'),  # <-- FIXED
                 alignment=TA_CENTER,
                 spaceAfter=20,
                 fontName='Helvetica-Bold'
@@ -1845,7 +1852,7 @@ class RansomwareMonitor:
                 'Header',
                 parent=styles['Heading2'],
                 fontSize=14,
-                textColor=colors.HexColor('#283593'),
+                textColor=reportlab_colors.HexColor('#283593'),  # <-- FIXED
                 spaceAfter=10,
                 fontName='Helvetica-Bold'
             )
@@ -1854,7 +1861,7 @@ class RansomwareMonitor:
                 'Normal',
                 parent=styles['Normal'],
                 fontSize=10,
-                textColor=colors.HexColor('#1a1a1a'),
+                textColor=reportlab_colors.HexColor('#1a1a1a'),  # <-- FIXED
                 spaceAfter=4,
                 fontName='Helvetica'
             )
@@ -1880,15 +1887,15 @@ class RansomwareMonitor:
             
             header_table = Table(header_data, colWidths=[5.5*inch])
             header_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#f0f4ff')),
-                ('TEXTCOLOR', (0, 0), (-1, -1), colors.HexColor('#1a237e')),
+                ('BACKGROUND', (0, 0), (-1, -1), reportlab_colors.HexColor('#f0f4ff')),  # <-- FIXED
+                ('TEXTCOLOR', (0, 0), (-1, -1), reportlab_colors.HexColor('#1a237e')),  # <-- FIXED
                 ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
                 ('FONTSIZE', (0, 0), (-1, -1), 10),
                 ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
                 ('TOPPADDING', (0, 0), (-1, -1), 6),
                 ('LEFTPADDING', (0, 0), (-1, -1), 15),
                 ('RIGHTPADDING', (0, 0), (-1, -1), 15),
-                ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#1a237e')),
+                ('BOX', (0, 0), (-1, -1), 1, reportlab_colors.HexColor('#1a237e')),  # <-- FIXED
                 ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ]))
             
@@ -1911,14 +1918,14 @@ class RansomwareMonitor:
             
             stats_table = Table(stats_data, colWidths=[2.5*inch, 3*inch])
             stats_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1a237e')),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('BACKGROUND', (0, 0), (-1, 0), reportlab_colors.HexColor('#1a237e')),  # <-- FIXED
+                ('TEXTCOLOR', (0, 0), (-1, 0), reportlab_colors.whitesmoke),  # <-- FIXED
                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
                 ('FONTSIZE', (0, 0), (-1, 0), 11),
                 ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                ('BACKGROUND', (0, 1), (-1, -1), reportlab_colors.white),  # <-- FIXED
+                ('GRID', (0, 0), (-1, -1), 0.5, reportlab_colors.grey),  # <-- FIXED
                 ('FONTSIZE', (0, 1), (-1, -1), 9),
                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                 ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
@@ -1942,14 +1949,14 @@ class RansomwareMonitor:
             
             backup_table = Table(backup_data, colWidths=[2.5*inch, 3*inch])
             backup_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2e7d32')),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('BACKGROUND', (0, 0), (-1, 0), reportlab_colors.HexColor('#2e7d32')),  # <-- FIXED
+                ('TEXTCOLOR', (0, 0), (-1, 0), reportlab_colors.whitesmoke),  # <-- FIXED
                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
                 ('FONTSIZE', (0, 0), (-1, 0), 11),
                 ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                ('BACKGROUND', (0, 1), (-1, -1), reportlab_colors.white),  # <-- FIXED
+                ('GRID', (0, 0), (-1, -1), 0.5, reportlab_colors.grey),  # <-- FIXED
                 ('FONTSIZE', (0, 1), (-1, -1), 9),
                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                 ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
@@ -1971,14 +1978,14 @@ class RansomwareMonitor:
                 
                 events_table = Table(events_data, colWidths=[1.5*inch, 1.5*inch, 2.5*inch])
                 events_table.setStyle(TableStyle([
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#d32f2f')),
-                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                    ('BACKGROUND', (0, 0), (-1, 0), reportlab_colors.HexColor('#d32f2f')),  # <-- FIXED
+                    ('TEXTCOLOR', (0, 0), (-1, 0), reportlab_colors.whitesmoke),  # <-- FIXED
                     ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                     ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
                     ('FONTSIZE', (0, 0), (-1, 0), 10),
                     ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
-                    ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-                    ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                    ('BACKGROUND', (0, 1), (-1, -1), reportlab_colors.white),  # <-- FIXED
+                    ('GRID', (0, 0), (-1, -1), 0.5, reportlab_colors.grey),  # <-- FIXED
                     ('FONTSIZE', (0, 1), (-1, -1), 8),
                     ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                     ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
@@ -1990,7 +1997,7 @@ class RansomwareMonitor:
                 'Footer',
                 parent=styles['Normal'],
                 fontSize=8,
-                textColor=colors.HexColor('#666666'),
+                textColor=reportlab_colors.HexColor('#666666'),  # <-- FIXED
                 alignment=TA_CENTER,
                 spaceBefore=20
             )
@@ -2008,6 +2015,8 @@ class RansomwareMonitor:
         except Exception as e:
             self._log_message(f"Failed to export PDF: {str(e)}", "ERROR")
             print(f"{Fore.RED}[!] PDF export failed: {str(e)}{Style.RESET_ALL}")
+            import traceback
+            traceback.print_exc()
             return None
 
     def _export_html(self, filepath: Path) -> Optional[str]:
