@@ -53,211 +53,123 @@ if sys.platform == "win32":
         pass
 
 # ============================================================
-# ANSI COLOR DEFINITIONS (ALWAYS AVAILABLE)
+# TERMINAL COLOR / ANSI HANDLING
 # ============================================================
-class Colors:
-    """ANSI color codes for terminal output"""
-    BLACK = '\033[30m'
-    RED = '\033[31m'
-    GREEN = '\033[32m'
-    YELLOW = '\033[33m'
-    BLUE = '\033[34m'
-    MAGENTA = '\033[35m'
-    CYAN = '\033[36m'
-    WHITE = '\033[37m'
-    RESET = '\033[0m'
-    BRIGHT_BLACK = '\033[90m'
-    BRIGHT_RED = '\033[91m'
-    BRIGHT_GREEN = '\033[92m'
-    BRIGHT_YELLOW = '\033[93m'
-    BRIGHT_BLUE = '\033[94m'
-    BRIGHT_MAGENTA = '\033[95m'
-    BRIGHT_CYAN = '\033[96m'
-    BRIGHT_WHITE = '\033[97m'
-    DIM = '\033[90m'
-    BOLD = '\033[1m'
-    ITALIC = '\033[3m'
-    UNDERLINE = '\033[4m'
-    BLINK = '\033[5m'
-    REVERSE = '\033[7m'
-    HIDDEN = '\033[8m'
-    RESET_ALL = '\033[0m'
-    
-    @staticmethod
-    def strip(text):
-        ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
-        return ansi_escape.sub('', text)
-
-# Force ANSI color codes to work
-os.environ['TERM'] = 'xterm-256color'
-os.environ['CLICOLOR'] = '1'
-os.environ['CLICOLOR_FORCE'] = '1'
-os.environ['FORCE_COLOR'] = '1'
-os.environ['PY_COLORS'] = '1'
-os.environ['PAGER'] = 'cat'
-
-# Ensure escape sequences are not stripped
-import sys
-if hasattr(sys.stdout, 'reconfigure'):
-    sys.stdout.reconfigure(encoding='utf-8')
-
-# ============================================================
-# TRY TO IMPORT COLORAMA WITH PROPER ERROR HANDLING
-# ============================================================
+# Colorama is the single source of truth for legacy terminal output.
 try:
     from colorama import init, Fore, Back, Style
     import colorama
-    
-    if platform.system() == 'Windows':
-        init(autoreset=True, convert=True, strip=False)
+
+    if sys.platform == "win32":
+        init(autoreset=False, convert=True, strip=None, wrap=True)
     else:
-        init(autoreset=True, convert=False, strip=False)
-    
-    os.environ['PYTHONIOENCODING'] = 'utf-8'
-    os.environ['PYTHONUTF8'] = '1'
+        init(autoreset=False, convert=False, strip=False, wrap=True)
     COLORS_AVAILABLE = True
-    
-except ImportError:
+except Exception:
     COLORS_AVAILABLE = False
-    class Fore:
-        BLACK = '\033[30m'; RED = '\033[31m'; GREEN = '\033[32m'
-        YELLOW = '\033[33m'; BLUE = '\033[34m'; MAGENTA = '\033[35m'
-        CYAN = '\033[36m'; WHITE = '\033[37m'; RESET = '\033[0m'
-        LIGHTBLACK_EX = '\033[90m'; LIGHTRED_EX = '\033[91m'
-        LIGHTGREEN_EX = '\033[92m'; LIGHTYELLOW_EX = '\033[93m'
-        LIGHTBLUE_EX = '\033[94m'; LIGHTMAGENTA_EX = '\033[95m'
-        LIGHTCYAN_EX = '\033[96m'; LIGHTWHITE_EX = '\033[97m'
-        BRIGHT_BLACK = '\033[90m'; BRIGHT_RED = '\033[91m'
-        BRIGHT_GREEN = '\033[92m'; BRIGHT_YELLOW = '\033[93m'
-        BRIGHT_BLUE = '\033[94m'; BRIGHT_MAGENTA = '\033[95m'
-        BRIGHT_CYAN = '\033[96m'; BRIGHT_WHITE = '\033[97m'
-        DIM = '\033[2m'; BOLD = '\033[1m'; ITALIC = '\033[3m'
-        UNDERLINE = '\033[4m'; BLINK = '\033[5m'; REVERSE = '\033[7m'
-        HIDDEN = '\033[8m'; RESET_ALL = '\033[0m'
-    
-    class Style:
-        RESET_ALL = '\033[0m'; BRIGHT = '\033[1m'; DIM = '\033[2m'
-        ITALIC = '\033[3m'; UNDERLINE = '\033[4m'; BLINK = '\033[5m'
-        REVERSE = '\033[7m'; HIDDEN = '\033[8m'; NORMAL = '\033[22m'
-    
-    class Back:
-        RESET = '\033[49m'; BLACK = '\033[40m'; RED = '\033[41m'
-        GREEN = '\033[42m'; YELLOW = '\033[43m'; BLUE = '\033[44m'
-        MAGENTA = '\033[45m'; CYAN = '\033[46m'; WHITE = '\033[47m'
-        LIGHTBLACK_EX = '\033[100m'; LIGHTRED_EX = '\033[101m'
-        LIGHTGREEN_EX = '\033[102m'; LIGHTYELLOW_EX = '\033[103m'
-        LIGHTBLUE_EX = '\033[104m'; LIGHTMAGENTA_EX = '\033[105m'
-        LIGHTCYAN_EX = '\033[106m'; LIGHTWHITE_EX = '\033[107m'
 
-except Exception as e:
-    COLORS_AVAILABLE = False
-    class Fore:
-        BLACK = '\033[30m'; RED = '\033[31m'; GREEN = '\033[32m'
-        YELLOW = '\033[33m'; BLUE = '\033[34m'; MAGENTA = '\033[35m'
-        CYAN = '\033[36m'; WHITE = '\033[37m'; RESET = '\033[0m'
-        LIGHTBLACK_EX = '\033[90m'; LIGHTRED_EX = '\033[91m'
-        LIGHTGREEN_EX = '\033[92m'; LIGHTYELLOW_EX = '\033[93m'
-        LIGHTBLUE_EX = '\033[94m'; LIGHTMAGENTA_EX = '\033[95m'
-        LIGHTCYAN_EX = '\033[96m'; LIGHTWHITE_EX = '\033[97m'
-        BRIGHT_BLACK = '\033[90m'; BRIGHT_RED = '\033[91m'
-        BRIGHT_GREEN = '\033[92m'; BRIGHT_YELLOW = '\033[93m'
-        BRIGHT_BLUE = '\033[94m'; BRIGHT_MAGENTA = '\033[95m'
-        BRIGHT_CYAN = '\033[96m'; BRIGHT_WHITE = '\033[97m'
-        DIM = '\033[2m'; BOLD = '\033[1m'; ITALIC = '\033[3m'
-        UNDERLINE = '\033[4m'; BLINK = '\033[5m'; REVERSE = '\033[7m'
-        HIDDEN = '\033[8m'; RESET_ALL = '\033[0m'
-    
-    class Style:
-        RESET_ALL = '\033[0m'; BRIGHT = '\033[1m'; DIM = '\033[2m'
-        ITALIC = '\033[3m'; UNDERLINE = '\033[4m'; BLINK = '\033[5m'
-        REVERSE = '\033[7m'; HIDDEN = '\033[8m'; NORMAL = '\033[22m'
-    
-    class Back:
-        RESET = '\033[49m'; BLACK = '\033[40m'; RED = '\033[41m'
-        GREEN = '\033[42m'; YELLOW = '\033[43m'; BLUE = '\033[44m'
-        MAGENTA = '\033[45m'; CYAN = '\033[46m'; WHITE = '\033[47m'
-        LIGHTBLACK_EX = '\033[100m'; LIGHTRED_EX = '\033[101m'
-        LIGHTGREEN_EX = '\033[102m'; LIGHTYELLOW_EX = '\033[103m'
-        LIGHTBLUE_EX = '\033[104m'; LIGHTMAGENTA_EX = '\033[105m'
-        LIGHTCYAN_EX = '\033[106m'; LIGHTWHITE_EX = '\033[107m'
+    # NO-ANSI fallback
+    class _NoColor:
+        BLACK = RED = GREEN = YELLOW = BLUE = MAGENTA = CYAN = WHITE = ""
+        RESET = RESET_ALL = ""
+        LIGHTBLACK_EX = LIGHTRED_EX = LIGHTGREEN_EX = LIGHTYELLOW_EX = ""
+        LIGHTBLUE_EX = LIGHTMAGENTA_EX = LIGHTCYAN_EX = LIGHTWHITE_EX = ""
+        BRIGHT_BLACK = BRIGHT_RED = BRIGHT_GREEN = BRIGHT_YELLOW = ""
+        BRIGHT_BLUE = BRIGHT_MAGENTA = BRIGHT_CYAN = BRIGHT_WHITE = ""
+        BRIGHT = DIM = ITALIC = UNDERLINE = BLINK = REVERSE = HIDDEN = ""
+        NORMAL = ""
 
-def fix_console_encoding():
-    if platform.system() == 'Windows':
-        try:
-            import ctypes
-            kernel32 = ctypes.windll.kernel32
-            kernel32.SetConsoleCP(65001)
-            kernel32.SetConsoleOutputCP(65001)
-            handle = kernel32.GetStdHandle(-11)
-            mode = ctypes.c_ulong()
-            if kernel32.GetConsoleMode(handle, ctypes.byref(mode)):
-                ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
-                if not (mode.value & ENABLE_VIRTUAL_TERMINAL_PROCESSING):
-                    kernel32.SetConsoleMode(handle, mode.value | ENABLE_VIRTUAL_TERMINAL_PROCESSING)
-        except:
-            pass
+    Fore = _NoColor()
+    Style = _NoColor()
+    Back = _NoColor()
 
-fix_console_encoding()
+# ANSI regex for stripping
+_ANSI_RE = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+
+# ============================================================
+# GET CORRECT USER HOME DIRECTORY (even when running with sudo)
+# ============================================================
+
+def get_user_home():
+    """Get the correct user home directory even when running with sudo"""
+    # Check if running with sudo
+    if os.getenv('SUDO_USER'):
+        import pwd
+        return pwd.getpwnam(os.getenv('SUDO_USER')).pw_dir
+    else:
+        return os.path.expanduser("~")
+
+USER_HOME = get_user_home()
+
+def strip_ansi(text: Any) -> str:
+    """Return text without ANSI/VT escape sequences."""
+    if text is None:
+        return ""
+    return _ANSI_RE.sub("", str(text))
+
+def fix_color_string(text: Any) -> str:
+    """Normalize a terminal colour value without ever exposing raw ANSI codes."""
+    if text is None:
+        return ""
+
+    value = str(text)
+
+    # If Colorama is available, use it directly
+    if COLORS_AVAILABLE:
+        return value
+
+    # If Colorama is unavailable, strip all ANSI codes
+    return strip_ansi(value)
+
+class Colors:
+    """Backward-compatible colour facade for older DSTerminal code."""
+    BLACK = getattr(Fore, "BLACK", "")
+    RED = getattr(Fore, "RED", "")
+    GREEN = getattr(Fore, "GREEN", "")
+    YELLOW = getattr(Fore, "YELLOW", "")
+    BLUE = getattr(Fore, "BLUE", "")
+    MAGENTA = getattr(Fore, "MAGENTA", "")
+    CYAN = getattr(Fore, "CYAN", "")
+    WHITE = getattr(Fore, "WHITE", "")
+    RESET = getattr(Fore, "RESET", getattr(Style, "RESET_ALL", ""))
+    BRIGHT_BLACK = getattr(Fore, "LIGHTBLACK_EX", "")
+    BRIGHT_RED = getattr(Fore, "LIGHTRED_EX", "")
+    BRIGHT_GREEN = getattr(Fore, "LIGHTGREEN_EX", "")
+    BRIGHT_YELLOW = getattr(Fore, "LIGHTYELLOW_EX", "")
+    BRIGHT_BLUE = getattr(Fore, "LIGHTBLUE_EX", "")
+    BRIGHT_MAGENTA = getattr(Fore, "LIGHTMAGENTA_EX", "")
+    BRIGHT_CYAN = getattr(Fore, "LIGHTCYAN_EX", "")
+    BRIGHT_WHITE = getattr(Fore, "LIGHTWHITE_EX", "")
+    DIM = getattr(Style, "DIM", "")
+    BOLD = getattr(Style, "BRIGHT", "")
+    ITALIC = getattr(Style, "ITALIC", "")
+    UNDERLINE = getattr(Style, "UNDERLINE", "")
+    BLINK = getattr(Style, "BLINK", "")
+    REVERSE = getattr(Style, "REVERSE", "")
+    HIDDEN = getattr(Style, "HIDDEN", "")
+    RESET_ALL = getattr(Style, "RESET_ALL", "")
+
+    @staticmethod
+    def strip(text: Any) -> str:
+        return strip_ansi(text)
+
+def safe_color(attr_name, default=""):
+    return getattr(Fore, attr_name, default)
+
+def safe_style(attr_name, default=""):
+    return getattr(Style, attr_name, default)
 
 
-def fix_color_string(text):
-    """Ensure ANSI escape characters are properly formatted"""
-    if not isinstance(text, str):
-        return text
-    
-    # First, ensure we have a clean string
-    import re
-    
-    # Fix missing escape characters - this is the key fix
-    # Pattern: [XXm (with no \033 prefix) should become \033[XXm
-    text = re.sub(r'(?<!\x1b)(?<!\033)\[([0-9;]+)m', r'\033[\1m', text)
-    
-    # Fix escaped backslashes
-    text = text.replace('\\033[', '\033[').replace('\\x1b[', '\033[').replace('\\x1B[', '\033[')
-    
-    # Fix any other common broken patterns
-    replacements = {
-        '\x1b': '\033',
-        '\x1B': '\033',
-        '[39m': '\033[39m',
-        '[90m': '\033[90m',
-        '[92m': '\033[92m',
-        '[93m': '\033[93m',
-        '[96m': '\033[96m',
-        '[97m': '\033[97m',
-        '[91m': '\033[91m',
-        '[32m': '\033[32m',
-        '[31m': '\033[31m',
-        '[33m': '\033[33m',
-        '[34m': '\033[34m',
-        '[35m': '\033[35m',
-        '[36m': '\033[36m',
-        '[37m': '\033[37m',
-        '[2m': '\033[2m',
-        '[1m': '\033[1m',
-        '[0m': '\033[0m',
-        '[5m': '\033[5m',
-        '[7m': '\033[7m',
-        '[4m': '\033[4m',
-        '[3m': '\033[3m',
-    }
-    
-    for old, new in replacements.items():
-        text = text.replace(old, new)
-    
-    return text
-
-def safe_color(attr_name, default=''):
+# UTF-8 is required for the dashboard's box-drawing characters.
+# Do not force ANSI-related environment variables.
+if sys.platform == "win32":
     try:
-        return getattr(Fore, attr_name, default)
-    except:
-        return default
-
-def safe_style(attr_name, default=''):
-    try:
-        return getattr(Style, attr_name, default)
-    except:
-        return default
+        if hasattr(sys.stdout, "reconfigure"):
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        if hasattr(sys.stderr, "reconfigure"):
+            sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
 
 try:
     from rich.console import Console
@@ -284,8 +196,8 @@ except ImportError:
 # ============================================================
 
 class HardeningState:
-    STATE_FILE = os.path.expanduser("~/DSTerminal_Workspace/.hardening_state.json")
-    
+    STATE_FILE = os.path.join(USER_HOME, "DSTerminal_Workspace/.hardening_state.json")
+
     def __init__(self):
         self.state = self._load_state()
         self._ensure_state_file()
@@ -352,6 +264,11 @@ class HardeningState:
     def get_all_applied_modules(self) -> List[str]:
         return list(self.state.get("modules", {}).keys())
 
+    def clear_module_state(self, module_id: str):
+        """Clear the state of a specific module (for rollback)"""
+        if module_id in self.state.get("modules", {}):
+            del self.state["modules"][module_id]
+            self._save_state()
 
 class DownloadManager:
     DOWNLOAD_DIR = os.path.expanduser("~/DSTerminal_Workspace/downloads")
@@ -487,7 +404,10 @@ class HardeningStateManager:
     def clear_module_state(self, module_id: str):
         """Clear the state of a specific module (for rollback)"""
         self.state.clear_module_state(module_id)
-
+    # ============================================================
+    def get_all_applied_modules(self) -> List[str]:
+        """Get list of all applied module IDs"""
+        return self.state.get_all_applied_modules()
 
 class HardeningCategory(Enum):
     USER_SECURITY = "User Account Security"
@@ -619,9 +539,9 @@ class HardeningDashboard:
                 return os.geteuid() == 0
         except:
             return False
-    
+        
     def _setup_logging(self):
-        log_dir = os.path.expanduser("~/DSTerminal_Workspace/logs")
+        log_dir = os.path.join(USER_HOME, "DSTerminal_Workspace/logs")
         os.makedirs(log_dir, exist_ok=True)
         logging.basicConfig(
             level=logging.INFO,
@@ -1028,16 +948,20 @@ class HardeningDashboard:
                                 animated: bool = False,
                                 animation_duration: float = 1.0):
         """Draw a centered neon glowing hacker-styled box with optional animation."""
-        # ============================================================
-        # FIX: Apply ANSI color fixing to ALL input
-        # ============================================================
-        # Fix color strings
-        title_color = fix_color_string(str(title_color)) if title_color else Fore.LIGHTCYAN_EX
-        border_color = fix_color_string(str(border_color)) if border_color else Fore.LIGHTCYAN_EX
-        content_color = fix_color_string(str(content_color)) if content_color else Fore.LIGHTGREEN_EX
+        # Fix color strings - ensure they're defined
+        if title_color is None or title_color == "":
+            title_color = Fore.LIGHTCYAN_EX if COLORS_AVAILABLE else ""
+        if border_color is None or border_color == "":
+            border_color = Fore.LIGHTCYAN_EX if COLORS_AVAILABLE else ""
+        if content_color is None or content_color == "":
+            content_color = Fore.LIGHTGREEN_EX if COLORS_AVAILABLE else ""
+        
+        title_color_str = fix_color_string(str(title_color))
+        border_color_str = fix_color_string(str(border_color))
+        content_color_str = fix_color_string(str(content_color))
         
         # Fix content lines
-        content_lines = [fix_color_string(line) for line in content_lines]
+        content_lines = [fix_color_string(str(line)) for line in content_lines]
         
         try:
             term = shutil.get_terminal_size()
@@ -1057,37 +981,30 @@ class HardeningDashboard:
             if not line.strip():
                 wrapped_lines.append("")
                 continue
-            # Check if line has ANSI codes
             if re.search(r'\x1b\[[0-9;]*m', line) or re.search(r'\033\[[0-9;]*m', line):
                 wrapped_lines.append(line)
             else:
                 wrapped_lines.extend(textwrap.wrap(line, inner_width, break_long_words=False))
         
-        # Fix all wrapped lines again (safety)
-        wrapped_lines = [fix_color_string(line) for line in wrapped_lines]
+        # Fix all wrapped lines again
+        wrapped_lines = [fix_color_string(str(line)) for line in wrapped_lines]
         
         # Box drawing characters
-        TOP_LEFT = "╔"
-        TOP_RIGHT = "╗"
-        BOTTOM_LEFT = "╚"
-        BOTTOM_RIGHT = "╝"
-        HORIZONTAL = "═"
-        VERTICAL = "║"
-        T_LEFT = "╠"
-        T_RIGHT = "╣"
+        TOP_LEFT = "╔"; TOP_RIGHT = "╗"; BOTTOM_LEFT = "╚"; BOTTOM_RIGHT = "╝"
+        HORIZONTAL = "═"; VERTICAL = "║"; T_LEFT = "╠"; T_RIGHT = "╣"
         
-        # ANSI escape codes
-        BOLD = '\033[1m'
-        BLINK_ON = '\033[5m'
-        BLINK_OFF = '\033[25m'
-        RESET = '\033[0m'
+        # Use Style attributes with fallbacks
+        BOLD = getattr(Style, "BRIGHT", "\033[1m")
+        BLINK_ON = getattr(Style, "BLINK", "\033[5m")
+        BLINK_OFF = getattr(Style, "RESET_ALL", "\033[25m")
+        RESET = getattr(Style, "RESET_ALL", "\033[0m")
         
         glow_prefix = BOLD if glow_border else ""
         title_prefix = BOLD
         if blink_title:
             title_prefix += BLINK_ON
         
-        # Build box with proper ANSI codes
+        # Build box
         top = f"{' ' * left_margin}{glow_prefix}{border_color_str}{TOP_LEFT}{HORIZONTAL * (width - 2)}{TOP_RIGHT}{RESET}"
         title_text = f" {title} ".center(width - 2)
         title_line = f"{' ' * left_margin}{title_prefix}{title_color_str}{VERTICAL}{title_text}{VERTICAL}{RESET}"
@@ -1097,10 +1014,10 @@ class HardeningDashboard:
         bot = f"{' ' * left_margin}{glow_prefix}{border_color_str}{BOTTOM_LEFT}{HORIZONTAL * (width - 2)}{BOTTOM_RIGHT}{RESET}"
         
         # Fix all box parts
-        top = fix_color_string(top)
-        title_line = fix_color_string(title_line)
-        mid = fix_color_string(mid)
-        bot = fix_color_string(bot)
+        top = fix_color_string(str(top))
+        title_line = fix_color_string(str(title_line))
+        mid = fix_color_string(str(mid))
+        bot = fix_color_string(str(bot))
         
         if animated:
             print(top)
@@ -1112,7 +1029,7 @@ class HardeningDashboard:
             time.sleep(0.1)
             
             for line in wrapped_lines:
-                line = fix_color_string(line)
+                line = fix_color_string(str(line))
                 has_color = re.search(r'\x1b\[[0-9;]*m', line) or re.search(r'\033\[[0-9;]*m', line)
                 if has_color:
                     clean_line = re.sub(r'\x1b\[[0-9;]*m', '', line)
@@ -1123,8 +1040,8 @@ class HardeningDashboard:
                     
                     left_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL} {RESET}"
                     right_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL}{RESET}"
-                    left_border = fix_color_string(left_border)
-                    right_border = fix_color_string(right_border)
+                    left_border = fix_color_string(str(left_border))
+                    right_border = fix_color_string(str(right_border))
                     
                     sys.stdout.write(left_border)
                     for char in line:
@@ -1137,8 +1054,8 @@ class HardeningDashboard:
                     padded_line = line.ljust(inner_width)
                     left_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL} {RESET}"
                     right_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL}{RESET}"
-                    left_border = fix_color_string(left_border)
-                    right_border = fix_color_string(right_border)
+                    left_border = fix_color_string(str(left_border))
+                    right_border = fix_color_string(str(right_border))
                     
                     sys.stdout.write(left_border)
                     for char in padded_line:
@@ -1159,7 +1076,7 @@ class HardeningDashboard:
             print(title_line)
             print(mid)
             for line in wrapped_lines:
-                line = fix_color_string(line)
+                line = fix_color_string(str(line))
                 has_color = re.search(r'\x1b\[[0-9;]*m', line) or re.search(r'\033\[[0-9;]*m', line)
                 if has_color:
                     clean_line = re.sub(r'\x1b\[[0-9;]*m', '', line)
@@ -1168,18 +1085,19 @@ class HardeningDashboard:
                     if padding_needed < 0:
                         padding_needed = 0
                     left_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL} {RESET}"
-                    left_border = fix_color_string(left_border)
+                    left_border = fix_color_string(str(left_border))
                     right_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL}{RESET}"
-                    right_border = fix_color_string(right_border)
+                    right_border = fix_color_string(str(right_border))
                     print(f"{left_border}{line}{' ' * padding_needed} {right_border}")
                 else:
                     left_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL} {RESET}"
-                    left_border = fix_color_string(left_border)
+                    left_border = fix_color_string(str(left_border))
                     right_border = f"{' ' * left_margin}{glow_prefix}{border_color_str}{VERTICAL}{RESET}"
-                    right_border = fix_color_string(right_border)
+                    right_border = fix_color_string(str(right_border))
                     print(f"{left_border}{content_color_str}{line.ljust(inner_width)}{RESET} {right_border}")
             print(bot)
             print()
+
 
     def _get_severity_text(self, severity):
         if severity == HardeningSeverity.CRITICAL:
@@ -1876,12 +1794,14 @@ class HardeningDashboard:
         self._display_completion_summary_animated()
     
     def _display_completion_summary_animated(self):
-        RESET = '\033[0m'
-        GREEN = '\033[92m'
-        RED = '\033[91m'
-        YELLOW = '\033[93m'
-        CYAN = '\033[96m'
-        DIM = '\033[2m'
+        """Display completion summary with animated neon box"""
+        # Use Colorama attributes with fallbacks
+        RESET = getattr(Style, "RESET_ALL", "\033[0m")
+        GREEN = getattr(Fore, "LIGHTGREEN_EX", "\033[92m")
+        RED = getattr(Fore, "LIGHTRED_EX", "\033[91m")
+        YELLOW = getattr(Fore, "LIGHTYELLOW_EX", "\033[93m")
+        CYAN = getattr(Fore, "LIGHTCYAN_EX", "\033[96m")
+        DIM = getattr(Style, "DIM", "\033[2m")
         
         successful = sum(1 for r in self.results if r.success)
         already_applied = sum(1 for r in self.results if r.was_already_applied)
@@ -1897,7 +1817,7 @@ class HardeningDashboard:
             status_emoji = "🟡"
             status_text = "GOOD"
         elif rate >= 50:
-            status_color = "\033[91m"
+            status_color = RED
             status_emoji = "🟠"
             status_text = "FAIR"
         else:
@@ -1926,12 +1846,12 @@ class HardeningDashboard:
             summary_lines,
             title_color=status_color,
             border_color=status_color,
-            content_color="\033[37m",
+            content_color=Fore.WHITE if COLORS_AVAILABLE else "",
             blink_title=True,
             glow_border=True,
             animated=True
         )
-    
+        
     # ============================================================
     # MODULE SELECTION METHODS
     # ============================================================
@@ -1988,7 +1908,9 @@ class HardeningDashboard:
             # Execute rollback command
             result = subprocess.run(module.rollback_command, shell=True, capture_output=True, text=True, timeout=30)
             if result.returncode == 0:
-                # Clear state using the state manager
+                # Clear state - use the state manager's method
+                # This calls HardeningStateManager.clear_module_state() which then calls HardeningState.clear_module_state()
+                # But we need to ensure HardeningState has the method
                 self.state_manager.clear_module_state(module_id)
                 module.applied = False
                 module.verified = False
@@ -2000,13 +1922,13 @@ class HardeningDashboard:
             print(f"{Fore.RED}✗ Rollback timed out{Style.RESET_ALL}")
         except Exception as e:
             print(f"{Fore.RED}✗ Rollback failed: {e}{Style.RESET_ALL}")
-
     # ============================================================
     # REPORT GENERATION
     # ============================================================
     
     def _generate_report(self):
-        workspace = os.path.expanduser("~/dsterminal_workspace/reports")
+        """Generate hardening report"""
+        workspace = os.path.join(USER_HOME, "dsterminal_workspace/reports")
         os.makedirs(workspace, exist_ok=True)
         
         total = len(self.results)
@@ -2015,6 +1937,7 @@ class HardeningDashboard:
         failed = total - successful
         success_rate = (successful / total * 100) if total > 0 else 0
         
+        # Fix: Use state_manager.get_all_applied_modules() - this should now work
         report = {
             "session_id": self.session_id,
             "timestamp": datetime.now().isoformat(),
@@ -2038,7 +1961,7 @@ class HardeningDashboard:
                 "output": r.output[:500] if r.output else "",
                 "timestamp": r.start_time.isoformat() if r.start_time else ""
             } for r in self.results],
-            "applied_modules": self.state_manager.get_all_applied_modules()
+            "applied_modules": self.state_manager.get_all_applied_modules()  # This now works
         }
         
         json_path = f"{workspace}/hardening_{self.session_id}.json"
@@ -2049,7 +1972,8 @@ class HardeningDashboard:
         html_path = self._generate_html_report(report, workspace)
         if html_path:
             print(f"{Fore.GREEN}✓ HTML Report saved: {html_path}{Style.RESET_ALL}")
-    
+
+
     def _generate_html_report(self, report: Dict, workspace: str) -> Optional[str]:
         try:
             html_content = f"""<!DOCTYPE html>
@@ -2197,6 +2121,7 @@ class HardeningDashboard:
         print(f"{Fore.RED}Failed:{Fore.RESET} {sum(1 for r in self.results if not r.success and not r.was_already_applied)}")
     
     def _view_selected_modules(self):
+        """View selected modules with proper display"""
         if not self.selected_modules:
             print(f"\n{Fore.YELLOW}No modules selected{Fore.RESET}")
             print(f"\n{Fore.CYAN}Use option 1 to select modules{Fore.RESET}")
@@ -2209,6 +2134,11 @@ class HardeningDashboard:
         
         print(f"\n{Fore.GREEN}Selected Modules ({len(selected)}):{Fore.RESET}")
         print(f"{Fore.WHITE}{'─'*50}{Fore.RESET}")
+        
+        # Count applied vs pending
+        applied_count = sum(1 for m in selected if m.applied)
+        pending_count = len(selected) - applied_count
+        
         for i, m in enumerate(selected, 1):
             if m.applied:
                 status = f"{Fore.GREEN}✓ APPLIED{Fore.RESET}"
@@ -2216,7 +2146,10 @@ class HardeningDashboard:
                 status = f"{Fore.YELLOW}○ PENDING{Fore.RESET}"
             severity_color = Fore.RED if m.severity == HardeningSeverity.CRITICAL else Fore.YELLOW
             print(f"  {i:2d}. {m.name:40s} [{severity_color}{m.severity.value}{Fore.RESET}] {status}")
-    
+        
+        print(f"\n{Fore.DIM}Summary: {Fore.GREEN}{applied_count} applied{Fore.RESET}, {Fore.YELLOW}{pending_count} pending{Fore.RESET}")
+
+
     def _view_results(self):
         if not self.results:
             print(f"\n{Fore.YELLOW}No results available{Fore.RESET}")
@@ -2247,6 +2180,7 @@ class HardeningDashboard:
                 print(f"      Output: {Style.DIM}{output_preview}{Fore.RESET}")
     
     def _select_modules_interactive(self):
+        """Interactive module selection with hacker-themed glowing box display"""
         self._clear_screen()
         try:
             term = shutil.get_terminal_size()
@@ -2353,9 +2287,14 @@ class HardeningDashboard:
         choice = sys.stdin.readline().strip().lower()
         
         if choice == 'all':
-            self.selected_modules = [m.id for m in self.modules if not (m.requires_admin and not self.is_admin_user) and not m.applied]
+            # FIX: Select ALL compatible modules, regardless of applied status
+            self.selected_modules = [m.id for m in self.modules if not (m.requires_admin and not self.is_admin_user)]
             print(f"\n{' ' * left_margin}{Fore.GREEN}✓ Selected all compatible modules ({len(self.selected_modules)}){Fore.RESET}")
-            time.sleep(1)
+            # Show which modules are already applied
+            applied_count = sum(1 for m in self.modules if m.id in self.selected_modules and m.applied)
+            if applied_count > 0:
+                print(f"{' ' * left_margin}{Fore.YELLOW}⚠ {applied_count} module(s) already applied (will be skipped during execution){Fore.RESET}")
+            time.sleep(1.5)
         elif choice == 'clear':
             self.selected_modules = []
             print(f"\n{' ' * left_margin}{Fore.YELLOW}⚡ Cleared all selections{Fore.RESET}")
@@ -2396,7 +2335,7 @@ class HardeningDashboard:
             except Exception as e:
                 print(f"\n{' ' * left_margin}{Fore.RED}✗ Invalid selection: {e}{Fore.RESET}")
             time.sleep(1.5)
-    
+
     def _display_header(self):
         header = f"""
 {Fore.GREEN}{'='*self.terminal_width}
@@ -2790,7 +2729,7 @@ if __name__ == "__main__":
             parser.add_argument('--reset', action='store_true', help='Reset all module states')
             args = parser.parse_args()
             if args.reset:
-                state_file = os.path.expanduser("~/DSTerminal_Workspace/.hardening_state.json")
+                state_file = os.path.join(USER_HOME, "DSTerminal_Workspace/.hardening_state.json")
                 if os.path.exists(state_file):
                     os.remove(state_file)
                     print(f"{Fore.GREEN}Reset all module states{Style.RESET_ALL}")
