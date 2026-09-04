@@ -916,11 +916,38 @@ def run_terminal():
     terminal = SecurityTerminal()
     terminal.run()
 
+def show_version():
+    """Show version information"""
+    import platform
+    print(f"DSTerminal v{VERSION}")
+    print(f"{DESCRIPTION}")
+    print(f"Author: {AUTHOR}")
+    print(f"License: Proprietary - Stark Expo Tech Exchange LTD")
+    print(f"Platform: {platform.system()} {platform.release()}")
+
 def main():
     if len(sys.argv) > 1:
         arg = sys.argv[1].lower()
         if arg in ["--version", "-v", "version"]:
             show_version()
+            return
+        if arg in ["--help", "-h", "help"]:
+            print("DSTerminal - Defensive Security Terminal")
+            print("")
+            print("Usage: dsterminal [options]")
+            print("")
+            print("Options:")
+            print("  --version, -v    Show version information")
+            print("  --help, -h       Show this help message")
+            print("  --quiet, -q      Run in quiet mode")
+            print("  --workspace DIR  Specify workspace directory")
+            print("  --monitor-only   Run in monitor-only mode")
+            print("  --paths PATH     Specify paths to monitor")
+            print("")
+            print("Examples:")
+            print("  dsterminal              Start DSTerminal interactively")
+            print("  dsterminal --quiet      Start in quiet mode")
+            print("  dsterminal --version    Show version")
             return
     run_terminal()
 

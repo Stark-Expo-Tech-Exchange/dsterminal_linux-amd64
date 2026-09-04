@@ -130,7 +130,7 @@ class Colors:
     MAGENTA = '\033[95m' if not IS_WINDOWS else ''
     CYAN = '\033[96m' if not IS_WINDOWS else ''
     WHITE = '\033[97m' if not IS_WINDOWS else ''
-    BLACK = '\033[30m' if not IS_WINDOWS else ''  # <-- ADDED THIS
+    BLACK = '\033[30m' if not IS_WINDOWS else ''
     RESET = '\033[0m' if not IS_WINDOWS else ''
     DIM = '\033[2m' if not IS_WINDOWS else ''
     BRIGHT = '\033[1m' if not IS_WINDOWS else ''
@@ -149,7 +149,7 @@ class ServerColors:
     MAGENTA = Colors.MAGENTA
     CYAN = Colors.CYAN
     WHITE = Colors.WHITE
-    BLACK = Colors.BLACK  # <-- ADDED THIS
+    BLACK = Colors.BLACK
     RESET = Colors.RESET
     DIM = Colors.DIM
     BOLD = Colors.BRIGHT
@@ -369,9 +369,6 @@ config = load_config()
 # ============================================================
 # CROSS-PLATFORM WHITELIST/BLACKLIST
 # ============================================================
-# ============================================================
-# CROSS-PLATFORM WHITELIST/BLACKLIST
-# ============================================================
 def get_default_whitelist():
     """Get platform-specific default whitelist"""
     if IS_WINDOWS:
@@ -393,22 +390,17 @@ def get_default_whitelist():
         ]
     else:  # Linux
         return [
-            # System binaries - NEVER quarantine these
             "/bin/*",
             "/sbin/*",
             "/usr/bin/*",
             "/usr/sbin/*",
             "/usr/local/bin/*",
             "/usr/local/sbin/*",
-            
-            # System libraries
             "/lib/*",
             "/lib64/*",
             "/usr/lib/*",
             "/usr/lib64/*",
             "/usr/local/lib/*",
-            
-            # System configuration - critical
             "/etc/passwd",
             "/etc/shadow",
             "/etc/group",
@@ -423,132 +415,86 @@ def get_default_whitelist():
             "/etc/cron.daily/*",
             "/etc/cron.weekly/*",
             "/etc/cron.monthly/*",
-            
-            # Boot files - NEVER quarantine
             "/boot/*",
             "/vmlinuz*",
             "/initrd*",
             "/System.map*",
             "/grub/*",
-            
-            # Kernel modules
             "/lib/modules/*",
             "/usr/lib/modules/*",
-            
-            # System logs
             "/var/log/*",
             "/var/log/syslog",
             "/var/log/auth.log",
             "/var/log/kern.log",
-            
-            # Package manager files - critical
             "/var/lib/dpkg/*",
             "/var/cache/apt/*",
             "/var/lib/apt/*",
             "/etc/apt/*",
-            
-            # SSH keys and configs - NEVER quarantine
             "/etc/ssh/*",
             "/root/.ssh/*",
             "/home/*/.ssh/*",
-            
-            # System services
             "/etc/systemd/*",
             "/lib/systemd/*",
             "/usr/lib/systemd/*",
-            
-            # Network configs
             "/etc/network/*",
             "/etc/NetworkManager/*",
-            
-            # Security configs
             "/etc/security/*",
             "/etc/pam.d/*",
             "/etc/apparmor/*",
             "/etc/apparmor.d/*",
-            
-            # Common application directories
             "/usr/share/*",
             "/usr/local/share/*",
             "/opt/*",
-            
-            # Python system packages - NEVER quarantine
             "/usr/lib/python*",
             "/usr/local/lib/python*",
             "/usr/lib/python3/*",
             "/usr/lib/python3/dist-packages/*",
-            
-            # User home directories - exclude but be careful
             "/home/*",
-            
-            # Docker and container stuff
             "/var/lib/docker/*",
             "/etc/docker/*",
-            
-            # Common web server paths
             "/var/www/*",
             "/usr/share/nginx/*",
             "/etc/apache2/*",
             "/etc/nginx/*",
-            
-            # Database files
             "/var/lib/mysql/*",
             "/var/lib/postgresql/*",
             "/var/lib/mongodb/*",
-            
-            # System temp (exclude from quarantine)
             "/tmp/*",
             "/var/tmp/*",
             "/var/run/*",
-            
-            # Important system files
             "/etc/hosts.allow",
             "/etc/hosts.deny",
             "/etc/nsswitch.conf",
             "/etc/timezone",
             "/etc/localtime",
-            
-            # Certificates - NEVER quarantine
             "/etc/ssl/*",
             "/usr/local/share/ca-certificates/*",
             "/usr/share/ca-certificates/*",
         ]
 
 def is_windows_path(path):
-    """Check if a path is a Windows path (contains backslashes or drive letter)"""
     return '\\' in path or (len(path) >= 2 and path[1] == ':')
 
 def load_whitelist():
-    """Load whitelist with platform detection - Cross-platform fix"""
     if os.path.exists(WHITELIST_FILE):
         try:
             with open(WHITELIST_FILE, 'r') as f:
                 loaded = json.load(f)
-            
-            # If running on Linux and the loaded whitelist contains Windows paths,
-            # replace with Linux default whitelist
             if IS_LINUX and loaded and any(is_windows_path(p) for p in loaded):
                 print("[WHITELIST] Detected Windows paths in whitelist on Linux - replacing with Linux paths")
                 linux_whitelist = get_default_whitelist()
-                # Save the new Linux whitelist
                 save_whitelist(linux_whitelist)
                 return linux_whitelist
-            
-            # If running on Windows and the loaded whitelist contains Linux paths,
-            # replace with Windows default whitelist
             if IS_WINDOWS and loaded and any(p.startswith('/') for p in loaded):
                 print("[WHITELIST] Detected Linux paths in whitelist on Windows - replacing with Windows paths")
                 windows_whitelist = get_default_whitelist()
                 save_whitelist(windows_whitelist)
                 return windows_whitelist
-            
             return loaded
         except:
             pass
     
-    # If file doesn't exist or loading failed, use platform default
     default_whitelist = get_default_whitelist()
-    # Save the default whitelist for future runs
     save_whitelist(default_whitelist)
     return default_whitelist
 
@@ -571,6 +517,7 @@ def save_blacklist(blacklist):
 
 whitelist = load_whitelist()
 blacklist = load_blacklist()
+
 # ============================================================
 # CROSS-PLATFORM SHIELD CORE
 # ============================================================
@@ -608,6 +555,12 @@ shield = ShieldCore(WORKSPACE_DIR)
 # ============================================================
 # CROSS-PLATFORM FLASK SETUP
 # ============================================================
+# ============================================================
+# CROSS-PLATFORM FLASK SETUP
+# ============================================================
+# ============================================================
+# CROSS-PLATFORM FLASK SETUP
+# ============================================================
 class SilenceFlaskStartup:
     def __enter__(self):
         self._original_stdout = sys.stdout
@@ -625,24 +578,70 @@ logging.getLogger('engineio').setLevel(logging.ERROR)
 app = Flask(__name__, static_folder=STATIC_DIR, static_url_path='/static')
 app.config['SECRET_KEY'] = 'dsterminal-holographic-2026'
 
+# ============================================================
+# SOCKETIO INITIALIZATION - FIXED FOR PYINSTALLER
+# ============================================================
+
 def create_socketio_instance(app):
-    """Create Flask-SocketIO with cross-platform backend"""
-    try:
-        sio = SocketIO(
-            app,
-            cors_allowed_origins="*",
-            async_mode="threading",  # Works on all platforms
-            logger=False,
-            engineio_logger=False,
-        )
-        print(f"[SOCKETIO] Initialized with async_mode: {sio.async_mode}")
-        return sio
-    except Exception as exc:
-        print(f"[FATAL] Flask-SocketIO initialization failed: {exc}")
-        raise
+    """Create Flask-SocketIO with PyInstaller-compatible configuration"""
+    
+    # First, set the environment variable to force threading mode
+    os.environ['FLASK_SOCKETIO_ASYNC_MODE'] = 'threading'
+    
+    # Try different initialization strategies
+    strategies = [
+        lambda: SocketIO(app, async_mode='threading', cors_allowed_origins="*"),
+        lambda: SocketIO(app, cors_allowed_origins="*", logger=False, engineio_logger=False),
+        lambda: SocketIO(app, async_mode='threading', cors_allowed_origins="*", async_handlers=True, logger=False),
+        lambda: SocketIO(app, async_mode='threading', cors_allowed_origins="*", manage_session=False),
+    ]
+    
+    for i, strategy in enumerate(strategies, 1):
+        try:
+            sio = strategy()
+            print(f"[SOCKETIO] ✅ Strategy {i} succeeded with async_mode: {sio.async_mode}")
+            return sio
+        except Exception as e:
+            print(f"[SOCKETIO] Strategy {i} failed: {e}")
+            continue
+    
+    # If all strategies fail, create a mock SocketIO that just works
+    print("[SOCKETIO] ⚠️ All strategies failed, creating mock SocketIO")
+    
+    class MockSocketIO:
+        def __init__(self):
+            self.async_mode = 'mock'
+            self.clients = set()
+            
+        def emit(self, event, data, room=None):
+            # Just log the emit
+            print(f"[MOCK SOCKETIO] emit: {event} -> {data}")
+            return True
+            
+        def on(self, event, handler=None):
+            # Just return the handler or a wrapper
+            if handler is None:
+                def decorator(f):
+                    return f
+                return decorator
+            return handler
+            
+        def run(self, app, **kwargs):
+            # Just run the app
+            app.run(**kwargs)
+            
+        def __getattr__(self, name):
+            # Return a no-op for any other method
+            def noop(*args, **kwargs):
+                return True
+            return noop
+    
+    mock_sio = MockSocketIO()
+    print("[SOCKETIO] Using mock SocketIO - WebSocket features will be disabled")
+    return mock_sio
 
+# Initialize socketio at module level
 socketio = create_socketio_instance(app)
-
 # ============================================================
 # CROSS-PLATFORM DATA STORES
 # ============================================================
@@ -712,10 +711,7 @@ class AdvancedRansomwareDetector:
         self._seen_files = set()
         
     def _get_monitored_directories(self):
-        """Get all directories to monitor - Cross-platform"""
         dirs = []
-        
-        # User directories
         home = os.path.expanduser('~')
         
         if IS_WINDOWS:
@@ -732,7 +728,6 @@ class AdvancedRansomwareDetector:
                 if os.path.exists(path):
                     dirs.append(path)
             
-            # Windows specific
             for drive in ['C:', 'D:', 'E:', 'F:']:
                 path = f"{drive}\\"
                 if os.path.exists(path):
@@ -779,38 +774,31 @@ class AdvancedRansomwareDetector:
             if path and os.path.exists(path):
                 dirs.append(path)
         
-        # Current directory
         if os.path.exists(os.getcwd()):
             dirs.append(os.getcwd())
         
         return list(set(dirs))
     
     def _is_ransomware_file(self, file_path):
-        """Check if a file exhibits ransomware behavior - Cross-platform"""
         try:
-            # Skip honeypot files
             if 'honeypot' in file_path.lower():
                 return False
             
-            # Skip files that are too small or too large
             file_size = os.path.getsize(file_path)
             if file_size < 10 or file_size > 1024 * 1024 * 50:
                 return False
             
-            # Read first 4KB
             with open(file_path, 'rb') as f:
                 content = f.read(4096)
             
             if not content:
                 return False
             
-            # Try to decode as text
             try:
                 text_content = content.decode('utf-8', errors='ignore').upper()
             except:
                 text_content = content.upper().decode('ascii', errors='ignore')
             
-            # Ransomware patterns
             ransomware_patterns = [
                 b'ENCRYPTED', b'DECRYPT', b'RANSOM', b'BITCOIN', b'MONERO',
                 b'WALLET', b'LOCKED', b'ENCRYPTION', b'CRYPTO', b'DECRYPTION',
@@ -825,7 +813,6 @@ class AdvancedRansomwareDetector:
                 if pattern in content_upper:
                     return True
             
-            # Text patterns
             text_patterns = [
                 'ENCRYPTED', 'DECRYPT', 'RANSOM', 'BITCOIN', 'MONERO',
                 'WALLET', 'LOCKED', 'ENCRYPTION', 'CRYPTO', 'DECRYPTION',
@@ -839,7 +826,6 @@ class AdvancedRansomwareDetector:
                 if pattern in text_content:
                     return True
             
-            # Check ransomware extensions
             ransomware_extensions = [
                 '.encrypted', '.enc', '.locked', '.crypt', '.crypto',
                 '.ransom', '.pay', '.bitcoin', '.monero', '.wallet',
@@ -849,7 +835,6 @@ class AdvancedRansomwareDetector:
             if file_ext in ransomware_extensions:
                 return True
             
-            # Check filename for ransomware indicators
             filename = os.path.basename(file_path).lower()
             ransomware_filenames = [
                 'decrypt', 'ransom', 'read_me', 'readme', 'recover',
@@ -860,7 +845,6 @@ class AdvancedRansomwareDetector:
                 if name in filename:
                     return True
             
-            # Check entropy for encrypted data
             text_extensions = ['.txt', '.log', '.csv', '.xml', '.json', '.html', '.css', '.js']
             if file_ext not in text_extensions:
                 entropy = self._calculate_entropy(content)
@@ -873,7 +857,6 @@ class AdvancedRansomwareDetector:
             return False
     
     def _calculate_entropy(self, data):
-        """Calculate entropy of data"""
         if not data:
             return 0
         import math
@@ -889,7 +872,6 @@ class AdvancedRansomwareDetector:
         return entropy
     
     def scan_for_ransomware(self):
-        """Scan all monitored directories - Cross-platform"""
         detected = []
         
         for directory in self.monitored_dirs:
@@ -898,7 +880,6 @@ class AdvancedRansomwareDetector:
                 
             try:
                 for root, dirs, files in os.walk(directory):
-                    # Limit depth
                     depth = root.replace(directory, '').count(os.sep)
                     if depth > 3:
                         continue
@@ -906,22 +887,18 @@ class AdvancedRansomwareDetector:
                     for file in files:
                         file_path = os.path.join(root, file)
                         
-                        # Skip honeypot files
                         if 'honeypot' in file_path.lower():
                             continue
                         
-                        # Check extension
                         ext = os.path.splitext(file)[1].lower()
                         if ext not in monitored_extensions:
                             ransomware_exts = ['.encrypted', '.enc', '.locked', '.crypt', '.crypto', '.ransom']
                             if ext not in ransomware_exts:
                                 continue
                         
-                        # Check whitelist
                         if file_path in whitelist:
                             continue
                         
-                        # Check if file is new or recently modified
                         if file_path not in self._seen_files:
                             self._seen_files.add(file_path)
                             if self._is_ransomware_file(file_path):
@@ -951,7 +928,6 @@ class AdvancedRansomwareDetector:
         return detected
     
     def _get_process_name(self, file_path):
-        """Get process that modified the file - Cross-platform"""
         if PSUTIL_AVAILABLE:
             try:
                 for proc in psutil.process_iter(['pid', 'name']):
@@ -970,11 +946,8 @@ detector = AdvancedRansomwareDetector()
 # CROSS-PLATFORM SYSTEM MONITOR
 # ============================================================
 def start_system_wide_monitor():
-    """Start background thread that continuously monitors ALL directories - Cross-platform"""
-    
     monitored_dirs = detector.monitored_dirs.copy()
     
-    # Add additional critical system paths
     additional_paths = [
         os.path.expanduser('~'),
         os.path.expanduser('~/Desktop'),
@@ -1062,7 +1035,6 @@ def start_system_wide_monitor():
                         is_ransomware = detector._is_ransomware_file(file_path)
                         
                         if is_ransomware:
-                            # Alert
                             print("\n" + "="*70)
                             print("🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴")
                             print("🔴                   RANSOMWARE DETECTED!                 🔴")
@@ -1283,7 +1255,6 @@ class AutoQuarantineEngine:
             self._update_progress(95, 'Quarantine complete!')
             time.sleep(1)
             
-            # Generate incident report
             incident_data = {
                 'threat_level': 'RANSOMWARE_DETECTED',
                 'file_path': file_path,
@@ -1402,13 +1373,11 @@ auto_quarantine = AutoQuarantineEngine()
 # CROSS-PLATFORM RANSOMWARE DETECTION
 # ============================================================
 def detect_ransomware_file():
-    """Enhanced ransomware detection - Cross-platform"""
     global pending_quarantine, ransomware_detected_files, detected_file_paths
     
     if not config.get('monitoring_enabled', True):
         return {'detected': False}
     
-    # Deploy honeypot files
     if config.get('honeypot_enabled', True):
         home = os.path.expanduser('~')
         
@@ -1448,7 +1417,6 @@ def detect_ransomware_file():
                 except:
                     pass
         
-        # Check honeypots
         for file_path in honeypot_paths:
             if 'honeypot' in file_path.lower():
                 continue
@@ -1495,7 +1463,6 @@ def detect_ransomware_file():
                 except:
                     pass
     
-    # Scan for real ransomware
     try:
         detected_files = detector.scan_for_ransomware()
         for file_info in detected_files:
@@ -1565,7 +1532,6 @@ def detect_ransomware_file():
 # CROSS-PLATFORM VULNERABILITY DETECTION
 # ============================================================
 def detect_vulnerabilities():
-    """Detect vulnerabilities - Cross-platform"""
     vulnerabilities = []
     
     if IS_WINDOWS:
@@ -1601,7 +1567,6 @@ def detect_vulnerabilities():
     
     elif IS_LINUX:
         try:
-            # Check for updates
             result = subprocess.run(['apt', 'list', '--upgradable'], 
                                   capture_output=True, text=True, timeout=30)
             upgradable = len([l for l in result.stdout.split('\n') if l and not l.startswith('Listing')])
@@ -1616,7 +1581,6 @@ def detect_vulnerabilities():
             pass
         
         try:
-            # Check firewall
             result = subprocess.run(['sudo', 'ufw', 'status'], 
                                   capture_output=True, text=True, timeout=10)
             if 'inactive' in result.stdout.lower():
@@ -1631,7 +1595,6 @@ def detect_vulnerabilities():
     
     elif IS_MAC:
         try:
-            # Check for software updates
             result = subprocess.run(['softwareupdate', '-l'], 
                                   capture_output=True, text=True, timeout=30)
             if 'No new software available' not in result.stdout:
@@ -1645,7 +1608,6 @@ def detect_vulnerabilities():
             pass
         
         try:
-            # Check firewall
             result = subprocess.run(['sudo', '/usr/libexec/ApplicationFirewall/socketfilterfw', '--getglobalstate'], 
                                   capture_output=True, text=True, timeout=10)
             if 'Disabled' in result.stdout:
@@ -1664,7 +1626,6 @@ def detect_vulnerabilities():
 # CROSS-PLATFORM SYSTEM FUNCTIONS
 # ============================================================
 def get_system_metrics():
-    """Get system metrics - Cross-platform"""
     metrics = {
         'cpu': 0,
         'memory': 0,
@@ -1687,7 +1648,6 @@ def get_system_metrics():
     return metrics
 
 def detect_threat_actors():
-    """Detect threat actors - Cross-platform"""
     threats = []
     suspicious_names = ['malware', 'ransom', 'crypto', 'miner', 'worm', 'trojan', 'backdoor']
     suspicious_processes = []
@@ -1720,12 +1680,10 @@ def detect_threat_actors():
     return threats
 
 def detect_active_mitre_techniques():
-    """Detect MITRE ATT&CK techniques - Cross-platform"""
     active = []
     
     if PSUTIL_AVAILABLE:
         try:
-            # Command & Scripting
             cmd_procs = ['cmd.exe', 'powershell.exe', 'pwsh.exe', 'bash', 'python', 'sh']
             count = sum(1 for p in psutil.process_iter(['name']) 
                        if p.info['name'] and any(c in p.info['name'].lower() for c in cmd_procs))
@@ -1735,7 +1693,6 @@ def detect_active_mitre_techniques():
             pass
         
         try:
-            # Process Injection
             count = sum(1 for p in psutil.process_iter(['name']) 
                        if p.info['name'] and 'inject' in p.info['name'].lower())
             if count > 0:
@@ -1743,7 +1700,6 @@ def detect_active_mitre_techniques():
         except:
             pass
     
-    # If no active techniques detected, show some common ones
     if not active:
         active = [
             {'id': 'T1059', 'count': random.randint(5, 15), 'name': 'Command & Scripting'},
@@ -1756,7 +1712,6 @@ def detect_active_mitre_techniques():
     return active
 
 def get_recommendations(threat_level, file_path=None):
-    """Get recommendations - Cross-platform"""
     if threat_level == 'RANSOMWARE_DETECTED':
         return [
             f'[SUCCESS] Auto-quarantine is enabled and will isolate the infected file',
@@ -1774,7 +1729,6 @@ def get_recommendations(threat_level, file_path=None):
 # CROSS-PLATFORM NETWORK FUNCTIONS
 # ============================================================
 def isolate_system():
-    """Isolate system from network - Cross-platform"""
     global system_isolated
     
     try:
@@ -1825,7 +1779,6 @@ def isolate_system():
         return {'success': False, 'error': str(e)}
 
 def restore_network():
-    """Restore network connectivity - Cross-platform"""
     global system_isolated
     
     try:
@@ -1876,7 +1829,6 @@ def restore_network():
 # CROSS-PLATFORM QUARANTINE FUNCTIONS
 # ============================================================
 def sanitize_path(file_path):
-    """Sanitize file path - Cross-platform"""
     file_path = file_path.strip().strip('"').strip("'")
     file_path = file_path.replace('\t', '\\')
     file_path = file_path.replace('	', '\\')
@@ -1895,7 +1847,6 @@ def sanitize_path(file_path):
     return file_path.strip()
 
 def find_file_anywhere(filename):
-    """Search for a file anywhere in the system - Cross-platform"""
     search_paths = [
         os.getcwd(),
         os.path.expanduser('~'),
@@ -1958,7 +1909,6 @@ def find_file_anywhere(filename):
     return None
 
 def quarantine_file(file_path, threat_type="Ransomware"):
-    """Quarantine a file - Cross-platform"""
     global pending_quarantine, quarantined_files, ransomware_detected_files
     
     file_path = sanitize_path(file_path)
@@ -2027,7 +1977,6 @@ def quarantine_file(file_path, threat_type="Ransomware"):
         return {'success': False, 'error': str(e)}
 
 def restore_from_quarantine(quarantine_path):
-    """Restore a file from quarantine - Cross-platform"""
     global quarantined_files
     
     quarantine_path = sanitize_path(quarantine_path)
@@ -2070,7 +2019,6 @@ def restore_from_quarantine(quarantine_path):
         return {'success': False, 'error': str(e)}
 
 def delete_quarantined(quarantine_path):
-    """Permanently delete a quarantined file - Cross-platform"""
     global quarantined_files
     
     quarantine_path = sanitize_path(quarantine_path)
@@ -2107,7 +2055,6 @@ def delete_quarantined(quarantine_path):
 # CROSS-PLATFORM PROCESS MANAGEMENT
 # ============================================================
 def kill_process(pid):
-    """Kill a process - Cross-platform"""
     try:
         if PSUTIL_AVAILABLE:
             process = psutil.Process(pid)
@@ -2135,7 +2082,6 @@ def kill_process(pid):
 # CROSS-PLATFORM SCAN FUNCTIONS
 # ============================================================
 def full_system_scan():
-    """Run a full system scan - Cross-platform"""
     global scanning_in_progress
     if scanning_in_progress:
         return {'success': False, 'error': 'Scan already in progress'}
@@ -2153,7 +2099,6 @@ def full_system_scan():
 # CROSS-PLATFORM REPORT GENERATOR
 # ============================================================
 def generate_report(incident_data):
-    """Generate incident report - Cross-platform"""
     global report_history
     
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
@@ -2173,7 +2118,6 @@ def generate_report(incident_data):
     with open(json_path, 'w', encoding='utf-8') as f:
         json.dump(json_data, f, indent=2)
     
-    # HTML Report
     html_content = f'''<!DOCTYPE html>
 <html>
 <head><title>DSTerminal Security Report</title>
@@ -2209,8 +2153,6 @@ body {{ font-family: 'Segoe UI', sans-serif; background: #0a0e17; color: #00ff88
     with open(html_path, 'w', encoding='utf-8') as f:
         f.write(html_content)
     
-    # PDF-like text report
-    pdf_path = os.path.join(REPORTS_DIR, f'{report_id}.txt')
     pdf_content = f"""
     ╔═══════════════════════════════════════════════════════════════════════════════╗
     ║              DSTERMINAL CYBER OPS - INCIDENT REPORT                          ║
@@ -2240,6 +2182,7 @@ body {{ font-family: 'Segoe UI', sans-serif; background: #0a0e17; color: #00ff88
     ║              Classified - Confidential                                      ║
     ╚═══════════════════════════════════════════════════════════════════════════════╝
     """
+    pdf_path = os.path.join(REPORTS_DIR, f'{report_id}.txt')
     with open(pdf_path, 'w', encoding='utf-8') as f:
         f.write(pdf_content)
     
@@ -2264,7 +2207,6 @@ body {{ font-family: 'Segoe UI', sans-serif; background: #0a0e17; color: #00ff88
 # CROSS-PLATFORM SERVER STATUS LOGGING
 # ============================================================
 def start_server_status_logging():
-    """Start periodic server status logging"""
     def status_loop():
         while True:
             try:
@@ -2729,7 +2671,6 @@ _realtime_thread = None
 _realtime_stop = threading.Event()
 
 def _realtime_snapshot():
-    """Build one complete dashboard update safely."""
     with app.app_context():
         try:
             status_response = get_status()
@@ -2763,7 +2704,6 @@ def _realtime_snapshot():
         }
 
 def _realtime_broadcast_loop():
-    """Broadcast dashboard telemetry every two seconds."""
     global _realtime_thread
     print("[SOCKETIO] Real-time monitoring loop started")
 
@@ -2797,7 +2737,6 @@ def _realtime_broadcast_loop():
         print("[SOCKETIO] Real-time monitoring loop stopped")
 
 def _ensure_realtime_monitoring():
-    """Start the shared broadcaster once when the first client subscribes."""
     global _realtime_thread
 
     with _realtime_lock:
@@ -2819,13 +2758,17 @@ def handle_connect():
         _realtime_clients.add(sid)
 
     print(f'[SOCKETIO] Client connected: {sid}')
-    emit('connected', {
-        'status': 'connected',
-        'sid': sid,
-        'async_mode': socketio.async_mode,
-        'realtime': True,
-        'platform': SYSTEM
-    })
+    
+    try:
+        emit('connected', {
+            'status': 'connected',
+            'sid': sid,
+            'async_mode': socketio.async_mode,
+            'realtime': True,
+            'platform': SYSTEM
+        })
+    except Exception as e:
+        print(f'[SOCKETIO] Error on connect: {e}')
 
     try:
         snapshot = _realtime_snapshot()
@@ -2833,8 +2776,8 @@ def handle_connect():
         emit('metrics_update', snapshot['metrics'])
         emit('mitre_update', snapshot['mitre'])
         emit('events_update', snapshot['events'])
-    except Exception:
-        pass
+    except Exception as e:
+        print(f'[SOCKETIO] Error sending snapshot: {e}')
 
 @socketio.on('disconnect')
 def handle_disconnect():
@@ -2869,7 +2812,6 @@ _dashboard_thread = None
 _dashboard_port = 5000
 
 def find_available_port(start_port=5000, max_port=5100):
-    """Find an available port - Cross-platform"""
     import socket
     for port in range(start_port, max_port + 1):
         try:
@@ -2885,7 +2827,6 @@ def find_available_port(start_port=5000, max_port=5100):
     return None
 
 def cmd_dashboard(args=None):
-    """Start the dashboard server - Cross-platform"""
     global _dashboard_running, _dashboard_thread, _dashboard_port
     
     if _dashboard_running:
@@ -2931,7 +2872,6 @@ def cmd_dashboard(args=None):
         return f"[!] Failed to start dashboard: {e}"
 
 def cmd_dashboard_stop(args=None):
-    """Stop the dashboard server"""
     global _dashboard_running
     
     if not _dashboard_running:
@@ -2944,7 +2884,6 @@ def cmd_dashboard_stop(args=None):
         return f"[!] Failed to stop dashboard: {e}"
 
 def cmd_dashboard_status(args=None):
-    """Check dashboard status"""
     global _dashboard_running, _dashboard_port
     
     if _dashboard_running:
@@ -2962,7 +2901,6 @@ def cmd_dashboard_status(args=None):
         return "[INFO] Dashboard is NOT running\n📋 Use 'dashboard' to start it"
 
 def cmd_dashboard_browser(args=None):
-    """Open dashboard in browser"""
     global _dashboard_port, _dashboard_running
     
     if not _dashboard_running:
@@ -2976,7 +2914,6 @@ def cmd_dashboard_browser(args=None):
         return f"[!] Failed to open browser: {e}"
 
 def cmd_dashboard_help(args=None):
-    """Show dashboard help"""
     return f"""
 ╔══════════════════════════════════════════════════════════════╗
 ║                    DASHBOARD COMMANDS                       ║
@@ -3021,7 +2958,6 @@ def cmd_dashboard_help(args=None):
 # DASHBOARD INTEGRATION CLASS
 # ============================================================
 class DashboardIntegration:
-    """Dashboard integration class for backward compatibility"""
     def __init__(self):
         self.running = False
         self.thread = None
@@ -3045,7 +2981,6 @@ class DashboardIntegration:
 dashboard_integration = DashboardIntegration()
 
 def register_dashboard_commands(terminal_instance):
-    """Register dashboard commands with terminal instance"""
     try:
         terminal_instance.register_command('dashboard', cmd_dashboard)
         terminal_instance.register_command('dash', cmd_dashboard)
@@ -3335,7 +3270,6 @@ HTML_TEMPLATE = """
 </div>
 
 <script>
-    // Platform detection
     const platform = navigator.platform || 'Unknown';
     document.getElementById('platformDisplay').textContent = platform;
     document.getElementById('platformFooter').textContent = '🖥️ ' + platform;
