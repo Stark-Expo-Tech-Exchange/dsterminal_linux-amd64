@@ -1,0 +1,11 @@
+Package: dsterminal
+Version: 4.0.0.113
+Section: utils
+Priority: optional
+Architecture: amd64
+Maintainer: Stark Expo Tech Exchange <support@starkexpo.tech>
+Description: DSTerminal Defensive Security Terminal
+ AI-assisted defensive cybersecurity monitoring, security analysis,
+ threat detection and SOC operations terminal platform.
+Depends: nmap, openssl, iproute2, python3, python3-requests
+Recommends: python3-rich, python3-colorama

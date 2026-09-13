@@ -1,0 +1,54 @@
+.\" DSTerminal Manual
+.TH DSTERMINAL 1 "August 2026" "4.0.0.113" "DSTerminal Manual"
+.SH NAME
+dsterminal \- Enterprise Security & Reconnaissance Suite
+.SH SYNOPSIS
+.B dsterminal
+[\fIOPTIONS\fR] [\fICOMMAND\fR]
+.SH DESCRIPTION
+DSTerminal is a comprehensive security and reconnaissance suite designed
+for penetration testing, vulnerability assessment, and system hardening.
+.SH COMMANDS
+.TP
+.B hardening
+Run System Hardening Dashboard
+.TP
+.B exploit
+Run Exploit Vulnerability Scanner
+.TP
+.B recon
+Run Network Reconnaissance Engine
+.TP
+.B recon <target>
+Run Reconnaissance on specific target
+.SH OPTIONS
+.TP
+.B \--quick
+Quick system hardening
+.TP
+.B \--full
+Full system hardening
+.TP
+.B \--status
+Show system status
+.TP
+.B \--help
+Show help message
+.SH EXAMPLES
+.TP
+.B dsterminal hardening
+Start hardening dashboard
+.TP
+.B dsterminal recon google.com
+Run reconnaissance on google.com
+.SH FILES
+.TP
+.B /etc/dsterminal/config.json
+Configuration file
+.TP
+.B /var/lib/dsterminal/workspace/
+Workspace directory
+.SH AUTHOR
+Stark Expo Tech Exchange <support@dsterminal.io>
+.SH SEE ALSO
+.BR nmap (1), whois (1), nslookup (1)

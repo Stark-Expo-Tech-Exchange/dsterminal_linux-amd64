@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=DSTerminal
+Comment=Enterprise Security & Reconnaissance Suite
+Icon=utilities-terminal
+Exec=dsterminal
+Terminal=true
+Categories=System;Security;Network;
+Keywords=security;reconnaissance;hardening;exploit;scanning
+StartupNotify=true

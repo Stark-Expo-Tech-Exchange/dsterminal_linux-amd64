@@ -1,0 +1,66 @@
+#!/bin/bash
+set -e
+
+echo "=================================================="
+echo "  DSTERMINAL v4.0.0.113-2026 INSTALLATION"
+echo "  Enterprise Security & Reconnaissance Suite"
+echo "=================================================="
+echo ""
+
+# Create necessary directories
+mkdir -p /usr/share/dsterminal/reports
+mkdir -p /usr/share/dsterminal/logs
+mkdir -p /usr/share/dsterminal/modules
+mkdir -p /var/lib/dsterminal
+mkdir -p /var/log/dsterminal
+mkdir -p /etc/dsterminal
+
+# Set permissions
+chmod 755 /usr/bin/dsterminal
+chown -R root:root /usr/share/dsterminal 2>/dev/null || true
+chown -R root:root /etc/dsterminal 2>/dev/null || true
+
+# Install Python dependencies (optional - don't fail if not available)
+echo "[*] Installing Python dependencies..."
+pip3 install --quiet colorama psutil rich reportlab requests urllib3 2>/dev/null || true
+
+# Create default configuration
+if [ ! -f /etc/dsterminal/config.json ]; then
+    cat > /etc/dsterminal/config.json << 'EOC'
+{
+    "version": "4.0.0.113",
+    "workspace": "/var/lib/dsterminal/workspace",
+    "log_level": "INFO",
+    "reports_dir": "/usr/share/dsterminal/reports",
+    "logs_dir": "/var/log/dsterminal",
+    "auto_update": true,
+    "telemetry": false,
+    "modules": {
+        "hardening": true,
+        "exploit": true,
+        "recon": true
+    },
+    "colors": true,
+    "animations": true,
+    "typing_speed": 0.035
+}
+EOC
+fi
+
+# Enable systemd service
+if [ -f /usr/lib/systemd/system/dsterminal.service ]; then
+    systemctl daemon-reload 2>/dev/null || true
+    systemctl enable dsterminal.service 2>/dev/null || true
+fi
+
+echo ""
+echo "=================================================="
+echo "  ✅ DSTERMINAL INSTALLATION COMPLETE"
+echo "=================================================="
+echo ""
+echo "  To start:  dsterminal"
+echo "  Help:      dsterminal --help"
+echo "  Workspace: /var/lib/dsterminal/workspace"
+echo "=================================================="
+
+exit 0

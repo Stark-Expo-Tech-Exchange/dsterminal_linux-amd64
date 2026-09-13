@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e
+
+echo "Preparing DSTerminal removal..."
+
+if pgrep -f "dsterminal" >/dev/null 2>&1; then
+    echo "Warning: DSTerminal is currently running."
+    echo "Do you want to continue? (y/N)"
+    read response
+    if [ "$response" != "y" ] && [ "$response" != "Y" ]; then
+        echo "Removal cancelled."
+        exit 1
+    fi
+fi
+
+echo "Proceeding with removal..."
+exit 0

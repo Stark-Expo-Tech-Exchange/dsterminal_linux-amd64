@@ -1,0 +1,28 @@
+#!/bin/sh
+set -e
+
+# Create configuration directory
+mkdir -p /etc/dsterminal
+
+# Set proper permissions
+chmod 755 /opt/dsterminal/dsterminal
+chmod 755 /usr/bin/dsterminal
+
+# Update desktop database if available
+if command -v update-desktop-database >/dev/null 2>&1; then
+    update-desktop-database
+fi
+
+# Update man database if available
+if command -v mandb >/dev/null 2>&1; then
+    mandb -q
+fi
+
+echo ""
+echo "==================================================="
+echo "   DSTERMINAL INSTALLED SUCCESSFULLY!"
+echo "==================================================="
+echo "   Run 'dsterminal' to start the security terminal"
+echo "   Type 'man dsterminal' for documentation"
+echo "==================================================="
+echo ""

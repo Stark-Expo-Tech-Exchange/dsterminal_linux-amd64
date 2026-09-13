@@ -1,4 +1,4 @@
-#!python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import sys
 
@@ -47,9 +47,7 @@ from datetime import datetime
 from pathlib import Path
 import requests
 import shutil
-from dotenv import load_dotenv
 
-load_dotenv()
 # ============================================================
 # FIX WINDOWS CONSOLE ENCODING - MUST BE FIRST
 # ============================================================
@@ -195,12 +193,9 @@ except ImportError:
     RICH_AVAILABLE = False
     console = None
 
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    pass
- 
+# ============================================================
+# UPDATE MANAGER CLASS - MODIFIED FOR PUBLIC REPO
+# ============================================================
 class UpdateManager:
     def __init__(self, config):
         self.config = config
@@ -214,10 +209,10 @@ class UpdateManager:
             )
         ).strip()
 
-        self.github_token = self.config.get(
-            "GITHUB_TOKEN",
-            os.environ.get("GITHUB_TOKEN", "")
-        ).strip()
+        # ============================================================
+        # REMOVED GITHUB_TOKEN - PUBLIC REPO NO TOKEN NEEDED
+        # ============================================================
+        
         # ============================================================
         # DOWNLOAD DIRECTORY - Use Downloads folder
         # ============================================================
@@ -334,37 +329,22 @@ class UpdateManager:
         ]
         
     def _get_headers(self):
-        """Get authenticated headers for GitHub API requests."""
-
+        """Get headers for GitHub API requests - PUBLIC REPO (NO TOKEN)"""
         headers = {
             "Accept": "application/vnd.github+json",
             "X-GitHub-Api-Version": "2022-11-28",
             "User-Agent": "DSTerminal-Update-Manager/4.0"
         }
-
-        if self.github_token:
-            headers["Authorization"] = (
-                f"Bearer {self.github_token}"
+        safe_print_unicode(
+            colorize(
+                "ℹ️ Public repository - no authentication needed",
+                BRIGHT_CYAN
             )
-
-            safe_print_unicode(
-                colorize(
-                    "✓ Authentication token loaded",
-                    BRIGHT_GREEN
-                )
-            )
-        else:
-            safe_print_unicode(
-                colorize(
-                    "⚠ No Update Module token found",
-                    BRIGHT_YELLOW
-                )
-            )
-
+        )
         return headers
         
     def _check_github_release(self):
-        """Check GitHub for latest release"""
+        """Check GitHub for latest release - FIXED FOR PUBLIC REPO"""
         try:
             import requests
             from datetime import datetime
@@ -374,60 +354,32 @@ class UpdateManager:
             headers = self._get_headers()
             
             safe_print_unicode(colorize(f"Connecting to UPDATE MODULE API for {self.github_repo}...", BRIGHT_CYAN))
-                        
-            tags_url = (
-                f"https://api.github.com/repos/"
-                f"{self.github_repo}/tags"
-            )
-            safe_print_unicode(colorize("Fetching tags...", BRIGHT_CYAN))
-            tags_response = requests.get(tags_url, timeout=15, headers=headers)
             
-            if tags_response.status_code == 200:
-                tags_data = tags_response.json()
-                if tags_data:
-                    latest_tag = tags_data[0].get("name", "")
-                    safe_print_unicode(colorize(f"✓ Found latest tag: {latest_tag}", BRIGHT_GREEN))
-                    
-                    release_url = (
-                        f"https://api.github.com/repos/"
-                        f"{self.github_repo}/releases/tags/"
-                        f"{latest_tag}"
-                    )
-                    safe_print_unicode(colorize(f"Fetching release for tag: {latest_tag}...", BRIGHT_CYAN))
-                    release_response = requests.get(release_url, timeout=15, headers=headers)
-                    
-                    if release_response.status_code == 200:
-                        release_data = release_response.json()
-                        safe_print_unicode(colorize(f"✓ Found release: {release_data.get('tag_name')}", BRIGHT_GREEN))
-                        return self._process_release_data(release_data)
-                    else:
-                        safe_print_unicode(colorize(f"No release found for tag {latest_tag}, using tag info", BRIGHT_YELLOW))
-                        return {
-                            "version": latest_tag.lstrip("v"),
-                            "url": (
-                                f"https://github.com/"
-                                f"{self.github_repo}/tree/{latest_tag}"
-                            ),
-
-                            "download_url": (
-                                f"https://github.com/"
-                                f"{self.github_repo}/archive/refs/tags/"
-                                f"{latest_tag}.zip"
-                            ),
-
-                            "notes": f"DSTerminal {latest_tag}",
-                            "prerelease": False,
-                            "published_at": datetime.now().strftime('%Y-%m-%d'),
-                            "asset_name": f"DSTerminal-{latest_tag}.zip",
-                            "asset_size": 0,
-                            "from_fallback": True
-                        }
+            # ============================================================
+            # FIX: Use releases endpoint directly (not tags)
+            # ============================================================
+            releases_url = (
+                f"https://api.github.com/repos/"
+                f"{self.github_repo}/releases"
+            )
+            safe_print_unicode(colorize("Fetching releases...", BRIGHT_CYAN))
+            releases_response = requests.get(releases_url, timeout=15, headers=headers)
+            
+            if releases_response.status_code == 200:
+                releases_data = releases_response.json()
+                if releases_data:
+                    # Get the latest release (first one)
+                    latest_release = releases_data[0]
+                    safe_print_unicode(colorize(f"✓ Found latest release: {latest_release.get('tag_name')}", BRIGHT_GREEN))
+                    return self._process_release_data(latest_release)
                 else:
-                    safe_print_unicode(colorize("✗ No tags found in repository", BRIGHT_RED))
-                    raise Exception("No tags found in repository")
+                    safe_print_unicode(colorize("✗ No releases found in repository", BRIGHT_YELLOW))
+                    raise Exception("No releases found in repository")
             else:
-                safe_print_unicode(colorize(f"✗ Failed to get tags: {tags_response.status_code}", BRIGHT_RED))
-                raise Exception(f"UPDATE MODULE API returned {tags_response.status_code} for tags endpoint")
+                safe_print_unicode(colorize(f"✗ Failed to get releases: {releases_response.status_code}", BRIGHT_RED))
+                # Try fallback to tags
+                safe_print_unicode(colorize("Trying tags endpoint as fallback...", BRIGHT_YELLOW))
+                return self._get_latest_tag()
              
         except requests.RequestException as e:
             safe_print_unicode(colorize(f"⚠️ Connection error: {e}", BRIGHT_RED))
@@ -435,6 +387,47 @@ class UpdateManager:
         except Exception as e:
             safe_print_unicode(colorize(f"⚠️ Error: {e}", BRIGHT_RED))
             raise
+
+    def _get_latest_tag(self):
+        """Fallback: Get latest tag from GitHub"""
+        try:
+            import requests
+            from datetime import datetime
+            
+            headers = self._get_headers()
+            
+            tags_url = (
+                f"https://api.github.com/repos/"
+                f"{self.github_repo}/tags"
+            )
+            tags_response = requests.get(tags_url, timeout=15, headers=headers)
+            
+            if tags_response.status_code == 200:
+                tags_data = tags_response.json()
+                if tags_data:
+                    latest_tag = tags_data[0].get("name", "")
+                    safe_print_unicode(colorize(f"✓ Found latest tag: {latest_tag}", BRIGHT_GREEN))
+                    return {
+                        "version": latest_tag.lstrip("v"),
+                        "url": (
+                            f"https://github.com/"
+                            f"{self.github_repo}/tree/{latest_tag}"
+                        ),
+                        "download_url": (
+                            f"https://github.com/"
+                            f"{self.github_repo}/archive/refs/tags/"
+                            f"{latest_tag}.zip"
+                        ),
+                        "notes": f"DSTerminal {latest_tag}",
+                        "prerelease": False,
+                        "published_at": datetime.now().strftime('%Y-%m-%d'),
+                        "asset_name": f"DSTerminal-{latest_tag}.zip",
+                        "asset_size": 0,
+                        "from_fallback": True
+                    }
+            return None
+        except Exception:
+            return None
 
     def _process_release_data(self, release):
         """Process GitHub release data and select the correct
@@ -625,7 +618,6 @@ class UpdateManager:
 
             # ---------------------------------------------------------
             # NO EXACT MATCH
-            # DO NOT DOWNLOAD ANOTHER PLATFORM'S PACKAGE
             # ---------------------------------------------------------
             if not selected_asset:
 
@@ -753,12 +745,7 @@ class UpdateManager:
                 'Accept': 'application/octet-stream'
             }
             
-            if hasattr(self, 'asset_api_url') and self.asset_api_url:
-                safe_print_unicode(colorize("Using asset API URL for download...", BRIGHT_CYAN))
-                download_url = self.asset_api_url
-                if self.github_token:
-                    headers['Authorization'] = f'Bearer {self.github_token}'
-                    safe_print_unicode(colorize("Using authentication token", BRIGHT_CYAN))
+            # No token needed for public repo
             
             safe_print_unicode(colorize("Connecting to server...", BRIGHT_CYAN))
             response = requests.get(
@@ -791,7 +778,7 @@ class UpdateManager:
                     safe_print_unicode(colorize("File not found. The update might be locked.", BRIGHT_YELLOW))
                     return False
                 elif response.status_code == 401 or response.status_code == 403:
-                    safe_print_unicode(colorize("Authentication failed. Check your Update token.", BRIGHT_YELLOW))
+                    safe_print_unicode(colorize("Access denied. This is a public repo, check your network.", BRIGHT_YELLOW))
                     return False
             
             response.raise_for_status()
@@ -848,7 +835,7 @@ class UpdateManager:
                 safe_print_unicode(colorize("File not found. The URL might be incorrect.", BRIGHT_YELLOW))
                 safe_print_unicode(colorize("Or try downloading manually from Stark Expo Tech Exchange Platform", BRIGHT_YELLOW))
             elif e.response.status_code == 401 or e.response.status_code == 403:
-                safe_print_unicode(colorize("Authentication failed. Check your Update token.", BRIGHT_YELLOW))
+                safe_print_unicode(colorize("Access denied. This is a public repo, check your network.", BRIGHT_YELLOW))
             return False
         except requests.exceptions.Timeout:
             safe_print_unicode(colorize("✗ Download timeout - Connection took too long", BRIGHT_RED))
@@ -1056,7 +1043,7 @@ class UpdateManager:
 
             return False
 
-        # Save API asset URL for private GitHub repositories
+        # Save API asset URL
         self.asset_api_url = latest.get("asset_api_url")
 
         # ============================================================
@@ -2187,8 +2174,8 @@ if __name__ == "__main__":
     class Config:
         def __init__(self):
             self.config = {
-                "CURRENT_VERSION": "4.0.0.113",
-                "GITHUB_TOKEN": os.environ.get("GITHUB_TOKEN", "")
+                "CURRENT_VERSION": "4.0.0.113"
+                # REMOVED GITHUB_TOKEN - NOT NEEDED FOR PUBLIC REPO
             }
         
         def get(self, key, default=None):

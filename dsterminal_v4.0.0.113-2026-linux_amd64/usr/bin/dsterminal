@@ -1,0 +1,67 @@
+#!/bin/bash
+# DSTerminal Launcher
+
+DSTERMINAL_HOME="/usr/share/dsterminal"
+
+function show_menu() {
+    echo ""
+    echo "=================================================="
+    echo "  DSTERMINAL v4.0.0.113-2026"
+    echo "  Enterprise Security & Reconnaissance Suite"
+    echo "=================================================="
+    echo ""
+    echo "  [1] Hardening Dashboard"
+    echo "  [2] Exploit Vulnerability Scanner"
+    echo "  [3] Network Reconnaissance Engine"
+    echo "  [4] Show Status"
+    echo "  [0] Exit"
+    echo ""
+    echo -n "Select option: "
+    read choice
+
+    case $choice in
+        1) python3 $DSTERMINAL_HOME/hardening_dashboard.py ;;
+        2) python3 $DSTERMINAL_HOME/exploit_scanner.py ;;
+        3) python3 $DSTERMINAL_HOME/recon.py ;;
+        4) 
+            echo "DSTERMINAL Status:"
+            echo "  Version: 4.0.0.113"
+            echo "  Workspace: /var/lib/dsterminal/workspace"
+            echo "  Reports: /usr/share/dsterminal/reports"
+            echo "  Logs: /var/log/dsterminal"
+            ;;
+        0) exit 0 ;;
+        *) echo "Invalid option" ;;
+    esac
+}
+
+if [ $# -eq 0 ]; then
+    show_menu
+else
+    case "$1" in
+        hardening) python3 $DSTERMINAL_HOME/hardening_dashboard.py ;;
+        exploit) python3 $DSTERMINAL_HOME/exploit_scanner.py ;;
+        recon) shift; python3 $DSTERMINAL_HOME/recon.py "$@" ;;
+        --quick) python3 $DSTERMINAL_HOME/hardening_dashboard.py --quick ;;
+        --full) python3 $DSTERMINAL_HOME/hardening_dashboard.py --full ;;
+        --status)
+            echo "DSTERMINAL Status:"
+            echo "  Version: 4.0.0.113"
+            echo "  Workspace: /var/lib/dsterminal/workspace"
+            ;;
+        --help)
+            echo "DSTERMINAL v4.0.0.113-2026"
+            echo "Usage: dsterminal [command]"
+            echo "Commands:"
+            echo "  hardening  - Run Hardening Dashboard"
+            echo "  exploit    - Run Exploit Scanner"
+            echo "  recon      - Run Reconnaissance Engine"
+            echo "  recon <target> - Run Recon on specific target"
+            echo "  --quick    - Quick system hardening"
+            echo "  --full     - Full system hardening"
+            echo "  --status   - Show status"
+            echo "  --help     - Show this help"
+            ;;
+        *) echo "Unknown command: $1"; echo "Use --help for usage" ;;
+    esac
+fi
