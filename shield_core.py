@@ -1,6 +1,6 @@
 #!python
 # ============================================================
-# DSTerminal Shield Core v5.2.0 - HYBRID TRAINABLE EDITION
+# DSTerminal Shield Core v5.3.0 - HYBRID TRAINABLE EDITION
 # ============================================================
 """
 Shield_Core: Hybrid Rule-Based + Trainable ML Ransomware Defense
@@ -10,12 +10,21 @@ Layers:
   [2] Logistic Regression - online-trainable, interpretable probabilities
       OR PyTorch MLP      - non-linear, gradient-explainable (--backend torch)
   [3] IsolationForest     - unsupervised zero-day anomaly detection
+                            (v5.3: trust-ramped, ignored until retrained)
   [4] Fusion Engine       - weighted combination + rule floor + veto
   [5] Session Correlator  - per-PID aggregation (catches slow-and-low)
   [6] Threat Intel Feed   - IOC hash / process / path matching
   [7] Analyst CLI         - human-in-the-loop feedback
   [8] Flask Dashboard     - live web UI with one-click labeling
   [9] Watchdog Observer   - OS-native real-time file monitoring
+
+v5.3 fixes vs v5.2:
+  - AnomalyDetector: trust ramp (min_train_calls, capped max_samples),
+    IF does not contribute until retrained 3+ times
+  - ANOMALY escalation: 5 anomalies from one process → HIGH_RISK
+  - Honeypots in user dirs are now opt-in (--deploy-honeypots)
+  - Watchdog: filters editor swap/backup sibling files
+  - Intel: --refresh reloads local + refetches last URL
 
 Optional deps (all graceful):
   pip install watchdog flask torch requests
@@ -207,6 +216,8 @@ class SecurityPolicies:
     honeypot_paths: List[str] = field(default_factory=list)
     backup_enabled: bool = True
     auto_rollback: bool = True
+    # v5.3: honeypots in user dirs are opt-in
+    deploy_user_honeypots: bool = False
 
 # ============================================================
 # FEATURE VECTOR
@@ -515,14 +526,24 @@ def make_classifier(backend: str, n_features: int = 17, lr: float = 0.05):
     return ThreatClassifier(n_features=n_features, lr=lr)
 
 # ============================================================
-# LAYER 3: ISOLATION FOREST
+# LAYER 3: ISOLATION FOREST (v5.3 - trust-ramped)
 # ============================================================
 class AnomalyDetector:
-    def __init__(self, n_features: int = 17, contamination: float = 0.05,
-                 min_samples: int = 100):
+    """
+    v5.3 changes:
+      - `min_train_calls`: IF is *trusted* only after being fit N times.
+        Before that, `score()` returns (0, 0) so it can't dominate fusion.
+      - `trust_ramp`: anomaly score is scaled by (train_calls / min_train_calls)
+        so a freshly-fit IF contributes less than a well-trained one.
+      - `max_samples`: caps sub-sampling to avoid overfitting tiny buffers.
+    """
+    def __init__(self, n_features: int = 17, contamination: float = 0.02,
+                 min_samples: int = 500, min_train_calls: int = 3):
         self.n_features = n_features
         self.contamination = contamination
         self.min_samples = min_samples
+        self.min_train_calls = min_train_calls
+        self.train_calls = 0
         self.model: Optional[Any] = None
         self.buffer: List[np.ndarray] = []
 
@@ -537,27 +558,57 @@ class AnomalyDetector:
         if len(self.buffer) < self.min_samples: return False
         X = np.stack(self.buffer)
         self.model = IsolationForest(
-            n_estimators=100, contamination=self.contamination,
-            random_state=42, n_jobs=-1)
+            n_estimators=100,
+            contamination=self.contamination,
+            random_state=42, n_jobs=-1,
+            max_samples=min(len(X), 256),
+        )
         self.model.fit(X)
+        self.train_calls += 1
         return True
 
     def score(self, x) -> Tuple[float, int]:
-        if self.model is None: return 0.0, 0
+        """
+        Returns (anomaly_score 0-1, is_anomaly 0/1).
+        v5.3: returns (0.0, 0) until the IF is trained `min_train_calls` times.
+        Score is scaled by the trust ramp so a fresh IF can't dominate.
+        """
+        if self.model is None:
+            return 0.0, 0
+        trust = min(1.0, self.train_calls / float(self.min_train_calls))
+        if trust <= 0.0:
+            return 0.0, 0
         xr = x.reshape(1, -1)
         raw = float(self.model.score_samples(xr)[0])
         pred = int(self.model.predict(xr)[0])
-        anom = float(np.clip(0.5 - raw, 0.0, 1.0))
+        anom = float(np.clip(0.5 - raw, 0.0, 1.0)) * trust
+        # Only return is_anomaly=1 once we trust the model
+        if trust < 1.0:
+            pred = 0
         return anom, (1 if pred == -1 else 0)
 
     def save(self, path):
         with open(path, 'wb') as f:
-            pickle.dump({'model': self.model, 'buffer': self.buffer[-2000:]}, f)
+            pickle.dump({
+                'model': self.model,
+                'buffer': self.buffer[-2000:],
+                'train_calls': self.train_calls,
+                'contamination': self.contamination,
+                'min_samples': self.min_samples,
+                'min_train_calls': self.min_train_calls,
+            }, f)
 
     @classmethod
     def load(cls, path):
         with open(path, 'rb') as f: d = pickle.load(f)
-        obj = cls(); obj.model = d.get('model'); obj.buffer = d.get('buffer', [])
+        obj = cls(
+            contamination=d.get('contamination', 0.02),
+            min_samples=d.get('min_samples', 500),
+            min_train_calls=d.get('min_train_calls', 3),
+        )
+        obj.model = d.get('model')
+        obj.buffer = d.get('buffer', [])
+        obj.train_calls = d.get('train_calls', 0)
         return obj
 
 # ============================================================
@@ -627,13 +678,15 @@ class HybridDecisionEngine:
             if rule_score >= 0.5 and ml_score < 0.2:
                 reasons.append(f"⚠ Conflict: rules={rule_score:.2f} ml={ml_score:.2f}")
 
+        # v5.3: ANOMALY path only when IF is confident (train_calls >= min)
         if fused >= 0.85 or veto:
             level = ThreatLevel.RANSOMWARE_DETECTED
         elif fused >= 0.60:
             level = ThreatLevel.HIGH_RISK
         elif fused >= 0.35:
             level = ThreatLevel.SUSPICIOUS
-        elif is_anom and anom_score > 0.6:
+        elif (is_anom and anom_score > 0.6
+              and self.anomaly.train_calls >= self.anomaly.min_train_calls):
             level = ThreatLevel.ANOMALY
             reasons.append(f"Unsupervised anomaly ({anom_score:.2f})")
         else:
@@ -788,7 +841,7 @@ class ProcessCorrelator:
         return sorted(out, key=lambda x: -x['files'])
 
 # ============================================================
-# LAYER 6: THREAT INTEL
+# LAYER 6: THREAT INTEL (v5.3 - --refresh support)
 # ============================================================
 class ThreatIntel:
     def __init__(self):
@@ -872,11 +925,12 @@ class ThreatIntel:
         return obj
 
 # ============================================================
-# CORE: SHIELD CORE v5.2
+# CORE: SHIELD CORE v5.3
 # ============================================================
 class ShieldCore:
     def __init__(self, workspace_dir: str = None, autotrain_if: bool = True,
-                 shadow_mode: bool = False, backend: str = "lr"):
+                 shadow_mode: bool = False, backend: str = "lr",
+                 deploy_user_honeypots: bool = False):
         self.workspace_dir = workspace_dir or os.path.expanduser("~/dsterminal_workspace")
         self.threat_level = ThreatLevel.CLEAN
         self.event_log: List[FileEvent] = []
@@ -885,6 +939,8 @@ class ShieldCore:
         self.backup_dir = None
         self.honeypot_dir = None
         self.policies = SecurityPolicies()
+        # v5.3: opt-in user honeypots
+        self.policies.deploy_user_honeypots = deploy_user_honeypots
         self.is_active = False
         self._monitor_thread = None
         self._stop_monitoring = False
@@ -901,6 +957,7 @@ class ShieldCore:
         self.clf_path = os.path.join(self.models_dir, f"shield_clf.{ext}")
         self.if_path = os.path.join(self.models_dir, "shield_if.pkl")
         self.intel_path = os.path.join(self.models_dir, "intel.txt")
+        self.intel_url_path = os.path.join(self.models_dir, "intel_url.txt")
 
         self._init_workspace()
 
@@ -923,7 +980,9 @@ class ShieldCore:
         if os.path.exists(self.if_path):
             try:
                 self.anomaly = AnomalyDetector.load(self.if_path)
-                self.typer.type_success("Loaded IsolationForest model")
+                self.typer.type_success(
+                    f"Loaded IsolationForest model "
+                    f"(train_calls={self.anomaly.train_calls})")
             except Exception as e:
                 self.typer.type_warning(f"IF load failed ({e}); fresh")
                 self.anomaly = AnomalyDetector(n_features=17)
@@ -945,9 +1004,14 @@ class ShieldCore:
 
         self.correlator = ProcessCorrelator(self, events_per_check=20)
         self.autotrain_if = autotrain_if
+        # v5.3: track anomalies per process for escalation
+        self._anomaly_hits: Dict[str, int] = defaultdict(int)
 
         if self.shadow_mode:
             self.typer.type_warning("SHADOW MODE: detections logged, no quarantine")
+        if self.policies.deploy_user_honeypots:
+            self.typer.type_warning(
+                "User-directory honeypots ENABLED (~/Documents, etc.)")
 
     # -------- Workspace / honeypots --------
     def _init_workspace(self):
@@ -966,6 +1030,7 @@ class ShieldCore:
     def _deploy_honeypots(self):
         self.typer.type_status("Deploying honeypots...", Colors.YELLOW)
         deployed = 0
+        # Workspace honeypots always deployed
         for name, content in [
             ("honeypot_1.txt", "HONEYPOT - DO NOT MODIFY"),
             ("honeypot_2.txt", "HONEYPOT - DO NOT MODIFY"),
@@ -979,22 +1044,27 @@ class ShieldCore:
             except Exception:
                 pass
 
-        for profile in self._get_all_user_profiles():
-            for sub, fname, cont in [
-                ("Documents", "honeypot_1.txt", "HONEYPOT - User Doc"),
-                ("Desktop", "honeypot_2.txt", "HONEYPOT - User Desktop"),
-                ("Downloads", "system_backup.bak", "HONEYPOT - User DL"),
-            ]:
-                try:
-                    d = os.path.join(profile, sub)
-                    os.makedirs(d, exist_ok=True)
-                    p = os.path.join(d, fname)
-                    if not os.path.exists(p):
-                        with open(p, 'w') as f:
-                            f.write(f"{cont}\nDeployed: {datetime.now()}\n")
-                        self.honeypot_paths.append(p); deployed += 1
-                except Exception:
-                    pass
+        # v5.3: user-directory honeypots are OPT-IN
+        if self.policies.deploy_user_honeypots:
+            for profile in self._get_all_user_profiles():
+                for sub, fname, cont in [
+                    ("Documents", "honeypot_1.txt", "HONEYPOT - User Doc"),
+                    ("Desktop", "honeypot_2.txt", "HONEYPOT - User Desktop"),
+                    ("Downloads", "system_backup.bak", "HONEYPOT - User DL"),
+                ]:
+                    try:
+                        d = os.path.join(profile, sub)
+                        os.makedirs(d, exist_ok=True)
+                        p = os.path.join(d, fname)
+                        if not os.path.exists(p):
+                            with open(p, 'w') as f:
+                                f.write(f"{cont}\nDeployed: {datetime.now()}\n")
+                            self.honeypot_paths.append(p); deployed += 1
+                    except Exception:
+                        pass
+        else:
+            self.typer.type_info(
+                "User-directory honeypots skipped (use --deploy-honeypots to enable)")
 
         self.typer.type_success(f"Deployed {deployed} honeypots")
 
@@ -1097,6 +1167,16 @@ class ShieldCore:
             for r in agg.reasons[-2:]:
                 print(f"   {Colors.DIM}→ {r}{Colors.END}")
             d = agg
+
+        # v5.3: ANOMALY escalation — repeated anomalies from same process
+        if d.threat_level == ThreatLevel.ANOMALY:
+            self._anomaly_hits[event.process_name] += 1
+            count = self._anomaly_hits[event.process_name]
+            if count >= 5:
+                d.threat_level = ThreatLevel.HIGH_RISK
+                d.fused_score = max(d.fused_score, 0.65)
+                d.reasons.append(
+                    f"Escalated: {count} anomalies from {event.process_name}")
 
         if d.threat_level in (ThreatLevel.RANSOMWARE_DETECTED, ThreatLevel.HIGH_RISK):
             self._respond_to_threat(event, d)
@@ -1217,7 +1297,10 @@ class ShieldCore:
         if ok:
             self.anomaly.save(self.if_path)
             self.typer.type_success(
-                f"IsolationForest trained on {len(self.anomaly.buffer)} samples")
+                f"IsolationForest trained on {len(self.anomaly.buffer)} samples "
+                f"(call #{self.anomaly.train_calls}, "
+                f"trust at {min(self.anomaly.train_calls, self.anomaly.min_train_calls)}"
+                f"/{self.anomaly.min_train_calls})")
         else:
             self.typer.type_warning(
                 f"IF needs {self.anomaly.min_samples} samples "
@@ -1235,6 +1318,7 @@ class ShieldCore:
             "backup_dir": self.backup_dir,
             "model_path": self.clf_path,
             "if_buffer_size": len(self.anomaly.buffer),
+            "if_train_calls": self.anomaly.train_calls,
             "sessions": self.correlator.summary()[:10],
             "recent_events": [
                 {"time": datetime.fromtimestamp(e.timestamp).isoformat(),
@@ -1262,6 +1346,8 @@ class ShieldCore:
             "ml_updates": self.classifier.n_updates,
             "if_samples": len(self.anomaly.buffer),
             "if_ready": self.anomaly.model is not None,
+            "if_train_calls": self.anomaly.train_calls,
+            "if_trusted": self.anomaly.train_calls >= self.anomaly.min_train_calls,
             "sessions_tracked": len(self.correlator.sessions),
             "ioc_hashes": len(self.intel.hashes),
             "ioc_proc": len(self.intel.process_patterns),
@@ -1383,7 +1469,7 @@ def train_from_csv(csv_path: str, model_out: str, epochs: int = 100,
     print(f"[+] Saved → {model_out}")
 
 # ============================================================
-# WATCHDOG REAL-TIME OBSERVER
+# WATCHDOG REAL-TIME OBSERVER (v5.3 - swap-file filtering)
 # ============================================================
 class ShieldEventHandler:
     def __init__(self, shield: ShieldCore,
@@ -1394,14 +1480,36 @@ class ShieldEventHandler:
         self._debounce_sec = 0.15
 
     def _should_ignore(self, path: str) -> bool:
+        # Regex ignore patterns
         for pat in self.ignore_patterns:
             if pat.search(path): return True
+
+        # Ignore our own workspace
         try:
             ws = os.path.abspath(self.shield.workspace_dir)
             if os.path.abspath(path).startswith(ws): return True
         except Exception:
             pass
+
+        # Model artifacts
         if path.endswith(('.pkl', '.pyc', '.pt')): return True
+
+        # v5.3: swap / backup siblings of honeypots
+        base = os.path.basename(path)
+        for hp in self.shield.honeypot_paths:
+            hp_base = os.path.basename(hp)
+            if hp_base in base and base != hp_base:
+                return True
+
+        # v5.3: dotfile editor artifacts
+        if base.startswith('.'):
+            for marker in ('.swp', '.swx', '.kate-swp', '.goutputstream',
+                           '.~lock', '.tmp', '.crdownload', '.part'):
+                if marker in base:
+                    return True
+            if base.endswith('~'):
+                return True
+
         return False
 
     def _debounced(self, path: str) -> bool:
@@ -1717,7 +1825,7 @@ def cmd_demo(args):
     os.system('cls' if os.name == 'nt' else 'clear')
     typer.type_banner([
         "╔══════════════════════════════════════════════════════════════╗",
-        "║    DSTERMINAL SHIELD CORE v5.2 - HYBRID FULL SUITE          ║",
+        "║    DSTERMINAL SHIELD CORE v5.3 - HYBRID FULL SUITE          ║",
         "║   Rules + LR/MLP + IsolationForest + Session + Intel + Web  ║",
         "╚══════════════════════════════════════════════════════════════╝",
     ], Colors.CYAN)
@@ -1732,7 +1840,9 @@ def cmd_demo(args):
         bootstrap_model(ws, backend=backend)
 
     shadow = getattr(args, "shadow", False)
-    shield = ShieldCore(workspace_dir=ws, shadow_mode=shadow, backend=backend)
+    deploy_hp = getattr(args, "deploy_honeypots", False)
+    shield = ShieldCore(workspace_dir=ws, shadow_mode=shadow, backend=backend,
+                        deploy_user_honeypots=deploy_hp)
     typer.type_status("Running detection tests...", Colors.CYAN)
 
     hp = shield.honeypot_paths[0] if shield.honeypot_paths else _ensure_file("/tmp/hp.txt")
@@ -1751,9 +1861,12 @@ def cmd_demo(args):
         print()
 
     typer.type_status("Training IsolationForest on observed samples...")
-    Xb, _ = generate_synthetic_training_data(n_benign=500, n_malicious=0)
-    for x in Xb[:300]: shield.anomaly.observe(x, label=0)
-    shield.train_anomaly_now()
+    Xb, _ = generate_synthetic_training_data(n_benign=600, n_malicious=0)
+    for x in Xb[:600]: shield.anomaly.observe(x, label=0)
+    # v5.3: train multiple times to exercise the trust ramp
+    shield.anomaly.min_samples = 100  # demo-only: lower bar so it trains
+    for _ in range(3):
+        shield.anomaly.train_if_ready()
 
     shield.generate_forensic_report()
     st = shield.get_status()
@@ -1766,6 +1879,8 @@ def cmd_demo(args):
         f"ML updates     : {st['ml_updates']}",
         f"IF samples     : {st['if_samples']}",
         f"IF ready       : {st['if_ready']}",
+        f"IF train calls : {st['if_train_calls']}",
+        f"IF trusted     : {st['if_trusted']}",
         f"Sessions       : {st['sessions_tracked']}",
         f"IOC hashes     : {st['ioc_hashes']}",
         f"Workspace      : {shield.workspace_dir}",
@@ -1836,7 +1951,6 @@ def cmd_train_anomaly(args):
             continue
     print(f"[*] Loaded {n} new benign; buffer: {existing} → {len(shield.anomaly.buffer)}")
     if len(shield.anomaly.buffer) >= shield.anomaly.min_samples:
-        shield.anomaly.model = None
         shield.train_anomaly_now()
     else:
         print(f"{Colors.YELLOW}[!] Need {shield.anomaly.min_samples}, "
@@ -1846,8 +1960,10 @@ def cmd_train_anomaly(args):
 def cmd_watch(args):
     """Polling file watcher fallback."""
     ws = args.workspace or os.path.expanduser("~/dsterminal_workspace")
+    deploy_hp = getattr(args, "deploy_honeypots", False)
     shield = ShieldCore(workspace_dir=ws, shadow_mode=args.shadow,
-                        backend=args.backend)
+                        backend=args.backend,
+                        deploy_user_honeypots=deploy_hp)
     root = args.path or os.path.expanduser("~")
     print(f"{Colors.CYAN}[*] Watching: {root}  (poll every {args.interval}s){Colors.END}")
     print(f"{Colors.DIM}    Ctrl+C to stop{Colors.END}")
@@ -1873,21 +1989,30 @@ def cmd_watch(args):
 
 
 def cmd_watch_realtime(args):
-    """Watchdog-based real-time observer."""
+    """Watchdog-based real-time observer (v5.3 - swap-file filtering)."""
     if not WATCHDOG_OK:
         print(f"{Colors.RED}[x] watchdog not installed (pip install watchdog){Colors.END}")
         print(f"    Falling back to polling mode.")
         return cmd_watch(args)
 
     ws = args.workspace or os.path.expanduser("~/dsterminal_workspace")
+    deploy_hp = getattr(args, "deploy_honeypots", False)
     shield = ShieldCore(workspace_dir=ws, shadow_mode=args.shadow,
-                        backend=args.backend)
+                        backend=args.backend,
+                        deploy_user_honeypots=deploy_hp)
     root = os.path.expanduser(args.path or "~")
 
     handler = ShieldEventHandler(shield, ignore_patterns=[
-        r'\.swp$', r'~$', r'\.tmp$', r'\.log$',
+        # Editor artifacts
+        r'\.swp$', r'\.swx$', r'\.kate-swp$', r'~$',
+        r'(^|/)\.\#', r'\.~lock\.', r'\.goutputstream-',
+        # Common temp / cache
+        r'\.tmp$', r'\.log$', r'\.part$', r'\.crdownload$',
+        # VCS / builds
         r'\.git/', r'__pycache__/', r'node_modules/',
-        r'/proc/', r'/sys/', r'/dev/',
+        r'\.venv/', r'venv/', r'\.cache/',
+        # System
+        r'/proc/', r'/sys/', r'/dev/', r'/run/',
     ])
     bridge = _WatchdogBridge(handler)
     observer = Observer()
@@ -1895,7 +2020,9 @@ def cmd_watch_realtime(args):
     observer.start()
 
     print(f"{Colors.CYAN}[*] Watchdog active on {root}{Colors.END}")
-    print(f"{Colors.DIM}    Shadow={args.shadow}  Ctrl+C to stop{Colors.END}")
+    print(f"{Colors.DIM}    Shadow={args.shadow}  "
+          f"User honeypots={'on' if deploy_hp else 'off'}  "
+          f"Ctrl+C to stop{Colors.END}")
     try:
         while True: time.sleep(1)
     except KeyboardInterrupt:
@@ -1919,7 +2046,28 @@ def cmd_dashboard(args):
 def cmd_intel(args):
     ws = args.workspace or os.path.expanduser("~/dsterminal_workspace")
     intel_path = os.path.join(ws, "models", "intel.txt")
+    intel_url_path = os.path.join(ws, "models", "intel_url.txt")
     intel = ThreatIntel.load(intel_path)
+
+    # v5.3: --refresh reloads local + re-fetches last URL
+    if args.refresh:
+        n = intel.load_file(intel_path) if os.path.exists(intel_path) else 0
+        extra = 0
+        if os.path.exists(intel_url_path):
+            with open(intel_url_path) as f:
+                url = f.read().strip()
+            if url:
+                try:
+                    extra = intel.load_url(url)
+                    print(f"{Colors.GREEN}[+] Refreshed {extra} IOCs from {url}{Colors.END}")
+                except Exception as e:
+                    print(f"{Colors.RED}[x] Refresh failed: {e}{Colors.END}")
+        intel.save(intel_path)
+        print(f"[+] Reloaded {n} local IOCs. "
+              f"Total: {len(intel.hashes)} hashes, "
+              f"{len(intel.process_patterns)} proc, "
+              f"{len(intel.path_patterns)} path")
+        return
 
     if args.add:
         n = intel.load_file(args.add); intel.save(intel_path)
@@ -1931,7 +2079,10 @@ def cmd_intel(args):
     if args.url:
         try:
             n = intel.load_url(args.url); intel.save(intel_path)
-            print(f"{Colors.GREEN}[+] Fetched {n} IOCs{Colors.END}")
+            # remember for --refresh
+            with open(intel_url_path, 'w') as f:
+                f.write(args.url)
+            print(f"{Colors.GREEN}[+] Fetched {n} IOCs from {args.url}{Colors.END}")
         except Exception as e:
             print(f"{Colors.RED}[x] {e}{Colors.END}")
         return
@@ -1963,11 +2114,13 @@ def cmd_intel(args):
 def main():
     p = argparse.ArgumentParser(
         prog="shield_core",
-        description="Shield_Core v5.2 - Hybrid Trainable Ransomware Defense")
+        description="Shield_Core v5.3 - Hybrid Trainable Ransomware Defense")
     p.add_argument("--workspace", "-w", default=None,
                    help="Workspace dir (default: ~/dsterminal_workspace)")
     p.add_argument("--backend", choices=['lr', 'torch'], default='lr',
                    help="Classifier backend")
+    p.add_argument("--deploy-honeypots", action="store_true",
+                   help="Deploy decoys into user dirs (~/Documents, etc.)")
     sub = p.add_subparsers(dest="cmd")
 
     sp = sub.add_parser("demo", help="Run detection demo")
@@ -2010,6 +2163,8 @@ def main():
     sp = sub.add_parser("intel", help="Manage IOC feed")
     sp.add_argument("--add", help="Load IOC file")
     sp.add_argument("--url", help="Fetch from URL")
+    sp.add_argument("--refresh", action="store_true",
+                    help="Reload local + refetch last URL")
     sp.add_argument("--autolabel", action="store_true")
     sp.set_defaults(func=cmd_intel)
 
