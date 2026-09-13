@@ -1,33 +1,32 @@
 #!python
 # ============================================================
-# DSTerminal Shield Core v5.3.0 - HYBRID TRAINABLE EDITION
+# DSTerminal Shield Core v5.6.2 - HARDENED + CLEAN EDITION
 # ============================================================
 """
 Shield_Core: Hybrid Rule-Based + Trainable ML Ransomware Defense
+with Auto-Escalation, Rollback, Daemon Mode, and SIEM Forwarding.
 
-Layers:
-  [1] Rule Engine         - deterministic, high precision, veto power
-  [2] Logistic Regression - online-trainable, interpretable probabilities
-      OR PyTorch MLP      - non-linear, gradient-explainable (--backend torch)
-  [3] IsolationForest     - unsupervised zero-day anomaly detection
-                            (v5.3: trust-ramped, ignored until retrained)
-  [4] Fusion Engine       - weighted combination + rule floor + veto
-  [5] Session Correlator  - per-PID aggregation (catches slow-and-low)
-  [6] Threat Intel Feed   - IOC hash / process / path matching
-  [7] Analyst CLI         - human-in-the-loop feedback
-  [8] Flask Dashboard     - live web UI with one-click labeling
-  [9] Watchdog Observer   - OS-native real-time file monitoring
+v5.6.1 fixes vs v5.6:
+  - ProcessBlacklist purges self/observer entries on load (poison cleanup)
+  - AutoResponse never blacklists self/observer processes
+  - _respond_to_threat uses safe `or {}` access for None fields
+    (fixes: 'NoneType' object has no attribute 'get')
+  - analyze_event skips blacklist escalation for self/observer
+  - _respond_to_threat silently returns early for self/observer
+    (no more spam: 🚨 AUTO-RESPONSE + 🛡 Refusing)
+  - _is_self_event() helper for consistent self-detection
 
-v5.3 fixes vs v5.2:
-  - AnomalyDetector: trust ramp (min_train_calls, capped max_samples),
-    IF does not contribute until retrained 3+ times
-  - ANOMALY escalation: 5 anomalies from one process → HIGH_RISK
-  - Honeypots in user dirs are now opt-in (--deploy-honeypots)
-  - Watchdog: filters editor swap/backup sibling files
-  - Intel: --refresh reloads local + refetches last URL
+v5.6 hardening (retained):
+  - AutoResponse refuses to act on self/observer processes
+  - ProcessKiller refuses to kill init, self, parent
+  - ProcessCorrelator skips observer-originated events
+  - Session elevations are advisory, not action-triggering
+  - ML confidence gate: downweighted until n_updates >= 50
+  - DaemonRuntime detects & clears stale PID files
+  - Better CLI hints (siem disabled, undertrained classifier)
 
 Optional deps (all graceful):
-  pip install watchdog flask torch requests
+  pip install watchdog flask torch requests psutil
 """
 import sys
 import os
@@ -35,6 +34,8 @@ import io
 import time
 import json
 import csv
+import signal
+import atexit
 import shutil
 import hashlib
 import threading
@@ -95,6 +96,12 @@ except ImportError:
     TORCH_OK = False
 
 try:
+    import psutil
+    PSUTIL_OK = True
+except ImportError:
+    PSUTIL_OK = False
+
+try:
     from colorama import init, Fore, Back, Style
     init(autoreset=True, convert=True, strip=False)
     COLORS_AVAILABLE = True
@@ -137,6 +144,33 @@ def print_centered(text: str, color: str = "", width: int = None):
     if width is None:
         width = get_terminal_width()
     print(center_text(f"{color}{text}{Colors.END}" if color else text, width))
+
+def _hostname() -> str:
+    try:
+        return os.uname().nodename
+    except Exception:
+        return os.environ.get("COMPUTERNAME") or "unknown"
+
+# v5.6.1: hoisted so ProcessBlacklist.load can purge these names
+OBSERVER_PROCESS_NAMES = {"watchdog", "watcher"}
+
+def _self_process_names() -> Set[str]:
+    """Names we must never auto-respond against or blacklist."""
+    names = set(OBSERVER_PROCESS_NAMES) | {"shield_core", "shield_core.py"}
+    try:
+        names.add(os.path.basename(sys.argv[0]))
+    except Exception:
+        pass
+    names.add(os.path.basename(sys.executable))
+    return {n for n in names if n}
+
+def _is_self_event(event: "FileEvent") -> bool:
+    """v5.6.1: True if this event came from us or our observer."""
+    if event.pid == os.getpid():
+        return True
+    if event.process_name in _self_process_names():
+        return True
+    return False
 
 # ============================================================
 # AUTO-TYPE ENGINE
@@ -182,7 +216,7 @@ class AutoTypeEngine:
         print(" " * pad + f"{border}│{Colors.END}{' ' * tp}{Colors.YELLOW}{Colors.BOLD}"
               f"{title_t}{Colors.END}{' ' * (bw - cl(title_t) - tp)}{border}│{Colors.END}")
         print(" " * pad + f"{border}├{'─' * bw}┤{Colors.END}")
-        for line in lines[:14]:
+        for line in lines[:20]:
             if cl(line) > bw - 2:
                 line = line[:bw - 5] + "..."
             p = max(0, bw - cl(line) - 2)
@@ -216,7 +250,6 @@ class SecurityPolicies:
     honeypot_paths: List[str] = field(default_factory=list)
     backup_enabled: bool = True
     auto_rollback: bool = True
-    # v5.3: honeypots in user dirs are opt-in
     deploy_user_honeypots: bool = False
 
 # ============================================================
@@ -526,17 +559,9 @@ def make_classifier(backend: str, n_features: int = 17, lr: float = 0.05):
     return ThreatClassifier(n_features=n_features, lr=lr)
 
 # ============================================================
-# LAYER 3: ISOLATION FOREST (v5.3 - trust-ramped)
+# LAYER 3: ISOLATION FOREST (trust-ramped)
 # ============================================================
 class AnomalyDetector:
-    """
-    v5.3 changes:
-      - `min_train_calls`: IF is *trusted* only after being fit N times.
-        Before that, `score()` returns (0, 0) so it can't dominate fusion.
-      - `trust_ramp`: anomaly score is scaled by (train_calls / min_train_calls)
-        so a freshly-fit IF contributes less than a well-trained one.
-      - `max_samples`: caps sub-sampling to avoid overfitting tiny buffers.
-    """
     def __init__(self, n_features: int = 17, contamination: float = 0.02,
                  min_samples: int = 500, min_train_calls: int = 3):
         self.n_features = n_features
@@ -568,11 +593,6 @@ class AnomalyDetector:
         return True
 
     def score(self, x) -> Tuple[float, int]:
-        """
-        Returns (anomaly_score 0-1, is_anomaly 0/1).
-        v5.3: returns (0.0, 0) until the IF is trained `min_train_calls` times.
-        Score is scaled by the trust ramp so a fresh IF can't dominate.
-        """
         if self.model is None:
             return 0.0, 0
         trust = min(1.0, self.train_calls / float(self.min_train_calls))
@@ -582,7 +602,6 @@ class AnomalyDetector:
         raw = float(self.model.score_samples(xr)[0])
         pred = int(self.model.predict(xr)[0])
         anom = float(np.clip(0.5 - raw, 0.0, 1.0)) * trust
-        # Only return is_anomaly=1 once we trust the model
         if trust < 1.0:
             pred = 0
         return anom, (1 if pred == -1 else 0)
@@ -612,7 +631,7 @@ class AnomalyDetector:
         return obj
 
 # ============================================================
-# LAYER 4: HYBRID DECISION ENGINE
+# LAYER 4: HYBRID DECISION ENGINE (ML confidence gate)
 # ============================================================
 @dataclass
 class Decision:
@@ -626,6 +645,8 @@ class Decision:
 
 
 class HybridDecisionEngine:
+    MIN_ML_UPDATES = 50  # ML trust threshold
+
     def __init__(self, classifier, anomaly,
                  ml_weight=0.5, rule_weight=0.3, anomaly_weight=0.2):
         self.clf = classifier; self.anomaly = anomaly
@@ -657,9 +678,20 @@ class HybridDecisionEngine:
     def decide(self, fv: FeatureVector, learn_ok: bool = True) -> Decision:
         rule_score, reasons, veto = self._rule_score(fv)
         x = fv.to_array()
-        ml_score = self.clf.predict_proba(x)
+        ml_score_raw = self.clf.predict_proba(x)
         anom_score, is_anom = self.anomaly.score(x)
         top_feats = self.clf.explain(x, top_k=5)
+
+        # ML confidence gate
+        n_upd = getattr(self.clf, "n_updates", 0)
+        if n_upd < self.MIN_ML_UPDATES:
+            ml_trust = 0.10
+            reasons.append(
+                f"ML undertrained ({n_upd}/{self.MIN_ML_UPDATES}) — "
+                f"downweighted to 10%")
+        else:
+            ml_trust = 1.0
+        ml_score = ml_score_raw * ml_trust
 
         if veto:
             fused = 1.0; reasons.append("RULE VETO: forcing malicious")
@@ -675,10 +707,9 @@ class HybridDecisionEngine:
             if rule_score > 0.6 and ml_score > 0.7:
                 fused = min(1.0, fused + 0.10)
                 reasons.append("Rules + ML agree")
-            if rule_score >= 0.5 and ml_score < 0.2:
+            if rule_score >= 0.5 and ml_score < 0.2 and ml_trust >= 1.0:
                 reasons.append(f"⚠ Conflict: rules={rule_score:.2f} ml={ml_score:.2f}")
 
-        # v5.3: ANOMALY path only when IF is confident (train_calls >= min)
         if fused >= 0.85 or veto:
             level = ThreatLevel.RANSOMWARE_DETECTED
         elif fused >= 0.60:
@@ -698,7 +729,7 @@ class HybridDecisionEngine:
 
         return Decision(
             threat_level=level, rule_score=rule_score,
-            ml_score=ml_score, anomaly_score=anom_score,
+            ml_score=ml_score_raw, anomaly_score=anom_score,
             fused_score=fused, reasons=reasons, top_features=top_feats,
         )
 
@@ -716,7 +747,7 @@ class HybridDecisionEngine:
         self.clf.fit(X, y, epochs=epochs)
 
 # ============================================================
-# LAYER 5: PROCESS CORRELATION
+# LAYER 5: PROCESS CORRELATION (skips observer events)
 # ============================================================
 @dataclass
 class ProcessSession:
@@ -776,6 +807,9 @@ class ProcessCorrelator:
         return event.pid if event.pid else (hash(event.process_name) & 0xFFFFFFFF)
 
     def observe(self, event: FileEvent) -> Optional[Decision]:
+        # v5.6.1: never correlate observer-originated events
+        if event.process_name in OBSERVER_PROCESS_NAMES:
+            return None
         key = self._key(event)
         sess = self.sessions.get(key)
         if sess is None:
@@ -841,7 +875,7 @@ class ProcessCorrelator:
         return sorted(out, key=lambda x: -x['files'])
 
 # ============================================================
-# LAYER 6: THREAT INTEL (v5.3 - --refresh support)
+# LAYER 6: THREAT INTEL
 # ============================================================
 class ThreatIntel:
     def __init__(self):
@@ -925,7 +959,912 @@ class ThreatIntel:
         return obj
 
 # ============================================================
-# CORE: SHIELD CORE v5.3
+# AUTO-RESPONSE — Rollback, Kill, Blacklist (v5.6.1)
+# ============================================================
+@dataclass
+class RollbackEntry:
+    path: str
+    operation: str
+    timestamp: float
+    size_at_touch: int = 0
+    backup_path: Optional[str] = None
+    restored: bool = False
+    error: str = ""
+
+
+class RollbackManager:
+    def __init__(self, shield, max_entries_per_process: int = 500):
+        self.shield = shield
+        self.max_entries_per_process = max_entries_per_process
+        self.history: Dict[str, deque] = defaultdict(
+            lambda: deque(maxlen=max_entries_per_process))
+        self._snapshots: Dict[str, Tuple[float, str]] = {}
+        self._snapshot_ttl = 3600.0
+
+    def snapshot_before_write(self, event: FileEvent) -> Optional[str]:
+        if not self.shield.policies.backup_enabled:
+            return None
+        if not os.path.exists(event.path):
+            return None
+        try:
+            if os.path.getsize(event.path) > 100 * 1024 * 1024:
+                return None
+        except OSError:
+            return None
+
+        now = time.time()
+        cached = self._snapshots.get(event.path)
+        if cached and (now - cached[0]) < self._snapshot_ttl:
+            return cached[1]
+
+        ts = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
+        dest = os.path.join(
+            self.shield.backup_dir,
+            f"{ts}_{os.path.basename(event.path)}.vss")
+        try:
+            shutil.copy2(event.path, dest)
+            self._snapshots[event.path] = (now, dest)
+            return dest
+        except Exception:
+            return None
+
+    def record(self, event: FileEvent, backup_path: Optional[str]):
+        try:
+            size = os.path.getsize(event.path) if os.path.exists(event.path) else 0
+        except OSError:
+            size = 0
+        entry = RollbackEntry(
+            path=event.path,
+            operation=event.operation,
+            timestamp=event.timestamp,
+            size_at_touch=size,
+            backup_path=backup_path,
+        )
+        self.history[event.process_name].append(entry)
+
+    def rollback_process(self, process_name: str,
+                         dry_run: bool = False) -> Dict[str, Any]:
+        entries = list(self.history.get(process_name, []))
+        if not entries:
+            return {'process': process_name, 'attempted': 0,
+                    'restored': 0, 'failed': 0, 'skipped': 0, 'details': []}
+
+        write_entries = [e for e in entries if e.operation == 'write']
+        write_entries.reverse()
+
+        restored = failed = skipped = 0
+        details = []
+
+        for e in write_entries:
+            if not e.backup_path or not os.path.exists(e.backup_path):
+                skipped += 1
+                details.append({'path': e.path, 'status': 'no_snapshot'})
+                continue
+            if dry_run:
+                details.append({'path': e.path, 'status': 'would_restore',
+                                'from': e.backup_path})
+                restored += 1
+                continue
+            try:
+                if os.path.exists(e.path):
+                    ts = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
+                    trash = os.path.join(
+                        self.shield.quarantine_dir,
+                        f"rollback_{ts}_{os.path.basename(e.path)}.pre")
+                    shutil.move(e.path, trash)
+                shutil.copy2(e.backup_path, e.path)
+                e.restored = True
+                restored += 1
+                details.append({'path': e.path, 'status': 'restored'})
+            except Exception as ex:
+                failed += 1
+                e.error = str(ex)
+                details.append({'path': e.path, 'status': 'failed',
+                                'error': str(ex)})
+
+        self.history.pop(process_name, None)
+        return {
+            'process': process_name,
+            'attempted': len(write_entries),
+            'restored': restored,
+            'failed': failed,
+            'skipped': skipped,
+            'details': details[:50],
+        }
+
+    def process_summary(self, process_name: str) -> Dict[str, Any]:
+        entries = list(self.history.get(process_name, []))
+        return {
+            'process': process_name,
+            'files_touched': len(entries),
+            'writes': sum(1 for e in entries if e.operation == 'write'),
+            'reads': sum(1 for e in entries if e.operation == 'read'),
+            'with_snapshot': sum(1 for e in entries if e.backup_path),
+        }
+
+
+class ProcessKiller:
+    def __init__(self, shield):
+        self.shield = shield
+        self.psutil = psutil if PSUTIL_OK else None
+        self.available = PSUTIL_OK
+
+    def kill_tree(self, pid: int, process_name: str,
+                  dry_run: bool = False) -> Dict[str, Any]:
+        result = {'pid': pid, 'process': process_name,
+                  'killed': [], 'failed': [], 'method': 'none'}
+
+        # refuse to kill init, self, or parent
+        if pid <= 1:
+            result['method'] = 'refused'
+            result['failed'].append('pid <= 1')
+            return result
+        if pid == os.getpid():
+            result['method'] = 'refused'
+            result['failed'].append('would kill self')
+            return result
+        try:
+            if os.getppid() == pid:
+                result['method'] = 'refused'
+                result['failed'].append('would kill parent')
+                return result
+        except Exception:
+            pass
+
+        if not self.available:
+            result['method'] = 'unavailable'
+            result['failed'].append('psutil not installed')
+            return result
+
+        if not self.psutil.pid_exists(pid):
+            result['method'] = 'not_running'
+            return result
+
+        if dry_run:
+            result['method'] = 'dry_run'
+            try:
+                p = self.psutil.Process(pid)
+                children = p.children(recursive=True)
+                result['killed'] = [p.name()] + [c.name() for c in children]
+            except Exception:
+                pass
+            return result
+
+        try:
+            parent = self.psutil.Process(pid)
+            children = parent.children(recursive=True)
+            for c in children:
+                try: c.terminate()
+                except Exception: pass
+            gone, alive = self.psutil.wait_procs(children, timeout=3)
+            for c in alive:
+                try: c.kill()
+                except Exception: pass
+            try:
+                parent.terminate()
+                try: parent.wait(timeout=3)
+                except self.psutil.TimeoutExpired: parent.kill()
+            except Exception:
+                pass
+            result['method'] = 'psutil'
+            result['killed'] = [process_name] + [c.name() for c in children]
+        except Exception as e:
+            result['method'] = 'psutil_error'
+            result['failed'].append(str(e))
+        return result
+
+
+class ProcessBlacklist:
+    def __init__(self, path: str):
+        self.path = path
+        self.entries: Dict[str, Dict[str, Any]] = {}
+        self.load()
+
+    def load(self):
+        if not os.path.exists(self.path):
+            return
+        try:
+            with open(self.path) as f:
+                self.entries = json.load(f)
+        except Exception:
+            self.entries = {}
+        # v5.6.1: purge self/observer entries from poisoned blacklists
+        banned = _self_process_names()
+        before = len(self.entries)
+        self.entries = {k: v for k, v in self.entries.items() if k not in banned}
+        if len(self.entries) != before:
+            print(f"{Colors.YELLOW}[!] Purged {before - len(self.entries)} "
+                  f"self/observer entries from blacklist{Colors.END}")
+            self.save()
+
+    def save(self):
+        try:
+            with open(self.path, 'w') as f:
+                json.dump(self.entries, f, indent=2)
+        except Exception:
+            pass
+
+    def add(self, process_name: str, reason: str = "", pid: int = 0):
+        # v5.6.1: refuse to add self/observer names
+        if process_name in _self_process_names():
+            return
+        now = time.time()
+        e = self.entries.setdefault(process_name, {
+            'hits': 0, 'first_seen': now, 'reasons': []
+        })
+        e['hits'] += 1
+        e['last_seen'] = now
+        e['last_pid'] = pid
+        if reason and reason not in e['reasons']:
+            e['reasons'].append(reason)
+            e['reasons'] = e['reasons'][-5:]
+        self.save()
+
+    def contains(self, process_name: str) -> bool:
+        return process_name in self.entries
+
+    def get(self, process_name: str) -> Optional[Dict[str, Any]]:
+        return self.entries.get(process_name)
+
+    def remove(self, process_name: str):
+        if process_name in self.entries:
+            del self.entries[process_name]
+            self.save()
+
+    def summary(self) -> List[Dict[str, Any]]:
+        out = []
+        for name, e in self.entries.items():
+            out.append({
+                'process': name,
+                'hits': e.get('hits', 0),
+                'last_seen': e.get('last_seen'),
+                'reasons': e.get('reasons', [])[:3],
+            })
+        return sorted(out, key=lambda x: -x['hits'])
+
+
+@dataclass
+class AutoResponsePolicy:
+    kill_process: bool = True
+    rollback_files: bool = True
+    quarantine_current: bool = True
+    blacklist_process: bool = True
+    dry_run: bool = False
+    min_level: ThreatLevel = ThreatLevel.RANSOMWARE_DETECTED
+
+
+class AutoResponse:
+    def __init__(self, shield, policy: AutoResponsePolicy = None):
+        self.shield = shield
+        self.policy = policy or AutoResponsePolicy()
+        self.rollback = RollbackManager(shield)
+        self.killer = ProcessKiller(shield)
+
+    def _is_self(self, event: FileEvent) -> Optional[str]:
+        """Return reason if event targets self/observer, else None."""
+        my_pid = os.getpid()
+        safe_names = _self_process_names()
+        if event.pid == my_pid:
+            return f"my pid={my_pid}"
+        if event.process_name in safe_names:
+            return f"self/observer name={event.process_name}"
+        return None
+
+    def handle(self, event: FileEvent, d: Decision) -> Dict[str, Any]:
+        # v5.6.1: refuse to act on our own process
+        self_reason = self._is_self(event)
+        if self_reason:
+            self.shield.typer.type_warning(
+                f"🛡  Refusing auto-response on self/observer: {self_reason}")
+            report = {
+                'timestamp': datetime.now().isoformat(),
+                'event': asdict(event),
+                'decision': {
+                    'level': d.threat_level.name,
+                    'rule': d.rule_score, 'ml': d.ml_score,
+                    'anomaly': d.anomaly_score, 'fused': d.fused_score,
+                    'reasons': list(d.reasons),
+                },
+                'dry_run': self.policy.dry_run,
+                'skipped': 'self_process_protection',
+                'skipped_reason': self_reason,
+                'kill': None, 'quarantine': None,
+                'rollback': None, 'blacklist': None,
+            }
+            self._save_response_report(report)
+            return report
+
+        report = {
+            'timestamp': datetime.now().isoformat(),
+            'event': asdict(event),
+            'decision': {
+                'level': d.threat_level.name,
+                'rule': d.rule_score, 'ml': d.ml_score,
+                'anomaly': d.anomaly_score, 'fused': d.fused_score,
+                'reasons': list(d.reasons),
+            },
+            'dry_run': self.policy.dry_run,
+            'kill': None,
+            'quarantine': None,
+            'rollback': None,
+            'blacklist': None,
+        }
+
+        if self.policy.blacklist_process:
+            is_self = self._is_self(event) is not None
+            if not self.policy.dry_run and not is_self:
+                self.shield.blacklist.add(
+                    event.process_name,
+                    reason=f"detected {d.threat_level.name}",
+                    pid=event.pid)
+            report['blacklist'] = {
+                'process': event.process_name,
+                'applied': (not self.policy.dry_run) and (not is_self),
+            }
+
+        if self.policy.kill_process and event.pid:
+            report['kill'] = self.killer.kill_tree(
+                event.pid, event.process_name, dry_run=self.policy.dry_run)
+            killed_n = len(report['kill'].get('killed', []))
+            self.shield.typer.type_error(
+                f"🔪 Kill {'(dry-run) ' if self.policy.dry_run else ''}"
+                f"{event.process_name} (pid={event.pid}): {killed_n} killed")
+
+        if self.policy.quarantine_current:
+            if self.policy.dry_run:
+                report['quarantine'] = {
+                    'path': event.path,
+                    'status': 'would_quarantine',
+                }
+            else:
+                ok = self.shield.quarantine_file(event.path)
+                report['quarantine'] = {
+                    'path': event.path,
+                    'status': 'quarantined' if ok else 'failed',
+                }
+
+        if self.policy.rollback_files:
+            summary = self.rollback.rollback_process(
+                event.process_name, dry_run=self.policy.dry_run)
+            report['rollback'] = summary
+            self.shield.typer.type_error(
+                f"♻️  Rollback {'(dry-run) ' if self.policy.dry_run else ''}"
+                f"{summary['restored']}/{summary['attempted']} files restored "
+                f"({summary['failed']} failed)")
+
+        self._save_response_report(report)
+        return report
+
+    def _save_response_report(self, report: Dict[str, Any]):
+        p = os.path.join(
+            self.shield.workspace_dir, "reports",
+            f"autoresponse_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.json")
+        try:
+            with open(p, 'w') as f:
+                json.dump(report, f, indent=2, default=str)
+        except Exception:
+            pass
+
+# ============================================================
+# SIEM FORWARDING
+# ============================================================
+class SiemTarget:
+    name = "base"
+    def send(self, events: List[Dict[str, Any]]) -> bool:
+        raise NotImplementedError
+    def test(self) -> Tuple[bool, str]:
+        return True, "not implemented"
+
+
+class SplunkHEC(SiemTarget):
+    name = "splunk"
+    def __init__(self, cfg: Dict[str, Any]):
+        self.url = cfg["url"].rstrip('/')
+        self.token = cfg["token"]
+        self.index = cfg.get("index", "main")
+        self.source = cfg.get("source", "shield_core")
+        self.sourcetype = cfg.get("sourcetype", "shield:event")
+        self.verify = cfg.get("verify_tls", True)
+        self.timeout = cfg.get("timeout", 10)
+
+    def send(self, events):
+        try:
+            import requests
+        except ImportError:
+            return False
+        url = f"{self.url}/services/collector/event"
+        headers = {
+            "Authorization": f"Splunk {self.token}",
+            "Content-Type": "application/json",
+        }
+        body = "\n".join(json.dumps({
+            "time": e.get("timestamp", time.time()),
+            "host": _hostname(),
+            "source": self.source,
+            "sourcetype": self.sourcetype,
+            "index": self.index,
+            "event": e,
+        }) for e in events)
+        try:
+            r = requests.post(url, data=body, headers=headers,
+                              verify=self.verify, timeout=self.timeout)
+            return r.status_code in (200, 201)
+        except Exception:
+            return False
+
+    def test(self):
+        try:
+            import requests
+        except ImportError:
+            return False, "requests not installed"
+        url = f"{self.url}/services/collector/health"
+        headers = {"Authorization": f"Splunk {self.token}"}
+        try:
+            r = requests.get(url, headers=headers,
+                             verify=self.verify, timeout=self.timeout)
+            return r.status_code == 200, f"HTTP {r.status_code}"
+        except Exception as e:
+            return False, str(e)
+
+
+class ElasticBulk(SiemTarget):
+    name = "elastic"
+    def __init__(self, cfg: Dict[str, Any]):
+        self.url = cfg["url"].rstrip('/')
+        self.index = cfg.get("index", "shield-events")
+        self.api_key = cfg.get("api_key")
+        self.username = cfg.get("username")
+        self.password = cfg.get("password")
+        self.verify = cfg.get("verify_tls", True)
+        self.timeout = cfg.get("timeout", 10)
+
+    def _headers(self):
+        h = {"Content-Type": "application/x-ndjson"}
+        if self.api_key:
+            h["Authorization"] = f"ApiKey {self.api_key}"
+        return h
+
+    def _auth(self):
+        if self.username and self.password:
+            return (self.username, self.password)
+        return None
+
+    def _resolve_index(self) -> str:
+        idx = self.index
+        if "%" in idx:
+            idx = datetime.now().strftime(idx)
+        return idx
+
+    def send(self, events):
+        try:
+            import requests
+        except ImportError:
+            return False
+        idx = self._resolve_index()
+        lines = []
+        for e in events:
+            lines.append(json.dumps({"index": {"_index": idx}}))
+            lines.append(json.dumps(e))
+        body = "\n".join(lines) + "\n"
+        url = f"{self.url}/_bulk"
+        try:
+            r = requests.post(url, data=body, headers=self._headers(),
+                              auth=self._auth(), verify=self.verify,
+                              timeout=self.timeout)
+            return r.status_code in (200, 201)
+        except Exception:
+            return False
+
+    def test(self):
+        try:
+            import requests
+        except ImportError:
+            return False, "requests not installed"
+        try:
+            r = requests.get(f"{self.url}/", headers=self._headers(),
+                             auth=self._auth(), verify=self.verify,
+                             timeout=self.timeout)
+            return r.status_code == 200, f"HTTP {r.status_code}"
+        except Exception as e:
+            return False, str(e)
+
+
+class LokiPush(SiemTarget):
+    name = "loki"
+    def __init__(self, cfg: Dict[str, Any]):
+        self.url = cfg["url"].rstrip('/')
+        self.labels = cfg.get("labels", {"job": "shield_core"})
+        self.verify = cfg.get("verify_tls", True)
+        self.timeout = cfg.get("timeout", 10)
+        self.username = cfg.get("username")
+        self.password = cfg.get("password")
+
+    def _auth(self):
+        if self.username and self.password:
+            return (self.username, self.password)
+        return None
+
+    def send(self, events):
+        try:
+            import requests
+        except ImportError:
+            return False
+        values = []
+        for e in events:
+            ts_ns = str(int(e.get("timestamp", time.time()) * 1_000_000_000))
+            values.append([ts_ns, json.dumps(e)])
+        payload = {"streams": [{"stream": self.labels, "values": values}]}
+        url = f"{self.url}/loki/api/v1/push"
+        try:
+            r = requests.post(url, json=payload,
+                              auth=self._auth(), verify=self.verify,
+                              timeout=self.timeout)
+            return r.status_code in (200, 204)
+        except Exception:
+            return False
+
+    def test(self):
+        try:
+            import requests
+        except ImportError:
+            return False, "requests not installed"
+        try:
+            r = requests.get(f"{self.url}/ready",
+                             auth=self._auth(), verify=self.verify,
+                             timeout=self.timeout)
+            return r.status_code == 200, f"HTTP {r.status_code}"
+        except Exception as e:
+            return False, str(e)
+
+
+class GenericWebhook(SiemTarget):
+    name = "webhook"
+    def __init__(self, cfg: Dict[str, Any]):
+        self.url = cfg["url"]
+        self.headers = cfg.get("headers", {})
+        self.verify = cfg.get("verify_tls", True)
+        self.timeout = cfg.get("timeout", 10)
+
+    def send(self, events):
+        try:
+            import requests
+        except ImportError:
+            return False
+        headers = {"Content-Type": "application/json"}
+        headers.update(self.headers)
+        try:
+            r = requests.post(self.url, json={"events": events},
+                              headers=headers, verify=self.verify,
+                              timeout=self.timeout)
+            return r.status_code in (200, 201, 202, 204)
+        except Exception:
+            return False
+
+    def test(self):
+        try:
+            import requests
+        except ImportError:
+            return False, "requests not installed"
+        try:
+            r = requests.post(self.url, json={"events": [{"test": True}]},
+                              headers=self.headers, verify=self.verify,
+                              timeout=self.timeout)
+            return r.status_code < 500, f"HTTP {r.status_code}"
+        except Exception as e:
+            return False, str(e)
+
+
+def make_siem_target(cfg: Dict[str, Any]) -> Optional[SiemTarget]:
+    t = cfg.get("type", "").lower()
+    try:
+        if t == "splunk":   return SplunkHEC(cfg)
+        if t == "elastic":  return ElasticBulk(cfg)
+        if t == "loki":     return LokiPush(cfg)
+        if t == "webhook":  return GenericWebhook(cfg)
+    except Exception as e:
+        print(f"{Colors.YELLOW}[!] Bad SIEM target ({t}): {e}{Colors.END}")
+    return None
+
+
+class SiemForwarder:
+    def __init__(self, targets: List[Dict[str, Any]] = None,
+                 batch_size: int = 50, flush_interval: float = 5.0,
+                 queue_max: int = 10000):
+        self.targets: List[SiemTarget] = []
+        for cfg in (targets or []):
+            t = make_siem_target(cfg)
+            if t:
+                self.targets.append(t)
+        self.batch_size = batch_size
+        self.flush_interval = flush_interval
+        self.queue: "deque[Dict[str, Any]]" = deque(maxlen=queue_max)
+        self.queue_max = queue_max
+        self.dropped = 0
+        self.sent = 0
+        self.failed = 0
+        self._stop = threading.Event()
+        self._thread: Optional[threading.Thread] = None
+        self._lock = threading.Lock()
+
+    def start(self):
+        if not self.targets: return
+        if self._thread and self._thread.is_alive(): return
+        self._stop.clear()
+        self._thread = threading.Thread(target=self._loop, daemon=True)
+        self._thread.start()
+
+    def stop(self):
+        self._stop.set()
+        if self._thread:
+            self._thread.join(timeout=3)
+
+    def emit(self, event_dict: Dict[str, Any]):
+        with self._lock:
+            if len(self.queue) >= self.queue_max:
+                self.dropped += 1
+            self.queue.append(event_dict)
+
+    def _drain_batch(self) -> List[Dict[str, Any]]:
+        batch = []
+        with self._lock:
+            while self.queue and len(batch) < self.batch_size:
+                batch.append(self.queue.popleft())
+        return batch
+
+    def _loop(self):
+        last_flush = time.time()
+        while not self._stop.is_set():
+            batch = self._drain_batch()
+            now = time.time()
+            should_flush = (len(batch) >= self.batch_size or
+                            (batch and now - last_flush >= self.flush_interval))
+            if should_flush and batch:
+                self._send_to_all(batch)
+                last_flush = now
+            time.sleep(0.25)
+        while True:
+            batch = self._drain_batch()
+            if not batch: break
+            self._send_to_all(batch)
+
+    def _send_to_all(self, batch):
+        for t in self.targets:
+            ok = False
+            for attempt in range(3):
+                try:
+                    ok = t.send(batch)
+                except Exception:
+                    ok = False
+                if ok: break
+                time.sleep(0.5 * (2 ** attempt))
+            if ok:
+                self.sent += len(batch)
+            else:
+                self.failed += len(batch)
+
+    def flush(self, timeout: float = 5.0):
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            with self._lock:
+                if not self.queue:
+                    return
+            time.sleep(0.1)
+
+    def stats(self) -> Dict[str, Any]:
+        return {
+            "targets": [t.name for t in self.targets],
+            "queued": len(self.queue),
+            "sent": self.sent,
+            "failed": self.failed,
+            "dropped": self.dropped,
+        }
+
+    def test_targets(self) -> List[Tuple[str, bool, str]]:
+        out = []
+        for t in self.targets:
+            ok, msg = t.test()
+            out.append((t.name, ok, msg))
+        return out
+
+# ============================================================
+# CONFIG FILE
+# ============================================================
+DEFAULT_CONFIG = {
+    "workspace": None,
+    "backend": "lr",
+    "shadow_mode": False,
+    "deploy_user_honeypots": False,
+    "watch_path": None,
+    "realtime": True,
+    "auto_response": {
+        "kill_process": True,
+        "rollback_files": True,
+        "quarantine_current": True,
+        "blacklist_process": True,
+        "dry_run": False,
+        "min_level": "RANSOMWARE_DETECTED",
+    },
+    "siem": {
+        "enabled": False,
+        "targets": [],
+        "batch_size": 50,
+        "flush_interval": 5.0,
+        "queue_max": 10000,
+    },
+}
+
+def _deep_merge(base: dict, overlay: dict):
+    for k, v in overlay.items():
+        if k in base and isinstance(base[k], dict) and isinstance(v, dict):
+            _deep_merge(base[k], v)
+        else:
+            base[k] = v
+
+def load_config(path: str) -> Dict[str, Any]:
+    cfg = json.loads(json.dumps(DEFAULT_CONFIG))
+    if path and os.path.exists(path):
+        try:
+            with open(path) as f:
+                user = json.load(f)
+            _deep_merge(cfg, user)
+        except Exception as e:
+            print(f"{Colors.YELLOW}[!] Config load failed: {e}{Colors.END}")
+    return cfg
+
+# ============================================================
+# DAEMON RUNTIME (stale PID detection)
+# ============================================================
+class DaemonRuntime:
+    def __init__(self, shield: "ShieldCore", pid_path: str,
+                 log_path: str = None):
+        self.shield = shield
+        self.pid_path = pid_path
+        self.log_path = log_path or os.path.join(
+            shield.workspace_dir, "logs", "daemon.log")
+        self._shutdown = threading.Event()
+        self._reload = threading.Event()
+        self._stats = threading.Event()
+        os.makedirs(os.path.dirname(self.log_path), exist_ok=True)
+
+    def _write_pid(self):
+        # detect and clear stale PID files
+        if os.path.exists(self.pid_path):
+            try:
+                with open(self.pid_path) as f:
+                    old_pid = int(f.read().strip())
+                alive = False
+                try:
+                    os.kill(old_pid, 0)
+                    alive = True
+                except OSError:
+                    alive = False
+                if alive and old_pid != os.getpid():
+                    print(f"{Colors.RED}[x] Another instance is running "
+                          f"(pid={old_pid}). Aborting.{Colors.END}")
+                    sys.exit(1)
+                else:
+                    print(f"{Colors.YELLOW}[!] Removing stale PID file "
+                          f"(pid={old_pid} is dead){Colors.END}")
+                    os.remove(self.pid_path)
+            except Exception as e:
+                print(f"{Colors.YELLOW}[!] Could not verify PID file: "
+                      f"{e}{Colors.END}")
+        try:
+            with open(self.pid_path, 'w') as f:
+                f.write(str(os.getpid()))
+        except Exception as e:
+            print(f"[!] Could not write PID file {self.pid_path}: {e}")
+
+    def _remove_pid(self):
+        try:
+            if os.path.exists(self.pid_path):
+                with open(self.pid_path) as f:
+                    pid_in_file = f.read().strip()
+                if pid_in_file == str(os.getpid()):
+                    os.remove(self.pid_path)
+        except Exception:
+            pass
+
+    def _log(self, msg: str):
+        line = f"{datetime.now().isoformat()} [daemon pid={os.getpid()}] {msg}\n"
+        try:
+            with open(self.log_path, 'a') as f:
+                f.write(line)
+        except Exception:
+            pass
+        print(f"{Colors.DIM}{line.rstrip()}{Colors.END}")
+
+    def _install_signals(self):
+        def handle_term(signum, frame):
+            self._log(f"Received SIGTERM/SIGINT ({signum}); shutting down")
+            self._shutdown.set()
+        def handle_hup(signum, frame):
+            self._log("Received SIGHUP; will reload IOC feed")
+            self._reload.set()
+        def handle_usr1(signum, frame):
+            self._log("Received SIGUSR1; will dump status")
+            self._stats.set()
+
+        signal.signal(signal.SIGTERM, handle_term)
+        signal.signal(signal.SIGINT, handle_term)
+        if hasattr(signal, "SIGHUP"):
+            signal.signal(signal.SIGHUP, handle_hup)
+        if hasattr(signal, "SIGUSR1"):
+            signal.signal(signal.SIGUSR1, handle_usr1)
+        atexit.register(self._remove_pid)
+
+    def run(self, watch_path: str = None, realtime: bool = True):
+        self._write_pid()
+        self._install_signals()
+        self._log(f"Shield daemon started (pid={os.getpid()})")
+        self._log(f"Workspace: {self.shield.workspace_dir}")
+        self._log(f"Backend:   {self.shield.backend}")
+        self._log(f"Shadow:    {self.shield.shadow_mode}")
+
+        observer = None
+        if watch_path and realtime and WATCHDOG_OK:
+            handler = ShieldEventHandler(self.shield, ignore_patterns=[
+                r'\.swp$', r'\.swx$', r'\.kate-swp$', r'~$',
+                r'(^|/)\.\#', r'\.~lock\.', r'\.goutputstream-',
+                r'\.tmp$', r'\.log$', r'\.part$', r'\.crdownload$',
+                r'\.git/', r'__pycache__/', r'node_modules/',
+                r'\.venv/', r'venv/', r'\.cache/',
+                r'/proc/', r'/sys/', r'/dev/', r'/run/',
+            ])
+            bridge = _WatchdogBridge(handler)
+            observer = Observer()
+            observer.schedule(bridge, os.path.expanduser(watch_path),
+                              recursive=True)
+            observer.start()
+            self._log(f"Watchdog watching: {watch_path}")
+
+        self.shield.start_monitoring()
+        self._log("Monitoring thread active")
+
+        last_stats = time.time()
+        try:
+            while not self._shutdown.is_set():
+                if self._reload.is_set():
+                    self._reload.clear()
+                    try:
+                        n = self.shield.intel.load_file(self.shield.intel_path)
+                        self.shield.intel.save(self.shield.intel_path)
+                        self._log(f"Reloaded {n} IOCs on SIGHUP")
+                    except Exception as e:
+                        self._log(f"IOC reload failed: {e}")
+
+                if self._stats.is_set():
+                    self._stats.clear()
+                    st = self.shield.get_status()
+                    self._log(f"STATUS: {json.dumps(st)}")
+
+                if time.time() - last_stats > 300:
+                    last_stats = time.time()
+                    st = self.shield.get_status()
+                    self._log(f"periodic: events={st['events_monitored']} "
+                              f"blacklist={st['blacklist_size']} "
+                              f"sessions={st['sessions_tracked']}")
+
+                time.sleep(1)
+        finally:
+            self._log("Shutdown requested; cleaning up...")
+            self.shield.stop_monitoring()
+            if observer:
+                observer.stop()
+                try: observer.join(timeout=3)
+                except Exception: pass
+            if getattr(self.shield, "siem", None):
+                try:
+                    self.shield.siem.flush(timeout=5.0)
+                    self._log("SIEM queue flushed")
+                except Exception as e:
+                    self._log(f"SIEM flush error: {e}")
+            self.shield.save_models()
+            self._remove_pid()
+            self._log("Daemon stopped cleanly")
+
+# ============================================================
+# CORE: SHIELD CORE v5.6.1
 # ============================================================
 class ShieldCore:
     def __init__(self, workspace_dir: str = None, autotrain_if: bool = True,
@@ -939,7 +1878,6 @@ class ShieldCore:
         self.backup_dir = None
         self.honeypot_dir = None
         self.policies = SecurityPolicies()
-        # v5.3: opt-in user honeypots
         self.policies.deploy_user_honeypots = deploy_user_honeypots
         self.is_active = False
         self._monitor_thread = None
@@ -958,6 +1896,7 @@ class ShieldCore:
         self.if_path = os.path.join(self.models_dir, "shield_if.pkl")
         self.intel_path = os.path.join(self.models_dir, "intel.txt")
         self.intel_url_path = os.path.join(self.models_dir, "intel_url.txt")
+        self.blacklist_path = os.path.join(self.models_dir, "blacklist.json")
 
         self._init_workspace()
 
@@ -1004,14 +1943,30 @@ class ShieldCore:
 
         self.correlator = ProcessCorrelator(self, events_per_check=20)
         self.autotrain_if = autotrain_if
-        # v5.3: track anomalies per process for escalation
         self._anomaly_hits: Dict[str, int] = defaultdict(int)
+
+        # Blacklist + auto-response
+        self.blacklist = ProcessBlacklist(self.blacklist_path)
+        self.auto_response_policy = AutoResponsePolicy(
+            kill_process=True,
+            rollback_files=True,
+            quarantine_current=True,
+            blacklist_process=True,
+            dry_run=False,
+        )
+        self.auto_response = AutoResponse(self, self.auto_response_policy)
+
+        # SIEM (wired later by daemon/cmd)
+        self.siem: Optional[SiemForwarder] = None
 
         if self.shadow_mode:
             self.typer.type_warning("SHADOW MODE: detections logged, no quarantine")
         if self.policies.deploy_user_honeypots:
             self.typer.type_warning(
                 "User-directory honeypots ENABLED (~/Documents, etc.)")
+        if self.blacklist.entries:
+            self.typer.type_warning(
+                f"Blacklist has {len(self.blacklist.entries)} entries")
 
     # -------- Workspace / honeypots --------
     def _init_workspace(self):
@@ -1030,7 +1985,6 @@ class ShieldCore:
     def _deploy_honeypots(self):
         self.typer.type_status("Deploying honeypots...", Colors.YELLOW)
         deployed = 0
-        # Workspace honeypots always deployed
         for name, content in [
             ("honeypot_1.txt", "HONEYPOT - DO NOT MODIFY"),
             ("honeypot_2.txt", "HONEYPOT - DO NOT MODIFY"),
@@ -1044,7 +1998,6 @@ class ShieldCore:
             except Exception:
                 pass
 
-        # v5.3: user-directory honeypots are OPT-IN
         if self.policies.deploy_user_honeypots:
             for profile in self._get_all_user_profiles():
                 for sub, fname, cont in [
@@ -1145,7 +2098,38 @@ class ShieldCore:
             self.typer.type_error(f"🎯 IOC HIT: {hits[0]}")
         return d
 
+    def _siem_emit(self, event: FileEvent, d: Decision, kind: str = "event"):
+        if not self.siem:
+            return
+        payload = {
+            "kind": kind,
+            "timestamp": event.timestamp,
+            "host": _hostname(),
+            "event": {
+                "path": event.path,
+                "operation": event.operation,
+                "process_name": event.process_name,
+                "pid": event.pid,
+            },
+            "decision": {
+                "level": d.threat_level.name,
+                "rule": d.rule_score,
+                "ml": d.ml_score,
+                "anomaly": d.anomaly_score,
+                "fused": d.fused_score,
+                "reasons": d.reasons,
+            },
+            "workspace": self.workspace_dir,
+        }
+        self.siem.emit(payload)
+
     def analyze_event(self, event: FileEvent) -> Decision:
+        # Pre-write snapshot for rollback
+        backup_path = None
+        if event.operation == 'write':
+            backup_path = self.auto_response.rollback.snapshot_before_write(event)
+            self.auto_response.rollback.record(event, backup_path)
+
         self.event_log.append(event)
         stats = self._update_process_stats(event)
 
@@ -1157,8 +2141,24 @@ class ShieldCore:
         fv = self.extractor.extract(event, stats)
         d = self.engine.decide(fv)
         d = self._apply_intel(event, d)
+
+        # Blacklist auto-escalation (v5.6.1: never for self/observer)
+        if (not _is_self_event(event)
+                and self.blacklist.contains(event.process_name)):
+            entry = self.blacklist.get(event.process_name)
+            if d.threat_level.value < ThreatLevel.HIGH_RISK.value:
+                d.threat_level = ThreatLevel.HIGH_RISK
+                d.fused_score = max(d.fused_score, 0.65)
+                d.reasons.append(
+                    f"Blacklisted process (hits={entry.get('hits', 0)})")
+
         self._log_decision(event, d)
 
+        # Ship detection events to SIEM
+        if d.threat_level.value >= ThreatLevel.SUSPICIOUS.value:
+            self._siem_emit(event, d, kind="detection")
+
+        # Session correlation (advisory only)
         agg = self.correlator.observe(event)
         if agg and agg.threat_level.value > d.threat_level.value:
             self.typer.type_warning(
@@ -1166,9 +2166,12 @@ class ShieldCore:
                 f"for PID {event.pid or '?'} ({event.process_name})")
             for r in agg.reasons[-2:]:
                 print(f"   {Colors.DIM}→ {r}{Colors.END}")
-            d = agg
+            if agg.threat_level.value >= self.auto_response_policy.min_level.value:
+                d = agg
+            else:
+                self._siem_emit(event, agg, kind="session_elevation")
 
-        # v5.3: ANOMALY escalation — repeated anomalies from same process
+        # ANOMALY escalation
         if d.threat_level == ThreatLevel.ANOMALY:
             self._anomaly_hits[event.process_name] += 1
             count = self._anomaly_hits[event.process_name]
@@ -1178,8 +2181,12 @@ class ShieldCore:
                 d.reasons.append(
                     f"Escalated: {count} anomalies from {event.process_name}")
 
-        if d.threat_level in (ThreatLevel.RANSOMWARE_DETECTED, ThreatLevel.HIGH_RISK):
+        # Full auto-response on confirmed threat
+        if d.threat_level.value >= self.auto_response_policy.min_level.value:
             self._respond_to_threat(event, d)
+        elif d.threat_level == ThreatLevel.HIGH_RISK:
+            self._respond_to_threat(event, d)
+
         return d
 
     def _log_decision(self, event: FileEvent, d: Decision):
@@ -1198,14 +2205,40 @@ class ShieldCore:
             print(f"   {Colors.DIM}→ {r}{Colors.END}")
 
     def _respond_to_threat(self, event: FileEvent, d: Decision):
+        # v5.6.1: silently skip self/observer events before any logging
+        if _is_self_event(event):
+            return
+
         if self.shadow_mode:
             self.typer.type_warning(
                 f"[SHADOW] Would respond to {event.process_name} "
-                f"(fused={d.fused_score:.2f})")
-        else:
-            self.typer.type_error(f"🚨 RESPONSE: {event.process_name}")
-            self.quarantine_file(event.path)
+                f"(fused={d.fused_score:.2f}, level={d.threat_level.name})")
+            self._save_incident(event, d)
+            return
+
+        self.typer.type_error(
+            f"🚨 AUTO-RESPONSE: {event.process_name} "
+            f"({d.threat_level.name}, fused={d.fused_score:.2f})")
+
+        report = self.auto_response.handle(event, d)
         self._save_incident(event, d)
+        self._siem_emit(event, d, kind="response")
+
+        # v5.6.1: safe access even when report fields are explicitly None
+        kill_report = report.get('kill') or {}
+        rollback_report = report.get('rollback') or {}
+        killed = len(kill_report.get('killed', []) or [])
+        restored = rollback_report.get('restored', 0)
+        attempted = rollback_report.get('attempted', 0)
+        skipped = report.get('skipped')
+        if skipped:
+            self.typer.type_info(
+                f"Response SKIPPED ({skipped}): {report.get('skipped_reason', '')}")
+        else:
+            self.typer.type_info(
+                f"Response: killed={killed}, "
+                f"rollback={restored}/{attempted}, "
+                f"blacklisted={self.blacklist.contains(event.process_name)}")
 
     def _save_incident(self, event: FileEvent, d: Decision):
         p = os.path.join(
@@ -1230,11 +2263,10 @@ class ShieldCore:
         except Exception as e:
             self.typer.type_warning(f"Incident save failed: {e}")
 
-    # -------- Response / Recovery --------
+    # -------- Response / Recovery (low-level) --------
     def contain_threat(self, process_name: str, pid: int) -> bool:
         try:
-            import psutil
-            if psutil.pid_exists(pid):
+            if PSUTIL_OK and psutil.pid_exists(pid) and pid != os.getpid():
                 pr = psutil.Process(pid); pr.terminate(); pr.wait(timeout=5)
                 self.typer.type_success(f"Terminated {process_name}")
                 return True
@@ -1291,6 +2323,8 @@ class ShieldCore:
         except Exception as e: self.typer.type_warning(f"IF save failed: {e}")
         try: self.intel.save(self.intel_path)
         except Exception: pass
+        try: self.blacklist.save()
+        except Exception: pass
 
     def train_anomaly_now(self) -> bool:
         ok = self.anomaly.train_if_ready()
@@ -1319,6 +2353,14 @@ class ShieldCore:
             "model_path": self.clf_path,
             "if_buffer_size": len(self.anomaly.buffer),
             "if_train_calls": self.anomaly.train_calls,
+            "blacklist": self.blacklist.summary()[:20],
+            "auto_response_policy": {
+                'kill_process': self.auto_response_policy.kill_process,
+                'rollback_files': self.auto_response_policy.rollback_files,
+                'dry_run': self.auto_response_policy.dry_run,
+                'min_level': self.auto_response_policy.min_level.name,
+            },
+            "siem": self.siem.stats() if self.siem else None,
             "sessions": self.correlator.summary()[:10],
             "recent_events": [
                 {"time": datetime.fromtimestamp(e.timestamp).isoformat(),
@@ -1344,6 +2386,7 @@ class ShieldCore:
             "backup_dir": self.backup_dir,
             "workspace_dir": self.workspace_dir,
             "ml_updates": self.classifier.n_updates,
+            "ml_trusted": self.classifier.n_updates >= HybridDecisionEngine.MIN_ML_UPDATES,
             "if_samples": len(self.anomaly.buffer),
             "if_ready": self.anomaly.model is not None,
             "if_train_calls": self.anomaly.train_calls,
@@ -1352,6 +2395,9 @@ class ShieldCore:
             "ioc_hashes": len(self.intel.hashes),
             "ioc_proc": len(self.intel.process_patterns),
             "ioc_path": len(self.intel.path_patterns),
+            "blacklist_size": len(self.blacklist.entries),
+            "auto_response_dry_run": self.auto_response_policy.dry_run,
+            "siem_enabled": self.siem is not None,
         }
 
     # -------- Monitoring thread --------
@@ -1469,7 +2515,7 @@ def train_from_csv(csv_path: str, model_out: str, epochs: int = 100,
     print(f"[+] Saved → {model_out}")
 
 # ============================================================
-# WATCHDOG REAL-TIME OBSERVER (v5.3 - swap-file filtering)
+# WATCHDOG REAL-TIME OBSERVER
 # ============================================================
 class ShieldEventHandler:
     def __init__(self, shield: ShieldCore,
@@ -1480,28 +2526,21 @@ class ShieldEventHandler:
         self._debounce_sec = 0.15
 
     def _should_ignore(self, path: str) -> bool:
-        # Regex ignore patterns
         for pat in self.ignore_patterns:
             if pat.search(path): return True
-
-        # Ignore our own workspace
         try:
             ws = os.path.abspath(self.shield.workspace_dir)
             if os.path.abspath(path).startswith(ws): return True
         except Exception:
             pass
-
-        # Model artifacts
         if path.endswith(('.pkl', '.pyc', '.pt')): return True
 
-        # v5.3: swap / backup siblings of honeypots
         base = os.path.basename(path)
         for hp in self.shield.honeypot_paths:
             hp_base = os.path.basename(hp)
             if hp_base in base and base != hp_base:
                 return True
 
-        # v5.3: dotfile editor artifacts
         if base.startswith('.'):
             for marker in ('.swp', '.swx', '.kate-swp', '.goutputstream',
                            '.~lock', '.tmp', '.crdownload', '.part'):
@@ -1524,8 +2563,9 @@ class ShieldEventHandler:
 
     def _emit(self, path: str, op: str):
         if self._should_ignore(path) or self._debounced(path): return
+        # pid=0 so correlator/auto-response never treat this as a real process
         ev = FileEvent(path=path, operation=op,
-                       process_name="watchdog", pid=os.getpid())
+                       process_name="watchdog", pid=0)
         try: self.shield.analyze_event(ev)
         except Exception as e:
             self.shield.typer.type_warning(f"watchdog analyze error: {e}")
@@ -1700,6 +2740,16 @@ def create_dashboard_app(workspace_dir: str):
         with open(fp, 'w') as f: json.dump(d, f, indent=2)
         return jsonify({'ok': True})
 
+    @app.route("/api/blacklist")
+    def api_blacklist():
+        bl_path = os.path.join(workspace_dir, "models", "blacklist.json")
+        if not os.path.exists(bl_path):
+            return jsonify([])
+        try:
+            with open(bl_path) as f: return jsonify(json.load(f))
+        except Exception:
+            return jsonify([])
+
     return app
 
 # ============================================================
@@ -1710,13 +2760,18 @@ class AnalystCLI:
         self.shield = shield
         self.incidents_dir = shield.incidents_dir
 
-    def list_pending(self):
+    def list_pending(self, include_observer: bool = False):
+        banned = _self_process_names() | OBSERVER_PROCESS_NAMES
         files = sorted(glob.glob(os.path.join(self.incidents_dir, "*.json")))
         pending = []
         for fp in files:
             try:
                 with open(fp) as f: d = json.load(f)
-                if d.get('label') is None: pending.append(fp)
+                if d.get('label') is not None: continue
+                if not include_observer:
+                    proc = d.get('event', {}).get('process_name', '')
+                    if proc in banned: continue
+                pending.append(fp)
             except Exception:
                 continue
         return pending
@@ -1751,8 +2806,8 @@ class AnalystCLI:
         self.shield.engine.record_feedback(fv, label)
         self.shield.save_models()
 
-    def run_interactive(self):
-        pending = self.list_pending()
+    def run_interactive(self, include_observer: bool = False):
+        pending = self.list_pending(include_observer=include_observer)
         if not pending:
             print(f"{Colors.GREEN}No pending incidents to label.{Colors.END}")
             return
@@ -1820,13 +2875,77 @@ def _ensure_file(path, size=4096, high_entropy=False):
         return tmp
 
 
+def cmd_purge_legacy(args):
+    """
+    Remove incident JSONs and blacklist entries created by self/observer
+    processes (from pre-v5.6.1 poisoned runs).
+    """
+    ws = args.workspace or os.path.expanduser("~/dsterminal_workspace")
+    inc_dir = os.path.join(ws, "incidents")
+    bl_path = os.path.join(ws, "models", "blacklist.json")
+    banned = _self_process_names() | OBSERVER_PROCESS_NAMES
+
+    removed_incidents = 0
+    kept_incidents = 0
+
+    if not os.path.isdir(inc_dir):
+        print(f"{Colors.YELLOW}[!] No incidents dir at {inc_dir}{Colors.END}")
+        return
+
+    for fp in glob.glob(os.path.join(inc_dir, "*.json")):
+        try:
+            with open(fp) as f:
+                d = json.load(f)
+            proc = d.get('event', {}).get('process_name', '')
+            reasons = d.get('decision', {}).get('reasons', []) or []
+            poisoned = (
+                proc in banned
+                or any('Blacklisted process' in r for r in reasons)
+                or any('self_process_protection' in str(r) for r in reasons)
+            )
+            if poisoned:
+                if args.dry_run:
+                    print(f"{Colors.DIM}would remove:{Colors.END} {fp}")
+                else:
+                    os.remove(fp)
+                removed_incidents += 1
+            else:
+                kept_incidents += 1
+        except Exception:
+            continue
+
+    # Purge blacklist entries
+    removed_bl = 0
+    if os.path.exists(bl_path):
+        try:
+            with open(bl_path) as f:
+                entries = json.load(f)
+            before = len(entries)
+            entries = {k: v for k, v in entries.items() if k not in banned}
+            removed_bl = before - len(entries)
+            if removed_bl and not args.dry_run:
+                with open(bl_path, 'w') as f:
+                    json.dump(entries, f, indent=2)
+        except Exception:
+            pass
+
+    verb = "Would remove" if args.dry_run else "Removed"
+    print(f"\n{Colors.BOLD}Legacy purge summary{Colors.END}")
+    print(f"  {verb} {removed_incidents} poisoned incident file(s)")
+    print(f"  Kept {kept_incidents} valid incident file(s)")
+    print(f"  {verb} {removed_bl} blacklist entry/entries")
+    if args.dry_run:
+        print(f"\n  {Colors.DIM}Dry-run mode. Rerun without --dry-run to apply.{Colors.END}")
+
+
 def cmd_demo(args):
     typer = AutoTypeEngine(delay=0.02)
     os.system('cls' if os.name == 'nt' else 'clear')
     typer.type_banner([
         "╔══════════════════════════════════════════════════════════════╗",
-        "║    DSTERMINAL SHIELD CORE v5.3 - HYBRID FULL SUITE          ║",
+        "║    DSTERMINAL SHIELD CORE v5.6.1 - CLEAN EDITION            ║",
         "║   Rules + LR/MLP + IsolationForest + Session + Intel + Web  ║",
+        "║   + Auto-Response + Daemon + SIEM + Self-Protection         ║",
         "╚══════════════════════════════════════════════════════════════╝",
     ], Colors.CYAN)
 
@@ -1863,10 +2982,17 @@ def cmd_demo(args):
     typer.type_status("Training IsolationForest on observed samples...")
     Xb, _ = generate_synthetic_training_data(n_benign=600, n_malicious=0)
     for x in Xb[:600]: shield.anomaly.observe(x, label=0)
-    # v5.3: train multiple times to exercise the trust ramp
-    shield.anomaly.min_samples = 100  # demo-only: lower bar so it trains
+    shield.anomaly.min_samples = 100
     for _ in range(3):
         shield.anomaly.train_if_ready()
+
+    if getattr(shield.classifier, "n_updates", 0) < HybridDecisionEngine.MIN_ML_UPDATES:
+        typer.type_warning(
+            f"Classifier has only {shield.classifier.n_updates} updates. "
+            f"ML scores are downweighted until {HybridDecisionEngine.MIN_ML_UPDATES}.")
+        typer.type_info(
+            "Next: `python shield_core.py label` → mark incidents → "
+            "`export` → `train --csv …`")
 
     shield.generate_forensic_report()
     st = shield.get_status()
@@ -1876,13 +3002,16 @@ def cmd_demo(args):
         f"Shadow Mode    : {st['shadow_mode']}",
         f"Events analyzed: {st['events_monitored']}",
         f"Honeypots      : {st['honeypots']}",
-        f"ML updates     : {st['ml_updates']}",
+        f"ML updates     : {st['ml_updates']}  trusted={st['ml_trusted']}",
         f"IF samples     : {st['if_samples']}",
         f"IF ready       : {st['if_ready']}",
         f"IF train calls : {st['if_train_calls']}",
         f"IF trusted     : {st['if_trusted']}",
         f"Sessions       : {st['sessions_tracked']}",
         f"IOC hashes     : {st['ioc_hashes']}",
+        f"Blacklist size : {st['blacklist_size']}",
+        f"AutoResp dry   : {st['auto_response_dry_run']}",
+        f"SIEM enabled   : {st['siem_enabled']}",
         f"Workspace      : {shield.workspace_dir}",
     ], Colors.GREEN)
     print()
@@ -1893,7 +3022,8 @@ def cmd_label(args):
     shield = ShieldCore(workspace_dir=ws, backend=args.backend)
     cli = AnalystCLI(shield)
     cli.bulk_label_report()
-    if not args.stats: cli.run_interactive()
+    if not args.stats:
+        cli.run_interactive(include_observer=args.include_observer)
 
 
 def cmd_bootstrap(args):
@@ -1926,13 +3056,21 @@ def cmd_export(args):
     with open(out_csv, 'w', newline='') as f:
         w = csv.writer(f)
         w.writerow(FeatureVector.feature_names() + ['label'])
+        banned = _self_process_names() | OBSERVER_PROCESS_NAMES
+        skipped = 0
         for fp in glob.glob(os.path.join(inc_dir, "*.json")):
             try:
                 with open(fp) as fh: d = json.load(fh)
                 if d.get('label') is None: continue
+                proc = d.get('event', {}).get('process_name', '')
+                if proc in banned:
+                    skipped += 1
+                    continue
                 w.writerow(list(d['features']) + [d['label']]); count += 1
             except Exception:
                 continue
+        if skipped:
+            print(f"{Colors.YELLOW}[!] Skipped {skipped} self/observer incident(s){Colors.END}")
     print(f"[+] Exported {count} labeled samples → {out_csv}")
 
 
@@ -1958,7 +3096,6 @@ def cmd_train_anomaly(args):
 
 
 def cmd_watch(args):
-    """Polling file watcher fallback."""
     ws = args.workspace or os.path.expanduser("~/dsterminal_workspace")
     deploy_hp = getattr(args, "deploy_honeypots", False)
     shield = ShieldCore(workspace_dir=ws, shadow_mode=args.shadow,
@@ -1989,7 +3126,6 @@ def cmd_watch(args):
 
 
 def cmd_watch_realtime(args):
-    """Watchdog-based real-time observer (v5.3 - swap-file filtering)."""
     if not WATCHDOG_OK:
         print(f"{Colors.RED}[x] watchdog not installed (pip install watchdog){Colors.END}")
         print(f"    Falling back to polling mode.")
@@ -2003,15 +3139,11 @@ def cmd_watch_realtime(args):
     root = os.path.expanduser(args.path or "~")
 
     handler = ShieldEventHandler(shield, ignore_patterns=[
-        # Editor artifacts
         r'\.swp$', r'\.swx$', r'\.kate-swp$', r'~$',
         r'(^|/)\.\#', r'\.~lock\.', r'\.goutputstream-',
-        # Common temp / cache
         r'\.tmp$', r'\.log$', r'\.part$', r'\.crdownload$',
-        # VCS / builds
         r'\.git/', r'__pycache__/', r'node_modules/',
         r'\.venv/', r'venv/', r'\.cache/',
-        # System
         r'/proc/', r'/sys/', r'/dev/', r'/run/',
     ])
     bridge = _WatchdogBridge(handler)
@@ -2049,7 +3181,6 @@ def cmd_intel(args):
     intel_url_path = os.path.join(ws, "models", "intel_url.txt")
     intel = ThreatIntel.load(intel_path)
 
-    # v5.3: --refresh reloads local + re-fetches last URL
     if args.refresh:
         n = intel.load_file(intel_path) if os.path.exists(intel_path) else 0
         extra = 0
@@ -2079,7 +3210,6 @@ def cmd_intel(args):
     if args.url:
         try:
             n = intel.load_url(args.url); intel.save(intel_path)
-            # remember for --refresh
             with open(intel_url_path, 'w') as f:
                 f.write(args.url)
             print(f"{Colors.GREEN}[+] Fetched {n} IOCs from {args.url}{Colors.END}")
@@ -2108,18 +3238,271 @@ def cmd_intel(args):
     print(f"  Path   : {len(intel.path_patterns)}")
     print(f"  File   : {intel_path}")
 
+
+def cmd_rollback(args):
+    ws = args.workspace or os.path.expanduser("~/dsterminal_workspace")
+    shield = ShieldCore(workspace_dir=ws, backend=args.backend)
+    mgr = RollbackManager(shield)
+
+    for fp in glob.glob(os.path.join(shield.incidents_dir, "*.json")):
+        try:
+            with open(fp) as f: d = json.load(f)
+            ev_dict = d.get('event', {})
+            proc = ev_dict.get('process_name')
+            if not proc: continue
+            if args.process and proc != args.process: continue
+            ev = FileEvent(**ev_dict)
+            pattern = f"*_{os.path.basename(ev.path)}.vss"
+            snaps = sorted(glob.glob(os.path.join(shield.backup_dir, pattern)),
+                           key=os.path.getmtime)
+            backup = snaps[-1] if snaps else None
+            mgr.record(ev, backup)
+        except Exception:
+            continue
+
+    if args.list:
+        print(f"\n{Colors.BOLD}Processes with recorded file touches:{Colors.END}")
+        for pname, entries in mgr.history.items():
+            n_write = sum(1 for e in entries if e.operation == 'write')
+            n_snap = sum(1 for e in entries if e.backup_path)
+            print(f"  {Colors.CYAN}{pname:40s}{Colors.END} "
+                  f"writes={n_write:4d}  snapshots={n_snap:4d}")
+        print(f"\n  {Colors.DIM}Blacklist:{Colors.END}")
+        for b in shield.blacklist.summary():
+            print(f"  {Colors.RED}{b['process']:40s}{Colors.END} "
+                  f"hits={b['hits']}  reasons={b['reasons']}")
+        return
+
+    if not args.process:
+        print(f"{Colors.RED}[x] --process required (or use --list){Colors.END}")
+        return
+
+    print(f"\n{Colors.BOLD}Rolling back: {args.process}{Colors.END}")
+    summary = mgr.rollback_process(args.process, dry_run=args.dry_run)
+    print(f"  Attempted : {summary['attempted']}")
+    print(f"  Restored  : {Colors.GREEN}{summary['restored']}{Colors.END}")
+    print(f"  Failed    : {Colors.RED}{summary['failed']}{Colors.END}")
+    print(f"  Skipped   : {Colors.DIM}{summary['skipped']}{Colors.END}")
+    for det in summary['details'][:20]:
+        color = Colors.GREEN if det['status'] in ('restored', 'would_restore') else Colors.RED
+        print(f"    {color}{det['status']:15s}{Colors.END} {det.get('path', '')[:70]}")
+
+    if args.unblacklist and shield.blacklist.contains(args.process):
+        shield.blacklist.remove(args.process)
+        print(f"  {Colors.GREEN}✓ Removed from blacklist{Colors.END}")
+
+
+def cmd_blacklist(args):
+    ws = args.workspace or os.path.expanduser("~/dsterminal_workspace")
+    shield = ShieldCore(workspace_dir=ws, backend=args.backend)
+
+    if args.clear:
+        count = len(shield.blacklist.entries)
+        shield.blacklist.entries.clear()
+        shield.blacklist.save()
+        print(f"{Colors.GREEN}[+] Cleared {count} blacklist entries{Colors.END}")
+        return
+    if args.remove:
+        if shield.blacklist.contains(args.remove):
+            shield.blacklist.remove(args.remove)
+            print(f"{Colors.GREEN}[+] Removed {args.remove}{Colors.END}")
+        else:
+            print(f"{Colors.YELLOW}[!] Not in blacklist: {args.remove}{Colors.END}")
+        return
+    if args.add:
+        shield.blacklist.add(args.add, reason="manual")
+        print(f"{Colors.GREEN}[+] Added {args.add}{Colors.END}")
+        return
+
+    entries = shield.blacklist.summary()
+    if not entries:
+        print(f"{Colors.GREEN}Blacklist is empty.{Colors.END}")
+        return
+    print(f"\n{Colors.BOLD}Process blacklist ({len(entries)}){Colors.END}")
+    for e in entries:
+        last = (datetime.fromtimestamp(e['last_seen']).isoformat()
+                if e.get('last_seen') else "?")
+        print(f"  {Colors.RED}{e['process']:40s}{Colors.END} "
+              f"hits={e['hits']:3d}  last={last}")
+        if e.get('reasons'):
+            print(f"    {Colors.DIM}reasons: {', '.join(e['reasons'])}{Colors.END}")
+    print(f"\n  {Colors.DIM}File: {shield.blacklist_path}{Colors.END}")
+
+
+def cmd_response(args):
+    ws = args.workspace or os.path.expanduser("~/dsterminal_workspace")
+    shield = ShieldCore(workspace_dir=ws, backend=args.backend)
+
+    pol = shield.auto_response_policy
+    if args.dry_run: pol.dry_run = True
+    if args.no_kill: pol.kill_process = False
+    if args.no_rollback: pol.rollback_files = False
+    if args.no_quarantine: pol.quarantine_current = False
+    pol.min_level = ThreatLevel[args.min_level]
+
+    print(f"\n{Colors.BOLD}Auto-Response Policy{Colors.END}")
+    print(f"  Kill process      : {Colors.GREEN if pol.kill_process else Colors.RED}"
+          f"{pol.kill_process}{Colors.END}")
+    print(f"  Rollback files    : {Colors.GREEN if pol.rollback_files else Colors.RED}"
+          f"{pol.rollback_files}{Colors.END}")
+    print(f"  Quarantine file   : {Colors.GREEN if pol.quarantine_current else Colors.RED}"
+          f"{pol.quarantine_current}{Colors.END}")
+    print(f"  Blacklist process : "
+          f"{Colors.GREEN if pol.blacklist_process else Colors.RED}"
+          f"{pol.blacklist_process}{Colors.END}")
+    print(f"  Dry run           : "
+          f"{Colors.YELLOW if pol.dry_run else Colors.GREEN}"
+          f"{pol.dry_run}{Colors.END}")
+    print(f"  Min threat level  : {Colors.YELLOW}{pol.min_level.name}{Colors.END}")
+    print(f"  Self-protection   : {Colors.GREEN}always on{Colors.END} "
+          f"(never acts on self/observer)")
+
+
+def cmd_daemon(args):
+    """Run Shield_Core as a long-lived daemon."""
+    cfg = load_config(args.config) if args.config else load_config(None)
+
+    ws = (args.workspace or cfg.get("workspace")
+          or os.path.expanduser("~/dsterminal_workspace"))
+    backend = args.backend or cfg.get("backend", "lr")
+    shadow = args.shadow if args.shadow is not None else cfg.get("shadow_mode", False)
+    deploy_hp = (args.deploy_honeypots
+                 if args.deploy_honeypots is not None
+                 else cfg.get("deploy_user_honeypots", False))
+
+    shield = ShieldCore(workspace_dir=ws, shadow_mode=shadow,
+                        backend=backend,
+                        deploy_user_honeypots=deploy_hp)
+
+    ar = cfg.get("auto_response", {})
+    shield.auto_response_policy.kill_process = ar.get("kill_process", True)
+    shield.auto_response_policy.rollback_files = ar.get("rollback_files", True)
+    shield.auto_response_policy.quarantine_current = ar.get("quarantine_current", True)
+    shield.auto_response_policy.blacklist_process = ar.get("blacklist_process", True)
+    shield.auto_response_policy.dry_run = ar.get("dry_run", False)
+    try:
+        shield.auto_response_policy.min_level = ThreatLevel[ar.get(
+            "min_level", "RANSOMWARE_DETECTED")]
+    except KeyError:
+        pass
+
+    siem_cfg = cfg.get("siem", {})
+    if siem_cfg.get("enabled"):
+        shield.siem = SiemForwarder(
+            targets=siem_cfg.get("targets", []),
+            batch_size=siem_cfg.get("batch_size", 50),
+            flush_interval=siem_cfg.get("flush_interval", 5.0),
+            queue_max=siem_cfg.get("queue_max", 10000),
+        )
+        shield.siem.start()
+        print(f"{Colors.GREEN}[+] SIEM forwarder active: "
+              f"{len(siem_cfg.get('targets', []))} targets{Colors.END}")
+
+    pid_path = args.pid or os.path.join(ws, "shield.pid")
+    log_path = args.log or os.path.join(ws, "logs", "daemon.log")
+    watch_path = args.path or cfg.get("watch_path")
+    realtime = cfg.get("realtime", True) if args.realtime is None else args.realtime
+
+    daemon = DaemonRuntime(shield, pid_path=pid_path, log_path=log_path)
+    daemon.run(watch_path=watch_path, realtime=realtime)
+
+
+def cmd_siem(args):
+    """Manage SIEM forwarding."""
+    cfg = load_config(args.config) if args.config else load_config(None)
+    siem_cfg = cfg.get("siem", {})
+    if not siem_cfg.get("enabled"):
+        print(f"{Colors.YELLOW}[!] SIEM not enabled in config.{Colors.END}")
+        print(f"    Enable it by editing your config and setting:")
+        print(f'      {{"siem": {{"enabled": true, "targets": [ ... ]}}}}')
+        print(f"")
+        print(f"    Then verify:")
+        print(f"      python shield_core.py siem --config "
+              f"{args.config or '~/.shield_core.json'} --test")
+        return
+
+    forwarder = SiemForwarder(
+        targets=siem_cfg.get("targets", []),
+        batch_size=siem_cfg.get("batch_size", 50),
+        flush_interval=siem_cfg.get("flush_interval", 5.0),
+        queue_max=siem_cfg.get("queue_max", 10000),
+    )
+
+    if args.test:
+        print(f"\n{Colors.BOLD}Testing {len(forwarder.targets)} SIEM "
+              f"target(s){Colors.END}")
+        for name, ok, msg in forwarder.test_targets():
+            color = Colors.GREEN if ok else Colors.RED
+            print(f"  {color}{'OK ' if ok else 'FAIL'}{Colors.END} "
+                  f"{name:12s} {msg}")
+        return
+
+    if args.emit_test:
+        import uuid
+        test_ev = {
+            "kind": "test",
+            "timestamp": time.time(),
+            "host": _hostname(),
+            "event": {
+                "path": "/tmp/shield_siem_test.txt",
+                "operation": "write",
+                "process_name": "shield_siem_test",
+                "pid": os.getpid(),
+            },
+            "decision": {
+                "level": "CLEAN",
+                "rule": 0.0, "ml": 0.0, "anomaly": 0.0, "fused": 0.0,
+                "reasons": ["synthetic test event"],
+            },
+            "test_id": str(uuid.uuid4()),
+        }
+        print(f"{Colors.CYAN}[*] Sending synthetic test event to "
+              f"{len(forwarder.targets)} target(s)...{Colors.END}")
+        forwarder.start()
+        forwarder.emit(test_ev)
+        forwarder.flush(timeout=5.0)
+        forwarder.stop()
+        print(f"{Colors.GREEN}[+] Sent. Check your SIEM for "
+              f"test_id={test_ev['test_id']}{Colors.END}")
+        return
+
+    print(f"\n{Colors.BOLD}SIEM Targets{Colors.END}")
+    for t in forwarder.targets:
+        print(f"  - {t.name}")
+    print(f"\n  batch_size     : {siem_cfg.get('batch_size', 50)}")
+    print(f"  flush_interval : {siem_cfg.get('flush_interval', 5.0)}s")
+    print(f"  queue_max      : {siem_cfg.get('queue_max', 10000)}")
+
+
+def cmd_config_init(args):
+    """Write a starter config file."""
+    out = os.path.expanduser(args.out)
+    os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
+    if os.path.exists(out):
+        print(f"{Colors.YELLOW}[!] {out} already exists.{Colors.END}")
+        try:
+            ans = input("    Overwrite? [y/N] ").strip().lower()
+        except (EOFError, KeyboardInterrupt):
+            ans = 'n'
+        if ans != 'y':
+            print("    Aborted."); return
+    with open(out, 'w') as f:
+        json.dump(DEFAULT_CONFIG, f, indent=2)
+    print(f"{Colors.GREEN}[+] Wrote starter config → {out}{Colors.END}")
+    print(f"    Edit it, then run: python shield_core.py daemon --config {out}")
+
 # ============================================================
 # MAIN
 # ============================================================
 def main():
     p = argparse.ArgumentParser(
         prog="shield_core",
-        description="Shield_Core v5.3 - Hybrid Trainable Ransomware Defense")
+        description="Shield_Core v5.6.1 - Hardened + Clean Edition")
     p.add_argument("--workspace", "-w", default=None,
                    help="Workspace dir (default: ~/dsterminal_workspace)")
     p.add_argument("--backend", choices=['lr', 'torch'], default='lr',
                    help="Classifier backend")
-    p.add_argument("--deploy-honeypots", action="store_true",
+    p.add_argument("--deploy-honeypots", action="store_true", default=None,
                    help="Deploy decoys into user dirs (~/Documents, etc.)")
     sub = p.add_subparsers(dest="cmd")
 
@@ -2133,7 +3516,15 @@ def main():
 
     sp = sub.add_parser("label", help="Label incidents")
     sp.add_argument("--stats", action="store_true")
+    sp.add_argument("--include-observer", action="store_true",
+                    help="Include self/observer incidents (rarely wanted)")
     sp.set_defaults(func=cmd_label)
+
+    sp = sub.add_parser("purge-legacy",
+                        help="Remove self/observer incidents from pre-v5.6.1 runs")
+    sp.add_argument("--dry-run", action="store_true",
+                    help="Show what would be removed, don't delete")
+    sp.set_defaults(func=cmd_purge_legacy)
 
     sp = sub.add_parser("train", help="Train from CSV")
     sp.add_argument("--csv", required=True)
@@ -2168,9 +3559,72 @@ def main():
     sp.add_argument("--autolabel", action="store_true")
     sp.set_defaults(func=cmd_intel)
 
+    sp = sub.add_parser("rollback", help="Roll back files touched by a process")
+    sp.add_argument("--process", help="Process name (e.g. suspicious.exe)")
+    sp.add_argument("--dry-run", action="store_true",
+                    help="Show what would be restored, don't touch files")
+    sp.add_argument("--list", action="store_true",
+                    help="List processes with recorded file touches")
+    sp.add_argument("--unblacklist", action="store_true",
+                    help="Also remove the process from blacklist")
+    sp.set_defaults(func=cmd_rollback)
+
+    sp = sub.add_parser("blacklist", help="Manage the process blacklist")
+    sp.add_argument("--add", help="Add a process name")
+    sp.add_argument("--remove", help="Remove a process name")
+    sp.add_argument("--clear", action="store_true",
+                    help="Clear the entire blacklist")
+    sp.set_defaults(func=cmd_blacklist)
+
+    sp = sub.add_parser("response", help="Configure / inspect auto-response policy")
+    sp.add_argument("--dry-run", action="store_true",
+                    help="Enable dry-run for this session")
+    sp.add_argument("--no-kill", action="store_true",
+                    help="Disable process kill")
+    sp.add_argument("--no-rollback", action="store_true",
+                    help="Disable file rollback")
+    sp.add_argument("--no-quarantine", action="store_true",
+                    help="Disable current-file quarantine")
+    sp.add_argument("--min-level", default="RANSOMWARE_DETECTED",
+                    choices=['SUSPICIOUS', 'HIGH_RISK',
+                             'RANSOMWARE_DETECTED', 'ANOMALY'],
+                    help="Minimum threat level to trigger auto-response")
+    sp.set_defaults(func=cmd_response)
+
+    sp = sub.add_parser("daemon", help="Run as a long-lived daemon")
+    sp.add_argument("--config", default=None, help="Path to JSON config file")
+    sp.add_argument("--pid", default=None,
+                    help="PID file (default: <workspace>/shield.pid)")
+    sp.add_argument("--log", default=None,
+                    help="Log file (default: <workspace>/logs/daemon.log)")
+    sp.add_argument("--path", default=None,
+                    help="Directory to watch (overrides config)")
+    sp.add_argument("--realtime", dest="realtime", action="store_true",
+                    default=None, help="Force watchdog mode")
+    sp.add_argument("--poll", dest="realtime", action="store_false",
+                    help="Force polling mode")
+    sp.add_argument("--shadow", dest="shadow", action="store_true",
+                    default=None)
+    sp.add_argument("--no-shadow", dest="shadow", action="store_false")
+    sp.add_argument("--deploy-honeypots", dest="deploy_honeypots",
+                    action="store_true", default=None)
+    sp.set_defaults(func=cmd_daemon)
+
+    sp = sub.add_parser("siem", help="Manage SIEM forwarding")
+    sp.add_argument("--config", default=None, help="JSON config file")
+    sp.add_argument("--test", action="store_true",
+                    help="Test connectivity to all targets")
+    sp.add_argument("--emit-test", action="store_true",
+                    help="Send a synthetic test event")
+    sp.set_defaults(func=cmd_siem)
+
+    sp = sub.add_parser("config-init", help="Write a starter config file")
+    sp.add_argument("--out", default="~/.shield_core.json",
+                    help="Output path")
+    sp.set_defaults(func=cmd_config_init)
+
     args = p.parse_args()
     if not args.cmd:
-        # Default: run demo
         args.shadow = False
         cmd_demo(args); return
     args.func(args)
