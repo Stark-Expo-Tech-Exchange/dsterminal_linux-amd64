@@ -4,7 +4,7 @@ Hash: SHA512
 Origin: Stark Expo Tech Exchange
 Label: DSTerminal
 Suite: stable
-Codename: stable
+Codename: DFFENEX
 Version: 4.0.0.113
 Date: $(date -R)
 Architectures: amd64 all
