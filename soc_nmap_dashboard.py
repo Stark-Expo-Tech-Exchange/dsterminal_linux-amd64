@@ -3,7 +3,7 @@
  
 """
 DSTERMINAL SOC-GRADE NMAP SCAN DASHBOARD - COMPLETE EDITION
-Hacker-style 3-Panel Layout | Real-time Scan Monitoring | AI Vulnerability Scoring
+Hacker-style 3-Panel Layout | Real-time Scan Monitoring | SHIELD_CORE - AI Vulnerability Scoring
 """
 import sys
 # ============================================================
@@ -54,6 +54,28 @@ import socket
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass, field
+
+# ---- Tile provider config ----
+TILE_PROVIDERS = {
+    "esri_dark": {
+        "url": "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+        "attr": "Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ",
+        "css_filter": "brightness(0.95) saturate(1.1) contrast(1.05)",
+    },
+    "esri_satellite": {
+        "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        "attr": "Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics",
+        "css_filter": "brightness(0.7) saturate(0.9) contrast(1.15)",
+    },
+    "maptiler_basic": {
+        "url": "https://api.maptiler.com/maps/basic/{z}/{x}/{y}.png?key=YOUR_MAPTILER_KEY_HERE",
+        "attr": "&copy; MapTiler &copy; OpenStreetMap contributors",
+        "css_filter": "brightness(0.6) saturate(0.8) contrast(1.2)",
+    },
+}
+
+# Change this one line to switch providers:
+ACTIVE_TILE_PROVIDER = "esri_satellite"
 
 # ============================================================
 # ANSI COLOR DEFINITIONS (ALWAYS AVAILABLE)
@@ -862,29 +884,21 @@ class EnhancedGeoMapVisualizer:
         """Generate interactive threat intelligence map with BLINKING lines and circles"""
         if not GEO_AVAILABLE:
             return '<div style="padding:50px;text-align:center;color:#888;">[] GeoIP module not available</div>'
-        
-        # Use OpenStreetMap ONLY - most reliable, NO API key required
+
+        # Esri World Dark Gray - no API key, no signup, genuinely dark raster tiles
         try:
+            cfg = TILE_PROVIDERS[ACTIVE_TILE_PROVIDER]
+
             m = folium.Map(
-                location=[20, 0], 
-                zoom_start=2, 
-                tiles='OpenStreetMap',
-                control_scale=True
+                location=[20, 0],
+                zoom_start=2,
+                tiles=cfg["url"],
+                attr=cfg["attr"],
+                control_scale=True,
             )
         except Exception as e:
-            # Ultimate fallback - use OpenStreetMap with a different URL
-            try:
-                m = folium.Map(
-                    location=[20, 0], 
-                    zoom_start=2, 
-                    tiles='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-                    control_scale=True
-                )
-            except:
-                # Last resort - use a simple HTML map
-                return '<div style="padding:50px;text-align:center;color:#888;">[+] Map tiles unavailable - please check internet connection</div>'
-        
+            return f'<div style="padding:50px;text-align:center;color:#888;">[+] Map init failed: {e}</div>'
+
         blink_css = """
         <style>
             body { 
@@ -893,15 +907,14 @@ class EnhancedGeoMapVisualizer:
                 padding: 0 !important;
                 min-height: 100vh !important;
             }
-            
-            /* Make OpenStreetMap darker with CSS overlay */
+
+            /* Esri dark tiles are already dark; slight tuning only */
             .leaflet-tile-pane {
-                filter: brightness(0.7) saturate(0.8) contrast(1.2);
+                filter: __TILE_FILTER__;
             }
             .leaflet-tile-pane img {
-                filter: brightness(0.7) saturate(0.8) contrast(1.2);
+                filter: __TILE_FILTER__;
             }
-            
             @keyframes blink-red { 
                 0% { opacity: 1; transform: scale(1); } 
                 50% { opacity: 0.3; transform: scale(1.4); } 
@@ -922,7 +935,7 @@ class EnhancedGeoMapVisualizer:
                 50% { opacity: 0.6; transform: scale(1.1); } 
                 100% { opacity: 1; transform: scale(1); } 
             }
-            
+
             .blink-critical { 
                 animation: blink-red 0.6s ease-in-out infinite !important; 
                 filter: drop-shadow(0 0 10px #ff0000) !important;
@@ -939,7 +952,7 @@ class EnhancedGeoMapVisualizer:
                 animation: blink-green 1.2s ease-in-out infinite !important; 
                 filter: drop-shadow(0 0 4px #00ff00) !important;
             }
-            
+
             @keyframes pulse-ring {
                 0% { transform: scale(0.8); opacity: 0.8; }
                 100% { transform: scale(2.5); opacity: 0; }
@@ -948,7 +961,7 @@ class EnhancedGeoMapVisualizer:
                 animation: pulse-ring 1.5s ease-out infinite !important; 
                 transform-origin: center;
             }
-            
+
             .leaflet-popup-content-wrapper {
                 background: rgba(10, 15, 30, 0.95) !important;
                 border: 1px solid #00ffff !important;
@@ -973,20 +986,20 @@ class EnhancedGeoMapVisualizer:
                 font-size: 18px !important;
                 font-weight: bold !important;
             }
-            
+
             .live-badge { 
                 position: fixed; top: 10px; right: 10px; background: #00ff00; color: #000; 
                 padding: 5px 12px; border-radius: 5px; font-family: monospace; font-size: 10px; 
                 z-index: 1000; animation: blink-green 1s infinite !important; font-weight: bold;
                 box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
             }
-            
+
             .marker-icon {
                 border-radius: 50% !important;
                 border: 2px solid #fff !important;
                 box-shadow: 0 0 15px rgba(0,0,0,0.5) !important;
             }
-            
+
             ::-webkit-scrollbar {
                 width: 6px;
             }
@@ -999,23 +1012,23 @@ class EnhancedGeoMapVisualizer:
             }
         </style>
         """
-        
+        blink_css = blink_css.replace("__TILE_FILTER__", cfg["css_filter"])
         m.get_root().header.add_child(folium.Element(blink_css))
         m.get_root().html.add_child(folium.Element('<div class="live-badge">[+] LIVE MONITORING ACTIVE [+]</div>'))
-        
+
         heat_data = [[loc["lat"], loc["lon"], loc["risk_score"] / 10] for loc in self.locations if loc["lat"] != 0]
         if heat_data:
             HeatMap(heat_data, radius=25, blur=15, max_zoom=6,
                 gradient={0.2: 'blue', 0.5: 'lime', 0.8: 'orange', 1: 'red'}).add_to(m)
-        
+
         valid_locations = [loc for loc in self.locations if loc["lat"] != 0]
-        
+
         if len(valid_locations) >= 2:
             for i in range(len(valid_locations) - 1):
                 loc1 = valid_locations[i]
                 loc2 = valid_locations[i + 1]
                 avg_risk = (loc1["risk_score"] + loc2["risk_score"]) / 2
-                
+
                 if avg_risk >= 7:
                     color = "#ff0000"
                 elif avg_risk >= 4:
@@ -1024,7 +1037,7 @@ class EnhancedGeoMapVisualizer:
                     color = "#ffcc00"
                 else:
                     color = "#00ff00"
-                
+
                 folium.PolyLine(
                     locations=[[loc1["lat"], loc1["lon"]], [loc2["lat"], loc2["lon"]]],
                     color=color,
@@ -1033,11 +1046,11 @@ class EnhancedGeoMapVisualizer:
                     dash_array='5, 5',
                     popup=f"Connection: {loc1['ip']} -> {loc2['ip']}<br>Risk: {avg_risk:.1f}"
                 ).add_to(m)
-        
+
         for loc in self.locations:
             if loc["lat"] == 0:
                 continue
-            
+
             risk = loc["risk_score"]
             if risk >= 7:
                 color = "#ff0000"
@@ -1067,7 +1080,7 @@ class EnhancedGeoMapVisualizer:
                 pulse_radius = 50000
                 risk_emoji = "[+]"
                 risk_label = "LOW"
-            
+
             domain = loc.get('domain', loc['ip'])
             country = loc.get('country', 'Unknown')
             city = loc.get('city', 'Unknown')
@@ -1081,14 +1094,14 @@ class EnhancedGeoMapVisualizer:
                 timestamp_str = timestamp.strftime('%Y-%m-%d %H:%M:%S')
             else:
                 timestamp_str = str(timestamp)
-            
+
             popup_html = f"""
             <div style="font-family: monospace; color: #00ff00; padding: 8px;">
                 <div style="border-bottom: 1px solid rgba(0,255,255,0.2); padding-bottom: 6px; margin-bottom: 6px;">
                     <b style="color: #00ffff; font-size: 13px;">[*] {domain}</b>
                     <span style="float: right; font-size: 11px; color: {color}; font-weight: bold;">{risk_emoji} {risk_label}</span>
                 </div>
-                
+
                 <table style="width: 100%%; border-collapse: collapse; font-size: 11px;">
                     <tr><td style="color: #888; padding: 2px 4px;">[+] Location:</td><td style="color: #ffcc00; padding: 2px 4px;">{city}, {country}</td></tr>
                     <tr><td style="color: #888; padding: 2px 4px;">[+] IP:</td><td style="color: #00ff88; padding: 2px 4px;">{loc['ip']}</td></tr>
@@ -1097,14 +1110,14 @@ class EnhancedGeoMapVisualizer:
                     <tr><td style="color: #888; padding: 2px 4px;">[+] Ports:</td><td style="color: #ff66ff; padding: 2px 4px;">{port_count}</td></tr>
                 </table>
             """
-            
+
             if org_country:
                 popup_html += f"""
                 <div style="border-top: 1px solid rgba(255,170,0,0.2); margin-top: 4px; padding-top: 4px;">
                     <span style="color: #ffaa00;">[+] HQ:</span> <span style="color: #ffcc44;">{org_country} - {org_city}</span>
                 </div>
                 """
-            
+
             if services:
                 services_str = ', '.join(services[:3])
                 if len(services) > 3:
@@ -1114,23 +1127,23 @@ class EnhancedGeoMapVisualizer:
                     <span style="color: #00ff88;">[+] Services:</span> <span style="color: #88ddff; font-size: 10px;">{services_str}</span>
                 </div>
                 """
-            
+
             if loc.get('server_country') and loc.get('server_country') != org_country:
                 popup_html += f"""
                 <div style="border-top: 1px solid rgba(255,102,0,0.2); margin-top: 4px; padding-top: 4px;">
                     <span style="color: #ff6600;">[+] Server:</span> <span style="color: #ff9966;">{loc.get('server_city', 'Unknown')}, {loc.get('server_country', 'Unknown')}</span>
                 </div>
                 """
-            
+
             popup_html += f"""
                 <div style="border-top: 1px solid rgba(255,255,255,0.05); margin-top: 4px; padding-top: 4px; font-size: 9px; color: #666;">
                     [+] {timestamp_str}
                 </div>
             </div>
             """
-            
+
             popup = folium.Popup(popup_html, max_width=450)
-            
+
             icon_html = f"""
             <div style="
                 width: {radius * 2 + 6}px;
@@ -1150,7 +1163,7 @@ class EnhancedGeoMapVisualizer:
                 <span style="font-size: 12px;">{risk_emoji}</span>
             </div>
             """
-            
+
             folium.Marker(
                 location=[loc["lat"], loc["lon"]],
                 popup=popup,
@@ -1160,7 +1173,7 @@ class EnhancedGeoMapVisualizer:
                     html=icon_html
                 )
             ).add_to(m)
-            
+
             folium.CircleMarker(
                 location=[loc["lat"], loc["lon"]],
                 radius=radius + 2,
@@ -1171,7 +1184,7 @@ class EnhancedGeoMapVisualizer:
                 weight=1,
                 className=blink_class
             ).add_to(m)
-            
+
             folium.CircleMarker(
                 location=[loc["lat"], loc["lon"]],
                 radius=radius + 6,
@@ -1181,7 +1194,7 @@ class EnhancedGeoMapVisualizer:
                 fill_opacity=0.08,
                 weight=1
             ).add_to(m)
-            
+
             if risk >= 4:
                 folium.Circle(
                     location=[loc["lat"], loc["lon"]],
@@ -1193,14 +1206,14 @@ class EnhancedGeoMapVisualizer:
                     className="pulse-ring",
                     popup=f"[!] Active Threat Zone - Risk: {risk}/10"
                 ).add_to(m)
-        
+
         if len(valid_locations) >= 2:
             for i in range(len(valid_locations)):
                 for j in range(i + 1, len(valid_locations)):
                     loc1 = valid_locations[i]
                     loc2 = valid_locations[j]
                     dist_risk = (loc1["risk_score"] + loc2["risk_score"]) / 2
-                    
+
                     if dist_risk >= 7:
                         line_color = "#ff0000"
                         weight = 2
@@ -1213,7 +1226,7 @@ class EnhancedGeoMapVisualizer:
                     else:
                         line_color = "#00ff00"
                         weight = 1
-                    
+
                     folium.PolyLine(
                         locations=[[loc1["lat"], loc1["lon"]], [loc2["lat"], loc2["lon"]]],
                         color=line_color,
@@ -1222,7 +1235,7 @@ class EnhancedGeoMapVisualizer:
                         dash_array='8, 6',
                         popup=f"Network Link<br>{loc1['ip']} <-> {loc2['ip']}<br>Risk: {dist_risk:.1f}"
                     ).add_to(m)
-        
+
         legend_html = '''
         <div style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; background: rgba(0,0,0,0.85); padding: 10px; border-radius: 8px; border: 1px solid #00ff00; font-family: monospace; font-size: 9px; min-width: 140px;">
             <b style="color: #00ff00;">[+] THREAT LEGEND</b><br>
@@ -1237,8 +1250,9 @@ class EnhancedGeoMapVisualizer:
         </div>
         '''
         m.get_root().html.add_child(folium.Element(legend_html))
-        
+
         return m._repr_html_()
+
 
 class InteractiveSOCDashboard:
     def __init__(self):
@@ -2456,8 +2470,8 @@ class InteractiveSOCDashboard:
     </head>
     <body>
         <div class="header">
-            <h1>[+] DSTERMINAL CYBER-OPS NETWORK TOPOLOGY MAPPING [+]</h1>
-            <div>Network Intelligence | AI Vulnerability Scoring | Real-time Threat Detection</div>
+            <h1>[+] DSTERMINAL HOST PHYSICAL GEOLOCATION INTELLIGENCE [+]</h1>
+            <div>Network Intelligence | SHIELD_CORE - AI Vulnerability Scoring | Real-time Threat Detection</div>
             <div class="blink" style="color: #00ff00; font-size: 11px; margin-top: 5px;">[+] FULL INTELLIGENCE DASHBOARD - DUAL LOCATION TRACKING [+]</div>
             <div style="font-size: 10px; color: #ffaa00; margin-top: 3px;">[+] Organization Headquarters + [+] Server/Cloud Locations</div>
         </div>
@@ -2504,7 +2518,7 @@ class InteractiveSOCDashboard:
         </div>
         
         <div class="footer">
-            DSTerminal Enterprise SOC Platform | Powered by AI Vulnerability Scoring | Threat Intelligence Active
+            DSTerminal Enterprise SOC Platform | Powered by SHIELD_CORE - AI Vulnerability Scoring | Threat Intelligence Active
             <br>[+] DSTerminal autogenerated report | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
             <br><span style="color: {RiskColors.HTML_LOW};">[+] GEOLOCATION: IP-API.COM</span> | <span style="color: #ffaa00;">[+] ORGANIZATION HEADQUARTERS</span> | <span style="color: {RiskColors.HTML_HIGH};">[+] SERVER LOCATIONS</span> | [+] REAL-TIME MONITORING ACTIVE [+]
         </div>
@@ -2710,7 +2724,7 @@ class InteractiveSOCDashboard:
     <body>
         <div class="header">
             <h1>[+] DSTERMINAL CYBER-OPS NETWORK TOPOLOGY MAPPING [+]</h1>
-            <div>Network Intelligence | AI Vulnerability Scoring | Real-time Threat Detection</div>
+            <div>Network Intelligence | SHIELD_CORE - AI Vulnerability Scoring | Real-time Threat Detection</div>
             <div class="blink" style="color: #00ff00; font-size: 11px; margin-top: 5px;">[+] FULL INTELLIGENCE DASHBOARD - DUAL LOCATION TRACKING [+]</div>
             <div style="font-size: 10px; color: #ffaa00; margin-top: 3px;">[+] Organization Headquarters + [+] Server/Cloud Locations</div>
         </div>
@@ -2757,7 +2771,7 @@ class InteractiveSOCDashboard:
         </div>
         
         <div class="footer">
-            DSTerminal Enterprise SOC Platform | Powered by AI Vulnerability Scoring | Threat Intelligence Active
+            DSTerminal Enterprise SOC Platform | Powered by SHIELD_CORE - AI Vulnerability Scoring | Threat Intelligence Active
             <br>[+] DSTerminal autogenerated report | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
             <br><span style="color: {RiskColors.HTML_LOW};">[+] GEOLOCATION: IP-API.COM</span> | <span style="color: #ffaa00;">[+] ORGANIZATION HEADQUARTERS</span> | <span style="color: {RiskColors.HTML_HIGH};">[+] SERVER LOCATIONS</span> | [+] REAL-TIME MONITORING ACTIVE [+]
         </div>
